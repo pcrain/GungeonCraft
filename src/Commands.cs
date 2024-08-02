@@ -28,13 +28,23 @@ public class Commands
         // Shader tests
         ETGModConsole.Commands.AddGroup("shiny", delegate (string[] args)
         {
-            ETGModConsole.Log($"testing custom shader");
-            // CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.sprite, delay: 1.0f);
-            // CwaffShaders.Digitize(GameManager.Instance.PrimaryPlayer.CurrentGun.sprite, delay: 1.0f);
             tk2dBaseSprite s = GameManager.Instance.PrimaryPlayer.sprite;
+            SpriteOutlineManager.RemoveOutlineFromSprite(s);
             s.usesOverrideMaterial = true;
             Material m = s.renderer.material;
-            m.shader = CwaffShaders.GoldShader;
+            m.shader = CwaffShaders.EmissiveAlphaShader;
+            // m.SetFloat("_EmissivePower", 50f);
+            // m.SetFloat("_Fade", 0.01f);
+            float power = 100f;
+            if (args.Length >= 1)
+                power = float.Parse(args[0]);
+            float alpha = 0.5f;
+            if (args.Length >= 2)
+                alpha = float.Parse(args[1]);
+
+            ETGModConsole.Log($"testing custom shader power {power} alpha {alpha}");
+            m.SetFloat("_EmissivePower", power);
+            m.SetFloat("_Fade", alpha);
         });
         ETGModConsole.Commands.AddGroup("shader", delegate (string[] args)
         {

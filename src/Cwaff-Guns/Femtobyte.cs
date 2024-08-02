@@ -139,6 +139,8 @@ public class Femtobyte : CwaffGun
     private Material _placementMaterial = null;
     internal int _currentSlot = 0;
     internal bool _displayNameDirty = false;
+    internal string _lastEnemyKilled = null;
+    internal string _lastEnemyName = null;
     private bool _suppressNextClick = false;
 
     public static void Init()
@@ -173,6 +175,9 @@ public class Femtobyte : CwaffGun
     {
         if (enemy.healthHaver is not HealthHaver hh || hh.IsDead || hh.IsBoss || hh.IsSubboss)
             return false;
+        this._lastEnemyKilled = enemy.EnemyGuid;
+        this._lastEnemyName = EnemyDatabase.GetOrLoadByGuid(this._lastEnemyKilled).ActorName;
+        this._displayNameDirty = true;
         if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_FEMTOBYTE))
             if (DigitizedObject.FromEnemyGuid(enemy.EnemyGuid) is DigitizedObject d)
                 SetCurrentSlot(d);
@@ -743,6 +748,13 @@ public class Femtobyte : CwaffGun
             if (this._femto._displayNameDirty || this._cachedDisplayName.IsNullOrWhiteSpace())
             {
                 _SB.Length = 0;
+                if (this._owner.HasSynergy(Synergy.LOOKUP_TABLE) && this._femto._lastEnemyName != null)
+                {
+                    _SB.Append("[color #dd6666]");
+                    _SB.Append(this._femto._lastEnemyName);
+                    _SB.Append("[/color]");
+                    _SB.Append("\n");
+                }
                 _SB.Append(this._femto.GetTitleForCurrentSlot());
                 _SB.Append("\n");
                 for (int i = 0; i < _MAX_SLOTS; ++i)
@@ -795,9 +807,15 @@ public class FemtobyteProjectile : MonoBehaviour
             m.SetFloat("_Emission", 10f);
     }
 
-    private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
+    private void OnHitEnemy(Projectile p, SpeculativeRigidbody body, bool killed)
     {
-        Femtobyte.SpawnBitBurst(enemy.UnitCenter, Mathf.Min((int)p.baseData.damage, 30));
+        Femtobyte.SpawnBitBurst(body.UnitCenter, Mathf.Min((int)p.baseData.damage, 30));
+        if (body.gameObject.GetComponent<AIActor>() is not AIActor enemy)
+            return;
+        if (!this._femtobyte || enemy.EnemyGuid == null || enemy.EnemyGuid != this._femtobyte._lastEnemyKilled)
+            return;
+        if (this._femtobyte.PlayerOwner is PlayerController player && player.HasSynergy(Synergy.LOOKUP_TABLE))
+            this.OnWillKillEnemy(p, body);
     }
 
     private void OnWillKillEnemy(Projectile proj, SpeculativeRigidbody enemy)

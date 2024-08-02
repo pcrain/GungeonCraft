@@ -489,7 +489,7 @@ public class BilliardBall : MonoBehaviour
             this._projectile.baseData.speed = this._baseSpeed;
             this._projectile.UpdateSpeed();
             this._projectile.SendInDirection(this._failsafeLaunchAngle.ToVector(), true);
-            ETGModConsole.Log($"did failsafe launch at angle {this._failsafeLaunchAngle} with speed {this._baseSpeed}");
+            Lazy.DebugLog($"did failsafe launch at angle {this._failsafeLaunchAngle} with speed {this._baseSpeed}");
             return;
         }
 

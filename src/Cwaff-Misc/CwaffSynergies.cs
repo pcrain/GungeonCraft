@@ -91,6 +91,8 @@ public static class CwaffSynergies
         NewSynergy(BIONIC_COMMANDO, "Bionic Commando", new[]{IName(BionicFinger.ItemName), "grappling_hook"});
         // Every blank used in a shop gives a 10% discount.
         NewSynergy(BLANK_EXPRESSION, "Blank Expression", new[]{IName(BlankChecks.ItemName), "disarming_personality"});
+        // Femtobyte's projectiles instantly kill any enemy of the last type killed by Femtobyte.
+        NewSynergy(LOOKUP_TABLE, "Lookup Table", new[]{IName(Femtobyte.ItemName), "portable_table_device"});
       #endregion
 
       #region Masteries
@@ -402,6 +404,7 @@ public enum Synergy {
     BANK_SHOTS,
     BIONIC_COMMANDO,
     BLANK_EXPRESSION,
+    LOOKUP_TABLE,
 
     // Masteries
     MASTERY_GRANDMASTER,
