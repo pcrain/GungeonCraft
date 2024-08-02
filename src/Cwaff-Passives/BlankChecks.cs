@@ -29,17 +29,12 @@ public class BlankChecks : CwaffPassive
         player.OnUsedBlank += this.OnUsedBlank;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.OnUsedBlank -= this.OnUsedBlank;
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            this.Owner.OnUsedBlank -= this.OnUsedBlank;
-        base.OnDestroy();
     }
 
     private void OnUsedBlank(PlayerController player, int remainingBlanks)

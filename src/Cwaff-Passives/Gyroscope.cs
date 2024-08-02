@@ -44,22 +44,17 @@ public class Gyroscope : CwaffPassive
         player.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
-        this._dodgeRoller.AbortDodgeRoll();
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            this.Owner.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
         if (this._dodgeRoller)
-            _dodgeRoller.AbortDodgeRoll();
-        base.OnDestroy();
+            this._dodgeRoller.AbortDodgeRoll();
     }
 }
+
 public class GyroscopeRoll : CustomDodgeRoll
 {
     const float MAX_DASH_TIME  = 4.0f;     // Max time we spend dashing

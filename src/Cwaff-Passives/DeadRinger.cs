@@ -40,21 +40,13 @@ public class DeadRinger : CwaffPassive
         player.OnReceivedDamage += this.OnReceivedDamage;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.OnReceivedDamage -= this.OnReceivedDamage;
         BreakStealth(player);
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-        {
-            this.Owner.OnReceivedDamage -= this.OnReceivedDamage;
-            BreakStealth(this.Owner);
-        }
-        base.OnDestroy();
     }
 
     private void OnReceivedDamage(PlayerController player)

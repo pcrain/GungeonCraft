@@ -50,21 +50,13 @@ public class JohnsWick : CwaffPassive
         player.healthHaver.damageTypeModifiers.AddUnique(this._fireResistance);
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.PostProcessProjectile -= this.PostProcessProjectile;
         player.healthHaver.damageTypeModifiers.TryRemove(this._fireResistance);
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-        {
-            this.Owner.PostProcessProjectile -= this.PostProcessProjectile;
-            this.Owner.healthHaver.damageTypeModifiers.TryRemove(this._fireResistance);
-        }
-        base.OnDestroy();
     }
 
     private void PostProcessProjectile(Projectile proj, float effectChanceScalar)

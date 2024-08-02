@@ -46,21 +46,13 @@ public class Blazer : CwaffPassive
         player.OnEnteredCombat += this.OnEnteredCombat;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.OnEnteredCombat -= this.OnEnteredCombat;
         RemoveBoosts(player);
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-        {
-            this.Owner.OnEnteredCombat -= this.OnEnteredCombat;
-            RemoveBoosts(this.Owner);
-        }
-        base.OnDestroy();
     }
 
     private void OnEnteredCombat()

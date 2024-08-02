@@ -27,17 +27,12 @@ public class VoodooDoll : CwaffPassive
         player.OnDealtDamageContext += this.OnDealtDamage;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.OnDealtDamageContext -= this.OnDealtDamage;
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            this.Owner.OnDealtDamageContext -= this.OnDealtDamage;
-        base.OnDestroy();
     }
 
     private void OnDealtDamage(PlayerController source, float damage, bool fatal, HealthHaver enemy)

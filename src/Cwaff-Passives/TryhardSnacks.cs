@@ -24,17 +24,12 @@ public class TryhardSnacks : CwaffPassive
         player.PostProcessProjectile += PostProcessProjectile;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.PostProcessProjectile -= PostProcessProjectile;
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            this.Owner.PostProcessProjectile -= PostProcessProjectile;
-        base.OnDestroy();
     }
 
     private static void PostProcessProjectile(Projectile proj, float effectChanceScalar)

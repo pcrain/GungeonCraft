@@ -30,18 +30,13 @@ public class ComfySlippers : CwaffPassive
         };
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         this._lastFloorType = CellVisualData.CellFloorType.Stone;
         SetComfiness(false);
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        this._lastFloorType = CellVisualData.CellFloorType.Stone;
-        SetComfiness(false);
-        base.OnDestroy();
     }
 
     public override void Update()

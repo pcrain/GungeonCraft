@@ -21,17 +21,12 @@ public class UtilityVest : CwaffPassive
         player.healthHaver.ModifyDamage += this.OnTakeDamage;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.healthHaver.ModifyDamage -= this.OnTakeDamage;
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            this.Owner.healthHaver.ModifyDamage -= this.OnTakeDamage;
-        base.OnDestroy();
     }
 
     private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)

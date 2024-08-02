@@ -41,22 +41,17 @@ public class CreditCard : CwaffPassive
         base.Pickup(player);
         player.healthHaver.ModifyDamage += this.OnTakeDamage;
         oldCurrency = _BASE_CREDIT;
-        GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency += _BASE_CREDIT;
+        player.carriedConsumables.Currency += _BASE_CREDIT;
         UpdateCreditScore();
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
-        GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency -= _BASE_CREDIT;
+        base.DisableEffect(player);
+        if (!player)
+            return;
+        player.carriedConsumables.Currency -= _BASE_CREDIT;
         player.healthHaver.ModifyDamage -= this.OnTakeDamage;
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            this.Owner.healthHaver.ModifyDamage -= this.OnTakeDamage;
-        base.OnDestroy();
     }
 
     private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)

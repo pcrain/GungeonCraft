@@ -27,17 +27,12 @@ public class EchoChamber : CwaffPassive
         player.PostProcessProjectile += this.PostProcessProjectile;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.PostProcessProjectile -= this.PostProcessProjectile;
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            this.Owner.PostProcessProjectile -= this.PostProcessProjectile;
-        base.OnDestroy();
     }
 
     private void PostProcessProjectile(Projectile proj, float effectChanceScalar)

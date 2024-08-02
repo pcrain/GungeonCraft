@@ -44,25 +44,15 @@ public class WeddingRing : CwaffPassive
         player.OnKilledEnemy += this.OnKilledEnemy;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.OnKilledEnemy -= this.OnKilledEnemy;
         player.PostProcessProjectile -= this.PostProcessProjectile;
         player.OnPreFireProjectileModifier -= this.ChanceToRefundAmmo;
         UpdateCommitmentStats(player, reset: true);
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-        {
-            this.Owner.OnKilledEnemy -= this.OnKilledEnemy;
-            this.Owner.PostProcessProjectile -= this.PostProcessProjectile;
-            this.Owner.OnPreFireProjectileModifier -= this.ChanceToRefundAmmo;
-            UpdateCommitmentStats(this.Owner, reset: true);
-        }
-        base.OnDestroy();
     }
 
     private void UpdateCommitmentStats(PlayerController player, bool reset = false)

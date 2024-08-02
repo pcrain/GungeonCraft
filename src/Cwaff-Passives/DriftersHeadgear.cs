@@ -56,21 +56,14 @@ public class DriftersHeadgear : CwaffPassive
         player.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
-        this._dodgeRoller.AbortDodgeRoll();
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
         if (this._dodgeRoller)
-        {
-            this._dodgeRoller.owner.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
             this._dodgeRoller.AbortDodgeRoll();
-        }
-        base.OnDestroy();
     }
 }
 

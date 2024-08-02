@@ -77,21 +77,13 @@ public class WarriorsGi : CwaffPassive
         };
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.healthHaver.OnDamaged -= this.OnDamaged;
         player.healthHaver.OnHealthChanged -= this.OnHealthChanged;
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-        {
-            this.Owner.healthHaver.OnDamaged -= this.OnDamaged;
-            this.Owner.healthHaver.OnHealthChanged -= this.OnHealthChanged;
-        }
-        base.OnDestroy();
     }
 
     private void OnHealthChanged(float resultValue, float maxValue)

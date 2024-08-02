@@ -66,17 +66,12 @@ public class CampingSupplies : CwaffPassive
         ResetStats(player);
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         ResetStats(player);
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            ResetStats(this.Owner);
-        base.OnDestroy();
     }
 
     public override void Update()

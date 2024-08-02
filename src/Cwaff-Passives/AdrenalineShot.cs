@@ -123,20 +123,15 @@ public class AdrenalineShot : CwaffPassive
             player.healthHaver.ModifyDamage += this.OnTakeDamage;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         if (this._adrenalineActive)
             DeactivateAdrenaline(); // shouldn't ever be able to happen, but just in case
         if (!player.ForceZeroHealthState)
             player.healthHaver.ModifyDamage -= this.OnTakeDamage;
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner && !this.Owner.ForceZeroHealthState)
-            this.Owner.healthHaver.ModifyDamage -= this.OnTakeDamage;
-        base.OnDestroy();
     }
 
     public override void Update()

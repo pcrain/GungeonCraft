@@ -34,17 +34,12 @@ public class AstralProjector : CwaffPassive
         player.specRigidbody.OnPreTileCollision += this.OnPreTileCollision;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
+        if (!player)
+            return;
         player.specRigidbody.OnPreTileCollision -= this.OnPreTileCollision;
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            this.Owner.specRigidbody.OnPreTileCollision -= this.OnPreTileCollision;
-        base.OnDestroy();
     }
 
     private static PrototypeDungeonRoom.RoomCategory[] _BannedRoomTypes = {

@@ -130,23 +130,15 @@ public class LibraryCardtridge : CwaffPassive
         ETGMod.AIActor.OnPreStart += this.OnEnemySpawn;
     }
 
-    public override DebrisObject Drop(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
+        base.DisableEffect(player);
         ETGMod.AIActor.OnPreStart -= this.OnEnemySpawn;
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.MakeBooksFree;
+        NoMoreFreeBooks();
+        if (!player)
+            return;
         player.OnEnteredCombat -= this.OnEnteredCombat;
-        GameManager.Instance.OnNewLevelFullyLoaded -= this.MakeBooksFree;
-        NoMoreFreeBooks();
-        return base.Drop(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.Owner)
-            this.Owner.OnEnteredCombat -= this.OnEnteredCombat;
-        ETGMod.AIActor.OnPreStart -= this.OnEnemySpawn;
-        GameManager.Instance.OnNewLevelFullyLoaded -= this.MakeBooksFree;
-        NoMoreFreeBooks();
-        base.OnDestroy();
     }
 
     private void MakeBooksFree()
