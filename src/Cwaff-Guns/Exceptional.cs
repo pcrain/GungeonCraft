@@ -97,10 +97,6 @@ public class Exceptional : CwaffGun
         var d = player.GetComponent<Exceptional>().debris; // throws a null reference exception
     }
 
-    public override void OnPlayerPickup(PlayerController player)
-    {
-    }
-
     public void AdjustGunShader(bool isOn)
     {
         this.gun.sprite.usesOverrideMaterial = isOn;
