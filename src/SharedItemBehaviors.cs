@@ -1723,22 +1723,14 @@ public static class Replicant
         replicant.IgnoreForRoomClear = true;
         replicant.IsHarmlessEnemy = true;
         replicant.ApplyEffect(AlienNailgun._Charm);
-        shaderFunc(replicant.sprite);
         if (replicant.GetComponent<SpawnEnemyOnDeath>() is SpawnEnemyOnDeath seod)
             seod.chanceToSpawn = 0.0f; // prevent enemies such as Blobulons from replicating on death
         if (replicant.healthHaver is HealthHaver hh)
             hh.PreventAllDamage = true; // can't be harmed normally (exceptions for, e.g., Pinhead or Nitra self-detonation)
         if (replicant.knockbackDoer is KnockbackDoer kb)
             kb.SetImmobile(true, "replicant"); // can't be knocked back
-        if (replicant.CurrentGun is Gun gun)
-            shaderFunc(gun.sprite);
-        for (int i = 0; i < replicant.transform.childCount; ++i)
-        {
-            Transform child = replicant.transform.GetChild(i);
-            if (child.GetComponent<tk2dSprite>() is not tk2dSprite sprite)
-                continue;
-            shaderFunc(sprite);
-        }
+
+        replicant.ApplyShader(shaderFunc, true, true);
         return replicant;
     }
 }

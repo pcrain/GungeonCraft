@@ -511,9 +511,9 @@ public static class Lazy
     }
 
     /// <summary>Determine position of the nearest enemy to position start</summary>
-    public static Vector2? NearestEnemyPos(Vector2 start, float coneAngle, bool useNearestAngleInsteadOfDistance = false, bool ignoreWalls = false)
+    public static Vector2? NearestEnemyPos(Vector2 start, bool useNearestAngleInsteadOfDistance = false, bool ignoreWalls = false)
     {
-        return NearestEnemyPosWithinConeOfVision(start: start, coneAngle: coneAngle, maxDeviation: 360f,
+        return NearestEnemyPosWithinConeOfVision(start: start, coneAngle: 0f, maxDeviation: 360f,
             useNearestAngleInsteadOfDistance: useNearestAngleInsteadOfDistance, ignoreWalls: ignoreWalls);
     }
 

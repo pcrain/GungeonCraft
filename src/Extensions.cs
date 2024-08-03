@@ -2444,4 +2444,16 @@ public static class Extensions
       return _EnemyNames[guid] = entry.PrimaryDisplayName;
     return _EnemyNames[guid] = StringTableManager.GetEnemiesString(entry.PrimaryDisplayName);
   }
+
+  /// <summary>Apply a shader to an enemy using a specific shader function</summary>
+  public static void ApplyShader(this AIActor enemy, Action<tk2dBaseSprite> shaderFunc, bool includeHands = true, bool includeGun = false)
+  {
+    shaderFunc(enemy.sprite);
+    if (includeGun && enemy.CurrentGun is Gun gun)
+      shaderFunc(gun.sprite);
+    if (includeHands)
+      for (int i = 0; i < enemy.transform.childCount; ++i)
+        if (enemy.transform.GetChild(i).GetComponent<tk2dSprite>() is tk2dSprite sprite)
+          shaderFunc(sprite);
+  }
 }
