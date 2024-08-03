@@ -182,7 +182,7 @@ public class Natascha : CwaffGun
                 return;
 
             cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
-            cursor.Emit(OpCodes.Ldfld, AccessTools.GetDeclaredFields(ot).Find(f => f.Name == "$this")); // load actual "$this" field
+            cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
             cursor.Emit(OpCodes.Call, typeof(Natascha).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
             cursor.Emit(OpCodes.Mul);  // multiply the additional natascha rate of fire by fireMultiplier
 
@@ -193,7 +193,7 @@ public class Natascha : CwaffGun
 
             // // load the gun itself onto the stack and call our fire speed
             // cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
-            // cursor.Emit(OpCodes.Ldfld, AccessTools.GetDeclaredFields(ot).Find(f => f.Name == "$this")); // load actual "$this" field
+            // cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
             // cursor.Emit(OpCodes.Call, typeof(Natascha).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
         }
     }

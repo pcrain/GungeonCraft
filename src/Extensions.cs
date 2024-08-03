@@ -1862,15 +1862,24 @@ public static class Extensions
   }
 
   /// <summary>Retrieves a field from within an enumerator</summary>
-  private static Regex rx_enum_field = new Regex(@"^<(.*)>__[0-9]+$", RegexOptions.Compiled);
-  public static string GetEnumeratorField(this Type t, string s)
+  private static Regex rx_enum_field = new Regex(@"^<?([^>]+)(>__[0-9]+)?$", RegexOptions.Compiled);
+  public static FieldInfo GetEnumeratorField(this Type t, string s)
   {
       return AccessTools.GetDeclaredFields(t).Find(f => {
+          // ETGModConsole.Log($"{f.Name}");
           foreach (Match match in rx_enum_field.Matches(f.Name))
+          {
+            // ETGModConsole.Log($"  {match.Groups[1].Value}");
             if (match.Groups[1].Value == s)
               return true;
+          }
           return false;
-      }).Name;
+      });
+  }
+
+  public static string GetEnumeratorFieldName(this Type t, string s)
+  {
+      return t.GetEnumeratorField(s).Name;
   }
 
   /// <summary>Yoinked from Spapi, need to refactor later</summary>

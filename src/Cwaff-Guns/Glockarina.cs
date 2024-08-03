@@ -82,7 +82,7 @@ public class Glockarina : CwaffGun
         {
             ILCursor cursor = new ILCursor(il);
             Type ot = original.DeclaringType;
-            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld(ot, ot.GetEnumeratorField("displayTime"))))
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld(ot, ot.GetEnumeratorFieldName("displayTime"))))
                 return; // play our sound right before we begin the item display countdown
             cursor.Emit(OpCodes.Call, typeof(Glockarina).GetMethod("OnChestOpen", BindingFlags.Static | BindingFlags.NonPublic));
         }

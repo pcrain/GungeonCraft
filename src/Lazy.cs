@@ -993,4 +993,17 @@ public static class Lazy
     {
         return AtlasHelper.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
     }
+
+    private const int _RANDOM_STRING_LENGTH = 10;
+    private const int _MAX_CACHED_RANDOM_STRINGS = 100;
+    private static List<string> _RandomStrings = new(_MAX_CACHED_RANDOM_STRINGS);
+    /// <summary>Generate a random 10-character string from a GUID</summary>
+    public static string GenRandomCorruptedString()
+    {
+        if (_RandomStrings.Count >= _MAX_CACHED_RANDOM_STRINGS)
+            return _RandomStrings[UnityEngine.Random.Range(0, _MAX_CACHED_RANDOM_STRINGS)];
+        string s = $"[color #dd6666]{Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, _RANDOM_STRING_LENGTH)}[/color]";
+        _RandomStrings.Add(s);
+        return s;
+    }
 }

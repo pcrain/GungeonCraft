@@ -140,7 +140,7 @@ public static class CwaffTweaks
             {
                 ILCursor cursor = new ILCursor(il);
                 Type ot = original.DeclaringType;
-                string sellPriceFieldName = ot.GetEnumeratorField("sellPrice");
+                string sellPriceFieldName = ot.GetEnumeratorFieldName("sellPrice");
                 if (!cursor.TryGotoNext(MoveType.After, // move after the block forcing the price to 3 for excldued items
                     instr => instr.MatchLdcI4(3),
                     instr => instr.MatchStfld(ot, sellPriceFieldName)))

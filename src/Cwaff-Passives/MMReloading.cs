@@ -52,7 +52,7 @@ public class MMReloading : CwaffPassive
 
             cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
             // load actual Gun from "$this" field
-            cursor.Emit(OpCodes.Ldfld, AccessTools.GetDeclaredFields(original.DeclaringType).Find(f => f.Name == "$this"));
+            cursor.Emit(OpCodes.Ldfld, original.DeclaringType.GetEnumeratorField("$this"));
             cursor.Emit(OpCodes.Call, typeof(MMReloading).GetMethod("ModifyReloadSpeedIfIdle", BindingFlags.Static | BindingFlags.NonPublic));
             cursor.Emit(OpCodes.Mul);  // multiply deltatime by the steady hands reload factor
         }
@@ -72,7 +72,7 @@ public class MMReloading : CwaffPassive
 
             cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
             // load actual GameUIReloadBarController from "$this" field
-            cursor.Emit(OpCodes.Ldfld, AccessTools.GetDeclaredFields(original.DeclaringType).Find(f => f.Name == "$this"));
+            cursor.Emit(OpCodes.Ldfld, original.DeclaringType.GetEnumeratorField("$this"));
             cursor.Emit(OpCodes.Call, typeof(MMReloading).GetMethod("ModifyVisualReloadSpeedIfIdle", BindingFlags.Static | BindingFlags.NonPublic));
             cursor.Emit(OpCodes.Mul);  // multiply deltatime by the steady hands reload factor
         }

@@ -252,6 +252,7 @@ public class Initialisation : BaseUnityPlugin
                 Telefragger.Init();
                 English.Init();
                 Femtobyte.Init();
+                Exceptional.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

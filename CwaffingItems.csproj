@@ -179,6 +179,7 @@
     <Compile Include="src\Cwaff-Guns\Blackjack.cs"/>
     <Compile Include="src\Cwaff-Guns\Femtobyte.cs"/>
     <Compile Include="src\Cwaff-Guns\Vladimir.cs"/>
+    <Compile Include="src\Cwaff-Guns\Exceptional.cs"/>
     <Compile Include="src\Cwaff-Guns\Zag.cs"/>
     <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>
     <Compile Include="src\Cwaff-Guns\SeltzerPelter.cs"/>
