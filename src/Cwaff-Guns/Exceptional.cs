@@ -1,7 +1,8 @@
 ﻿namespace CwaffingTheGungy;
 
 /* TODO:
-    - don't apply these specific harmony patches until the gun is created, since they're kind of laggy
+    - make the gun actually spawn when there's 64-1000 errors
+
 */
 
 public class Exceptional : CwaffGun
@@ -21,11 +22,11 @@ public class Exceptional : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Exceptional>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
-            gun.SetAttributes(quality: ItemQuality.SPECIAL, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 80, shootFps: 30, reloadFps: 40,
+            gun.SetAttributes(quality: ItemQuality.SPECIAL, gunClass: CwaffGunClass.UTILITY, reloadTime: 0f, ammo: 80, shootFps: 30, reloadFps: 40,
               muzzleFrom: Items.Mailbox, fireAudio: "corruption_sound", banFromBlessedRuns: true, infiniteAmmo: true, modulesAreTiers: true);
 
         Projectile proj = gun.InitProjectile(GunData.New(sprite: "exceptional_projectile", clipSize: 32, cooldown: 0.33f, shootStyle: ShootStyle.Burst,
-            angleVariance: 10f, damage: 5.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f)).Attach<ExceptionalProjectile>();
+            angleVariance: 10f, damage: 4.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f)).Attach<ExceptionalProjectile>();
 
         //NOTE: vanilla modulesAreTiers does NOT play nicely with burst weapons and continues firing sometimes long after you release the fire button.
         //      i think this has to do with the flag3 variable in HandleInitialGunShoot(), but i have no desire to muck with it
@@ -48,8 +49,32 @@ public class Exceptional : CwaffGun
         Application.logMessageReceived += Exceptionalizationizer;
     }
 
+    /// <summary>Manually initialize some Harmony patches at runtime if the gun ever gets instantiated, since they're a bit heavy-handed</summary>
+    public static void InitRuntimePatches()
+    {
+        Harmony harmony = Initialisation._Harmony;
+        BindingFlags anyFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+        harmony.Patch(typeof(AmmonomiconPageRenderer).GetMethod(nameof(AmmonomiconPageRenderer.SetRightDataPageTexts), bindingAttr: anyFlags),
+          postfix: new HarmonyMethod(typeof(CorruptAmmonomiconPatch).GetMethod("Postfix", bindingAttr: anyFlags)));
+
+        harmony.Patch(typeof(EncounterTrackable).GetMethod(nameof(EncounterTrackable.GetModifiedDisplayName), bindingAttr: anyFlags),
+          postfix: new HarmonyMethod(typeof(CorruptDisplayNamePatch).GetMethod("Postfix", bindingAttr: anyFlags)));
+
+        harmony.Patch(
+          original: AccessTools.EnumeratorMoveNext(
+            typeof(UINotificationController).GetMethod(nameof(UINotificationController.HandleNotification), bindingAttr: anyFlags)),
+          ilmanipulator: new HarmonyMethod(typeof(CorruptNotificationPatch).GetMethod("CorruptNotificationIL", bindingAttr: anyFlags)));
+    }
+
+    private static bool _DidRuntimePatches = false;
     private void Start()
     {
+        if (!_DidRuntimePatches)
+        {
+            InitRuntimePatches();
+            _DidRuntimePatches = true;
+        }
         AdjustGunShader(true);
     }
 
@@ -67,6 +92,8 @@ public class Exceptional : CwaffGun
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
+        if (!C.DEBUG_BUILD)
+            return; // don't throw exceptions in release builds
         var d = player.GetComponent<Exceptional>().debris; // throws a null reference exception
     }
 
@@ -184,11 +211,9 @@ public class ExceptionalProjectile : MonoBehaviour
     }
 }
 
-[HarmonyPatch(typeof(UINotificationController), nameof(UINotificationController.HandleNotification), MethodType.Enumerator)]
 static class CorruptNotificationPatch
 {
-    [HarmonyILManipulator]
-    private static void PatchNameIL(ILContext il, MethodBase original)
+    private static void CorruptNotificationIL(ILContext il, MethodBase original)
     {
         ILCursor cursor = new ILCursor(il);
         Type ot = original.DeclaringType;
@@ -224,7 +249,6 @@ static class CorruptNotificationPatch
     }
 }
 
-[HarmonyPatch(typeof(AmmonomiconPageRenderer), nameof(AmmonomiconPageRenderer.SetRightDataPageTexts))]
 static class CorruptAmmonomiconPatch
 {
     static void Postfix(AmmonomiconPageRenderer __instance, tk2dBaseSprite sourceSprite, EncounterDatabaseEntry linkedTrackable)
@@ -264,7 +288,6 @@ static class CorruptAmmonomiconPatch
     }
 }
 
-[HarmonyPatch(typeof(EncounterTrackable), nameof(EncounterTrackable.GetModifiedDisplayName))]
 static class CorruptDisplayNamePatch
 {
     static void Postfix(EncounterTrackable __instance, ref string __result)

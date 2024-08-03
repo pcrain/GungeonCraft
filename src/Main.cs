@@ -58,6 +58,7 @@ namespace CwaffingTheGungy;
 public class Initialisation : BaseUnityPlugin
 {
     public static Initialisation Instance;
+    internal static Harmony _Harmony;
 
     public void Start()
     {
@@ -81,11 +82,11 @@ public class Initialisation : BaseUnityPlugin
             }
 
             Instance = this;
-            Harmony harmony = new Harmony(C.MOD_GUID);
+            _Harmony = new Harmony(C.MOD_GUID);
 
             #region Set up Early Harmony Patches (needs to be synchronous due to call to AmmonomiconController.ForceInstance)
                 System.Diagnostics.Stopwatch setupEarlyHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
-                AtlasHelper.InitSetupPatches(harmony);
+                AtlasHelper.InitSetupPatches(_Harmony);
                 setupEarlyHarmonyWatch.Stop();
             #endregion
 
@@ -93,7 +94,7 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch setupLateHarmonyWatch = null;
                 Thread setupLateHarmonyThread = new Thread(() => {
                     setupLateHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
-                    harmony.PatchAll();
+                    _Harmony.PatchAll();
                     setupLateHarmonyWatch.Stop();
                 });
                 setupLateHarmonyThread.Start();

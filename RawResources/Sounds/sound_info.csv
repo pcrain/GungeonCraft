@@ -216,3 +216,4 @@ generic_bullet_impact,-2.0,1,sound
 femtobyte_hit_enemy_sound,-2.0,1,sound
 midas_touch_sound,2.0,1,sound
 midas_explode_sound,-2.0,1,sound
+corruption_sound,1.5,1,sound
