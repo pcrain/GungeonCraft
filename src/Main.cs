@@ -254,6 +254,7 @@ public class Initialisation : BaseUnityPlugin
                 English.Init();
                 Femtobyte.Init();
                 Exceptional.Init();
+                Gunflower.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
