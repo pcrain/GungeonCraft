@@ -252,6 +252,7 @@
     <Compile Include="src\Cwaff-Misc\GunBuilder.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHUD.cs"/>
     <Compile Include="src\Cwaff-Misc\MiniInteractable.cs"/>
+    <Compile Include="src\Cwaff-Misc\LightAPI.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffProjectile.cs"/>
     <Compile Include="src\Cwaff-Misc\DamageAdjuster.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffShaders.cs"/>
