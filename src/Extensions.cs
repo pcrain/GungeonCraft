@@ -2456,4 +2456,14 @@ public static class Extensions
         if (enemy.transform.GetChild(i).GetComponent<tk2dSprite>() is tk2dSprite sprite)
           shaderFunc(sprite);
   }
+
+  public static GoopPositionData GoopData(this Vector2 pos)
+  {
+    IntVector2 key = (pos / DeadlyDeadlyGoopManager.GOOP_GRID_SIZE).ToIntVector2(VectorConversions.Floor);
+    if (!DeadlyDeadlyGoopManager.allGoopPositionMap.TryGetValue(key, out DeadlyDeadlyGoopManager goopManager))
+      return null;
+    if (!goopManager.m_goopedCells.TryGetValue(key, out GoopPositionData data))
+      return null;
+    return data;
+  }
 }

@@ -44,10 +44,11 @@ global using StaticReferences  = Alexandria.DungeonAPI.StaticReferences;
 
 global using Gunfiguration;
 
-global using static ProjectileModule;      //ShootStyle, ProjectileSequenceStyle
-global using static tk2dBaseSprite;        //Anchor
-global using static PickupObject;          //ItemQuality
-global using static BasicBeamController;   //BeamState
+global using static ProjectileModule;        //ShootStyle, ProjectileSequenceStyle
+global using static tk2dBaseSprite;          //Anchor
+global using static PickupObject;            //ItemQuality
+global using static BasicBeamController;     //BeamState
+global using static DeadlyDeadlyGoopManager; //GoopPositionData
 
 namespace CwaffingTheGungy;
 

@@ -3,11 +3,14 @@
 public class Gunflower : CwaffGun
 {
     public static string ItemName         = "Gunflower";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Petal to the Metal";
+    public static string LongDescription  = "Fires a highly concentrated beam of sunlight. Replenishes ammo when exposed to water and water-like goops. Depletes ammo when exposed to fire and various unhealthy goops.";
     public static string Lore             = "TBD";
 
     private const float _LIGHT_SPACING = 2f;
+
+    internal static GameObject _GrowthSparkles;
+    internal static GameObject _DecayVFX;
 
     private List<AdditionalBraveLight> _lights = new();
     private ModuleShootData _cachedShootData = null;
@@ -16,35 +19,31 @@ public class Gunflower : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Gunflower>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.0f, ammo: 1200, shootFps: 4, reloadFps: 4,
-                muzzleFrom: Items.Mailbox);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 100, shootFps: 4, reloadFps: 4,
+              muzzleFrom: Items.Mailbox, dynamicBarrelOffsets: true);
             gun.LoopAnimation(gun.shootAnimation, 4);
 
         //NOTE: inherit from Moonscraper for hitscan
-        Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.Beam,
-            speed: -1f, ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f));
+        Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f,
+          shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 10, angleVariance: 0f));
 
         BasicBeamController beamComp = projectile.SetupBeamSprites(spriteName: "gunflower_beam", fps: 17, chargeFps: 8,
-            dims: new Vector2(32, 7), impactDims: new Vector2(15, 7), impactFps: 14, loopCharge: false);
+          dims: new Vector2(32, 7), impactDims: new Vector2(15, 7), impactFps: 14, loopCharge: false);
         beamComp.reflections = 0;
-        beamComp.chargeDelay = 0.8f; // <gun shoot animation loop point> / <shootFps>
+        beamComp.chargeDelay = 0.8f;
         beamComp.sprite.usesOverrideMaterial = true;
         beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
         beamComp.sprite.renderer.material.SetFloat("_EmissivePower", 40f);
 
-        // Projectile proj = gun.InitProjectile(GunData.New(sprite: null, clipSize: 60, cooldown: 0.05f, shootStyle: ShootStyle.Automatic,
-        //     damage: 3.0f, speed: 30f, range: 1000f, force: 2f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound",
-        //     invisibleProjectile: true, preventSparks: true))
-        //   .Attach<LightProjectile>();
-        // proj.AddLight(color: Color.yellow, radius: 2f, brightness: 100f);
-
-        // gun.AddLight(useCone: true, fadeInTime: 0.5f, fadeOutTime: 0.25f, color: Color.yellow, grownIn: true, turnOnImmediately: false);
+        _GrowthSparkles = VFX.Create("gunflower_growth_sparkles", 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100f);
+        _DecayVFX = VFX.Create("gunflower_decay_vfx", 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100f);
     }
 
     private bool _revved = false;
     public override void Update()
     {
         base.Update();
+        UpdateNutrients();
         bool shouldPlaySound = this.gun && this.gun.IsFiring;
         if (shouldPlaySound && this._soundId == 0)
             this._soundId = this.gun.LoopSound("gunflower_fire_sound", loopPointMs: 1750, rewindAmountMs: 1750 - 1177);
@@ -72,6 +71,63 @@ public class Gunflower : CwaffGun
             }
             DismissLights();
         }
+    }
+
+    private void UpdateNutrients()
+    {
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+        GoopDefinition currentGoop = player.CurrentGoop;
+        if (!currentGoop)
+            return;
+        GoopPositionData goopData = player.specRigidbody.UnitCenter.GoopData();
+        if (goopData == null)
+            return;
+        int nutrition;
+        bool consumesGoop;
+        if (currentGoop.DrainsAmmo)
+            { consumesGoop = false; nutrition = 0; }  // no double jeopardy from ammo draining goop
+        else if (player.m_currentGoopFrozen)
+            { consumesGoop = false; nutrition = 0; }  // do nothing on ice
+        else if (goopData.IsOnFire && currentGoop.fireEffect is GameActorFireEffect fire && fire.AffectsPlayers)
+            { consumesGoop = true; nutrition = -1; }  // fire burns us
+        else if (currentGoop.AppliesDamageOverTime)
+            { consumesGoop = true; nutrition = -1; }  // poison is toxic
+        else if (currentGoop.isOily)
+            { consumesGoop = true; nutrition = -1; }  // oil is toxic
+        else if (currentGoop.usesWaterVfx)
+            { consumesGoop = true; nutrition = 1; }   // water is nutritious
+        else if (currentGoop.SpeedModifierEffect is GameActorSpeedEffect)
+            { consumesGoop = false; nutrition = 0; }  // do nothing on webs
+        else
+            { consumesGoop = true; nutrition = -1; }  // mystery goops are assumed toxic
+        bool nutritious = nutrition > 0;
+        if (nutrition > 0)
+        {
+            this.gun.GainAmmo(nutrition);
+            this.gun.gameObject.PlayOnce("starmageddon_bullet_impact_sound_2");
+        }
+        else if (nutrition < 0)
+        {
+            this.gun.LoseAmmo(-nutrition);
+            this.gun.gameObject.PlayOnce("lightwing_impact_sound");
+        }
+        if (nutrition != 0)
+            CwaffVFX.SpawnBurst(
+                prefab           : nutritious ? _GrowthSparkles : _DecayVFX,
+                numToSpawn       : nutritious ? 2 : 1,
+                basePosition     : this.gun.barrelOffset.position,
+                positionVariance : 1f,
+                velocityVariance : nutritious ? 3f : 5f,
+                velType          : CwaffVFX.Vel.Radial,
+                rotType          : CwaffVFX.Rot.None,
+                lifetime         : 0.5f,
+                fadeOutTime      : 0.5f,
+                emissivePower    : (nutrition > 0) ? 100f : 0f,
+                emissiveColor    : Color.yellow
+                );
+        if (consumesGoop)
+            DeadlyDeadlyGoopManager.DelayedClearGoopsInRadius(player.CenterPosition, 1f);
     }
 
     private BeamController GetExtantBeam()
@@ -113,10 +169,15 @@ public class Gunflower : CwaffGun
                 this._lights[i].Initialize();
             }
             if (i == steps)
+            {
                 this._lights[i].gameObject.transform.position = barrelPos + mag * deltaNorm;
+                this._lights[i].LightIntensity = 100f;
+            }
             else
+            {
                 this._lights[i].gameObject.transform.position = barrelPos + i * gap;
-            this._lights[i].LightIntensity = 10f;
+                this._lights[i].LightIntensity = 10f;
+            }
         }
         for (int i = steps + 1; i < this._lights.Count; ++i)
             if (this._lights[i])
