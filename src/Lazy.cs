@@ -382,6 +382,29 @@ public static class Lazy
         _SoundTimers.Remove(soundName);
     }
 
+    public static uint LoopSound(this MonoBehaviour behav, string soundName, int loopPointMs, int rewindAmountMs)
+    {
+        uint eventId = AkSoundEngine.PostEvent(soundName, behav.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
+        behav.StartCoroutine(LoopSound_CR(behav.gameObject, eventId, soundName, loopPointMs, rewindAmountMs));
+        return eventId;
+    }
+
+    private static IEnumerator LoopSound_CR(GameObject gameObject, uint eventId, string soundName, int loopPointMs, int rewindAmountMs)
+    {
+      yield return new WaitForSeconds(0.5f);  // GetSourcePlayPosition() will fail if we don't wait a bit
+      while (true)
+      {
+        int pos;
+        AKRESULT status = AkSoundEngine.GetSourcePlayPosition(eventId, out pos);
+        if (status != AKRESULT.AK_Success)
+            break;
+        if (pos >= loopPointMs)
+            AkSoundEngine.SeekOnEvent(soundName, gameObject, pos - rewindAmountMs);
+        yield return null;
+      }
+      yield break;
+    }
+
     /// <summary>Create some smoke VFX at the specified position</summary>
     public static void DoSmokeAt(Vector3 pos)
     {

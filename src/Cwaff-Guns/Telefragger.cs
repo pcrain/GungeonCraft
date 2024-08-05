@@ -35,10 +35,6 @@ public class Telefragger : CwaffGun
         Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.DemonHead.Projectile(), clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.Beam,
             ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f)).Attach<TelefragJuice>();
 
-        //HACK: this is necessary when copying beams to avoid weird beam offsets from walls...why???
-        projectile.gameObject.transform.localScale = Vector3.one;
-        projectile.gameObject.transform.localPosition = Vector3.zero;
-
         BasicBeamController beamComp = projectile.SetupBeamSprites(spriteName: "telefragger_beam", fps: 17,
             dims: new Vector2(32, 7), impactDims: new Vector2(15, 7), impactFps: 14, loopCharge: false);
         beamComp.chargeDelay = 0.4f; // <gun shoot animation loop point> / <shootFps>

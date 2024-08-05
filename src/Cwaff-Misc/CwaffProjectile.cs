@@ -15,6 +15,7 @@ public class CwaffProjectile : MonoBehaviour
     public bool preventOrbiting      = false;
     public bool firedForFree         = true;
     public bool becomeDebris         = false;
+    public bool preventSparks        = false;
 
     private Projectile _projectile;
     private PlayerController _owner;
@@ -126,6 +127,18 @@ public class CwaffProjectile : MonoBehaviour
             if (beam.projectile.GetComponent<CwaffProjectile>() is not CwaffProjectile c)
               return true; // call the original method
             return !c.preventOrbiting; // skip the original method iff we are supposed to prevent orbiting
+        }
+    }
+
+    /// <summary>Prevent electric damage bullets from emitting sparks when they're electric / cursed</summary>
+    [HarmonyPatch(typeof(Projectile), nameof(Projectile.HandleSparks))]
+    private class ProjectileHandleSparksPatch
+    {
+        static bool Prefix(Projectile __instance, Vector2? overridePoint)
+        {
+          if (__instance.GetComponent<CwaffProjectile>() is not CwaffProjectile cp)
+            return true;     // call the original method
+          return !cp.preventSparks; // skip original method if preventSparks is true
         }
     }
 }
