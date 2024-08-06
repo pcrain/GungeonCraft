@@ -15,6 +15,7 @@ public class Gunflower : CwaffGun
     private List<AdditionalBraveLight> _lights = new();
     private ModuleShootData _cachedShootData = null;
     private uint _soundId = 0;
+    private bool _revved = false;
 
     public static void Init()
     {
@@ -39,7 +40,6 @@ public class Gunflower : CwaffGun
         _DecayVFX = VFX.Create("gunflower_decay_vfx", 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100f);
     }
 
-    private bool _revved = false;
     public override void Update()
     {
         base.Update();
@@ -183,28 +183,4 @@ public class Gunflower : CwaffGun
             if (this._lights[i])
                 this._lights[i].LightIntensity = 0f;
     }
-
-    // public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
-    // {
-    //     base.OnReloadPressed(player, gun, manualReload);
-    //     if (gun.GetComponentInChildren<EasyLight>() is EasyLight light)
-    //         light.Toggle();
-    // }
-}
-
-public class LightProjectile : MonoBehaviour
-{
-    // private GameActor _owner;
-    // private EasyLight _light;
-    // private void Start()
-    // {
-    //     this._light = base.gameObject.GetComponentInChildren<EasyLight>();
-    //     this._owner = base.gameObject.GetComponent<Projectile>().Owner;
-    // }
-
-    // private void Update()
-    // {
-    //     if (this._light && this._owner)
-    //         this._light.PointAt(this._owner.CenterPosition);
-    // }
 }

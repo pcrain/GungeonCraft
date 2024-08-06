@@ -6,7 +6,7 @@ using static EasyLight.State;
 public partial class EasyLight : MonoBehaviour
 {
   /// <summary>Whether the light is current on or not. May still be invisible if its parent is deactivated.</summary>
-  public bool IsOn => this._state == VISIBLE || this._state == FADEIN;
+  public bool IsOn => this._state is (VISIBLE or FADEIN);
 
   /// <summary>Turns the light on if off, and turns it off if on.</summary>
   public void Toggle()

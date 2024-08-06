@@ -164,50 +164,24 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
             ETGModConsole.Log(theCollection.spriteDefinitions[i].name);
     }
 
-    public static void DumpILInstruction(this Instruction c)
+    public static string DumpILInstruction(this Instruction c)
     {
+        try { return c.ToString(); }
+        catch { }
         try
         {
-            ETGModConsole.Log($"  {c.ToStringSafe()}");
+            if (c.OpCode.OperandType is OperandType.InlineBrTarget or OperandType.ShortInlineBrTarget && c.Operand is ILLabel l)
+                return $"IL_{c.Offset:x4}: {c.OpCode.Name} IL_{l.Target.Offset:x4}";
+
+            if (c.OpCode.OperandType is OperandType.InlineSwitch && c.Operand is IEnumerable<ILLabel> en)
+                return $"IL_{c.Offset:x4}: {c.OpCode.Name} {string.Join(", ", en.Select(x => x.Target.Offset.ToString("x4")).ToArray())}";
         }
-        catch (Exception)
-        {
-            try
-            {
-                ILLabel label = null;
-                if (label == null) c.MatchBr(out label);
-                if (label == null) c.MatchBeq(out label);
-                if (label == null) c.MatchBge(out label);
-                if (label == null) c.MatchBgeUn(out label);
-                if (label == null) c.MatchBgt(out label);
-                if (label == null) c.MatchBgtUn(out label);
-                if (label == null) c.MatchBle(out label);
-                if (label == null) c.MatchBleUn(out label);
-                if (label == null) c.MatchBlt(out label);
-                if (label == null) c.MatchBltUn(out label);
-                if (label == null) c.MatchBrfalse(out label);
-                if (label == null) c.MatchBrtrue(out label);
-                if (label == null) c.MatchBneUn(out label);
-                if (label != null)
-                    ETGModConsole.Log($"  IL_{c.Offset.ToString("x4")}: {c.OpCode.Name} IL_{label.Target.Offset.ToString("x4")}");
-                else
-                    ETGModConsole.Log($"[UNKNOWN INSTRUCTION]");
-                    // ETGModConsole.Log($"  IL_{c.Offset.ToString("x4")}: {c.OpCode.Name} {c.Operand.ToStringSafe()}");
-            }
-            catch (Exception)
-            {
-                ETGModConsole.Log($"  <error>");
-            }
-        }
+        catch { }
+        return "This shouldn't be happening";
     }
 
-    // Dump IL instructions for an IL Hook
-    // private static HashSet<string> _DumpedKeys = new();
     public static void DumpIL(this ILCursor cursor)
     {
-        // if (_DumpedKeys.Contains(key))
-        //     return;
-        // _DumpedKeys.Add(key);
         foreach (Instruction c in cursor.Instrs)
             DumpILInstruction(c);
     }
