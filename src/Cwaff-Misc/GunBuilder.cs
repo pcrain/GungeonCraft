@@ -85,8 +85,6 @@ public sealed class GunData
   public int beamEndFps;
   public int beamChargeFps;
   public int beamImpactFps;
-  public Vector2? beamDims;
-  public Vector2? beamImpactDims;
   public bool beamLoopCharge;
   public float beamEmission;
   public int beamReflections;
@@ -176,8 +174,6 @@ public sealed class GunData
   /// <param name="beamEndFps">The framerate for the beam's end animation.</param>
   /// <param name="beamChargeFps">The framerate for the beam's charge animation.</param>
   /// <param name="beamImpactFps">The framerate for the beam's impact animation.</param>
-  /// <param name="beamDims">The width and height of the beam sprite.</param>
-  /// <param name="beamImpactDims">The width and height of the beam impact sprite.</param>
   /// <param name="beamLoopCharge">Whether the beam's charge amimation should be looped.</param>
   /// <param name="beamEmission">The emissive power of the beam sprites.</param>
   /// <param name="beamReflections">The number of times the beam projectile should reflect.</param>
@@ -206,11 +202,10 @@ public sealed class GunData
     float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null, string hitSound = null, string hitEnemySound = null, string hitWallSound = null,
     bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false, bool? electric = null, float? burstCooldown = null,
     bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null, bool forceBeam = false,
-    string beamSprite = null, int beamFps = -1, int beamStartFps = -1, int beamEndFps = -1, int beamChargeFps = -1, int beamImpactFps = -1, Vector2? beamDims = null,
-    Vector2? beamImpactDims = null, bool beamLoopCharge = true, float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f,
-    GoopDefinition beamGoop = null, bool? beamInterpolate = null, int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null,
-    float beamKnockback = -1f, BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null,
-    bool beamStartIsMuzzle = false)
+    string beamSprite = null, int beamFps = -1, int beamStartFps = -1, int beamEndFps = -1, int beamChargeFps = -1, int beamImpactFps = -1, bool beamLoopCharge = true,
+    float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f, GoopDefinition beamGoop = null, bool? beamInterpolate = null,
+    int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null, float beamKnockback = -1f,
+    BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -283,8 +278,6 @@ public sealed class GunData
       _Instance.beamEndFps                        = beamEndFps;
       _Instance.beamChargeFps                     = beamChargeFps;
       _Instance.beamImpactFps                     = beamImpactFps;
-      _Instance.beamDims                          = beamDims;
-      _Instance.beamImpactDims                    = beamImpactDims;
       _Instance.beamLoopCharge                    = beamLoopCharge;
       _Instance.beamEmission                      = beamEmission;
       _Instance.beamReflections                   = beamReflections;
@@ -486,8 +479,6 @@ public static class GunBuilder
       BasicBeamController beamComp = p.SetupBeamSprites(
           spriteName : b.beamSprite,
           fps        : b.beamFps,
-          dims       : b.beamDims ?? Vector2.one,
-          impactDims : b.beamImpactDims,
           impactFps  : b.beamImpactFps,
           endFps     : b.beamEndFps,
           startFps   : b.beamStartFps,

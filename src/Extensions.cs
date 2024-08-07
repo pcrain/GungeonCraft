@@ -1397,7 +1397,7 @@ public static class Extensions
   /// <summary>
   /// Perform basic initialization of beam sprites for a projectile, override the beam controller's existing sprites if they exist
   /// </summary>
-  public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, Vector2 dims, Vector2? impactDims = null, int impactFps = -1,
+  public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, int impactFps = -1,
     int endFps = -1, int startFps = -1, int chargeFps = -1, bool loopCharge = true)
   {
       // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody (no longer necessary with FixedGenerateBeamPrefab())
@@ -1409,44 +1409,24 @@ public static class Extensions
       // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimator>());
       // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<BasicBeamController>());
 
-      // Compute beam offsets from middle-left of sprite
-      Vector2 offsets = new Vector2(0, Mathf.Ceil(dims.y / 2f));
-      // Compute impact offsets from true center of sprite
-      Vector2? impactOffsets = impactDims.HasValue ? new Vector2(Mathf.Ceil(impactDims.Value.x / 2f), Mathf.Ceil(impactDims.Value.y / 2f)) : null;
-
       // Create the beam itself using our resource map lookup
       BasicBeamController beamComp = projectile.FixedGenerateBeamPrefab(
-          spritePath                  : ResMap.Get($"{spriteName}_mid")[0],
-          colliderDimensions          : dims,
-          colliderOffsets             : offsets,
           beamAnimationPaths          : ResMap.Get($"{spriteName}_mid"),
           beamFPS                     : fps,
           //Impact
           impactVFXAnimationPaths     : ResMap.Get($"{spriteName}_impact", quietFailure: true),
           beamImpactFPS               : (impactFps > 0) ? impactFps : fps,
-          impactVFXColliderDimensions : impactDims,
-          impactVFXColliderOffsets    : impactOffsets,
           //End
           endVFXAnimationPaths        : ResMap.Get($"{spriteName}_end", quietFailure: true),
           beamEndFPS                  : (endFps > 0) ? endFps : fps,
-          endVFXColliderDimensions    : dims,
-          endVFXColliderOffsets       : offsets,
           //Beginning
           startVFXAnimationPaths      : ResMap.Get($"{spriteName}_start", quietFailure: true),
           beamStartFPS                : (startFps > 0) ? startFps : fps,
-          startVFXColliderDimensions  : dims,
-          startVFXColliderOffsets     : offsets,
           //Charge
           chargeVFXAnimationPaths     : ResMap.Get($"{spriteName}_charge", quietFailure: true),
           beamChargeFPS               : (chargeFps > 0) ? chargeFps : fps,
-          chargeVFXColliderDimensions : dims,
-          chargeVFXColliderOffsets    : offsets,
-          loopCharge                  : loopCharge //,
-          //Other Variables
-          // glowAmount                  : 0f,
-          // emissivecolouramt           : 0f
+          loopCharge                  : loopCharge
           );
-
 
       // fix some more animation glitches (don't consistently work, check and enable on a case by case basis)
       // beamComp.usesChargeDelay = false;
