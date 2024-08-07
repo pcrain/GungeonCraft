@@ -18,7 +18,7 @@ public class LibraryCardtridge : CwaffPassive
         PassiveItem item   = Lazy.SetupPassive<LibraryCardtridge>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.D;
         item.AddToSubShop(ItemBuilder.ShopType.Flynt);
-        item.AddToSubShop(ModdedShopType.Talbert);
+        item.AddToShop(ModdedShopType.Talbert);
 
         // Add guids for book items to set
         _BookItemIDs = new();

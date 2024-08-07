@@ -40,7 +40,7 @@ public class Exceptional : CwaffGun
             newMod.burstShotCount = i;
             newMod.projectiles = Enumerable.Repeat<Projectile>(proj, i).ToList();
             gun.Volley.projectiles.Add(newMod);
-        }
+        } //REFACTOR: burst builder
 
         gun.gameObject.AddComponent<ExceptionalAmmoDisplay>();
 

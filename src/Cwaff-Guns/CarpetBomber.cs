@@ -26,7 +26,7 @@ public class CarpetBomber : CwaffGun
             muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound")
           .SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18)
           .SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-          .AddToSubShop(ModdedShopType.Boomhildr);
+          .AddToShop(ModdedShopType.Boomhildr);
 
         Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(GunData.New(
           clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: true,
@@ -58,7 +58,7 @@ public class CarpetBomber : CwaffGun
                     }),
                     ChargeTime = _CHARGE_PER_PROJECTILE * (i + 1),
                 });
-        }
+        } //REFACTOR: charge level builder
 
         // Initialize our explosion data
         _CarpetExplosion = new ExplosionData()

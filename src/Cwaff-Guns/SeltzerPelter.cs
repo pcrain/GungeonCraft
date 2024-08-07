@@ -16,7 +16,7 @@ public class SeltzerPelter : CwaffGun
     {
         Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150, shootFps: 36, muzzleFrom: Items.Mailbox)
-          .AddToSubShop(ItemBuilder.ShopType.Goopton);
+          .AddToShop(ItemBuilder.ShopType.Goopton);
 
         _ReloadAnimations = new(){
             gun.QuickUpdateGunAnimation("reload",   returnToIdle: true), // coke can

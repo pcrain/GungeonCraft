@@ -22,7 +22,7 @@ public class BorrowedTime : CwaffActive
     {
         PlayerItem item = Lazy.SetupActive<BorrowedTime>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality    = ItemQuality.C;
-        item.AddToSubShop(ModdedShopType.TimeTrader);
+        item.AddToShop(ModdedShopType.TimeTrader);
 
         ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 2);
         item.consumable   = false;

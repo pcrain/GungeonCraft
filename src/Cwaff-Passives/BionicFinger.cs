@@ -12,8 +12,8 @@ public class BionicFinger : CwaffPassive
         PassiveItem item   = Lazy.SetupPassive<BionicFinger>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
-        item.AddToSubShop(ModdedShopType.Rusty);
-        item.AddToSubShop(ModdedShopType.Handy);
+        item.AddToShop(ModdedShopType.Rusty);
+        item.AddToShop(ModdedShopType.Handy);
     }
 
     [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandleGunFiringInternal))]

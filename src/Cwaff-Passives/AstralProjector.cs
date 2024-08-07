@@ -24,7 +24,7 @@ public class AstralProjector : CwaffPassive
     {
         PassiveItem item   = Lazy.SetupPassive<AstralProjector>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.A;
-        item.AddToSubShop(ModdedShopType.TimeTrader);
+        item.AddToShop(ModdedShopType.TimeTrader);
     }
 
     public override void Pickup(PlayerController player)

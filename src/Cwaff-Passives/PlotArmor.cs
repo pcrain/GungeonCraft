@@ -17,7 +17,7 @@ public class PlotArmor : CwaffPassive
         PassiveItem item  = Lazy.SetupPassive<PlotArmor>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
-        item.AddToSubShop(ModdedShopType.Ironside);
+        item.AddToShop(ModdedShopType.Ironside);
     }
 
     public override void Update()

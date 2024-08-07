@@ -14,7 +14,6 @@ public class Uppskeruvel : CwaffGun
     internal const float _SOULS_PER_HEALTH  = 0.1f;
     internal const float _SPAWN_DELAY       = 0.1f;
 
-    internal static int        _UppskeruvelId              = -1;
     internal static GameObject _LostSoulPrefab             = null;
     internal static GameObject _CombatSoulPrefab           = null;
     internal static GameObject _SoulCollectVFX             = null;
@@ -34,14 +33,13 @@ public class Uppskeruvel : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Uppskeruvel>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Uppskeruvel>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.25f, ammo: 400, shootFps: 24, reloadFps: 30,
             muzzleVFX: "muzzle_uppskeruvel", muzzleFps: 60, muzzleScale: 0.2f, muzzleAnchor: Anchor.MiddleCenter,
             fireAudio: "uppskeruvel_fire_sound")
           .SetReloadAudio("uppskeruvel_reload_sound", 4, 22)
-          .Attach<UppskeruvelAmmoDisplay>();
-
-        gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: true,
+          .Attach<UppskeruvelAmmoDisplay>()
+          .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: true,
             sprite: "uppskeruvel_projectile", fps: 12, anchor: Anchor.MiddleLeft, hitEnemySound: "soul_impact_sound"))
           .Attach<UppskeruvelProjectile>()
           .CopyAllImpactVFX(Items.SkullSpitter);
@@ -61,8 +59,6 @@ public class Uppskeruvel : CwaffGun
         // level ups at 10, 30, 60, 100, 150, etc. souls
         for (int i = 0; i < _MAX_SOULS; ++i)
             _LevelThresholds[i] = 5 * (i*i+i);
-
-        _UppskeruvelId = gun.PickupObjectId; //REFACTOR
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -321,6 +317,8 @@ public class UppskeruvelLostSoul : MonoBehaviour
     const float _FRICTION           = 0.96f;
     const float _MAX_LIFE           = 10f;  // time before despawning
 
+    internal static int _UppskeruvelId = -1;
+
     private bool _setup             = false;
     private PlayerController _owner = null;
     private float _homeSpeed        = 0.0f;
@@ -390,13 +388,15 @@ public class UppskeruvelLostSoul : MonoBehaviour
             return;
         }
 
+        if (_UppskeruvelId < 0)
+            _UppskeruvelId = Lazy.PickupId<Uppskeruvel>();
         foreach (PlayerController player in GameManager.Instance.AllPlayers)
         {
             if (!player || !player.isActiveAndEnabled || player.IsGhost)
                 continue;
             if ((base.transform.position.XY() - player.CenterPosition).sqrMagnitude > _ATTRACT_RADIUS_SQR)
                 continue;
-            if (!player.HasGun(Uppskeruvel._UppskeruvelId))
+            if (!player.HasGun(_UppskeruvelId))
                 continue;
             this._owner = player;
         }

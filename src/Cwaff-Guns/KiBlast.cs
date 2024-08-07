@@ -28,7 +28,7 @@ public class KiBlast : CwaffGun
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 20, canGainAmmo: false, idleFps: 10,
             fireAudio: "ki_blast_sound", muzzleVFX: "muzzle_ki_blast", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft)
           .Attach<KiBlastAmmoDisplay>()
-          .AddToSubShop(ModdedShopType.Boomhildr);
+          .AddToShop(ModdedShopType.Boomhildr);
 
         _FireLeftAnim  = gun.shootAnimation;
         _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true);

@@ -11,7 +11,7 @@ public class DrabOutfit : CwaffPassive
     {
         PassiveItem item  = Lazy.SetupPassive<DrabOutfit>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
-        item.AddToSubShop(ModdedShopType.Rusty);
+        item.AddToShop(ModdedShopType.Rusty);
     }
 
     [HarmonyPatch(typeof(FloorRewardData), nameof(FloorRewardData.DetermineCurrentMagnificence))]

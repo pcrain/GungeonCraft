@@ -26,7 +26,7 @@ public class StackOfTorches : CwaffActive
     {
         PlayerItem item = Lazy.SetupActive<StackOfTorches>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality    = ItemQuality.D;
-        item.AddToSubShop(ModdedShopType.Rusty);
+        item.AddToShop(ModdedShopType.Rusty);
 
         ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.None, 0.1f);
         item.consumable   = true;

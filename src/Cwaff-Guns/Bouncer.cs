@@ -19,8 +19,8 @@ public class Bouncer : CwaffGun
             muzzleFrom: Items.Magnum, fireAudio: "MC_RocsCape")
           .SetReloadAudio("bouncer_reload_short", 5, 10, 15, 20)
           .SetReloadAudio("bouncer_reload", 25)
-          .AddToSubShop(ModdedShopType.Boomhildr)
-          .AddToSubShop(ModdedShopType.Rusty)
+          .AddToShop(ModdedShopType.Boomhildr)
+          .AddToShop(ModdedShopType.Rusty)
           .InitProjectile(GunData.New(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic, damage: _ACCELERATION, speed: _ACCELERATION,
             range: 9999f, sprite: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter,
             overrideColliderPixelSizes: new IntVector2(1,1))) // 1-pixel collider for accurate bounce animation

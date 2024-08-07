@@ -47,8 +47,6 @@ public class IceCreamGun : CwaffGun
     public static string LongDescription  = "EYE KEEM! 'v'";
     public static string Lore             = "EYYYYYEEEE KEEEEEMM";
 
-    internal static int _IceCreamGunId;
-
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<IceCreamGun>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
@@ -86,8 +84,6 @@ public class IceCreamGun : CwaffGun
             };
             bulletKin.sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
             bulletKin.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
-
-        _IceCreamGunId = gun.PickupObjectId;
     }
 }
 
@@ -215,9 +211,12 @@ public class HappyIceCreamHaver : MonoBehaviour
         return false;
     }
 
+    private static int _IceCreamGunId = -1;
     internal static void ShareIceCream(AIActor enemy)
     {
-        enemy.ReplaceGun((Items)IceCreamGun._IceCreamGunId);
+        if (_IceCreamGunId < 0)
+            _IceCreamGunId = Lazy.PickupId<IceCreamGun>();
+        enemy.ReplaceGun((Items)_IceCreamGunId);
         enemy.gameObject.AddComponent<HappyIceCreamHaver>();
         GameObject vfx = SpawnManager.SpawnVFX(IceCream._HeartVFX, enemy.sprite.WorldTopCenter + new Vector2(0f, 1f), Quaternion.identity, ignoresPools: true);
             tk2dSprite sprite = vfx.GetComponent<tk2dSprite>();

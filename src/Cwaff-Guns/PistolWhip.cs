@@ -23,7 +23,7 @@ public class PistolWhip : CwaffGun
         Lazy.SetupGun<PistolWhip>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100, shootFps: 30, reloadFps: 40, curse: 2f, infiniteAmmo: true)
           .Attach<PistolWhipAmmoDisplay>()
-          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .AddToShop(ItemBuilder.ShopType.Cursula)
           .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
             damage: 0.0f, speed: 0.01f, range: 999.0f))
           .Attach<WhipChainStartProjectile>();

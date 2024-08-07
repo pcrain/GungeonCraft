@@ -35,7 +35,7 @@ public class BBGun : CwaffGun
             gun.DefaultModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
                 Projectile = p.Clone(GunData.New(speed: 40f + 20f * i)).Attach<TheBB>(),
                 ChargeTime = _CHARGE_LEVELS[i],
-            });
+            }); //REFACTOR: charge level builder
     }
 }
 

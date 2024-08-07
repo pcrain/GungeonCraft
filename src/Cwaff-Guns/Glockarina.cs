@@ -56,20 +56,17 @@ public class Glockarina : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Glockarina>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Glockarina>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 400, canReloadNoMatterAmmo: true,
             shootFps: 24, reloadFps: 20, muzzleFrom: Items.Mailbox, fireAudio: "glockarina_shoot_sound", reloadAudio: "glockarina_reload_sound")
-          .Attach<GlockarinaAmmoDisplay>();
-
-        gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f, damage: 7.5f, customClip: true,
-          sprite: "glockarina_projectile", fps: 12, anchor: Anchor.MiddleLeft, shouldRotate: false));
+          .Attach<GlockarinaAmmoDisplay>()
+          .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f, damage: 7.5f, customClip: true,
+            sprite: "glockarina_projectile", fps: 12, anchor: Anchor.MiddleLeft, shouldRotate: false));
 
         _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();
         _DecoyPrefab.GetComponent<Decoy>().DeathExplosionTimer = _DECOY_LIFE;
 
         _NoteVFXPrefab = VFX.Create("note_vfx", fps: 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
-
-        _GlockarinaPickupID = gun.PickupObjectId;
     }
 
     [HarmonyPatch(typeof(Chest), nameof(Chest.PresentItem), MethodType.Enumerator)]
@@ -88,6 +85,8 @@ public class Glockarina : CwaffGun
 
     private static void OnChestOpen()
     {
+        if (_GlockarinaPickupID < 0)
+            _GlockarinaPickupID = Lazy.PickupId<Glockarina>();
         if (Lazy.AnyoneHasGun(_GlockarinaPickupID))
             GameManager.Instance.gameObject.Play("zelda_chest_sound");
     }

@@ -15,7 +15,7 @@ public class PlatinumStar : CwaffGun
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480, shootFps: 20, reloadFps: 40,
             muzzleVFX: "muzzle_platinum_star", muzzleFps: 60, muzzleScale: 0.25f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "platinum_fire_sound")
           .SetReloadAudio("platinum_reload_sound", frame: 5)
-          .AddToSubShop(ModdedShopType.TimeTrader)
+          .AddToShop(ModdedShopType.TimeTrader)
           .InitProjectile(GunData.New(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
             damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f, sprite: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft, spawnSound: "tomislav_shoot"))
           .Attach<PlatinumProjectile>();

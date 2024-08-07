@@ -10,8 +10,6 @@ public class GasterBlaster : CwaffActive
     internal static Projectile _GasterBlast;
     internal static GameObject _GasterBlaster;
 
-    public static int ID;
-
     private bool _anyGunFiredInRoom = false;
     private PlayerController _owner = null;
 
@@ -35,8 +33,6 @@ public class GasterBlaster : CwaffActive
             beamComp.penetration           = 1000;
 
         _GasterBlaster = VFX.Create("gaster_blaster_vfx", 2, loops: true, anchor: Anchor.MiddleCenter);
-
-        ID = item.PickupObjectId;
     }
 
     public override void Pickup(PlayerController player)

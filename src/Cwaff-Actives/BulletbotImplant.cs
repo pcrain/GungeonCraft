@@ -21,7 +21,7 @@ public class BulletbotImplant : CwaffActive
         item.consumable = true;
         item.canStack   = false;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
-        item.AddToSubShop(ModdedShopType.Handy);
+        item.AddToShop(ModdedShopType.Handy);
 
         FakeItem.Create<UsedBulletbotImplant>();
     }

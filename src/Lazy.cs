@@ -27,6 +27,8 @@ public static class Lazy
         ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
     }
 
+    private static readonly Dictionary<Type, PickupObject> _CustomPickups = new();
+    private static readonly Dictionary<Type, int> _CustomPickupIds = new();
     private static ProjectileModule _BaseModule = null;
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
     public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
@@ -89,6 +91,11 @@ public static class Lazy
             item.encounterTrackable.journalData.SuppressInAmmonomicon = true;
 
         IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
+        if (typeof(TItemClass) != typeof(Gun))
+        {
+            _CustomPickups[typeof(TItemSpecific)] = item; // register item in pickup by type database
+            _CustomPickupIds[typeof(TItemSpecific)] = item.PickupObjectId; // register item in pickup id by type database
+        }
         if (C.DEBUG_BUILD && !hideFromAmmonomicon)
         {
             if (item is Gun)
@@ -162,6 +169,8 @@ public static class Lazy
     {
         Gun gun = SetupItem<Gun, Gun>(gunName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
         gun.gameObject.AddComponent<T>();
+        _CustomPickups[typeof(T)] = gun; // register gun in pickup by type database
+        _CustomPickupIds[typeof(T)] = gun.PickupObjectId; // register gun in pickup id by type database
         _GunSpriteCollection ??= gun.sprite.collection; // need to initialize at least once
 
         #region Auto-setup barrelOffset from Casing attach point
@@ -187,6 +196,12 @@ public static class Lazy
             EncounterDatabase.GetEntry(gun.encounterTrackable.EncounterGuid).shootStyleInt = (int)gun.DefaultModule.shootStyle;
         _GunsToFinalize.Clear();
     }
+
+    /// <summary>Retrieve the pickup object associated with a given type</summary>
+    public static PickupObject Pickup<T>() => _CustomPickups[typeof(T)];
+
+    /// <summary>Retrieve the pickup object id associated with a given type</summary>
+    public static int PickupId<T>() => _CustomPickupIds[typeof(T)];
 
     /// <summary>
     /// Post a custom item pickup notification to the bottom of the screen

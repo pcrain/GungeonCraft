@@ -17,8 +17,8 @@ public class HolyWaterGun : CwaffGun
     {
         Lazy.SetupGun<HolyWaterGun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true)
-          .AddToSubShop(ItemBuilder.ShopType.Cursula)
-          .AddToSubShop(ItemBuilder.ShopType.Goopton)
+          .AddToShop(ItemBuilder.ShopType.Cursula)
+          .AddToShop(ItemBuilder.ShopType.Goopton)
           .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam, jammedDamageMult: _JAMMED_DAMAGE_MULT,
             ammoType: GameUIAmmoType.AmmoType.BEAM, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f))
           .Attach<ExorcismJuice>()

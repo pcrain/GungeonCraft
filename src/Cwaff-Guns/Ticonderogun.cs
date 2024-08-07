@@ -47,7 +47,7 @@ public class Ticonderogun : CwaffGun
     {
         Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24, curse: 2f)
-          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .AddToShop(ItemBuilder.ShopType.Cursula)
           .SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM));
 
         _SparklePrefab = VFX.Create("pencil_sparkles", 12, loops: false, anchor: Anchor.MiddleCenter);

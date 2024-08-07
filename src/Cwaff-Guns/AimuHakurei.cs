@@ -32,7 +32,7 @@ public class AimuHakurei : CwaffGun
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
             ammo: 200, canGainAmmo: false, canReloadNoMatterAmmo: true, modulesAreTiers: true, shootFps: 60, muzzleVFX: "muzzle_aimu",
             muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter)
-          .AddToSubShop(ModdedShopType.TimeTrader);
+          .AddToShop(ModdedShopType.TimeTrader);
 
         _BulletSprite = AnimatedBullet.Create(name: "aimu_projectile", fps: 2, scale: 0.625f, anchor: Anchor.MiddleCenter);
 

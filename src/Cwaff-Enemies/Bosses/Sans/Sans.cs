@@ -126,7 +126,7 @@ public partial class SansBoss : AIActor
       aura = null;
 
       Lazy.SpawnChestWithSpecificItem(
-        pickup: ItemHelper.Get((Items)GasterBlaster.ID),
+        pickup: Lazy.Pickup<GasterBlaster>(),
         position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success),
         overrideChestQuality: ItemQuality.S);
     }

@@ -19,7 +19,7 @@ public class StuntHelmet : CwaffPassive
     {
         PassiveItem item   = Lazy.SetupPassive<StuntHelmet>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
-        item.AddToSubShop(ModdedShopType.Boomhildr);
+        item.AddToShop(ModdedShopType.Boomhildr);
 
         _StuntStats = new StatModifier {
             amount      = _DAMAGE_ADD,

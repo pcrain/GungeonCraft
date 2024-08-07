@@ -26,8 +26,8 @@ public class Deadline : CwaffGun
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64, idleFps: 10, shootFps: 20,
             reloadFps: 30, muzzleVFX: "muzzle_deadline", muzzleFps: 20, muzzleScale: 0.4f, muzzleAnchor: Anchor.MiddleCenter,
             fireAudio: "deadline_fire_sound", reloadAudio: "deadline_reload_sound")
-          .AddToSubShop(ModdedShopType.TimeTrader)
-          .AddToSubShop(ModdedShopType.Boomhildr)
+          .AddToShop(ModdedShopType.TimeTrader)
+          .AddToShop(ModdedShopType.Boomhildr)
           .InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic,
             speed: 60.0f, range: 30.0f, sprite: "deadline_projectile", fps: 2, anchor: Anchor.MiddleLeft, collidesWithEnemies: false))
           .Attach<DeadlineProjectile>()

@@ -19,7 +19,7 @@ public class WeddingRing : CwaffPassive
     {
         PassiveItem item   = Lazy.SetupPassive<WeddingRing>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
-        item.AddToSubShop(ModdedShopType.Rusty);
+        item.AddToShop(ModdedShopType.Rusty);
         item.passiveStatModifiers = new StatModifier[] {
             new StatModifier {
                 amount      = 1.00f,

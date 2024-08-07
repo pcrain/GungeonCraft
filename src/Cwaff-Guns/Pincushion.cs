@@ -13,8 +13,6 @@ public class Pincushion : CwaffGun
     internal const float _DLT_SPREAD           = _MAX_SPREAD - _MIN_SPREAD;
     internal const float _NEEDLE_DAMAGE        = 0.35f;
 
-    internal static VFXPool _Microdust;
-
     public static void Init()
     {
         Lazy.SetupGun<Pincushion>(ItemName, ShortDescription, LongDescription, Lore)
@@ -25,7 +23,7 @@ public class Pincushion : CwaffGun
           .InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
             damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, spawnSound: "pincushion_fire",
             anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS))
-          .SetAllImpactVFX(_Microdust)
+          .SetAllImpactVFX(VFX.CreatePool("microdust", fps: 30, loops: false))
           .Attach<VeryFragileProjectile>()
           .Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
@@ -36,8 +34,6 @@ public class Pincushion : CwaffGun
             trail.BaseColor  = Color.gray;
             trail.EndColor   = Color.gray;
           });
-
-        _Microdust = VFX.CreatePool("microdust", fps: 30, loops: false);
     }
 
     // GetLowDiscrepancyRandom() makes projectiles not spread as randomly as they could, so override that randomness with our own spread

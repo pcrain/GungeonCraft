@@ -22,7 +22,7 @@ public class Maestro : CwaffGun
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 500, shootFps: 24,
             muzzleFrom: Items.FaceMelter, doesScreenShake: false, continuousFire: true, curse: 1f, dynamicBarrelOffsets: true,
             banFromBlessedRuns: true)
-          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .AddToShop(ItemBuilder.ShopType.Cursula)
           .AddReticle<CwaffEnemyReticle>(reticleVFX : VFX.Create("maestro_target_enemy_vfx", fps: 2), aimFromPlayerCenter: true,
             reticleAlpha  : 0.5f, smoothLerp : true, rotateSpeed : 270f, visibility : CwaffReticle.Visibility.WITHTARGET)
           .AddReticle<CwaffProjectileReticle>(reticleVFX : VFX.Create("maestro_target_projectile_vfx", fps: 2), aimFromPlayerCenter: true,

@@ -12,7 +12,7 @@ public class UtilityVest : CwaffPassive
         PassiveItem item  = Lazy.SetupPassive<UtilityVest>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
-        item.AddToSubShop(ModdedShopType.Ironside);
+        item.AddToShop(ModdedShopType.Ironside);
     }
 
     public override void Pickup(PlayerController player)

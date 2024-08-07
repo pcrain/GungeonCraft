@@ -31,7 +31,7 @@ public class Magunet : CwaffGun
         Lazy.SetupGun<Magunet>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
             chargeFps: 16, curse: 1f, banFromBlessedRuns: true)
-          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .AddToShop(ItemBuilder.ShopType.Cursula)
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, //TODO: can possibly use dummy charge module here
             ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
