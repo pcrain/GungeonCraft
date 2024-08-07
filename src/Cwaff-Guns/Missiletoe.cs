@@ -56,27 +56,7 @@ public class Missiletoe : CwaffGun
 
         gun.DefaultModule.SetAttributes(GunData.New(gun: gun, clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: true));
 
-        ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData;
-        ExplosionData giftExplosion = new ExplosionData()
-        {
-            forceUseThisRadius     = true,
-            pushRadius             = 0.5f,
-            damageRadius           = 0.5f,
-            damageToPlayer         = 0f,
-            doDamage               = true,
-            damage                 = 10,
-            doDestroyProjectiles   = false,
-            doForce                = true,
-            debrisForce            = 10f,
-            preventPlayerForce     = true,
-            explosionDelay         = 0.01f,
-            usesComprehensiveDelay = false,
-            doScreenShake          = false,
-            playDefaultSFX         = true,
-            effect                 = defaultExplosion.effect,
-            ignoreList             = defaultExplosion.ignoreList,
-            ss                     = defaultExplosion.ss,
-        };
+        ExplosionData splode = Explosions.DefaultSmall.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false);
 
         tk2dSpriteAnimationClip ball        = AnimatedBullet.Create(name: "missiletoe_projectile_ball",        anchor: Anchor.MiddleLeft);
         tk2dSpriteAnimationClip gingerbread = AnimatedBullet.Create(name: "missiletoe_projectile_gingerbread", anchor: Anchor.MiddleLeft);
@@ -91,9 +71,9 @@ public class Missiletoe : CwaffGun
         _ExplodingOrnamentProjectile = Items._38Special.CloneProjectile()
           .AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath)
           .Attach<GlowyChristmasProjectileBehavior>(glow => glow.Glow(40))
-          .Attach<ExplosiveModifier>(e => e.explosionData = giftExplosion);
+          .Attach<ExplosiveModifier>(e => e.explosionData = splode);
         _GiftProjectileS = SetupProjectile(gun: gun, name: "gift_projectile_black", damage: 30f, speed: 30f, force: 30f)
-          .Attach<ExplosiveModifier>(e => e.explosionData = giftExplosion)
+          .Attach<ExplosiveModifier>(e => e.explosionData = splode)
           .Attach<SpawnProjModifier>(s => {
             s.spawnProjectilesOnCollision  = true;
             s.numberToSpawnOnCollison      = 9;

@@ -2490,6 +2490,7 @@ public static class Extensions
           shaderFunc(sprite);
   }
 
+  /// <summary>Get the current goop data for a position in the world.</summary>
   public static GoopPositionData GoopData(this Vector2 pos)
   {
     IntVector2 key = (pos / DeadlyDeadlyGoopManager.GOOP_GRID_SIZE).ToIntVector2(VectorConversions.Floor);
@@ -2498,5 +2499,33 @@ public static class Extensions
     if (!goopManager.m_goopedCells.TryGetValue(key, out GoopPositionData data))
       return null;
     return data;
+  }
+
+  private static readonly List<SpeculativeRigidbody> _NoIgnores = Enumerable.Empty<SpeculativeRigidbody>().ToList();
+  /// <summary>Creates a new explosion</summary>
+  public static ExplosionData With(this ExplosionData effect, float force = 100f, float debrisForce = 10f, float damage = 10f, float radius = 0.5f,
+      bool preventPlayerForce = false, bool shake = true)
+  {
+      return new ExplosionData()
+      {
+          forceUseThisRadius     = true,
+          pushRadius             = radius,
+          damageRadius           = radius,
+          damageToPlayer         = 0f,
+          doDamage               = (damage > 0),
+          damage                 = damage,
+          doDestroyProjectiles   = false,
+          doForce                = (force > 0 || debrisForce > 0),
+          force                  = force,
+          debrisForce            = debrisForce,
+          preventPlayerForce     = preventPlayerForce,
+          explosionDelay         = 0.01f,
+          usesComprehensiveDelay = false,
+          doScreenShake          = shake,
+          playDefaultSFX         = true,
+          ignoreList             = _NoIgnores,
+          effect                 = effect.effect,
+          ss                     = effect.ss,
+      };
   }
 }

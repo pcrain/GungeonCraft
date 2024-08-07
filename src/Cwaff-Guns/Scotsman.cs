@@ -31,26 +31,7 @@ public class Scotsman : CwaffGun
           .Attach<Stickybomb>();
 
         // Initialize our explosion data
-        _ScotsmanExplosion = new ExplosionData()
-        {
-            forceUseThisRadius     = true,
-            pushRadius             = 1.5f,
-            damageRadius           = 1.5f,
-            damageToPlayer         = 0f,
-            doDamage               = true,
-            damage                 = 10,
-            doDestroyProjectiles   = false,
-            doForce                = true,
-            debrisForce            = 10f,
-            preventPlayerForce     = false,
-            explosionDelay         = 0.01f,
-            usesComprehensiveDelay = false,
-            doScreenShake          = false,
-            playDefaultSFX         = true,
-            effect                 = Explosions.ExplosiveRounds.effect,
-            ignoreList             = Explosions.DefaultSmall.ignoreList,
-            ss                     = Explosions.DefaultSmall.ss,
-        };
+        _ScotsmanExplosion = Explosions.ExplosiveRounds.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 1.5f, preventPlayerForce: false, shake: false);
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)

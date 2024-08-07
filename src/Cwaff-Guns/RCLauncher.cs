@@ -29,26 +29,7 @@ public class RCLauncher : CwaffGun
           .Attach<RCProjectileBehavior>();
 
         // Initialize our explosion data
-        _CarExplosion = new ExplosionData()
-        {
-            forceUseThisRadius     = true,
-            pushRadius             = 0.5f,
-            damageRadius           = 0.5f,
-            damageToPlayer         = 0f,
-            doDamage               = true,
-            damage                 = 5f,
-            doDestroyProjectiles   = false,
-            doForce                = true,
-            debrisForce            = 10f,
-            preventPlayerForce     = true,
-            explosionDelay         = 0.01f,
-            usesComprehensiveDelay = false,
-            doScreenShake          = false,
-            playDefaultSFX         = true,
-            effect                 = Explosions.ExplosiveRounds.effect,
-            ignoreList             = Explosions.DefaultSmall.ignoreList,
-            ss                     = Explosions.DefaultSmall.ss,
-        };
+        _CarExplosion = Explosions.ExplosiveRounds.With(damage: 5f, force: 100f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false);
     }
 
     public override void Update()

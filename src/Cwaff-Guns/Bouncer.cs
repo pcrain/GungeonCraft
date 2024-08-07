@@ -27,27 +27,7 @@ public class Bouncer : CwaffGun
           .Attach<HarmlessUntilBounce>();
 
         // Initialize our explosion data
-        ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData;
-        _MiniExplosion = new ExplosionData()
-        {
-            forceUseThisRadius     = true,
-            pushRadius             = 0.5f,
-            damageRadius           = 0.5f,
-            damageToPlayer         = 0f,
-            doDamage               = true,
-            damage                 = 10,
-            doDestroyProjectiles   = false,
-            doForce                = true,
-            debrisForce            = 10f,
-            preventPlayerForce     = true,
-            explosionDelay         = 0.01f,
-            usesComprehensiveDelay = false,
-            doScreenShake          = false,
-            playDefaultSFX         = true,
-            effect                 = defaultExplosion.effect,
-            ignoreList             = defaultExplosion.ignoreList,
-            ss                     = defaultExplosion.ss,
-        };
+        _MiniExplosion = Explosions.DefaultSmall.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false);
     }
 }
 

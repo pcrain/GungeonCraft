@@ -38,28 +38,6 @@ public class Breegull : CwaffGun
           .SetReloadAudio("breegull_reload_sound", 0, 4, 8)
           .Attach<BreegullAmmoDisplay>();
 
-        ExplosionData clockworkExplosion = new ExplosionData()
-        {
-            forceUseThisRadius     = true,
-            pushRadius             = 0.5f,
-            damageRadius           = 0.5f,
-            damageToPlayer         = 0f,
-            doDamage               = true,
-            damage                 = 5,
-            doDestroyProjectiles   = false,
-            doForce                = true,
-            force                  = 20f,
-            debrisForce            = 10f,
-            preventPlayerForce     = true,
-            explosionDelay         = 0.01f,
-            usesComprehensiveDelay = false,
-            doScreenShake          = false,
-            playDefaultSFX         = true,
-            effect                 = Explosions.DefaultSmall.effect,
-            ignoreList             = Explosions.DefaultSmall.ignoreList,
-            ss                     = Explosions.DefaultSmall.ss,
-        };
-
         _EggNormal = gun.InitProjectile(GunData.New(sprite: "breegull_projectile_normal", clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 5.0f,
             shrapnelVFX: VFX.Create("breegull_impact_normal"), shrapnelCount: 10, destroySound: "egg_hit_enemy_sound"));
 
@@ -70,7 +48,8 @@ public class Breegull : CwaffGun
           .Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultLarge);
         _EggIce       = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_ice", shrapnelVFX: VFX.Create("breegull_impact_ice"), freeze: 0.75f));
         _EggClockwork = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_clockwork", shrapnelVFX: VFX.Create("breegull_impact_clockwork")))
-          .Attach<ExplosiveModifier>(ex => ex.explosionData = clockworkExplosion)
+          .Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultSmall.With(
+            damage: 5f, force: 20f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false))
           .Attach<HomingModifier>(home => { home.HomingRadius = 10f; home.AngularVelocity = 720f; });
 
         _Eggs = new List<EggData>() {

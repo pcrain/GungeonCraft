@@ -49,32 +49,13 @@ public class LibraryCardtridge : CwaffPassive
         _CharmEffect = (ItemHelper.Get(Items.YellowChamber) as YellowChamberItem).CharmEffect;
 
         // Initialize our explosion data
-        ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
-        _BookExplosion = new ExplosionData()
-        {
-            forceUseThisRadius     = true,
-            pushRadius             = 3f,
-            damageRadius           = 3f,
-            damageToPlayer         = 0f,
-            doDamage               = true,
-            damage                 = 100,
-            doDestroyProjectiles   = false,
-            doForce                = true,
-            debrisForce            = 10f,
-            preventPlayerForce     = true,
-            explosionDelay         = 0.01f,
-            usesComprehensiveDelay = false,
-            doScreenShake          = false,
-            playDefaultSFX         = true,
-            effect                 = defaultExplosion.effect,
-            ignoreList             = defaultExplosion.ignoreList,
-            ss                     = defaultExplosion.ss,
-        };
+        _BookExplosion = Explosions.DefaultLarge.With(damage: 100f, force: 100f, debrisForce: 10f, radius: 3f, preventPlayerForce: true, shake: false);
 
         // Get our book pile assets
-        AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
-        DungeonPlaceable pile = sharedAssets.LoadAsset<DungeonPlaceable>("PileOrStackOfBooks");
-        sharedAssets = null;
+        //NOTE: this doesn't do an anything, why is it here???
+        // AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
+        // DungeonPlaceable pile = sharedAssets.LoadAsset<DungeonPlaceable>("PileOrStackOfBooks");
+        // sharedAssets = null;
     }
 
     private void MakeBooksFriendlyAndExplodey(AIActor enemy)

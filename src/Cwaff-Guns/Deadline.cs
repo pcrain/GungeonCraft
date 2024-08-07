@@ -40,37 +40,16 @@ public class Deadline : CwaffGun
             trail.EndColor   = Color.green;
           });
 
-        ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
-        _DeadlineExplosion = new ExplosionData()
-        {
-            forceUseThisRadius     = true,
-            pushRadius             = 3f,
-            damageRadius           = 3f,
-            damageToPlayer         = 0f,
-            doDamage               = true,
-            damage                 = 100,
-            doDestroyProjectiles   = false,
-            doForce                = true,
-            debrisForce            = 30f,
-            preventPlayerForce     = false,
-            explosionDelay         = 0.01f,
-            usesComprehensiveDelay = false,
-            doScreenShake          = true,
-            playDefaultSFX         = true,
-            effect                 = defaultExplosion.effect,
-            ignoreList             = defaultExplosion.ignoreList,
-            ss                     = new ScreenShakeSettings
-            {
-                magnitude               = 0.5f,
-                speed                   = 1.5f,
-                time                    = 1f,
-                falloff                 = 0,
-                direction               = Vector2.zero,
-                vibrationType           = ScreenShakeSettings.VibrationType.Auto,
-                simpleVibrationStrength = Vibration.Strength.Light,
-                simpleVibrationTime     = Vibration.Time.Instant
-            },
-        };
+        _DeadlineExplosion = Explosions.DefaultLarge.With(damage: 100f, force: 100f, debrisForce: 30f, radius: 3f, preventPlayerForce: false);
+        _DeadlineExplosion.ss = new ScreenShakeSettings {
+            magnitude               = 0.5f,
+            speed                   = 1.5f,
+            time                    = 1f,
+            falloff                 = 0,
+            direction               = Vector2.zero,
+            vibrationType           = ScreenShakeSettings.VibrationType.Auto,
+            simpleVibrationStrength = Vibration.Strength.Light,
+            simpleVibrationTime     = Vibration.Time.Instant };
 
         _SplodeVFX = VFX.Create("splode", fps: 18, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
     }
