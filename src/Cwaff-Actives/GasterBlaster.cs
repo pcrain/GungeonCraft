@@ -22,17 +22,11 @@ public class GasterBlaster : CwaffActive
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
 
         _GasterBlast = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 700.0f, speed: 150.0f, force: 70.0f, range: 200.0f,
-            pierceBreakables: true, pierceInternalWalls: true))
+            pierceBreakables: true, pierceInternalWalls: true, isBeam: true, beamSprite: "gaster_beam", beamFps: 60, beamDims: new Vector2(35, 39),
+            beamImpactDims: new Vector2(36, 36), beamImpactFps: 16, beamIsRigid: false, beamContinueToWall: false, beamPiercing: 1000, beamPiercesCover: true))
           .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; });
 
-        BasicBeamController beamComp = _GasterBlast.SetupBeamSprites(
-          spriteName: "gaster_beam", fps: 60, dims: new Vector2(35, 39), impactDims: new Vector2(36, 36), impactFps: 16);
-            beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
-            beamComp.ContinueBeamArtToWall = false;
-            beamComp.PenetratesCover       = true;
-            beamComp.penetration           = 1000;
-
-        _GasterBlaster = VFX.Create("gaster_blaster_vfx", 2, loops: true, anchor: Anchor.MiddleCenter);
+        _GasterBlaster = VFX.Create("gaster_blaster_vfx");
     }
 
     public override void Pickup(PlayerController player)

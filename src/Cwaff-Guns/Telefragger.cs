@@ -31,16 +31,9 @@ public class Telefragger : CwaffGun
           .SetFireAudio("telefragger_amp_up_sound", 0, 3, 6, 9)
           .LoopFireAnimation(12)
           .InitProjectile(GunData.New(baseProjectile: Items.DemonHead.Projectile(), clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.Beam,
-            ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f))
-          .Attach<TelefragJuice>()
-          .Assign(out Projectile projectile);
-
-        BasicBeamController beamComp = projectile.SetupBeamSprites(spriteName: "telefragger_beam", fps: 17,
-            dims: new Vector2(32, 7), impactDims: new Vector2(15, 7), impactFps: 14, loopCharge: false);
-        beamComp.chargeDelay = 0.4f; // <gun shoot animation loop point> / <shootFps>
-        beamComp.sprite.usesOverrideMaterial = true;
-        beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-        beamComp.sprite.renderer.material.SetFloat("_EmissivePower", 2f);
+            ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f, isBeam: true, beamSprite: "telefragger_beam", beamFps: 17,
+            beamDims: new Vector2(32, 7), beamImpactDims: new Vector2(15, 7), beamImpactFps: 14, beamLoopCharge: false, beamChargeDelay: 0.4f, beamEmission: 2f))
+          .Attach<TelefragJuice>();
 
         _TeleportVFX = VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
         _FloorVFX    = ItemHelper.Get(Items.RatBoots).gameObject.GetComponent<RatBootsItem>().FloorVFX;

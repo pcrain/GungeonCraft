@@ -16,10 +16,11 @@ public class MacchiAuto : CwaffGun
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true)
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .AddToShop(ItemBuilder.ShopType.Goopton)
-          .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
-            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 1f, speed: 50.0f, force: 0.0f))
-          .Attach<OverdoseJuice>()
-          .Assign(out Projectile projectile);
+          .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam, isBeam: true,
+            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 1f, speed: 50.0f, force: 0.0f, beamSprite: "overdose", beamFps: 20, beamDims: new Vector2(15, 15),
+            beamImpactDims: new Vector2(7, 7), beamEmission: 3f, beamStatusDelay: 0f, beamStartIsMuzzle: true, beamInterpolate: false,
+            beamGoop: EasyGoopDefinitions.CoffeeGoop))
+          .Attach<OverdoseJuice>();
 
         _OverdoseEffect = new OverdoseEffect() {
             TintColor        = _OverdoseTint,
@@ -31,18 +32,6 @@ public class MacchiAuto : CwaffGun
             effectIdentifier = ItemName,
             stackMode        = GameActorEffect.EffectStackingMode.DarkSoulsAccumulate,
             };
-
-        BasicBeamController beamComp = projectile.SetupBeamSprites(spriteName: "overdose", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
-            beamComp.TimeToStatus = 0f; // apply our status effect immediately
-            beamComp.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.CoffeeGoop;
-
-            beamComp.sprite.usesOverrideMaterial = true;
-            beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-            beamComp.sprite.renderer.material.SetFloat("_EmissivePower", 3f);
-            // fix some animation glitches (don't blindly copy paste; need to be set on a case by case basis depending on your beam's needs)
-            beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animation null
-            beamComp.beamStartAnimation = null;
-            beamComp.interpolateStretchedBones = false; // causes weird graphical glitches whether it's enabled or not, but enabled is worse
     }
 
     /// <summary>Allow beams to apply arbitrary status effects</summary>

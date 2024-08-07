@@ -36,24 +36,12 @@ public class SeltzerPelter : CwaffGun
         .Attach<SeltzerProjectile>();
 
         // the perfect seltzer stats, do not tweak without testing! (beam damage == DPS)
-        _BubbleBeam = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f, preventOrbiting: true))
-        .SetupBeamSprites(spriteName: "bubble_stream", fps: 8, dims: new Vector2(8, 8)); //REFACTOR: need major cleanup for beams
-            _BubbleBeam.sprite.usesOverrideMaterial = true;
-            _BubbleBeam.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-            _BubbleBeam.sprite.renderer.material.SetFloat("_EmissivePower", 5f);
+        _BubbleBeam = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f, preventOrbiting: true, isBeam: true,
+            beamSprite: "bubble_stream", beamFps: 8, beamDims: new Vector2(8, 8), beamEmission: 5f, beamChargeDelay: 0f, beamSeparation: true, beamIsRigid: false,
+            beamInterpolate: false, beamKnockback: 100f, beamTiling: BasicBeamController.BeamTileType.Flowing, beamEndType: BasicBeamController.BeamEndType.Persist))
+          .GetComponent<BasicBeamController>();
 
-            _BubbleBeam.chargeDelay         = 0f;
-            _BubbleBeam.usesChargeDelay     = false;
-            _BubbleBeam.HitsPlayers         = false;
-            _BubbleBeam.HitsEnemies         = true;
-            _BubbleBeam.collisionSeparation = true;
-            _BubbleBeam.knockbackStrength   = 100f;
-            _BubbleBeam.boneType            = BasicBeamController.BeamBoneType.Projectile;
-            _BubbleBeam.TileType            = BasicBeamController.BeamTileType.Flowing;
-            _BubbleBeam.endType             = BasicBeamController.BeamEndType.Persist;
-            _BubbleBeam.interpolateStretchedBones = false; // causes weird graphical glitches whether it's enabled or not, but enabled is worse
-
-        GoopModifier gmod = _BubbleBeam.gameObject.AddComponent<GoopModifier>();
+        GoopModifier gmod = _BubbleBeam.gameObject.GetOrAddComponent<GoopModifier>();
             gmod.SpawnAtBeamEnd         = true;
             gmod.BeamEndRadius          = 0.5f;
             gmod.SpawnGoopInFlight      = true;

@@ -78,6 +78,32 @@ public sealed class GunData
   public bool? collidesOnlyWithPlayerProjectiles;
   public bool? pierceInternalWalls;
 
+  public bool isBeam;
+  public string beamSprite;
+  public int beamFps;
+  public int beamStartFps;
+  public int beamEndFps;
+  public int beamChargeFps;
+  public int beamImpactFps;
+  public Vector2? beamDims;
+  public Vector2? beamImpactDims;
+  public bool beamLoopCharge;
+  public float beamEmission;
+  public int beamReflections;
+  public float beamChargeDelay;
+  public float beamStatusDelay;
+  public GoopDefinition beamGoop;
+  public bool? beamInterpolate;
+  public int beamPiercing;
+  public bool? beamPiercesCover;
+  public bool? beamContinueToWall;
+  public bool? beamIsRigid;
+  public float beamKnockback;
+  public BasicBeamController.BeamTileType? beamTiling;
+  public BasicBeamController.BeamEndType? beamEndType;
+  public bool? beamSeparation;
+  public bool beamStartIsMuzzle;
+
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
   /// <param name="baseProjectile">The projectile we're using as a base (if null, reuses the first projectile of the gun's default module).</param>
@@ -143,6 +169,32 @@ public sealed class GunData
   /// <param name="pierceBreakables">If true, the projectile will pierce minor breakables such as crates, barrels, etc.</param>
   /// <param name="collidesOnlyWithPlayerProjectiles">If true and if collidesWithProjectiles is true, the projectile will only collide with player projectiles.</param>
   /// <param name="pierceInternalWalls">If true, the projectile will pierce internal walls within rooms.</param>
+
+  /// <param name="isBeam">If true, marks the projectile as a beam and does additional beam setup.</param>
+  /// <param name="beamSprite">The base sprite name to use for beam start, end, impact, etc. sprites.</param>
+  /// <param name="beamFps">The default framerate for beam sprite animators.</param>
+  /// <param name="beamStartFps">The framerate for the beam's start animation.</param>
+  /// <param name="beamEndFps">The framerate for the beam's end animation.</param>
+  /// <param name="beamChargeFps">The framerate for the beam's charge animation.</param>
+  /// <param name="beamImpactFps">The framerate for the beam's impact animation.</param>
+  /// <param name="beamDims">The width and height of the beam sprite.</param>
+  /// <param name="beamImpactDims">The width and height of the beam impact sprite.</param>
+  /// <param name="beamLoopCharge">Whether the beam's charge amimation should be looped.</param>
+  /// <param name="beamEmission">The emissive power of the beam sprites.</param>
+  /// <param name="beamReflections">The number of times the beam projectile should reflect.</param>
+  /// <param name="beamChargeDelay">How long the beam charges before firing.</param>
+  /// <param name="beamStatusDelay">How long the beam must contact an enemy before applying any status effects.</param>
+  /// <param name="beamGoop">Which goop, if any, the beam should spawn.</param>
+  /// <param name="beamInterpolate">If true, beam bones interpolate sprites (can fix / cause visual jankiness depending on the situation).</param>
+  /// <param name="beamPiercing">How much the beam can pierce.</param>
+  /// <param name="beamPiercesCover">If true, the beam instantly breaks tables and flippables (I think).</param>
+  /// <param name="beamContinueToWall">If false, the beam sprite will not continue all the way to the wall with partial tiling.</param>
+  /// <param name="beamIsRigid">If true, the beam will always be completely straight. If false, beam segments can curve and bend.</param>
+  /// <param name="beamKnockback">The knockback strength of the beam.</param>
+  /// <param name="beamTiling">Determines how segments of the beam grow / attach to each other.</param>
+  /// <param name="beamEndType">Determines how the end of the beam dissipates.</param>
+  /// <param name="beamSeparation">If true, the beam can separate from its linked nodes upon collision.</param>
+  /// <param name="beamStartIsMuzzle">If true, uses the beam's start animation as a muzzle animation instead (fixes some graphical glitches).</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
@@ -152,73 +204,125 @@ public sealed class GunData
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null,
     bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null,
     string hitSound = null, string hitEnemySound = null, string hitWallSound = null, bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false,
-    bool? electric = null, float? burstCooldown = null, bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null
+    bool? electric = null, float? burstCooldown = null, bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null,
+
+    bool isBeam                                  = false,
+    string beamSprite                            = null,
+    int beamFps                                  = -1,
+    int beamStartFps                             = -1,
+    int beamEndFps                               = -1,
+    int beamChargeFps                            = -1,
+    int beamImpactFps                            = -1,
+    Vector2? beamDims                            = null,
+    Vector2? beamImpactDims                      = null,
+    bool beamLoopCharge                          = true,
+    float beamEmission                           = -1f,
+    int beamReflections                          = -1,
+    float beamChargeDelay                        = -1f,
+    float beamStatusDelay                        = -1f,
+    GoopDefinition beamGoop                      = null,
+    bool? beamInterpolate                        = null,
+    int beamPiercing                             = -1,
+    bool? beamPiercesCover                       = null,
+    bool? beamContinueToWall                     = null,
+    bool? beamIsRigid                            = null,
+    float beamKnockback                          = -1f,
+    BasicBeamController.BeamTileType? beamTiling = null,
+    BasicBeamController.BeamEndType? beamEndType = null,
+    bool? beamSeparation                         = null,
+    bool beamStartIsMuzzle                       = false
     )
   {
-      _Instance.gun                           = gun; // set by InitSpecialProjectile()
-      _Instance.baseProjectile                = baseProjectile;
-      _Instance.clipSize                      = clipSize;
-      _Instance.cooldown                      = cooldown;
-      _Instance.angleVariance                 = angleVariance;
-      _Instance.shootStyle                    = shootStyle;
-      _Instance.sequenceStyle                 = sequenceStyle;
-      _Instance.chargeTime                    = chargeTime;
-      _Instance.ammoCost                      = ammoCost;
-      _Instance.ammoType                      = ammoType;
-      _Instance.customClip                    = customClip;
-      _Instance.damage                        = damage;
-      _Instance.speed                         = speed;
-      _Instance.force                         = force;
-      _Instance.range                         = range;
-      _Instance.recoil                        = recoil;
-      _Instance.poison                        = poison;
-      _Instance.fire                          = fire;
-      _Instance.freeze                        = freeze;
-      _Instance.slow                          = slow;
-      _Instance.collidesWithEnemies           = collidesWithEnemies;
-      _Instance.ignoreDamageCaps              = ignoreDamageCaps;
-      _Instance.collidesWithProjectiles       = collidesWithProjectiles;
-      _Instance.surviveRigidbodyCollisions    = surviveRigidbodyCollisions;
-      _Instance.collidesWithTilemap           = collidesWithTilemap;
-      _Instance.sprite                        = sprite;
-      _Instance.fps                           = fps;
-      _Instance.anchor                        = anchor;
-      _Instance.scale                         = scale;
-      _Instance.anchorsChangeColliders        = anchorsChangeColliders;
-      _Instance.fixesScales                   = fixesScales;
-      _Instance.overrideColliderPixelSizes    = overrideColliderPixelSizes;
-      _Instance.overrideColliderOffsets       = overrideColliderOffsets;
-      _Instance.bossDamageMult                = bossDamageMult;
-      _Instance.jammedDamageMult              = jammedDamageMult;
-      _Instance.destroySound                  = destroySound;
-      _Instance.shouldRotate                  = shouldRotate;
-      _Instance.barrageSize                   = barrageSize;
-      _Instance.shouldFlipHorizontally        = shouldFlipHorizontally;
-      _Instance.shouldFlipVertically          = shouldFlipVertically;
-      _Instance.useDummyChargeModule          = useDummyChargeModule;
-      _Instance.invisibleProjectile           = invisibleProjectile;
-      _Instance.spawnSound                    = spawnSound;
-      _Instance.stopSoundOnDeath              = stopSoundOnDeath;
-      _Instance.uniqueSounds                  = uniqueSounds;
-      _Instance.shrapnelVFX                   = shrapnelVFX;
-      _Instance.shrapnelCount                 = shrapnelCount;
-      _Instance.shrapnelMinVelocity           = shrapnelMinVelocity;
-      _Instance.shrapnelMaxVelocity           = shrapnelMaxVelocity;
-      _Instance.shrapnelLifetime              = shrapnelLifetime;
-      _Instance.preventOrbiting               = preventOrbiting;
-      _Instance.hitSound                      = hitSound;
-      _Instance.hitEnemySound                 = hitEnemySound;
-      _Instance.hitWallSound                  = hitWallSound;
-      _Instance.becomeDebris                  = becomeDebris;
-      _Instance.angleFromAim                  = angleFromAim;
-      _Instance.mirror                        = mirror;
-      _Instance.electric                      = electric;
-      _Instance.burstCooldown                 = burstCooldown;
-      _Instance.preventSparks                 = preventSparks;
-      _Instance.pierceBreakables              = pierceBreakables;
-      _Instance.collidesWithProjectiles       = collidesWithProjectiles;
+      _Instance.gun                               = gun; // set by InitSpecialProjectile()
+      _Instance.baseProjectile                    = baseProjectile;
+      _Instance.clipSize                          = clipSize;
+      _Instance.cooldown                          = cooldown;
+      _Instance.angleVariance                     = angleVariance;
+      _Instance.shootStyle                        = shootStyle;
+      _Instance.sequenceStyle                     = sequenceStyle;
+      _Instance.chargeTime                        = chargeTime;
+      _Instance.ammoCost                          = ammoCost;
+      _Instance.ammoType                          = ammoType;
+      _Instance.customClip                        = customClip;
+      _Instance.damage                            = damage;
+      _Instance.speed                             = speed;
+      _Instance.force                             = force;
+      _Instance.range                             = range;
+      _Instance.recoil                            = recoil;
+      _Instance.poison                            = poison;
+      _Instance.fire                              = fire;
+      _Instance.freeze                            = freeze;
+      _Instance.slow                              = slow;
+      _Instance.collidesWithEnemies               = collidesWithEnemies;
+      _Instance.ignoreDamageCaps                  = ignoreDamageCaps;
+      _Instance.collidesWithProjectiles           = collidesWithProjectiles;
+      _Instance.surviveRigidbodyCollisions        = surviveRigidbodyCollisions;
+      _Instance.collidesWithTilemap               = collidesWithTilemap;
+      _Instance.sprite                            = sprite;
+      _Instance.fps                               = fps;
+      _Instance.anchor                            = anchor;
+      _Instance.scale                             = scale;
+      _Instance.anchorsChangeColliders            = anchorsChangeColliders;
+      _Instance.fixesScales                       = fixesScales;
+      _Instance.overrideColliderPixelSizes        = overrideColliderPixelSizes;
+      _Instance.overrideColliderOffsets           = overrideColliderOffsets;
+      _Instance.bossDamageMult                    = bossDamageMult;
+      _Instance.jammedDamageMult                  = jammedDamageMult;
+      _Instance.destroySound                      = destroySound;
+      _Instance.shouldRotate                      = shouldRotate;
+      _Instance.barrageSize                       = barrageSize;
+      _Instance.shouldFlipHorizontally            = shouldFlipHorizontally;
+      _Instance.shouldFlipVertically              = shouldFlipVertically;
+      _Instance.useDummyChargeModule              = useDummyChargeModule;
+      _Instance.invisibleProjectile               = invisibleProjectile;
+      _Instance.spawnSound                        = spawnSound;
+      _Instance.stopSoundOnDeath                  = stopSoundOnDeath;
+      _Instance.uniqueSounds                      = uniqueSounds;
+      _Instance.shrapnelVFX                       = shrapnelVFX;
+      _Instance.shrapnelCount                     = shrapnelCount;
+      _Instance.shrapnelMinVelocity               = shrapnelMinVelocity;
+      _Instance.shrapnelMaxVelocity               = shrapnelMaxVelocity;
+      _Instance.shrapnelLifetime                  = shrapnelLifetime;
+      _Instance.preventOrbiting                   = preventOrbiting;
+      _Instance.hitSound                          = hitSound;
+      _Instance.hitEnemySound                     = hitEnemySound;
+      _Instance.hitWallSound                      = hitWallSound;
+      _Instance.becomeDebris                      = becomeDebris;
+      _Instance.angleFromAim                      = angleFromAim;
+      _Instance.mirror                            = mirror;
+      _Instance.electric                          = electric;
+      _Instance.burstCooldown                     = burstCooldown;
+      _Instance.preventSparks                     = preventSparks;
+      _Instance.pierceBreakables                  = pierceBreakables;
+      _Instance.collidesWithProjectiles           = collidesWithProjectiles;
       _Instance.collidesOnlyWithPlayerProjectiles = collidesOnlyWithPlayerProjectiles;
       _Instance.pierceInternalWalls               = pierceInternalWalls;
+
+      _Instance.isBeam                            = isBeam;
+      _Instance.beamSprite                        = beamSprite;
+      _Instance.beamFps                           = beamFps;
+      _Instance.beamStartFps                      = beamStartFps;
+      _Instance.beamEndFps                        = beamEndFps;
+      _Instance.beamChargeFps                     = beamChargeFps;
+      _Instance.beamImpactFps                     = beamImpactFps;
+      _Instance.beamDims                          = beamDims;
+      _Instance.beamImpactDims                    = beamImpactDims;
+      _Instance.beamLoopCharge                    = beamLoopCharge;
+      _Instance.beamEmission                      = beamEmission;
+      _Instance.beamReflections                   = beamReflections;
+      _Instance.beamChargeDelay                   = beamChargeDelay;
+      _Instance.beamStatusDelay                   = beamStatusDelay;
+      _Instance.beamGoop                          = beamGoop;
+      _Instance.beamInterpolate                   = beamInterpolate;
+      _Instance.beamPiercing                      = beamPiercing;
+      _Instance.beamPiercesCover                  = beamPiercesCover;
+      _Instance.beamContinueToWall                = beamContinueToWall;
+      _Instance.beamIsRigid                       = beamIsRigid;
+      _Instance.beamKnockback                     = beamKnockback;
+      _Instance.beamTiling                        = beamTiling;
+      _Instance.beamEndType                       = beamEndType;
+      _Instance.beamSeparation                    = beamSeparation;
+      _Instance.beamStartIsMuzzle                 = beamStartIsMuzzle;
       return _Instance;
   }
 }
@@ -392,7 +496,62 @@ public static class GunBuilder
     if (p.AppliesSpeedModifier)
       p.speedEffect = Items.TripleCrossbow.AsGun().DefaultModule.projectiles[0].speedEffect;
 
+    if (b.isBeam)
+      p.InternalSetupBeam(b);
+
     return p;
+  }
+
+  /// <summary>Sets up all of the necessary stuff for beams</summary>
+  private static void InternalSetupBeam(this Projectile p, GunData b)
+  {
+      BasicBeamController beamComp = p.SetupBeamSprites(
+          spriteName : b.beamSprite,
+          fps        : b.beamFps,
+          dims       : b.beamDims ?? Vector2.one,
+          impactDims : b.beamImpactDims,
+          impactFps  : b.beamImpactFps,
+          endFps     : b.beamEndFps,
+          startFps   : b.beamStartFps,
+          chargeFps  : b.beamChargeFps,
+          loopCharge : b.beamLoopCharge);
+      if (b.beamChargeDelay >= 0f)
+      {
+        beamComp.usesChargeDelay = b.beamChargeDelay > 0;
+        beamComp.chargeDelay = b.beamChargeDelay;
+      }
+      if (b.beamEmission > 0f)
+      {
+        beamComp.sprite.usesOverrideMaterial = true;
+        beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+        beamComp.sprite.renderer.material.SetFloat("_EmissivePower", b.beamEmission);
+      }
+      if (b.beamReflections >= 0f)
+        beamComp.reflections = b.beamReflections;
+      if (b.beamStatusDelay >= 0f)
+        beamComp.TimeToStatus = b.beamStatusDelay;
+      if (b.beamPiercing >= 0f)
+        beamComp.penetration = b.beamPiercing;
+      if (b.beamKnockback >= 0f)
+        beamComp.knockbackStrength = b.beamKnockback;
+      if (b.beamIsRigid is bool rigid)
+        beamComp.boneType = rigid ? BasicBeamController.BeamBoneType.Straight : BasicBeamController.BeamBoneType.Projectile;
+      if (b.beamGoop != null)
+        beamComp.GetOrAddComponent<GoopModifier>().goopDefinition = b.beamGoop;
+
+      beamComp.interpolateStretchedBones = b.beamInterpolate    ?? beamComp.interpolateStretchedBones;
+      beamComp.ContinueBeamArtToWall     = b.beamContinueToWall ?? beamComp.ContinueBeamArtToWall;
+      beamComp.PenetratesCover           = b.beamPiercesCover   ?? beamComp.PenetratesCover;
+      beamComp.collisionSeparation       = b.beamSeparation     ?? beamComp.collisionSeparation;
+      beamComp.TileType                  = b.beamTiling         ?? beamComp.TileType;
+      beamComp.endType                   = b.beamEndType        ?? beamComp.endType;
+
+      if (b.beamStartIsMuzzle)
+      {
+          // fix some animation glitches (don't blindly copy paste; need to be set on a case by case basis depending on your beam's needs)
+          beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animation null
+          beamComp.beamStartAnimation = null;
+      }
   }
 
   /// <summary>Generic version of Clone, assuming we just want a normal projectile</summary>

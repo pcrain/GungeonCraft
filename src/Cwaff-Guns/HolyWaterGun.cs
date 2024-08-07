@@ -20,19 +20,9 @@ public class HolyWaterGun : CwaffGun
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam, jammedDamageMult: _JAMMED_DAMAGE_MULT,
-            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f))
-          .Attach<ExorcismJuice>()
-          .Assign(out Projectile projectile);
-
-        BasicBeamController beamComp = projectile.SetupBeamSprites(
-          spriteName: "holy_water_gun", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));
-            beamComp.sprite.usesOverrideMaterial = true;
-            beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-            beamComp.sprite.renderer.material.SetFloat("_EmissivePower", 15f);
-            // fix some animation glitches (don't blindly copy paste; need to be set on a case by case basis depending on your beam's needs)
-            beamComp.muzzleAnimation = beamComp.beamStartAnimation;  //use start animation for muzzle animation, make start animation null
-            beamComp.beamStartAnimation = null;
-            beamComp.interpolateStretchedBones = false; // causes weird graphical glitches whether it's enabled or not, but enabled is worse
+            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f, isBeam: true, beamSprite: "holy_water_gun",
+            beamFps: 20, beamDims: new Vector2(15, 15), beamImpactDims: new Vector2(7, 7), beamEmission: 15f, beamInterpolate: false, beamStartIsMuzzle: true))
+          .Attach<ExorcismJuice>();
 
         _ExorcismParticleVFX = VFX.Create("exorcism_particles", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 2);
     }
