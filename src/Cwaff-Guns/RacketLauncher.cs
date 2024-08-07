@@ -15,10 +15,11 @@ public class RacketLauncher : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true,
-                idleFps: _IDLE_FPS, shootFps: 60);
-            gun.spriteAnimator.playAutomatically = false; // don't autoplay idle animation when dropped
+        Gun gun = Lazy.SetupGun<RacketLauncher>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true,
+            idleFps: _IDLE_FPS, shootFps: 60);
+
+        gun.spriteAnimator.playAutomatically = false; //REFACTOR: don't autoplay idle animation when dropped
 
         gun.InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
           damage: 10.0f, speed: 20.0f, range: 300.0f, force: 12f, sprite: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter,

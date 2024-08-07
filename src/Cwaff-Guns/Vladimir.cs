@@ -20,16 +20,15 @@ public class Vladimir : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Vladimir>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.1f, ammo: 100,
-              infiniteAmmo: true, canReloadNoMatterAmmo: true, fireAudio: "vladimir_fire_sound", muzzleVFX: "muzzle_vladimir",
-              muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, curse: 1f, dynamicBarrelOffsets: true);
-            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
-
-        gun.InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 7.0f, speed: 1f, range: 0.01f, sprite: "vladimir_hitbox"))  // low range ensures the projectile dissipates swiftly
-        .SetAllImpactVFX(VFX.CreatePool("vladimir_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f))
-        .Attach<VladimirProjectile>();
+        Lazy.SetupGun<Vladimir>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.1f, ammo: 100,
+            infiniteAmmo: true, canReloadNoMatterAmmo: true, fireAudio: "vladimir_fire_sound", muzzleVFX: "muzzle_vladimir",
+            muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, curse: 1f, dynamicBarrelOffsets: true)
+          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
+            damage: 7.0f, speed: 1f, range: 0.01f, sprite: "vladimir_hitbox"))  // low range ensures the projectile dissipates swiftly
+          .SetAllImpactVFX(VFX.CreatePool("vladimir_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f))
+          .Attach<VladimirProjectile>();
 
         _AbsorbVFX = VFX.Create("vladimir_impale_projectile_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1f);
     }

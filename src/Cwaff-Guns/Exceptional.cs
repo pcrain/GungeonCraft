@@ -21,9 +21,9 @@ public class Exceptional : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Exceptional>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
-            gun.SetAttributes(quality: ItemQuality.SPECIAL, gunClass: CwaffGunClass.UTILITY, reloadTime: 0f, ammo: 80, shootFps: 30, reloadFps: 40,
-              muzzleFrom: Items.Mailbox, fireAudio: "corruption_sound", banFromBlessedRuns: true, infiniteAmmo: true, modulesAreTiers: true);
+        Gun gun = Lazy.SetupGun<Exceptional>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true)
+          .SetAttributes(quality: ItemQuality.SPECIAL, gunClass: CwaffGunClass.UTILITY, reloadTime: 0f, ammo: 80, shootFps: 30, reloadFps: 40,
+            muzzleFrom: Items.Mailbox, fireAudio: "corruption_sound", banFromBlessedRuns: true, infiniteAmmo: true, modulesAreTiers: true);
 
         Projectile proj = gun.InitProjectile(GunData.New(sprite: "exceptional_projectile", clipSize: 32, cooldown: 0.33f, shootStyle: ShootStyle.Burst,
             angleVariance: 10f, damage: 4.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f)).Attach<ExceptionalProjectile>();

@@ -13,22 +13,21 @@ public class RCLauncher : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<RCLauncher>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: _FULL_RELOAD_TIME, ammo: 240, shootFps: 30, reloadFps: 16,
-                loopReloadAt: 0, fireAudio: "rc_car_launch_sound", reloadAudio: "rc_car_reload_sound");
-
-        gun.InitSpecialProjectile<RCGuidedProjectile>(GunData.New(sprite: "rc_car_projectile", clipSize: 7, cooldown: 0.1f,
-          shootStyle: ShootStyle.SemiAutomatic, speed: 20f, damage: 9f, range: 9999f,
-          shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false,
-          spawnSound: "rc_car_engine_sound", stopSoundOnDeath: true, destroySound: "rc_car_crash_sound"))
-        .Attach<RCGuidedProjectile>(igp => {
-          igp.dumbfireTime          = 0.2f;
-          igp.trackingSpeed         = 360f;
-          igp.minSpeed              = 20f;
-          igp.accel                 = 15f;
-          igp.followTheLeader       = true;
-          igp.pierceMinorBreakables = true; })
-        .Attach<RCProjectileBehavior>();
+        Lazy.SetupGun<RCLauncher>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: _FULL_RELOAD_TIME, ammo: 240, shootFps: 30, reloadFps: 16,
+            loopReloadAt: 0, fireAudio: "rc_car_launch_sound", reloadAudio: "rc_car_reload_sound")
+          .InitSpecialProjectile<RCGuidedProjectile>(GunData.New(sprite: "rc_car_projectile", clipSize: 7, cooldown: 0.1f,
+            shootStyle: ShootStyle.SemiAutomatic, speed: 20f, damage: 9f, range: 9999f,
+            shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false,
+            spawnSound: "rc_car_engine_sound", stopSoundOnDeath: true, destroySound: "rc_car_crash_sound"))
+          .Attach<RCGuidedProjectile>(igp => {
+            igp.dumbfireTime          = 0.2f;
+            igp.trackingSpeed         = 360f;
+            igp.minSpeed              = 20f;
+            igp.accel                 = 15f;
+            igp.followTheLeader       = true;
+            igp.pierceMinorBreakables = true; })
+          .Attach<RCProjectileBehavior>();
 
         // Initialize our explosion data
         _CarExplosion = new ExplosionData()

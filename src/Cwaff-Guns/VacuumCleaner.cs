@@ -29,15 +29,13 @@ public class VacuumCleaner : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<VacuumCleaner>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
-                chargeFps: 16, banFromBlessedRuns: true);
-            gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
-            gun.AddToSubShop(ModdedShopType.Rusty);
-
-        gun.gameObject.AddComponent<VacuumAmmoDisplay>();
-
-        gun.InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
+        Lazy.SetupGun<VacuumCleaner>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.D, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
+            chargeFps: 16, banFromBlessedRuns: true)
+          .Attach<VacuumAmmoDisplay>()
+          .AddToSubShop(ItemBuilder.ShopType.Goopton)
+          .AddToSubShop(ModdedShopType.Rusty)
+          .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
         _VacuumVFX = VFX.Create("vacuum_wind_sprite_a", fps: 30, loops: true, loopStart: 6, anchor: Anchor.MiddleCenter, scale: 0.5f);
     }

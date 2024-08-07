@@ -12,14 +12,14 @@ public class QuarterPounder : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<QuarterPounder>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false,
-                shootFps: 24, reloadFps: 16, muzzleVFX: "muzzle_quarter_pounder", muzzleFps: 30, muzzleScale: 0.4f, muzzleAnchor: Anchor.MiddleCenter,
-                fireAudio: "fire_coin_sound", reloadAudio: "coin_gun_reload", banFromBlessedRuns: true);
-            //NOTE: can't use vanilla RequiresFundsToShoot because that gives us an infinite clip size
-
-        gun.InitProjectile(GunData.New(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 20.0f, speed: 44.0f,
-          sprite: "coin_gun_projectile", fps: 2, anchor: Anchor.MiddleCenter, hitSound: "coin_hit_wall_sound")).Attach<MidasProjectile>();
+        //NOTE: can't use vanilla RequiresFundsToShoot because that gives us an infinite clip size
+        Lazy.SetupGun<QuarterPounder>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 9999, canGainAmmo: false,
+            shootFps: 24, reloadFps: 16, muzzleVFX: "muzzle_quarter_pounder", muzzleFps: 30, muzzleScale: 0.4f, muzzleAnchor: Anchor.MiddleCenter,
+            fireAudio: "fire_coin_sound", reloadAudio: "coin_gun_reload", banFromBlessedRuns: true)
+          .InitProjectile(GunData.New(clipSize: 10, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 20.0f, speed: 44.0f,
+            sprite: "coin_gun_projectile", fps: 2, anchor: Anchor.MiddleCenter, hitSound: "coin_hit_wall_sound"))
+          .Attach<MidasProjectile>();
 
         _GoldProjectile = Items.Ak47.CloneProjectile(GunData.New(sprite: "midas_gold_projectile", damage: 30.0f, speed: 80.0f, force: 10.0f,
           range: 80.0f, shouldRotate: true)).Attach<MidasProjectile>();

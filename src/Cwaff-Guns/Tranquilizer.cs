@@ -14,12 +14,12 @@ public class Tranquilizer : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Tranquilizer>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 80, shootFps: 30, reloadFps: 40,
-                muzzleFrom: Items.Mailbox, fireAudio: "blowgun_fire_sound", reloadAudio: "blowgun_reload_sound", banFromBlessedRuns: true);
-
-        gun.InitProjectile(GunData.New(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 0f,
-          sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft)).Attach<TranquilizerBehavior>();
+        Lazy.SetupGun<Tranquilizer>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.D, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 80, shootFps: 30, reloadFps: 40,
+            muzzleFrom: Items.Mailbox, fireAudio: "blowgun_fire_sound", reloadAudio: "blowgun_reload_sound", banFromBlessedRuns: true)
+          .InitProjectile(GunData.New(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 0f,
+            sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft))
+          .Attach<TranquilizerBehavior>();
 
         _DrowsyVFX      = VFX.Create("drowsy_cloud", fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
         _SleepyVFX      = VFX.Create("sheep_vfx", fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.75f);

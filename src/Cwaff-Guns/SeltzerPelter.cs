@@ -14,20 +14,21 @@ public class SeltzerPelter : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150, shootFps: 36, muzzleFrom: Items.Mailbox);
-            _ReloadAnimations = new(){
-                gun.QuickUpdateGunAnimation("reload",   returnToIdle: true), // coke can
-                gun.QuickUpdateGunAnimation("reload_b", returnToIdle: true), // pepsi can
-                gun.QuickUpdateGunAnimation("reload_c", returnToIdle: true), // sprite can
-            };
-            foreach(string animation in _ReloadAnimations)
-            {
-                gun.SetAnimationFPS(animation, 52);
-                gun.SetGunAudio(animation, "seltzer_shake_sound", 0, 10, 22, 29, 35);
-                gun.SetGunAudio(animation, "seltzer_insert_sound", 42);
-            }
-            gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
+        Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 150, shootFps: 36, muzzleFrom: Items.Mailbox)
+          .AddToSubShop(ItemBuilder.ShopType.Goopton);
+
+        _ReloadAnimations = new(){
+            gun.QuickUpdateGunAnimation("reload",   returnToIdle: true), // coke can
+            gun.QuickUpdateGunAnimation("reload_b", returnToIdle: true), // pepsi can
+            gun.QuickUpdateGunAnimation("reload_c", returnToIdle: true), // sprite can
+        };
+        foreach(string animation in _ReloadAnimations)
+        {
+            gun.SetAnimationFPS(animation, 52);
+            gun.SetGunAudio(animation, "seltzer_shake_sound", 0, 10, 22, 29, 35);
+            gun.SetGunAudio(animation, "seltzer_insert_sound", 42);
+        }
 
         gun.InitProjectile(GunData.New(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
           damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later

@@ -24,26 +24,26 @@ public class Grandmaster : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Grandmaster>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350, shootFps: 24, reloadFps: 16,
-                muzzleFrom: Items.Mailbox, fireAudio: "chess_gun_fire", reloadAudio: "chess_gun_reload");
-
-        _Projectile = gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
-          speed: 30f, damage: 5.5f, force: 9f, range: 1000f, shouldRotate: false))
-        .AddAnimations(
-          AnimatedBullet.Create(refClip: ref _PawnSprite,        name: "chess_pawn",         scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _RookSprite,        name: "chess_rook",         scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _BishopSprite,      name: "chess_bishop",       scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _KnightSprite,      name: "chess_knight",       scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _QueenSprite,       name: "chess_queen",        scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _KingSprite,        name: "chess_king",         scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _BlackPawnSprite,   name: "chess_pawn_black",   scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _BlackRookSprite,   name: "chess_rook_black",   scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _BlackBishopSprite, name: "chess_bishop_black", scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _BlackKnightSprite, name: "chess_knight_black", scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _BlackQueenSprite,  name: "chess_queen_black",  scale: 0.8f, anchor: Anchor.MiddleCenter),
-          AnimatedBullet.Create(refClip: ref _BlackKingSprite,   name: "chess_king_black",   scale: 0.8f, anchor: Anchor.MiddleCenter))
-        .Attach<PlayChessBehavior>();
+        Lazy.SetupGun<Grandmaster>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350, shootFps: 24, reloadFps: 16,
+            muzzleFrom: Items.Mailbox, fireAudio: "chess_gun_fire", reloadAudio: "chess_gun_reload")
+          .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
+            speed: 30f, damage: 5.5f, force: 9f, range: 1000f, shouldRotate: false))
+          .AddAnimations(
+            AnimatedBullet.Create(refClip: ref _PawnSprite,        name: "chess_pawn",         scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _RookSprite,        name: "chess_rook",         scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BishopSprite,      name: "chess_bishop",       scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _KnightSprite,      name: "chess_knight",       scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _QueenSprite,       name: "chess_queen",        scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _KingSprite,        name: "chess_king",         scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackPawnSprite,   name: "chess_pawn_black",   scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackRookSprite,   name: "chess_rook_black",   scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackBishopSprite, name: "chess_bishop_black", scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackKnightSprite, name: "chess_knight_black", scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackQueenSprite,  name: "chess_queen_black",  scale: 0.8f, anchor: Anchor.MiddleCenter),
+            AnimatedBullet.Create(refClip: ref _BlackKingSprite,   name: "chess_king_black",   scale: 0.8f, anchor: Anchor.MiddleCenter))
+          .Attach<PlayChessBehavior>()
+          .Assign(out _Projectile);
     }
 
     public override void OnDestroy()

@@ -11,15 +11,14 @@ public class PlatinumStar : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<PlatinumStar>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480, shootFps: 20, reloadFps: 40,
-                muzzleVFX: "muzzle_platinum_star", muzzleFps: 60, muzzleScale: 0.25f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "platinum_fire_sound");
-            gun.SetReloadAudio("platinum_reload_sound", frame: 5);
-            gun.AddToSubShop(ModdedShopType.TimeTrader);
-
-        gun.InitProjectile(GunData.New(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
-          damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f, sprite: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft, spawnSound: "tomislav_shoot"))
-        .Attach<PlatinumProjectile>();
+        Lazy.SetupGun<PlatinumStar>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480, shootFps: 20, reloadFps: 40,
+            muzzleVFX: "muzzle_platinum_star", muzzleFps: 60, muzzleScale: 0.25f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "platinum_fire_sound")
+          .SetReloadAudio("platinum_reload_sound", frame: 5)
+          .AddToSubShop(ModdedShopType.TimeTrader)
+          .InitProjectile(GunData.New(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
+            damage: 3.0f, speed: 50.0f, force: 1.0f, range: 50.0f, sprite: "platinum_star_projectile", fps: 12, anchor: Anchor.MiddleLeft, spawnSound: "tomislav_shoot"))
+          .Attach<PlatinumProjectile>();
 
         _OraBullet = Items.Polaris.CloneProjectile(GunData.New(damage: 1.0f, speed: 75.0f, force: 0.1f, range: 3.0f, shouldRotate: true))
           .AddAnimations(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight))

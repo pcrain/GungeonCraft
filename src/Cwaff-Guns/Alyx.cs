@@ -23,14 +23,13 @@ public class Alyx : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Alyx>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO,
-                shootFps: 20, reloadFps: 20, muzzleVFX: "muzzle_alyx", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
-                reloadAudio: "alyx_reload_sound");
-            gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
-
-        gun.InitProjectile(GunData.New(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: true, damage: 15.0f, speed: 20.0f,
-          poison: 1.0f, fire: 1.0f, sprite: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter, spawnSound: "alyx_shoot_sound", uniqueSounds: true));
+        Lazy.SetupGun<Alyx>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO,
+            shootFps: 20, reloadFps: 20, muzzleVFX: "muzzle_alyx", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
+            reloadAudio: "alyx_reload_sound")
+          .AddToSubShop(ItemBuilder.ShopType.Goopton)
+          .InitProjectile(GunData.New(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: true, damage: 15.0f, speed: 20.0f, poison: 1.0f,
+            fire: 1.0f, sprite: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter, spawnSound: "alyx_shoot_sound", uniqueSounds: true));
     }
 
     private void Start()

@@ -21,22 +21,22 @@ public class Crapshooter : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Crapshooter>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300, idleFps: 6, shootFps: 24,
-                reloadFps: 24, muzzleFrom: Items.Mailbox, fireAudio: "crapshooter_shoot_sound");
-            gun.SetReloadAudio(_DiceSounds[0], 0, 6, 11, 14, 17, 19, 28);
-            gun.SetReloadAudio(_DiceSounds[1], 3, 7, 12, 15, 21, 27);
-            gun.SetReloadAudio(_DiceSounds[2], 2, 18, 23, 25, 31);
-
-        _BaseCrapshooterProjectile = gun.InitSpecialProjectile<GrenadeProjectile>(GunData.New(clipSize: 12, cooldown: 0.16f,
-          shootStyle: ShootStyle.Automatic, scale: 2.0f, damage: 3f, speed: 24f, force: 10f, range: 30f, customClip: true,
-          sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false))
-        .Attach<GrenadeProjectile>(g => { g.startingHeight = 0.5f; })
-        .Attach<BounceProjModifier>(bounce => {
-          bounce.percentVelocityToLoseOnBounce = 0.5f;
-          bounce.numberOfBounces = Mathf.Max(bounce.numberOfBounces, 0) + 3;
-          bounce.OnBounce += () => { bounce.gameObject.Play(_DiceSounds.ChooseRandom()); }; })
-        .Attach<DiceProjectile>();
+        Lazy.SetupGun<Crapshooter>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300, idleFps: 6, shootFps: 24,
+            reloadFps: 24, muzzleFrom: Items.Mailbox, fireAudio: "crapshooter_shoot_sound")
+          .SetReloadAudio(_DiceSounds[0], 0, 6, 11, 14, 17, 19, 28)
+          .SetReloadAudio(_DiceSounds[1], 3, 7, 12, 15, 21, 27)
+          .SetReloadAudio(_DiceSounds[2], 2, 18, 23, 25, 31)
+          .InitSpecialProjectile<GrenadeProjectile>(GunData.New(clipSize: 12, cooldown: 0.16f,
+            shootStyle: ShootStyle.Automatic, scale: 2.0f, damage: 3f, speed: 24f, force: 10f, range: 30f, customClip: true,
+            sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false))
+          .Attach<GrenadeProjectile>(g => { g.startingHeight = 0.5f; })
+          .Attach<BounceProjModifier>(bounce => {
+            bounce.percentVelocityToLoseOnBounce = 0.5f;
+            bounce.numberOfBounces = Mathf.Max(bounce.numberOfBounces, 0) + 3;
+            bounce.OnBounce += () => { bounce.gameObject.Play(_DiceSounds.ChooseRandom()); }; })
+          .Attach<DiceProjectile>()
+          .Assign(out _BaseCrapshooterProjectile);
     }
 
     private void Explode(Projectile p)

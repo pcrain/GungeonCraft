@@ -32,12 +32,11 @@ public class Breegull : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Breegull>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 480, shootFps: 20, reloadFps: 12,
-                introFps: 8, fireAudio: "breegull_shoot_sound", introAudio: "breegull_intro_sound", carryOffset: new IntVector2(6, 0));
-            gun.SetReloadAudio("breegull_reload_sound", 0, 4, 8);
-
-        gun.gameObject.AddComponent<BreegullAmmoDisplay>();
+        Gun gun = Lazy.SetupGun<Breegull>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 480, shootFps: 20, reloadFps: 12,
+            introFps: 8, fireAudio: "breegull_shoot_sound", introAudio: "breegull_intro_sound", carryOffset: new IntVector2(6, 0))
+          .SetReloadAudio("breegull_reload_sound", 0, 4, 8)
+          .Attach<BreegullAmmoDisplay>();
 
         ExplosionData clockworkExplosion = new ExplosionData()
         {

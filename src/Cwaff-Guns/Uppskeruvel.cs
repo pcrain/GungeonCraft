@@ -34,18 +34,17 @@ public class Uppskeruvel : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Uppskeruvel>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.25f, ammo: 400, shootFps: 24, reloadFps: 30,
-                muzzleVFX: "muzzle_uppskeruvel", muzzleFps: 60, muzzleScale: 0.2f, muzzleAnchor: Anchor.MiddleCenter,
-                fireAudio: "uppskeruvel_fire_sound");
-            gun.SetReloadAudio("uppskeruvel_reload_sound", 4, 22);
+        Gun gun = Lazy.SetupGun<Uppskeruvel>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.25f, ammo: 400, shootFps: 24, reloadFps: 30,
+            muzzleVFX: "muzzle_uppskeruvel", muzzleFps: 60, muzzleScale: 0.2f, muzzleAnchor: Anchor.MiddleCenter,
+            fireAudio: "uppskeruvel_fire_sound")
+          .SetReloadAudio("uppskeruvel_reload_sound", 4, 22)
+          .Attach<UppskeruvelAmmoDisplay>();
 
         gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: true,
-          sprite: "uppskeruvel_projectile", fps: 12, anchor: Anchor.MiddleLeft, hitEnemySound: "soul_impact_sound"))
-        .Attach<UppskeruvelProjectile>()
-        .CopyAllImpactVFX(Items.SkullSpitter);
-
-        gun.gameObject.AddComponent<UppskeruvelAmmoDisplay>();
+            sprite: "uppskeruvel_projectile", fps: 12, anchor: Anchor.MiddleLeft, hitEnemySound: "soul_impact_sound"))
+          .Attach<UppskeruvelProjectile>()
+          .CopyAllImpactVFX(Items.SkullSpitter);
 
         _SoulTrailPrefab = VFX.CreateSpriteTrailObject("uppskeruvel_soul_trail", fps: 60, cascadeTimer: 4f * C.FRAME, softMaxLength: 2f, destroyOnEmpty: false);
 
@@ -63,7 +62,7 @@ public class Uppskeruvel : CwaffGun
         for (int i = 0; i < _MAX_SOULS; ++i)
             _LevelThresholds[i] = 5 * (i*i+i);
 
-        _UppskeruvelId = gun.PickupObjectId;
+        _UppskeruvelId = gun.PickupObjectId; //REFACTOR
     }
 
     public override void OnPlayerPickup(PlayerController player)

@@ -18,19 +18,18 @@ public class Maestro : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Maestro>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 500, shootFps: 24,
-                muzzleFrom: Items.FaceMelter, doesScreenShake: false, continuousFire: true, curse: 1f, dynamicBarrelOffsets: true,
-                banFromBlessedRuns: true);
-            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
-
-        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.2f, angleVariance: 15.0f,
-          shootStyle: ShootStyle.Automatic, damage: 9f, speed: 60.0f, ammoType: GameUIAmmoType.AmmoType.BEAM,
-          sprite: "maestro_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
-        gun.AddReticle<CwaffEnemyReticle>(reticleVFX : VFX.Create("maestro_target_enemy_vfx", fps: 2), aimFromPlayerCenter: true,
-            reticleAlpha  : 0.5f, smoothLerp : true, rotateSpeed : 270f, visibility : CwaffReticle.Visibility.WITHTARGET);
-        gun.AddReticle<CwaffProjectileReticle>(reticleVFX : VFX.Create("maestro_target_projectile_vfx", fps: 2), aimFromPlayerCenter: true,
-            reticleAlpha : 0.75f, smoothLerp : true, rotateSpeed : 270f, visibility : CwaffReticle.Visibility.WITHTARGET);
+        Lazy.SetupGun<Maestro>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 500, shootFps: 24,
+            muzzleFrom: Items.FaceMelter, doesScreenShake: false, continuousFire: true, curse: 1f, dynamicBarrelOffsets: true,
+            banFromBlessedRuns: true)
+          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .AddReticle<CwaffEnemyReticle>(reticleVFX : VFX.Create("maestro_target_enemy_vfx", fps: 2), aimFromPlayerCenter: true,
+            reticleAlpha  : 0.5f, smoothLerp : true, rotateSpeed : 270f, visibility : CwaffReticle.Visibility.WITHTARGET)
+          .AddReticle<CwaffProjectileReticle>(reticleVFX : VFX.Create("maestro_target_projectile_vfx", fps: 2), aimFromPlayerCenter: true,
+            reticleAlpha : 0.75f, smoothLerp : true, rotateSpeed : 270f, visibility : CwaffReticle.Visibility.WITHTARGET)
+          .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.2f, angleVariance: 15.0f,
+            shootStyle: ShootStyle.Automatic, damage: 9f, speed: 60.0f, ammoType: GameUIAmmoType.AmmoType.BEAM,
+            sprite: "maestro_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
     }
 
     private GameObject GetTargetEnemy(CwaffReticle reticle) => this._targetEnemy ? this._targetEnemy.gameObject : null;

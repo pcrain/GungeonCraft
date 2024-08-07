@@ -145,23 +145,17 @@ public class Femtobyte : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Femtobyte>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: CwaffGunClass.UTILITY, reloadTime: 0.0f, ammo: 9999, canGainAmmo: false,
-                infiniteAmmo: true, shootFps: 24, reloadFps: 16, modulesAreTiers: true, fireAudio: "femtobyte_shoot_sound", banFromBlessedRuns: true);
-            //NOTE: modulesAreTiers with no 2nd module lets use switch to tier 1 to do cool alternate stuff without firing projectiles
-
-        Projectile proj = gun.InitProjectile(GunData.New(clipSize: -1, angleVariance: 2.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f, speed: 90.0f,
-          cooldown: 0.4f, sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter, hitEnemySound: "femtobyte_hit_enemy_sound"))
-        .Attach<FemtobyteProjectile>();
-        proj.AddTrailToProjectilePrefab("femtobyte_beam", fps: 10, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false);
+        //NOTE: modulesAreTiers with no 2nd module lets use switch to tier 1 to do cool alternate stuff without firing projectiles
+        Lazy.SetupGun<Femtobyte>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: CwaffGunClass.UTILITY, reloadTime: 0.0f, ammo: 9999, canGainAmmo: false,
+            infiniteAmmo: true, shootFps: 24, reloadFps: 16, modulesAreTiers: true, fireAudio: "femtobyte_shoot_sound", banFromBlessedRuns: true)
+          .Attach<FemtobyteAmmoDisplay>()
+          .InitProjectile(GunData.New(clipSize: -1, angleVariance: 2.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f, speed: 90.0f,
+            cooldown: 0.4f, sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter, hitEnemySound: "femtobyte_hit_enemy_sound"))
+          .Attach<FemtobyteProjectile>()
+          .AddTrailToProjectilePrefab("femtobyte_beam", fps: 10, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false); //REFACTOR: return projectile
 
         _ImpactBits = VFX.Create("femtobyte_projectile_vfx", fps: 1, loops: false, anchor: Anchor.MiddleCenter);
-
-        gun.gameObject.AddComponent<FemtobyteAmmoDisplay>();
-
-        // foreach (var kvpair in _NameToPrefabMap)
-        //     if (kvpair.Value == null || kvpair.Value.prefab == null)
-        //         ETGModConsole.Log($"  failed to load prefab for {kvpair.Key}");
     }
 
     private static bool IsWhiteListedPrefab(GameObject bodyObject, out PrefabData trapPrefab)

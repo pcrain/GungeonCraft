@@ -12,13 +12,14 @@ public class MacchiAuto : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<MacchiAuto>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true);
-            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
-            gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
-
-        Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
-            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 1f, speed: 50.0f, force: 0.0f)).Attach<OverdoseJuice>();
+        Lazy.SetupGun<MacchiAuto>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true)
+          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .AddToSubShop(ItemBuilder.ShopType.Goopton)
+          .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
+            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 1f, speed: 50.0f, force: 0.0f))
+          .Attach<OverdoseJuice>()
+          .Assign(out Projectile projectile);
 
         _OverdoseEffect = new OverdoseEffect() {
             TintColor        = _OverdoseTint,

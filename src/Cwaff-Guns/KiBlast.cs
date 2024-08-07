@@ -24,14 +24,16 @@ public class KiBlast : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<KiBlast>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 20, canGainAmmo: false, idleFps: 10,
-                fireAudio: "ki_blast_sound", muzzleVFX: "muzzle_ki_blast", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft);
-            _FireLeftAnim  = gun.shootAnimation;
-            _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true);
-            gun.SetAnimationFPS(_FireLeftAnim, 24);
-            gun.SetAnimationFPS(_FireRightAnim, 24);
-            gun.AddToSubShop(ModdedShopType.Boomhildr);
+        Gun gun = Lazy.SetupGun<KiBlast>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 20, canGainAmmo: false, idleFps: 10,
+            fireAudio: "ki_blast_sound", muzzleVFX: "muzzle_ki_blast", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft)
+          .Attach<KiBlastAmmoDisplay>()
+          .AddToSubShop(ModdedShopType.Boomhildr);
+
+        _FireLeftAnim  = gun.shootAnimation;
+        _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true);
+        gun.SetAnimationFPS(_FireLeftAnim, 24);
+        gun.SetAnimationFPS(_FireRightAnim, 24);
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
           ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 4.0f, range: 1000.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
@@ -46,8 +48,6 @@ public class KiBlast : CwaffGun
           trail.EndColor   = Color.cyan; })
         .Attach<ArcTowardsTargetBehavior>()
         .Attach<KiBlastBehavior>(); //TODO: KiBlastBehavior must init before ArcTowardsTargetBehavior so we can call Setup() before Start()
-
-        gun.gameObject.AddComponent<KiBlastAmmoDisplay>();
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

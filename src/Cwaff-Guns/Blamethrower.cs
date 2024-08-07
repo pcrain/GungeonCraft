@@ -13,15 +13,14 @@ public class Blamethrower : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Blamethrower>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 300,
-                doesScreenShake: false, canReloadNoMatterAmmo: true, shootFps: 40, muzzleVFX: "muzzle_blamethrower", muzzleFps: 30);
-
-        Projectile proj = gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic,
-          damage: 2f, angleVariance: 30f, speed: 17f, range: 17f, customClip: true,
-          sprite: "blamethrower_projectile", scale: 2.0f, fps: 10, anchor: Anchor.MiddleCenter, shouldRotate: false))
-        .Attach<BlameDamage>()
-        .Attach<BlamethrowerProjectile>();
+        Lazy.SetupGun<Blamethrower>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 300,
+            doesScreenShake: false, canReloadNoMatterAmmo: true, shootFps: 40, muzzleVFX: "muzzle_blamethrower", muzzleFps: 30)
+          .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic,
+            damage: 2f, angleVariance: 30f, speed: 17f, range: 17f, customClip: true,
+            sprite: "blamethrower_projectile", scale: 2.0f, fps: 10, anchor: Anchor.MiddleCenter, shouldRotate: false))
+          .Attach<BlameDamage>()
+          .Attach<BlamethrowerProjectile>();
 
         _BlameImpact = VFX.Create("blamethrower_projectile_vfx", fps: 1, loops: false, anchor: Anchor.MiddleCenter);
         _BlameTrail = VFX.Create("blamethrower_trail", fps: 16, loops: true, anchor: Anchor.MiddleCenter);

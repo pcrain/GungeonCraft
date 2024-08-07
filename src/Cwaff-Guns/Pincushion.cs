@@ -17,28 +17,27 @@ public class Pincushion : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Pincushion>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.8f, ammo: 10000, doesScreenShake: false,
-                shootFps: 30, reloadFps: 24);
-            gun.SetReloadAudio("pincushion_reload_start_sound", 0);
-            gun.SetReloadAudio("pincushion_reload_sound", 8, 13, 18, 23, 28, 35);
+        Lazy.SetupGun<Pincushion>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.8f, ammo: 10000, doesScreenShake: false,
+            shootFps: 30, reloadFps: 24)
+          .SetReloadAudio("pincushion_reload_start_sound", 0)
+          .SetReloadAudio("pincushion_reload_sound", 8, 13, 18, 23, 28, 35)
+          .InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
+            damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, spawnSound: "pincushion_fire",
+            anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS))
+          .SetAllImpactVFX(_Microdust)
+          .Attach<VeryFragileProjectile>()
+          .Attach<EasyTrailBullet>(trail => {
+            trail.TrailPos   = trail.transform.position;
+            trail.StartWidth = 0.1f;
+            trail.EndWidth   = 0f;
+            trail.LifeTime   = 0.1f;
+            trail.StartColor = Color.gray;
+            trail.BaseColor  = Color.gray;
+            trail.EndColor   = Color.gray;
+          });
 
         _Microdust = VFX.CreatePool("microdust", fps: 30, loops: false);
-
-        gun.InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
-          damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, spawnSound: "pincushion_fire",
-          anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS))
-        .SetAllImpactVFX(_Microdust)
-        .Attach<VeryFragileProjectile>()
-        .Attach<EasyTrailBullet>(trail => {
-          trail.TrailPos   = trail.transform.position;
-          trail.StartWidth = 0.1f;
-          trail.EndWidth   = 0f;
-          trail.LifeTime   = 0.1f;
-          trail.StartColor = Color.gray;
-          trail.BaseColor  = Color.gray;
-          trail.EndColor   = Color.gray;
-        });
     }
 
     // GetLowDiscrepancyRandom() makes projectiles not spread as randomly as they could, so override that randomness with our own spread

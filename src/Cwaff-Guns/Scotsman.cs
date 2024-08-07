@@ -19,16 +19,16 @@ public class Scotsman : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Scotsman>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 2.00f, ammo: 300, canReloadNoMatterAmmo: true,
-                shootFps: 24, reloadFps: 12, fireAudio: "stickybomblauncher_shoot", reloadAudio: "stickybomblauncher_worldreload",
-                muzzleVFX: "muzzle_scotsman", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft);
-            gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
-
-        gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 5.0f, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter)).Attach<Stickybomb>();
-        gun.AddReticle<CwaffReticle>(reticleVFX : VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter),
-          controllerScale : _MAX_RETICLE_RANGE, visibility : CwaffReticle.Visibility.CONTROLLER);
+        Lazy.SetupGun<Scotsman>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 2.00f, ammo: 300, canReloadNoMatterAmmo: true,
+            shootFps: 24, reloadFps: 12, fireAudio: "stickybomblauncher_shoot", reloadAudio: "stickybomblauncher_worldreload",
+            muzzleVFX: "muzzle_scotsman", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft)
+          .AddReticle<CwaffReticle>(reticleVFX : VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter),
+            controllerScale : _MAX_RETICLE_RANGE, visibility : CwaffReticle.Visibility.CONTROLLER)
+          .AddToSubShop(ItemBuilder.ShopType.Trorc)
+          .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
+            damage: 5.0f, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter))
+          .Attach<Stickybomb>();
 
         // Initialize our explosion data
         _ScotsmanExplosion = new ExplosionData()

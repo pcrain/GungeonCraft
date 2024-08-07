@@ -19,9 +19,9 @@ public class Blackjack : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Blackjack>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _AMMO, canGainAmmo: false,
-                shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound", fireAudio: "card_throw_sound");
+        Gun gun = Lazy.SetupGun<Blackjack>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _AMMO, canGainAmmo: false,
+            shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound", fireAudio: "card_throw_sound");
 
         Projectile p = gun.InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
           customClip: true, damage: 6f, speed: 22f, range: 999f, hitSound: "blackjack_card_impact_sound"))

@@ -34,12 +34,11 @@ public class AlienNailgun : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<AlienNailgun>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.7f, ammo: 480, idleFps: 24, shootFps: 24, reloadFps: 60,
-                loopReloadAt: 0, muzzleFrom: Items.Mailbox, fireAudio: "alien_nailgun_shoot_sound", reloadAudio: "gorgun_eye_activate");
-            gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
-
-        gun.InitProjectile(GunData.New(clipSize: _RECONSTRUCT_COST, cooldown: 0.14f, shootStyle: ShootStyle.Charged, damage: 2.0f,
+        Lazy.SetupGun<AlienNailgun>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.7f, ammo: 480, idleFps: 24, shootFps: 24, reloadFps: 60,
+            loopReloadAt: 0, muzzleFrom: Items.Mailbox, fireAudio: "alien_nailgun_shoot_sound", reloadAudio: "gorgun_eye_activate")
+          .AddToSubShop(ItemBuilder.ShopType.Goopton)
+          .InitProjectile(GunData.New(clipSize: _RECONSTRUCT_COST, cooldown: 0.14f, shootStyle: ShootStyle.Charged, damage: 2.0f,
             sprite: "alien_nailgun_projectile", customClip: true, chargeTime: 0.0f, useDummyChargeModule: true));
 
         _Charm = new(){

@@ -52,6 +52,20 @@ public static class ModdedShopItemAdder
         _ModdedShopNameMap["ski:Arms_Dealer"]    = ModdedShopType.Handy;
     }
 
+    // Add a gun to a vanilla shop and return the gun
+    public static Gun AddToSubShop(this Gun gun, ItemBuilder.ShopType type/*, float weight = 1*/)
+    {
+        gun.AddToSubShop(type);
+        return gun;
+    }
+
+    // Extension method for adding items to modded subshops (delayed until first level is loaded, then used by AddOurItemsToModdedShops())
+    public static Gun AddToSubShop(this Gun gun, ModdedShopType type/*, float weight = 1*/)
+    {
+        _ModdedShopItems[type].Add(gun.PickupObjectId);
+        return gun;
+    }
+
     // Extension method for adding items to modded subshops (delayed until first level is loaded, then used by AddOurItemsToModdedShops())
     public static void AddToSubShop(this PickupObject po, ModdedShopType type/*, float weight = 1*/)
     {

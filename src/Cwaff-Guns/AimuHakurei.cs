@@ -28,11 +28,11 @@ public class AimuHakurei : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
-                ammo: 200, canGainAmmo: false, canReloadNoMatterAmmo: true, modulesAreTiers: true, shootFps: 60, muzzleVFX: "muzzle_aimu",
-                muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter);
-            gun.AddToSubShop(ModdedShopType.TimeTrader);
+        Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
+            ammo: 200, canGainAmmo: false, canReloadNoMatterAmmo: true, modulesAreTiers: true, shootFps: 60, muzzleVFX: "muzzle_aimu",
+            muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter)
+          .AddToSubShop(ModdedShopType.TimeTrader);
 
         _BulletSprite = AnimatedBullet.Create(name: "aimu_projectile", fps: 2, scale: 0.625f, anchor: Anchor.MiddleCenter);
 
@@ -40,11 +40,10 @@ public class AimuHakurei : CwaffGun
 
         _ProjBase = gun.InitFirstProjectile(GunData.New(damage: 8f, speed: 44f, range: 100f, force: 3f));
 
-        Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f, spawnSound: "aimu_beam_sound_2"));
-            TrailController tc = beamProj.AddTrailToProjectilePrefab(
-                "aimu_beam_mid", fps: 60, startAnim: "aimu_beam_start", softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true,
-                dispersalPrefab: Items.FlashRay.AsGun().DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab);
-            beamProj.SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
+        Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f, spawnSound: "aimu_beam_sound_2"))
+          .SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter));
+        beamProj.AddTrailToProjectilePrefab("aimu_beam_mid", fps: 60, startAnim: "aimu_beam_start", softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true,
+          dispersalPrefab: Items.FlashRay.AsGun().DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab);
 
         // set up tiered projectiles
         gun.Volley.projectiles = new(){

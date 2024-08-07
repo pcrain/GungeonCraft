@@ -28,13 +28,12 @@ public class Magunet : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Magunet>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
-                chargeFps: 16, curse: 1f, banFromBlessedRuns: true);
-            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
-
-        //TODO: can possibly use dummy charge module here
-        gun.InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
+        Lazy.SetupGun<Magunet>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
+            chargeFps: 16, curse: 1f, banFromBlessedRuns: true)
+          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, //TODO: can possibly use dummy charge module here
+            ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
         _MagunetBeamVFX = VFX.Create("magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.65f, emissivePower: 1f);
         _MagunetChargeVFX = VFX.Create("magunet_charge_vfx", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f);

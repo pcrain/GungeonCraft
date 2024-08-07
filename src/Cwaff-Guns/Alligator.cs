@@ -30,16 +30,14 @@ public class Alligator : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Alligator>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300, shootFps: 20, reloadFps: 16,
-                muzzleVFX: "muzzle_alligator", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 50f,
-                fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound", dynamicBarrelOffsets: true);
-
-        gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
-          damage: 1.0f, speed: 50.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter, electric: true))
-        .Attach<AlligatorProjectile>();
-
-        gun.gameObject.AddComponent<AlligatorAmmoDisplay>();
+        Lazy.SetupGun<Alligator>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300, shootFps: 20, reloadFps: 16,
+            muzzleVFX: "muzzle_alligator", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 50f,
+            fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound", dynamicBarrelOffsets: true)
+          .Attach<AlligatorAmmoDisplay>()
+          .InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
+            damage: 1.0f, speed: 50.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter, electric: true))
+          .Attach<AlligatorProjectile>();
 
         _SparkVFX = VFX.Create("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
         _ClipVFX  = VFX.Create("alligator_clamped_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter);

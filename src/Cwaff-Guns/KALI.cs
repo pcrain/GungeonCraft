@@ -20,12 +20,12 @@ public class KALI : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<KALI>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 200, fireAudio: "kali_shoot_sound");
+        Gun gun = Lazy.SetupGun<KALI>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 200, fireAudio: "kali_shoot_sound");
 
         _KaliProjectile = gun.InitProjectile(GunData.New(range: 9999f, force: 3f, cooldown: 0.1f, collidesWithProjectiles: true,
-          clipSize: 1, sprite: "kali_projectile", shootStyle: ShootStyle.Charged))
-        .Attach<PierceProjModifier>(pierce => { pierce.penetration = 999; pierce.penetratesBreakables = true; });
+            clipSize: 1, sprite: "kali_projectile", shootStyle: ShootStyle.Charged))
+          .Attach<PierceProjModifier>(pierce => { pierce.penetration = 999; pierce.penetratesBreakables = true; });
         _KaliProjectile.AddTrailToProjectilePrefab("kali_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false,
           dispersalPrefab: Items.FlashRay.AsGun().DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab);
 

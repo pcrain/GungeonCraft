@@ -15,10 +15,16 @@ public class SubtractorBeam : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<SubtractorBeam>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300, idleFps: 10, shootFps: 24, reloadFps: 30,
-                muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter,
-                reloadAudio: "subtractor_beam_reload_sound", banFromBlessedRuns: true);
+        Lazy.SetupGun<SubtractorBeam>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 1.25f, ammo: 300, idleFps: 10, shootFps: 24, reloadFps: 30,
+            muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter,
+            reloadAudio: "subtractor_beam_reload_sound", banFromBlessedRuns: true)
+          .InitProjectile(GunData.New(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,
+            damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f, customClip: true, spawnSound: "subtractor_beam_fire_sound", uniqueSounds: true))
+          .Attach<PierceProjModifier>(pierce => {
+            pierce.penetration            = 999;
+            pierce.penetratesBreakables   = true; })
+          .Attach<SubtractorProjectile>();
 
         _GreenTrailPrefab = VFX.CreateTrailObject("subtractor_beam_mid", fps: 60, startAnim: "subtractor_beam_start",
             softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
@@ -27,12 +33,6 @@ public class SubtractorBeam : CwaffGun
         _HitEffects = VFX.Create("subtractor_beam_hit_effect", 12, loops: true,
             scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
 
-        gun.InitProjectile(GunData.New(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f, customClip: true, spawnSound: "subtractor_beam_fire_sound", uniqueSounds: true))
-        .Attach<PierceProjModifier>(pierce => {
-          pierce.penetration            = 999;
-          pierce.penetratesBreakables   = true; })
-        .Attach<SubtractorProjectile>();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)

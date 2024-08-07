@@ -26,11 +26,11 @@ public class Telefragger : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Telefragger>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 0.9f, ammo: 600, shootFps: 30, reloadFps: 4/*, audioFrom: Items.DemonHead*/);
-            gun.SetFireAudio("telefragger_amp_up_sound", 0, 3, 6, 9);
-            gun.LoopAnimation(gun.shootAnimation, 12);
-            gun.gunHandedness = GunHandedness.HiddenOneHanded;
+        Gun gun = Lazy.SetupGun<Telefragger>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 0.9f, ammo: 600, shootFps: 30, reloadFps: 4)
+          .SetFireAudio("telefragger_amp_up_sound", 0, 3, 6, 9)
+          .LoopFireAnimation(12);
+        gun.gunHandedness = GunHandedness.HiddenOneHanded; //REFACTOR:
 
         Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.DemonHead.Projectile(), clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.Beam,
             ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f)).Attach<TelefragJuice>();

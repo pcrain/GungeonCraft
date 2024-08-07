@@ -20,24 +20,23 @@ public class PistolWhip : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<PistolWhip>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100, shootFps: 30, reloadFps: 40, curse: 2f, infiniteAmmo: true);
-            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
-
-        gun.InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 0.0f, speed: 0.01f, range: 999.0f)).Attach<WhipChainStartProjectile>();
-
-        gun.gameObject.AddComponent<PistolWhipAmmoDisplay>();
+        Lazy.SetupGun<PistolWhip>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.01f, ammo: 100, shootFps: 30, reloadFps: 40, curse: 2f, infiniteAmmo: true)
+          .Attach<PistolWhipAmmoDisplay>()
+          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
+            damage: 0.0f, speed: 0.01f, range: 999.0f))
+          .Attach<WhipChainStartProjectile>();
 
         _PistolWhipProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f))
-        .Attach<EasyTrailBullet>(trail => {
-          trail.TrailPos   = trail.transform.position;
-          trail.StartWidth = 0.3f;
-          trail.EndWidth   = 0f;
-          trail.LifeTime   = 0.05f;
-          trail.BaseColor  = Color.yellow;
-          trail.EndColor   = Color.yellow;
-        });
+          .Attach<EasyTrailBullet>(trail => {
+            trail.TrailPos   = trail.transform.position;
+            trail.StartWidth = 0.3f;
+            trail.EndWidth   = 0f;
+            trail.LifeTime   = 0.05f;
+            trail.BaseColor  = Color.yellow;
+            trail.EndColor   = Color.yellow;
+          });
 
         _PistolButtProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f))
           .AddAnimations(AnimatedBullet.Create(name: "pistol_whip_dummy_bullet", fps: 12, anchor: Anchor.MiddleCenter)) // Not really visible, just used for pixel collider size

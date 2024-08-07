@@ -49,10 +49,10 @@ public class Missiletoe : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true,
-                shootFps: 45, reloadFps: 20, muzzleFrom: Items.Mailbox, fireAudio: "missiletoe_shoot_sound_1", reloadAudio: "missiletoe_reload_sound");
-            gun.AddToSubShop(ModdedShopType.Boomhildr);
+        Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true,
+            shootFps: 45, reloadFps: 20, muzzleFrom: Items.Mailbox, fireAudio: "missiletoe_shoot_sound_1", reloadAudio: "missiletoe_reload_sound")
+          .AddToSubShop(ModdedShopType.Boomhildr);
 
         gun.DefaultModule.SetAttributes(GunData.New(gun: gun, clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: true));
 

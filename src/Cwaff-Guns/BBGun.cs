@@ -12,10 +12,10 @@ public class BBGun : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<BBGun>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false,
-                shootFps: 10, chargeFps: 16, loopChargeAt: 32, muzzleVFX: "muzzle_b_b_gun", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
-                fireAudio: "Play_WPN_seriouscannon_shot_01", reloadAudio: "Play_ENM_flame_veil_01");
+        Gun gun = Lazy.SetupGun<BBGun>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false,
+            shootFps: 10, chargeFps: 16, loopChargeAt: 32, muzzleVFX: "muzzle_b_b_gun", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
+            fireAudio: "Play_WPN_seriouscannon_shot_01", reloadAudio: "Play_ENM_flame_veil_01");
 
         Projectile p = gun.InitProjectile(GunData.New(
           clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
@@ -25,9 +25,9 @@ public class BBGun : CwaffGun
           pierce.penetration = Mathf.Max(pierce.penetration, 999);
           pierce.penetratesBreakables = true; })
         .Attach<BounceProjModifier>(bounce => {
-          bounce.numberOfBounces               = Mathf.Max(bounce.numberOfBounces, 999);
-          bounce.chanceToDieOnBounce           = 0f;
-          bounce.onlyBounceOffTiles            = true; })
+          bounce.numberOfBounces     = Mathf.Max(bounce.numberOfBounces, 999);
+          bounce.chanceToDieOnBounce = 0f;
+          bounce.onlyBounceOffTiles  = true; })
         .CopyAllImpactVFX(Items.Crestfaller);
 
         gun.DefaultModule.chargeProjectiles.Clear();

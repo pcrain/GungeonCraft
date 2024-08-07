@@ -527,13 +527,28 @@ public static class GunBuilder
     return gun.DefaultModule.SetAttributes(b);
   }
 
+  /// <summary>Add a component to a gun's GameObject, perform setup if necessary, and return the gun</summary>
+  public static Gun Attach<T>(this Gun gun, Action<T> predicate = null, bool allowDuplicates = false) where T : MonoBehaviour
+  {
+    T component = allowDuplicates ? gun.gameObject.AddComponent<T>() : gun.gameObject.GetOrAddComponent<T>();
+    if (predicate != null)
+      predicate(component);
+    return gun;
+  }
+
   /// <summary>Add a component to a projectile's GameObject, perform setup if necessary, and return the projectile</summary>
   public static Projectile Attach<T>(this Projectile projectile, Action<T> predicate = null, bool allowDuplicates = false) where T : MonoBehaviour
   {
-    T component = allowDuplicates ? projectile.AddComponent<T>() : projectile.GetOrAddComponent<T>();
+    T component = allowDuplicates ? projectile.gameObject.AddComponent<T>() : projectile.gameObject.GetOrAddComponent<T>();
     if (predicate != null)
       predicate(component);
     return projectile;
+  }
+
+  /// <summary>Assign a projectile by reference</summary>
+  public static T Assign<T>(this T projectile, out T projectileRef) where T : Projectile
+  {
+    return projectileRef = projectile;
   }
 
   /// <summary>Add each animation from a list in turn to a projectile and return that projectile</summary>

@@ -19,14 +19,13 @@ public class Gunflower : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Gunflower>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 100, shootFps: 4, reloadFps: 4,
-              muzzleFrom: Items.Mailbox, dynamicBarrelOffsets: true);
-            gun.LoopAnimation(gun.shootAnimation, 4);
-
-        //NOTE: inherit from Moonscraper for hitscan
-        Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f,
-          shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 10, angleVariance: 0f));
+        Lazy.SetupGun<Gunflower>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 100, shootFps: 4, reloadFps: 4,
+            muzzleFrom: Items.Mailbox, dynamicBarrelOffsets: true)
+          .LoopFireAnimation(4)
+          .InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
+            shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 10, angleVariance: 0f))
+          .Assign(out Projectile projectile);
 
         BasicBeamController beamComp = projectile.SetupBeamSprites(spriteName: "gunflower_beam", fps: 17, chargeFps: 8,
           dims: new Vector2(32, 7), impactDims: new Vector2(15, 7), impactFps: 14, loopCharge: false);

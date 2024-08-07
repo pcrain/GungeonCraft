@@ -12,15 +12,14 @@ public class Zag : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Zag>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 600, shootFps: 30, reloadFps: 40,
-                fireAudio: "zag_zig_sound", reloadAudio: "zag_zig_sound", muzzleFrom: Items.Heroine);
-            gun.LoopAnimation(gun.reloadAnimation);
-
-        gun.InitProjectile(GunData.New(clipSize: 9, cooldown: 0.125f, shootStyle: ShootStyle.SemiAutomatic, electric: true,
-          damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter, hitEnemySound: "zag_hit_enemy_sound"))
-        .Attach<ZagProjectile>()
-        .CopyAllImpactVFX(Items.ShockRifle);
+        Lazy.SetupGun<Zag>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 600, shootFps: 30, reloadFps: 40,
+            fireAudio: "zag_zig_sound", reloadAudio: "zag_zig_sound", muzzleFrom: Items.Heroine)
+          .LoopReloadAnimation()
+          .InitProjectile(GunData.New(clipSize: 9, cooldown: 0.125f, shootStyle: ShootStyle.SemiAutomatic, electric: true,
+            damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter, hitEnemySound: "zag_hit_enemy_sound"))
+          .Attach<ZagProjectile>()
+          .CopyAllImpactVFX(Items.ShockRifle);
 
         _ZagTrailPrefab = VFX.CreateTrailObject("zag_trail_mid", fps: 30, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 

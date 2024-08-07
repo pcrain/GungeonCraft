@@ -14,18 +14,17 @@ public class Bouncer : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Bouncer>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.3f, ammo: 300, shootFps: 14, reloadFps: 30,
-                muzzleFrom: Items.Magnum, fireAudio: "MC_RocsCape");
-            gun.SetReloadAudio("bouncer_reload_short", 5, 10, 15, 20);
-            gun.SetReloadAudio("bouncer_reload", 25);
-            gun.AddToSubShop(ModdedShopType.Boomhildr);
-            gun.AddToSubShop(ModdedShopType.Rusty);
-
-        gun.InitProjectile(GunData.New(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic, damage: _ACCELERATION, speed: _ACCELERATION,
-          range: 9999f, sprite: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter,
-          overrideColliderPixelSizes: new IntVector2(1,1))) // 1-pixel collider for accurate bounce animation
-        .Attach<HarmlessUntilBounce>();
+        Lazy.SetupGun<Bouncer>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.PISTOL, reloadTime: 1.3f, ammo: 300, shootFps: 14, reloadFps: 30,
+            muzzleFrom: Items.Magnum, fireAudio: "MC_RocsCape")
+          .SetReloadAudio("bouncer_reload_short", 5, 10, 15, 20)
+          .SetReloadAudio("bouncer_reload", 25)
+          .AddToSubShop(ModdedShopType.Boomhildr)
+          .AddToSubShop(ModdedShopType.Rusty)
+          .InitProjectile(GunData.New(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic, damage: _ACCELERATION, speed: _ACCELERATION,
+            range: 9999f, sprite: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter,
+            overrideColliderPixelSizes: new IntVector2(1,1))) // 1-pixel collider for accurate bounce animation
+          .Attach<HarmlessUntilBounce>();
 
         // Initialize our explosion data
         ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData;

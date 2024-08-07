@@ -11,14 +11,13 @@ public class Nycterian : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Nycterian>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.1f, ammo: 425, shootFps: 20, reloadFps: 20,
-                muzzleFrom: Items.Mailbox, fireAudio: "nycterian_shoot_sound", reloadAudio: "nycterian_reload_sound");
+        Lazy.SetupGun<Nycterian>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.1f, ammo: 425, shootFps: 20, reloadFps: 20,
+            muzzleFrom: Items.Mailbox, fireAudio: "nycterian_shoot_sound", reloadAudio: "nycterian_reload_sound")
+          .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.19f, shootStyle: ShootStyle.SemiAutomatic, scale: 1.5f,
+            damage: 7.0f, speed: 27.0f, range: 100.0f, sprite: "bat_projectile", fps: 12)).Attach<BatProjectile>();
 
-        gun.InitProjectile(GunData.New(clipSize: 10, cooldown: 0.19f, shootStyle: ShootStyle.SemiAutomatic, scale: 1.5f,
-          damage: 7.0f, speed: 27.0f, range: 100.0f, sprite: "bat_projectile", fps: 12)).Attach<BatProjectile>();
-        _DistractedVFX = VFX.Create("distracted_vfx", fps: 18, loops: true, anchor: Anchor.MiddleCenter,
-          emissivePower: 1, emissiveColour: Color.magenta);
+        _DistractedVFX = VFX.Create("distracted_vfx", fps: 18, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1, emissiveColour: Color.magenta);
     }
 }
 

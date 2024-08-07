@@ -9,15 +9,14 @@ public class HatchlingGun : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<HatchlingGun>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 1.25f, ammo: 500,
-                shootFps: 40, reloadFps: 20, muzzleFrom: Items.Mailbox);
-            gun.SetReloadAudio("hatchling_gun_bounce_sound", 0, 6, 14);
-
-        gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
-          damage: 3.0f, speed: 24.0f, sprite: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter, spawnSound: "hatchling_gun_shoot_sound"))
-        .SetAllImpactVFX(VFX.CreatePool("egg_break", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter))
-        .Attach<HatchlingProjectile>();
+        Lazy.SetupGun<HatchlingGun>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 1.25f, ammo: 500,
+            shootFps: 40, reloadFps: 20, muzzleFrom: Items.Mailbox)
+          .SetReloadAudio("hatchling_gun_bounce_sound", 0, 6, 14)
+          .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
+            damage: 3.0f, speed: 24.0f, sprite: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter, spawnSound: "hatchling_gun_shoot_sound"))
+          .SetAllImpactVFX(VFX.CreatePool("egg_break", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter))
+          .Attach<HatchlingProjectile>();
     }
 }
 

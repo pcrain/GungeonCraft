@@ -9,21 +9,20 @@ public class PaintballCannon : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<PaintballCannon>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
-                muzzleFrom: Items.Mailbox, fireAudio: "paintball_shoot_sound", reloadAudio: "paintball_reload_sound");
-            gun.AddToSubShop(ItemBuilder.ShopType.Goopton);
-
-        gun.InitProjectile(GunData.New(sprite: "paintball_cannon_projectile", scale: 0.9f, clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
+        Lazy.SetupGun<PaintballCannon>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
+            muzzleFrom: Items.Mailbox, fireAudio: "paintball_shoot_sound", reloadAudio: "paintball_reload_sound")
+          .AddToSubShop(ItemBuilder.ShopType.Goopton)
+          .InitProjectile(GunData.New(sprite: "paintball_cannon_projectile", scale: 0.9f, clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 9.0f, speed: 25f, range: 18f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound"))
-        .Attach<PaintballColorizer>()
-        .Attach<GoopModifier>(g => {
-          g.SpawnGoopOnCollision   = true;
-          g.CollisionSpawnRadius   = 1f;
-          g.SpawnGoopInFlight      = true;
-          g.InFlightSpawnRadius    = 0.4f;
-          g.InFlightSpawnFrequency = 0.01f;})
-        .SetAllImpactVFX(VFX.CreatePool("paint_splatter_vfx", fps: 60, loops: false));
+          .Attach<PaintballColorizer>()
+          .Attach<GoopModifier>(g => {
+            g.SpawnGoopOnCollision   = true;
+            g.CollisionSpawnRadius   = 1f;
+            g.SpawnGoopInFlight      = true;
+            g.InFlightSpawnRadius    = 0.4f;
+            g.InFlightSpawnFrequency = 0.01f;})
+          .SetAllImpactVFX(VFX.CreatePool("paint_splatter_vfx", fps: 60, loops: false));
     }
 
     public override void PostProcessProjectile(Projectile projectile)

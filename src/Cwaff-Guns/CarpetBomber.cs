@@ -20,13 +20,13 @@ public class CarpetBomber : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 360, shootFps: 30, reloadFps: 20,
-                chargeFps: (int)(1f / _CHARGE_PER_PROJECTILE), loopChargeAt: 10, muzzleVFX: "muzzle_carpet_bomber", muzzleFps: 30,
-                muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound");
-            gun.SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18);
-            gun.SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-            gun.AddToSubShop(ModdedShopType.Boomhildr);
+        Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 360, shootFps: 30, reloadFps: 20,
+            chargeFps: (int)(1f / _CHARGE_PER_PROJECTILE), loopChargeAt: 10, muzzleVFX: "muzzle_carpet_bomber", muzzleFps: 30,
+            muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound")
+          .SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18)
+          .SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+          .AddToSubShop(ModdedShopType.Boomhildr);
 
         Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(GunData.New(
           clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: true,

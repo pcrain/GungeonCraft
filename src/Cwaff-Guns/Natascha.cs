@@ -18,16 +18,16 @@ public class Natascha : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Natascha>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500,
-              shootFps: (int)((float)_FIRE_ANIM_FRAMES / _BASE_COOLDOWN) + 1,
-              muzzleVFX: "muzzle_natascha", muzzleFps: 60, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter);
-            gun.SetCasing(Items.Ak47);
-            gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
-            gun.AddToSubShop(ModdedShopType.Rusty);
-            gun.GainsRateOfFireAsContinueAttack = true; //NOTE: necessary for the patch below to work
-            gun.RateOfFireMultiplierAdditionPerSecond = 0f; // also necessary for patch below
+        Gun gun = Lazy.SetupGun<Natascha>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500,
+            shootFps: (int)((float)_FIRE_ANIM_FRAMES / _BASE_COOLDOWN) + 1,
+            muzzleVFX: "muzzle_natascha", muzzleFps: 60, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter)
+          .SetCasing(Items.Ak47)
+          .AddToSubShop(ItemBuilder.ShopType.Trorc)
+          .AddToSubShop(ModdedShopType.Rusty);
 
+        gun.GainsRateOfFireAsContinueAttack = true; //NOTE: necessary for the patch below to work
+        gun.RateOfFireMultiplierAdditionPerSecond = 0f; // also necessary for patch below
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: _BASE_COOLDOWN, angleVariance: 15.0f,
           shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f, slow: 1.0f, spawnSound: "tomislav_shoot",
           sprite: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));

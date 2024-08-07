@@ -28,23 +28,24 @@ public class Gunbrella : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60 * _BARRAGE_SIZE, shootFps: 60, chargeFps: 16,
-                loopChargeAt: 17, muzzleVFX: "muzzle_gunbrella", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter);
-
-        gun.InitProjectile(GunData.New(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true, ammoCost: 1,
-          damage: _PROJ_DAMAGE, sprite: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft, freeze: 0.33f, chargeTime: _MIN_CHARGE_TIME,
-          destroySound: "icicle_crash", barrageSize: _BARRAGE_SIZE, bossDamageMult: 0.6f)) // bosses are big and this does a lot of damage, so tone it down
-        .SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f))
-        .Attach<GunbrellaProjectile>();
-
-        _MasteryModule = new ProjectileModule(){projectiles = new(){ gun.DefaultModule.projectiles[0] }}.SetAttributes(GunData.New(
-            gun: gun, ammoCost: 1, clipSize: -1, cooldown: 0.05f, shootStyle: ShootStyle.Automatic, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
-
-        gun.AddReticle<CwaffReticle>(
+        Gun gun = Lazy.SetupGun<Gunbrella>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60 * _BARRAGE_SIZE, shootFps: 60, chargeFps: 16,
+            loopChargeAt: 17, muzzleVFX: "muzzle_gunbrella", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter)
+          .AddReticle<CwaffReticle>(
             reticleVFX : VFX.Create("gunbrella_target_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f),
             reticleAlpha: 0.25f, fadeInTime : _MIN_CHARGE_TIME, fadeOutTime : 0.25f, maxDistance : _MAX_RETICLE_RANGE, controllerScale : 1f + _MAX_RETICLE_RANGE,
             visibility : CwaffReticle.Visibility.CHARGING, background: true);
+
+        gun.InitProjectile(GunData.New(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true, ammoCost: 1,
+            damage: _PROJ_DAMAGE, sprite: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft, freeze: 0.33f, chargeTime: _MIN_CHARGE_TIME,
+            destroySound: "icicle_crash", barrageSize: _BARRAGE_SIZE, bossDamageMult: 0.6f)) // bosses are big and this does a lot of damage, so tone it down
+          .SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f))
+          .Attach<GunbrellaProjectile>()
+          .Assign(out Projectile proj);
+
+        _MasteryModule = new ProjectileModule(){projectiles = new(){ proj }}.SetAttributes(GunData.New(
+            gun: gun, ammoCost: 1, clipSize: -1, cooldown: 0.05f, shootStyle: ShootStyle.Automatic, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
+
     }
 
     public override void Update()

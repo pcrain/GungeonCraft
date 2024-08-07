@@ -15,18 +15,15 @@ public class ChekhovsGun : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<ChekhovsGun>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 200, shootFps: 16, reloadFps: 16,
-                muzzleVFX: "muzzle_chekhovs_gun", fireAudio: "chekhovs_gun_place_sound", reloadAudio: "chekhovs_gun_reload_sound");
-
-        gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 15f, range: 1000f, speed: 200f, sprite: "chekhov_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter))
-        .Attach<ChekhovBullet>();
+        Lazy.SetupGun<ChekhovsGun>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 200, shootFps: 16, reloadFps: 16,
+            muzzleVFX: "muzzle_chekhovs_gun", fireAudio: "chekhovs_gun_place_sound", reloadAudio: "chekhovs_gun_reload_sound")
+          .InitProjectile(GunData.New(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+            damage: 15f, range: 1000f, speed: 200f, sprite: "chekhov_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter))
+          .Attach<ChekhovBullet>();
 
         _ChekhovTrailPrefab = VFX.CreateTrailObject("chekhov_trail_mid", fps: 60, startAnim: "chekhov_trail_start", cascadeTimer: C.FRAME, destroyOnEmpty: true);
-
-        //WARNING: don't use actual gun animations for VFX or the actual gun's sprites can get messed up
-        _ChekhovGunVFX = VFX.Create("chekhovs_gun_idle_vfx", 12, loops: true, anchor: Anchor.UpperRight);
+        _ChekhovGunVFX = VFX.Create("chekhovs_gun_idle_vfx", 12, loops: true, anchor: Anchor.UpperRight); //WARNING: don't use actual gun animations for VFX
         _ChekhovGunFireVFX = VFX.Create("chekhovs_gun_fire_vfx", 12, loops: false, anchor: Anchor.UpperRight);
     }
 

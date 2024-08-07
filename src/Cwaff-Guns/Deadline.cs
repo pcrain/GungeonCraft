@@ -22,24 +22,23 @@ public class Deadline : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Deadline>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64, idleFps: 10, shootFps: 20,
-                reloadFps: 30, muzzleVFX: "muzzle_deadline", muzzleFps: 20, muzzleScale: 0.4f, muzzleAnchor: Anchor.MiddleCenter,
-                fireAudio: "deadline_fire_sound", reloadAudio: "deadline_reload_sound");
-            gun.AddToSubShop(ModdedShopType.TimeTrader);
-            gun.AddToSubShop(ModdedShopType.Boomhildr);
-
-        gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic,
-          speed: 60.0f, range: 30.0f, sprite: "deadline_projectile", fps: 2, anchor: Anchor.MiddleLeft, collidesWithEnemies: false))
-        .Attach<DeadlineProjectile>()
-        .Attach<EasyTrailBullet>(trail => {
-          trail.TrailPos   = trail.transform.position;
-          trail.StartWidth = 0.2f;
-          trail.EndWidth   = 0f;
-          trail.LifeTime   = 0.1f;
-          trail.BaseColor  = Color.green;
-          trail.EndColor   = Color.green;
-        });
+        Lazy.SetupGun<Deadline>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64, idleFps: 10, shootFps: 20,
+            reloadFps: 30, muzzleVFX: "muzzle_deadline", muzzleFps: 20, muzzleScale: 0.4f, muzzleAnchor: Anchor.MiddleCenter,
+            fireAudio: "deadline_fire_sound", reloadAudio: "deadline_reload_sound")
+          .AddToSubShop(ModdedShopType.TimeTrader)
+          .AddToSubShop(ModdedShopType.Boomhildr)
+          .InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 0.0f, shootStyle: ShootStyle.SemiAutomatic,
+            speed: 60.0f, range: 30.0f, sprite: "deadline_projectile", fps: 2, anchor: Anchor.MiddleLeft, collidesWithEnemies: false))
+          .Attach<DeadlineProjectile>()
+          .Attach<EasyTrailBullet>(trail => {
+            trail.TrailPos   = trail.transform.position;
+            trail.StartWidth = 0.2f;
+            trail.EndWidth   = 0f;
+            trail.LifeTime   = 0.1f;
+            trail.BaseColor  = Color.green;
+            trail.EndColor   = Color.green;
+          });
 
         ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData;
         _DeadlineExplosion = new ExplosionData()

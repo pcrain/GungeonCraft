@@ -45,11 +45,10 @@ public class Ticonderogun : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24, curse: 2f);
-            gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
-
-        gun.SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM));
+        Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24, curse: 2f)
+          .AddToSubShop(ItemBuilder.ShopType.Cursula)
+          .SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM));
 
         _SparklePrefab = VFX.Create("pencil_sparkles", 12, loops: false, anchor: Anchor.MiddleCenter);
         _RunePrefab = VFX.Create("pencil_runes", 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly

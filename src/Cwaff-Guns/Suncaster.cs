@@ -32,14 +32,15 @@ public class Suncaster : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,
-              canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false, shootFps: 30, reloadFps: 40);
+        Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,
+            canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false, shootFps: 30, reloadFps: 40)
+          .Attach<SuncasterAmmoDisplay>();
 
         _SuncasterProjectile = gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged,
-          damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft, customClip: true, spawnSound: "suncaster_fire_sound", uniqueSounds: true))
-        .Attach<PierceProjModifier>(pierce => pierce.penetration = 999)
-        .Attach<SuncasterProjectile>();
+            damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft, customClip: true, spawnSound: "suncaster_fire_sound", uniqueSounds: true))
+          .Attach<PierceProjModifier>(pierce => pierce.penetration = 999)
+          .Attach<SuncasterProjectile>();
         _SuncasterProjectile.pierceMinorBreakables = true;
         _SuncasterProjectile.PenetratesInternalWalls = true;
 
@@ -76,8 +77,6 @@ public class Suncaster : CwaffGun
           Enabled                = true,
           IsTrigger              = false,
         }};
-
-        gun.gameObject.AddComponent<SuncasterAmmoDisplay>();
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)

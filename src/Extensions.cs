@@ -196,11 +196,16 @@ public static class Extensions
   }
 
   /// <summary>Loop a gun's animation</summary>
-  public static void LoopAnimation(this Gun gun, string animationName, int loopStart = 0)
+  public static Gun LoopAnimation(this Gun gun, string animationName, int loopStart = 0)
   {
     gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
     gun.GetComponent<tk2dSpriteAnimator>().GetClipByName(animationName).loopStart = loopStart;
+    return gun;
   }
+
+  public static Gun LoopReloadAnimation(this Gun gun, int loopStart = 0) => gun.LoopAnimation(gun.reloadAnimation, loopStart: loopStart);
+  public static Gun LoopChargeAnimation(this Gun gun, int loopStart = 0) => gun.LoopAnimation(gun.chargeAnimation, loopStart: loopStart);
+  public static Gun LoopFireAnimation(this Gun gun, int loopStart = 0) => gun.LoopAnimation(gun.shootAnimation, loopStart: loopStart);
 
   /// <summary>Set a projectile's horizontal impact VFX</summary>
   public static Projectile SetHorizontalImpactVFX(this Projectile p, VFXPool vfx)
@@ -609,96 +614,106 @@ public static class Extensions
   }
 
   /// <summary>Clear a gun's default audio events</summary>
-  public static void ClearDefaultAudio(this Gun gun)
+  public static Gun ClearDefaultAudio(this Gun gun)
   {
     gun.gunSwitchGroup = Items.Banana.AsGun().gunSwitchGroup; // banana has silent reload and charge audio
     gun.PreventNormalFireAudio = true;
     gun.OverrideNormalFireAudioEvent = "";
+    return gun;
   }
 
   /// <summary>Set an audio event for a specific frame of a gun's animation</summary>
-  public static void SetGunAudio(this Gun gun, string name = null, string audio = "", int frame = 0)
+  public static Gun SetGunAudio(this Gun gun, string name = null, string audio = "", int frame = 0)
   {
     tk2dSpriteAnimationFrame aframe = gun.spriteAnimator.GetClipByName(name).frames[frame];
     aframe.triggerEvent = !string.IsNullOrEmpty(audio);
     aframe.eventAudio = audio;
+    return gun;
   }
 
   /// <summary>Set an audio event for several frames of a gun's animation</summary>
-  public static void SetGunAudio(this Gun gun, string name = null, string audio = "", params int[] frames)
+  public static Gun SetGunAudio(this Gun gun, string name = null, string audio = "", params int[] frames)
   {
     foreach (int frame in frames)
       gun.SetGunAudio(name: name, audio: audio, frame: frame);
+    return gun;
   }
 
   /// <summary>needs to use Alexandria version because fireaudio overrides are not serialized</summary>
-  public static void SetFireAudio(this Gun gun, string audio = "", int frame = 0)
+  public static Gun SetFireAudio(this Gun gun, string audio = "", int frame = 0)
   {
-    gun.SetGunAudio(name: gun.shootAnimation, audio: audio, frame: frame);
+    return gun.SetGunAudio(name: gun.shootAnimation, audio: audio, frame: frame);
   }
-  public static void SetFireAudio(this Gun gun, string audio = "", params int[] frames)
+  public static Gun SetFireAudio(this Gun gun, string audio = "", params int[] frames)
   {
     foreach (int frame in frames)
       gun.SetFireAudio(audio: audio, frame: frame);
+    return gun;
   }
-  public static void SetReloadAudio(this Gun gun, string audio = "", int frame = 0)
+  public static Gun SetReloadAudio(this Gun gun, string audio = "", int frame = 0)
   {
-    gun.SetGunAudio(name: gun.reloadAnimation, audio: audio, frame: frame);
+    return gun.SetGunAudio(name: gun.reloadAnimation, audio: audio, frame: frame);
   }
-  public static void SetReloadAudio(this Gun gun, string audio = "", params int[] frames)
+  public static Gun SetReloadAudio(this Gun gun, string audio = "", params int[] frames)
   {
     foreach (int frame in frames)
       gun.SetGunAudio(name: gun.reloadAnimation, audio: audio, frame: frame);
+    return gun;
   }
-  public static void SetChargeAudio(this Gun gun, string audio = "", int frame = 0)
+  public static Gun SetChargeAudio(this Gun gun, string audio = "", int frame = 0)
   {
-    gun.SetGunAudio(name: gun.chargeAnimation, audio: audio, frame: frame);
+    return gun.SetGunAudio(name: gun.chargeAnimation, audio: audio, frame: frame);
   }
-  public static void SetChargeAudio(this Gun gun, string audio = "", params int[] frames)
+  public static Gun SetChargeAudio(this Gun gun, string audio = "", params int[] frames)
   {
     foreach (int frame in frames)
       gun.SetGunAudio(name: gun.chargeAnimation, audio: audio, frame: frame);
+    return gun;
   }
-  public static void SetIdleAudio(this Gun gun, string audio = "", int frame = 0)
+  public static Gun SetIdleAudio(this Gun gun, string audio = "", int frame = 0)
   {
-    gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
+    return gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
   }
-  public static void SetIdleAudio(this Gun gun, string audio = "", params int[] frames)
+  public static Gun SetIdleAudio(this Gun gun, string audio = "", params int[] frames)
   {
     foreach (int frame in frames)
       gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
+    return gun;
   }
-  public static void SetMuzzleVFX(this Gun gun, string resPath = null, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1, bool continuous = false)
+  public static Gun SetMuzzleVFX(this Gun gun, string resPath = null, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1, bool continuous = false)
   {
     if (string.IsNullOrEmpty(resPath))
     {
       gun.muzzleFlashEffects = null; //.type = VFXPoolType.None;
-      return;
+      return gun;
     }
 
     gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
       loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
     gun.usesContinuousMuzzleFlash = continuous;
+    return gun;
   }
 
-  public static void SetMuzzleVFX(this Gun gun, Items gunToCopyFrom, bool onlyCopyBasicEffects = true)
+  public static Gun SetMuzzleVFX(this Gun gun, Items gunToCopyFrom, bool onlyCopyBasicEffects = true)
   {
     Gun otherGun = gunToCopyFrom.AsGun();
     if (!otherGun)
-      return;
+      return gun;
 
     gun.muzzleFlashEffects = otherGun.muzzleFlashEffects;
     if (onlyCopyBasicEffects)
-      return;
+      return gun;
 
     gun.usesContinuousMuzzleFlash  = otherGun.usesContinuousMuzzleFlash;
     gun.finalMuzzleFlashEffects    = otherGun.finalMuzzleFlashEffects;
     gun.CriticalMuzzleFlashEffects = otherGun.CriticalMuzzleFlashEffects;
+    return gun;
   }
 
-  public static void SetCasing(this Gun gun, Items otherGun)
+  public static Gun SetCasing(this Gun gun, Items otherGun)
   {
     gun.shellCasing = otherGun.AsGun().shellCasing;
+    return gun;
   }
 
   // Gets the actual rectangle corresponding to the the outermost walls of a room
@@ -783,7 +798,7 @@ public static class Extensions
   }
 
   /// <summary>Set some basic attributes for each gun</summary>
-  public static void SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
+  public static Gun SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
@@ -855,6 +870,8 @@ public static class Extensions
         continuous    : false
         );
     }
+
+    return gun;
   }
 
   /// <summary>Create a prefab trail and add it to a prefab projectile</summary>
@@ -2071,7 +2088,7 @@ public static class Extensions
   public static PassiveItem AsPassive(this Items item) => ItemHelper.Get(item) as PassiveItem;
 
   /// <summary>Adds a targeting reticle to the gun</summary>
-  public static void AddReticle<T>(this Gun gun, GameObject reticleVFX, float reticleAlpha = 1f, float fadeInTime = 0f, float fadeOutTime = 0f, bool smoothLerp = false,
+  public static Gun AddReticle<T>(this Gun gun, GameObject reticleVFX, float reticleAlpha = 1f, float fadeInTime = 0f, float fadeOutTime = 0f, bool smoothLerp = false,
     float maxDistance = -1f, float controllerScale = 1f, float rotateSpeed = 0f, CwaffReticle.Visibility visibility = CwaffReticle.Visibility.DEFAULT,
     Func<CwaffReticle, GameObject> targetObjFunc = null, Func<CwaffReticle, Vector2> targetPosFunc = null, bool aimFromPlayerCenter = false, bool background = false) where T : CwaffReticle
   {
@@ -2089,6 +2106,7 @@ public static class Extensions
     reticle.targetObjFunc       = targetObjFunc;
     reticle.targetPosFunc       = targetPosFunc;
     reticle.background          = background;
+    return gun;
   }
 
   /// <summary>Check if a rigid body is the Oubilette entrance disguised as a wall, because it causes a lot of problems</summary>
