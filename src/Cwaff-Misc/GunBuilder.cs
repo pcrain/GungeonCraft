@@ -10,6 +10,9 @@ public sealed class GunData
   private GunData() {} // private default constructor to prevent explicit instantiation
   public static GunData Default { get { return GunData.New(); } } // get default settings for GunBuildData
 
+  /// <summary>Special flags used for simplifying setup</summary>
+  public const int MATCH_ANIM = -2;
+
   public Gun gun;
   public Projectile baseProjectile;
   public int? clipSize;
@@ -44,6 +47,7 @@ public sealed class GunData
   public IntVector2? overrideColliderPixelSizes;
   public IntVector2? overrideColliderOffsets;
   public float bossDamageMult;
+  public float jammedDamageMult;
   public string destroySound;
   public bool? shouldRotate;
   public int barrageSize;
@@ -70,6 +74,9 @@ public sealed class GunData
   public bool? electric;
   public float? burstCooldown;
   public bool? preventSparks;
+  public bool? pierceBreakables;
+  public bool? collidesOnlyWithPlayerProjectiles;
+  public bool? pierceInternalWalls;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -106,6 +113,7 @@ public sealed class GunData
   /// <param name="overrideColliderPixelSizes">If set, manually adjusts the size of the projectile's hitbox.</param>
   /// <param name="overrideColliderOffsets">If set, manually adjusts the offset of the projectile's hitbox.</param>
   /// <param name="bossDamageMult">Multiplier for damage done to bosses.</param>
+  /// <param name="jammedDamageMult">Multiplier for damage done to jammed enemies.</param>
   /// <param name="destroySound">Sound event for when projectile is destroyed.</param>
   /// <param name="shouldRotate">Whether the projectile should rotate based on its velocity.</param>
   /// <param name="barrageSize">The number of projectiles to fire simultaenously.</param>
@@ -132,16 +140,19 @@ public sealed class GunData
   /// <param name="electric">If true, adds the Electric damage type to the projectile.</param>
   /// <param name="burstCooldown">The minimum number of seconds between shots in a burst.</param>
   /// <param name="preventSparks">If true, prevents sparks from being created for electric / cursed projectiles.</param>
+  /// <param name="pierceBreakables">If true, the projectile will pierce minor breakables such as crates, barrels, etc.</param>
+  /// <param name="collidesOnlyWithPlayerProjectiles">If true and if collidesWithProjectiles is true, the projectile will only collide with player projectiles.</param>
+  /// <param name="pierceInternalWalls">If true, the projectile will pierce internal walls within rooms.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
     bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
     bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
     string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, IntVector2? overrideColliderPixelSizes = null,
-    IntVector2? overrideColliderOffsets = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
+    IntVector2? overrideColliderOffsets = null, float bossDamageMult = 1.0f, float jammedDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null,
     bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null,
     string hitSound = null, string hitEnemySound = null, string hitWallSound = null, bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false,
-    bool? electric = null, float? burstCooldown = null, bool? preventSparks = null
+    bool? electric = null, float? burstCooldown = null, bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null
     )
   {
       _Instance.gun                           = gun; // set by InitSpecialProjectile()
@@ -178,6 +189,7 @@ public sealed class GunData
       _Instance.overrideColliderPixelSizes    = overrideColliderPixelSizes;
       _Instance.overrideColliderOffsets       = overrideColliderOffsets;
       _Instance.bossDamageMult                = bossDamageMult;
+      _Instance.jammedDamageMult              = jammedDamageMult;
       _Instance.destroySound                  = destroySound;
       _Instance.shouldRotate                  = shouldRotate;
       _Instance.barrageSize                   = barrageSize;
@@ -203,6 +215,10 @@ public sealed class GunData
       _Instance.electric                      = electric;
       _Instance.burstCooldown                 = burstCooldown;
       _Instance.preventSparks                 = preventSparks;
+      _Instance.pierceBreakables              = pierceBreakables;
+      _Instance.collidesWithProjectiles       = collidesWithProjectiles;
+      _Instance.collidesOnlyWithPlayerProjectiles = collidesOnlyWithPlayerProjectiles;
+      _Instance.pierceInternalWalls               = pierceInternalWalls;
       return _Instance;
   }
 }
@@ -317,6 +333,10 @@ public static class GunBuilder
     p.ignoreDamageCaps                                = b.ignoreDamageCaps           ?? p.ignoreDamageCaps;
     p.collidesWithProjectiles                         = b.collidesWithProjectiles    ?? p.collidesWithProjectiles;
     p.BulletScriptSettings.surviveRigidbodyCollisions = b.surviveRigidbodyCollisions ?? p.BulletScriptSettings.surviveRigidbodyCollisions;
+    p.pierceMinorBreakables                           = b.pierceBreakables           ?? p.pierceMinorBreakables;
+    p.collidesWithProjectiles                         = b.collidesWithProjectiles    ?? p.collidesWithProjectiles;
+    p.collidesOnlyWithPlayerProjectiles               = b.collidesOnlyWithPlayerProjectiles ?? p.collidesOnlyWithPlayerProjectiles;
+    p.PenetratesInternalWalls                         = b.pierceInternalWalls ?? p.PenetratesInternalWalls;
     if (p.specRigidbody)
       p.specRigidbody.CollideWithTileMap              = b.collidesWithTilemap ?? p.specRigidbody.CollideWithTileMap;  // doesn't work!
     if (b.recoil.HasValue && b.recoil.Value != 0f)
@@ -346,10 +366,11 @@ public static class GunBuilder
       c.preventSparks       = b.preventSparks       ?? c.preventSparks;
 
     // Non-defaulted
-    p.BossDamageMultiplier  = b.bossDamageMult;
-    p.onDestroyEventName    = b.destroySound;
-    p.enemyImpactEventName  = b.hitEnemySound ?? b.hitSound;
-    p.objectImpactEventName = b.hitWallSound ?? b.hitSound;
+    p.BossDamageMultiplier         = b.bossDamageMult;
+    p.BlackPhantomDamageMultiplier = b.jammedDamageMult;
+    p.onDestroyEventName           = b.destroySound;
+    p.enemyImpactEventName         = b.hitEnemySound ?? b.hitSound;
+    p.objectImpactEventName        = b.hitWallSound ?? b.hitSound;
 
     p.PoisonApplyChance = b.poison;
     p.AppliesPoison     = b.poison > 0.0f;

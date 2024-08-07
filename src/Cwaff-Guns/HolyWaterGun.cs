@@ -19,12 +19,10 @@ public class HolyWaterGun : CwaffGun
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true)
           .AddToSubShop(ItemBuilder.ShopType.Cursula)
           .AddToSubShop(ItemBuilder.ShopType.Goopton)
-          .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
+          .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam, jammedDamageMult: _JAMMED_DAMAGE_MULT,
             ammoType: GameUIAmmoType.AmmoType.BEAM, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f))
           .Attach<ExorcismJuice>()
           .Assign(out Projectile projectile);
-
-        projectile.BlackPhantomDamageMultiplier = _JAMMED_DAMAGE_MULT; //REFACTOR: add to gun builder
 
         BasicBeamController beamComp = projectile.SetupBeamSprites(
           spriteName: "holy_water_gun", fps: 20, dims: new Vector2(15, 15), impactDims: new Vector2(7, 7));

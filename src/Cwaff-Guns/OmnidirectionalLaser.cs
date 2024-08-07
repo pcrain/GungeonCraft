@@ -33,11 +33,10 @@ public class OmnidirectionalLaser : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<OmnidirectionalLaser>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250,
-            idleFps: _BASE_FPS, shootFps: _BASE_FPS, loopFireAt: 0, preventRotation: true)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250, handedness: GunHandedness.NoHanded,
+            idleFps: _BASE_FPS, shootFps: _BASE_FPS, loopFireAt: 0, preventRotation: true, suppressReloadAnim: true)
           .SetFireAudio("omni_spin_sound", 0, 1, 2, 3, 4, 5, 6, 7);
 
-        gun.SuppressReloadAnimations();
         gun.AddFlippedCarryPixelOffsets(offset: new IntVector2(5, -4), flippedOffset: new IntVector2(4, -4),
           offsetPilot:       new IntVector2(5, -4), flippedOffsetPilot:       new IntVector2(5, -4),
           offsetConvict:     new IntVector2(5, -4), flippedOffsetConvict:     new IntVector2(5, -4),
@@ -48,7 +47,6 @@ public class OmnidirectionalLaser : CwaffGun
           offsetBullet:      new IntVector2(8, -4), flippedOffsetBullet:      new IntVector2(8, -4),
           offsetEevee:       new IntVector2(5, -4), flippedOffsetEevee:       new IntVector2(5, -4),  //no one good offset for this character, so deal with a good average
           offsetGunslinger:  new IntVector2(5, -4), flippedOffsetGunslinger:  new IntVector2(5, -4)); //TODO: verify
-        gun.gunHandedness           = GunHandedness.NoHanded;
         gun.reloadAnimation         = gun.idleAnimation; // animation shouldn't automatically change when reloading
         gun.shootAnimation          = null; // animation shouldn't automatically change when firing
         gun.PreventOutlines         = true; // messes up with two-part rendering

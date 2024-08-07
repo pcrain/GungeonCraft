@@ -26,14 +26,14 @@ public class Telefragger : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Telefragger>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 0.9f, ammo: 600, shootFps: 30, reloadFps: 4)
+        Lazy.SetupGun<Telefragger>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 0.9f, ammo: 600, shootFps: 30, reloadFps: 4, handedness: GunHandedness.HiddenOneHanded)
           .SetFireAudio("telefragger_amp_up_sound", 0, 3, 6, 9)
-          .LoopFireAnimation(12);
-        gun.gunHandedness = GunHandedness.HiddenOneHanded; //REFACTOR:
-
-        Projectile projectile = gun.InitProjectile(GunData.New(baseProjectile: Items.DemonHead.Projectile(), clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.Beam,
-            ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f)).Attach<TelefragJuice>();
+          .LoopFireAnimation(12)
+          .InitProjectile(GunData.New(baseProjectile: Items.DemonHead.Projectile(), clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.Beam,
+            ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f))
+          .Attach<TelefragJuice>()
+          .Assign(out Projectile projectile);
 
         BasicBeamController beamComp = projectile.SetupBeamSprites(spriteName: "telefragger_beam", fps: 17,
             dims: new Vector2(32, 7), impactDims: new Vector2(15, 7), impactFps: 14, loopCharge: false);

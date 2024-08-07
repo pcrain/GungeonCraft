@@ -17,12 +17,9 @@ public class Widowmaker : CwaffGun
         Lazy.SetupGun<Widowmaker>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.4f, ammo: 320, shootFps: 20, reloadFps: 12, fireAudio: "widowmaker_fire_sound")
           .SetReloadAudio("widowmaker_reload_sound", 0, 4, 8, 10, 12, 14)
-          .InitProjectile(GunData.New(clipSize: 5, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 3.5f,
+          .InitProjectile(GunData.New(clipSize: 5, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 3.5f, pierceBreakables: true,
             sprite: "widowmaker_projectile", fps: 12, scale: _SCALE, anchor: Anchor.MiddleLeft))
-          .Attach<WidowmakerProjectile>()
-          .Assign(out Projectile p);
-
-        p.pierceMinorBreakables = true; //REFACTOR:
+          .Attach<WidowmakerProjectile>();
 
         _WidowmakerPrefab = VFX.Create("spider_turret", fps: 16, loops: true, scale: _SCALE, anchor: Anchor.MiddleCenter, emissivePower: 1f);
         _WidowmakerPrefab.AddAnimation("deploy", "widowmaker_deploy_vfx", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 1f);

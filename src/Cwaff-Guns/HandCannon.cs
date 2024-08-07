@@ -15,12 +15,10 @@ public class HandCannon : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<HandCannon>(ItemName, ShortDescription, LongDescription, Lore);
-          gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 100, shootFps: 30,
-            reloadFps: (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime),
-            chargeFps: (int)(_CHARGE_LOOP_FRAME / _CHARGE_TIME), loopChargeAt: (int)_CHARGE_LOOP_FRAME,
-            muzzleVFX: "muzzle_hand_cannon", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
-            fireAudio: "hand_cannon_shoot_sound", reloadAudio: "hand_cannon_reload_sound")
+        Lazy.SetupGun<HandCannon>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.75f, ammo: 100, shootFps: 30, reloadFps: GunData.MATCH_ANIM,
+            chargeFps: (int)(_CHARGE_LOOP_FRAME / _CHARGE_TIME), loopChargeAt: (int)_CHARGE_LOOP_FRAME, muzzleVFX: "muzzle_hand_cannon", muzzleFps: 30,
+            muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "hand_cannon_shoot_sound", reloadAudio: "hand_cannon_reload_sound")
           .SetChargeAudio("hand_cannon_charge_sound", 0, 10)
           .InitProjectile(GunData.New(clipSize: 2, cooldown: 0.1f, angleVariance: 15.0f, shootStyle: ShootStyle.Charged,
             customClip: true, damage: 40.0f, speed: 40.0f, sprite: "slappp", fps: 30, scale: 0.5f, anchor: Anchor.MiddleCenter,

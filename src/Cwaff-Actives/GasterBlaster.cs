@@ -23,12 +23,9 @@ public class GasterBlaster : CwaffActive
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
 
-        _GasterBlaster = VFX.Create("gaster_blaster_vfx", 2, loops: true, anchor: Anchor.MiddleCenter);
-
-        _GasterBlast = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 700.0f, speed: 150.0f, force: 70.0f, range: 200.0f));
-        _GasterBlast.ignoreDamageCaps        = false;
-        _GasterBlast.PenetratesInternalWalls = true;
-        _GasterBlast.pierceMinorBreakables   = true;
+        _GasterBlast = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 700.0f, speed: 150.0f, force: 70.0f, range: 200.0f,
+            pierceBreakables: true, pierceInternalWalls: true))
+          .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; });
 
         BasicBeamController beamComp = _GasterBlast.SetupBeamSprites(
           spriteName: "gaster_beam", fps: 60, dims: new Vector2(35, 39), impactDims: new Vector2(36, 36), impactFps: 16);
@@ -37,9 +34,7 @@ public class GasterBlaster : CwaffActive
             beamComp.PenetratesCover       = true;
             beamComp.penetration           = 1000;
 
-        PierceProjModifier pierce = _GasterBlast.gameObject.GetOrAddComponent<PierceProjModifier>();
-            pierce.penetration          = 100;
-            pierce.penetratesBreakables = true;
+        _GasterBlaster = VFX.Create("gaster_blaster_vfx", 2, loops: true, anchor: Anchor.MiddleCenter);
 
         ID = item.PickupObjectId;
     }

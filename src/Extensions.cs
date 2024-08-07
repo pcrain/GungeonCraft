@@ -803,7 +803,8 @@ public static class Extensions
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
     float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
-    bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false)
+    bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
+    GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true)
   {
     gun.quality = quality;
     gun.reloadTime = reloadTime;
@@ -811,14 +812,19 @@ public static class Extensions
     gun.SetBaseMaxAmmo(ammo);
     gun.CurrentAmmo = gun.GetBaseMaxAmmo(); // necessary iff gun basemaxammo > 1000
 
+    gun.gunHandedness = handedness;
     gun.preventRotation = preventRotation;
     gun.gunSwitchGroup = audioFrom.AsGun().gunSwitchGroup;
     gun.InfiniteAmmo = infiniteAmmo;
     gun.CanGainAmmo = canGainAmmo;
     gun.CanReloadNoMatterAmmo = canReloadNoMatterAmmo;
     gun.Volley.ModulesAreTiers = modulesAreTiers;
+    gun.GainsRateOfFireAsContinueAttack = rampUpFireRate;
+    if (rampUpFireRate)
+      gun.RateOfFireMultiplierAdditionPerSecond = rampUpFactor;
 
     gun.doesScreenShake = doesScreenShake ?? gun.doesScreenShake;
+    gun.spriteAnimator.playAutomatically = autoPlay;
 
     if (!defaultAudio)
       gun.ClearDefaultAudio();
@@ -843,7 +849,13 @@ public static class Extensions
     if (idleFps.HasValue)
       gun.SetAnimationFPS(gun.GetOriginalIdleAnimationName(), idleFps.Value);
     if (shootFps.HasValue)   gun.SetAnimationFPS(gun.shootAnimation, shootFps.Value);
-    if (reloadFps.HasValue)  gun.SetAnimationFPS(gun.reloadAnimation, reloadFps.Value);
+    if (reloadFps is int reloadFpsValue)
+    {
+      if (reloadFpsValue == GunData.MATCH_ANIM)
+        gun.SetAnimationFPS(gun.reloadAnimation, (int)(gun.spriteAnimator.GetClipByName(gun.reloadAnimation).frames.Length / gun.reloadTime));
+      else
+        gun.SetAnimationFPS(gun.reloadAnimation, reloadFpsValue);
+    }
     if (chargeFps.HasValue)  gun.SetAnimationFPS(gun.chargeAnimation, chargeFps.Value);
     if (introFps.HasValue)   gun.SetAnimationFPS(gun.introAnimation, introFps.Value);
     if (fireAudio != null)   gun.SetFireAudio(fireAudio);  //NOTE: intentionally allowing empty strings here, just not null ones
@@ -870,6 +882,9 @@ public static class Extensions
         continuous    : false
         );
     }
+
+    if (suppressReloadAnim)
+        gun.SuppressReloadAnimations();
 
     return gun;
   }
