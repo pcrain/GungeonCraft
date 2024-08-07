@@ -20,7 +20,7 @@ public class HolyWaterGun : CwaffGun
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam, jammedDamageMult: _JAMMED_DAMAGE_MULT,
-            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f, isBeam: true, beamSprite: "holy_water_gun",
+            ammoType: GameUIAmmoType.AmmoType.BEAM, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f, beamSprite: "holy_water_gun",
             beamFps: 20, beamDims: new Vector2(15, 15), beamImpactDims: new Vector2(7, 7), beamEmission: 15f, beamInterpolate: false, beamStartIsMuzzle: true))
           .Attach<ExorcismJuice>();
 

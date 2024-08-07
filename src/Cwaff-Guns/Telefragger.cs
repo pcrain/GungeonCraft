@@ -15,8 +15,6 @@ public class Telefragger : CwaffGun
     private static VFXPool _TeleportVFX    = null;
     private static GameObject _FloorVFX    = null;
 
-    private BasicBeamController _beam = null;
-
     // lots of logic borrowed from RatBootsItem.cs
     private tk2dSprite m_extantFloor       = null;
     private bool m_frameWasPartialPit      = false;
@@ -31,7 +29,7 @@ public class Telefragger : CwaffGun
           .SetFireAudio("telefragger_amp_up_sound", 0, 3, 6, 9)
           .LoopFireAnimation(12)
           .InitProjectile(GunData.New(baseProjectile: Items.DemonHead.Projectile(), clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.Beam,
-            ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f, isBeam: true, beamSprite: "telefragger_beam", beamFps: 17,
+            ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f, beamSprite: "telefragger_beam", beamFps: 17,
             beamDims: new Vector2(32, 7), beamImpactDims: new Vector2(15, 7), beamImpactFps: 14, beamLoopCharge: false, beamChargeDelay: 0.4f, beamEmission: 2f))
           .Attach<TelefragJuice>();
 
@@ -41,10 +39,8 @@ public class Telefragger : CwaffGun
 
     private void Start()
     {
-        Material m = gun.sprite.renderer.material;
         this.gun.sprite.SetGlowiness(10f, glowColor: new Color(0.0f, 0.625f, 0.664f, 1f));
-        this._beam = this.gun.gameObject.GetComponent<BasicBeamController>();
-        m.SetFloat("_EmissiveColorPower", 10f); // extra spicy colors
+        gun.sprite.renderer.material.SetFloat("_EmissiveColorPower", 10f); // extra spicy colors
     }
 
     private bool SynchronizeSpriteWithBeam()

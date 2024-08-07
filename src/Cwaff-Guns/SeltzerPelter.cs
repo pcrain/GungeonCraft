@@ -31,12 +31,12 @@ public class SeltzerPelter : CwaffGun
         }
 
         gun.InitProjectile(GunData.New(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
-          damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1,  anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
+          damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1, anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))) // prevent uneven colliders from glitching into walls
         .Attach<SeltzerProjectile>();
 
         // the perfect seltzer stats, do not tweak without testing! (beam damage == DPS)
-        _BubbleBeam = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f, preventOrbiting: true, isBeam: true,
+        _BubbleBeam = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f, preventOrbiting: true, forceBeam: true,
             beamSprite: "bubble_stream", beamFps: 8, beamDims: new Vector2(8, 8), beamEmission: 5f, beamChargeDelay: 0f, beamSeparation: true, beamIsRigid: false,
             beamInterpolate: false, beamKnockback: 100f, beamTiling: BasicBeamController.BeamTileType.Flowing, beamEndType: BasicBeamController.BeamEndType.Persist))
           .GetComponent<BasicBeamController>();

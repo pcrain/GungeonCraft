@@ -24,7 +24,7 @@ public class Gunflower : CwaffGun
             muzzleFrom: Items.Mailbox, dynamicBarrelOffsets: true)
           .LoopFireAnimation(4)
           .InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
-            shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 10, angleVariance: 0f, isBeam: true,
+            shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 10, angleVariance: 0f,
             beamSprite: "gunflower_beam", beamFps: 17, beamChargeFps: 8, beamDims: new Vector2(32, 7), beamImpactDims: new Vector2(15, 7), beamImpactFps: 14,
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0.8f, beamEmission: 40f));
 

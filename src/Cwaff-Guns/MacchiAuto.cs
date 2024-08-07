@@ -16,7 +16,7 @@ public class MacchiAuto : CwaffGun
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true)
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .AddToShop(ItemBuilder.ShopType.Goopton)
-          .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam, isBeam: true,
+          .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
             ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 1f, speed: 50.0f, force: 0.0f, beamSprite: "overdose", beamFps: 20, beamDims: new Vector2(15, 15),
             beamImpactDims: new Vector2(7, 7), beamEmission: 3f, beamStatusDelay: 0f, beamStartIsMuzzle: true, beamInterpolate: false,
             beamGoop: EasyGoopDefinitions.CoffeeGoop))

@@ -78,7 +78,7 @@ public sealed class GunData
   public bool? collidesOnlyWithPlayerProjectiles;
   public bool? pierceInternalWalls;
 
-  public bool isBeam;
+  public bool forceBeam;
   public string beamSprite;
   public int beamFps;
   public int beamStartFps;
@@ -169,8 +169,7 @@ public sealed class GunData
   /// <param name="pierceBreakables">If true, the projectile will pierce minor breakables such as crates, barrels, etc.</param>
   /// <param name="collidesOnlyWithPlayerProjectiles">If true and if collidesWithProjectiles is true, the projectile will only collide with player projectiles.</param>
   /// <param name="pierceInternalWalls">If true, the projectile will pierce internal walls within rooms.</param>
-
-  /// <param name="isBeam">If true, marks the projectile as a beam and does additional beam setup.</param>
+  /// <param name="forceBeam">If true, marks the projectile as a beam and does additional beam setup even if not part of a ShootStyle.Beam module.</param>
   /// <param name="beamSprite">The base sprite name to use for beam start, end, impact, etc. sprites.</param>
   /// <param name="beamFps">The default framerate for beam sprite animators.</param>
   /// <param name="beamStartFps">The framerate for the beam's start animation.</param>
@@ -196,42 +195,22 @@ public sealed class GunData
   /// <param name="beamSeparation">If true, the beam can separate from its linked nodes upon collision.</param>
   /// <param name="beamStartIsMuzzle">If true, uses the beam's start animation as a muzzle animation instead (fixes some graphical glitches).</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
-    ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1, GameUIAmmoType.AmmoType? ammoType = null,
-    bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null, float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f,
-    bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null, bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null,
-    string sprite = null, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, IntVector2? overrideColliderPixelSizes = null,
+    ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
+    GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
+    float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f, bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null,
+    bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null, string sprite = null, int fps = 2,
+    Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, IntVector2? overrideColliderPixelSizes = null,
     IntVector2? overrideColliderOffsets = null, float bossDamageMult = 1.0f, float jammedDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
-    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null, bool? stopSoundOnDeath = null,
-    bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null, float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null,
-    string hitSound = null, string hitEnemySound = null, string hitWallSound = null, bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false,
-    bool? electric = null, float? burstCooldown = null, bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null,
-
-    bool isBeam                                  = false,
-    string beamSprite                            = null,
-    int beamFps                                  = -1,
-    int beamStartFps                             = -1,
-    int beamEndFps                               = -1,
-    int beamChargeFps                            = -1,
-    int beamImpactFps                            = -1,
-    Vector2? beamDims                            = null,
-    Vector2? beamImpactDims                      = null,
-    bool beamLoopCharge                          = true,
-    float beamEmission                           = -1f,
-    int beamReflections                          = -1,
-    float beamChargeDelay                        = -1f,
-    float beamStatusDelay                        = -1f,
-    GoopDefinition beamGoop                      = null,
-    bool? beamInterpolate                        = null,
-    int beamPiercing                             = -1,
-    bool? beamPiercesCover                       = null,
-    bool? beamContinueToWall                     = null,
-    bool? beamIsRigid                            = null,
-    float beamKnockback                          = -1f,
-    BasicBeamController.BeamTileType? beamTiling = null,
-    BasicBeamController.BeamEndType? beamEndType = null,
-    bool? beamSeparation                         = null,
-    bool beamStartIsMuzzle                       = false
-    )
+    bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null,
+    bool? stopSoundOnDeath = null, bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null,
+    float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null, string hitSound = null, string hitEnemySound = null, string hitWallSound = null,
+    bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false, bool? electric = null, float? burstCooldown = null,
+    bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null, bool forceBeam = false,
+    string beamSprite = null, int beamFps = -1, int beamStartFps = -1, int beamEndFps = -1, int beamChargeFps = -1, int beamImpactFps = -1, Vector2? beamDims = null,
+    Vector2? beamImpactDims = null, bool beamLoopCharge = true, float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f,
+    GoopDefinition beamGoop = null, bool? beamInterpolate = null, int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null,
+    float beamKnockback = -1f, BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null,
+    bool beamStartIsMuzzle = false)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -297,8 +276,7 @@ public sealed class GunData
       _Instance.collidesWithProjectiles           = collidesWithProjectiles;
       _Instance.collidesOnlyWithPlayerProjectiles = collidesOnlyWithPlayerProjectiles;
       _Instance.pierceInternalWalls               = pierceInternalWalls;
-
-      _Instance.isBeam                            = isBeam;
+      _Instance.forceBeam                         = forceBeam;
       _Instance.beamSprite                        = beamSprite;
       _Instance.beamFps                           = beamFps;
       _Instance.beamStartFps                      = beamStartFps;
@@ -496,7 +474,7 @@ public static class GunBuilder
     if (p.AppliesSpeedModifier)
       p.speedEffect = Items.TripleCrossbow.AsGun().DefaultModule.projectiles[0].speedEffect;
 
-    if (b.isBeam)
+    if (b.shootStyle == ShootStyle.Beam || b.forceBeam)
       p.InternalSetupBeam(b);
 
     return p;
