@@ -24,8 +24,8 @@ public class Bouncer : CwaffGun
 
         gun.InitProjectile(GunData.New(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic, damage: _ACCELERATION, speed: _ACCELERATION,
           range: 9999f, sprite: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter,
-          overrideColliderPixelSizes: new IntVector2(1,1) // 1-pixel collider for accurate bounce animation
-          )).Attach<HarmlessUntilBounce>();
+          overrideColliderPixelSizes: new IntVector2(1,1))) // 1-pixel collider for accurate bounce animation
+        .Attach<HarmlessUntilBounce>();
 
         // Initialize our explosion data
         ExplosionData defaultExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData;

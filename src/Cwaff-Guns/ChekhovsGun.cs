@@ -19,9 +19,9 @@ public class ChekhovsGun : CwaffGun
             gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 200, shootFps: 16, reloadFps: 16,
                 muzzleVFX: "muzzle_chekhovs_gun", fireAudio: "chekhovs_gun_place_sound", reloadAudio: "chekhovs_gun_reload_sound");
 
-        Projectile proj = gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 15f, range: 1000f, speed: 200f, sprite: "chekhov_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter)
-        ).Attach<ChekhovBullet>();
+        gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+          damage: 15f, range: 1000f, speed: 200f, sprite: "chekhov_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter))
+        .Attach<ChekhovBullet>();
 
         _ChekhovTrailPrefab = VFX.CreateTrailObject("chekhov_trail_mid", fps: 60, startAnim: "chekhov_trail_start", cascadeTimer: C.FRAME, destroyOnEmpty: true);
 

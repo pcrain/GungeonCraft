@@ -18,9 +18,9 @@ public class Zag : CwaffGun
             gun.LoopAnimation(gun.reloadAnimation);
 
         gun.InitProjectile(GunData.New(clipSize: 9, cooldown: 0.125f, shootStyle: ShootStyle.SemiAutomatic, electric: true,
-            damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter, hitEnemySound: "zag_hit_enemy_sound"))
-          .Attach<ZagProjectile>()
-          .CopyAllImpactVFX(Items.ShockRifle);
+          damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter, hitEnemySound: "zag_hit_enemy_sound"))
+        .Attach<ZagProjectile>()
+        .CopyAllImpactVFX(Items.ShockRifle);
 
         _ZagTrailPrefab = VFX.CreateTrailObject("zag_trail_mid", fps: 30, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 

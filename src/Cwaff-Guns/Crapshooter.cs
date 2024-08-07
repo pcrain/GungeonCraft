@@ -29,18 +29,14 @@ public class Crapshooter : CwaffGun
             gun.SetReloadAudio(_DiceSounds[2], 2, 18, 23, 25, 31);
 
         _BaseCrapshooterProjectile = gun.InitSpecialProjectile<GrenadeProjectile>(GunData.New(clipSize: 12, cooldown: 0.16f,
-            shootStyle: ShootStyle.Automatic, scale: 2.0f, damage: 3f, speed: 24f, force: 10f, range: 30f, customClip: true,
-            sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false
-          )).Attach<GrenadeProjectile>(g => {
-            g.startingHeight = 0.5f;
-          }).Attach<BounceProjModifier>(bounce => {
-            bounce.percentVelocityToLoseOnBounce = 0.5f;
-            bounce.numberOfBounces = Mathf.Max(bounce.numberOfBounces, 0) + 3;
-            bounce.OnBounce += () => {
-                bounce.gameObject.Play(_DiceSounds.ChooseRandom());
-            };
-          }).Attach<DiceProjectile>(
-          );
+          shootStyle: ShootStyle.Automatic, scale: 2.0f, damage: 3f, speed: 24f, force: 10f, range: 30f, customClip: true,
+          sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false))
+        .Attach<GrenadeProjectile>(g => { g.startingHeight = 0.5f; })
+        .Attach<BounceProjModifier>(bounce => {
+          bounce.percentVelocityToLoseOnBounce = 0.5f;
+          bounce.numberOfBounces = Mathf.Max(bounce.numberOfBounces, 0) + 3;
+          bounce.OnBounce += () => { bounce.gameObject.Play(_DiceSounds.ChooseRandom()); }; })
+        .Attach<DiceProjectile>();
     }
 
     private void Explode(Projectile p)

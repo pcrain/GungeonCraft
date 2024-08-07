@@ -38,7 +38,7 @@ public class Magunet : CwaffGun
 
         _MagunetBeamVFX = VFX.Create("magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.65f, emissivePower: 1f);
         _MagunetChargeVFX = VFX.Create("magunet_charge_vfx", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f);
-            _MagunetChargeVFX.SetAlpha(0.5f);
+            _MagunetChargeVFX.SetAlpha(0.5f); //REFACTOR: combine
 
         _DebrisImpactVFX    = Items.Ak47.EnemyImpactVFX();
         _DebrisBigImpactVFX = Items.HegemonyRifle.EnemyImpactVFX();

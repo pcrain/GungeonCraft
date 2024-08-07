@@ -22,8 +22,8 @@ public class Outbreak : CwaffGun
             gun.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
         _InfectionProjectile = gun.InitProjectile(GunData.New(clipSize: 10, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
-          damage: 8.0f, speed: 17.0f, range: 100.0f, sprite: "outbreak_projectile", fps: 12, anchor: Anchor.MiddleLeft
-          )).Attach<InfectionBehavior>();
+          damage: 8.0f, speed: 17.0f, range: 100.0f, sprite: "outbreak_projectile", fps: 12, anchor: Anchor.MiddleLeft))
+        .Attach<InfectionBehavior>();
 
         _OutbreakSmokeVFX = VFX.Create("outbreak_smoke_small", 2, loops: true, anchor: Anchor.MiddleCenter);
         _OutbreakSmokeLargeVFX = VFX.Create("outbreak_smoke_large", 2, loops: true, anchor: Anchor.MiddleCenter);

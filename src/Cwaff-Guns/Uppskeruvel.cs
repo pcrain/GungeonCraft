@@ -41,9 +41,9 @@ public class Uppskeruvel : CwaffGun
             gun.SetReloadAudio("uppskeruvel_reload_sound", 4, 22);
 
         gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: true,
-            sprite: "uppskeruvel_projectile", fps: 12, anchor: Anchor.MiddleLeft, hitEnemySound: "soul_impact_sound"))
-          .Attach<UppskeruvelProjectile>()
-          .CopyAllImpactVFX(Items.SkullSpitter);
+          sprite: "uppskeruvel_projectile", fps: 12, anchor: Anchor.MiddleLeft, hitEnemySound: "soul_impact_sound"))
+        .Attach<UppskeruvelProjectile>()
+        .CopyAllImpactVFX(Items.SkullSpitter);
 
         gun.gameObject.AddComponent<UppskeruvelAmmoDisplay>();
 

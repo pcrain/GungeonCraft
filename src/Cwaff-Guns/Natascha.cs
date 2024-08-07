@@ -20,8 +20,8 @@ public class Natascha : CwaffGun
     {
         Gun gun = Lazy.SetupGun<Natascha>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500,
-                shootFps: (int)((float)_FIRE_ANIM_FRAMES / _BASE_COOLDOWN) + 1,
-                muzzleVFX: "muzzle_natascha", muzzleFps: 60, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter);
+              shootFps: (int)((float)_FIRE_ANIM_FRAMES / _BASE_COOLDOWN) + 1,
+              muzzleVFX: "muzzle_natascha", muzzleFps: 60, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter);
             gun.SetCasing(Items.Ak47);
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
             gun.AddToSubShop(ModdedShopType.Rusty);

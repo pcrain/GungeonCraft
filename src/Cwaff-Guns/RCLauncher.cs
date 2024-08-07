@@ -18,18 +18,17 @@ public class RCLauncher : CwaffGun
                 loopReloadAt: 0, fireAudio: "rc_car_launch_sound", reloadAudio: "rc_car_reload_sound");
 
         gun.InitSpecialProjectile<RCGuidedProjectile>(GunData.New(sprite: "rc_car_projectile", clipSize: 7, cooldown: 0.1f,
-            shootStyle: ShootStyle.SemiAutomatic, speed: 20f, damage: 9f, range: 9999f,
-            shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false,
-            spawnSound: "rc_car_engine_sound", stopSoundOnDeath: true, destroySound: "rc_car_crash_sound")
-        ).Attach<RCGuidedProjectile>(igp => {
-            igp.dumbfireTime          = 0.2f;
-            igp.trackingSpeed         = 360f;
-            igp.minSpeed              = 20f;
-            igp.accel                 = 15f;
-            igp.followTheLeader       = true;
-            igp.pierceMinorBreakables = true;
-        }).Attach<RCProjectileBehavior>(
-        );
+          shootStyle: ShootStyle.SemiAutomatic, speed: 20f, damage: 9f, range: 9999f,
+          shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false,
+          spawnSound: "rc_car_engine_sound", stopSoundOnDeath: true, destroySound: "rc_car_crash_sound"))
+        .Attach<RCGuidedProjectile>(igp => {
+          igp.dumbfireTime          = 0.2f;
+          igp.trackingSpeed         = 360f;
+          igp.minSpeed              = 20f;
+          igp.accel                 = 15f;
+          igp.followTheLeader       = true;
+          igp.pierceMinorBreakables = true; })
+        .Attach<RCProjectileBehavior>();
 
         // Initialize our explosion data
         _CarExplosion = new ExplosionData()

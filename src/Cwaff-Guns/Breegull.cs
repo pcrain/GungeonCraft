@@ -67,12 +67,12 @@ public class Breegull : CwaffGun
         //WARNING: CloneProjectile from anything other than a vanilla gun causes weird issues on MacOS and Linux???
         //         Can maybe be circumvented by setting up each sprite individually? (actually just has to do with missing DLL / patch for generic Instantiate())
         _EggFire      = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_fire", shrapnelVFX: VFX.Create("breegull_impact_fire"), fire: 1.0f));
-        _EggGrenade   = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_grenade", shrapnelVFX: VFX.Create("breegull_impact_grenade"))
-            ).Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultLarge);
+        _EggGrenade   = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_grenade", shrapnelVFX: VFX.Create("breegull_impact_grenade")))
+          .Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultLarge);
         _EggIce       = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_ice", shrapnelVFX: VFX.Create("breegull_impact_ice"), freeze: 0.75f));
-        _EggClockwork = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_clockwork", shrapnelVFX: VFX.Create("breegull_impact_clockwork"))
-            ).Attach<ExplosiveModifier>(ex => ex.explosionData = clockworkExplosion
-            ).Attach<HomingModifier>(home => { home.HomingRadius = 10f; home.AngularVelocity = 720f; });
+        _EggClockwork = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_clockwork", shrapnelVFX: VFX.Create("breegull_impact_clockwork")))
+          .Attach<ExplosiveModifier>(ex => ex.explosionData = clockworkExplosion)
+          .Attach<HomingModifier>(home => { home.HomingRadius = 10f; home.AngularVelocity = 720f; });
 
         _Eggs = new List<EggData>() {
             new EggData(){ projectile = _EggNormal,    sound = "collect_egg_normal_sound",    ui = "breegull_normal_ui",    ammo = 1, },

@@ -23,9 +23,9 @@ public class IronMaid : CwaffGun
             gun.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         Projectile proj = gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 5.0f, speed: 40.0f,
-            sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter, hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound"))
-          .CopyAllImpactVFX(Items.Thunderclap)
-          .Attach<IronMaidBullets>();
+          sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter, hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound"))
+        .CopyAllImpactVFX(Items.Thunderclap)
+        .Attach<IronMaidBullets>();
 
         gun.AddSynergyModules(Synergy.MASTERY_IRON_MAID, new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, ammoCost: 0, clipSize: 20, cooldown: 0.1f,
           shootStyle: ShootStyle.SemiAutomatic, angleFromAim: 20f, angleVariance: 8f, ignoredForReloadPurposes: true, mirror: true, baseProjectile: proj)));

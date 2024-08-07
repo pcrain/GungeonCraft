@@ -27,18 +27,18 @@ public class Pincushion : CwaffGun
 
         gun.InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
           damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, spawnSound: "pincushion_fire",
-          anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS
-          )).SetAllImpactVFX(_Microdust
-          ).Attach<VeryFragileProjectile>(
-          ).Attach<EasyTrailBullet>(trail => {
-            trail.TrailPos   = trail.transform.position;
-            trail.StartWidth = 0.1f;
-            trail.EndWidth   = 0f;
-            trail.LifeTime   = 0.1f;
-            trail.StartColor = Color.gray;
-            trail.BaseColor  = Color.gray;
-            trail.EndColor   = Color.gray;
-          });
+          anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS))
+        .SetAllImpactVFX(_Microdust)
+        .Attach<VeryFragileProjectile>()
+        .Attach<EasyTrailBullet>(trail => {
+          trail.TrailPos   = trail.transform.position;
+          trail.StartWidth = 0.1f;
+          trail.EndWidth   = 0f;
+          trail.LifeTime   = 0.1f;
+          trail.StartColor = Color.gray;
+          trail.BaseColor  = Color.gray;
+          trail.EndColor   = Color.gray;
+        });
     }
 
     // GetLowDiscrepancyRandom() makes projectiles not spread as randomly as they could, so override that randomness with our own spread

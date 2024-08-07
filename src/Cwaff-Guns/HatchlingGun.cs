@@ -15,9 +15,9 @@ public class HatchlingGun : CwaffGun
             gun.SetReloadAudio("hatchling_gun_bounce_sound", 0, 6, 14);
 
         gun.InitProjectile(GunData.New(clipSize: 12, cooldown: 0.2f, angleVariance: 15.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
-          damage: 3.0f, speed: 24.0f, sprite: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter, spawnSound: "hatchling_gun_shoot_sound"
-          )).SetAllImpactVFX(VFX.CreatePool("egg_break", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter)
-          ).Attach<HatchlingProjectile>();
+          damage: 3.0f, speed: 24.0f, sprite: "egg", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter, spawnSound: "hatchling_gun_shoot_sound"))
+        .SetAllImpactVFX(VFX.CreatePool("egg_break", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter))
+        .Attach<HatchlingProjectile>();
     }
 }
 

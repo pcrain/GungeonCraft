@@ -38,16 +38,15 @@ public class OmnidirectionalLaser : CwaffGun
             gun.SetFireAudio("omni_spin_sound", 0, 1, 2, 3, 4, 5, 6, 7);
             gun.SuppressReloadAnimations();
             gun.AddFlippedCarryPixelOffsets(offset: new IntVector2(5, -4), flippedOffset: new IntVector2(4, -4),
-                offsetPilot:       new IntVector2(5, -4), flippedOffsetPilot:       new IntVector2(5, -4),
-                offsetConvict:     new IntVector2(5, -4), flippedOffsetConvict:     new IntVector2(5, -4),
-                offsetRobot:       new IntVector2(5, -4), flippedOffsetRobot:       new IntVector2(4, -4),
-                offsetSoldier:     new IntVector2(6, -4), flippedOffsetSoldier:     new IntVector2(6, -4),
-                offsetGuide:       new IntVector2(7, -4), flippedOffsetGuide:       new IntVector2(7, -4),
-                offsetCoopCultist: new IntVector2(5, -4), flippedOffsetCoopCultist: new IntVector2(5, -4),  //TODO: verify
-                offsetBullet:      new IntVector2(8, -4), flippedOffsetBullet:      new IntVector2(8, -4),
-                offsetEevee:       new IntVector2(5, -4), flippedOffsetEevee:       new IntVector2(5, -4),  //no one good offset for this character, so deal with a good average
-                offsetGunslinger:  new IntVector2(5, -4), flippedOffsetGunslinger:  new IntVector2(5, -4)   //TODO: verify
-                );
+              offsetPilot:       new IntVector2(5, -4), flippedOffsetPilot:       new IntVector2(5, -4),
+              offsetConvict:     new IntVector2(5, -4), flippedOffsetConvict:     new IntVector2(5, -4),
+              offsetRobot:       new IntVector2(5, -4), flippedOffsetRobot:       new IntVector2(4, -4),
+              offsetSoldier:     new IntVector2(6, -4), flippedOffsetSoldier:     new IntVector2(6, -4),
+              offsetGuide:       new IntVector2(7, -4), flippedOffsetGuide:       new IntVector2(7, -4),
+              offsetCoopCultist: new IntVector2(5, -4), flippedOffsetCoopCultist: new IntVector2(5, -4),  //TODO: verify
+              offsetBullet:      new IntVector2(8, -4), flippedOffsetBullet:      new IntVector2(8, -4),
+              offsetEevee:       new IntVector2(5, -4), flippedOffsetEevee:       new IntVector2(5, -4),  //no one good offset for this character, so deal with a good average
+              offsetGunslinger:  new IntVector2(5, -4), flippedOffsetGunslinger:  new IntVector2(5, -4)); //TODO: verify
             gun.gunHandedness           = GunHandedness.NoHanded;
             gun.reloadAnimation         = gun.idleAnimation; // animation shouldn't automatically change when reloading
             gun.shootAnimation          = null; // animation shouldn't automatically change when firing

@@ -151,8 +151,8 @@ public class Femtobyte : CwaffGun
             //NOTE: modulesAreTiers with no 2nd module lets use switch to tier 1 to do cool alternate stuff without firing projectiles
 
         Projectile proj = gun.InitProjectile(GunData.New(clipSize: -1, angleVariance: 2.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f, speed: 90.0f,
-            cooldown: 0.4f, sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter, hitEnemySound: "femtobyte_hit_enemy_sound"))
-          .Attach<FemtobyteProjectile>();
+          cooldown: 0.4f, sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter, hitEnemySound: "femtobyte_hit_enemy_sound"))
+        .Attach<FemtobyteProjectile>();
         proj.AddTrailToProjectilePrefab("femtobyte_beam", fps: 10, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false);
 
         _ImpactBits = VFX.Create("femtobyte_projectile_vfx", fps: 1, loops: false, anchor: Anchor.MiddleCenter);

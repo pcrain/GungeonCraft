@@ -36,8 +36,8 @@ public class Alligator : CwaffGun
                 fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound", dynamicBarrelOffsets: true);
 
         gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
-          damage: 1.0f, speed: 50.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter, electric: true
-          )).Attach<AlligatorProjectile>();
+          damage: 1.0f, speed: 50.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter, electric: true))
+        .Attach<AlligatorProjectile>();
 
         gun.gameObject.AddComponent<AlligatorAmmoDisplay>();
 

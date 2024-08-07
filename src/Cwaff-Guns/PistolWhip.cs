@@ -29,20 +29,20 @@ public class PistolWhip : CwaffGun
 
         gun.gameObject.AddComponent<PistolWhipAmmoDisplay>();
 
-        _PistolWhipProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f
-          )).Attach<EasyTrailBullet>(trail => {
-            trail.TrailPos   = trail.transform.position;
-            trail.StartWidth = 0.3f;
-            trail.EndWidth   = 0f;
-            trail.LifeTime   = 0.05f;
-            trail.BaseColor  = Color.yellow;
-            trail.EndColor   = Color.yellow;
-          });
+        _PistolWhipProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f))
+        .Attach<EasyTrailBullet>(trail => {
+          trail.TrailPos   = trail.transform.position;
+          trail.StartWidth = 0.3f;
+          trail.EndWidth   = 0f;
+          trail.LifeTime   = 0.05f;
+          trail.BaseColor  = Color.yellow;
+          trail.EndColor   = Color.yellow;
+        });
 
-        _PistolButtProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f
-          )).AddAnimations(AnimatedBullet.Create(name: "pistol_whip_dummy_bullet", fps: 12, anchor: Anchor.MiddleCenter) // Not really visible, just used for pixel collider size
-          ).SetAllImpactVFX(VFX.CreatePool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f)
-          ).Attach<PistolButtProjectile>();
+        _PistolButtProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f))
+          .AddAnimations(AnimatedBullet.Create(name: "pistol_whip_dummy_bullet", fps: 12, anchor: Anchor.MiddleCenter)) // Not really visible, just used for pixel collider size
+          .SetAllImpactVFX(VFX.CreatePool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f))
+          .Attach<PistolButtProjectile>();
     }
 
     public void ReplenishMiniBlanks(Projectile p, SpeculativeRigidbody body)

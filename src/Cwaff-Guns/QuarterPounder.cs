@@ -22,7 +22,7 @@ public class QuarterPounder : CwaffGun
           sprite: "coin_gun_projectile", fps: 2, anchor: Anchor.MiddleCenter, hitSound: "coin_hit_wall_sound")).Attach<MidasProjectile>();
 
         _GoldProjectile = Items.Ak47.CloneProjectile(GunData.New(sprite: "midas_gold_projectile", damage: 30.0f, speed: 80.0f, force: 10.0f,
-            range: 80.0f, shouldRotate: true)).Attach<MidasProjectile>();
+          range: 80.0f, shouldRotate: true)).Attach<MidasProjectile>();
 
         _MidasParticleVFX = VFX.Create("midas_sparkle", fps: 8, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 5);
     }

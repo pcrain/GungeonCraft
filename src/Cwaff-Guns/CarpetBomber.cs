@@ -32,12 +32,12 @@ public class CarpetBomber : CwaffGun
           clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: true,
           sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "carpet_bomber_projectile", fps: 20, anchor: Anchor.MiddleCenter,
           scale: 0.5f, barrageSize: _MAX_PROJECTILES, shouldRotate: true, shouldFlipHorizontally: true, surviveRigidbodyCollisions: true,
-          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(8, 8)
-        )).Attach<BounceProjModifier>(bounce => {
+          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(8, 8)))
+        .Attach<BounceProjModifier>(bounce => {
           bounce.numberOfBounces = _MAX_WALL_BOUNCES;
           bounce.onlyBounceOffTiles = false;
-          bounce.ExplodeOnEnemyBounce = false;
-        }).Attach<CarpetProjectile>();
+          bounce.ExplodeOnEnemyBounce = false; })
+        .Attach<CarpetProjectile>();
 
         for (int i = 0; i < _MAX_PROJECTILES; i++)
         {
@@ -49,13 +49,13 @@ public class CarpetBomber : CwaffGun
                 gun.RawSourceVolley.projectiles[j].chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
                     Projectile = p.Clone(GunData.New(
                       // speed increases both with the charge and with the projectile's index in the array
-                      speed: _MIN_SPEED + (_DLT_SPEED + _SPEED_PER_CHARGE * i) * (i == 0 ? 0.5f : ((float)j / (float)i)))
-                      ).Attach<FancyGrenadeProjectile>(g => {
-                        g.startingHeight   = 0.5f;
-                        g.minBounceAngle   = 10f;
-                        g.maxBounceAngle   = 30f;
-                        g.startingVelocity = 0.5f * j;
-                      }),
+                      speed: _MIN_SPEED + (_DLT_SPEED + _SPEED_PER_CHARGE * i) * (i == 0 ? 0.5f : ((float)j / (float)i))))
+                    .Attach<FancyGrenadeProjectile>(g => {
+                      g.startingHeight   = 0.5f;
+                      g.minBounceAngle   = 10f;
+                      g.maxBounceAngle   = 30f;
+                      g.startingVelocity = 0.5f * j;
+                    }),
                     ChargeTime = _CHARGE_PER_PROJECTILE * (i + 1),
                 });
         }

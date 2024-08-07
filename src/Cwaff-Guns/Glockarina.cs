@@ -66,8 +66,7 @@ public class Glockarina : CwaffGun
           sprite: "glockarina_projectile", fps: 12, anchor: Anchor.MiddleLeft, shouldRotate: false));
 
         _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();
-        Decoy decoy = _DecoyPrefab.GetComponent<Decoy>();
-            decoy.DeathExplosionTimer = _DECOY_LIFE;
+        _DecoyPrefab.GetComponent<Decoy>().DeathExplosionTimer = _DECOY_LIFE;
 
         _NoteVFXPrefab = VFX.Create("note_vfx", fps: 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
 

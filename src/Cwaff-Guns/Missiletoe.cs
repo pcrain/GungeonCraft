@@ -85,47 +85,47 @@ public class Missiletoe : CwaffGun
         tk2dSpriteAnimationClip star        = AnimatedBullet.Create(name: "missiletoe_projectile_star",        anchor: Anchor.MiddleLeft);
         tk2dSpriteAnimationClip wreath      = AnimatedBullet.Create(name: "missiletoe_projectile_wreath",      anchor: Anchor.MiddleLeft);
 
-        _OrnamentProjectile = Items._38Special.CloneProjectile(
-          ).AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath
-          ).Attach<GlowyChristmasProjectileBehavior>();
-        _ExplodingOrnamentProjectile = Items._38Special.CloneProjectile(
-          ).AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath
-          ).Attach<GlowyChristmasProjectileBehavior>(glow => glow.Glow(40)
-          ).Attach<ExplosiveModifier>(e => e.explosionData = giftExplosion);
-        _GiftProjectileS = SetupProjectile(gun: gun, name: "gift_projectile_black", damage: 30f, speed: 30f, force: 30f
-            ).Attach<ExplosiveModifier>(e => e.explosionData = giftExplosion
-            ).Attach<SpawnProjModifier>(s => {
-              s.spawnProjectilesOnCollision  = true;
-              s.numberToSpawnOnCollison      = 9;
-              s.startAngle                   = 180;
-              s.projectileToSpawnOnCollision = _ExplodingOrnamentProjectile;
-              s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
-            });
-        _GiftProjectileA = SetupProjectile(gun: gun, name: "gift_projectile_red",   damage: 25f, speed: 30f, force: 25f
-            ).Attach<ExplosiveModifier>(e => e.explosionData = Bouncer._MiniExplosion
-            ).Attach<SpawnProjModifier>(s => {
-              s.spawnProjectilesOnCollision  = true;
-              s.numberToSpawnOnCollison      = 7;
-              s.startAngle                   = 180;
-              s.projectileToSpawnOnCollision = _OrnamentProjectile;
-              s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
-            });
-        _GiftProjectileB = SetupProjectile(gun: gun, name: "gift_projectile_green", damage: 20f, speed: 25f, force: 20f
-            ).Attach<SpawnProjModifier>(s => {
-              s.spawnProjectilesOnCollision  = true;
-              s.numberToSpawnOnCollison      = 5;
-              s.startAngle                   = 180;
-              s.projectileToSpawnOnCollision = _OrnamentProjectile;
-              s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
-            });
-        _GiftProjectileC = SetupProjectile(gun: gun, name: "gift_projectile_blue",  damage: 15f, speed: 25f, force: 15f
-            ).Attach<SpawnProjModifier>(s => {
-              s.spawnProjectilesOnCollision  = true;
-              s.numberToSpawnOnCollison      = 2;
-              s.startAngle                   = 180;
-              s.projectileToSpawnOnCollision = _OrnamentProjectile;
-              s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.FLAK_BURST;
-            });
+        _OrnamentProjectile = Items._38Special.CloneProjectile()
+          .AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath)
+          .Attach<GlowyChristmasProjectileBehavior>();
+        _ExplodingOrnamentProjectile = Items._38Special.CloneProjectile()
+          .AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath)
+          .Attach<GlowyChristmasProjectileBehavior>(glow => glow.Glow(40))
+          .Attach<ExplosiveModifier>(e => e.explosionData = giftExplosion);
+        _GiftProjectileS = SetupProjectile(gun: gun, name: "gift_projectile_black", damage: 30f, speed: 30f, force: 30f)
+          .Attach<ExplosiveModifier>(e => e.explosionData = giftExplosion)
+          .Attach<SpawnProjModifier>(s => {
+            s.spawnProjectilesOnCollision  = true;
+            s.numberToSpawnOnCollison      = 9;
+            s.startAngle                   = 180;
+            s.projectileToSpawnOnCollision = _ExplodingOrnamentProjectile;
+            s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
+          });
+        _GiftProjectileA = SetupProjectile(gun: gun, name: "gift_projectile_red",   damage: 25f, speed: 30f, force: 25f)
+          .Attach<ExplosiveModifier>(e => e.explosionData = Bouncer._MiniExplosion)
+          .Attach<SpawnProjModifier>(s => {
+            s.spawnProjectilesOnCollision  = true;
+            s.numberToSpawnOnCollison      = 7;
+            s.startAngle                   = 180;
+            s.projectileToSpawnOnCollision = _OrnamentProjectile;
+            s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
+          });
+        _GiftProjectileB = SetupProjectile(gun: gun, name: "gift_projectile_green", damage: 20f, speed: 25f, force: 20f)
+          .Attach<SpawnProjModifier>(s => {
+            s.spawnProjectilesOnCollision  = true;
+            s.numberToSpawnOnCollison      = 5;
+            s.startAngle                   = 180;
+            s.projectileToSpawnOnCollision = _OrnamentProjectile;
+            s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.RADIAL;
+          });
+        _GiftProjectileC = SetupProjectile(gun: gun, name: "gift_projectile_blue",  damage: 15f, speed: 25f, force: 15f)
+          .Attach<SpawnProjModifier>(s => {
+            s.spawnProjectilesOnCollision  = true;
+            s.numberToSpawnOnCollison      = 2;
+            s.startAngle                   = 180;
+            s.projectileToSpawnOnCollision = _OrnamentProjectile;
+            s.collisionSpawnStyle          = SpawnProjModifier.CollisionSpawnStyle.FLAK_BURST;
+          });
         _GiftProjectileD = SetupProjectile(gun: gun, name: "gift_projectile_brown", damage: 10f, speed: 25f, force: 10f);
 
         _WrapVFXS       = SetupVFX("black_gift_wrap");

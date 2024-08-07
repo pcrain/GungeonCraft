@@ -22,8 +22,8 @@ public class SchrodingersGat : CwaffGun
                 shootFps: 24, banFromBlessedRuns: true);
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
-          damage: 0.0f, speed: 32.0f, sprite: "schrodingers_gat_projectile", fps: 12, anchor: Anchor.MiddleCenter, spawnSound: "schrodingers_gat_fire_sound"
-          )).Attach<SchrodingersGatProjectile>();
+          damage: 0.0f, speed: 32.0f, sprite: "schrodingers_gat_projectile", fps: 12, anchor: Anchor.MiddleCenter, spawnSound: "schrodingers_gat_fire_sound"))
+        .Attach<SchrodingersGatProjectile>();
     }
 
     public override void OnPlayerPickup(PlayerController player)

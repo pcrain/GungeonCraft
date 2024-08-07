@@ -34,9 +34,9 @@ public class Gunbrella : CwaffGun
 
         gun.InitProjectile(GunData.New(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true, ammoCost: 1,
           damage: _PROJ_DAMAGE, sprite: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft, freeze: 0.33f, chargeTime: _MIN_CHARGE_TIME,
-          destroySound: "icicle_crash", barrageSize: _BARRAGE_SIZE, bossDamageMult: 0.6f // bosses are big and this does a lot of damage, so tone it down
-          )).SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f)
-          ).Attach<GunbrellaProjectile>();
+          destroySound: "icicle_crash", barrageSize: _BARRAGE_SIZE, bossDamageMult: 0.6f)) // bosses are big and this does a lot of damage, so tone it down
+        .SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f))
+        .Attach<GunbrellaProjectile>();
 
         _MasteryModule = new ProjectileModule(){projectiles = new(){ gun.DefaultModule.projectiles[0] }}.SetAttributes(GunData.New(
             gun: gun, ammoCost: 1, clipSize: -1, cooldown: 0.05f, shootStyle: ShootStyle.Automatic, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));

@@ -37,9 +37,9 @@ public class Suncaster : CwaffGun
               canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false, shootFps: 30, reloadFps: 40);
 
         _SuncasterProjectile = gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged,
-          damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft, customClip: true, spawnSound: "suncaster_fire_sound", uniqueSounds: true)
-        ).Attach<PierceProjModifier>(pierce => pierce.penetration = 999
-        ).Attach<SuncasterProjectile>();
+          damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft, customClip: true, spawnSound: "suncaster_fire_sound", uniqueSounds: true))
+        .Attach<PierceProjModifier>(pierce => pierce.penetration = 999)
+        .Attach<SuncasterProjectile>();
         _SuncasterProjectile.pierceMinorBreakables = true;
         _SuncasterProjectile.PenetratesInternalWalls = true;
 

@@ -15,9 +15,9 @@ public class Wavefront : CwaffGun
             gun.SetReloadAudio("wavefront_reload_sound", 0, 6, 12, 18);
 
         gun.InitProjectile(GunData.New(clipSize: 8, cooldown: 0.125f, shootStyle: ShootStyle.Automatic, range: 999999f, speed: 60f, shouldRotate: true,
-          customClip: true, sprite: "wavefront_projectile_alt", scale: 0.25f, fps: 24, anchor: Anchor.MiddleCenter)
-        ).SetEnemyImpactVFX(VFX.CreatePool("wavefront_impact_particles", fps: 24, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f, emissivePower: 2f)
-        ).Attach<TeslaProjectileBehavior>();
+          customClip: true, sprite: "wavefront_projectile_alt", scale: 0.25f, fps: 24, anchor: Anchor.MiddleCenter))
+        .SetEnemyImpactVFX(VFX.CreatePool("wavefront_impact_particles", fps: 24, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f, emissivePower: 2f))
+        .Attach<TeslaProjectileBehavior>();
     }
 }
 

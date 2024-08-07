@@ -28,7 +28,7 @@ public class Scotsman : CwaffGun
         gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 5.0f, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter)).Attach<Stickybomb>();
         gun.AddReticle<CwaffReticle>(reticleVFX : VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter),
-            controllerScale : _MAX_RETICLE_RANGE, visibility : CwaffReticle.Visibility.CONTROLLER);
+          controllerScale : _MAX_RETICLE_RANGE, visibility : CwaffReticle.Visibility.CONTROLLER);
 
         // Initialize our explosion data
         _ScotsmanExplosion = new ExplosionData()

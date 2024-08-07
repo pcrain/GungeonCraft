@@ -19,9 +19,9 @@ public class Blamethrower : CwaffGun
 
         Projectile proj = gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic,
           damage: 2f, angleVariance: 30f, speed: 17f, range: 17f, customClip: true,
-          sprite: "blamethrower_projectile", scale: 2.0f, fps: 10, anchor: Anchor.MiddleCenter, shouldRotate: false)
-        ).Attach<BlameDamage>(
-        ).Attach<BlamethrowerProjectile>();
+          sprite: "blamethrower_projectile", scale: 2.0f, fps: 10, anchor: Anchor.MiddleCenter, shouldRotate: false))
+        .Attach<BlameDamage>()
+        .Attach<BlamethrowerProjectile>();
 
         _BlameImpact = VFX.Create("blamethrower_projectile_vfx", fps: 1, loops: false, anchor: Anchor.MiddleCenter);
         _BlameTrail = VFX.Create("blamethrower_trail", fps: 16, loops: true, anchor: Anchor.MiddleCenter);

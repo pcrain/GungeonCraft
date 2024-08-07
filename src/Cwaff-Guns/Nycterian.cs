@@ -17,8 +17,8 @@ public class Nycterian : CwaffGun
 
         gun.InitProjectile(GunData.New(clipSize: 10, cooldown: 0.19f, shootStyle: ShootStyle.SemiAutomatic, scale: 1.5f,
           damage: 7.0f, speed: 27.0f, range: 100.0f, sprite: "bat_projectile", fps: 12)).Attach<BatProjectile>();
-        _DistractedVFX = VFX.Create("distracted_vfx",
-            fps: 18, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1, emissiveColour: Color.magenta);
+        _DistractedVFX = VFX.Create("distracted_vfx", fps: 18, loops: true, anchor: Anchor.MiddleCenter,
+          emissivePower: 1, emissiveColour: Color.magenta);
     }
 }
 

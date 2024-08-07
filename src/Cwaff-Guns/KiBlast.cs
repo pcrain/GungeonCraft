@@ -35,18 +35,17 @@ public class KiBlast : CwaffGun
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
           ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 4.0f, range: 1000.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
-          anchor: Anchor.MiddleCenter, ignoreDamageCaps: true
-          )).SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f)
-          ).Attach<EasyTrailBullet>(trail => {
-            trail.TrailPos   = trail.transform.position;
-            trail.StartWidth = 0.2f;
-            trail.EndWidth   = 0f;
-            trail.LifeTime   = 0.1f;
-            trail.BaseColor  = Color.cyan;
-            trail.EndColor   = Color.cyan;
-          }).Attach<ArcTowardsTargetBehavior>(
-          ).Attach<KiBlastBehavior>(  //TODO: KiBlastBehavior must init before ArcTowardsTargetBehavior so we can call Setup() before Start()
-          );
+          anchor: Anchor.MiddleCenter, ignoreDamageCaps: true))
+        .SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f))
+        .Attach<EasyTrailBullet>(trail => {
+          trail.TrailPos   = trail.transform.position;
+          trail.StartWidth = 0.2f;
+          trail.EndWidth   = 0f;
+          trail.LifeTime   = 0.1f;
+          trail.BaseColor  = Color.cyan;
+          trail.EndColor   = Color.cyan; })
+        .Attach<ArcTowardsTargetBehavior>()
+        .Attach<KiBlastBehavior>(); //TODO: KiBlastBehavior must init before ArcTowardsTargetBehavior so we can call Setup() before Start()
 
         gun.gameObject.AddComponent<KiBlastAmmoDisplay>();
     }

@@ -27,15 +27,15 @@ public class Widowmaker : CwaffGun
         _WidowmakerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
         _WidowmakerPrefab.AddComponent<Crawlyboi>();
 
-        _WidowTurretProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f
-          )).Attach<EasyTrailBullet>(trail => {
-            trail.TrailPos   = trail.transform.position;
-            trail.StartWidth = 0.3f;
-            trail.EndWidth   = 0.05f;
-            trail.LifeTime   = 0.07f;
-            trail.BaseColor  = ExtendedColours.paleYellow;
-            trail.EndColor   = Color.Lerp(ExtendedColours.paleYellow, Color.white, 0.25f);
-          });
+        _WidowTurretProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f))
+        .Attach<EasyTrailBullet>(trail => {
+          trail.TrailPos   = trail.transform.position;
+          trail.StartWidth = 0.3f;
+          trail.EndWidth   = 0.05f;
+          trail.LifeTime   = 0.07f;
+          trail.BaseColor  = ExtendedColours.paleYellow;
+          trail.EndColor   = Color.Lerp(ExtendedColours.paleYellow, Color.white, 0.25f);
+        });
     }
 }
 
