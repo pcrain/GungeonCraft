@@ -474,7 +474,9 @@ public class Femtobyte : CwaffGun
     private void UpdateCurrentSlot()
     {
         DigitizedObject d = this.digitizedObjects[this._currentSlot];
-        this.gun.CurrentStrengthTier = (d == null || d.type == EMPTY) ? 0 : 1;
+        int newTier = (d == null || d.type == EMPTY) ? 0 : 1;
+        if (newTier != this.gun.CurrentStrengthTier)
+            this.gun.CurrentStrengthTier = newTier; //NOTE: expensive assignment since it recalculates stats, so only set if actually changed
         this._displayNameDirty = true;
     }
 

@@ -28,9 +28,10 @@ public class Exceptional : CwaffGun
         Projectile proj = gun.InitProjectile(GunData.New(sprite: "exceptional_projectile", clipSize: 32, cooldown: 0.33f, shootStyle: ShootStyle.Burst,
             angleVariance: 10f, damage: 4.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f)).Attach<ExceptionalProjectile>();
 
-        //NOTE: vanilla modulesAreTiers does NOT play nicely with burst weapons and continues firing sometimes long after you release the fire button.
+        //WARN: vanilla modulesAreTiers does NOT play nicely with burst weapons and continues firing sometimes long after you release the fire button.
         //      i think this has to do with the flag3 variable in HandleInitialGunShoot(), but i have no desire to muck with it
         //      as a workaround, i'm setting numberOfShotsInClip to -1, which prevents the glitch for some reason
+        //TODO: fixed in Hotfixes, restore clip size later
         ProjectileModule mod = gun.DefaultModule;
         gun.Volley.projectiles = new(10);
         for (int i = 1; i <= 10; ++i)
@@ -84,10 +85,11 @@ public class Exceptional : CwaffGun
         if (this._cachedPower == _ExceptionalPower)
             return;
         this._cachedPower = _ExceptionalPower;
-        if (this._cachedPower < 2)
-            this.gun.CurrentStrengthTier = 0;
-        else
-            this.gun.CurrentStrengthTier = Mathf.Min(9, Mathf.FloorToInt(Mathf.Log(this._cachedPower, 2)));
+        int newTier = 0;
+        if (this._cachedPower >= 2)
+            newTier = Mathf.Min(9, Mathf.FloorToInt(Mathf.Log(this._cachedPower, 2)));
+        if (this.gun.CurrentStrengthTier != newTier)
+            this.gun.CurrentStrengthTier = newTier; //NOTE: expensive assignment since it recalculates stats, so only set if actually changed
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
