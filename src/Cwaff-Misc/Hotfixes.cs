@@ -1,5 +1,35 @@
 namespace CwaffingTheGungy;
 
+
+// Fixes vanilla bug where if ModulesAreTiers is true, inactive burst modules contribute towards m_midBurstFire checks,
+//   causing infinite firing after letting go of mouse
+[HarmonyPatch(typeof(Gun), nameof(Gun.ContinueAttack))]
+public static class ModulesAreTiersBurstFirePatch
+{
+    [HarmonyILManipulator]
+    private static void ModulesAreTiersBurstFirePatchIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<ProjectileModule>("burstShotCount")))
+            return;
+
+        cursor.Emit(OpCodes.Ldarg_0); // Gun instance
+        cursor.Emit(OpCodes.Ldloc_S, (byte)4); // V_4 == projectileModule
+        cursor.Emit(OpCodes.Ldloc_3); // V_3 == i (loop iterator)
+        cursor.Emit(OpCodes.Call, typeof(ModulesAreTiersBurstFirePatch).GetMethod(nameof(ModulesAreTiersBurstFirePatch.IsCurrentBurstModule),
+          BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    private static int IsCurrentBurstModule(int unadjustBurstShotCount, Gun gun, ProjectileModule mod, int i)
+    {
+      if (!gun.Volley.ModulesAreTiers)
+        return unadjustBurstShotCount;
+      if (gun.m_currentStrengthTier == ((mod.CloneSourceIndex < 0) ? i : mod.CloneSourceIndex))
+        return unadjustBurstShotCount;
+      return 0;
+    }
+}
+
 // Fixes a vanilla bug with the background of final projectiles rendering above the foreground
 // Also fixes a vanilla bug with AmmoBurstVFX rendering below final clip projectiles
 [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateAmmoUIForModule))]
