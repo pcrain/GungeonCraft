@@ -23,7 +23,7 @@ public class ChekhovsGun : CwaffGun
           .Attach<ChekhovBullet>();
 
         _ChekhovTrailPrefab = VFX.CreateTrailObject("chekhov_trail_mid", fps: 60, startAnim: "chekhov_trail_start", cascadeTimer: C.FRAME, destroyOnEmpty: true);
-        _ChekhovGunVFX = VFX.Create("chekhovs_gun_idle_vfx", 12, loops: true, anchor: Anchor.UpperRight); //WARNING: don't use actual gun animations for VFX
+        _ChekhovGunVFX = VFX.Create("chekhovs_gun_idle_vfx", 12,  anchor: Anchor.UpperRight); //WARNING: don't use actual gun animations for VFX
         _ChekhovGunFireVFX = VFX.Create("chekhovs_gun_fire_vfx", 12, loops: false, anchor: Anchor.UpperRight);
     }
 

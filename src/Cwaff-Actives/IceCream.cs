@@ -17,8 +17,7 @@ public class IceCream : CwaffActive
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 15f);
 
-        _HeartVFX = VFX.Create("heart_vfx",
-            fps: 18, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1, emissiveColour: Color.magenta);
+        _HeartVFX = VFX.Create("heart_vfx", fps: 18, emissivePower: 1, emissiveColour: Color.magenta);
     }
 
     public override bool CanBeUsed(PlayerController user)

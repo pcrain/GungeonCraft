@@ -61,7 +61,7 @@ public class KALI : CwaffGun
             gun.SetGunAudio(chargeAnim3, "kali_charge_sound", 0);
         _ChargeAnimations = new(){chargeAnim1, chargeAnim2, chargeAnim3};
 
-        _IonizeVFX = VFX.Create("kali_ionize_particle", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100f);
+        _IonizeVFX = VFX.Create("kali_ionize_particle", fps: 7, emissivePower: 100f);
     }
 
     public override void Update()

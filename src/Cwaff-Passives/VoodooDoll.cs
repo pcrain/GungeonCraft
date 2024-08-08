@@ -17,8 +17,7 @@ public class VoodooDoll : CwaffPassive
         item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
 
-        _VoodooGhostVFX   = VFX.Create("voodoo_ghost",
-            fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
+        _VoodooGhostVFX   = VFX.Create("voodoo_ghost", scale: 0.5f);
     }
 
     public override void Pickup(PlayerController player)

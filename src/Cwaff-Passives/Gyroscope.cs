@@ -19,7 +19,7 @@ public class Gyroscope : CwaffPassive
 
         var comp = item.gameObject.AddComponent<GyroscopeRoll>();
 
-        _TornadoVFX = VFX.Create("tornado", 20, loops: true, anchor: Anchor.LowerCenter);
+        _TornadoVFX = VFX.Create("tornado", fps: 20, anchor: Anchor.LowerCenter);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)

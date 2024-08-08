@@ -31,8 +31,7 @@ public class EmergencySiren : CwaffActive
             },
         };
 
-        _SirenVFX = VFX.Create("siren", 36,
-            loops: true, anchor: Anchor.MiddleCenter, scale: 0.75f, emissivePower: 50f);
+        _SirenVFX = VFX.Create("siren", 36, scale: 0.75f, emissivePower: 50f);
     }
 
     public override void Pickup(PlayerController player)

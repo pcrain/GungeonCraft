@@ -119,7 +119,7 @@ public class Missiletoe : CwaffGun
         _UnwrapVFXC     = SetupVFX("blue_gift_unwrap");
         _UnwrapVFXD     = SetupVFX("brown_gift_unwrap");
         _WrapAnimLength = _WrapVFXB.GetComponent<tk2dSpriteAnimator>().DefaultClip.BaseClipLength;
-        _SparklePrefab  = VFX.Create("missiletoe_sparkles", fps: 8, scale: 0.75f, loops: false, anchor: Anchor.MiddleCenter);
+        _SparklePrefab  = VFX.Create("missiletoe_sparkles", fps: 8, scale: 0.75f, loops: false);
     }
 
     private static GameObject SetupVFX(string name)

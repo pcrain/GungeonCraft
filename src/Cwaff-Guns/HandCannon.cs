@@ -25,7 +25,7 @@ public class HandCannon : CwaffGun
             chargeTime: _CHARGE_TIME))
           .Attach<SlappProjectile>();
 
-        _SlapppAnimation = VFX.Create("slappp_vfx", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f);
+        _SlapppAnimation = VFX.Create("slappp_vfx", fps: 30, loops: false, scale: 0.5f);
         _ClapppShockwave = Items.ChargeShot.AsGun().muzzleFlashEffects.effects[0].effects[0].effect;
     }
 }

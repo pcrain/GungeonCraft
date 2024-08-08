@@ -47,14 +47,14 @@ public class InsurancePolicy : CwaffActive
         item.CustomCost     = 30;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
 
-        _InsuranceVFXRobot      = VFX.Create("insurance_policy_robot_vfx",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXConvict    = VFX.Create("insurance_policy_convict_vfx",    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXPilot      = VFX.Create("insurance_policy_pilot_vfx",      fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXParadox    = VFX.Create("insurance_policy_paradox_vfx",    fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXGunslinger = VFX.Create("insurance_policy_gunslinger_vfx", fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXHunter     = VFX.Create("insurance_policy_hunter_vfx",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXMarine     = VFX.Create("insurance_policy_marine_vfx",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
-        _InsuranceVFXBullet     = VFX.Create("insurance_policy_bullet_vfx",     fps: 1, loops: true, anchor: Anchor.MiddleCenter);
+        _InsuranceVFXRobot      = VFX.Create("insurance_policy_robot_vfx");
+        _InsuranceVFXConvict    = VFX.Create("insurance_policy_convict_vfx");
+        _InsuranceVFXPilot      = VFX.Create("insurance_policy_pilot_vfx");
+        _InsuranceVFXParadox    = VFX.Create("insurance_policy_paradox_vfx");
+        _InsuranceVFXGunslinger = VFX.Create("insurance_policy_gunslinger_vfx");
+        _InsuranceVFXHunter     = VFX.Create("insurance_policy_hunter_vfx");
+        _InsuranceVFXMarine     = VFX.Create("insurance_policy_marine_vfx");
+        _InsuranceVFXBullet     = VFX.Create("insurance_policy_bullet_vfx");
 
         _InsuranceSpriteRobot      = item.sprite.collection.GetSpriteIdByName("insurance_policy_robot_icon");
         _InsuranceSpriteConvict    = item.sprite.collection.GetSpriteIdByName("insurance_policy_convict_icon");
@@ -80,8 +80,7 @@ public class InsurancePolicy : CwaffActive
         _InsuranceFile     = Path.Combine(SaveManager.SavePath,"insurance.csv");
         _InsurancePickupId = item.PickupObjectId;
 
-        _InsuranceParticleVFX = VFX.Create("insurance_sparkle",
-            fps: 8, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 5);
+        _InsuranceParticleVFX = VFX.Create("insurance_sparkle", fps: 8, loops: false, emissivePower: 5);
 
         CwaffEvents.OnFirstFloorOfRunFullyLoaded += InsuranceCheck;
     }

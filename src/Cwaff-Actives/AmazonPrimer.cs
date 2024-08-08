@@ -16,7 +16,7 @@ public class AmazonPrimer : CwaffActive
         item.consumable   = true;
         item.CanBeDropped = true;
 
-        _PrimeLogo = VFX.Create("prime_logo_overhead", 2, loops: true, anchor: Anchor.LowerCenter, emissivePower: 100f);
+        _PrimeLogo = VFX.Create("prime_logo_overhead", anchor: Anchor.LowerCenter, emissivePower: 100f);
         FakeItem.Create<PrimerSubscription>();
     }
 

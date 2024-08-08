@@ -39,8 +39,8 @@ public class WeightedRobes : CwaffActive, ILabelItem
 
         _InactiveId  = item.sprite.spriteId;
         _ActiveId    = item.sprite.collection.GetSpriteIdByName("weighted_robes_active_icon");
-        _TrainingVFX = VFX.Create("status_arrow_down", 2, loops: true, anchor: Anchor.LowerCenter, emissivePower: 100f);;
-        _TrainedVFX  = VFX.Create("status_arrow_up", 2, loops: true, anchor: Anchor.LowerCenter, emissivePower: 100f);;
+        _TrainingVFX = VFX.Create("status_arrow_down", anchor: Anchor.LowerCenter, emissivePower: 100f);;
+        _TrainedVFX  = VFX.Create("status_arrow_up", anchor: Anchor.LowerCenter, emissivePower: 100f);;
     }
 
     public string GetLabel()

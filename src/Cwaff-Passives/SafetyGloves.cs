@@ -22,7 +22,7 @@ public class SafetyGloves : CwaffPassive
 
         //WARNING: reusing ammonomicon icon screws up bounding box in ammonomicon
         // _HandlingVFX = VFX.Create("safety_gloves_icon", 2, loops: true, anchor: Anchor.LowerCenter);
-        _HandlingVFX = VFX.Create("safety_gloves_vfx", 2, loops: true, anchor: Anchor.LowerCenter);
+        _HandlingVFX = VFX.Create("safety_gloves_vfx", anchor: Anchor.LowerCenter);
     }
 
     public override void Update()

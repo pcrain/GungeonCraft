@@ -27,7 +27,7 @@ public class GunSynthesizer : CwaffActive
         item.consumable                 = false;
         item.CanBeDropped               = true;
 
-        _SPAWN_VFX = VFX.Create("basic_green_square", fps: 2, anchor: Anchor.MiddleCenter);
+        _SPAWN_VFX = VFX.Create("basic_green_square");
         _SPAWN_VFX.GetComponent<tk2dSprite>().MakeHolographic(green: true);
     }
 

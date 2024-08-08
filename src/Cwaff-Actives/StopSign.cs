@@ -21,7 +21,7 @@ public class StopSign : CwaffActive
 
         //WARNING: reusing ammonomicon icon screws up bounding box in ammonomicon
         // _StopSignVFX = VFX.Create("stop_sign_icon", 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1f);
-        _StopSignVFX = VFX.Create("stop_sign_vfx", 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _StopSignVFX = VFX.Create("stop_sign_vfx", emissivePower: 1f);
 
         _SpeedEffect = new GameActorSpeedEffect {
             SpeedMultiplier    = 0f,

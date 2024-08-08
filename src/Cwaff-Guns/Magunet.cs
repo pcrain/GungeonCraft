@@ -35,8 +35,8 @@ public class Magunet : CwaffGun
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, //TODO: can possibly use dummy charge module here
             ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
-        _MagunetBeamVFX = VFX.Create("magbeam_alt", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 0.65f, emissivePower: 1f);
-        _MagunetChargeVFX = VFX.Create("magunet_charge_vfx", fps: 30, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f);
+        _MagunetBeamVFX = VFX.Create("magbeam_alt", fps: 30, scale: 0.65f, emissivePower: 1f);
+        _MagunetChargeVFX = VFX.Create("magunet_charge_vfx", fps: 30);
             _MagunetChargeVFX.SetAlpha(0.5f); //REFACTOR: combine
 
         _DebrisImpactVFX    = Items.Ak47.EnemyImpactVFX();

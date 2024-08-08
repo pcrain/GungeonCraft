@@ -23,7 +23,7 @@ public class Zag : CwaffGun
 
         _ZagTrailPrefab = VFX.CreateTrailObject("zag_trail_mid", fps: 30, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 
-        _ZagZigVFX = VFX.Create("zag_zig_vfx", fps: 15, loops: false, anchor: Anchor.MiddleCenter);
+        _ZagZigVFX = VFX.Create("zag_zig_vfx", fps: 15, loops: false);
     }
 }
 

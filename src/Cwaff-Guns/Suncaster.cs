@@ -60,10 +60,9 @@ public class Suncaster : CwaffGun
         _SunTrailRefractedPrefab = VFX.CreateTrailObject("suncaster_beam_refracted_mid", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1, destroyOnEmpty: false);
         _SunTrailFinalPrefab = VFX.CreateTrailObject("suncaster_beam_final_mid", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1, destroyOnEmpty: false);
 
-        _TraceVFX = VFX.Create("basic_square", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10f);
-        // _NewTraceVFX = VFX.Create("basic_green_square", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10f);
+        _TraceVFX = VFX.Create("basic_square", fps: 7, emissivePower: 10f);
 
-        _PrismPrefab = VFX.Create("prism_vfx", fps: 7, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 5f);
+        _PrismPrefab = VFX.Create("prism_vfx", fps: 7, emissivePower: 5f);
         SpeculativeRigidbody body = _PrismPrefab.GetOrAddComponent<SpeculativeRigidbody>();
         body.CanBePushed          = true;
         body.PixelColliders       = new List<PixelCollider>(){new(){

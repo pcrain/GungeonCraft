@@ -30,8 +30,7 @@ public class SubtractorBeam : CwaffGun
             softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
         _RedTrailPrefab = VFX.CreateTrailObject("subtractor_beam_red_mid", fps: 60, startAnim: "subtractor_beam_red_start",
             softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
-        _HitEffects = VFX.Create("subtractor_beam_hit_effect", 12, loops: true,
-            scale: 0.5f, anchor: Anchor.MiddleCenter, emissivePower: 10f);
+        _HitEffects = VFX.Create("subtractor_beam_hit_effect", 12, scale: 0.5f, emissivePower: 10f);
 
     }
 

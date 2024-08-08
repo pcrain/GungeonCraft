@@ -24,7 +24,7 @@ public class HolyWaterGun : CwaffGun
             beamFps: 20, beamEmission: 15f, beamInterpolate: false, beamStartIsMuzzle: true))
           .Attach<ExorcismJuice>();
 
-        _ExorcismParticleVFX = VFX.Create("exorcism_particles", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 2);
+        _ExorcismParticleVFX = VFX.Create("exorcism_particles", fps: 12, loops: false, emissivePower: 2);
     }
 
     public override void OnPlayerPickup(PlayerController player)

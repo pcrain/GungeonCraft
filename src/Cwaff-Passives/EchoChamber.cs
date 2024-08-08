@@ -18,7 +18,7 @@ public class EchoChamber : CwaffPassive
 
         _FlakProjectile = (ItemHelper.Get(Items.FlakBullets) as ComplexProjectileModifier).CollisionSpawnProjectile;
         _DefaultSprite = Items.Ak47.Projectile().gameObject.GetComponentInChildren<tk2dSprite>();
-        _EchoPrefab = VFX.Create("echo_effect", 16, loops: true, anchor: Anchor.MiddleCenter);
+        _EchoPrefab = VFX.Create("echo_effect", fps: 16);
     }
 
     public override void Pickup(PlayerController player)

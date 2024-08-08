@@ -21,10 +21,10 @@ public class Tranquilizer : CwaffGun
             sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft))
           .Attach<TranquilizerBehavior>();
 
-        _DrowsyVFX      = VFX.Create("drowsy_cloud", fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f);
-        _SleepyVFX      = VFX.Create("sheep_vfx", fps: 6, loops: true, anchor: Anchor.MiddleCenter, scale: 0.75f);
-        _TranqImpactVFX = VFX.Create("tranquilizer_impact", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
-        _SleepImpactVFX = VFX.Create("sleep_impact_vfx", fps: 6, loops: true, anchor: Anchor.MiddleCenter);
+        _DrowsyVFX      = VFX.Create("drowsy_cloud", fps: 6, scale: 0.5f);
+        _SleepyVFX      = VFX.Create("sheep_vfx", fps: 6, scale: 0.75f);
+        _TranqImpactVFX = VFX.Create("tranquilizer_impact", fps: 2);
+        _SleepImpactVFX = VFX.Create("sleep_impact_vfx", fps: 6);
     }
 
     private void LateUpdate()

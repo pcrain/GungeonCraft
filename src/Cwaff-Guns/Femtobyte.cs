@@ -155,7 +155,7 @@ public class Femtobyte : CwaffGun
           .Attach<FemtobyteProjectile>()
           .AddTrailToProjectilePrefab("femtobyte_beam", fps: 10, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false); //REFACTOR: return projectile
 
-        _ImpactBits = VFX.Create("femtobyte_projectile_vfx", fps: 1, loops: false, anchor: Anchor.MiddleCenter);
+        _ImpactBits = VFX.Create("femtobyte_projectile_vfx");
     }
 
     private static bool IsWhiteListedPrefab(GameObject bodyObject, out PrefabData trapPrefab)

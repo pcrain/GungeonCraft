@@ -21,8 +21,8 @@ public class Widowmaker : CwaffGun
             sprite: "widowmaker_projectile", fps: 12, scale: _SCALE, anchor: Anchor.MiddleLeft))
           .Attach<WidowmakerProjectile>();
 
-        _WidowmakerPrefab = VFX.Create("spider_turret", fps: 16, loops: true, scale: _SCALE, anchor: Anchor.MiddleCenter, emissivePower: 1f);
-        _WidowmakerPrefab.AddAnimation("deploy", "widowmaker_deploy_vfx", fps: 12, loops: false, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _WidowmakerPrefab = VFX.Create("spider_turret", fps: 16, scale: _SCALE, emissivePower: 1f);
+        _WidowmakerPrefab.AddAnimation("deploy", "widowmaker_deploy_vfx", fps: 12, loops: false, emissivePower: 1f);
         _WidowmakerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
         _WidowmakerPrefab.AddComponent<Crawlyboi>();
 

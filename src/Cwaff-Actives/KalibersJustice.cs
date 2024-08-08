@@ -16,7 +16,6 @@ public class KalibersJustice : CwaffActive
         item.consumable   = false;
         item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 1000f);
-        // item.SetCooldownType(ItemBuilder.CooldownType.Timed, 1f);
     }
 
     public override bool CanBeUsed(PlayerController user)

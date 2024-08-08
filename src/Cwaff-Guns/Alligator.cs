@@ -39,8 +39,8 @@ public class Alligator : CwaffGun
             damage: 1.0f, speed: 50.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter, electric: true))
           .Attach<AlligatorProjectile>();
 
-        _SparkVFX = VFX.Create("spark_vfx", fps: 16, loops: true, anchor: Anchor.MiddleCenter, scale: 0.35f, emissivePower: 50f);
-        _ClipVFX  = VFX.Create("alligator_clamped_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter);
+        _SparkVFX = VFX.Create("spark_vfx", fps: 16, scale: 0.35f, emissivePower: 50f);
+        _ClipVFX  = VFX.Create("alligator_clamped_vfx");
     }
 
     public override void OnPlayerPickup(PlayerController player)

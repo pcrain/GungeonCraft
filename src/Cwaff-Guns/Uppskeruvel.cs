@@ -46,15 +46,15 @@ public class Uppskeruvel : CwaffGun
 
         _SoulTrailPrefab = VFX.CreateSpriteTrailObject("uppskeruvel_soul_trail", fps: 60, cascadeTimer: 4f * C.FRAME, softMaxLength: 2f, destroyOnEmpty: false);
 
-        _LostSoulPrefab = VFX.Create("poe_soul", fps: 8, loops: true, anchor: Anchor.LowerCenter/*, emissivePower: 0.4f*/);
+        _LostSoulPrefab = VFX.Create("poe_soul", fps: 8, anchor: Anchor.LowerCenter);
             _LostSoulPrefab.AddComponent<UppskeruvelLostSoul>();
 
-        _CombatSoulPrefab = VFX.Create("large_poe_soul", fps: 8, loops: true, anchor: Anchor.MiddleCenter, scale: 2.0f/*, emissivePower: 0.4f*/);
+        _CombatSoulPrefab = VFX.Create("large_poe_soul", fps: 8, scale: 2.0f);
             _CombatSoulPrefab.AddComponent<UppskeruvelCombatSoul>();
 
-        _SoulExplodePrefab = VFX.Create("soul_explode", fps: 32, loops: false, anchor: Anchor.MiddleCenter);
+        _SoulExplodePrefab = VFX.Create("soul_explode", fps: 32, loops: false);
 
-        _SoulCollectVFX = VFX.Create("soul_collect", 16, loops: true, anchor: Anchor.MiddleCenter);
+        _SoulCollectVFX = VFX.Create("soul_collect", fps: 16);
 
         // level ups at 10, 30, 60, 100, 150, etc. souls
         for (int i = 0; i < _MAX_SOULS; ++i)

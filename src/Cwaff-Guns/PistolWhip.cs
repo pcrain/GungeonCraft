@@ -40,7 +40,7 @@ public class PistolWhip : CwaffGun
 
         _PistolButtProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 30.0f, speed: 1.0f, force: 40.0f, range: 0.01f))
           .AddAnimations(AnimatedBullet.Create(name: "pistol_whip_dummy_bullet", fps: 12, anchor: Anchor.MiddleCenter)) // Not really visible, just used for pixel collider size
-          .SetAllImpactVFX(VFX.CreatePool("whip_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f))
+          .SetAllImpactVFX(VFX.CreatePool("whip_particles", fps: 20, loops: false, scale: 0.5f))
           .Attach<PistolButtProjectile>();
     }
 

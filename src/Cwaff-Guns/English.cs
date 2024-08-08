@@ -50,8 +50,8 @@ public class English : CwaffGun
         _BilliardBall.hitEffects.overrideMidairDeathVFX =
             ((ItemHelper.Get(Items.Winchester) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
-        _BilliardBallPhantom = VFX.Create("billiard_ball_small_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter, scale: 1.5f, emissivePower: 10f);
-        _BilliardBallPlaceholder = VFX.Create("billiard_ball_placeholder_vfx", fps: 10, loops: true, anchor: Anchor.MiddleCenter);
+        _BilliardBallPhantom = VFX.Create("billiard_ball_small_vfx", scale: 1.5f, emissivePower: 10f);
+        _BilliardBallPlaceholder = VFX.Create("billiard_ball_placeholder_vfx", fps: 10);
     }
 
     public override void OnPlayerPickup(PlayerController player)

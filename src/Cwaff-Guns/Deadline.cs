@@ -51,7 +51,7 @@ public class Deadline : CwaffGun
             simpleVibrationStrength = Vibration.Strength.Light,
             simpleVibrationTime     = Vibration.Time.Instant };
 
-        _SplodeVFX = VFX.Create("splode", fps: 18, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 100, emissiveColour: Color.cyan);
+        _SplodeVFX = VFX.Create("splode", fps: 18, emissivePower: 100, emissiveColour: Color.cyan);
     }
 
     public override void OnSwitchedToThisGun()

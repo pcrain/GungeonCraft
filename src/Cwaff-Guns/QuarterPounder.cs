@@ -24,7 +24,7 @@ public class QuarterPounder : CwaffGun
         _GoldProjectile = Items.Ak47.CloneProjectile(GunData.New(sprite: "midas_gold_projectile", damage: 30.0f, speed: 80.0f, force: 10.0f,
           range: 80.0f, shouldRotate: true)).Attach<MidasProjectile>();
 
-        _MidasParticleVFX = VFX.Create("midas_sparkle", fps: 8, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 5);
+        _MidasParticleVFX = VFX.Create("midas_sparkle", fps: 8, emissivePower: 5);
     }
 
     public override void OnPlayerPickup(PlayerController player)

@@ -66,7 +66,7 @@ public class Glockarina : CwaffGun
         _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();
         _DecoyPrefab.GetComponent<Decoy>().DeathExplosionTimer = _DECOY_LIFE;
 
-        _NoteVFXPrefab = VFX.Create("note_vfx", fps: 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
+        _NoteVFXPrefab = VFX.Create("note_vfx");
     }
 
     [HarmonyPatch(typeof(Chest), nameof(Chest.PresentItem), MethodType.Enumerator)]

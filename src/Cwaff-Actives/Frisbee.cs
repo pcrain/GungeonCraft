@@ -27,7 +27,7 @@ public class Frisbee : CwaffActive
         item.usableDuringDodgeRoll = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.2f);
 
-        _FrisbeePrefab = VFX.Create("frisbee_vfx", fps: 8, loops: true, anchor: Anchor.MiddleCenter);
+        _FrisbeePrefab = VFX.Create("frisbee_vfx", fps: 8);
         _FrisbeePrefab.AddComponent<FrisbeeBehaviour>();
         SpeculativeRigidbody body = _FrisbeePrefab.AddComponent<SpeculativeRigidbody>();
         body.CanBePushed          = true;

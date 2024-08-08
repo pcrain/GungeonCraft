@@ -40,16 +40,16 @@ public class CampingSupplies : CwaffPassive
         _SmokePrefab     = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;
         _BonfirePrefab   = (ItemHelper.Get(Items.GunSoul) as ExtraLifeItem).BonfireSynergyBonfire;
         _CampfirePrefabs = new GameObject[]{
-            VFX.Create("campfire_a", fps: 8, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 0.1f), // level 0 (unused)
-            VFX.Create("campfire_b", fps: 8, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 0.5f), // level 1
-            VFX.Create("campfire_c", fps: 8, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 1.0f), // level 2
-            VFX.Create("campfire_d", fps: 8, loops: true, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 2.0f), // level 3
+            VFX.Create("campfire_a", fps: 8, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 0.1f), // level 0 (unused)
+            VFX.Create("campfire_b", fps: 8, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 0.5f), // level 1
+            VFX.Create("campfire_c", fps: 8, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 1.0f), // level 2
+            VFX.Create("campfire_d", fps: 8, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 2.0f), // level 3
         };
 
         _SodaCanPrefabs  = new GameObject[] {
-            VFX.Create("can_of_coke",   loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f),
-            VFX.Create("can_of_pepsi",  loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f),
-            VFX.Create("can_of_sprite", loops: true, anchor: Anchor.MiddleCenter, scale: 0.5f),
+            VFX.Create("can_of_coke",   scale: 0.5f),
+            VFX.Create("can_of_pepsi",  scale: 0.5f),
+            VFX.Create("can_of_sprite", scale: 0.5f),
         };
 
     }

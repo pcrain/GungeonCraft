@@ -30,7 +30,7 @@ public class Vladimir : CwaffGun
           .SetAllImpactVFX(VFX.CreatePool("vladimir_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f))
           .Attach<VladimirProjectile>();
 
-        _AbsorbVFX = VFX.Create("vladimir_impale_projectile_vfx", fps: 2, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _AbsorbVFX = VFX.Create("vladimir_impale_projectile_vfx", emissivePower: 1f);
     }
 
     public override void Update()

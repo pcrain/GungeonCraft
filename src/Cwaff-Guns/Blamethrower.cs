@@ -22,9 +22,9 @@ public class Blamethrower : CwaffGun
           .Attach<BlameDamage>()
           .Attach<BlamethrowerProjectile>();
 
-        _BlameImpact = VFX.Create("blamethrower_projectile_vfx", fps: 1, loops: false, anchor: Anchor.MiddleCenter);
-        _BlameTrail = VFX.Create("blamethrower_trail", fps: 16, loops: true, anchor: Anchor.MiddleCenter);
-        _ScapeGoatVFX = VFX.Create("goat_vfx", fps: 16, loops: true, scale: 1f, anchor: Anchor.MiddleCenter);
+        _BlameImpact = VFX.Create("blamethrower_projectile_vfx", loops: false);
+        _BlameTrail = VFX.Create("blamethrower_trail", fps: 16);
+        _ScapeGoatVFX = VFX.Create("goat_vfx", fps: 16);
     }
 
     public override void OnPlayerPickup(PlayerController player)

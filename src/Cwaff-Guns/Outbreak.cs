@@ -25,8 +25,8 @@ public class Outbreak : CwaffGun
           .Attach<InfectionBehavior>()
           .Assign(out _InfectionProjectile);
 
-        _OutbreakSmokeVFX = VFX.Create("outbreak_smoke_small", 2, loops: true, anchor: Anchor.MiddleCenter);
-        _OutbreakSmokeLargeVFX = VFX.Create("outbreak_smoke_large", 2, loops: true, anchor: Anchor.MiddleCenter);
+        _OutbreakSmokeVFX = VFX.Create("outbreak_smoke_small");
+        _OutbreakSmokeLargeVFX = VFX.Create("outbreak_smoke_large");
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

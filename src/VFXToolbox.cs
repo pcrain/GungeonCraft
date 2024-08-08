@@ -22,9 +22,9 @@ public static class VFX
     public static void Init()
     {
         LaserSightPrefab = LoadHelper.LoadAssetFromAnywhere("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject;
-        MiniPickup = VFX.Create("mini_pickup", 12, loops: false, anchor: Anchor.MiddleCenter);
-        MasterySigil = VFX.Create("mastery_sigil", fps: 2);
-        BasicReticle = VFX.Create("basic_reticle", fps: 2);
+        MiniPickup = VFX.Create("mini_pickup", fps: 12, loops: false);
+        MasterySigil = VFX.Create("mastery_sigil");
+        BasicReticle = VFX.Create("basic_reticle");
     }
 
     /// <summary>Register an animation for a VFX object</summary>

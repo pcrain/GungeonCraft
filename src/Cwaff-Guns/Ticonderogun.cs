@@ -50,8 +50,8 @@ public class Ticonderogun : CwaffGun
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM));
 
-        _SparklePrefab = VFX.Create("pencil_sparkles", 12, loops: false, anchor: Anchor.MiddleCenter);
-        _RunePrefab = VFX.Create("pencil_runes", 0.01f, loops: false, anchor: Anchor.MiddleCenter); // FPS must be nonzero or sprites don't update properly
+        _SparklePrefab = VFX.Create("pencil_sparkles", fps: 12, loops: false);
+        _RunePrefab = VFX.Create("pencil_runes", loops: false); // FPS must be nonzero or sprites don't update properly
     }
 
     public override void OnPlayerPickup(PlayerController player)
