@@ -22,6 +22,8 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
     public bool isDodging         { get; set; }
     public PlayerController owner { get; set; }
 
+    private static List<CustomDodgeRoll> _Overrides = new();
+
     public virtual bool canDodge      => true;
     public virtual bool canMultidodge => false;
     public virtual bool putsOutFire   => true;
@@ -37,18 +39,18 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
                 return true;
 
             // Figure out all of our passives that give us a custom dodge roll
-            List<CustomDodgeRoll> overrides = new List<CustomDodgeRoll>();
+            _Overrides.Clear();
             foreach (PassiveItem p in player.passiveItems)
                 if (p && p.GetComponent<CustomDodgeRoll>() is CustomDodgeRoll overrideDodgeRoll)
-                    overrides.Add(overrideDodgeRoll);
-            if (overrides.Count == 0)  // fall back to default behavior if we don't have overrides
+                    _Overrides.Add(overrideDodgeRoll);
+            if (_Overrides.Count == 0)  // fall back to default behavior if we don't have overrides
                 return true;
 
             // Turn off dodgeButtonHeld state for all custom rolls if we aren't pushing the dodge button
             BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(player.PlayerIDX);
             if (!instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
             {
-                foreach (CustomDodgeRoll customDodgeRoll in overrides)
+                foreach (CustomDodgeRoll customDodgeRoll in _Overrides)
                     customDodgeRoll.dodgeButtonHeld = false;
                 __result = false; // dodge roll failed
                 return false; // skip original method
@@ -56,7 +58,7 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
 
             // Begin the dodge roll for all of our custom dodge rolls available
             // instanceForPlayer.ConsumeButtonDown(GungeonActions.GungeonActionType.DodgeRoll);
-            foreach (CustomDodgeRoll customDodgeRoll in overrides)
+            foreach (CustomDodgeRoll customDodgeRoll in _Overrides)
             {
                 if (customDodgeRoll.dodgeButtonHeld)
                     continue;
