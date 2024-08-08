@@ -475,10 +475,12 @@ public static class Lazy
         return _NullProjectilePrefab;
     }
 
+    private static List<AIActor> _TempEnemies = new();
     /// <summary>Determine whether any enemy is in an line between start and end (does not account for walls)</summary>
     public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
-        foreach (AIActor enemy in start.SafeGetEnemiesInRoom())
+        start.SafeGetEnemiesInRoom(ref _TempEnemies);
+        foreach (AIActor enemy in _TempEnemies)
         {
             if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
                 continue;
@@ -496,7 +498,8 @@ public static class Lazy
     {
         AIActor nearest = null;
         float nearestSqrDist = float.MaxValue;
-        foreach (AIActor enemy in start.SafeGetEnemiesInRoom())
+        start.SafeGetEnemiesInRoom(ref _TempEnemies);
+        foreach (AIActor enemy in _TempEnemies)
         {
             if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
                 continue;
@@ -520,7 +523,8 @@ public static class Lazy
         float maxSqrDist   = maxDistance * maxDistance;
         float bestSqrDist  = maxSqrDist;
         Vector2 bestTarget = Vector2.zero;
-        foreach (AIActor enemy in start.SafeGetEnemiesInRoom())
+        start.SafeGetEnemiesInRoom(ref _TempEnemies);
+        foreach (AIActor enemy in _TempEnemies)
         {
             if (!enemy.IsHostile(canBeNeutral: true))
                 continue;

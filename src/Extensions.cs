@@ -2118,25 +2118,15 @@ public static class Extensions
     return false; //TODO: originally needed so Frisbee couldn't clip behind Bello's shop, but that was fixed...should still be implemented at some point
   }
 
-  /// <summary>Get all active enemies in a room, returning an empty list instead of null when the target is invalid</summary>
   private static readonly List<AIActor> _NoEnemies = Enumerable.Empty<AIActor>().ToList();
+  private static List<AIActor> _RefEnemies = new();
+  /// <summary>Get all active enemies in a room, returning an empty list instead of null when the target is invalid</summary>
   public static List<AIActor> SafeGetEnemiesInRoom(this RoomHandler room)
   {
     if (room == null)
       return _NoEnemies;
-    if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-      return _NoEnemies;
-    return enemies;
-  }
-
-  /// <summary>Get all active enemies in a room given a Vector3 position, returning an empty list instead of null when the target is invalid</summary>
-  public static List<AIActor> SafeGetEnemiesInRoom(this Vector3 pos)
-  {
-    if (pos.XY().GetAbsoluteRoom() is not RoomHandler room)
-      return _NoEnemies;
-    if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-      return _NoEnemies;
-    return enemies;
+    room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref _RefEnemies);
+    return _RefEnemies;
   }
 
   /// <summary>Get all active enemies in a room given a Vector2 position, returning an empty list instead of null when the target is invalid</summary>
@@ -2144,9 +2134,24 @@ public static class Extensions
   {
     if (pos.GetAbsoluteRoom() is not RoomHandler room)
       return _NoEnemies;
-    if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is not List<AIActor> enemies)
-      return _NoEnemies;
-    return enemies;
+    room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref _RefEnemies);
+    return _RefEnemies;
+  }
+
+  /// <summary>Get all active enemies in a room, returning an empty list instead of null when the target is invalid</summary>
+  public static void SafeGetEnemiesInRoom(this RoomHandler room, ref List<AIActor> refList)
+  {
+    refList.Clear();
+    if (room != null)
+      room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref refList);
+  }
+
+  /// <summary>Get all active enemies in a room given a Vector2 position, returning an empty list instead of null when the target is invalid</summary>
+  public static void SafeGetEnemiesInRoom(this Vector2 pos, ref List<AIActor> refList)
+  {
+    refList.Clear();
+    if (pos.GetAbsoluteRoom() is RoomHandler room)
+      room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref refList);
   }
 
   /// <summary>Adds an item to a list if it doesn't already contain it</summary>
