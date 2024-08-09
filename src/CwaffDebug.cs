@@ -152,11 +152,11 @@ public static class ConstructorProfiler
             //})
             .ToList();
         // var constructors = types.SelectMany(type => type.GetConstructors()).Where(x => !x.FullDescription().Contains("<") || !x.FullDescription().Contains(">")).ToList();
-        // var constructors = types.SelectMany(type => type.GetConstructors()).ToList();
+        var constructors = types.SelectMany(type => type.GetConstructors()).ToList();
         // var constructors = typeof(List<object>).GetConstructors().ToList();
         // var constructors = typeof(string).GetConstructors().ToList(); // doesn't work
         // var constructors = typeof(string).GetMethods().ToList();
-        var constructors = types.SelectMany(type => type.GetMethods().Where(m => m.FullDescription().Contains("Alexandria"))).ToList();
+        // var constructors = types.SelectMany(type => type.GetMethods().Where(m => m.FullDescription().Contains("Alexandria"))).ToList();
 
         foreach (var constructor in constructors)
         {

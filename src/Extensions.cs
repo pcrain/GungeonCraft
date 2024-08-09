@@ -2513,4 +2513,13 @@ public static class Extensions
           ss                     = effect.ss,
       };
   }
+
+  /// <summary>Set an audio event for a specific frame of a projectile's animation</summary>
+  public static Projectile AudioEvent(this Projectile proj, string audio = "", int frame = 0)
+  {
+    tk2dSpriteAnimationFrame aframe = proj.sprite.spriteAnimator.DefaultClip.frames[frame];
+    aframe.triggerEvent = !string.IsNullOrEmpty(audio);
+    aframe.eventAudio = audio;
+    return proj;
+  }
 }

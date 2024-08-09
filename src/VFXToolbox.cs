@@ -1090,6 +1090,8 @@ public partial class CwaffVFX // private
             this._animator.PickFrame(frame: specificFrame);
         else if (randomFrame)
             this._animator.PickFrame();
+        else
+            this._animator.PlayFromFrame(0);
 
         this._setup = true;
     }
