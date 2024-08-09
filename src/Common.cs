@@ -238,50 +238,26 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
     }
 }
 
-public class AudioResourceLoader // example audio resource loading class and functions
+public static class AudioResourceLoader
 {
-    public static void AutoloadFromAssembly(string prefix)
+    public static unsafe void AutoloadFromAssembly()
     {
         Assembly assembly = Assembly.GetExecutingAssembly();
-        bool flag2 = prefix == null;
-        if (flag2) { throw new ArgumentNullException("prefix", "Prefix name cannot be null."); }
-        prefix = prefix.Trim();
-        bool flag3 = prefix == "";
-        if (flag3) { throw new ArgumentException("Prefix name cannot be an empty (or whitespace only) string.", "prefix"); }
-
-        List<string> list = new List<string>(assembly.GetManifestResourceNames());
-        for (int i = 0; i < list.Count; i++)
+        string assemblyName = assembly.GetName().Name;
+        foreach (string resPath in assembly.GetManifestResourceNames())
         {
-            string text = list[i];
-            if (text.LastIndexOf(".bnk") != text.Length - ".bnk".Length)
+            int extPos = resPath.Length - ".bnk".Length;
+            if (resPath.LastIndexOf(".bnk") != extPos)
                 continue;
-
-            string text2 = text;
-            text2 = text2.Replace('/', Path.DirectorySeparatorChar);
-            text2 = text2.Replace('\\', Path.DirectorySeparatorChar);
-            if (text2.IndexOf(prefix) != 0)
-                continue;
-
-            text2 = text2.Substring(text2.IndexOf(prefix) + prefix.Length);
-            text2 = text2.Substring(0, text2.Length - ".bnk".Length);
-            bool flag6 = text2.IndexOf(Path.DirectorySeparatorChar) == 0;
-            if (flag6) { text2 = text2.Substring(1); }
-            text2 = prefix + ":" + text2;
-            using (Stream manifestResourceStream = assembly.GetManifestResourceStream(text))
+            int bankPos = resPath.LastIndexOf('.', extPos - 1) + 1;
+            string bankName = assemblyName + ":" + resPath.Substring(bankPos, extPos - bankPos);
+            using (Stream stream = assembly.GetManifestResourceStream(resPath))
             {
-                LoadSoundbankFromStream(manifestResourceStream, text2);
+                byte[] array = new byte[stream.Length];
+                stream.Read(array, 0, array.Length);
+                fixed (byte* p = array)
+                    AkSoundEngine.LoadAndDecodeBankFromMemory((IntPtr)p, (uint)array.Length, false, bankName, false, out _);
             }
-        }
-    }
-
-    private static unsafe void LoadSoundbankFromStream(Stream stream, string name)
-    {
-        byte[] array = new byte[stream.Length];
-        stream.Read(array, 0, array.Length);
-        fixed (byte* p = array)
-        {
-            AKRESULT akresult = AkSoundEngine.LoadAndDecodeBankFromMemory((IntPtr)p, (uint)array.Length, false, name, false, out var num);
-            // Console.WriteLine(string.Format("Result of soundbank load: {0}.", akresult));
         }
     }
 }

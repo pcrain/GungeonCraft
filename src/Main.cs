@@ -173,8 +173,7 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch setupAudioWatch = null;
                 Thread setupAudioThread = new Thread(() => {
                     setupAudioWatch = System.Diagnostics.Stopwatch.StartNew();
-                    ETGModMainBehaviour.Instance.gameObject.AddComponent<AudioSource>(); // is this necessary?
-                    AudioResourceLoader.AutoloadFromAssembly(C.MOD_INT_NAME);  // Load Audio Banks
+                    AudioResourceLoader.AutoloadFromAssembly();  // Load Audio Banks
                     setupAudioWatch.Stop();
                 });
                 setupAudioThread.Start();
