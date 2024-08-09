@@ -2,7 +2,14 @@
 
 ## TBD
 
+- Added Gunflower
+- Updated required MtG API version to 1.8.2 for custom ammo pickup functionality
 - Prevented Femtobyte from being able to infinitely trigger table techs by repeatedly digitizing and materializing tables
+- Fixed projectile trails disappearing if projectiles slow down too much
+- Fixed longstanding issue with custom dodge roll code creating a new list every frame and eating up memory extremely quickly
+- Optimized setting a gun's CurrentStrengthTier in places it was being set too often
+- Optimized code for finding enemies in rooms
+- Fixed vanilla bug with burst modules of tiered guns infinitely firing after releasing the mouse
 
 ## 1.16.4 (2024-08-01)
 
