@@ -116,6 +116,7 @@ public static class ConstructorProfiler
         string[] bannedAssemblies = new[] { "ConstructorProfiler", "mscorlib" };
         var asses = AppDomain.CurrentDomain.GetAssemblies().Where(x =>
             {
+                // return x.FullName.Contains("Alexandria");
                 if (bannedAssemblies.Any(y => x.FullName.Contains(y))) return false;
                 //try{if (x.Location.Contains("BepInEx")) return true;}
                 //catch{}
@@ -134,7 +135,8 @@ public static class ConstructorProfiler
                 {
                     return ex.Types.Where(x => x != null);
                 }
-            }).Where(x => x.IsClass && !x.IsGenericType && !x.FullName.Contains("ConstructorProfiler"))
+            }).Where(x => x.IsClass && !x.IsGenericType && !x.FullName.Contains("ConstructorProfiler") && !x.FullName.Contains("ReflectionUtil"))
+            // }).Where(x => x.IsClass && !x.IsGenericType && !x.FullName.Contains("ConstructorProfiler"))
             //.Where(x =>
             //{
             //    if (x.Assembly.FullName.Contains("mscorlib"))
@@ -149,8 +151,12 @@ public static class ConstructorProfiler
             //    return true;
             //})
             .ToList();
-        //var constructors = types.SelectMany(type => type.GetConstructors()).Where(x => !x.FullDescription().Contains("<") || !x.FullDescription().Contains(">")).ToList();
-        var constructors = types.SelectMany(type => type.GetConstructors()).ToList();
+        // var constructors = types.SelectMany(type => type.GetConstructors()).Where(x => !x.FullDescription().Contains("<") || !x.FullDescription().Contains(">")).ToList();
+        // var constructors = types.SelectMany(type => type.GetConstructors()).ToList();
+        // var constructors = typeof(List<object>).GetConstructors().ToList();
+        // var constructors = typeof(string).GetConstructors().ToList(); // doesn't work
+        // var constructors = typeof(string).GetMethods().ToList();
+        var constructors = types.SelectMany(type => type.GetMethods().Where(m => m.FullDescription().Contains("Alexandria"))).ToList();
 
         foreach (var constructor in constructors)
         {
@@ -159,20 +165,23 @@ public static class ConstructorProfiler
                 System.Console.WriteLine($"Patching {constructor.FullDescription()}");
                 harmony.Patch(constructor, new HarmonyMethod(AddCallMethodInfo));
             }
-            catch (Exception)
+            catch (Exception/* e*/)
             {
                 System.Console.WriteLine($"  Exception patching {constructor.FullDescription()}");
+                // System.Console.WriteLine($"  Exception patching {constructor.FullDescription()}:\n{e}");
             }
         }
     }
 
+    private static bool _Adding = false;
     private static MethodInfo AddCallMethodInfo = typeof(ConstructorProfiler).GetMethod(nameof(AddCall), AccessTools.all);
     private static void AddCall()
     {
-        if (!run)
+        if (!run || _Adding)
         {
             return;
         }
+        _Adding = true;
         var stackTrace = new System.Diagnostics.StackTrace();
         var key = stackTrace.ToString();
 
@@ -184,6 +193,7 @@ public static class ConstructorProfiler
         {
             CallCounter.Add(key, new StackData(stackTrace));
         }
+        _Adding = false;
     }
 
     private static bool run;
