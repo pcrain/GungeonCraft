@@ -1,5 +1,26 @@
 namespace CwaffingTheGungy;
 
+// Keeps projectile trails from disappearing if projectiles slow down too much
+[HarmonyPatch(typeof(TrailController), nameof(TrailController.Update))]
+public static class TrailControllerUpdatePatch
+{
+    [HarmonyILManipulator]
+    private static void TrailControllerUpdateIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt(typeof(LinkedList<TrailController.Bone>).GetMethod("get_Count"))))
+            return;
+
+        cursor.Emit(OpCodes.Ldarg_0); // TrailController
+        cursor.Emit(OpCodes.Call, typeof(TrailControllerUpdatePatch).GetMethod(nameof(TrailControllerUpdatePatch.KeepAliveWhenEmpty),
+            BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    private static int KeepAliveWhenEmpty(int oldCount, TrailController trail)
+    {
+        return trail.destroyOnEmpty ? oldCount : 999; // must be nonzero to avoid BrTrue statement
+    }
+}
 
 // Fixes vanilla bug where if ModulesAreTiers is true, inactive burst modules contribute towards m_midBurstFire checks,
 //   causing infinite firing after letting go of mouse
