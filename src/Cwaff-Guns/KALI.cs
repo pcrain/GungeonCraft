@@ -152,7 +152,7 @@ public class KaliProjectile : MonoBehaviour
 
     private void Start()
     {
-        if (base.GetComponentInChildren<TrailController>() is TrailController tc)
+        if (base.GetComponentInChildren<CwaffTrailController>() is CwaffTrailController tc)
             tc.gameObject.SetGlowiness(100f);
         Projectile p = base.GetComponent<Projectile>();
         p.OnWillKillEnemy += OnWillKillEnemy;

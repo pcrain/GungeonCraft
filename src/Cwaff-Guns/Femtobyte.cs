@@ -789,7 +789,7 @@ public class FemtobyteProjectile : MonoBehaviour
         this._projectile.OnHitEnemy += this.OnHitEnemy;
         this._projectile.OnWillKillEnemy += this.OnWillKillEnemy;
 
-        TrailController tc = base.gameObject.GetComponentInChildren<TrailController>();
+        CwaffTrailController tc = base.gameObject.GetComponentInChildren<CwaffTrailController>();
         tk2dBaseSprite trailSprite = tc.gameObject.GetComponent<tk2dBaseSprite>();
             trailSprite.usesOverrideMaterial = true;
             Material m = trailSprite.renderer.material;
