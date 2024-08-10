@@ -218,5 +218,5 @@ midas_touch_sound,2.0,1,sound,0
 midas_explode_sound,-2.0,1,sound,0
 corruption_sound,1.5,1,sound,0
 gunflower_fire_sound,3.5,1,sound,0
-snap_sound,-6.0,1,sound,0
+snap_sound,-8.0,1,sound,1
 chomp_large_sound,0.0,1,sound,1

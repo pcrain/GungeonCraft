@@ -908,14 +908,6 @@ public static class Extensions
       return trail;
   }
 
-  /// <summary>Add an existing prefab trail to a prefab projectile</summary>
-  public static TrailController AddTrailToProjectilePrefab(this Projectile target, TrailController trail)
-  {
-      trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
-      trail.gameObject.transform.parent = target.transform;
-      return trail;
-  }
-
   /// <summary>Add an existing prefab trail to a projectile instance</summary>
   public static TrailController AddTrailToProjectileInstance(this Projectile target, TrailController trail)
   {
@@ -2521,5 +2513,41 @@ public static class Extensions
     aframe.triggerEvent = !string.IsNullOrEmpty(audio);
     aframe.eventAudio = audio;
     return proj;
+  }
+
+  /// <summary>Given a non-increasing array of floats vals, returns the first index i for which val >= vals[i].</summary>
+  public static int FirstGE(this float[] vals, float val)
+  {
+    for (int i = 0; i < vals.Length; ++i)
+      if (val >= vals[i])
+        return i;
+    return vals.Length;
+  }
+
+  /// <summary>Given a non-increasing array of floats vals, returns the first index i for which val > vals[i].</summary>
+  public static int FirstGT(this float[] vals, float val)
+  {
+    for (int i = 0; i < vals.Length; ++i)
+      if (val > vals[i])
+        return i;
+    return vals.Length;
+  }
+
+  /// <summary>Given a non-decreasing array of floats vals, returns the first index i for which val <= vals[i].</summary>
+  public static int FirstLE(this float[] vals, float val)
+  {
+    for (int i = 0; i < vals.Length; ++i)
+      if (val <= vals[i])
+        return i;
+    return vals.Length;
+  }
+
+  /// <summary>Given a non-decreasing array of floats vals, returns the first index i for which val < vals[i].</summary>
+  public static int FirstLT(this float[] vals, float val)
+  {
+    for (int i = 0; i < vals.Length; ++i)
+      if (val < vals[i])
+        return i;
+    return vals.Length;
   }
 }

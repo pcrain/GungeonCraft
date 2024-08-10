@@ -324,6 +324,7 @@
     <Reference Include="UnityEngine.TilemapModule"/>
     <Reference Include="UnityEngine.ImageConversionModule"/>
     <Reference Include="MonoMod.Utils"/>
+    <Reference Include="ModTheGungeonAPI"/>
     <Reference Include="MonoMod.RuntimeDetour"/>
     <Reference Include="Assembly-CSharp"/>
     <Reference Include="PlayMaker"/>
@@ -334,7 +335,6 @@
     <Reference Include="Mono.Cecil"/>
     <Reference Include="Mono.Cecil.Pdb"/>
     <Reference Include="Mono.Cecil.Mdb"/>
-    <Reference Include="ModTheGungeonAPI"/>
     <Reference Include="Alexandria"/>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>

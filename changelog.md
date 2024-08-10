@@ -2,7 +2,7 @@
 
 ## TBD
 
-- Added Gunflower
+- Added Gunflower and Hallaeribut
 - Updated required MtG API version to 1.8.2 for custom ammo pickup functionality
 - Prevented Femtobyte from being able to infinitely trigger table techs by repeatedly digitizing and materializing tables
 - Fixed projectile trails disappearing if projectiles slow down too much
