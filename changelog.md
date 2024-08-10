@@ -17,6 +17,8 @@
 - Prevented Starmageddon from targeting invulernable enemies
 - Added roll sounds to Talon Trot synergy
 - Fixed Femtobyte projectiles being unable to hit enemies in mine carts
+- Added digitized shader to friendly enemies spawned by Femtobyte
+- Fixed Mimics spawned by Femtobyte being able to damage the player
 
 ## 1.16.4 (2024-08-01)
 

@@ -21,7 +21,7 @@ public class AlienNailgun : CwaffGun
     private const float _FRAGMENT_GAP        = _RECONSTRUCT_TIME / (float)_FRAGMENTS;
 
     internal static GameActorCharmEffect _Charm = null;
-    internal static List<AIActor> _Replicants   = new();
+    internal static HashSet<AIActor> _Replicants   = new();
 
     private Coroutine _dnaReconstruct       = null;
     private List<string> _registeredEnemies = new();

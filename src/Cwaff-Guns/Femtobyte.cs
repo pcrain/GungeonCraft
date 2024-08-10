@@ -15,7 +15,9 @@ public class Femtobyte : CwaffGun
     internal const string _EmptyActiveUI = $"{C.MOD_PREFIX}:_SlotEmptyActiveUI";
     internal const string _FullUI        = $"{C.MOD_PREFIX}:_SlotFullUI";
     internal const string _FullActiveUI  = $"{C.MOD_PREFIX}:_SlotFullActiveUI";
+
     internal static GameObject _ImpactBits = null;
+    internal static HashSet<AIActor> _Replicants = new();
 
     public enum HoldType { EMPTY, TABLE, BARREL, SPECIAL, CHEST, ENEMY, PICKUP }
     public class PrefabData
@@ -176,6 +178,8 @@ public class Femtobyte : CwaffGun
             if (DigitizedObject.FromEnemyGuid(enemy.EnemyGuid) is DigitizedObject d)
                 SetCurrentSlot(d);
         CwaffShaders.Digitize(enemy.sprite);
+        if (_Replicants.Contains(enemy))
+            _Replicants.Remove(enemy);
         if (enemy.gameObject.GetComponent<DigitizedEnemy>())
             enemy.EraseFromExistence(); // no reward cheesing
         else
@@ -356,9 +360,54 @@ public class Femtobyte : CwaffGun
         return "Unknown";
     }
 
+    /// <summary>Class to temporarily make projectiles digitized without the shader effects bleeding back into the projectile pool</summary>
+    public class DigitizedProjectile : MonoBehaviour
+    {
+        private Shader _oldShader = null;
+
+        private void Start()
+        {
+            Projectile p = base.GetComponent<Projectile>();
+            if (!p || p.sprite is not tk2dBaseSprite s)
+                return;
+            this._oldShader = s.renderer.material.shader;
+            s.usesOverrideMaterial = true;
+            s.renderer.material.shader = CwaffShaders.DigitizeShader;
+            s.renderer.material.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
+            s.renderer.material.SetFloat("_BinarizeProgress", 1.0f);
+            s.renderer.material.SetFloat("_ColorizeProgress", 1.0f);
+            s.renderer.material.SetFloat("_FadeProgress", 0.0f);
+            s.renderer.material.SetFloat("_ScrollSpeed", -4.5f);
+            p.OnDestruction += DestroyReplicantProjectile;
+        }
+
+        private void DestroyReplicantProjectile(Projectile p)
+        {
+            p.sprite.usesOverrideMaterial = false;
+            p.sprite.renderer.material.shader = this._oldShader;
+            this.SafeDestroy();
+        }
+    }
+
+    //NOTE: adapted from Alien Nailgun's CheckFromReplicantOwner, possibly merge later?
+    private static void CheckFromDigitizedOwner(Projectile p)
+    {
+        if (!p || p.Owner is not AIActor enemy)
+            return;
+        if (!_Replicants.Contains(enemy))
+            return;
+        p.StopCollidingWithPlayers();
+        p.collidesWithEnemies = true;
+        p.AddComponent<DigitizedProjectile>();
+    }
+
     bool _DidDebugSetup = false;
     public override void OnPlayerPickup(PlayerController player)
     {
+        StaticReferenceManager.ProjectileAdded -= CheckFromDigitizedOwner;
+        StaticReferenceManager.ProjectileAdded += CheckFromDigitizedOwner;
+        CwaffEvents.OnBankBulletOwnerAssigned -= CheckFromDigitizedOwner;
+        CwaffEvents.OnBankBulletOwnerAssigned += CheckFromDigitizedOwner;
         base.OnPlayerPickup(player);
         AdjustGunShader(on: true);
         player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
@@ -542,6 +591,9 @@ public class Femtobyte : CwaffGun
                 break;
             case ENEMY:
                 AIActor ai = Replicant.Create(d.enemyGuid, placePoint, CwaffShaders.MaterializePartial, hasCollision: true);
+                if (!ai)
+                    break;
+                _Replicants.Add(ai);
                 ai.gameObject.AddComponent<DigitizedEnemy>();
                 PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(ai.specRigidbody, null, false);
                 break;
