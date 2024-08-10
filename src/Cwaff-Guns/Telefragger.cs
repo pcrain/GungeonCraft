@@ -216,40 +216,35 @@ public class Telefragger : CwaffGun
 public class TelefragJuice : MonoBehaviour
 {
     private Projectile _projectile;
-    private PlayerController _owner;
-    private Telefragger _telefragger;
 
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
-        this._owner = this._projectile.Owner as PlayerController;
-        if (!this._owner)
-            return;
-        if (this._owner.CurrentGun is not Gun gun)
-            return;
-        if (gun.GetComponent<Telefragger>() is not Telefragger telefragger)
-            return;
-        this._telefragger = telefragger;
         this._projectile.OnHitEnemy += this.OnHitEnemy;
     }
 
     private void OnHitEnemy(Projectile proj, SpeculativeRigidbody other, bool willKill)
     {
-        if (!(willKill && this._owner && this._telefragger && other.gameObject.GetComponent<AIActor>() is AIActor enemy))
+        if (!willKill)
+            return;
+        if (this._projectile.Owner is not PlayerController owner)
+            return;
+        if (other.gameObject.GetComponent<AIActor>() is not AIActor enemy)
             return;
         if (enemy.healthHaver is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
             return; // don't teleport to bosses since they tend to have cutscenes and we don't want to interfere with those
         Vector2 targetPos = enemy.CenterPosition;
         if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
         {
-            PlayerController otherPlayer = GameManager.Instance.GetOtherPlayer(this._owner);
+            PlayerController otherPlayer = GameManager.Instance.GetOtherPlayer(owner);
             if (otherPlayer && !otherPlayer.IsGhost && !GameManager.Instance.MainCameraController.PointIsVisible(targetPos))
             {
-                this._owner.DoEasyBlank(targetPos, EasyBlankType.MINI);
+                owner.DoEasyBlank(targetPos, EasyBlankType.MINI);
                 return; // don't teleport around in co-op if we're offscreen
             }
         }
-        this._owner.specRigidbody.RegisterTemporaryCollisionException(other, 2.0f); // could possibly be a permanent collision exception
-        this._telefragger.TeleportPlayerToPosition(this._owner, targetPos);
+        owner.specRigidbody.RegisterTemporaryCollisionException(other, 2.0f); // could possibly be a permanent collision exception
+        if (owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<Telefragger>() is Telefragger telefragger)
+            telefragger.TeleportPlayerToPosition(owner, targetPos);
     }
 }
