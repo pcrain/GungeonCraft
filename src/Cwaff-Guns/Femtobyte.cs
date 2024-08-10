@@ -835,6 +835,11 @@ public class FemtobyteProjectile : MonoBehaviour
             if (otherBody.GetComponent<HealthHaver>() is HealthHaver hh && (hh.IsBoss || hh.IsSubboss))
                 return; // handled in OnWillKillEnemy
         }
+        if (otherBody.GetComponent<MineCartController>()) // don't collide with mine carts
+        {
+            PhysicsEngine.SkipCollision = true;
+            return;
+        }
         Vector2 otherPos = otherBody.UnitCenter;
         if (!this._femtobyte.TryToDigitize(otherBody.gameObject))
             return;

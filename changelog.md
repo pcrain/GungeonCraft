@@ -16,6 +16,7 @@
 - Buffed Starmageddon projectile damage from 6 to 8
 - Prevented Starmageddon from targeting invulernable enemies
 - Added roll sounds to Talon Trot synergy
+- Fixed Femtobyte projectiles being unable to hit enemies in mine carts
 
 ## 1.16.4 (2024-08-01)
 
