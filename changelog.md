@@ -11,6 +11,11 @@
 - Optimized code for finding enemies in rooms
 - Fixed vanilla bug with burst modules of tiered guns infinitely firing after releasing the mouse
 - Optimized projectile trail creation code to reduce memory usage and lag spikes
+- Fixed Femtobyte's text being cut off when displaying very long names
+- Tweaked volume on Suncaster's projectiles
+- Buffed Starmageddon projectile damage from 6 to 8
+- Prevented Starmageddon from targeting invulernable enemies
+- Added roll sounds to Talon Trot synergy
 
 ## 1.16.4 (2024-08-01)
 

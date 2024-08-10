@@ -103,6 +103,31 @@ public class Breegull : CwaffGun
         UpdateEggs(playSound: false);
     }
 
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        player.OnRollStarted += this.OnDodgeRoll;
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        base.OnDroppedByPlayer(player);
+        player.OnRollStarted -= this.OnDodgeRoll;
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnRollStarted -= this.OnDodgeRoll;
+        base.OnDestroy();
+    }
+
+    private void OnDodgeRoll(PlayerController player, Vector2 dirVec)
+    {
+        if (player.CurrentGun == this.gun && player.HasSynergy(Synergy.TALON_TROT))
+            player.gameObject.Play("kazooi_roll_sound");
+    }
+
     private void UpdateEggs(bool playSound = false)
     {
         EggData e = _Eggs[this._currentEggType];

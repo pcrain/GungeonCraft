@@ -203,10 +203,6 @@ public static class Extensions
     return gun;
   }
 
-  public static Gun LoopReloadAnimation(this Gun gun, int loopStart = 0) => gun.LoopAnimation(gun.reloadAnimation, loopStart: loopStart);
-  public static Gun LoopChargeAnimation(this Gun gun, int loopStart = 0) => gun.LoopAnimation(gun.chargeAnimation, loopStart: loopStart);
-  public static Gun LoopFireAnimation(this Gun gun, int loopStart = 0) => gun.LoopAnimation(gun.shootAnimation, loopStart: loopStart);
-
   /// <summary>Set a projectile's horizontal impact VFX</summary>
   public static Projectile SetHorizontalImpactVFX(this Projectile p, VFXPool vfx)
   {

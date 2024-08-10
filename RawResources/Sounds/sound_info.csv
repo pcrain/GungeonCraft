@@ -134,7 +134,7 @@ blame_sound_4,-4.0,1,sound,0
 blame_sound_5,-4.0,1,sound,0
 blamethrower_impact_sound,-4.0,1,sound,0
 prism_refract_sound,-3.5,1,sound,0
-suncaster_fire_sound,-4.0,1,sound,0
+suncaster_fire_sound,0.0,1,sound,0
 suncaster_fire_sound_high,-4.0,1,sound,0
 kali_charge_sound,-4.5,1,sound,0
 kali_activate_sound,-7.0,1,sound,0
@@ -220,3 +220,4 @@ corruption_sound,1.5,1,sound,0
 gunflower_fire_sound,3.5,1,sound,0
 snap_sound,-8.0,1,sound,1
 chomp_large_sound,0.0,1,sound,1
+kazooi_roll_sound,-2.0,1,sound,1

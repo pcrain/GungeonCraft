@@ -37,8 +37,7 @@ public class English : CwaffGun
     {
         Lazy.SetupGun<English>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 0.9f, ammo: 960, shootFps: 40, chargeFps: 10,
-            curse: 1f, muzzleFrom: Items.Mailbox, fireAudio: "billiard_first_strike_sound")
-          .LoopChargeAnimation(5)
+            curse: 1f, muzzleFrom: Items.Mailbox, fireAudio: "billiard_first_strike_sound", loopChargeAt: 5)
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.25f, angleVariance: 5.0f, chargeTime: 0f, shootStyle: ShootStyle.Charged, pierceBreakables: true,
             damage: 2.5f, speed: 81.0f, range: 9999f, sprite: "billiard_ball_projectile_small", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter,
