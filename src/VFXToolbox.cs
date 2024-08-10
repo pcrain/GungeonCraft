@@ -684,42 +684,24 @@ public static class VFX
 
     }
 
-    internal static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> animSpritePaths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, Anchor? anchorOverride = null, bool shouldConstructOffsets = true)
+    internal static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> paths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, Anchor? anchorOverride = null, bool shouldConstructOffsets = true)
     {
-        tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = animationName, frames = new tk2dSpriteAnimationFrame[0], fps = fps };
-        List<string> spritePaths = animSpritePaths;
-        List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
-        clip.wrapMode = wrapMode;
-        foreach (string path in spritePaths)
+        tk2dSpriteAnimationClip clip = new() { name = animationName, frames = new tk2dSpriteAnimationFrame[paths.Count], fps = fps, wrapMode = wrapMode };
+        tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+        for (int i = 0; i < paths.Count; ++i)
         {
-            tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-            int frameSpriteId = collection.GetSpriteIdByName(path);
+            int frameSpriteId = collection.GetSpriteIdByName(paths[i]);
+            clip.frames[i] = new(){ spriteId = frameSpriteId, spriteCollection = collection };
             tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
             if (shouldConstructOffsets)
                 frameDef.BetterConstructOffsetsFromAnchor(anchorOverride ?? Anchor.MiddleLeft);
             if (overrideVertices != null)
-            {
                 frameDef.colliderVertices = overrideVertices;
-            }
+            else if (colliderDimensions is Vector2 actualDimensions && colliderOffsets is Vector2 actualOffsets)
+                frameDef.colliderVertices = new Vector3[]{ C.PIXEL_SIZE * actualOffsets, C.PIXEL_SIZE * actualDimensions };
             else
-            {
-                if (colliderDimensions == null || colliderOffsets == null)
-                {
-                    ETGModConsole.Log("<size=100><color=#ff0000ff>BEAM ERROR: colliderDimensions or colliderOffsets was null with no override vertices!</color></size>", false);
-                }
-                else
-                {
-                    Vector2 actualDimensions = (Vector2)colliderDimensions;
-                    Vector2 actualOffsets = (Vector2)colliderOffsets;
-                    frameDef.colliderVertices = new Vector3[]{
-                        new Vector3(actualOffsets.x / 16, actualOffsets.y / 16, 0f),
-                        new Vector3(actualDimensions.x / 16, actualDimensions.y / 16, 0f)
-                    };
-                }
-            }
-            frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+                ETGModConsole.Log("<size=100><color=#ff0000ff>BEAM ERROR: colliderDimensions or colliderOffsets was null with no override vertices!</color></size>", false);
         }
-        clip.frames = frames.ToArray();
         beamAnimation.clips = beamAnimation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
     }
 }
