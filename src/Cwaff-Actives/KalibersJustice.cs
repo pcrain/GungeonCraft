@@ -219,14 +219,22 @@ public class KalibersJustice : CwaffActive
                     ? (big ? ItemQuality.S : ItemQuality.B)
                     : (big ? ItemQuality.A : ItemQuality.C);
                 LootEngine.SpawnItem(GameManager.Instance.RewardManager.GetItemForPlayer(
-                    user, GameManager.Instance.RewardManager.GunsLootTable, qg, null).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+                    user, GameManager.Instance.RewardManager.GunsLootTable, qg, null), SpotNear(where), Vector2.zero, 0f, true, true, false);
                 break;
-            case NeedType.Passives: // TODO: can spawn actives too since it just uses the ItemsLootTable
+            case NeedType.Passives:
                 ItemQuality qp = Lazy.CoinFlip()
                     ? (big ? ItemQuality.S : ItemQuality.B)
                     : (big ? ItemQuality.A : ItemQuality.C);
-                LootEngine.SpawnItem(GameManager.Instance.RewardManager.GetItemForPlayer(
-                    user, GameManager.Instance.RewardManager.ItemsLootTable, qp, null).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+                while (true) // retry until we get a passive
+                {
+                    GameObject item = GameManager.Instance.RewardManager.GetItemForPlayer(user, GameManager.Instance.RewardManager.ItemsLootTable, qp, null);
+                    if (item == null)
+                        break;
+                    if (item.GetComponent<PlayerItem>())
+                        continue; // don't accept actives
+                    LootEngine.SpawnItem(item, SpotNear(where), Vector2.zero, 0f, true, true, false);
+                    break;
+                }
                 break;
             case NeedType.Actives:
                 LootEngine.SpawnItem(ItemHelper.Get(Items.Backpack).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);

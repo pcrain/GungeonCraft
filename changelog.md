@@ -20,6 +20,7 @@
 - Added digitized shader to friendly enemies spawned by Femtobyte
 - Fixed Mimics spawned by Femtobyte being able to damage the player
 - Fixed Femtobyte not remebering last enemy killed for Lookup Table synergy when reloading a midgame save
+- Fixed Kaliber's Justice being able to spawn Active items with the Passive item blessing
 
 ## 1.16.4 (2024-08-01)
 
