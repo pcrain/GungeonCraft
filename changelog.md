@@ -21,6 +21,8 @@
 - Fixed Mimics spawned by Femtobyte being able to damage the player
 - Fixed Femtobyte not remebering last enemy killed for Lookup Table synergy when reloading a midgame save
 - Fixed Kaliber's Justice being able to spawn Active items with the Passive item blessing
+- Fixed King's Law Projectiles sometimes firing with a longer delay than they should when launched
+- Fixed King's Law muzzle rune persisting when dropped while charging
 
 ## 1.16.4 (2024-08-01)
 
