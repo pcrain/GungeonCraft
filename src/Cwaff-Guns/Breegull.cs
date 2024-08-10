@@ -86,9 +86,8 @@ public class Breegull : CwaffGun
 
     public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
     {
-        if (gun.GetComponent<Breegull>())
-            return _Eggs[this._currentEggType].projectile;
-        return projectile;
+        UpdateEggs(playSound: false);
+        return _Eggs[this._currentEggType].projectile;
     }
 
     public override void OnFullClipReload(PlayerController player, Gun gun)

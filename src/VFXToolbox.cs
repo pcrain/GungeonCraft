@@ -765,8 +765,8 @@ public partial class CwaffVFX // public
         c.Setup(
             prefab        : prefab,
             position      : position,
-            rotation      : rotation ?? Quaternion.identity,
-            velocity      : velocity ?? Vector2.zero,
+            rotation      : rotation,
+            velocity      : velocity,
             lifetime      : lifetime,
             fadeOutTime   : fadeOutTime,
             emissivePower : emissivePower,
