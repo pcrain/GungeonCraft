@@ -890,10 +890,10 @@ public static class Extensions
   }
 
   /// <summary>Create a prefab trail and add it to a prefab projectile</summary>
-  public static TrailController AddTrailToProjectilePrefab(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
+  public static SpriteTrailController AddTrailToProjectilePrefab(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
     float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null)
   {
-      TrailController trail = VFX.CreateTrailObject(
+      SpriteTrailController trail = VFX.CreateSpriteTrailObject(
           spriteName         : spriteName,
           fps                : fps,
           startAnim          : startAnim,
@@ -909,11 +909,11 @@ public static class Extensions
   }
 
   /// <summary>Add an existing prefab trail to a projectile instance</summary>
-  public static TrailController AddTrailToProjectileInstance(this Projectile target, TrailController trail)
+  public static SpriteTrailController AddTrailToProjectileInstance(this Projectile target, SpriteTrailController trail)
   {
       GameObject instantiatedTrail = UnityEngine.Object.Instantiate(trail.gameObject);
       instantiatedTrail.transform.parent = target.transform;
-      return instantiatedTrail.GetComponent<TrailController>();
+      return instantiatedTrail.GetComponent<SpriteTrailController>();
   }
 
   /// <summary>Add an existing prefab trail to a sprite instance</summary>

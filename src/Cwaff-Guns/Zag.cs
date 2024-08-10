@@ -7,7 +7,7 @@ public class Zag : CwaffGun
     public static string LongDescription  = "Fires bullets that will attempt to navigate around walls to seek out enemies and home in when perpendicular to them.";
     public static string Lore             = "An unusual combination of cutting-edge projectile technology housed in a cheap, barebones firearm. Given that the projectiles are self-propelled, self-stabilized, and self-guided before even leaving the barrel, the housing is largely incidental. Even so, one would think that any manufacturer willing to spend a fortune on state-of-the-art projectiles could spare a few extra casings for a more shock absorbant grip.";
 
-    internal static TrailController _ZagTrailPrefab = null;
+    internal static SpriteTrailController _ZagTrailPrefab = null;
     internal static GameObject _ZagZigVFX = null;
 
     public static void Init()
@@ -21,7 +21,7 @@ public class Zag : CwaffGun
           .Attach<ZagProjectile>()
           .CopyAllImpactVFX(Items.ShockRifle);
 
-        _ZagTrailPrefab = VFX.CreateTrailObject("zag_trail_mid", fps: 30, cascadeTimer: C.FRAME, destroyOnEmpty: true);
+        _ZagTrailPrefab = VFX.CreateSpriteTrailObject("zag_trail_mid", fps: 30, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 
         _ZagZigVFX = VFX.Create("zag_zig_vfx", fps: 15, loops: false);
     }
@@ -39,7 +39,7 @@ public class ZagProjectile : MonoBehaviour
     private SpeculativeRigidbody _body;
     private bool _hasTarget = false;
     private bool _straightened = false;
-    private TrailController _trail = null;
+    private SpriteTrailController _trail = null;
 
     private static readonly Color _ZAG_GRAY = new Color(0.5f, 0.625f, 0.5f, 1f);
 

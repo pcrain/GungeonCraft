@@ -17,9 +17,9 @@ public class Suncaster : CwaffGun
     internal static GameObject      _PrismPrefab             = null;
     internal static GameObject      _TraceVFX                = null;
     // internal static GameObject      _NewTraceVFX             = null;
-    internal static TrailController _SunTrailPrefab          = null;
-    internal static TrailController _SunTrailRefractedPrefab = null;
-    internal static TrailController _SunTrailFinalPrefab     = null;
+    internal static SpriteTrailController _SunTrailPrefab          = null;
+    internal static SpriteTrailController _SunTrailRefractedPrefab = null;
+    internal static SpriteTrailController _SunTrailFinalPrefab     = null;
     internal static Projectile      _SuncasterProjectile     = null;
 
     [SerializeField] // make sure we keep this when the gun is dropped and picked back up
@@ -56,9 +56,9 @@ public class Suncaster : CwaffGun
           },
         };
 
-        _SunTrailPrefab = VFX.CreateTrailObject("suncaster_beam_mid", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1, destroyOnEmpty: false);
-        _SunTrailRefractedPrefab = VFX.CreateTrailObject("suncaster_beam_refracted_mid", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1, destroyOnEmpty: false);
-        _SunTrailFinalPrefab = VFX.CreateTrailObject("suncaster_beam_final_mid", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1, destroyOnEmpty: false);
+        _SunTrailPrefab = VFX.CreateSpriteTrailObject("suncaster_beam_mid", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1, destroyOnEmpty: false);
+        _SunTrailRefractedPrefab = VFX.CreateSpriteTrailObject("suncaster_beam_refracted_mid", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1, destroyOnEmpty: false);
+        _SunTrailFinalPrefab = VFX.CreateSpriteTrailObject("suncaster_beam_final_mid", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1, destroyOnEmpty: false);
 
         _TraceVFX = VFX.Create("basic_square", fps: 7, emissivePower: 10f);
 
@@ -205,7 +205,7 @@ public class SuncasterProjectile : MonoBehaviour
     private Projectile             _proj           = null;
     private PlayerController       _owner          = null;
     private Vector2                _lastPos        = Vector2.zero;
-    private TrailController        _trail          = null;
+    private SpriteTrailController  _trail          = null;
     private Suncaster              _gun            = null;
     private int                    _prismsLeft     = 0;
 

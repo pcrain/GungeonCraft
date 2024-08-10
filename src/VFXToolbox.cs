@@ -450,77 +450,7 @@ public static class VFX
     }
 
     // yoinked and adapted from SomeBunny
-    public static TrailController CreateTrailObject(string spriteName, int fps = -1, string startAnim = null, float timeTillAnimStart = -1,
-        float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null)
-    {
-      try
-      {
-          List<string> animPaths = ResMap.Get(spriteName);
-          string spritePath = animPaths[0];
-          GameObject newTrailObject = new GameObject().RegisterPrefab();
-          newTrailObject.name = "trailObject";
-
-          int spriteID = ETGMod.Databases.Items.ProjectileCollection.GetSpriteIdByName(spritePath);
-          tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
-
-          tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
-          tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
-          def.colliderVertices = new Vector3[]{
-              Vector3.zero,
-              def.untrimmedBoundsDataExtents
-          };
-
-          tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
-          tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();
-          animation.clips = new tk2dSpriteAnimationClip[0];
-          animator.Library = animation;
-
-          TrailController trail = newTrailObject.AddComponent<TrailController>();
-
-          // ---------------- Sets up the animation for the main part of the trail
-          if (animPaths != null)
-          {
-              SetupBeamPart(animation, animPaths, "trail_mid", fps, null, null, def.colliderVertices);
-              trail.animation = "trail_mid";
-              trail.usesAnimation = true;
-          }
-          else
-          {
-              def.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft); //NOTE: this is already done in SetupBeamPart(), and we don't want to do it twice
-              trail.usesAnimation = false;
-          }
-
-          if (startAnim != null)
-          {
-              SetupBeamPart(animation, ResMap.Get(startAnim), "trail_start", fps, null, null, def.colliderVertices);
-              trail.startAnimation = "trail_start";
-              trail.usesStartAnimation = true;
-          }
-          else
-              trail.usesStartAnimation = false;
-
-          if (dispersalPrefab)
-          {
-            trail.UsesDispersalParticles = true;
-            trail.DispersalParticleSystemPrefab = dispersalPrefab;
-          }
-
-          //Trail Variables
-          if (softMaxLength > 0) { trail.usesSoftMaxLength = true; trail.softMaxLength = softMaxLength; }
-          if (cascadeTimer > 0) { trail.usesCascadeTimer = true; trail.cascadeTimer = cascadeTimer; }
-          if (timeTillAnimStart > 0) { trail.usesGlobalTimer = true; trail.globalTimer = timeTillAnimStart; }
-          trail.destroyOnEmpty = destroyOnEmpty;
-          return trail;
-      }
-      catch (Exception e)
-      {
-          ETGModConsole.Log(e.ToString());
-          return null;
-      }
-    }
-
-    // lazily copied from above, refactor later?
-    public static SpriteTrailController CreateSpriteTrailObject(string spriteName, int fps = -1, string startAnim = null, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false)
+    public static SpriteTrailController CreateSpriteTrailObject(string spriteName, int fps = -1, string startAnim = null, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null)
     {
       try
       {
@@ -567,6 +497,12 @@ public static class VFX
           }
           else
               trail.usesStartAnimation = false;
+
+          if (dispersalPrefab)
+          {
+            trail.UsesDispersalParticles = true;
+            trail.DispersalParticleSystemPrefab = dispersalPrefab;
+          }
 
           //Trail Variables
           if (softMaxLength > 0) { trail.usesSoftMaxLength = true; trail.softMaxLength = softMaxLength; }

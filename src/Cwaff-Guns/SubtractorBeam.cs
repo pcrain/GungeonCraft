@@ -9,8 +9,8 @@ public class SubtractorBeam : CwaffGun
 
     internal static Dictionary<int, Nametag> _Nametags = new();
 
-    internal static TrailController _GreenTrailPrefab;
-    internal static TrailController _RedTrailPrefab;
+    internal static SpriteTrailController _GreenTrailPrefab;
+    internal static SpriteTrailController _RedTrailPrefab;
     internal static GameObject _HitEffects;
 
     public static void Init()
@@ -26,9 +26,9 @@ public class SubtractorBeam : CwaffGun
             pierce.penetratesBreakables   = true; })
           .Attach<SubtractorProjectile>();
 
-        _GreenTrailPrefab = VFX.CreateTrailObject("subtractor_beam_mid", fps: 60, startAnim: "subtractor_beam_start",
+        _GreenTrailPrefab = VFX.CreateSpriteTrailObject("subtractor_beam_mid", fps: 60, startAnim: "subtractor_beam_start",
             softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
-        _RedTrailPrefab = VFX.CreateTrailObject("subtractor_beam_red_mid", fps: 60, startAnim: "subtractor_beam_red_start",
+        _RedTrailPrefab = VFX.CreateSpriteTrailObject("subtractor_beam_red_mid", fps: 60, startAnim: "subtractor_beam_red_start",
             softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
         _HitEffects = VFX.Create("subtractor_beam_hit_effect", 12, scale: 0.5f, emissivePower: 10f);
 
@@ -111,7 +111,7 @@ public class SubtractorProjectile : MonoBehaviour
     private bool _hitFirstEnemy    = false;
     private float _damage          = 0f;
     private float _postHitDamage   = 0f;
-    private TrailController _trail = null;
+    private SpriteTrailController _trail = null;
 
     private void Start()
     {

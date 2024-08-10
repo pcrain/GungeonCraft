@@ -7,7 +7,7 @@ public class ChekhovsGun : CwaffGun
     public static string LongDescription  = "Places a rifle that automatically fires a single round at any enemy that crosses its line of sight. Cannot fire within 3 seconds of its placement. Half of all unfired shots are returned as ammo on room clear.";
     public static string Lore             = "There is no record of this gun having ever been brought into the Gungeon, nor of it having belonged to anyone named Chekhov. Rather, the arcane magics enveloping the Gungeon have seemingly managed to produce a physical manifestation of a purely metaphorical weapon. Whether its unique properties will render it a deus ex machina or a brick joke remains to be seen.";
 
-    internal static TrailController _ChekhovTrailPrefab = null;
+    internal static SpriteTrailController _ChekhovTrailPrefab = null;
     internal static GameObject _ChekhovGunVFX           = null;
     internal static GameObject _ChekhovGunFireVFX       = null;
 
@@ -22,7 +22,7 @@ public class ChekhovsGun : CwaffGun
             damage: 15f, range: 1000f, speed: 200f, sprite: "chekhov_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter))
           .Attach<ChekhovBullet>();
 
-        _ChekhovTrailPrefab = VFX.CreateTrailObject("chekhov_trail_mid", fps: 60, startAnim: "chekhov_trail_start", cascadeTimer: C.FRAME, destroyOnEmpty: true);
+        _ChekhovTrailPrefab = VFX.CreateSpriteTrailObject("chekhov_trail_mid", fps: 60, startAnim: "chekhov_trail_start", cascadeTimer: C.FRAME, destroyOnEmpty: true);
         _ChekhovGunVFX = VFX.Create("chekhovs_gun_idle_vfx", 12,  anchor: Anchor.UpperRight); //WARNING: don't use actual gun animations for VFX
         _ChekhovGunFireVFX = VFX.Create("chekhovs_gun_fire_vfx", 12, loops: false, anchor: Anchor.UpperRight);
     }
