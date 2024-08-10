@@ -18,8 +18,9 @@ public class BulletbotImplant : CwaffActive
     {
         PlayerItem item = Lazy.SetupActive<BulletbotImplant>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality    = ItemQuality.A;
-        item.consumable = true;
+        item.consumable = false;
         item.canStack   = false;
+        ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.PerRoom, 10);
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
         item.AddToShop(ModdedShopType.Handy);
 
@@ -28,6 +29,7 @@ public class BulletbotImplant : CwaffActive
 
     public override bool CanBeUsed(PlayerController user)
     {
+        this._nearestCompanion = null;
         if (!base.CanBeUsed(user))
             return false;
         if (user.IsGunLocked)
@@ -36,14 +38,17 @@ public class BulletbotImplant : CwaffActive
             return false;
         if (!gun.CanBeDropped)
             return false;
+        if (user.companions == null)
+            return false;
 
-        this._nearestCompanion = null;
-        Vector2 ppos           = user.CenterPosition;
-        float nearest          = 9999f;
+        Vector2 ppos  = user.CenterPosition;
+        float nearest = 9999f;
         foreach (AIActor companion in user.companions)
         {
             if (!companion.GetComponent<CompanionController>())
                 continue;
+            if (companion.aiShooter)
+                continue; // can't arm an enemy that already has a gun
 
             float dist = (ppos - companion.CenterPosition).sqrMagnitude;
             if (dist > nearest)
@@ -52,13 +57,7 @@ public class BulletbotImplant : CwaffActive
            this._nearestCompanion = companion;
         }
 
-        if (!this._nearestCompanion)
-            return false;
-
-        if (this._nearestCompanion.aiShooter is AIShooter shooter)
-            return false; // can't arm an enemy that already has a gun
-
-        return true;
+        return this._nearestCompanion;
     }
 
     public override void DoEffect(PlayerController user)
