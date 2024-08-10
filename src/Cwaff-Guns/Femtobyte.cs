@@ -717,6 +717,8 @@ public class Femtobyte : CwaffGun
                     break;
             }
         }
+
+        data.Add((this._lastEnemyKilled != null) ? this._lastEnemyKilled : string.Empty);
     }
 
     public override void MidGameDeserialize(List<object> saveData, ref int i)
@@ -766,6 +768,13 @@ public class Femtobyte : CwaffGun
                     break;
             }
         }
+
+        this._lastEnemyKilled = (string)saveData[i++];
+        if (string.IsNullOrEmpty(this._lastEnemyKilled))
+            this._lastEnemyKilled = null;
+        else
+            this._lastEnemyName = this._lastEnemyKilled.AmmonomiconName();
+
         UpdateCurrentSlot();
     }
 

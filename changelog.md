@@ -19,6 +19,7 @@
 - Fixed Femtobyte projectiles being unable to hit enemies in mine carts
 - Added digitized shader to friendly enemies spawned by Femtobyte
 - Fixed Mimics spawned by Femtobyte being able to damage the player
+- Fixed Femtobyte not remebering last enemy killed for Lookup Table synergy when reloading a midgame save
 
 ## 1.16.4 (2024-08-01)
 
