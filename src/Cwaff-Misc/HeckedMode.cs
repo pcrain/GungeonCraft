@@ -35,6 +35,14 @@ public static class HeckedMode
     // public readonly static List<int> HeckedModeGunWhiteList = new(){
     // };
     public readonly static List<int> HeckedModeGunWhiteList = new(){
+        // Hecked Beams
+        (int)Items.Moonscraper,
+        (int)Items.ProtonBackpack,
+        (int)Items.ScienceCannon,
+        // (int)Items.FossilizedGun, // technically works but doesn't do much interesting stuff
+        (int)Items.Plunger,
+        (int)Items.GammaRay,
+
         // Unfair Hitscan D:
         (int)Items.PrototypeRailgun,
         (int)Items.EyeOfTheBeholster,
@@ -241,6 +249,7 @@ public static class HeckedMode
         (int)Items.BulletBore,
         (int)Items.CatClaw, // barely threatening and very goofy looking
         (int)Items.MolotovLauncher,
+        (int)Items.AbyssalTentacle, // self destruct
 
         // Semi-broken, projectile module related
         // (int)Items.GungeonAnt, // null deref looking up a projectile module
@@ -276,17 +285,13 @@ public static class HeckedMode
         // (int)Items.Ac15, // doesn't work at all (null deref looking up a projectile module after charge projectile fix)
 
         // // Beam broken
-        // (int)Items.LifeOrb, // broken like any other beam after deleting LifeOrbGunModifier component
-        // (int)Items.WoodBeam,
-        // (int)Items.AbyssalTentacle, // GOOD LORD THE HORROR O_O
-        // (int)Items.Disintegrator, // beams stay in place on screen after firing and loop their firing sound nonstop o.o
-        // (int)Items.ProtonBackpack,  // beams weapons are very evidently a mistake
-        // (int)Items.ScienceCannon, // yup, still bad
-        // (int)Items.FossilizedGun,
-        // (int)Items.Plunger,
+        // (int)Items.LifeOrb, // can't target player
+        // (int)Items.WoodBeam, // doesn't fully extend
+        // (int)Items.Disintegrator, // charge phase never finishes
     };
 
     public readonly static int _FirstWeakGun = HeckedModeGunWhiteList.IndexOf((int)Items.MakeshiftCannon);
+    public readonly static int _FirstNonBeam = HeckedModeGunWhiteList.IndexOf((int)Items.PrototypeRailgun);
 
     internal const string _CONFIG_KEY = "Hecked Mode";
 
@@ -362,6 +367,56 @@ public static class HeckedMode
         }
     }
 
+    [HarmonyPatch(typeof(AIShooter), nameof(AIShooter.Shoot))]
+    private class AIShooterShootClearBeamPatch // prevent infinite beams when firing
+    {
+        static void Prefix(AIShooter __instance)
+        {
+            if (__instance.CurrentGun is Gun gun && gun.m_activeBeams != null)
+                gun.ClearBeams();
+        }
+    }
+
+    [HarmonyPatch(typeof(AIShooter), nameof(AIShooter.OnPreDeath))]
+    private class AIShooterDeathClearBeamPatch // prevent infinite beams when dying
+    {
+        static void Prefix(AIShooter __instance)
+        {
+            if (__instance.CurrentGun is Gun gun && gun.m_activeBeams != null)
+                gun.ClearBeams();
+        }
+    }
+
+    [HarmonyPatch(typeof(Gun), nameof(Gun.DropGun))]
+    private class GunDropGunClearBeamPatch // prevent infinite beams when dropping guns
+    {
+        static void Prefix(Gun __instance)
+        {
+            if (__instance.m_activeBeams != null)
+                __instance.ClearBeams();
+        }
+    }
+
+    [HarmonyPatch(typeof(Gun), nameof(Gun.OnDisable))]
+    private class GunDisableClearBeamPatch // prevent infinite beams when guns are disabled
+    {
+        static void Prefix(Gun __instance)
+        {
+            if (__instance.m_activeBeams != null)
+                __instance.ClearBeams();
+        }
+    }
+
+    [HarmonyPatch(typeof(Gun), nameof(Gun.OnDestroy))]
+    private class GunDestroyClearBeamPatch // prevent infinite beams when guns are destroyed
+    {
+        static void Prefix(Gun __instance)
+        {
+            if (__instance.m_activeBeams != null)
+                __instance.ClearBeams();
+        }
+    }
+
     [HarmonyPatch(typeof(AIActor), nameof(AIActor.Awake))]
     private class HeckedEnemyAwakePatch
     {
@@ -374,7 +429,7 @@ public static class HeckedMode
             if (_HeckedModeStatus == Hecked.Retrashed)
                 replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(0, _FirstWeakGun)];
             else
-                replacementGunId = (Items)HeckedModeGunWhiteList.ChooseRandom();
+                replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(_FirstNonBeam, HeckedModeGunWhiteList.Count)];
             __instance.HeckedShootGunBehavior(replacementGunId.AsGun());
         }
     }
