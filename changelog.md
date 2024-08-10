@@ -10,6 +10,7 @@
 - Optimized setting a gun's CurrentStrengthTier in places it was being set too often
 - Optimized code for finding enemies in rooms
 - Fixed vanilla bug with burst modules of tiered guns infinitely firing after releasing the mouse
+- Optimized projectile trail creation code to reduce memory usage and lag spikes
 
 ## 1.16.4 (2024-08-01)
 

@@ -22,7 +22,7 @@ public class OmnidirectionalLaser : CwaffGun
     private static List<int> _BackSpriteIds = new();
     private static List<Vector3> _BarrelOffsets = new();
     private static GameObject _OmniReticle  = null;
-    private static SpriteTrailController _OmniTrailPrefab  = null;
+    private static CwaffTrailController _OmniTrailPrefab  = null;
 
     private tk2dSprite _backside = null;
     private tk2dSprite _reticle = null;

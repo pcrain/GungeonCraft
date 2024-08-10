@@ -18,7 +18,7 @@ public class Uppskeruvel : CwaffGun
     internal static GameObject _CombatSoulPrefab           = null;
     internal static GameObject _SoulCollectVFX             = null;
     internal static GameObject _SoulExplodePrefab          = null;
-    internal static SpriteTrailController _SoulTrailPrefab = null;
+    internal static CwaffTrailController _SoulTrailPrefab = null;
 
     private static int[] _LevelThresholds = new int[_MAX_SOULS];
 
@@ -439,7 +439,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
     private float _jiggle           = 0f; // random offset from directly behind player
     private float _timer            = 0.0f;
     private State _state            = State.SPAWNING;
-    private SpriteTrailController _trail = null;
+    private CwaffTrailController _trail = null;
 
     public void Setup(PlayerController owner, Uppskeruvel gun)
     {

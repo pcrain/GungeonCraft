@@ -17,9 +17,9 @@ public class Suncaster : CwaffGun
     internal static GameObject      _PrismPrefab             = null;
     internal static GameObject      _TraceVFX                = null;
     // internal static GameObject      _NewTraceVFX             = null;
-    internal static SpriteTrailController _SunTrailPrefab          = null;
-    internal static SpriteTrailController _SunTrailRefractedPrefab = null;
-    internal static SpriteTrailController _SunTrailFinalPrefab     = null;
+    internal static CwaffTrailController _SunTrailPrefab          = null;
+    internal static CwaffTrailController _SunTrailRefractedPrefab = null;
+    internal static CwaffTrailController _SunTrailFinalPrefab     = null;
     internal static Projectile      _SuncasterProjectile     = null;
 
     [SerializeField] // make sure we keep this when the gun is dropped and picked back up
@@ -205,7 +205,7 @@ public class SuncasterProjectile : MonoBehaviour
     private Projectile             _proj           = null;
     private PlayerController       _owner          = null;
     private Vector2                _lastPos        = Vector2.zero;
-    private SpriteTrailController  _trail          = null;
+    private CwaffTrailController  _trail          = null;
     private Suncaster              _gun            = null;
     private int                    _prismsLeft     = 0;
 

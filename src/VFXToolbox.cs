@@ -450,7 +450,7 @@ public static class VFX
     }
 
     // yoinked and adapted from SomeBunny
-    public static SpriteTrailController CreateSpriteTrailObject(string spriteName, int fps = -1, string startAnim = null, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null)
+    public static CwaffTrailController CreateSpriteTrailObject(string spriteName, int fps = -1, string startAnim = null, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null)
     {
       try
       {
@@ -474,7 +474,7 @@ public static class VFX
           animation.clips = new tk2dSpriteAnimationClip[0];
           animator.Library = animation;
 
-          SpriteTrailController trail = newTrailObject.AddComponent<SpriteTrailController>();
+          CwaffTrailController trail = newTrailObject.AddComponent<CwaffTrailController>();
 
           // ---------------- Sets up the animation for the main part of the trail
           if (animPaths != null)

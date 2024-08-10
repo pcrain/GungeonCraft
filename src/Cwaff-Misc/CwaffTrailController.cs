@@ -1,7 +1,7 @@
 namespace CwaffingTheGungy;
 
-// Version of TrailController that doesn't rely on rigid bodies or projectiles, only a sprite
-public class SpriteTrailController : BraveBehaviour
+// Version of TrailController that doesn't rely on rigid bodies or projectiles and pools bones for memory efficiency
+public class CwaffTrailController : BraveBehaviour
 {
   private class Bone
   {
@@ -13,7 +13,7 @@ public class SpriteTrailController : BraveBehaviour
 
     public float AnimationTimer;
 
-    public readonly float HeightOffset;
+    public float HeightOffset;
 
     public bool Hide = false;
 
@@ -21,12 +21,38 @@ public class SpriteTrailController : BraveBehaviour
 
     private static int _BonesCreated = 0;
 
-    public Bone(Vector2 pos, float posX, float heightOffset)
+    private static readonly LinkedList<Bone> _BonePool = new();
+
+    internal static LinkedListNode<Bone> Rent(Vector2 pos, float posX, float heightOffset)
     {
-      // ETGModConsole.Log($"created {++_BonesCreated} bones");
-      this.pos = pos;
-      this.posX = posX;
-      HeightOffset = heightOffset;
+      if (_BonePool.Count == 0)
+        _BonePool.AddLast(new Bone());
+
+      LinkedListNode<Bone> node = _BonePool.Last;
+      _BonePool.RemoveLast();
+
+      Bone bone = node.Value;
+      bone.pos            = pos;
+      bone.posX           = posX;
+      bone.HeightOffset   = heightOffset;
+
+      bone.normal         = default;
+      bone.IsAnimating    = default;
+      bone.AnimationTimer = default;
+      bone.Hide           = default;
+
+      return node;
+    }
+
+    internal static void Return(LinkedListNode<Bone> bone)
+    {
+      _BonePool.AddLast(bone);
+      // System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
+    }
+
+    private Bone() // can only be created by Rent
+    {
+      ++_BonesCreated;
     }
   }
 
@@ -137,7 +163,7 @@ public class SpriteTrailController : BraveBehaviour
     if (base.specRigidbody)
       base.specRigidbody.Initialize();
     parent_sprite = base.transform.parent.gameObject.GetComponent<tk2dBaseSprite>();
-    base.transform.parent = SpawnManager.Instance.VFX;
+    // base.transform.parent = SpawnManager.Instance.VFX; //NOTE: need to be parented to our projectiles so we get destroyed properly
     base.transform.rotation = Quaternion.identity;
     base.transform.position = Vector3.zero;
     if (base.specRigidbody && base.specRigidbody.projectile && base.specRigidbody.projectile.Owner is PlayerController)
@@ -151,8 +177,8 @@ public class SpriteTrailController : BraveBehaviour
     tk2dSpriteDefinition currentSpriteDef = trail_sprite.GetCurrentSpriteDef();
     m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.untrimmedBoundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
     float heightOffset = ((!rampHeight) ? 0f : rampStartHeight);
-    m_bones.AddLast(new Bone(TruePosition + boneSpawnOffset, 0f, heightOffset));
-    m_bones.AddLast(new Bone(TruePosition + boneSpawnOffset, 0f, heightOffset));
+    m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, 0f, heightOffset));
+    m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, 0f, heightOffset));
 
     if (usesStartAnimation)
       m_startAnimationClip = base.spriteAnimator.GetClipByName(startAnimation);
@@ -213,6 +239,7 @@ public class SpriteTrailController : BraveBehaviour
               LinkedListNode<Bone> node = linkedListNode;
               linkedListNode = linkedListNode.Next;
               m_bones.Remove(node);
+              Bone.Return(node);
             }
             flag = true;
             m_isDirty = true;
@@ -264,7 +291,9 @@ public class SpriteTrailController : BraveBehaviour
 
   public void LateUpdate()
   {
-    HandleExtension(TruePosition); //TODO: not in original code, why did i put this here?
+    base.transform.rotation = Quaternion.identity; //NOTE: if we're parented to a projectile, prevent our bones from rotating
+    if (!base.specRigidbody)
+      HandleExtension(TruePosition); //NOTE: this will never get called otherwise if we don't have a rigid body
     UpdateIfDirty();
   }
 
@@ -276,6 +305,12 @@ public class SpriteTrailController : BraveBehaviour
       speculativeRigidbody.OnCollision = (Action<CollisionData>)Delegate.Remove(speculativeRigidbody.OnCollision, new Action<CollisionData>(UpdateOnCollision));
       SpeculativeRigidbody speculativeRigidbody2 = base.specRigidbody;
       speculativeRigidbody2.OnPostRigidbodyMovement = (Action<SpeculativeRigidbody, Vector2, IntVector2>)Delegate.Remove(speculativeRigidbody2.OnPostRigidbodyMovement, new Action<SpeculativeRigidbody, Vector2, IntVector2>(PostRigidbodyMovement));
+    }
+    while (m_bones.Count > 0)
+    {
+      LinkedListNode<Bone> node = m_bones.Last;
+      m_bones.RemoveLast();
+      Bone.Return(node);
     }
     base.OnDestroy();
   }
@@ -295,8 +330,8 @@ public class SpriteTrailController : BraveBehaviour
     Vector2 specRigidbodyPosition = base.specRigidbody.Position.UnitPosition + PhysicsEngine.PixelToUnit(obj.NewPixelsToMove);
     HandleExtension(specRigidbodyPosition);
     m_bones.Last.Value.Hide = true;
-    m_bones.AddLast(new Bone(m_bones.Last.Value.pos, m_bones.Last.Value.posX, m_bones.Last.Value.HeightOffset));
-    m_bones.AddLast(new Bone(m_bones.Last.Value.pos, m_bones.Last.Value.posX, m_bones.Last.Value.HeightOffset));
+    m_bones.AddLast(Bone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX, m_bones.Last.Value.HeightOffset));
+    m_bones.AddLast(Bone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX, m_bones.Last.Value.HeightOffset));
   }
 
   private void PostRigidbodyMovement(SpeculativeRigidbody rigidbody, Vector2 unitDelta, IntVector2 pixelDelta)
@@ -331,9 +366,11 @@ public class SpriteTrailController : BraveBehaviour
     if (!destroyOnEmpty && m_bones.Count == 0)
     {
       float heightOffset = ((!rampHeight) ? 0f : rampStartHeight);
-      m_bones.AddLast(new Bone(TruePosition + boneSpawnOffset, m_maxPosX, heightOffset));
-      m_bones.AddLast(new Bone(TruePosition + boneSpawnOffset, m_maxPosX, heightOffset));
+      m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX, heightOffset));
+      m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX, heightOffset));
     }
+    if (base.specRigidbody && base.specRigidbody.projectile && base.specRigidbody.projectile.OverrideTrailPoint.HasValue)
+      toPosition = base.specRigidbody.projectile.OverrideTrailPoint.Value;
     ExtendBonesTo(toPosition + boneSpawnOffset);
     m_isDirty = true;
   }
@@ -382,11 +419,11 @@ public class SpriteTrailController : BraveBehaviour
       {
         if (num7 < 0.25f)
         {
-          m_bones.AddLast(new Bone(newPos, m_bones.Last.Value.posX + num7, heightOffset));
+          m_bones.AddLast(Bone.Rent(newPos, m_bones.Last.Value.posX + num7, heightOffset));
           break;
         }
         pos += vector3 * 0.25f;
-        m_bones.AddLast(new Bone(pos, m_bones.Last.Value.posX + 0.25f, heightOffset));
+        m_bones.AddLast(Bone.Rent(pos, m_bones.Last.Value.posX + 0.25f, heightOffset));
         num7 -= 0.25f;
         if (usesGlobalTimer && m_globalTimer > globalTimer)
         {

@@ -890,10 +890,10 @@ public static class Extensions
   }
 
   /// <summary>Create a prefab trail and add it to a prefab projectile</summary>
-  public static SpriteTrailController AddTrailToProjectilePrefab(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
+  public static CwaffTrailController AddTrailToProjectilePrefab(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
     float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null)
   {
-      SpriteTrailController trail = VFX.CreateSpriteTrailObject(
+      CwaffTrailController trail = VFX.CreateSpriteTrailObject(
           spriteName         : spriteName,
           fps                : fps,
           startAnim          : startAnim,
@@ -909,19 +909,19 @@ public static class Extensions
   }
 
   /// <summary>Add an existing prefab trail to a projectile instance</summary>
-  public static SpriteTrailController AddTrailToProjectileInstance(this Projectile target, SpriteTrailController trail)
+  public static CwaffTrailController AddTrailToProjectileInstance(this Projectile target, CwaffTrailController trail)
   {
       GameObject instantiatedTrail = UnityEngine.Object.Instantiate(trail.gameObject);
       instantiatedTrail.transform.parent = target.transform;
-      return instantiatedTrail.GetComponent<SpriteTrailController>();
+      return instantiatedTrail.GetComponent<CwaffTrailController>();
   }
 
   /// <summary>Add an existing prefab trail to a sprite instance</summary>
-  public static SpriteTrailController AddTrailToSpriteInstance(this tk2dBaseSprite target, SpriteTrailController trail)
+  public static CwaffTrailController AddTrailToSpriteInstance(this tk2dBaseSprite target, CwaffTrailController trail)
   {
       GameObject instantiatedTrail = UnityEngine.Object.Instantiate(trail.gameObject);
       instantiatedTrail.transform.parent = target.transform;
-      return instantiatedTrail.GetComponent<SpriteTrailController>();
+      return instantiatedTrail.GetComponent<CwaffTrailController>();
   }
 
   /// <summary>Set the rotation of a projectile manually</summary>

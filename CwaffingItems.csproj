@@ -246,8 +246,8 @@
     <Compile Include="src\Cwaff-Misc\AtlasHelper.cs"/>
     <Compile Include="src\Cwaff-Misc\Hotfixes.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHats.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffTrailController.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffPatches.cs"/>
-    <Compile Include="src\Cwaff-Misc\SpriteTrailController.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedMode.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffEnums.cs"/>
     <Compile Include="src\Cwaff-Misc\GunBuilder.cs"/>

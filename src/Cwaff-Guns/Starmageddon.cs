@@ -7,7 +7,7 @@ public class Starmageddon : CwaffGun
     public static string LongDescription  = "Fires projectiles that orbit the player while fire is held. Projectiles ascend when fire is released and fall upon semi-random enemies after a short delay. Enemies closer to the player are more likely to be targeted.";
     public static string Lore             = "A mythical weapon feared and revered by many as the 'Gun That Shall Fire the Final Shot', it is said to launch projectiles heavenward and rain meteoric destruction upon the lands. Fortunately for humanity, the weapon's projectiles only get to ascend about 50 feet before hitting the Gungeon's ceiling, making it a rare example of a gun that is actually *weakened* by the Gungeon's magic.";
 
-    internal static SpriteTrailController _StarmageddonTrailPrefab = null;
+    internal static CwaffTrailController _StarmageddonTrailPrefab = null;
 
     private int _nextIndex = 0;
     private int _curBatch  = 0;
@@ -196,7 +196,7 @@ public class StarmageddonProjectile : MonoBehaviour
         this._projectile.SetSpeed(200f);
         this._projectile.SendInDirection(Vector2.up, true);
         this._projectile.baseData.range = float.MaxValue;
-        SpriteTrailController tc = this._projectile.AddTrailToProjectileInstance(Starmageddon._StarmageddonTrailPrefab);
+        CwaffTrailController tc = this._projectile.AddTrailToProjectileInstance(Starmageddon._StarmageddonTrailPrefab);
         tc.gameObject.SetGlowiness(10f);
         yield return null; // wait a frame so we can properly set the trails to unoccluded without being overwritten
         tc.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));

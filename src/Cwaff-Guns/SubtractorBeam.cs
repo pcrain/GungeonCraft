@@ -9,8 +9,8 @@ public class SubtractorBeam : CwaffGun
 
     internal static Dictionary<int, Nametag> _Nametags = new();
 
-    internal static SpriteTrailController _GreenTrailPrefab;
-    internal static SpriteTrailController _RedTrailPrefab;
+    internal static CwaffTrailController _GreenTrailPrefab;
+    internal static CwaffTrailController _RedTrailPrefab;
     internal static GameObject _HitEffects;
 
     public static void Init()
@@ -111,7 +111,7 @@ public class SubtractorProjectile : MonoBehaviour
     private bool _hitFirstEnemy    = false;
     private float _damage          = 0f;
     private float _postHitDamage   = 0f;
-    private SpriteTrailController _trail = null;
+    private CwaffTrailController _trail = null;
 
     private void Start()
     {
