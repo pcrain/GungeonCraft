@@ -15,7 +15,7 @@ public class CwaffTrailController : BraveBehaviour
 
     public float HeightOffset;
 
-    public bool Hide = false;
+    public bool Hide;
 
     public Vector2 pos { get; set; }
 
@@ -138,6 +138,8 @@ public class CwaffTrailController : BraveBehaviour
   private float m_maxPosX;
 
   private bool trailActive = true;
+
+  private bool disconnected = false;
 
   private const int c_bonePixelLength = 4;
 
@@ -292,7 +294,7 @@ public class CwaffTrailController : BraveBehaviour
   public void LateUpdate()
   {
     base.transform.rotation = Quaternion.identity; //NOTE: if we're parented to a projectile, prevent our bones from rotating
-    if (!base.specRigidbody)
+    if (!base.specRigidbody && !this.disconnected)
       HandleExtension(TruePosition); //NOTE: this will never get called otherwise if we don't have a rigid body
     UpdateIfDirty();
   }
@@ -301,10 +303,8 @@ public class CwaffTrailController : BraveBehaviour
   {
     if (base.specRigidbody)
     {
-      SpeculativeRigidbody speculativeRigidbody = base.specRigidbody;
-      speculativeRigidbody.OnCollision = (Action<CollisionData>)Delegate.Remove(speculativeRigidbody.OnCollision, new Action<CollisionData>(UpdateOnCollision));
-      SpeculativeRigidbody speculativeRigidbody2 = base.specRigidbody;
-      speculativeRigidbody2.OnPostRigidbodyMovement = (Action<SpeculativeRigidbody, Vector2, IntVector2>)Delegate.Remove(speculativeRigidbody2.OnPostRigidbodyMovement, new Action<SpeculativeRigidbody, Vector2, IntVector2>(PostRigidbodyMovement));
+      base.specRigidbody.OnCollision -= UpdateOnCollision;
+      base.specRigidbody.OnPostRigidbodyMovement -= PostRigidbodyMovement;
     }
     while (m_bones.Count > 0)
     {
@@ -319,10 +319,12 @@ public class CwaffTrailController : BraveBehaviour
   {
     if (!base.specRigidbody)
       return;
-    SpeculativeRigidbody speculativeRigidbody = base.specRigidbody;
-    speculativeRigidbody.OnCollision = (Action<CollisionData>)Delegate.Remove(speculativeRigidbody.OnCollision, new Action<CollisionData>(UpdateOnCollision));
-    SpeculativeRigidbody speculativeRigidbody2 = base.specRigidbody;
-    speculativeRigidbody2.OnPostRigidbodyMovement = (Action<SpeculativeRigidbody, Vector2, IntVector2>)Delegate.Remove(speculativeRigidbody2.OnPostRigidbodyMovement, new Action<SpeculativeRigidbody, Vector2, IntVector2>(PostRigidbodyMovement));
+    base.specRigidbody.OnCollision -= UpdateOnCollision;
+    base.specRigidbody.OnPostRigidbodyMovement -= PostRigidbodyMovement;
+    base.specRigidbody = null;
+    base.transform.parent = null; // make sure we don't keep transforming with whatever rigid body we were attached to
+    this.destroyOnEmpty = true; // make sure our bones get returned to the pool
+    this.disconnected = true; // don't call HandleExtension() any more
   }
 
   private void UpdateOnCollision(CollisionData obj)
