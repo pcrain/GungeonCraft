@@ -837,17 +837,30 @@ public class FemtobyteProjectile : MonoBehaviour
     private Projectile _projectile;
     private PlayerController _owner;
     private Femtobyte _femtobyte;
+    private bool _setup = false;
+
+    private void Start()
+    {
+        Setup(null);
+    }
 
     public void Setup(Femtobyte femtobyte)
     {
+        if (this._setup)
+            return;
+
+        this._setup = true;
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
-        this._femtobyte = femtobyte;
-        this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
-        this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.PlayerHitBox));
-        this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Trap));
-        this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Pickup));
-        this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.LowObstacle));
+        if (femtobyte)
+        {
+            this._femtobyte = femtobyte;
+            this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+            this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.PlayerHitBox));
+            this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Trap));
+            this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Pickup));
+            this._projectile.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.LowObstacle));
+        }
         this._projectile.OnHitEnemy += this.OnHitEnemy;
         this._projectile.OnWillKillEnemy += this.OnWillKillEnemy;
 
@@ -878,11 +891,11 @@ public class FemtobyteProjectile : MonoBehaviour
 
     private void OnWillKillEnemy(Projectile proj, SpeculativeRigidbody enemy)
     {
-        if (enemy.GetComponent<HealthHaver>() is HealthHaver hh && !hh.IsBoss && !hh.IsSubboss)
-        {
-            Femtobyte.SpawnBitBurst(enemy.UnitCenter, 10);
+        if (enemy.GetComponent<HealthHaver>() is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
+            return;
+        Femtobyte.SpawnBitBurst(enemy.UnitCenter, 10);
+        if (this._femtobyte)
             this._femtobyte.TryToDigitize(enemy.gameObject);
-        }
     }
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody body, PixelCollider myCollider, SpeculativeRigidbody otherBody, PixelCollider otherCollider)

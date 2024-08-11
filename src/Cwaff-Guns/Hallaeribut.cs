@@ -188,6 +188,7 @@ public class HallaeributProjectile : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._projectile.OnHitEnemy += this.OnHitEnemy;
         this._startSpeed = this._projectile.baseData.speed;
+        this._projectile.m_usesNormalMoveRegardless = true; // ignore all motion module overrides, helix bullets doeesn't play well with speed changing projectiles
     }
 
     private void OnHitEnemy(Projectile arg1, SpeculativeRigidbody arg2, bool arg3)
@@ -221,8 +222,8 @@ public class HallaeributProjectile : MonoBehaviour
                 if (this._lifetime >= _RELAUNCH_START)
                 {
                     if (this._target)
-                        this._projectile.SendInDirection(this._target.CenterPosition - this._projectile.SafeCenter, true);
-                    this._projectile.UpdateSpeed();
+                        this._projectile.SendInDirection(this._target.CenterPosition - this._projectile.SafeCenter, false);
+                    // this._projectile.UpdateSpeed();
                     this._state = State.RELAUNCH;
                 }
                 break;

@@ -31,6 +31,10 @@
 - Fixed null deref in Magunet caused by messing up some code in Magunet fix from 1.15.0
 - Fixed other player being able to move during [REDACTED]'s effect in co-op mode
 - Made [REDACTED] clear enemy projectiles when used to prevent visual oddities
+- Fixed English projectiles not spawned by English rapidly changing colors
+- Fixed Femtobyte prjoectiles not spawned by Femtobyte missing shaders and visual effects
+- Blacklisted Widowmaker projectiles from being affected by Orbital Bullets (projectiles should just die if they can't deploy)
+- Blacklisted Hallaeribut projectiles from being affected by Helix Bullets (they don't play nicely with frequent speed changes)
 
 ## 1.17.0 (2024-08-10)
 

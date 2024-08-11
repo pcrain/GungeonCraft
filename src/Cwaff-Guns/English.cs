@@ -346,7 +346,14 @@ public class BilliardBall : MonoBehaviour
         this._body.OnPreRigidbodyCollision += this.OnPreCollision;
 
         if (fired)
+        {
             this.Activate(FIRED);
+            if (this._projectile.spriteAnimator is tk2dSpriteAnimator animator && animator.Playing)
+            {
+                animator.PickFrame();
+                animator.Stop();
+            }
+        }
         else
             this.Deactivate();
         if (failsafeLaunchAngle.HasValue)

@@ -154,6 +154,7 @@ public class ExceptionalProjectile : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
         this._projectile.OnHitEnemy += this.OnHitEnemy;
+        this._projectile.m_usesNormalMoveRegardless = true; // ignore all motion module overrides, helix bullets doeesn't play well with speed changing projectiles
 
         this._projectile.sprite.usesOverrideMaterial = true;
         this._projectile.sprite.renderer.material.shader = CwaffShaders.CorruptShader;
