@@ -34,6 +34,7 @@
 - Fixed English projectiles not spawned by English rapidly changing colors
 - Fixed Femtobyte prjoectiles not spawned by Femtobyte missing shaders and visual effects
 - Blacklisted Widowmaker projectiles from being affected by Orbital Bullets (projectiles should just die if they can't deploy)
+- Blacklisted Zag projectiles from being affected by Orbital Bullets (never despawn due to movement)
 - Blacklisted Hallaeribut projectiles from being affected by Helix Bullets (they don't play nicely with frequent speed changes)
 - Fixed Zag's projectile trails having extremely buggy visual offsets when navigating around walls
 
