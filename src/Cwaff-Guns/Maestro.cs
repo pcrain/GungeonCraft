@@ -46,7 +46,7 @@ public class Maestro : CwaffGun
         gun.GetComponent<CwaffProjectileReticle>().targetObjFunc = GetTargetProjectile;
     }
 
-    private void RedirectProjectile(Projectile p, AIActor targetEnemy, float damage)
+    private void RedirectProjectile(Projectile p, AIActor targetEnemy, Projectile launcher)
     {
         const float REFLECT_SPEED = 60f;
         const float SPREAD = 4f;
@@ -64,18 +64,20 @@ public class Maestro : CwaffGun
             p.Direction = Lazy.RandomVector();
         if (p.Owner && p.Owner.specRigidbody)
             p.specRigidbody.DeregisterSpecificCollisionException(p.Owner.specRigidbody);
-        p.Owner = pc;
-        p.SetNewShooter(pc.specRigidbody);
+        p.baseData.damage = launcher.baseData.damage;
+        p.baseData.speed = launcher.baseData.speed;
+        p.baseData.force = launcher.baseData.force;
+        p.baseData.range = launcher.baseData.range;
+        p.SetOwnerAndStats(pc);
         p.allowSelfShooting = false;
         p.collidesWithPlayer = false;
         p.collidesWithEnemies = true;
         p.specRigidbody.CollideWithTileMap = false;
-        p.baseData.damage = damage;
         p.UpdateCollisionMask();
         p.ResetDistance();
         p.Reflected();
 
-        p.Speed = REFLECT_SPEED;
+        p.Speed = Mathf.Max(REFLECT_SPEED, p.Speed);
         CwaffVFX.Spawn(prefab: _LaunchVFX, position: p.SafeCenter, rotation: p.Direction.EulerZ());
 
         switch(UnityEngine.Random.Range(0,5))
@@ -227,7 +229,7 @@ public class Maestro : CwaffGun
         base.PostProcessProjectile(projectile);
         DetermineTargetEnemyIfNecessary();
         if (this._targetProjectile)
-            RedirectProjectile(this._targetProjectile, this._targetEnemy, projectile.baseData.damage);
+            RedirectProjectile(this._targetProjectile, this._targetEnemy, projectile);
         projectile.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
     }
 }

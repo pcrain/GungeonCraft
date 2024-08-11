@@ -53,6 +53,7 @@ public class Outbreak : CwaffGun
                     infectAngle = delta.ToAngle();
             }
             Projectile p = VolleyUtility.ShootSingleProjectile(_InfectionProjectile, enemy.CenterPosition, infectAngle, false, player);
+            p.SetOwnerAndStats(player);
             p.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
         }
         if (found)

@@ -131,7 +131,7 @@ public class SeltzerProjectile : MonoBehaviour
     {
         GameObject theBeamObject = SpawnManager.SpawnProjectile(SeltzerPelter._BubbleBeam.gameObject, this._canProjectile.SafeCenter, Quaternion.identity);
         Projectile beamProjectile = theBeamObject.GetComponent<Projectile>();
-            beamProjectile.Owner = this._owner;
+            beamProjectile.SetOwnerAndStats(this._owner);
 
         this._beam = theBeamObject.GetComponent<BasicBeamController>();
             this._beam.Owner       = this._owner;

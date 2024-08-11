@@ -232,7 +232,7 @@ public class IronMaidBullets : MonoBehaviour
         }
 
         // Phase 5 / 5 -- the launch
-        this._projectile.SetSpeed(_LAUNCH_SPEED);
+        this._projectile.SetSpeed(_LAUNCH_SPEED * (this._owner ? this._owner.ProjSpeedMult() : 1f));
         _projectile.SendInDirection(targetDir, true);
         this._projectile.gameObject.Play("knife_gun_launch");
 

@@ -159,9 +159,7 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
         this._owner = pc;
 
         this._targetAngle  = this._projectile.Direction.ToAngle();
-        this._targetPos    = Raycast.ToNearestWallOrEnemyOrObject(
-            this._owner.CenterPosition,
-            this._targetAngle);
+        this._targetPos    = Raycast.ToNearestWallOrEnemyOrObject(this._owner.CenterPosition, this._targetAngle);
 
         this._arcAngle = arcAngle;
         this._maxSecsToReachTarget = maxSecsToReachTarget;

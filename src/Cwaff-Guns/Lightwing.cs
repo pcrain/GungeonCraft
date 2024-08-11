@@ -54,7 +54,9 @@ public class LightwingProjectile : MonoBehaviour
     private EasyTrailBullet _trail       = null;
     private float _topSpeed              = 0f;
     private bool _retrievedAmmo          = false;
+    private float _speedMult             = 1.0f;
     private State _state_internal        = State.NEUTRAL;
+
     private State _state
     {
         get
@@ -102,11 +104,15 @@ public class LightwingProjectile : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
+        if (!this._owner)
+            return;
+
         if (!this._projectile.FiredForFree() && this._owner.CurrentGun.GetComponent<Lightwing>() is Lightwing lightwing)
             this._gun = this._owner.CurrentGun;
 
         this._topSpeed = this._projectile.baseData.speed;
-        this._projectile.baseData.speed = _START_SPEED;
+        this._speedMult = this._owner.ProjSpeedMult();
+        this._projectile.baseData.speed = _START_SPEED * this._speedMult;
         this._projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
         this._projectile.specRigidbody.OnCollision += this.OnCollision;
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
@@ -191,7 +197,7 @@ public class LightwingProjectile : MonoBehaviour
             }
             Vector2 currentDir = this._projectile.m_currentDirection;
 
-            float turnRate      = _MAX_TURN_RATE * relTime;
+            float turnRate      = _MAX_TURN_RATE * relTime * this._speedMult;
             float curAngle      = currentDir.ToAngle();
             float angleDelta    = (curAngle.RelAngleTo(targetDir.ToAngle()));
             if (Mathf.Abs(angleDelta) < turnRate)

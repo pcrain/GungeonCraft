@@ -155,7 +155,7 @@ public abstract class ChessPiece : MonoBehaviour
 
         this._sprite     = GetSprite();
         this._moveTime   = _BaseMoveTime * (this._mastered ? 0.5f : 1f);
-        this._pauseTime  = _BaseMovePause * (this._mastered ? 0.5f : 1f);
+        this._pauseTime  = _BaseMovePause * (this._mastered ? 0.5f : 1f) / owner.ProjSpeedMult();
         this._speed      = GetMoveDistance() / (_BaseMoveTime * C.FPS);
         this._movePhase  = this._twoPhaseMove ? 2 : 1;
 

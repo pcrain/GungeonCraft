@@ -264,12 +264,12 @@ public class WhipChainStart : MonoBehaviour
                 Vector3 pos = basePos + baseEuler * (whipRange * Vector2.right + barrelOffset);
 
                 Projectile proj = SpawnManager.SpawnProjectile(PistolWhip._PistolWhipProjectile.gameObject, pos, baseEuler).GetComponent<Projectile>();
-                    proj.Owner = this._owner;
+                    proj.SetOwnerAndStats(this._owner);
                     proj.collidesWithEnemies = true;
                     proj.collidesWithPlayer = false;
 
                 Projectile proj2 = SpawnManager.SpawnProjectile(PistolWhip._PistolButtProjectile.gameObject, pos, baseEuler).GetComponent<Projectile>();
-                    proj2.Owner = this._owner;
+                    proj2.SetOwnerAndStats(this._owner);
                     proj2.collidesWithEnemies = true;
                     proj2.collidesWithPlayer = false;
 

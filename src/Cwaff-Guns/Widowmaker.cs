@@ -183,8 +183,7 @@ public class Crawlyboi : MonoBehaviour
         proj.collidesWithPlayer  = false;
         proj.collidesWithEnemies = true;
         proj.baseData.damage     = this._damage;
-        proj.Owner               = this._owner;
-        proj.Shooter             = this._owner.specRigidbody;
+        proj.SetOwnerAndStats(this._owner);
 
         proj.SetSpeed(50f);
         base.gameObject.PlayUnique("widowmaker_turret_shoot_sound");

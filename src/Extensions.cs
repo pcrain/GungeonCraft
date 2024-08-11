@@ -1360,6 +1360,18 @@ public static class Extensions
   /// <summary>Get the player's current accuracy (spread) multiplier</summary>
   public static float AccuracyMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.Accuracy);
 
+  /// <summary>Get the player's current projectile speed multiplier</summary>
+  public static float ProjSpeedMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.ProjectileSpeed);
+
+  /// <summary>Get the player's current projectile knockback (force) multiplier</summary>
+  public static float KnockbackMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.KnockbackMultiplier);
+
+  /// <summary>Get the player's current projectile range multiplier</summary>
+  public static float RangeMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.RangeMultiplier);
+
+  /// <summary>Get the player's current gun charge rate multiplier</summary>
+  public static float ChargeMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.ChargeAmountMultiplier);
+
   /// <summary>returns true if sprite a overlaps sprite b in the world</summary>
   public static bool Overlaps(this tk2dBaseSprite a, tk2dBaseSprite b)
   {
@@ -2545,5 +2557,18 @@ public static class Extensions
       if (val < vals[i])
         return i;
     return vals.Length;
+  }
+
+  /// <summary>Sets the owner of a projectile and, if it's a player, copy over projectile baseData from their stats</summary>
+  public static void SetOwnerAndStats(this Projectile p, GameActor owner)
+  {
+    p.Owner = owner;
+    p.SetNewShooter(owner.specRigidbody);
+    if (owner is not PlayerController pc)
+      return;
+    p.baseData.damage *= pc.DamageMult();
+    p.baseData.range *= pc.RangeMult();
+    p.baseData.force *= pc.KnockbackMult();
+    p.baseData.speed *= pc.ProjSpeedMult();
   }
 }

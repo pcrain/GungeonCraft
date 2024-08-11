@@ -8,6 +8,7 @@ public class Scotsman : CwaffGun
     public static string Lore             = "Hailing straight from the Motherland, this weapon is a favorite among the explosion-loving Scots whose name it bears. The gun's sticky projectiles and ability to detonate them on command takes out much of the guesswork involved when using traditional firearms, ensuring substantial destructive output even when its wielder happens to be drunk, half-blind, or both.";
 
     private const float _MAX_RETICLE_RANGE = 16f;
+    private const float _BASE_EXPLOSION_DAMAGE = 10f;
 
     internal static ExplosionData _ScotsmanExplosion = null;
 
@@ -27,11 +28,12 @@ public class Scotsman : CwaffGun
             controllerScale : _MAX_RETICLE_RANGE, visibility : CwaffReticle.Visibility.CONTROLLER)
           .AddToShop(ItemBuilder.ShopType.Trorc)
           .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 5.0f, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter))
+            damage: _BASE_EXPLOSION_DAMAGE, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter))
           .Attach<Stickybomb>();
 
         // Initialize our explosion data
-        _ScotsmanExplosion = Explosions.ExplosiveRounds.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 1.5f, preventPlayerForce: false, shake: false);
+        _ScotsmanExplosion = Explosions.ExplosiveRounds.With(damage: _BASE_EXPLOSION_DAMAGE, force: 100f, debrisForce: 10f, radius: 1.5f,
+            preventPlayerForce: false, shake: false);
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -199,6 +201,7 @@ public class Stickybomb : MonoBehaviour
 
         // Phase 1, fire towards target
         this._projectile.shouldRotate = false; // prevent automatic rotation after creation
+        float explosionDamage = this._projectile.baseData.damage;
         this._projectile.baseData.damage = 0f;
         this._projectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
         this._projectile.BulletScriptSettings.surviveTileCollisions = true;
@@ -233,7 +236,7 @@ public class Stickybomb : MonoBehaviour
         }
 
         // Phase 4, explode
-        Exploder.Explode(this._projectile.transform.position, Scotsman._ScotsmanExplosion, Vector2.zero, ignoreQueues: true);
+        Exploder.Explode(this._projectile.transform.position, Scotsman._ScotsmanExplosion.With(damage: explosionDamage), Vector2.zero, ignoreQueues: true);
         this._projectile.DieInAir(suppressInAirEffects: true);
     }
 

@@ -4,7 +4,7 @@ public class BBGun : CwaffGun
 {
     public static string ItemName         = "B. B. Gun";
     public static string ShortDescription = "Spare No One";
-    public static string LongDescription  = "Fires a single large projectile that bounces off walls and knocks enemies around with extreme force. Ammo can only be regained by interacting with the projectiles once they have come to a halt.";
+    public static string LongDescription  = "Fires a single large projectile that bounces off walls and knocks enemies around with extreme force. Projectile damage and knockback scale with projectile speed. Ammo can only be regained by interacting with the projectiles once they have come to a halt.";
     public static string Lore             = "This gun was originally used in the mid-18th century for hunting turkeys, as they were the only birds slow enough to actually hit with any degree of reliability. While hunters quickly decided that using a large, slow, rolling projectile wasn't ideal for hunting, the gun's legacy lives on today in shooting arenas known as \"alleys\", where sporting enthusiasts roll similar projectiles against red and white wooden objects in hopes of scoring a \"turkey\" themselves.";
 
     private static readonly float[] _CHARGE_LEVELS  = {0.25f,0.5f,1.0f,2.0f};
@@ -52,11 +52,19 @@ public class TheBB : MonoBehaviour
     private Projectile _projectile;
     private PlayerController _owner;
     private float _maxSpeed = 0f;
+    private float _damageMult = _BB_DAMAGE_SCALE;
+    private float _knockbackMult = _BB_FORCE_SCALE;
 
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
+
+        if (this._owner)
+        {
+            this._damageMult = _BB_DAMAGE_SCALE * this._owner.DamageMult();
+            this._knockbackMult = _BB_FORCE_SCALE * this._owner.KnockbackMult();
+        }
 
         if (!this._projectile.FiredForFree())
             this._projectile.OnDestruction += CreateInteractible;
@@ -99,8 +107,8 @@ public class TheBB : MonoBehaviour
         }
 
         this._projectile.SetSpeed(newSpeed);
-        this._projectile.baseData.damage        = _BB_DAMAGE_SCALE * newSpeed;
-        this._projectile.baseData.force         = _BB_FORCE_SCALE * newSpeed;
+        this._projectile.baseData.damage        = this._damageMult * newSpeed;
+        this._projectile.baseData.force         = this._knockbackMult * newSpeed;
         this._projectile.spriteAnimator.ClipFps = Mathf.Min(_BASE_ANIM_SPEED * newSpeed, 60f);
         Lazy.PlaySoundUntilDeathOrTimeout("bb_rolling", this._projectile.gameObject, 0.1f);
     }

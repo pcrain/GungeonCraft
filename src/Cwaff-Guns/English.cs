@@ -160,7 +160,7 @@ public class English : CwaffGun
                 this._currentMaxCharge = player.HasSynergy(Synergy.MASTERY_ENGLISH)
                     ? _MAX_CHARGE_LEVEL : _NORM_CHARGE_LEVEL;
             }
-            if ((this._chargeTime += BraveTime.DeltaTime) > _CHARGE_PER_LEVEL)
+            if ((this._chargeTime += BraveTime.DeltaTime * player.ChargeMult()) > _CHARGE_PER_LEVEL)
             {
                 this._chargeTime -= _CHARGE_PER_LEVEL;
                 if (this._chargeLevel < this._currentMaxCharge)
@@ -262,7 +262,7 @@ public class English : CwaffGun
             Vector2 pos = this._phantoms[i].GetComponent<tk2dSprite>().WorldCenter;
             GameObject projObj = SpawnManager.SpawnProjectile(_BilliardBall.gameObject, pos, Quaternion.identity, true);
             Projectile proj = projObj.GetComponent<Projectile>();
-                proj.Owner = this.PlayerOwner;
+                proj.SetOwnerAndStats(this.PlayerOwner);
                 proj.collidesWithEnemies = true;
                 proj.collidesWithPlayer = false;
                 proj.SetFrame(_BALL_ORDER[i % 15]);

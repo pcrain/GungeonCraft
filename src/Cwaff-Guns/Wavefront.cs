@@ -38,7 +38,9 @@ public class TeslaProjectileBehavior : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner      = this._projectile.Owner as PlayerController;
-        this._myMaxSpeed = UnityEngine.Random.Range(_MIN_SPEED, _MAX_SPEED);
+        if (!this._owner)
+            return;
+        this._myMaxSpeed = UnityEngine.Random.Range(_MIN_SPEED, _MAX_SPEED) * this._owner.ProjSpeedMult();
         this._lifespan   = _LIFESPAN;
 
         this._projectile.specRigidbody.CollideWithTileMap = false;

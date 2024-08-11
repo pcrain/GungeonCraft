@@ -195,23 +195,26 @@ public class GunbrellaProjectile : MonoBehaviour
 
     private IEnumerator TakeToTheSkies()
     {
+        float speedMult =  (this._owner ? this._owner.ProjSpeedMult() : 1f);
         this._projectile.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
         if (!this._mastered || !this._gunbrella)
         {
             // Phase 1 / 4 -- become intangible and launch to the skies
             Vector2 targetLaunchVelocity = (85f + 10f * UnityEngine.Random.value).ToVector(1f);
             this._projectile.IgnoreTileCollisionsFor(_TIME_TO_REACH_TARGET);
-            this._projectile.SetSpeed(_LAUNCH_SPEED);
+            this._projectile.SetSpeed(_LAUNCH_SPEED * speedMult);
             this._projectile.baseData.range = float.MaxValue;
             this._launching = true;
-            while (this._lifetime < _LAUNCH_TIME)
+            float launchTime = _LAUNCH_TIME / speedMult;
+            float homeStrength = _HOME_STRENGTH * speedMult;
+            while (this._lifetime < launchTime)
             {
-                this._startVelocity = ((1f - _HOME_STRENGTH) * this._startVelocity) + (_HOME_STRENGTH * targetLaunchVelocity);
+                this._startVelocity = ((1f - homeStrength) * this._startVelocity) + (homeStrength * targetLaunchVelocity);
                 this._projectile.SendInDirection(this._startVelocity, true);
                 yield return null;
                 this._lifetime += BraveTime.DeltaTime;
             }
-            this._lifetime -= _LAUNCH_TIME;
+            this._lifetime -= launchTime;
 
             // Phase 2 / 4 -- slight delay
             this._launching = false;
@@ -233,12 +236,12 @@ public class GunbrellaProjectile : MonoBehaviour
         }
 
         // Phase 3 / 4 -- fall from the skies
-        float fallTime = this._mastered ? _SPEAR_TIME : _FALL_TIME;
-        float launchSpeed = (this._mastered ? (_FALL_TIME / _SPEAR_TIME) : 1f) * _LAUNCH_SPEED;
+        float fallTime = (this._mastered ? _SPEAR_TIME : _FALL_TIME) / speedMult;
+        float launchSpeed = (this._mastered ? (_FALL_TIME / _SPEAR_TIME) : 1f) * _LAUNCH_SPEED * speedMult;
         this._falling = true;
         Vector2 targetFallVelocity = (250f + 40f*UnityEngine.Random.value).ToVector(1f);
         this._projectile.SetSpeed(launchSpeed);
-        Vector2 offsetTarget = this._exactTarget + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value);
+        Vector2 offsetTarget = this._exactTarget + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value * (this._owner ? this._owner.AccuracyMult() : 1f));
         this._projectile.specRigidbody.Position = new Position(offsetTarget + (fallTime * launchSpeed) * (-targetFallVelocity));
         this._projectile.specRigidbody.UpdateColliderPositions();
         this._projectile.SendInDirection(targetFallVelocity, true);

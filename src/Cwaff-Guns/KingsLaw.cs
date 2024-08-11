@@ -329,7 +329,7 @@ public class KingsLawBullets : MonoBehaviour
         }
 
         // Phase 5 / 5 -- the launch
-        this._projectile.SetSpeed(_LAUNCH_SPEED);
+        this._projectile.SetSpeed(_LAUNCH_SPEED * (this._owner ? this._owner.ProjSpeedMult() : 1f));
         this._projectile.specRigidbody.CollideWithOthers = true;
         this._projectile.specRigidbody.Reinitialize();
         _projectile.SendInDirection(targetDir, true);

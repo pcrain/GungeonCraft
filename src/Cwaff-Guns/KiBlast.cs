@@ -189,11 +189,11 @@ public class KiBlastBehavior : MonoBehaviour
         float angle = 0;
         if (this._owner.CurrentGun.GetComponent<KiBlast>() is KiBlast k)
         {
-            angle = Mathf.Max(UnityEngine.Random.value * this._owner.AccuracyMult() * _MaxAngleVariance, _MinAngleVariance) * k.nextKiBlastSign;
+            angle = Mathf.Max(UnityEngine.Random.value * pc.AccuracyMult() * _MaxAngleVariance, _MinAngleVariance) * k.nextKiBlastSign;
             k.nextKiBlastSign *= -1;
         }
         this._arc = base.GetComponent<ArcTowardsTargetBehavior>();
-        this._arc.Setup(arcAngle: angle, maxSecsToReachTarget: 0.5f, minSpeed: 15.0f);
+        this._arc.Setup(arcAngle: angle, maxSecsToReachTarget: 0.5f / pc.ProjSpeedMult(), minSpeed: 15.0f);
 
         this._projectile.gameObject.Play("ki_blast_return_sound_stop_all");
         this._projectile.gameObject.PlayUnique("ki_blast_sound");

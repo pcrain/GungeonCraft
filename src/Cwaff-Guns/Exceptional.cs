@@ -196,7 +196,7 @@ public class ExceptionalProjectile : MonoBehaviour
                 {
                     if (Lazy.NearestEnemyPos(this._projectile.SafeCenter) is Vector2 v)
                         this._projectile.SendInDirection(v - this._projectile.SafeCenter, true);
-                    this._projectile.baseData.speed = 100f;
+                    this._projectile.baseData.speed = 100f * (this._owner ? this._owner.ProjSpeedMult() : 1f);
                     this._projectile.UpdateSpeed();
                     base.gameObject.PlayUnique("corruption_sound");
                     this._state = State.RELAUNCH;

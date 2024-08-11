@@ -207,12 +207,12 @@ public class StarmageddonProjectile : MonoBehaviour
         this._projectile.gameObject.Play("starmageddon_bullet_launch_sound");
         yield return new WaitForSeconds(0.25f);
         this._projectile.gameObject.Play("starmageddon_bullet_fall_sound");
-        yield return new WaitForSeconds(0.25f);
+        yield return new WaitForSeconds(0.25f / (this._owner ? this._owner.ProjSpeedMult() : 1f));
 
         // Phase 5 -- falling on enemies
         this._state = State.FALLING;
         GameActor target = FindTarget();
-        Vector2 targetPos = target.CenterPosition + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value);
+        Vector2 targetPos = target.CenterPosition + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value * (this._owner ? this._owner.AccuracyMult() : 1f));
         float fallSpeed = 150f.AddRandomSpread(10f);
         float fallAngle = 270f.AddRandomSpread(24f);
         float fallTime = 0.35f.AddRandomSpread(0.25f);

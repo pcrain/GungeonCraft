@@ -224,12 +224,11 @@ public class MagnetParticle : MonoBehaviour
 
         DebrisProjectile p    = base.gameObject.AddComponent<DebrisProjectile>();
         p.specRigidbody       = body;
-        p.Owner               = this._gun.CurrentOwner;
-        p.Shooter             = p.Owner.specRigidbody;
         p.baseData.damage     = this._debris.IsCorpse ? 30f : 2f;
         p.baseData.range      = 1000000f;
         p.baseData.speed      = velocity.magnitude;
         p.baseData.force      = 50f;
+        p.SetOwnerAndStats(this._gun.CurrentOwner);
         p.DestroyMode         = Projectile.ProjectileDestroyMode.BecomeDebris;
         p.collidesWithPlayer  = false;
         p.ManualControl       = true; // let debris velocity take care of movement
@@ -240,6 +239,8 @@ public class MagnetParticle : MonoBehaviour
         body.Reinitialize();
         p.Start();
 
+        if (p.Owner is PlayerController player)
+            velocity *= player.ProjSpeedMult();
         this._debris.m_currentPosition    = this.gameObject.transform.position.WithZ(0f);
         this._debris.m_transform.rotation = this.gameObject.transform.rotation;
         this._debris.enabled              = true;
@@ -289,7 +290,8 @@ public class MagnetParticle : MonoBehaviour
         {
             if (this._inStasis)
             {
-                float launchAngle = this._statisAngle * (Magunet._SPREAD / 180f);
+                PlayerController owner = this._gun.CurrentOwner as PlayerController;
+                float launchAngle = this._statisAngle * (Magunet._SPREAD / 180f) * (owner ? owner.AccuracyMult() : 1f);
                 float gunAngle = this._gun ? this._gun.CurrentAngle : Lazy.RandomAngle();
                 LaunchDebrisInStasis((gunAngle + launchAngle).ToVector(UnityEngine.Random.Range(_MIN_LAUNCH_SPEED, _MAX_LAUNCH_SPEED)));
                 return;
