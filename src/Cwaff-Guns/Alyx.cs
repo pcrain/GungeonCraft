@@ -19,7 +19,7 @@ public class Alyx : CwaffGun
     private DamageTypeModifier _poisonImmunity = null;
     private Coroutine _decayCoroutine = null;
 
-    public float timeAtLastRecalc   = 0.0f; // must be public so it serializes properly when dropped / picked up
+    public float timeAtLastRecalc = -1f; // must be public so it serializes properly when dropped / picked up
 
     public static void Init()
     {
@@ -48,18 +48,20 @@ public class Alyx : CwaffGun
             this.PlayerOwner.healthHaver.damageTypeModifiers.AddUnique(this._poisonImmunity);
     }
 
-    public override void OnPlayerPickup(PlayerController player)
+    public override void OnFirstPickup(PlayerController player)
     {
-        this._poisonImmunity ??= new DamageTypeModifier {
+        base.OnFirstPickup(player);
+        this._poisonImmunity = new DamageTypeModifier {
             damageType = CoreDamageTypes.Poison,
             damageMultiplier = 0f,
         };
-        if (timeAtLastRecalc == 0.0f)
-        {
-            this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
-            this.gun.CurrentAmmo = _BASE_MAX_AMMO;
-            this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
-        }
+        this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
+        this.gun.CurrentAmmo = _BASE_MAX_AMMO;
+        this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
         base.OnPlayerPickup(player);
         RecalculateAmmo();
         if (this._decayCoroutine != null)

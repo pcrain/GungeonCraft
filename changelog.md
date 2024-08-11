@@ -27,6 +27,7 @@
 - Gave Bulletbot Implant a 10 room cooldown rather than making it a one-time use item
 - Added launch VFX for projectiles launched by Maestro
 - Made Jugglernaut properly render behind player when facing backwards
+- Potentially fixed rare issue with Alyx being able to dissipate immediately after being picked up
 
 ## 1.16.4 (2024-08-01)
 
