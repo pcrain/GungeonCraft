@@ -119,6 +119,11 @@ public class Commands
                 ConstructorProfiler.Toggle();
             }
 
+            if (Input.GetKeyDown(KeyCode.E)) // throw an error immediately
+            {
+                __instance.GetComponent<Projectile>().DieInAir();
+            }
+
             return true;
         }
     }

@@ -1,10 +1,5 @@
 ﻿namespace CwaffingTheGungy;
 
-/* TODO:
-    - make the gun actually spawn when there's 64-1000 errors
-
-*/
-
 public class Exceptional : CwaffGun
 {
     public static string ItemName         = "Exceptional";
@@ -14,7 +9,9 @@ public class Exceptional : CwaffGun
 
     public static int _PickupId;
     public static int _ExceptionalPower;
+    public static bool _Spawned = false;
 
+    private const int _ERRORS_BEFORE_SPAWNING = 1337;
     private const int _BURST_SIZE = 7;
 
     private int _cachedPower = -1;
@@ -92,13 +89,6 @@ public class Exceptional : CwaffGun
             this.gun.CurrentStrengthTier = newTier; //NOTE: expensive assignment since it recalculates stats, so only set if actually changed
     }
 
-    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
-    {
-        if (!C.DEBUG_BUILD)
-            return; // don't throw exceptions in release builds
-        var d = player.GetComponent<Exceptional>().debris; // throws a null reference exception
-    }
-
     public void AdjustGunShader(bool isOn)
     {
         this.gun.sprite.usesOverrideMaterial = isOn;
@@ -107,8 +97,17 @@ public class Exceptional : CwaffGun
 
     public static void Exceptionalizationizer(string text, string stackTrace, LogType type)
     {
-        if (type == LogType.Exception)
-            ++_ExceptionalPower;
+        if (type != LogType.Exception)
+            return;
+        if (++_ExceptionalPower < _ERRORS_BEFORE_SPAWNING)
+            return;
+        if (_Spawned)
+            return;
+        _Spawned = true;
+        Lazy.SpawnChestWithSpecificItem(
+          pickup: Lazy.Pickup<Exceptional>(),
+          position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success),
+          overrideChestQuality: ItemQuality.S);
     }
 
     public class ExceptionalAmmoDisplay : CustomAmmoDisplay

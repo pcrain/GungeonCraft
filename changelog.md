@@ -1,33 +1,45 @@
 # Changelog
 
-## TBD
+## 1.17.0 (2024-08-10)
+
+#### Features:
 
 - Added Gunflower and Hallaeribut
-- Updated required MtG API version to 1.8.2 for custom ammo pickup functionality
-- Prevented Femtobyte from being able to infinitely trigger table techs by repeatedly digitizing and materializing tables
-- Fixed projectile trails disappearing if projectiles slow down too much
-- Fixed longstanding issue with custom dodge roll code creating a new list every frame and eating up memory extremely quickly
-- Optimized setting a gun's CurrentStrengthTier in places it was being set too often
-- Optimized code for finding enemies in rooms
-- Fixed vanilla bug with burst modules of tiered guns infinitely firing after releasing the mouse
-- Optimized projectile trail creation code to reduce memory usage and lag spikes
-- Fixed Femtobyte's text being cut off when displaying very long names
-- Tweaked volume on Suncaster's projectiles
+	- Gunflower sprites thanks to Nevernamed!
+
+#### Balance Changes and Polish:
+
 - Buffed Starmageddon projectile damage from 6 to 8
 - Prevented Starmageddon from targeting invulernable enemies
-- Added roll sounds to Talon Trot synergy
-- Fixed Femtobyte projectiles being unable to hit enemies in mine carts
+- Prevented Femtobyte from being able to infinitely trigger table techs by repeatedly digitizing and materializing tables
 - Added digitized shader to friendly enemies spawned by Femtobyte
+- Added roll sounds to Talon Trot synergy
+- Added launch VFX for projectiles launched by Maestro
+- Gave Bulletbot Implant a 10 room cooldown rather than making it a one-time use item
+- Made Jugglernaut properly render behind player when facing backwards
+
+#### Bugfixes:
+
+- Fixed vanilla bug with burst modules of tiered guns infinitely firing after releasing the mouse
+- Fixed longstanding issue with custom dodge roll code creating a new list every frame and eating up memory extremely quickly
+- Fixed projectile trails disappearing if projectiles slow down too much
+- Fixed Femtobyte's text being cut off when displaying very long names
+- Fixed Femtobyte projectiles being unable to hit enemies in mine carts
 - Fixed Mimics spawned by Femtobyte being able to damage the player
-- Fixed Femtobyte not remebering last enemy killed for Lookup Table synergy when reloading a midgame save
-- Fixed Kaliber's Justice being able to spawn Active items with the Passive item blessing
+- Fixed Femtobyte's Lookup Table synergy not remembering the last enemy killed when reloading a midgame save
+- Fixed Kaliber's Justice being able to spawn active items with the passive item blessing
 - Fixed King's Law Projectiles sometimes firing with a longer delay than they should when launched
 - Fixed King's Law muzzle rune persisting when dropped while charging
 - Potentially fixed rare issue with Breegull's eggs all costing 1 ammo regardless of type
-- Gave Bulletbot Implant a 10 room cooldown rather than making it a one-time use item
-- Added launch VFX for projectiles launched by Maestro
-- Made Jugglernaut properly render behind player when facing backwards
 - Potentially fixed rare issue with Alyx being able to dissipate immediately after being picked up
+
+#### Misc:
+
+- Updated required MtG API version to 1.8.2 for custom ammo pickup functionality
+- Optimized projectile trail creation code to reduce memory usage and lag spikes
+- Optimized setting a gun's CurrentStrengthTier in places it was being set too often
+- Optimized code for finding enemies in rooms
+- Tweaked volume on Suncaster's projectiles
 
 ## 1.16.4 (2024-08-01)
 

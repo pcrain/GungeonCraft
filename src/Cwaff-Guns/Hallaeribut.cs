@@ -5,9 +5,9 @@ using static Hallaeribut.State;
 public class Hallaeribut : CwaffGun
 {
     public static string ItemName         = "Hallaeribut";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Modern Warfare Cod";
+    public static string LongDescription  = "Fires piranhas that devour any targets in their sight. Becomes increasingly hungry as ammo is depleted, spawning more piranhas per shot but having increasingly negative side effects: when Peckish, cannot be dropped; when Hungry, cannot pick up ammo for other guns; when Starving, cannot switch to other guns; when Famished, feeds on the player every 30 seconds.";
+    public static string Lore             = "Piranhas are not known to be picky eaters. It's uncertain who first brought them into the Gungeon or for what purpose, but the fact that they're more than willing to eat flesh, metal, and lead is by all means a good enough reason to stick them in a gun and fire away. Just be extra careful whan handling the ammunition....";
 
     private const int _SWARM_SIZE = 2;
     private const int _BURSTS_PER_CLIP = 5;

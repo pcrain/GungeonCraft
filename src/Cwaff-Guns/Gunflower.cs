@@ -5,7 +5,7 @@ public class Gunflower : CwaffGun
     public static string ItemName         = "Gunflower";
     public static string ShortDescription = "Petal to the Metal";
     public static string LongDescription  = "Fires a highly concentrated beam of sunlight. Replenishes ammo when exposed to water and water-like goops. Depletes ammo when exposed to fire and various unhealthy goops.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A living sunflower that has been cybernetically enhanced with a generator and a refraction chamber. The botanist who invented it had originally been trying to produce a flower capable of growing itself, a million-dollar idea so it seemed. Several failed attempts and a refresher on the first law of thermodynamics later, they eventually tossed all of their prototypes into the wind, which carried some of them all the way into the Gungeon.";
 
     private const float _LIGHT_SPACING = 2f;
 

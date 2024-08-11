@@ -194,7 +194,7 @@ public static class CwaffShaders
     [HarmonyPatch(typeof(AIActor), nameof(AIActor.Start))]
     private class RandomCosmicKinPatch
     {
-        private const float _COSMIFY_CHANCE = 0.0025f;
+        private const float _COSMIFY_CHANCE = 0.0011f;
 
         static void Postfix(AIActor __instance)
         {
