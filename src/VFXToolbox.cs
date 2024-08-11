@@ -885,6 +885,7 @@ public partial class CwaffVFX // private
     private float      _startScale    = 1.0f;
     private float      _endScale      = 1.0f;
     private bool       _changesScale  = false;
+    private bool       _usesLifetime  = true;
     private bool       _shouldDespawn = false;
 
     /// <summary>Manager for our pooled projectiles</summary>
@@ -964,7 +965,10 @@ public partial class CwaffVFX // private
             this._sprite.scale = new Vector3(this._startScale, this._startScale, 1f);
         }
         else
+        {
             this._sprite.scale = prefabSprite.scale;
+            this._startScale = this._sprite.scale.x;
+        }
         this._sprite.FlipX = flipX;
         this._sprite.FlipY = flipY;
         this._sprite.renderer.SetAlpha(1.0f);
@@ -972,11 +976,12 @@ public partial class CwaffVFX // private
         this._animator.defaultClipId = prefabAnim.defaultClipId;
         this._animator.currentClip = this._animator.DefaultClip;
 
-        this._curLifeTime = 0.0f;
-        this._fadeIn      = fadeIn;
-        this._velocity    = velocity.HasValue ? (1.0f / C.PIXELS_PER_CELL) * velocity.Value.ToVector3ZisY(0) : Vector3.zero;
-        this._maxLifeTime = (lifetime > 0) ? lifetime : 3600f;
-        this._fadeOut     = fadeOutTime.HasValue;
+        this._curLifeTime  = 0.0f;
+        this._fadeIn       = fadeIn;
+        this._velocity     = velocity.HasValue ? (1.0f / C.PIXELS_PER_CELL) * velocity.Value.ToVector3ZisY(0) : Vector3.zero;
+        this._usesLifetime = lifetime > 0;
+        this._maxLifeTime  = this._usesLifetime ? lifetime : 36000f;
+        this._fadeOut      = this._usesLifetime && fadeOutTime.HasValue;
         if (this._fadeOut)
         {
             this._fadeTotalTime = fadeOutTime.Value;
@@ -1021,9 +1026,10 @@ public partial class CwaffVFX // private
 
         this._curLifeTime += BraveTime.DeltaTime;
         float percentDone = this._curLifeTime / this._maxLifeTime;
-        if (percentDone >= 1.0f)
+        if ((this._usesLifetime && percentDone >= 1.0f)
+            || (!this._usesLifetime && !this._animator.Paused && !this._animator.Playing))
         {
-            Despawn(this);
+            Despawn(this); // despawn if we've lived past our liftime, or if our animator has reached the end of its animation
             return;
         }
 

@@ -25,6 +25,7 @@
 - Fixed King's Law muzzle rune persisting when dropped while charging
 - Potentially fixed rare issue with Breegull's eggs all costing 1 ammo regardless of type
 - Gave Bulletbot Implant a 10 room cooldown rather than making it a one-time use item
+- Added launch VFX for projectiles launched by Maestro
 
 ## 1.16.4 (2024-08-01)
 

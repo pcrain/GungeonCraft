@@ -12,6 +12,8 @@ public class Maestro : CwaffGun
     private const float _SQR_TARGET_RADIUS            = _MAX_PROJECTILE_TARGET_RADIUS * _MAX_PROJECTILE_TARGET_RADIUS;
     private const int   _MAX_STEPS                    = 30;
 
+    internal static GameObject _LaunchVFX = null;
+
     private int        _targetEnemyIndex    = 0;
     private AIActor    _targetEnemy         = null;
     private Projectile _targetProjectile    = null;
@@ -30,6 +32,8 @@ public class Maestro : CwaffGun
           .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.2f, angleVariance: 15.0f,
             shootStyle: ShootStyle.Automatic, damage: 9f, speed: 60.0f, ammoType: GameUIAmmoType.AmmoType.BEAM,
             sprite: "maestro_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
+
+        _LaunchVFX = VFX.Create("maestro_launch_vfx", fps: 60, loops: false);
     }
 
     private GameObject GetTargetEnemy(CwaffReticle reticle) => this._targetEnemy ? this._targetEnemy.gameObject : null;
@@ -72,7 +76,7 @@ public class Maestro : CwaffGun
         p.Reflected();
 
         p.Speed = REFLECT_SPEED;
-        SpawnManager.SpawnVFX(EchoChamber._EchoPrefab, p.SafeCenter, Lazy.RandomEulerZ(), ignoresPools: true).ExpireIn(seconds: 0.5f, fadeFor: 0.5f);
+        CwaffVFX.Spawn(prefab: _LaunchVFX, position: p.SafeCenter, rotation: p.Direction.EulerZ());
 
         switch(UnityEngine.Random.Range(0,5))
         {
