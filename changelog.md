@@ -28,6 +28,7 @@
 - Reduced Omnidirectional Laser's spread to 0 so all shots now fire precisely at the reticle
 - Clarified in B.B. Gun's description that projectile damage and knockback scale with projectile speed (this was always true, but never mentioned)
 - Clarified in Pincushion's description that projectiles deal fixed damage (this was always true, but never mentioned)
+- Fixed null deref in Magunet caused by messing up some code in Magunet fix from 1.15.0
 
 ## 1.17.0 (2024-08-10)
 

@@ -232,7 +232,7 @@ public class MagnetParticle : MonoBehaviour
         p.DestroyMode         = Projectile.ProjectileDestroyMode.BecomeDebris;
         p.collidesWithPlayer  = false;
         p.ManualControl       = true; // let debris velocity take care of movement
-        p.OnHitEnemy         += OnHitEnemy;
+        p.OnHitEnemy         += this.OnHitEnemy;
         p.shouldRotate        = true;
 
         body.RegenerateCache();
@@ -251,10 +251,10 @@ public class MagnetParticle : MonoBehaviour
         UnityEngine.Object.Destroy(this);
     }
 
-    private static void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool what)
+    private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody body, bool what)
     {
         SpawnManager.SpawnVFX(
-            prefab: body.gameObject.GetComponent<DebrisObject>().IsCorpse ? Magunet._DebrisBigImpactVFX : Magunet._DebrisImpactVFX,
+            prefab: this._debris.IsCorpse ? Magunet._DebrisBigImpactVFX : Magunet._DebrisImpactVFX,
             position: body.UnitCenter + Lazy.RandomVector(0.5f),
             rotation: Quaternion.identity);
         UnityEngine.Object.Destroy(bullet.gameObject);
