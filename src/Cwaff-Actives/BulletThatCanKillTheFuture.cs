@@ -139,6 +139,14 @@ public class BulletThatCanKillTheFuture : CwaffActive
         interactor.SetInputOverride(ItemName);
         interactor.specRigidbody.CollideWithTileMap = false;
         interactor.specRigidbody.CollideWithOthers = false;
+        PlayerController otherPlayer = GameManager.Instance.GetOtherPlayer(interactor);
+        if (otherPlayer)
+        {
+            otherPlayer.SetInputOverride(ItemName);
+            otherPlayer.specRigidbody.CollideWithTileMap = false;
+            otherPlayer.specRigidbody.CollideWithOthers = false;
+        }
+        interactor.ForceBlank(silent: true, breaksWalls: false, breaksObjects: false);
 
         // Figure out which enemies we should freeze in place
         Dictionary<AIActor,AIActor.ActorState> frozenEnemies = new Dictionary<AIActor,AIActor.ActorState>();
@@ -320,6 +328,12 @@ public class BulletThatCanKillTheFuture : CwaffActive
         interactor.ClearInputOverride(ItemName);
         interactor.specRigidbody.CollideWithTileMap = true;
         interactor.specRigidbody.CollideWithOthers = true;
+        if (otherPlayer)
+        {
+            otherPlayer.ClearInputOverride(ItemName);
+            otherPlayer.specRigidbody.CollideWithTileMap = true;
+            otherPlayer.specRigidbody.CollideWithOthers = true;
+        }
         GameCursorController.CursorOverride.RemoveOverride(ItemName);
         Pixelator.Instance.DoFinalNonFadedLayer = false;
 

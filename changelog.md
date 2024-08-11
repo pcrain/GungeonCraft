@@ -29,6 +29,8 @@
 - Clarified in B.B. Gun's description that projectile damage and knockback scale with projectile speed (this was always true, but never mentioned)
 - Clarified in Pincushion's description that projectiles deal fixed damage (this was always true, but never mentioned)
 - Fixed null deref in Magunet caused by messing up some code in Magunet fix from 1.15.0
+- Fixed other player being able to move during [REDACTED]'s effect in co-op mode
+- Made [REDACTED] clear enemy projectiles when used to prevent visual oddities
 
 ## 1.17.0 (2024-08-10)
 
