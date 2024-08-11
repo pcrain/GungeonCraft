@@ -49,7 +49,7 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._owner = pc;
         this._damageMult = this._owner.DamageMult();
 
-        BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
+        BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>(); //REFACTOR: do in setup
             bounce.numberOfBounces     += 3; // needs to be more than 1 or projectile dies immediately in special handling code below
             bounce.chanceToDieOnBounce = 0f;
             bounce.OnBounce += OnBounce;

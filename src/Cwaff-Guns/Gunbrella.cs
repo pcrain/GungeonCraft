@@ -20,7 +20,7 @@ public class Gunbrella : CwaffGun
 
     internal static ProjectileModule _MasteryModule = null;
 
-    private float _curChargeTime         = 0.0f;
+    private bool _wasCharging            = false;
     private Vector2 _chargeStartPos      = Vector2.zero;
     private int _nextProjectileNumber    = 0;
     private bool _mastered               = false;
@@ -66,16 +66,17 @@ public class Gunbrella : CwaffGun
         }
         if (!this.gun.IsCharging && !this.gun.IsFiring)
         {
-            this._curChargeTime = 0.0f;
+            this._wasCharging = false;
             return;
         }
 
         Lazy.PlaySoundUntilDeathOrTimeout(soundName: "gunbrella_charge_sound", source: this.gun.gameObject, timer: 0.05f);
 
-        if (this._curChargeTime == 0.0f)
+        if (!this._wasCharging)
         {
             this._nextProjectileNumber = 0;
             this._chargeStartPos = this.gun.barrelOffset.PositionVector2();
+            this._wasCharging = true;
         }
 
         this._chargeStartPos = base.GetComponent<CwaffReticle>().GetTargetPos();
@@ -84,7 +85,6 @@ public class Gunbrella : CwaffGun
             Vector2 gunPos = this.gun.barrelOffset.PositionVector2();
             this._chargeStartPos = gunPos.ToNearestWall(out Vector2 normal, (this._chargeStartPos - gunPos).ToAngle(), 0f);
         }
-        this._curChargeTime += BraveTime.DeltaTime;
     }
 
     public override void PostProcessProjectile(Projectile projectile)

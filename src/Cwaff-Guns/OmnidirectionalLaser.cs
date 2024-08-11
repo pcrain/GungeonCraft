@@ -204,8 +204,7 @@ public class OmnidirectionalLaser : CwaffGun
             coneAngle                        : projectile.OriginalDirection(),
             maxDeviation                     : _LOCKON_FACTOR * this._currentFps, // between 16 and 64 degrees of lock-on
             useNearestAngleInsteadOfDistance : true,
-            ignoreWalls                      : false
-            );
+            ignoreWalls                      : false);
         if (targetPos.HasValue)
             projectile.SendInDirection((targetPos.Value - this.gun.barrelOffset.position.XY()), true, true);
         projectile.AddTrailToProjectileInstance(_OmniTrailPrefab).gameObject.SetGlowiness(10f);

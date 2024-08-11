@@ -42,7 +42,6 @@ public class RacketLauncher : CwaffGun
         if (this._extantTennisBalls.Count == 0 && gun.CurrentAmmo > 0)
         {
             mod.ammoCost = 1;
-            // gun.LoseAmmo(1);
             gun.ClipShotsRemaining = gun.CurrentAmmo;
             return projectile;
         }
@@ -60,7 +59,7 @@ public class RacketLauncher : CwaffGun
         }
         mod.ammoCost = 0;
         gun.ClipShotsRemaining = gun.CurrentAmmo + 1;
-        return Lazy.NoProjectile();
+        return Lazy.NoProjectile(); //REFACTOR: actually prevent shooting here with ilmanip / patch
     }
 
     public override void OnAmmoChanged(PlayerController player, Gun gun)
@@ -132,7 +131,7 @@ public class TennisBall : MonoBehaviour
             this._projectile.gameObject.Play("monkey_tennis_hit_serve");
         }
 
-        this._bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>();
+        this._bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>(); //REFACTOR: do in setup
             this._bounce.numberOfBounces     = 9999;
             this._bounce.chanceToDieOnBounce = 0f;
             this._bounce.onlyBounceOffTiles  = false;

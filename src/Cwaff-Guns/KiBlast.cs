@@ -37,7 +37,7 @@ public class KiBlast : CwaffGun
 
         gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
           ammoType: GameUIAmmoType.AmmoType.BEAM, damage: 4.0f, range: 1000.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
-          anchor: Anchor.MiddleCenter, ignoreDamageCaps: true))
+          anchor: Anchor.MiddleCenter, ignoreDamageCaps: true, hitSound: "ki_blast_explode_sound"))
         .SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f))
         .Attach<EasyTrailBullet>(trail => {
           trail.TrailPos   = trail.transform.position;
@@ -185,9 +185,6 @@ public class KiBlastBehavior : MonoBehaviour
         _BasicSlashData ??= new SlashData();
         this._startingDamage = this._projectile.baseData.damage;
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-        this._projectile.specRigidbody.OnCollision += (_) => {
-            this._projectile.gameObject.PlayUnique("ki_blast_explode_sound");
-        };
 
         float angle = 0;
         if (this._owner.CurrentGun.GetComponent<KiBlast>() is KiBlast k)
@@ -195,7 +192,6 @@ public class KiBlastBehavior : MonoBehaviour
             angle = Mathf.Max(UnityEngine.Random.value * this._owner.AccuracyMult() * _MaxAngleVariance, _MinAngleVariance) * k.nextKiBlastSign;
             k.nextKiBlastSign *= -1;
         }
-        else { ETGModConsole.Log("that should never happen o.o"); }
         this._arc = base.GetComponent<ArcTowardsTargetBehavior>();
         this._arc.Setup(arcAngle: angle, maxSecsToReachTarget: 0.5f, minSpeed: 15.0f);
 

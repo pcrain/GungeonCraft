@@ -24,10 +24,13 @@ public class SoulLinkProjectile : MonoBehaviour
     {
         Projectile proj = base.GetComponent<Projectile>();
         proj.sprite.SetGlowiness(glowAmount: 100f, glowColor: Color.magenta);
-        proj.OnHitEnemy += (Projectile p, SpeculativeRigidbody enemy, bool _) => {
-            p.gameObject.Play("soul_kaliber_impact");
-            enemy.aiActor.gameObject.GetOrAddComponent<SoulLinkStatus>();
-        };
+        proj.OnHitEnemy += this.OnHitEnemy;
+    }
+
+    private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool _)
+    {
+        p.gameObject.Play("soul_kaliber_impact");
+        enemy.aiActor.gameObject.GetOrAddComponent<SoulLinkStatus>();
     }
 }
 

@@ -164,13 +164,12 @@ public class ChekhovBullet : MonoBehaviour
         // this._projectile.SendInDirection(target.Value - this._projectile.SafeCenter, true);
         if (wasElectric)
             this._projectile.damageTypes |= CoreDamageTypes.Electric;
-        this._projectile.Attach<EasyTrailBullet>(trail => {
+        EasyTrailBullet trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
             trail.StartWidth = 0.1f;
             trail.EndWidth   = 0f;
             trail.LifeTime   = 0.25f;
             trail.BaseColor  = Color.yellow;
             trail.StartColor = Color.yellow;
             trail.EndColor   = Color.yellow;
-        });
     }
 }

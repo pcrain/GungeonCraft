@@ -91,14 +91,21 @@ public class CarpetProjectile : MonoBehaviour
         this._grenade.OnBounce += OnGroundBounce;
         this.GetComponent<BounceProjModifier>().OnBounce += OnGroundBounce;
 
-        this._projectile.OnDestruction += (Projectile p) => Exploder.Explode(
-            p.transform.position, CarpetBomber._CarpetExplosion, p.Direction, ignoreQueues: true);
+        this._projectile.OnDestruction += this.Explode;
         if (this._projectile.specRigidbody)
-            this._projectile.specRigidbody.OnRigidbodyCollision += (CollisionData rigidbodyCollision) => {
-                if (this._grenade)
-                    this._grenade.Redirect(rigidbodyCollision.Normal);
-                OnGroundBounce();
-            };
+            this._projectile.specRigidbody.OnRigidbodyCollision += this.OnRigidbodyCollision;
+    }
+
+    private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
+    {
+        if (this._grenade)
+            this._grenade.Redirect(rigidbodyCollision.Normal);
+        OnGroundBounce();
+    }
+
+    private void Explode(Projectile p)
+    {
+        Exploder.Explode(p.transform.position, CarpetBomber._CarpetExplosion, p.Direction, ignoreQueues: true);
     }
 
     private void Update()

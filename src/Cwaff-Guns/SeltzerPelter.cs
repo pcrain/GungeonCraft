@@ -83,7 +83,7 @@ public class SeltzerProjectile : MonoBehaviour
         this._canProjectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
         this._canProjectile.shouldRotate = false; // prevent automatic rotation after creation
         this._canProjectile.specRigidbody.OnRigidbodyCollision += OnRigidbodyCollision;
-        this._bounce = this._canProjectile.gameObject.GetOrAddComponent<BounceProjModifier>();
+        this._bounce = this._canProjectile.gameObject.GetOrAddComponent<BounceProjModifier>(); //REFACTOR: do in setup
             this._bounce.numberOfBounces      = 9999;
             this._bounce.chanceToDieOnBounce  = 0f;
             this._bounce.onlyBounceOffTiles   = false;

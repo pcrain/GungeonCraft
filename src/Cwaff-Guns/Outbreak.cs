@@ -52,8 +52,7 @@ public class Outbreak : CwaffGun
                 if (delta.sqrMagnitude > 1f) // prevents random angles from enemies targeting themselves
                     infectAngle = delta.ToAngle();
             }
-            Projectile p = VolleyUtility.ShootSingleProjectile(
-                _InfectionProjectile, enemy.CenterPosition /*enemy.GunPivot.PositionVector2()*/, infectAngle, false, player);
+            Projectile p = VolleyUtility.ShootSingleProjectile(_InfectionProjectile, enemy.CenterPosition, infectAngle, false, player);
             p.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
         }
         if (found)
