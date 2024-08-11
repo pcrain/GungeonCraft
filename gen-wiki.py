@@ -307,6 +307,8 @@ def scanGuns(masteryData):
     text = readAllLines(f)
     itemname = findPattern(text, r"""ItemName\s*=\s*\"(.*)\";""")
     classname = findPattern(text, r"""public class (.*) : Cwaff""")
+    if classname == "Exceptional":
+      continue
     entry = {
       "classname"   : classname,
       "filename"    : imageFor(iconForGun(itemname, nameOnly = True)),
@@ -330,6 +332,8 @@ def scanGuns(masteryData):
     masteryDesc = masteryData.get(entry["classname"], None)
     if masteryDesc is not None:
       entry["mastery"] = f"{MASTERY_TEMPLATE}{masteryDesc}"
+    if entry["speed"] == "-1":
+      entry["speed"] = "{{infinity}}"
     data[itemname] = entry
     classdata[classname] = entry
   return data, classdata

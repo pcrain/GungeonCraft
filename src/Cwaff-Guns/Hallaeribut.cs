@@ -30,7 +30,7 @@ public class Hallaeribut : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Hallaeribut>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true)
+        Gun gun = Lazy.SetupGun<Hallaeribut>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.2f, ammo: 800, shootFps: 24, reloadFps: 16,
             loopReloadAt: 0, muzzleVFX: "muzzle_hallaeribut", muzzleFps: 30, muzzleScale: 0.5f, fireAudio: "chomp_small_sound",
             reloadAudio: "chomp_small_sound", modulesAreTiers: true)
