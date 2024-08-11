@@ -1,42 +1,48 @@
 # Changelog
 
-## TBD:
+## 1.17.1 (2024-08-11):
 
-- Made Iron Maid projectiles launch speed scale with projectile speed stat
-- Made Ki Blast projectiles launch speed scale with projectile speed stat
-- Made B.B. Gun projectiles account for damage and knockback stats
-- Made King's Law projectiles account for projectile speed stat
-- Made Wavefront projectiles account for projectile speed stat
-- Made Grandmaster projectiles' pause time between moves scale inversely with projectile speed stat
-- Made Starmageddon projectiles' impact deviation scale inversely with accuracy stat
-- Made Gunbrella projectiles' impact deviation scale inversely with accuracy stat
-- Made Gunbrella projectiles' fall speed scale with projectile speed stat
-- Made Gunbrella projectiles' launch time and hang time scale inversely with projectile speed stat
-- Made Starmageddon projectiles' hang time scale inversely with projectile speed stat
-- Made Hand Cannon projectiles account for knockback stat
-- Made Lightwing projectiles' launch speed and turn speed scale with projectile speed stat
-- Made Scotsman projectile explosions deal damage that scales with damage stat
-- Made Selter Pelter projectiles' soda streams account for projectile damage, speed, range, and knockback stats
-- Made Widowmaker's spider turret projectile account for projectile damage, speed, range, and knockback stats
-- Made projectiles reflected by Maestro account for projectile damage, speed, range, and knockback stats
-- Made Outbreak's infection projectiles fired from enemies account for projectile damage, speed, range, and knockback stats
-- Made Pistol Whip's melee hit and projectile account for projectile damage, speed, range, and knockback stats
-- Made Magunet's debris launching account for accuracy stat
-- Made Magunet's debris projectiles account for projectile damage, speed, range, and knockback stats
-- Made English's charge rate account for gun charge multiplier stat
-- Made English's rack projectiles account for projectile damage, speed, range, and knockback stats
+#### Balance Changes and Polish:
+
+- Made several guns with special firing mechanics interact with player bullet stat upgrades:
+	- Made B.B. Gun projectiles account for damage and knockback stats
+	- Made English's charge rate account for gun charge multiplier stat
+	- Made English's rack projectiles account for projectile damage, speed, range, and knockback stats
+	- Made Grandmaster projectiles' pause time between moves scale inversely with projectile speed stat
+	- Made Gunbrella projectiles' fall speed scale with projectile speed stat
+	- Made Gunbrella projectiles' impact deviation account for accuracy stat
+	- Made Gunbrella projectiles' launch time and hang time scale inversely with projectile speed stat
+	- Made Hand Cannon projectiles account for knockback stat
+	- Made Iron Maid projectiles' launch speed scale with projectile speed stat
+	- Made Ki Blast projectiles' launch speed scale with projectile speed stat
+	- Made King's Law projectiles account for projectile speed stat
+	- Made Lightwing projectiles' launch speed and turn speed scale with projectile speed stat
+	- Made Maestro's reflected projectiles account for projectile damage, speed, range, and knockback stats
+	- Made Magunet's debris launching account for accuracy stat
+	- Made Magunet's debris projectiles account for projectile damage, speed, range, and knockback stats
+	- Made Outbreak's infection projectiles fired from enemies account for projectile damage, speed, range, and knockback stats
+	- Made Pistol Whip's melee hit and projectile account for projectile damage, speed, range, and knockback stats
+	- Made Scotsman projectile explosions deal damage that scales with damage stat
+	- Made Selter Pelter projectiles' soda streams account for projectile damage, speed, range, and knockback stats
+	- Made Starmageddon projectiles' hang time scale inversely with projectile speed stat
+	- Made Starmageddon projectiles' impact deviation account for accuracy stat
+	- Made Wavefront projectiles account for projectile speed stat
+	- Made Widowmaker's projectiles account for projectile damage, speed, range, and knockback stats
 - Reduced Omnidirectional Laser's spread to 0 so all shots now fire precisely at the reticle
-- Clarified in B.B. Gun's description that projectile damage and knockback scale with projectile speed (this was always true, but never mentioned)
-- Clarified in Pincushion's description that projectiles deal fixed damage (this was always true, but never mentioned)
+
+#### Bugfixes and Misc:
+
 - Fixed null deref in Magunet caused by messing up some code in Magunet fix from 1.15.0
-- Fixed other player being able to move during [REDACTED]'s effect in co-op mode
-- Made [REDACTED] clear enemy projectiles when used to prevent visual oddities
 - Fixed English projectiles not spawned by English rapidly changing colors
 - Fixed Femtobyte prjoectiles not spawned by Femtobyte missing shaders and visual effects
-- Blacklisted Widowmaker projectiles from being affected by Orbital Bullets (projectiles should just die if they can't deploy)
-- Blacklisted Zag projectiles from being affected by Orbital Bullets (never despawn due to movement)
-- Blacklisted Hallaeribut projectiles from being affected by Helix Bullets (they don't play nicely with frequent speed changes)
 - Fixed Zag's projectile trails having extremely buggy visual offsets when navigating around walls
+- Fixed other player being able to move during [REDACTED]'s effect in co-op mode
+- Made [REDACTED] clear enemy projectiles when used to prevent visual oddities
+- Blacklisted Widowmaker projectiles from being affected by Orbital Bullets (projectiles should just die if they can't deploy)
+- Blacklisted Zag projectiles from being affected by Orbital Bullets (they never despawn properly due to their movement)
+- Blacklisted Hallaeribut projectiles from being affected by Helix Bullets (which don't play nicely with frequent speed changes)
+- Clarified in B.B. Gun's description that projectile damage and knockback scale with projectile speed (this was always true, but never mentioned)
+- Clarified in Pincushion's description that projectiles deal fixed damage (this was always true, but never mentioned)
 
 ## 1.17.0 (2024-08-10)
 
