@@ -311,6 +311,17 @@ public class Jugglernaut : CwaffGun
         Lazy.PlaySoundUntilDeathOrTimeout("circus_music", pc.gameObject, 0.1f);
         UpdateIdleAnimation(); // fixes idle animation not playing when picked up, not sure why this is necessary
     }
+
+    private void LateUpdate()
+    {
+        if (this.PlayerOwner is not PlayerController pc)
+            return;
+        if (pc.m_currentGunAngle > 25f && pc.m_currentGunAngle < 155f)
+            this.gun.sprite.HeightOffGround = -0.075f; // vanilla back-facing depth when preventRotation is false
+        else
+            this.gun.sprite.HeightOffGround = 0.4f; // vanilla depth when preventRotation is true
+        this.gun.sprite.UpdateZDepth();
+    }
 }
 
 public class JugglernautProjectile : MonoBehaviour
