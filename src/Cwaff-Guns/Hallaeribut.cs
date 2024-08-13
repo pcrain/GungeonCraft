@@ -37,7 +37,8 @@ public class Hallaeribut : CwaffGun
           .Attach<HallaeributAmmoDisplay>();
 
         Projectile proj = gun.InitProjectile(GunData.New(sprite: "hallaeribut_projectile", fps: 24, scale: 0.75f, clipSize: 32, cooldown: 0.33f,
-            shootStyle: ShootStyle.Burst, angleVariance: 20f, damage: 9.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f))
+            shootStyle: ShootStyle.Burst, angleVariance: 20f, damage: 9.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f,
+            customClip: true))
           .AudioEvent("snap_sound") // play every time animation returns to frame 0, not just on projectile creation
           .Attach<HallaeributProjectile>();
 

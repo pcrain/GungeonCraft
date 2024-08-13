@@ -14,7 +14,7 @@ public class BlasTechF4 : CwaffGun
             muzzleVFX: "muzzle_blastech", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft, banFromBlessedRuns: true,
             dynamicBarrelOffsets: true)
           .SetReloadAudio("blastech_jam_sound", 0, 2, 4, 5, 6)
-          .InitProjectile(GunData.New(sprite: "blastech_projectile", clipSize: 20, cooldown: 0.11f, shootStyle: ShootStyle.Automatic,
+          .InitProjectile(GunData.New(sprite: "blastech_projectile", clipSize: 20, cooldown: 0.11f, shootStyle: ShootStyle.Automatic, customClip: true,
             damage: 20.0f, speed: 100f, range: 9999f, force: 12f, ignoreDamageCaps: true, scale: 0.5f, hitSound: "generic_bullet_impact"))
           .Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;

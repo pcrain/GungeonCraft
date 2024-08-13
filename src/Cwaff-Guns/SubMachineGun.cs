@@ -16,7 +16,7 @@ public class SubMachineGun : CwaffGun
             muzzleVFX: "muzzle_sub_machine_gun", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
             fireAudio: "sub_machine_gun_fire_sound", reloadAudio: "sub_machine_gun_reload_sound", banFromBlessedRuns: true)
           .InitProjectile(GunData.New(sprite: "sandwich_projectile", clipSize: 5, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 0.0f, shouldRotate: false))
+            damage: 0.0f, shouldRotate: false, customClip: true))
           .Attach<NourishingProjectile>();
 
         _NourishVFX = VFX.Create("nourish_vfx", fps: 18, emissivePower: 1, emissiveColour: Color.Lerp(Color.green, Color.white, 0.5f));

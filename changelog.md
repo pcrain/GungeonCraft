@@ -1,5 +1,9 @@
 # Changelog
 
+## TBD
+
+- Added custom clip sprites for Scotsman, Chekhov's Gun, K.A.L.I., R.C. Launcher, Breegull, Sub Machine Gun, Nycterian, Starmageddon, Widowmaker, Zag, BlasTech F-4, English, Hallaeribut
+
 ## 1.17.1 (2024-08-11):
 
 #### Balance Changes and Polish:
@@ -34,7 +38,7 @@
 
 - Fixed null deref in Magunet caused by messing up some code in Magunet fix from 1.15.0
 - Fixed English projectiles not spawned by English rapidly changing colors
-- Fixed Femtobyte prjoectiles not spawned by Femtobyte missing shaders and visual effects
+- Fixed Femtobyte projectiles not spawned by Femtobyte missing shaders and visual effects
 - Fixed Zag's projectile trails having extremely buggy visual offsets when navigating around walls
 - Fixed other player being able to move during [REDACTED]'s effect in co-op mode
 - Made [REDACTED] clear enemy projectiles when used to prevent visual oddities

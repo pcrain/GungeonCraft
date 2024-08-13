@@ -27,7 +27,7 @@ public class Scotsman : CwaffGun
           .AddReticle<CwaffReticle>(reticleVFX : VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter),
             controllerScale : _MAX_RETICLE_RANGE, visibility : CwaffReticle.Visibility.CONTROLLER)
           .AddToShop(ItemBuilder.ShopType.Trorc)
-          .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic,
+          .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
             damage: _BASE_EXPLOSION_DAMAGE, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter))
           .Attach<Stickybomb>();
 

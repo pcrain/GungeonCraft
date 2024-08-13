@@ -39,7 +39,7 @@ public class Breegull : CwaffGun
           .Attach<BreegullAmmoDisplay>();
 
         _EggNormal = gun.InitProjectile(GunData.New(sprite: "breegull_projectile_normal", clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 5.0f,
-            shrapnelVFX: VFX.Create("breegull_impact_normal"), shrapnelCount: 10, destroySound: "egg_hit_enemy_sound"));
+            shrapnelVFX: VFX.Create("breegull_impact_normal"), shrapnelCount: 10, destroySound: "egg_hit_enemy_sound", customClip: true));
 
         //WARNING: CloneProjectile from anything other than a vanilla gun causes weird issues on MacOS and Linux???
         //         Can maybe be circumvented by setting up each sprite individually? (actually just has to do with missing DLL / patch for generic Instantiate())

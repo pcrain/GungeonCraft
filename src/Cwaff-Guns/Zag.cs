@@ -16,7 +16,7 @@ public class Zag : CwaffGun
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 600, shootFps: 30, reloadFps: 40,
             fireAudio: "zag_zig_sound", reloadAudio: "zag_zig_sound", muzzleFrom: Items.Heroine, loopReloadAt: 0)
           .InitProjectile(GunData.New(clipSize: 9, cooldown: 0.125f, shootStyle: ShootStyle.SemiAutomatic, electric: true, preventOrbiting: true,
-            damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter, hitEnemySound: "zag_hit_enemy_sound"))
+            damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter, hitEnemySound: "zag_hit_enemy_sound", customClip: true))
           .Attach<ZagProjectile>()
           .CopyAllImpactVFX(Items.ShockRifle);
 
