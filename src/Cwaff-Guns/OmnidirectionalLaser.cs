@@ -157,6 +157,7 @@ public class OmnidirectionalLaser : CwaffGun
             this._backside.transform.parent = this.gun.transform;
             this._backside.transform.position = this.gun.transform.position;
         }
+        this._backside.transform.rotation = Quaternion.identity;
         this._backside.HeightOffGround = -0.5f;
         this._backside.UpdateZDepth();
         int frame = this.gun.spriteAnimator.CurrentFrame;

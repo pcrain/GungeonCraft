@@ -101,6 +101,7 @@ public sealed class GunData
   public BasicBeamController.BeamEndType? beamEndType;
   public bool? beamSeparation;
   public bool beamStartIsMuzzle;
+  public bool hideAmmo;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -190,6 +191,7 @@ public sealed class GunData
   /// <param name="beamEndType">Determines how the end of the beam dissipates.</param>
   /// <param name="beamSeparation">If true, the beam can separate from its linked nodes upon collision.</param>
   /// <param name="beamStartIsMuzzle">If true, uses the beam's start animation as a muzzle animation instead (fixes some graphical glitches).</param>
+  /// <param name="hideAmmo">If true, no ammo is displayed for the module (uses Blasphemy's ammo).</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -205,7 +207,8 @@ public sealed class GunData
     string beamSprite = null, int beamFps = -1, int beamStartFps = -1, int beamEndFps = -1, int beamChargeFps = -1, int beamImpactFps = -1, bool beamLoopCharge = true,
     float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f, GoopDefinition beamGoop = null, bool? beamInterpolate = null,
     int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null, float beamKnockback = -1f,
-    BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false)
+    BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
+    bool hideAmmo = false)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -294,6 +297,7 @@ public sealed class GunData
       _Instance.beamEndType                       = beamEndType;
       _Instance.beamSeparation                    = beamSeparation;
       _Instance.beamStartIsMuzzle                 = beamStartIsMuzzle;
+      _Instance.hideAmmo                          = hideAmmo;
       return _Instance;
   }
 }
@@ -662,7 +666,9 @@ public static class GunBuilder
     mod.mirror                   = b.mirror;
     if (b.angleVariance.HasValue)
       mod.angleVariance = b.angleVariance.Value;
-    if (b.customClip)
+    if (b.hideAmmo)
+      b.gun.gameObject.GetComponent<CwaffGun>().hideAmmo = true;
+    else if (b.customClip)
       mod.SetupCustomAmmoClip(b);
     else if (b.ammoType.HasValue)
       mod.ammoType = b.ammoType.Value;

@@ -33,7 +33,7 @@ public class Magunet : CwaffGun
             chargeFps: 16, curse: 1f, banFromBlessedRuns: true)
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, //TODO: can possibly use dummy charge module here
-            ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
+            hideAmmo: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
         _MagunetBeamVFX = VFX.Create("magbeam_alt", fps: 30, scale: 0.65f, emissivePower: 1f);
         _MagunetChargeVFX = VFX.Create("magunet_charge_vfx", fps: 30);

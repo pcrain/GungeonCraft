@@ -23,7 +23,7 @@ public class Exceptional : CwaffGun
             muzzleFrom: Items.Mailbox, fireAudio: "corruption_sound", banFromBlessedRuns: true, infiniteAmmo: true, modulesAreTiers: true);
 
         Projectile proj = gun.InitProjectile(GunData.New(sprite: "exceptional_projectile", clipSize: 32, cooldown: 0.33f, shootStyle: ShootStyle.Burst,
-            angleVariance: 10f, damage: 4.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f)).Attach<ExceptionalProjectile>();
+            angleVariance: 10f, damage: 4.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f, hideAmmo: true)).Attach<ExceptionalProjectile>();
 
         //WARN: vanilla modulesAreTiers does NOT play nicely with burst weapons and continues firing sometimes long after you release the fire button.
         //      i think this has to do with the flag3 variable in HandleInitialGunShoot(), but i have no desire to muck with it

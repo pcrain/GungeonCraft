@@ -152,7 +152,7 @@ public class Femtobyte : CwaffGun
           .SetAttributes(quality: ItemQuality.C, gunClass: CwaffGunClass.UTILITY, reloadTime: 0.0f, ammo: 9999, canGainAmmo: false,
             infiniteAmmo: true, shootFps: 24, reloadFps: 16, modulesAreTiers: true, fireAudio: "femtobyte_shoot_sound", banFromBlessedRuns: true)
           .Attach<FemtobyteAmmoDisplay>()
-          .InitProjectile(GunData.New(clipSize: -1, angleVariance: 2.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f, speed: 90.0f,
+          .InitProjectile(GunData.New(clipSize: -1, angleVariance: 2.0f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f, speed: 90.0f, hideAmmo: true,
             cooldown: 0.4f, sprite: "femtobyte_projectile", fps: 2, anchor: Anchor.MiddleCenter, hitEnemySound: "femtobyte_hit_enemy_sound"))
           .Attach<FemtobyteProjectile>()
           .AddTrailToProjectilePrefab("femtobyte_beam", fps: 10, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false);

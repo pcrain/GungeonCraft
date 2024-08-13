@@ -35,7 +35,7 @@ public class VacuumCleaner : CwaffGun
           .Attach<VacuumAmmoDisplay>()
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .AddToShop(ModdedShopType.Rusty)
-          .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
+          .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, hideAmmo: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
         _VacuumVFX = VFX.Create("vacuum_wind_sprite_a", fps: 30, loopStart: 6, scale: 0.5f);
     }

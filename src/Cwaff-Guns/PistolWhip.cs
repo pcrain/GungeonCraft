@@ -25,7 +25,7 @@ public class PistolWhip : CwaffGun
           .Attach<PistolWhipAmmoDisplay>()
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: WhipChainStart.TOTAL_TIME + C.FRAME, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 0.0f, speed: 0.01f, range: 999.0f))
+            damage: 0.0f, speed: 0.01f, range: 999.0f, hideAmmo: true))
           .Attach<WhipChainStartProjectile>();
 
         _PistolWhipProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f))

@@ -45,6 +45,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   private Dictionary<string, List<Vector3>> _barrelOffsets             = null;  // list of dynamic barrel offsets for each of a gun's animations
   private Vector3                           _defaultBarrelOffset       = Vector3.zero; // the default barrel offset for guns with dynamic offsets
 
+  public  bool                              hideAmmo                   = false;  // whether our ammo display is visible
+
   public static void SetUpDynamicBarrelOffsets(Gun gun)
   {
     var d = _BarrelOffsetCache[gun.GetUnmodifiedDisplayName()] = new();
@@ -175,6 +177,34 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   // public void BraveOnLevelWasLoaded()
   // {
   // }
+
+  /// <summary>Completely hides a gun's ammo like blasphemy</summary>
+  [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateUIGun))]
+  private class GameUIAmmoControllerUpdateUIGunPatch
+  {
+      [HarmonyILManipulator]
+      private static void GameUIAmmoControllerUpdateUIGunIL(ILContext il)
+      {
+          ILCursor cursor = new ILCursor(il);
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Gun>("IsHeroSword")))
+              return;
+
+          cursor.Emit(OpCodes.Ldloc_0);
+          cursor.Emit(OpCodes.Call, typeof(GameUIAmmoControllerUpdateUIGunPatch).GetMethod(
+            nameof(GameUIAmmoControllerUpdateUIGunPatch.CheckHideAmmo), BindingFlags.Static | BindingFlags.NonPublic));
+
+          return;
+      }
+
+      private static bool CheckHideAmmo(bool oldValue, Gun gun)
+      {
+        if (oldValue)
+          return true;
+        if (gun.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg)
+          return false;
+        return cg.hideAmmo;
+      }
+  }
 
   /// <summary>Thrown guns don't count as dropped or destroyed, leading to bugs with certain guns that handle cleanup when dropped, so handle it manually</summary>
   [HarmonyPatch(typeof(Gun), nameof(Gun.ThrowGun))]
