@@ -22,7 +22,7 @@ public class Pincushion : CwaffGun
           .SetReloadAudio("pincushion_reload_sound", 8, 13, 18, 23, 28, 35)
           .InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
             damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, spawnSound: "pincushion_fire",
-            anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS))
+            anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS, customClip: true))
           .SetAllImpactVFX(VFX.CreatePool("microdust", fps: 30, loops: false))
           .Attach<VeryFragileProjectile>()
           .Attach<EasyTrailBullet>(trail => {

@@ -13,7 +13,7 @@ public class SoulKaliber : CwaffGun
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 250, shootFps: 24, reloadFps: 12,
             muzzleFrom: Items.BundleOfWands, fireAudio: "soul_kaliber_fire", reloadAudio: "soul_kaliber_reload")
           .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, damage: 1.0f, speed: 30.0f,
-            sprite: "soul_kaliber_projectile", fps: 2, scale: 0.33f, anchor: Anchor.MiddleCenter))
+            sprite: "soul_kaliber_projectile", fps: 2, scale: 0.33f, anchor: Anchor.MiddleCenter, customClip: true))
           .Attach<SoulLinkProjectile>();
     }
 }

@@ -2,7 +2,7 @@
 
 ## TBD
 
-- Added custom clip sprites for Scotsman, Chekhov's Gun, K.A.L.I., R.C. Launcher, Breegull, Sub Machine Gun, Nycterian, Starmageddon, Widowmaker, Zag, BlasTech F-4, English, Hallaeribut
+- Added custom clip sprites for Scotsman, Chekhov's Gun, K.A.L.I., R.C. Launcher, Breegull, Sub Machine Gun, Nycterian, Starmageddon, Widowmaker, Zag, BlasTech F-4, English, Hallaeribut, Paintball Cannon, Soul Kaliber, Jugglernaut, Pincushion, Bouncer, Deadline, Natascha, Ki Blast
 
 ## 1.17.1 (2024-08-11):
 

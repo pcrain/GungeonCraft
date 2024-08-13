@@ -27,7 +27,7 @@ public class Natascha : CwaffGun
           .AddToShop(ModdedShopType.Rusty)
           .InitProjectile(GunData.New(clipSize: -1, cooldown: _BASE_COOLDOWN, angleVariance: 15.0f,
             shootStyle: ShootStyle.Automatic, damage: 3.0f, speed: 20.0f, slow: 1.0f, spawnSound: "tomislav_shoot",
-            sprite: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
+            sprite: "natascha_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, customClip: true));
     }
 
     public override void Update()

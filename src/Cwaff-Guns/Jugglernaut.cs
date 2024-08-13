@@ -95,7 +95,7 @@ public class Jugglernaut : CwaffGun
         gun.reloadAnimation         = null; // animation shouldn't change when reloading
         gun.shootAnimation          = null; // animation shouldn't change when firing
 
-        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
+        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f, customClip: true,
           sprite: "jugglernaut_projectile", fps: 2,  anchor: Anchor.MiddleCenter, shouldRotate: false, spawnSound: "jugglernaut_throw_sound", destroySound: "wall_thunk"));
     }
 
