@@ -179,7 +179,7 @@ public class Missiletoe : CwaffGun
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
-        if (manualReload && gun.DefaultModule.numberOfShotsInClip == gun.ClipShotsRemaining)
+        if (manualReload && gun.DefaultModule.numberOfShotsInClip == Mathf.Min(gun.ClipShotsRemaining, gun.AdjustedMaxAmmo))
             WrapPresent();
         else
             RecalculateClip();
