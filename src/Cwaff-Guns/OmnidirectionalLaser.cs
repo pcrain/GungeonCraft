@@ -62,7 +62,7 @@ public class OmnidirectionalLaser : CwaffGun
         }
 
         gun.InitProjectile(GunData.New(sprite: "omnilaser_projectile", clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-            angleVariance: 0.0f, speed: 200f, damage: 16f, spawnSound: "omnilaser_shoot_sound", uniqueSounds: true));
+            angleVariance: 0.0f, speed: 200f, damage: 16f, spawnSound: "omnilaser_shoot_sound", uniqueSounds: true, customClip: true));
 
         _OmniTrailPrefab = VFX.CreateSpriteTrailObject("omnilaser_projectile_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
 

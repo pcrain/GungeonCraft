@@ -29,7 +29,7 @@ public class Telefragger : CwaffGun
             reloadFps: 4, handedness: GunHandedness.HiddenOneHanded, loopFireAt: 12)
           .SetFireAudio("telefragger_amp_up_sound", 0, 3, 6, 9)
           .InitProjectile(GunData.New(baseProjectile: Items.DemonHead.Projectile(), clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.Beam,
-            ammoType: GameUIAmmoType.AmmoType.BEAM, ammoCost: 5, angleVariance: 0f, beamSprite: "telefragger_beam", beamFps: 17,
+            customClip: true, ammoCost: 5, angleVariance: 0f, beamSprite: "telefragger_beam", beamFps: 17,
             beamImpactFps: 14, beamLoopCharge: false, beamChargeDelay: 0.4f, beamEmission: 2f))
           .Attach<TelefragJuice>();
 

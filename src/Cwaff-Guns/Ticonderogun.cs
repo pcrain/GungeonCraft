@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 
 /* TODO:
-    - refactor player variable to use builtin variable
+     - refactor player variable to use builtin variable
 */
 
 public class Ticonderogun : CwaffGun
@@ -48,7 +48,7 @@ public class Ticonderogun : CwaffGun
         Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24, curse: 2f)
           .AddToShop(ItemBuilder.ShopType.Cursula)
-          .SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, ammoType: GameUIAmmoType.AmmoType.BEAM));
+          .SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, customClip: true));
 
         _SparklePrefab = VFX.Create("pencil_sparkles", fps: 12, loops: false);
         _RunePrefab = VFX.Create("pencil_runes", loops: false); // FPS must be nonzero or sprites don't update properly

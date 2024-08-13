@@ -30,7 +30,7 @@ public class Maestro : CwaffGun
           .AddReticle<CwaffProjectileReticle>(reticleVFX : VFX.Create("maestro_target_projectile_vfx", fps: 2), aimFromPlayerCenter: true,
             reticleAlpha : 0.75f, smoothLerp : true, rotateSpeed : 270f, visibility : CwaffReticle.Visibility.WITHTARGET)
           .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.2f, angleVariance: 15.0f,
-            shootStyle: ShootStyle.Automatic, damage: 9f, speed: 60.0f, ammoType: GameUIAmmoType.AmmoType.BEAM,
+            shootStyle: ShootStyle.Automatic, damage: 9f, speed: 60.0f, customClip: true,
             sprite: "maestro_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter));
 
         _LaunchVFX = VFX.Create("maestro_launch_vfx", fps: 60, loops: false);
