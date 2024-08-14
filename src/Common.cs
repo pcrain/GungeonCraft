@@ -2,11 +2,11 @@ namespace CwaffingTheGungy;
 
 public class C // constants and common variables
 {
-    public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+    public static readonly bool DEBUG_BUILD = false; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
     public const string MOD_NAME     = "GungeonCraft";
     public const string MOD_INT_NAME = "CwaffingTheGungy";
-    public const string MOD_VERSION  = "1.17.1";
+    public const string MOD_VERSION  = "1.17.2";
     public const string MOD_GUID     = "pretzel.etg.cwaff";
     public const string MOD_PREFIX   = "cg";
 

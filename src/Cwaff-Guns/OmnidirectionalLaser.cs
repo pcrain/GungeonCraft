@@ -87,7 +87,6 @@ public class OmnidirectionalLaser : CwaffGun
 
         if (!this._backside)
         {
-            ETGModConsole.Log($"new backside");
             this._backside = Lazy.SpriteObject(
                 spriteColl: this.gun.sprite.Collection,
                 spriteId: this.gun.sprite.Collection.GetSpriteIdByName($"{this.gun.InternalSpriteName()}_idle_back_001"));

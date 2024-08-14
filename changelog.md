@@ -1,11 +1,12 @@
 # Changelog
 
-## TBD
+## 1.17.2 (2024-08-13)
 
-- Added custom clip sprites for Scotsman, Chekhov's Gun, K.A.L.I., R.C. Launcher, Breegull, Sub Machine Gun, Nycterian, Starmageddon, Widowmaker, Zag, BlasTech F-4, English, Hallaeribut, Paintball Cannon, Soul Kaliber, Jugglernaut, Pincushion, Bouncer, Deadline, Natascha, Ki Blast, Macchi Auto, Maestro, Gunflower, Telefragger, Omnidirectional Laser, Holy Water Gun, Ticonderogun
-- Hid ammo for Vacuum Cleaner, Pistol Whip, Femtobyte, Vladimir, and Magunet
-- Fixed issue with back half of Omnidirectional Laser sometimes appearing at strange offsets when switching from another gun
+- Hid ammo display for Vacuum Cleaner, Pistol Whip, Femtobyte, Vladimir, and Magunet
+- Added custom ammo clip sprites for all remaining guns that didn't have them (Scotsman, Chekhov's Gun, K.A.L.I., R.C. Launcher, Breegull, Sub Machine Gun, Nycterian, Starmageddon, Widowmaker, Zag, BlasTech F-4, English, Hallaeribut, Paintball Cannon, Soul Kaliber, Jugglernaut, Pincushion, Bouncer, Deadline, Natascha, Ki Blast, Macchi Auto, Maestro, Gunflower, Telefragger, Omnidirectional Laser, Holy Water Gun, and Ticonderogun)
 - Fixed Missiletoe not being able to wrap / unwrap presents if clip size is greater than current ammo
+- Fixed issue with back half of Omnidirectional Laser sometimes appearing at strange offsets when switching from another gun
+- Removed debug message printed to console log by Omnidirectional Laser
 
 ## 1.17.1 (2024-08-11):
 
