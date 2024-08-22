@@ -194,6 +194,7 @@
     <Compile Include="src\Cwaff-Guns\Scotsman.cs"/>
     <Compile Include="src\Cwaff-Guns\Hallaeribut.cs"/>
     <Compile Include="src\Cwaff-Guns\Natascha.cs"/>
+    <Compile Include="src\Cwaff-Guns\Bubblebeam.cs"/>
     <Compile Include="src\Cwaff-Guns\Wavefront.cs"/>
     <Compile Include="src\Cwaff-Guns\Pincushion.cs"/>
     <Compile Include="src\Cwaff-Guns\Suncaster.cs"/>

@@ -8,7 +8,7 @@ public class CwaffDungeonFlow {
     {
         static bool Prefix(string name, ref DungeonFlow __result)
         {
-            ETGModConsole.Log($"loading a custom flow");
+            // ETGModConsole.Log($"loading a custom flow");
             string flowName = name;
             if (flowName.Contains("/"))
                 flowName = flowName.Substring(flowName.LastIndexOf("/") + 1);
