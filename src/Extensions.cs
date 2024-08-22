@@ -2571,4 +2571,22 @@ public static class Extensions
     p.baseData.force *= pc.KnockbackMult();
     p.baseData.speed *= pc.ProjSpeedMult();
   }
+
+  /// <summary>Check if a body has a collision layer override</summary>
+  public static bool HasCollisionLayerOverride(this SpeculativeRigidbody body, int mask)
+  {
+    for (int i = 0; i < body.PixelColliders.Count; i++)
+      if ((body.PixelColliders[i].CollisionLayerCollidableOverride & mask) == mask)
+        return true;
+    return false;
+  }
+
+  /// <summary>Check if a body has a collision layer ignore override</summary>
+  public static bool HasCollisionLayerIgnoreOverride(this SpeculativeRigidbody body, int mask)
+  {
+    for (int i = 0; i < body.PixelColliders.Count; i++)
+      if ((body.PixelColliders[i].CollisionLayerIgnoreOverride & mask) == mask)
+        return true;
+    return false;
+  }
 }

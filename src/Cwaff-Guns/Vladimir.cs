@@ -61,7 +61,7 @@ public class Vladimir : CwaffGun
             PixelCollider collider = enemy.specRigidbody.PrimaryPixelCollider;
             IntVector2 epos = enemy.sprite.WorldBottomLeft.ToIntVector2();
             IntVector2 edim = (enemy.sprite.WorldTopRight - enemy.sprite.WorldBottomLeft).ToIntVector2();
-            for (int j = StaticReferenceManager.AllProjectiles.Count - 1; j >= 0; --j)
+            for (int j = StaticReferenceManager.AllProjectiles.Count - 1; j >= 0; --j) //REFACTOR: make enemies collide with projectiles properly
             {
                 Projectile proj = StaticReferenceManager.AllProjectiles[j];
                 if (!proj | !proj.isActiveAndEnabled)

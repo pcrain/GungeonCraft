@@ -1060,4 +1060,18 @@ public static class Lazy
         _RandomStrings.Add(s);
         return s;
     }
+
+    /// <summary>Do an elastic collision between two speculative rigid bodies</summary>
+    public static void DoElasticBounce(CollisionData collision)
+    {
+        Vector2 posDiff = collision.MyRigidbody.UnitCenter - collision.OtherRigidbody.UnitCenter;
+        Vector2 v1 = collision.MyRigidbody.Velocity;
+        Vector2 v2 = collision.OtherRigidbody.Velocity;
+        float invDistNorm = 1f / Mathf.Max(0.1f, posDiff.sqrMagnitude);
+        Vector2 newv1 = v1 - (Vector2.Dot(v1 - v2, posDiff) * invDistNorm) * posDiff;
+        Vector2 newv2 = v2 - (Vector2.Dot(v2 - v1, -posDiff) * invDistNorm) * (-posDiff);
+
+        float newSpeed = Mathf.Sqrt(Mathf.Max(v1.sqrMagnitude, v2.sqrMagnitude/*, newv1.sqrMagnitude, newv2.sqrMagnitude*/));
+        PhysicsEngine.PostSliceVelocity = newSpeed * newv1.normalized;
+    }
 }

@@ -2,20 +2,29 @@
   "name": null,
   "x": 0,
   "y": 0,
-  "width": 33,
-  "height": 16,
+  "width": 57,
+  "height": 32,
   "flip": 1,
   "attachPoints": [
     {
       ".": "arraytype",
       "name": "array",
-      "size": 2
+      "size": 3
     },
     {
       "name": "PrimaryHand",
       "position": {
-        "x": 0.5,
-        "y": 0.1875,
+        "x": 1.1875,
+        "y": 0.6875,
+        "z": 0.0
+      },
+      "angle": 0.0
+    },
+    {
+      "name": "SecondaryHand",
+      "position": {
+        "x": 1.1875,
+        "y": 0.6875,
         "z": 0.0
       },
       "angle": 0.0
@@ -23,8 +32,8 @@
     {
       "name": "Casing",
       "position": {
-        "x": 2.0,
-        "y": 0.3125,
+        "x": 2.8125,
+        "y": 0.8125,
         "z": 0.0
       },
       "angle": 0.0
