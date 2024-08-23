@@ -46,6 +46,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   private Vector3                           _defaultBarrelOffset       = Vector3.zero; // the default barrel offset for guns with dynamic offsets
 
   public  bool                              hideAmmo                   = false;  // whether our ammo display is visible
+  public  bool                              preventMovingWhenCharging    = false;  // whether holding the gun prevents the player from moving
+  public  bool                              preventRollingWhenCharging   = false;  // whether holding the gun prevents the player from dodge rolling
 
   public static void SetUpDynamicBarrelOffsets(Gun gun)
   {
@@ -237,6 +239,44 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       private static bool CheckSecondaryReload(bool oldValue, PlayerController player)
       {
         return oldValue || player.SecondaryReloadPressed();
+      }
+  }
+
+  /// <summary>Patch to prevent dodge rolls when holding a specific gun</summary>
+  [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandleStartDodgeRoll))]
+  private class PlayerControllerHandleStartDodgeRollPatch
+  {
+      static bool Prefix(PlayerController __instance, Vector2 direction, ref bool __result)
+      {
+          if (__instance.CurrentGun is not Gun gun)
+            return true; // call the original method
+          if (!gun.IsCharging)
+            return true; // call the original method
+          if (gun.GetComponent<CwaffGun>() is not CwaffGun cg)
+            return true; // call the original method
+          if (!cg.preventRollingWhenCharging)
+            return true; // call the original method
+          __result = false; // change the original result
+          return false;    // skip the original method
+      }
+  }
+
+  /// <summary>Patch to prevent movement when holding a specific gun</summary>
+  [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.AdjustInputVector))]
+  private class PlayerControllerAdjustInputVectorPatch
+  {
+      static bool Prefix(PlayerController __instance, Vector2 rawInput, float cardinalMagnetAngle, float ordinalMagnetAngle, ref Vector2 __result)
+      {
+          if (__instance.CurrentGun is not Gun gun)
+            return true; // call the original method
+          if (!gun.IsCharging)
+            return true; // call the original method
+          if (gun.GetComponent<CwaffGun>() is not CwaffGun cg)
+            return true; // call the original method
+          if (!cg.preventMovingWhenCharging)
+            return true; // call the original method
+          __result = Vector2.zero; // change the original result
+          return false;    // skip the original method
       }
   }
 }

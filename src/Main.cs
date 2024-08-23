@@ -257,6 +257,7 @@ public class Initialisation : BaseUnityPlugin
                 Gunflower.Init();
                 Hallaeribut.Init();
                 Bubblebeam.Init();
+                Groundhog.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

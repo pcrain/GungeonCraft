@@ -214,6 +214,7 @@
     <Compile Include="src\Cwaff-Guns\SubMachineGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Grandmaster.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>
+    <Compile Include="src\Cwaff-Guns\Groundhog.cs"/>
     <Compile Include="src\Cwaff-Guns\PaintballCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\Widowmaker.cs"/>
     <Compile Include="src\Cwaff-Guns\HatchlingGun.cs"/>
