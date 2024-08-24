@@ -156,6 +156,7 @@
     <Compile Include="src\Cwaff-Guns\Unfinished\DeathNote.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\PopcornGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\Taomislav.cs"/>
+    <Compile Include="src\Cwaff-Guns\Unfinished\DerailGunOld.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\Nug.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\LastResort.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\GamblersFallacy.cs"/>
@@ -166,7 +167,6 @@
     <Compile Include="src\Cwaff-Guns\Unfinished\MaestroOld.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\Kinsurrection.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\TimingGun.cs"/>
-    <Compile Include="src\Cwaff-Guns\Unfinished\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Unfinished\SpinCycle.cs"/>
     <Compile Include="src\Cwaff-Guns\PlatinumStar.cs"/>
     <Compile Include="src\Cwaff-Guns\Crapshooter.cs"/>
@@ -211,6 +211,7 @@
     <Compile Include="src\Cwaff-Guns\KALI.cs"/>
     <Compile Include="src\Cwaff-Guns\AlienNailgun.cs"/>
     <Compile Include="src\Cwaff-Guns\English.cs"/>
+    <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\SubMachineGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Grandmaster.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>

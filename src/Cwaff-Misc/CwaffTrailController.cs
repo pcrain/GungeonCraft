@@ -84,6 +84,8 @@ public class CwaffTrailController : BraveBehaviour
 
   public bool destroyOnEmpty = true;
 
+  public bool awaitAllTimers = false; // if true, await for both global and cascade timers
+
   [HideInInspector]
   public bool FlipUvsY;
 
@@ -255,21 +257,24 @@ public class CwaffTrailController : BraveBehaviour
         }
         if (linkedListNode != null && !linkedListNode.Value.IsAnimating)
         {
-          if (usesGlobalTimer && m_globalTimer > globalTimer)
+          bool allReady = usesGlobalTimer || usesCascadeTimer || usesSoftMaxLength;
+          bool anyReady = false;
+          if (usesGlobalTimer)
           {
-            linkedListNode.Value.IsAnimating = true;
-            linkedListNode.Value.AnimationTimer = m_globalTimer - globalTimer;
-            DoDispersalParticles(linkedListNode, num2);
-            m_isDirty = true;
+            allReady &= (m_globalTimer > globalTimer);
+            anyReady |= (m_globalTimer > globalTimer);
           }
-          if (usesCascadeTimer && (linkedListNode == m_bones.First || lastNodeAnimationTimer >= cascadeTimer))
+          if (usesCascadeTimer)
           {
-            linkedListNode.Value.IsAnimating = true;
-            lastNodeAnimationTimer = 0f;
-            DoDispersalParticles(linkedListNode, num2);
-            m_isDirty = true;
+            allReady &= (linkedListNode == m_bones.First || lastNodeAnimationTimer >= cascadeTimer);
+            anyReady |= (linkedListNode == m_bones.First || lastNodeAnimationTimer >= cascadeTimer);
           }
-          if (usesSoftMaxLength && m_maxPosX - linkedListNode.Value.posX > softMaxLength)
+          if (usesSoftMaxLength)
+          {
+            allReady &= (m_maxPosX - linkedListNode.Value.posX > softMaxLength);
+            anyReady |= (m_maxPosX - linkedListNode.Value.posX > softMaxLength);
+          }
+          if (awaitAllTimers ? allReady : anyReady)
           {
             linkedListNode.Value.IsAnimating = true;
             lastNodeAnimationTimer = 0f;

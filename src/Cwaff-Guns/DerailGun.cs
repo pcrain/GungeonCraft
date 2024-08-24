@@ -1,0 +1,57 @@
+namespace CwaffingTheGungy;
+
+public class DerailGun : CwaffGun
+{
+    public static string ItemName         = "Derail Gun";
+    public static string ShortDescription = "TBD";
+    public static string LongDescription  = "TBD";
+    public static string Lore             = "TBD";
+
+    public static void Init()
+    {
+        Lazy.SetupGun<DerailGun>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 2.2f, ammo: 66, idleFps: 11, reloadFps: 11, shootFps: 2,
+            fireAudio: "train_bell_sound", autoPlay: false)
+          .SetIdleAudio("steam_engine_a", 1)
+          .SetIdleAudio("steam_engine_b", 3, 5, 7)
+          .SetReloadAudio("steam_engine_a", 7, 15)
+          .SetReloadAudio("steam_engine_b", 9, 11, 13, 17, 19, 21)
+          .AddToShop(ModdedShopType.Boomhildr)
+          .InitProjectile(GunData.New(sprite: "derail_gun_projectile", clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic,
+            damage: 30.0f, speed: 100f, range: 100f, force: 100f, hitSound: "train_launch_sound"))
+          .Attach<ExplosiveModifier>(e => e.explosionData =
+            Explosions.DefaultLarge.With(damage: 20f, force: 100f, debrisForce: 30f, radius: 3f, preventPlayerForce: false))
+          .Attach<GoopModifier>(g => {
+            g.goopDefinition         = EasyGoopDefinitions.OilDef;
+            g.SpawnGoopOnCollision   = true;
+            g.CollisionSpawnRadius   = 5f;
+            g.SpawnGoopInFlight      = true;
+            g.InFlightSpawnRadius    = 2f;
+            g.InFlightSpawnFrequency = 0.01f;})
+          .AddTrailToProjectilePrefab("derail_gun_beam", fps: 15, cascadeTimer: 2f * C.FRAME, softMaxLength: 1f, destroyOnEmpty: true,
+            boneSpawnOffset: new Vector2(0, -0.375f));
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        gun.SetAnimationFPS(gun.idleAnimation, 11); // don't need to use SetIdleAnimationFPS() outside of Initializer
+        gun.spriteAnimator.Play();
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        base.OnDroppedByPlayer(player);
+        gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
+        gun.spriteAnimator.StopAndResetFrameToDefault();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
+            return;
+        if (!this.gun.IsReloading && this.gun.ClipShotsRemaining < Mathf.Min(this.gun.ClipCapacity, this.gun.CurrentAmmo))
+            this.gun.Reload(); // force reload immediately after firing to prevent single frame of idle animation looking funny
+    }
+}

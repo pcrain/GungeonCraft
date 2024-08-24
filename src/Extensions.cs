@@ -887,7 +887,8 @@ public static class Extensions
 
   /// <summary>Create a prefab trail and add it to a prefab projectile</summary>
   public static CwaffTrailController AddTrailToProjectilePrefab(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
-    float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null)
+    float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null,
+    Vector2? boneSpawnOffset = null)
   {
       CwaffTrailController trail = VFX.CreateSpriteTrailObject(
           spriteName         : spriteName,
@@ -901,6 +902,7 @@ public static class Extensions
           );
       trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
       trail.gameObject.transform.parent = target.transform;
+      trail.boneSpawnOffset = boneSpawnOffset ?? Vector2.zero;
       return trail;
   }
 

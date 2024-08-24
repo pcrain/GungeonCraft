@@ -6,7 +6,7 @@ TODO (hardest to easiest):
     - tweak stats
 */
 
-public class DerailGun : CwaffGun
+public class DerailGunOld : CwaffGun
 {
     public static string ItemName         = "Derail Gun";
     public static string ShortDescription = "I Choo Choose You";
@@ -22,7 +22,7 @@ public class DerailGun : CwaffGun
 
     public static void Add()
     {
-        Gun gun = Lazy.SetupGun<DerailGun>(ItemName, ShortDescription, LongDescription, Lore);
+        Gun gun = Lazy.SetupGun<DerailGunOld>(ItemName, ShortDescription, LongDescription, Lore);
         gun.isAudioLoop                          = true;
         gun.doesScreenShake                      = false;
         gun.DefaultModule.ammoCost               = 1;
@@ -185,7 +185,7 @@ public class ExplodeOnImpact : MonoBehaviour
     private void OnDestruction(Projectile obj)
     {
         Vector2 deathPos = this.m_projectile.SafeCenter;
-        Exploder.Explode(deathPos, DerailGun.bigTrainExplosion, Vector2.zero);
+        Exploder.Explode(deathPos, DerailGunOld.bigTrainExplosion, Vector2.zero);
     }
 }
 
@@ -213,7 +213,7 @@ public class ReplaceBulletWithRail : MonoBehaviour
     private void BeginBeamFire()
     {
         m_beam = BeamAPI.FreeFireBeamFromAnywhere(
-            DerailGun.railBeam, this.m_owner, this.m_projectile.gameObject,
+            DerailGunOld.railBeam, this.m_owner, this.m_projectile.gameObject,
             Vector2.zero, this.m_angle, 5, true, true);
         Invoke("BeginScreenShake", 2f);
     }
@@ -239,12 +239,12 @@ public class ReplaceBulletWithRail : MonoBehaviour
         Vector2 endOfBeam =
             m_beam.GetComponent<BasicBeamController>().GetPointOnBeam(1.0f);
         Vector2 dontImmediatelyCollideWithWallOffset =
-            BraveMathCollege.DegreesToVector(this.return_angle, DerailGun.trainSpriteDiameter/C.PIXELS_PER_TILE);  //16f = tile size
+            BraveMathCollege.DegreesToVector(this.return_angle, DerailGunOld.trainSpriteDiameter/C.PIXELS_PER_TILE);  //16f = tile size
         Vector2 spawnPoint =
             endOfBeam + dontImmediatelyCollideWithWallOffset;
-        Exploder.Explode(spawnPoint, DerailGun.smallTrainExplosion, Vector2.zero);
+        Exploder.Explode(spawnPoint, DerailGunOld.smallTrainExplosion, Vector2.zero);
         SpawnManager.SpawnProjectile(
-            DerailGun.trainProjectile.gameObject,
+            DerailGunOld.trainProjectile.gameObject,
             spawnPoint,
             Quaternion.Euler(0f, 0f, this.return_angle),
             true);
