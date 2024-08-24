@@ -171,6 +171,7 @@ public class CwaffTrailController : BraveBehaviour
     if (base.specRigidbody && base.specRigidbody.projectile && base.specRigidbody.projectile.Owner is PlayerController)
     {
       m_projectileScale = (base.specRigidbody.projectile.Owner as PlayerController).BulletScaleModifier;
+      base.specRigidbody.projectile.OnDestruction += this.OnProjectileDestruction;
     }
     base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("FG_Critical"));
     trail_sprite = GetComponent<tk2dTiledSprite>();
@@ -197,7 +198,12 @@ public class CwaffTrailController : BraveBehaviour
     }
   }
 
-  public void Toggle(bool enable = true)
+  private void OnProjectileDestruction(Projectile obj)
+  {
+      DisconnectFromSpecRigidbody();
+  }
+
+    public void Toggle(bool enable = true)
   {
     this.trailActive = enable;
   }
