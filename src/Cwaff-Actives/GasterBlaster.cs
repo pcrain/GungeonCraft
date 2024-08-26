@@ -22,7 +22,7 @@ public class GasterBlaster : CwaffActive
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
 
         _GasterBlast = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 700.0f, speed: 150.0f, force: 70.0f, range: 200.0f,
-            pierceBreakables: true, pierceInternalWalls: true, forceBeam: true, beamSprite: "gaster_beam", beamFps: 60,
+            pierceBreakables: true, pierceInternalWalls: true, doBeamSetup: true, beamSprite: "gaster_beam", beamFps: 60,
             beamImpactFps: 16, beamIsRigid: false, beamContinueToWall: false, beamPiercing: 1000, beamPiercesCover: true))
           .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; });
 

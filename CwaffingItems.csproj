@@ -149,6 +149,7 @@
     <Compile Include="src\Cwaff-Guns\Lightwing.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\Magunet.cs"/>
+    <Compile Include="src\Cwaff-Guns\Yggdrashell.cs"/>
     <Compile Include="src\Cwaff-Guns\IronMaid.cs"/>
     <Compile Include="src\Cwaff-Guns\BlasTechF4.cs"/>
     <Compile Include="src\Cwaff-Guns\ChekhovsGun.cs"/>
@@ -241,6 +242,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffGenericNPC.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffItems.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffPrerequisite.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffRaidenBeamController.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedShrines.cs"/>
     <Compile Include="src\Cwaff-Misc\CustomDodgeRoll.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>

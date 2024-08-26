@@ -32,6 +32,13 @@ public class DerailGun : CwaffGun
             boneSpawnOffset: new Vector2(0, -0.375f));
     }
 
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        base.OnReloadPressed(player, gun, manualReload);
+        if (manualReload && gun.DefaultModule.numberOfShotsInClip == Mathf.Min(gun.ClipShotsRemaining, gun.AdjustedMaxAmmo))
+            gun.gameObject.PlayUnique("toy_train_whistle_sound");
+    }
+
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);

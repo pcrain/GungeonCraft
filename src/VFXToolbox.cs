@@ -684,6 +684,69 @@ public static class VFX
 
     }
 
+    public static CwaffRaidenBeamController AddRaidenBeamPrefab(this Projectile projectile, string spriteName, int fps = -1)
+    {
+        try
+        {
+            if (projectile.specRigidbody) // modified: not all projectiles (esp. preexisting beams) have a specRigidbody component
+                projectile.specRigidbody.CollideWithOthers = false;
+
+            List<string> spritePaths = ResMap.Get($"{spriteName}_mid");
+            string spritePath = spritePaths[0];
+            tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+            int spriteID = collection.GetSpriteIdByName(spritePath);
+            tk2dTiledSprite tiledSprite = projectile.gameObject.GetOrAddComponent<tk2dTiledSprite>();
+
+            tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
+            tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
+            def.colliderVertices = new Vector3[]{
+                new Vector3(0f, 0.5f * def.untrimmedBoundsDataExtents.y, 0f),
+                def.untrimmedBoundsDataExtents
+            };
+
+            //tiledSprite.anchor = Anchor.MiddleCenter;
+            tk2dSpriteAnimator animator = projectile.gameObject.GetOrAddComponent<tk2dSpriteAnimator>();
+            tk2dSpriteAnimation animation = projectile.gameObject.GetOrAddComponent<tk2dSpriteAnimation>();
+            animation.clips = new tk2dSpriteAnimationClip[0];
+            animator.Library = animation;
+            UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSprite>());
+            projectile.sprite = tiledSprite;
+
+            CwaffRaidenBeamController beamController = projectile.gameObject.GetOrAddComponent<CwaffRaidenBeamController>();
+
+            //---------------- Sets up the animation for the main part of the beam
+            tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "beam_idle", frames = new tk2dSpriteAnimationFrame[0], fps = fps };
+
+            List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+            foreach (string path in spritePaths)
+            {
+                int frameSpriteId = collection.GetSpriteIdByName(path);
+                tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+                frameDef.BetterConstructOffsetsFromAnchor(Anchor.MiddleLeft);
+                frameDef.colliderVertices = def.colliderVertices;
+                frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+            }
+            clip.frames = frames.ToArray();
+            animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+            beamController.beamAnimation = "beam_idle";
+
+            //--------------Sets up the animation for the very start of the beam (muzzle flash)
+            if (ResMap.Get($"{spriteName}_start") is List<string> startPaths)
+                SetupBeamPart(animation, startPaths, "beam_start", fps, null, null, def.colliderVertices, anchorOverride: Anchor.MiddleCenter);
+            else
+                SetupBeamPart(animation, spritePaths, "beam_start", fps, null, null, def.colliderVertices, shouldConstructOffsets: false);
+            beamController.startAnimation = "beam_start";
+
+            return beamController;
+        }
+        catch (Exception e)
+        {
+            ETGModConsole.Log(e.ToString());
+            return null;
+        }
+
+    }
+
     internal static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> paths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, Anchor? anchorOverride = null, bool shouldConstructOffsets = true)
     {
         tk2dSpriteAnimationClip clip = new() { name = animationName, frames = new tk2dSpriteAnimationFrame[paths.Count], fps = fps, wrapMode = wrapMode };

@@ -78,7 +78,7 @@ public sealed class GunData
   public bool? collidesOnlyWithPlayerProjectiles;
   public bool? pierceInternalWalls;
 
-  public bool forceBeam;
+  public bool? doBeamSetup;
   public string beamSprite;
   public int beamFps;
   public int beamStartFps;
@@ -168,7 +168,7 @@ public sealed class GunData
   /// <param name="pierceBreakables">If true, the projectile will pierce minor breakables such as crates, barrels, etc.</param>
   /// <param name="collidesOnlyWithPlayerProjectiles">If true and if collidesWithProjectiles is true, the projectile will only collide with player projectiles.</param>
   /// <param name="pierceInternalWalls">If true, the projectile will pierce internal walls within rooms.</param>
-  /// <param name="forceBeam">If true, marks the projectile as a beam and does additional beam setup even if not part of a ShootStyle.Beam module.</param>
+  /// <param name="doBeamSetup'">If non-null, forcibly enables / disables additional beam setup regardless of whether projectile is part of a ShootStyle.Beam module.</param>
   /// <param name="beamSprite">The base sprite name to use for beam start, end, impact, etc. sprites.</param>
   /// <param name="beamFps">The default framerate for beam sprite animators.</param>
   /// <param name="beamStartFps">The framerate for the beam's start animation.</param>
@@ -203,7 +203,7 @@ public sealed class GunData
     bool? stopSoundOnDeath = null, bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null,
     float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null, string hitSound = null, string hitEnemySound = null, string hitWallSound = null,
     bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false, bool? electric = null, float? burstCooldown = null,
-    bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null, bool forceBeam = false,
+    bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null, bool? doBeamSetup = null,
     string beamSprite = null, int beamFps = -1, int beamStartFps = -1, int beamEndFps = -1, int beamChargeFps = -1, int beamImpactFps = -1, bool beamLoopCharge = true,
     float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f, GoopDefinition beamGoop = null, bool? beamInterpolate = null,
     int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null, float beamKnockback = -1f,
@@ -274,7 +274,7 @@ public sealed class GunData
       _Instance.collidesWithProjectiles           = collidesWithProjectiles;
       _Instance.collidesOnlyWithPlayerProjectiles = collidesOnlyWithPlayerProjectiles;
       _Instance.pierceInternalWalls               = pierceInternalWalls;
-      _Instance.forceBeam                         = forceBeam;
+      _Instance.doBeamSetup                       = doBeamSetup;
       _Instance.beamSprite                        = beamSprite;
       _Instance.beamFps                           = beamFps;
       _Instance.beamStartFps                      = beamStartFps;
@@ -471,7 +471,7 @@ public static class GunBuilder
     if (p.AppliesSpeedModifier)
       p.speedEffect = Items.TripleCrossbow.AsGun().DefaultModule.projectiles[0].speedEffect;
 
-    if (b.shootStyle == ShootStyle.Beam || b.forceBeam)
+    if (b.doBeamSetup ?? (b.shootStyle == ShootStyle.Beam))
       p.InternalSetupBeam(b);
 
     return p;
