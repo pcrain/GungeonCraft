@@ -83,7 +83,7 @@ public class Exceptional : CwaffGun
             return;
         this._cachedPower = _ExceptionalPower;
         int newTier = 0;
-        if (this._cachedPower >= 2)
+        if (this._cachedPower >= 2) //BUG: due to the gun's spawn condition, newTier will only ever be 9
             newTier = Mathf.Min(9, Mathf.FloorToInt(Mathf.Log(this._cachedPower, 2)));
         if (this.gun.CurrentStrengthTier != newTier)
             this.gun.CurrentStrengthTier = newTier; //NOTE: expensive assignment since it recalculates stats, so only set if actually changed
