@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 public class Groundhog : CwaffGun
 {
     public static string ItemName         = "Groundhog";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Deep Impact";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
@@ -25,7 +25,7 @@ public class Groundhog : CwaffGun
             groundhog.preventRollingWhenCharging = true;
             groundhog.preventMovingWhenCharging = true;
 
-        gun.InitProjectile(GunData.New(sprite: null, clipSize: 12, cooldown: 0.75f, shootStyle: ShootStyle.Charged, chargeTime: 2f,
+        gun.InitProjectile(GunData.New(sprite: null, clipSize: 1, cooldown: 0.75f, shootStyle: ShootStyle.Charged, chargeTime: 2f, hideAmmo: true,
             damage: 50.0f, speed: 25f, range: 100f, force: 30f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound"));
 
         _EarthClod = VFX.Create("groundhog_rock_vfx", fps: 1, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f);

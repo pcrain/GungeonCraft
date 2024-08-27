@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 public class Bubblebeam : CwaffGun
 {
     public static string ItemName         = "Bubblebeam";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Next to Godliness";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
@@ -21,7 +21,7 @@ public class Bubblebeam : CwaffGun
             gun.SetReloadAudio("seltzer_shake_sound", 17, 19, 21, 23, 25, 27);
 
         gun.InitProjectile(GunData.New(sprite: "bubblebeam_projectile", fps: 16, clipSize: 100, cooldown: 0.05f, shootStyle: ShootStyle.Automatic,
-            collidesWithProjectiles: true, damage: 0.0f, speed: 35f, range: 18f, force: 10f, scale: 0.5f))
+            collidesWithProjectiles: true, damage: 0.0f, speed: 35f, range: 18f, force: 10f, scale: 0.5f, customClip: true))
           .Attach<BubblebeamProjectile>();
 
         _BubbleVFX = VFX.Create("capture_bubble", fps: 6);

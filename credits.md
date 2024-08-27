@@ -34,7 +34,7 @@ I have no artistic talent beyond making minor sprite and sound edits, so all bas
 ## Special Thanks
 
 - Lynceus, for generously donating time and effort to making a bunch of beautiful custom shopkeeper, clip, and projectile sprites, in addition to helping write some of the shopkeeper dialogue, beta test the mod, find a few bugs, and make the Thunderstore mod icon
-- NeverNamed, for making [Once More Into the Breach](https://enter-the-gungeon.thunderstore.io/package/Nevernamed/Once_More_Into_The_Breach/) and providing a very useful code base to reference as I was learning to mod Enter the Gungeon
+- NeverNamed, for making [Once More Into the Breach](https://enter-the-gungeon.thunderstore.io/package/Nevernamed/Once_More_Into_The_Breach/) and providing a very useful code base to reference as I was learning to mod Enter the Gungeon, as well as providing sprites for a few guns.
 - Dallan, for allowing me use an absurd amount of his wonderful pixel art for most of the mod's hats as well as several guns and items
 - [ApacheThunder](https://enter-the-gungeon.thunderstore.io/package/ApacheThunder/ExpandTheGungeon/), [SpecialAPI](https://enter-the-gungeon.thunderstore.io/package/SpecialAPI/SpecialAPIs_Stuff/), and [Some Bunny](https://enter-the-gungeon.thunderstore.io/package/TeamPlanetside/Planetside_Of_Gunymede_PreRelease/) for answering a lot of questions and troubleshooting a lot of issues related to Gungeon modding and Unity in general
 - Dulsam, June, Lichton, Neighborino, QAday, Skilotar, and the rest of the Mod the Gungeon Discord, for general help, friendly chat, and moral support. You are all beautiful people and I love you all <3 :D

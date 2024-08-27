@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 public class DerailGun : CwaffGun
 {
     public static string ItemName         = "Derail Gun";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Chugga Chugga Pew Pew";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
@@ -18,7 +18,7 @@ public class DerailGun : CwaffGun
           .SetReloadAudio("steam_engine_b", 9, 11, 13, 17, 19, 21)
           .AddToShop(ModdedShopType.Boomhildr)
           .InitProjectile(GunData.New(sprite: "derail_gun_projectile", clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 30.0f, speed: 100f, range: 100f, force: 100f, hitSound: "train_launch_sound"))
+            damage: 30.0f, speed: 100f, range: 100f, force: 100f, hitSound: "train_launch_sound", customClip: true))
           .Attach<ExplosiveModifier>(e => e.explosionData =
             Explosions.DefaultLarge.With(damage: 20f, force: 100f, debrisForce: 30f, radius: 3f, preventPlayerForce: false))
           .Attach<GoopModifier>(g => {
