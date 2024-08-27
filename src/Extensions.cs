@@ -986,7 +986,7 @@ public static class Extensions
   {
       string clipname    = b.gun.EncounterNameOrDisplayName.InternalName();
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
-      mod.customAmmoType = AtlasHelper.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
+      mod.customAmmoType = AtlasHelper.GetOrAddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
   }
 
   /// <summary>Check if a player will die from next hit</summary>

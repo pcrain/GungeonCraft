@@ -11,6 +11,10 @@ public class Commands
             return; // do nothing in non-debug builds
         //
         // Base command for doing whatever I'm testing at the moment
+        ETGModConsole.Commands.AddGroup("hh", delegate (string[] args)
+        {
+            GameManager.Instance.PrimaryPlayer.HealthAndArmorSwapped ^= true;
+        });
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             DebrisObject debris = LootEngine.SpawnItem(

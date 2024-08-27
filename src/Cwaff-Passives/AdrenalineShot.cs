@@ -200,7 +200,7 @@ public class AdrenalineShot : CwaffPassive
         this.Owner.FlatColorOverridden = true;
         this.Owner.baseFlatColorOverride = faded;
         this.Owner.ChangeFlatColorOverride(faded);
-        this.Owner.DoGenericItemActivation(this);
+        this.Owner.DoGenericItemActivation(this.sprite, "minecraft_totem_pop_sound");
 
         this._adrenalineTimer  = this.Owner.HasSynergy(Synergy.ADRENALINE_RUSH) ? _MAX_RUSH_TIME : _MAX_ADRENALINE_TIME;
     }

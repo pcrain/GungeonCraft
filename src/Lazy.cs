@@ -1045,7 +1045,7 @@ public static class Lazy
     /// <summary>Set up custom ammo types from default resource paths and returns it directly</summary>
     public static string SetupCustomAmmoClip(string clipname)
     {
-        return AtlasHelper.AddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
+        return AtlasHelper.GetOrAddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
     }
 
     private const int _RANDOM_STRING_LENGTH = 10;

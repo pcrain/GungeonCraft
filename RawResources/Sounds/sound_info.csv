@@ -223,3 +223,6 @@ chomp_large_sound,0.0,1,sound,1
 kazooi_roll_sound,-2.0,1,sound,1
 bubble_pop_sound,3.0,1,sound,0
 earthquake_sound,5.0,1,sound,0
+yggdrashell_power_up_sound,3.0,1,sound,0
+yggdrashell_protection_ready_sound,5.0,1,sound,0
+yggdrashell_protection_activate_sound,5.0,1,sound,0

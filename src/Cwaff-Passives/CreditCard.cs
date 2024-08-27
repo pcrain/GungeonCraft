@@ -69,7 +69,7 @@ public class CreditCard : CwaffPassive
         data.ModifiedDamage = 0f;
         hh.TriggerInvulnerabilityPeriod();
         Lazy.DoDamagedFlash(hh);
-        player.DoGenericItemActivation(this);
+        player.DoGenericItemActivation(this.sprite, "minecraft_totem_pop_sound");
     }
 
     public override void Update()

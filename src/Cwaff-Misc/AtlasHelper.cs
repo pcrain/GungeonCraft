@@ -277,9 +277,12 @@ public static class AtlasHelper
     return attachPointDict;
   }
 
+  private static readonly HashSet<string> _CreatedAmmoTypes = new();
   /// <summary>Modification of Alexandria method using our own packed textures</summary>
-  public static string AddCustomAmmoType(string name, string ammoTypeSpritePath, string ammoBackgroundSpritePath)
+  public static string GetOrAddCustomAmmoType(string name, string ammoTypeSpritePath, string ammoBackgroundSpritePath)
   {
+      if (_CreatedAmmoTypes.Contains(name))
+        return name;
       GameUIAmmoType uiammotype = new GameUIAmmoType {
           ammoBarBG      = new GameObject("sprite bg").RegisterPrefab().SetupDfSpriteFromDef<dfTiledSprite>(
             _PackedTextures[ammoBackgroundSpritePath], ShaderCache.Acquire("Daikon Forge/Default UI Shader")),
@@ -291,6 +294,7 @@ public static class AtlasHelper
       Alexandria.ItemAPI.CustomClipAmmoTypeToolbox.addedAmmoTypes.Add(uiammotype);
       foreach (GameUIAmmoController uiammocontroller in GameUIRoot.Instance.ammoControllers)
           Alexandria.ItemAPI.CustomClipAmmoTypeToolbox.Add(ref uiammocontroller.ammoTypes, uiammotype);
+      _CreatedAmmoTypes.Add(name);
       return name;
   }
 

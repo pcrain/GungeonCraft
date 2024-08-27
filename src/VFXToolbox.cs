@@ -416,12 +416,12 @@ public static class VFX
     }
 
     // Do a generic passive item activation effect above the player's head
-    public static void DoGenericItemActivation(this PlayerController player, PickupObject item, bool playSound = true)
+    public static void DoGenericItemActivation(this PlayerController player, tk2dBaseSprite itemSprite, string playSound = null)
     {
-        player.StartCoroutine(DoGenericItemActivation_CR(player, item, playSound));
+        player.StartCoroutine(DoGenericItemActivation_CR(player, itemSprite, playSound));
     }
 
-    public static IEnumerator DoGenericItemActivation_CR(PlayerController player, PickupObject item, bool playSound = true)
+    public static IEnumerator DoGenericItemActivation_CR(PlayerController player, tk2dBaseSprite itemSprite, string playSound = null)
     {
         const float FADE_TIME  = 1.0f;
         const float BOB_RATE   = 1.0f * 2f * Mathf.PI;
@@ -429,10 +429,10 @@ public static class VFX
         const float BOB_AMOUNT = 0.33f;
         const float SPIN_RATE  = 1.5f * 2f * Mathf.PI;
 
-        if (playSound)
-            player.gameObject.Play("minecraft_totem_pop_sound");
+        if (playSound != null)
+            player.gameObject.Play(playSound);
 
-        tk2dSprite sprite = Lazy.SpriteObject(item.sprite.collection, item.sprite.spriteId);
+        tk2dSprite sprite = Lazy.SpriteObject(itemSprite.collection, itemSprite.spriteId);
             sprite.PlaceAtPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET), Anchor.LowerCenter);
             sprite.transform.parent = player.transform;
 
@@ -684,7 +684,7 @@ public static class VFX
 
     }
 
-    public static CwaffRaidenBeamController AddRaidenBeamPrefab(this Projectile projectile, string spriteName, int fps = -1)
+    public static CwaffRaidenBeamController AddRaidenBeamPrefab(this Projectile projectile, string spriteName, int fps = -1, int maxTargets = -1, bool targetOffscreen = false)
     {
         try
         {
@@ -731,11 +731,14 @@ public static class VFX
             beamController.beamAnimation = "beam_idle";
 
             //--------------Sets up the animation for the very start of the beam (muzzle flash)
-            if (ResMap.Get($"{spriteName}_start") is List<string> startPaths)
+            if (ResMap.Get($"{spriteName}_start", quietFailure: true) is List<string> startPaths)
                 SetupBeamPart(animation, startPaths, "beam_start", fps, null, null, def.colliderVertices, anchorOverride: Anchor.MiddleCenter);
             else
                 SetupBeamPart(animation, spritePaths, "beam_start", fps, null, null, def.colliderVertices, shouldConstructOffsets: false);
             beamController.startAnimation = "beam_start";
+
+            beamController.maxTargets = maxTargets;
+            beamController.targetType = targetOffscreen ? CwaffRaidenBeamController.TargetType.Room : CwaffRaidenBeamController.TargetType.Screen;
 
             return beamController;
         }
@@ -796,6 +799,8 @@ public partial class CwaffVFX // public
         Away,
         ///<summary>Base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance.</summary>
         AwayRadial,
+        ///<summary>Base velocity is augmented by a vector towards position with magnitude of exactly velocityVariance.</summary>
+        InwardToCenter,
     }
 
     /// <summary>Spawn a single FancyVFX from a normal SpawnManager.SpawnVFX</summary>
@@ -815,10 +820,11 @@ public partial class CwaffVFX // public
     /// <param name="specificFrame">If >= 0, the animator is disabled and the VFX sprite is set to the specific frame of the animation.</param>
     /// <param name="flipX">Whether the VFX sprite should be flipped on the X axis.</param>
     /// <param name="flipY">Whether the VFX sprite should be flipped on the Y axis.</param>
+    /// <param name="anchorTransform">If non-null, projectile moves as its anchor transform moves (not a real parent since that causes pooling issues).</param>
     public static void Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null,
         bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1,
-        bool flipX = false, bool flipY = false)
+        bool flipX = false, bool flipY = false, Transform anchorTransform = null)
     {
         CwaffVFX c = (_DespawnedVFX.Count > 0) ? _DespawnedVFX.Pop() : new();
         if (c._node == null)
@@ -841,7 +847,8 @@ public partial class CwaffVFX // public
             randomFrame   : randomFrame,
             specificFrame : specificFrame,
             flipX         : flipX,
-            flipY         : flipY
+            flipY         : flipY,
+            anchorTransform: anchorTransform
             );
     }
 
@@ -878,12 +885,15 @@ public partial class CwaffVFX // public
     /// <param name="specificFrame">If >= 0, the animator is disabled and the VFX sprite is set to the specific frame of the animation.</param>
     /// <param name="flipX">Whether the VFX sprite should be flipped on the X axis.</param>
     /// <param name="flipY">Whether the VFX sprite should be flipped on the Y axis.</param>
+    /// <param name="anchorTransform">If non-null, projectile moves as its anchor transform moves (not a real parent since that causes pooling issues).</param>
     public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false,
-        bool uniform = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false)
+        bool uniform = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false,
+        Transform anchorTransform = null)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
+        lifetime = Mathf.Max(lifetime, 0.01f);
         for (int i = 0; i < numToSpawn; ++i)
         {
             float posOffsetAngle = uniform ? (baseAngle + 360f * ((float)i / numToSpawn)).Clamp360() : Lazy.RandomAngle();
@@ -891,11 +901,13 @@ public partial class CwaffVFX // public
                 ? basePosition + posOffsetAngle.ToVector((uniform ? 1f : UnityEngine.Random.value) * positionVariance)
                 : basePosition;
             Vector2 velocity = velType switch {
-                Vel.Random     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
-                Vel.Radial     => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
-                Vel.Away       => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
-                Vel.AwayRadial => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
-                _              => realBaseVelocity,
+                Vel.Random       => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                Vel.Radial       => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
+                Vel.Away         => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                Vel.AwayRadial   => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
+                Vel.InwardToCenter => realBaseVelocity - (finalpos - basePosition) / lifetime,
+                // Vel.InwardRadial => realBaseVelocity - posOffsetAngle.ToVector(minVelocity + velocityVariance),
+                _                => realBaseVelocity,
             };
             Quaternion rot = rotType switch {
                 Rot.Random   => UnityEngine.Random.Range(0f,360f).EulerZ(),
@@ -917,7 +929,8 @@ public partial class CwaffVFX // public
                 endScale      : endScale,
                 height        : height,
                 randomFrame   : randomFrame,
-                specificFrame : specificFrame
+                specificFrame : specificFrame,
+                anchorTransform: anchorTransform
                 );
         }
     }
@@ -950,6 +963,8 @@ public partial class CwaffVFX // private
     private bool       _changesScale  = false;
     private bool       _usesLifetime  = true;
     private bool       _shouldDespawn = false;
+    private Transform  _anchorTransform = null;
+    private Vector3    _anchorPos     = default;
 
     /// <summary>Manager for our pooled projectiles</summary>
     private class CwaffVFXManager : MonoBehaviour
@@ -1011,12 +1026,16 @@ public partial class CwaffVFX // private
     private void Setup(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null,
-        bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false)
+        bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false, Transform anchorTransform = null)
     {
         this._shouldDespawn = false;
         this._vfx.SetActive(true);
         this._vfx.transform.position = position;
         this._vfx.transform.localRotation = rotation ?? Quaternion.identity;
+
+        this._anchorTransform = anchorTransform;
+        if (anchorTransform != null)
+            this._anchorPos = anchorTransform.position;
 
         tk2dSprite          prefabSprite  = prefab.GetComponent<tk2dSprite>();
         tk2dSpriteAnimator  prefabAnim    = prefab.GetComponent<tk2dSpriteAnimator>();
@@ -1097,6 +1116,12 @@ public partial class CwaffVFX // private
         }
 
         this._sprite.transform.position += this._velocity * C.FPS * BraveTime.DeltaTime;
+        if (this._anchorTransform)
+        {
+            this._sprite.transform.position += (this._anchorTransform.position - this._anchorPos);
+            this._anchorPos = this._anchorTransform.position;
+        }
+
         if (this._changesScale)
         {
             float scale = Mathf.Lerp(this._startScale, this._endScale, percentDone);

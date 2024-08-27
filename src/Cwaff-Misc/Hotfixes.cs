@@ -1,5 +1,32 @@
 namespace CwaffingTheGungy;
 
+// Fixes UI armor sprites slowly shifting offscreen whenever they're changed
+[HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.UpdateHealth))]
+public static class ArmorUIOffsetFix
+{
+    [HarmonyILManipulator]
+    private static void ArmorUIOffsetFixIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        // 3 total instances, all of them need to be patched
+        while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<GameUIRoot>(nameof(GameUIRoot.GetMotionGroupParent))))
+        {
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Pixelator>(nameof(Pixelator.CurrentTileScale))))
+                return;
+            // motionGroupParent.Width -= 0f;
+            cursor.Emit(OpCodes.Call, typeof(ArmorUIOffsetFix).GetMethod(nameof(ArmorUIOffsetFix.Zero), BindingFlags.Static | BindingFlags.NonPublic));
+
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Pixelator>(nameof(Pixelator.CurrentTileScale))))
+                return;
+            // motionGroupParent.Height -= 0f;
+            cursor.Emit(OpCodes.Call, typeof(ArmorUIOffsetFix).GetMethod(nameof(ArmorUIOffsetFix.Zero), BindingFlags.Static | BindingFlags.NonPublic));
+        }
+        return;
+    }
+
+    private static float Zero(float originalValue) => 0f;
+}
+
 // Keeps projectile trails from disappearing if projectiles slow down too much
 [HarmonyPatch(typeof(TrailController), nameof(TrailController.Update))]
 public static class TrailControllerUpdatePatch
