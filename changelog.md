@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.18.0 (2024-08-27)
+
+- Added Bubblebeam, Groundhog, Derail Gun, and Yggdrashell
+	- Derail Gun sprites thanks to Nevernamed!
+- Fixed Femtobyte losing all of its stored data when dropped and picked back up
+- Fixed some projectile trails getting destroyed early when the projectile they were attached to was destroyed
+
 ## 1.17.2 (2024-08-13)
 
 - Hid ammo display for Vacuum Cleaner, Pistol Whip, Femtobyte, Vladimir, and Magunet

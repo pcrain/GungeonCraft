@@ -4,8 +4,8 @@ public class Groundhog : CwaffGun
 {
     public static string ItemName         = "Groundhog";
     public static string ShortDescription = "Deep Impact";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Penetrates the ground and detonates a warhead when charged, creating a massive shockwave that launches enemies within a large radius skyward. Immobilizes the player while charging.";
+    public static string Lore             = "A highly experimental weapon, its indiscriminate shattering of everything in a 100 foot radius makes it impractical for anything other than single-person infiltrations. The Groundhog is notable for having the most expensive ammunition of any handheld weapon in commission, with each projectile costing as much as a small house. This is partially related to the fact that the projectile's quality assurance process involves using it to destroy a small house.";
 
     private const float _BASE_FPS = 20f;
 

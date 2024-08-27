@@ -4,8 +4,8 @@ public class DerailGun : CwaffGun
 {
     public static string ItemName         = "Derail Gun";
     public static string ShortDescription = "Chugga Chugga Pew Pew";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Fires high-velocity miniature train engines that spread oil as they travel and explode violently upon impact.";
+    public static string Lore             = "The brainchild of a smart alec researcher who was tasked with designing a rail gun that used the most highly-conductive materials available. In a rare case of two wrongs making a right, the heat generated when launching the cheap plastic train projectiles had the tendency to melt them back into petroleum in transit, posing a hilarious fire hazard when properly misused.";
 
     public static void Init()
     {
