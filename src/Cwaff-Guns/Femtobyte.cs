@@ -20,6 +20,8 @@ public class Femtobyte : CwaffGun
     internal static HashSet<AIActor> _Replicants = new();
 
     public enum HoldType { EMPTY, TABLE, BARREL, SPECIAL, CHEST, ENEMY, PICKUP }
+
+    [Serializable]
     public class PrefabData
     {
         public string prefabName;
@@ -33,6 +35,7 @@ public class Femtobyte : CwaffGun
         }
     }
 
+    [Serializable]
     public class DigitizedObject
     {
         public HoldType   type          = EMPTY;
@@ -675,6 +678,14 @@ public class Femtobyte : CwaffGun
         CwaffVFX.SpawnBurst(prefab: _ImpactBits, numToSpawn: howMany, basePosition: pos,
             positionVariance: 1f, baseVelocity: 10f * Vector2.up, velocityVariance: 5f, velType: CwaffVFX.Vel.Radial,
             lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
+    }
+
+    public override void InheritData(Gun sourceGun)
+    {
+        base.InheritData(sourceGun);
+        if (sourceGun.gameObject.GetComponent<Femtobyte>() is not Femtobyte other)
+            return;
+        this.digitizedObjects = other.digitizedObjects; //NOTE: not sure why serialization isn't handled automatically, so we just override InheritData()
     }
 
     public override void MidGameSerialize(List<object> data, int i)
