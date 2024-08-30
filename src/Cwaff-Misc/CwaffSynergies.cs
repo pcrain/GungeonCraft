@@ -228,7 +228,7 @@ public static class CwaffSynergies
             return null;
 
         FakeItem.Create<T>();
-        int tokenId = FakeItem.Acquire<T>().PickupObjectId;
+        int tokenId = FakeItem.Get<T>().PickupObjectId;
         //NOTE: next line can't begin with NewSynergy or itemtips script gets messed up
         AdvancedSynergyEntry ase = NewSynergy(
             synergy              : synergy,

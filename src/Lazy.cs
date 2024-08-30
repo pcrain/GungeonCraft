@@ -125,7 +125,15 @@ public static class Lazy
 
         item.itemName = itemName;
         item.encounterTrackable.EncounterGuid = $"{C.MOD_PREFIX}-{baseItemName}"; //create a unique guid for the item
-        ETGMod.Databases.Items.Add(item);
+
+        // ETGMod.Databases.Items.Add(item); //WARNING: can't use because it adds the item to default loot pools -> can spawn from synergy chests
+        item.PickupObjectId = PickupObjectDatabase.Instance.Objects.Count;
+        PickupObjectDatabase.Instance.Objects.Add(item);
+        EncounterDatabase.Instance.Entries.Add(new(item.encounterTrackable)
+        {
+            myGuid = item.encounterTrackable.EncounterGuid,
+            path = "Assets/Resources/ITEMDB:" + item.name + ".prefab",
+        });
 
         item.encounterTrackable.journalData.SuppressInAmmonomicon = true; //don't show up in ammonomicon
         item.encounterTrackable.m_doNotificationOnEncounter = false; // don't display a notification when picked up

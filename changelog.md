@@ -2,6 +2,7 @@
 
 ## 1.18.1 (TBD)
 - Added 1 new synergy
+- Fixed dummy items from being able to appear in synergy chests
 
 ## 1.18.0 (2024-08-27)
 

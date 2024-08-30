@@ -1851,7 +1851,7 @@ public static class Extensions
   /// <summary>Acquire a fake item and put it in a player's inventory (generic version)</summary>
   public static T AcquireFakeItem<T>(this PlayerController player) where T : FakeItem
   {
-    GameObject gameObject = UnityEngine.Object.Instantiate(FakeItem.Acquire<T>().gameObject);
+    GameObject gameObject = UnityEngine.Object.Instantiate(FakeItem.Get<T>().gameObject);
     T fakePassive = gameObject.GetComponent<T>();
     EncounterTrackable trackable = fakePassive.GetComponent<EncounterTrackable>();
     if (trackable)
@@ -1864,7 +1864,7 @@ public static class Extensions
   /// <summary>Acquire a fake item and put it in a player's inventory (id version)</summary>
   public static FakeItem AcquireFakeItem(this PlayerController player, int id)
   {
-    GameObject gameObject = UnityEngine.Object.Instantiate(FakeItem.Acquire(id).gameObject);
+    GameObject gameObject = UnityEngine.Object.Instantiate(FakeItem.Get(id).gameObject);
     FakeItem fakePassive = gameObject.GetComponent<FakeItem>();
     EncounterTrackable trackable = fakePassive.GetComponent<EncounterTrackable>();
     if (trackable)

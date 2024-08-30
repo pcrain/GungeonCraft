@@ -89,12 +89,12 @@ public class FakeItem : CwaffPassive
         _PrefabsById[fake.PickupObjectId] = fake;
     }
 
-    public static FakeItem Acquire<T>() where T : FakeItem
+    public static FakeItem Get<T>() where T : FakeItem
     {
         return _Prefabs[typeof(T)];
     }
 
-    public static FakeItem Acquire(int id)
+    public static FakeItem Get(int id)
     {
         return _PrefabsById[id];
     }
