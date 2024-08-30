@@ -116,14 +116,14 @@ public class Ticonderogun : CwaffGun
         if (!this._owner || BraveTime.DeltaTime == 0.0f)
             return;
 
-        DrawVFXAtExtantPoints();
-
         if (!this.gun.IsCharging)
         {
             if (this._isCharging)
                 EndCharge();
             return;
         }
+
+        DrawVFXAtExtantPoints();
 
         if (this.gun.CurrentAmmo == 0)
             return;
@@ -228,16 +228,28 @@ public class Ticonderogun : CwaffGun
         this._extantPoints.Add(cursorPos);
     }
 
-    private void EndCharge()
+    private void EndCharge(bool lerp = true)
     {
         ResetCharge();
         this._trackedEnemy = null;
         this._trackedProj = null;
         this._lastCursorPos = null;
 
-        GameManager.Instance.MainCameraController.SetManualControl(false, true);
+        GameManager.Instance.MainCameraController.SetManualControl(false, lerp);
 
         this._isCharging = false;
+    }
+
+    /// <summary>Fix camera weirdness when killing a boss</summary>
+    [HarmonyPatch(typeof(BossKillCam), nameof(BossKillCam.TriggerSequence))]
+    private class BossKillCamTriggerSequencePatch
+    {
+        static void Prefix(BossKillCam __instance)
+        {
+            foreach (PlayerController player in GameManager.Instance.AllPlayers)
+                if (player && (player.CurrentGun is Gun gun) && (gun.gameObject.GetComponent<Ticonderogun>() is Ticonderogun t) && t._isCharging)
+                    t.EndCharge(lerp: false);
+        }
     }
 
     private void BeginCharge()

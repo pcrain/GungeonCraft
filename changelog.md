@@ -5,6 +5,7 @@
 - Added 1 new synergy
 - Fixed dummy items from being able to appear in synergy chests
 - Fixed Bubblebeam permanently changing the color of some projectiles fired by enemies even when they aren't enbubbled
+- Fixed camera not properly resetting when killing a boss with Ticonderogun
 
 ## 1.18.0 (2024-08-27)
 
