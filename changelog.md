@@ -3,6 +3,7 @@
 ## 1.18.1 (TBD)
 - Added 1 new synergy
 - Fixed dummy items from being able to appear in synergy chests
+- Fixed Bubblebeam permanently changing the color of some projectiles fired by enemies even when they aren't enbubbled
 
 ## 1.18.0 (2024-08-27)
 

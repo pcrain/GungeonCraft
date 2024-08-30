@@ -176,6 +176,7 @@ public class EnbubbledBehaviour : MonoBehaviour
     private const float _MIN_DRIFT = 2.5f;
     private const float _BUBBLE_DRIFT_DECAY = 1f;
 
+    private Shader _oldShader = null;
     private GameObject _vfx = null;
     private AIActor _enemy = null;
     private Projectile _proj = null;
@@ -287,7 +288,11 @@ public class EnbubbledBehaviour : MonoBehaviour
         this._proj.collidesWithPlayer = false;
         this._proj.collidesWithProjectiles = true;
         this._proj.collidesOnlyWithPlayerProjectiles = true;
-        this._proj.ChangeTintColorShader(0f, Color.cyan);
+        if (this._proj.sprite)
+        {
+            this._oldShader = this._proj.sprite.renderer.material.shader;
+            this._proj.ChangeTintColorShader(0f, Color.cyan);
+        }
         this._proj.baseData.damage = Mathf.Max(15f, this._proj.baseData.damage, ProjectileData.FixedFallbackDamageToEnemies);
         this._proj.UpdateCollisionMask();
         this._proj.ResetDistance();
@@ -302,6 +307,11 @@ public class EnbubbledBehaviour : MonoBehaviour
 
     private void OnDestruction(Projectile proj)
     {
+        if (proj.sprite)
+        {
+            proj.sprite.usesOverrideMaterial = false;
+            proj.sprite.renderer.material.shader = this._oldShader;
+        }
         UnityEngine.Object.Destroy(this);
     }
 
