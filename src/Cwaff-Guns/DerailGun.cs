@@ -42,6 +42,7 @@ public class DerailGun : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
+        player.OnReceivedDamage += this.OnReceivedDamage;
         gun.SetAnimationFPS(gun.idleAnimation, 11); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.Play();
     }
@@ -49,8 +50,26 @@ public class DerailGun : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
+        player.OnReceivedDamage -= this.OnReceivedDamage;
         gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.StopAndResetFrameToDefault();
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnReceivedDamage -= this.OnReceivedDamage;
+        base.OnDestroy();
+    }
+
+    private void OnReceivedDamage(PlayerController player)
+    {
+        if (!player.HasSynergy(Synergy.TROLLEY_PROBLEM))
+            return;
+        if (player.GetPassive((int)Items.TurtleProblem) is not MulticompanionItem tp)
+            return;
+        for (int i = 0; i < 5; ++i)
+            tp.CreateNewCompanion(player);
     }
 
     public override void Update()

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.18.1 (TBD)
+- Added 1 new synergy
+
 ## 1.18.0 (2024-08-27)
 
 - Added Bubblebeam, Groundhog, Derail Gun, and Yggdrashell

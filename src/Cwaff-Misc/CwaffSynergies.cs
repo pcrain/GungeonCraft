@@ -93,6 +93,8 @@ public static class CwaffSynergies
         NewSynergy(BLANK_EXPRESSION, "Blank Expression", new[]{IName(BlankChecks.ItemName), "disarming_personality"});
         // Femtobyte instantly kills any enemy that matches the last type of enemy it killed.
         NewSynergy(LOOKUP_TABLE, "Lookup Table", new[]{IName(Femtobyte.ItemName), "portable_table_device"});
+        // Spawns 5 turtles upon getting hit
+        NewSynergy(TROLLEY_PROBLEM, "Trolley Problem", new[]{IName(DerailGun.ItemName), "turtle_problem"});
       #endregion
 
       #region Masteries
@@ -405,6 +407,7 @@ public enum Synergy {
     BIONIC_COMMANDO,
     BLANK_EXPRESSION,
     LOOKUP_TABLE,
+    TROLLEY_PROBLEM,
 
     // Masteries
     MASTERY_GRANDMASTER,

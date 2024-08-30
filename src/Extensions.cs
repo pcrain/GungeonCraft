@@ -470,12 +470,30 @@ public static class Extensions
     return null;
   }
 
+  /// <summary>Get a passive item owned by the player by id</summary>
+  public static PassiveItem GetPassive(this PlayerController p, int id)
+  {
+    for (int i = 0; i < p.passiveItems.Count; ++i)
+      if (p.passiveItems[i].PickupObjectId == id)
+        return p.passiveItems[i];
+    return null;
+  }
+
   /// <summary>Get an active item owned by the player</summary>
   public static T GetActive<T>(this PlayerController p) where T : PlayerItem
   {
     for (int i = 0; i < p.activeItems.Count; ++i)
       if (p.activeItems[i] is T t)
         return t;
+    return null;
+  }
+
+  /// <summary>Get an active item owned by the player by id</summary>
+  public static PlayerItem GetActive(this PlayerController p, int id)
+  {
+    for (int i = 0; i < p.activeItems.Count; ++i)
+      if (p.activeItems[i].PickupObjectId == id)
+        return p.activeItems[i];
     return null;
   }
 
@@ -488,13 +506,13 @@ public static class Extensions
     return null;
   }
 
-  /// <summary>Get a passive item owned by the player by id</summary>
-  public static bool HasPassive(this PlayerController p, int id)
+  /// <summary>Get a gun owned by the player by id</summary>
+  public static Gun GetGun(this PlayerController p, int id)
   {
-    for (int i = 0; i < p.passiveItems.Count; ++i)
-      if (p.passiveItems[i].PickupObjectId == id)
-        return true;
-    return false;
+    for (int i = 0; i < p.inventory.AllGuns.Count; ++i)
+      if (p.inventory.AllGuns[i].PickupObjectId == id)
+        return p.inventory.AllGuns[i];
+    return null;
   }
 
   /// <summary>Clamps a float between two numbers (default 0 and 1)</summary>
