@@ -23,16 +23,21 @@ public class Ticonderogun : CwaffGun
     private const float _MAX_CONTROLLER_DIST     = 12f;   // [controller] how far away we can draw with the control stick at max distance
     private const float _AUTOTARGET_MAX_DELTA    = 20f;   // [controller] the cone of vision we have before we can lock on with controller
     private const float _ENEMY_TRACK_RADIUS      = 4f;    // [controller] the radius around a tracked enemy where we can draw
+    private const float _MAX_CONTROLLER_SQR_DIST = _MAX_CONTROLLER_DIST * _MAX_CONTROLLER_DIST;
 
     internal static GameObject _SparklePrefab    = null;  // prefab for the sparklies
     internal static GameObject _RunePrefab       = null;  // prefab for the runes
+    internal static int _PencilLineID            = -1;    // sprite id for pencil line
+    internal static int _EraserLineID            = -1;    // sprite id for eraser line
 
     private static float _LastWriteSound         = 0f;    // how long its been since we played the scribbling sound
 
     private PlayerController _owner              = null;  // player owner of the weapon
     private Vector2? _lastCursorPos              = null;  // position of the pencil cursor last time we updated
     private AIActor _trackedEnemy                = null;  // [controller] the enemy we are currently tracking
+    private Projectile _trackedProj              = null;  // [controller] the projectile we are currently tracking
     private bool _isCharging                     = false; // whether we are currently charging our weapon
+    private bool _eraserMode                     = false; // whether we are currently charging our weapon
     private float _lastDrawTime                  = 0f;    // the last time that VFX were drawn
     private float _timeCharging                  = 0f;
     private float _lifeElapsed                   = 0f;
@@ -45,19 +50,26 @@ public class Ticonderogun : CwaffGun
 
     public static void Init()
     {
-        Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24, curse: 2f)
-          .AddToShop(ItemBuilder.ShopType.Cursula)
-          .SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, customClip: true));
+        Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24, curse: 2f)
+          .AddToShop(ItemBuilder.ShopType.Cursula);
+        gun.SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, customClip: true));
+        gun.QuickUpdateGunAnimation("eraser_charge", returnToIdle : false);
+        gun.QuickUpdateGunAnimation("eraser_fire",   returnToIdle : false);
+        gun.QuickUpdateGunAnimation("eraser_idle",   returnToIdle : false);
+        gun.QuickUpdateGunAnimation("eraser_reload", returnToIdle : false);
 
         _SparklePrefab = VFX.Create("pencil_sparkles", fps: 12, loops: false);
         _RunePrefab = VFX.Create("pencil_runes", loops: false); // FPS must be nonzero or sprites don't update properly
+        _PencilLineID = VFX.Collection.GetSpriteIdByName("fancy_line");
+        _EraserLineID = VFX.Collection.GetSpriteIdByName("fancy_eraser_line");
     }
 
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
         this._owner = player;
+        this._eraserMode = false;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -71,6 +83,31 @@ public class Ticonderogun : CwaffGun
     {
         EndCharge();
         base.OnSwitchedAwayFromThisGun();
+    }
+
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        base.OnReloadPressed(player, gun, manualReload);
+        if (player.IsDodgeRolling || !player.AcceptingNonMotionInput)
+            return;
+        if (!player.HasSynergy(Synergy.MASTERY_TICONDEROGUN))
+            return;
+        this._eraserMode = !this._eraserMode;
+        base.gameObject.PlayOnce(this._eraserMode ? "pencil_erase" : "pencil_write");
+        this._trackedEnemy = null;
+        this._trackedProj = null;
+        this._lastCursorPos = null;
+        ToggleEraserSprites();
+    }
+
+    private void ToggleEraserSprites()
+    {
+        string baseName          = this._eraserMode ? "ticonderogun_eraser" : "ticonderogun";
+        this.gun.idleAnimation   = $"{baseName}_idle";
+        this.gun.reloadAnimation = $"{baseName}_reload";
+        this.gun.chargeAnimation = $"{baseName}_charge";
+        this.gun.shootAnimation  = $"{baseName}_fire";
+        this.gun.PlayIdleAnimation();
     }
 
     public override void Update()
@@ -125,6 +162,24 @@ public class Ticonderogun : CwaffGun
             DoEncirclingMagic(enemy, damage);
     }
 
+    private void CheckIfProjectilesAreEncircled(Vector2 hullCenter)
+    {
+        base.gameObject.Play("pencil_circle_sound");
+        if (!this._owner)
+            return;
+
+        foreach (Projectile projectile in StaticReferenceManager.AllProjectiles)
+            if (projectile && projectile.isActiveAndEnabled && projectile.Owner is not PlayerController && projectile.SafeCenter.IsPointInPolygonHull(this._extantPoints))
+                PassiveReflectItem.ReflectBullet(
+                    p                       : projectile,
+                    retargetReflectedBullet : true,
+                    newOwner                : this._owner,
+                    minReflectedBulletSpeed : 30f,
+                    scaleModifier           : 1f,
+                    damageModifier          : 1f,
+                    spread                  : 0f);
+    }
+
     private float ComputeCircleDamage(Vector2 hullCenter, int numEncircled)
     {
         float baseDamage = _BASE_DAMAGE * this._owner.DamageMult();
@@ -177,6 +232,7 @@ public class Ticonderogun : CwaffGun
     {
         ResetCharge();
         this._trackedEnemy = null;
+        this._trackedProj = null;
         this._lastCursorPos = null;
 
         GameManager.Instance.MainCameraController.SetManualControl(false, true);
@@ -188,6 +244,7 @@ public class Ticonderogun : CwaffGun
     {
         ResetCharge();
         this._trackedEnemy = null;
+        this._trackedProj = null;
         this._lastCursorPos = null;
 
         // Override camera position
@@ -202,13 +259,13 @@ public class Ticonderogun : CwaffGun
     }
 
     // Draw a nice tiled sprite from start to target
-    public static GameObject FancyLine(Vector2 start, Vector2 target, float width, int? spriteId = null)
+    public static GameObject FancyLine(Vector2 start, Vector2 target, float width, int spriteId)
     {
         Vector2 delta         = target - start;
         Quaternion rot        = delta.EulerZ();
         GameObject reticle    = UnityEngine.Object.Instantiate(new GameObject(), start, rot);
         tk2dSlicedSprite quad = reticle.AddComponent<tk2dSlicedSprite>();
-        quad.SetSprite(VFX.Collection, spriteId ?? VFX.Collection.GetSpriteIdByName("fancy_line"));
+        quad.SetSprite(VFX.Collection, spriteId);
         quad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude, width));
         quad.transform.localRotation = rot;
         quad.transform.position      = start + (0.5f * width * delta.normalized.Rotate(-90f));
@@ -216,7 +273,7 @@ public class Ticonderogun : CwaffGun
     }
 
     // Choose the enemy with the smallest angle from our aim point that is also within _MAX_CONTROLLER_DIST
-    private AIActor ChooseNewTarget()
+    private AIActor ChooseNewEnemyTarget()
     {
         if (!this._owner)
             return null;
@@ -229,10 +286,9 @@ public class Ticonderogun : CwaffGun
             if (!enemy || !enemy.IsHostile(canBeNeutral: true))
                 continue;
             Vector2 enemyDelta = (enemy.CenterPosition - this._owner.CenterPosition);
-            if (enemyDelta.magnitude > _MAX_CONTROLLER_DIST)
+            if (enemyDelta.sqrMagnitude > _MAX_CONTROLLER_SQR_DIST)
                 continue;
-            float enemyAngle = enemyDelta.ToAngle();
-            float deltaAngle = aimAngle.AbsAngleTo(enemyAngle);
+            float deltaAngle = aimAngle.AbsAngleTo(enemyDelta.ToAngle());
             if (deltaAngle < minDelta)
             {
                 minDelta = deltaAngle;
@@ -243,29 +299,79 @@ public class Ticonderogun : CwaffGun
         return bestEnemy;
     }
 
+    // Choose the projectile with the smallest angle from our aim point that is also within _MAX_CONTROLLER_DIST
+    private Projectile ChooseNewProjectileTarget()
+    {
+        if (!this._owner)
+            return null;
+
+        float aimAngle = this._owner.m_currentGunAngle;
+        float minDelta = _AUTOTARGET_MAX_DELTA;
+        Projectile bestProj = null;
+        foreach (Projectile proj in StaticReferenceManager.AllProjectiles)
+        {
+            if (!proj || !proj.isActiveAndEnabled || proj.Owner is PlayerController)
+                continue;
+            Vector2 projDelta = (proj.SafeCenter - this._owner.CenterPosition);
+            if (projDelta.sqrMagnitude > _MAX_CONTROLLER_SQR_DIST)
+                continue;
+            float deltaAngle = aimAngle.AbsAngleTo(projDelta.ToAngle());
+            if (deltaAngle < minDelta)
+            {
+                minDelta = deltaAngle;
+                bestProj = proj;
+            }
+        }
+
+        return bestProj;
+    }
+
     private Vector2 GetControllerTrackingVector()
     {
         // If we're using a mouse, just use the cursor position, easy
         if (this._owner.IsKeyboardAndMouse())
             return this._owner.unadjustedAimPoint.XY();
 
-        // If we're using a controller, determine if we should be tracking a specific enemy
+        // If we're using a controller, determine if we should be tracking a specific enemy or projectile
         bool restartCharge = false;
-        if (!this._trackedEnemy || !this._trackedEnemy.IsHostile(canBeNeutral: true))
-        {
-            this._trackedEnemy = ChooseNewTarget();
-            if (this._trackedEnemy)
-                restartCharge = true; // if we just chose a new target, we need to restart our charge
-        }
 
-        // If we're tracking an enemy, set our target based on the enemy's position and our cursor direction
-        if (this._trackedEnemy)
+        if (this._eraserMode)
         {
-            Vector2 target = this._trackedEnemy.CenterPosition + _ENEMY_TRACK_RADIUS * this._owner.m_activeActions.Aim.Vector;
-            if (restartCharge)
-                ResetCharge(target);
-            this._adjustedAimPoint = target; // set our adjusted aim point for when we stop tracking the enemy
-            return target; // Autotracked input
+            if (!this._trackedProj || !this._trackedProj.isActiveAndEnabled || this._trackedProj.Owner is PlayerController)
+            {
+                this._trackedProj = ChooseNewProjectileTarget();
+                if (this._trackedProj)
+                    restartCharge = true; // if we just chose a new target, we need to restart our charge
+            }
+
+            // If we're tracking an enemy, set our target based on the enemy's position and our cursor direction
+            if (this._trackedProj)
+            {
+                Vector2 target = this._trackedProj.SafeCenter + _ENEMY_TRACK_RADIUS * this._owner.m_activeActions.Aim.Vector;
+                if (restartCharge)
+                    ResetCharge(target);
+                this._adjustedAimPoint = target; // set our adjusted aim point for when we stop tracking the enemy
+                return target; // Autotracked input
+            }
+        }
+        else
+        {
+            if (!this._trackedEnemy || !this._trackedEnemy.IsHostile(canBeNeutral: true))
+            {
+                this._trackedEnemy = ChooseNewEnemyTarget();
+                if (this._trackedEnemy)
+                    restartCharge = true; // if we just chose a new target, we need to restart our charge
+            }
+
+            // If we're tracking an enemy, set our target based on the enemy's position and our cursor direction
+            if (this._trackedEnemy)
+            {
+                Vector2 target = this._trackedEnemy.CenterPosition + _ENEMY_TRACK_RADIUS * this._owner.m_activeActions.Aim.Vector;
+                if (restartCharge)
+                    ResetCharge(target);
+                this._adjustedAimPoint = target; // set our adjusted aim point for when we stop tracking the enemy
+                return target; // Autotracked input
+            }
         }
 
         // If we're not tracking an enemy, we're just freehanding input
@@ -317,12 +423,12 @@ public class Ticonderogun : CwaffGun
         if (_LastWriteSound + 0.1f < BraveTime.ScaledTimeSinceStartup)
         {
             _LastWriteSound = BraveTime.ScaledTimeSinceStartup;
-            base.gameObject.PlayOnce("pencil_write");
+            base.gameObject.PlayOnce(this._eraserMode ? "pencil_erase" : "pencil_write");
         }
 
         // Add the point and register the last cursor position
         if (this._lastCursorPos.HasValue)
-            this._extantSprites.Add(FancyLine(this._lastCursorPos.Value, pencilPos, 0.3f));
+            this._extantSprites.Add(FancyLine(this._lastCursorPos.Value, pencilPos, 0.3f, this._eraserMode ? _EraserLineID : _PencilLineID));
         this._lastCursorPos = pencilPos;
         this._extantPoints.Add(pencilPos);
 
@@ -350,7 +456,10 @@ public class Ticonderogun : CwaffGun
         // Determine if we've made a full circle-y shape
         if (endAngle.IsNearAngle(startAngle, 30f))
         {
-            CheckIfEnemiesAreEncircled(hullCentroid);
+            if (this._eraserMode)
+                CheckIfProjectilesAreEncircled(hullCentroid);
+            else
+                CheckIfEnemiesAreEncircled(hullCentroid);
             ResetCharge(pencilPos);
         }
     }

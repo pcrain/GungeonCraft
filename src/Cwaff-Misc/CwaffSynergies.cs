@@ -143,6 +143,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfAlligator>(MASTERY_ALLIGATOR, Alligator.ItemName);
         // Touching enemies that have been transmuted to gold causes them to explode in a burst of high damage gold projectiles that trasmute other enemies to gold on kill.
         NewMastery<MasteryOfQuarterPounder>(MASTERY_QUARTER_POUNDER, QuarterPounder.ItemName);
+        // Ticonderogun can be reloaded to switch to eraser mode, which reflects encircled enemy bullets.
+        NewMastery<MasteryOfTiconderogun>(MASTERY_TICONDEROGUN, Ticonderogun.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -375,6 +377,7 @@ internal class MasteryOfEnglish         : MasteryDummyItem {}
 internal class MasteryOfIronMaid        : MasteryDummyItem {}
 internal class MasteryOfAlligator       : MasteryDummyItem {}
 internal class MasteryOfQuarterPounder  : MasteryDummyItem {}
+internal class MasteryOfTiconderogun    : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -432,4 +435,5 @@ public enum Synergy {
     MASTERY_IRON_MAID,
     MASTERY_ALLIGATOR,
     MASTERY_QUARTER_POUNDER,
+    MASTERY_TICONDEROGUN,
 };

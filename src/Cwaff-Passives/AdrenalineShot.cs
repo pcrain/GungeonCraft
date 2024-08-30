@@ -23,15 +23,6 @@ public class AdrenalineShot : CwaffPassive
         PassiveItem item  = Lazy.SetupPassive<AdrenalineShot>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
-
-        // _AdrenalineHeart = Lazy.SetupUISprite(ResMap.Get("adrenaline_heart"));
-
-        // _AdrenalineShotId = item.PickupObjectId;
-
-        // Old hacky method, new one is better and more robust, but keeping this around in case i ever need different kinds of hearts
-        // new Hook(
-        //     typeof(GameUIHeartController).GetMethod("UpdateHealth", BindingFlags.Public | BindingFlags.Instance),
-        //     typeof(AdrenalineShot).GetMethod("UpdateHealth", BindingFlags.NonPublic | BindingFlags.Static));
     }
 
     [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.ProcessHeartSpriteModifications))]
@@ -48,67 +39,6 @@ public class AdrenalineShot : CwaffPassive
             __instance.m_currentEmptyHeartName = "adrenaline_heart_empty_ui";
         }
     }
-
-    // private static void UpdateHealth(Action<GameUIHeartController, HealthHaver> orig, GameUIHeartController guihc, HealthHaver hh)
-    // {
-    //     orig(guihc, hh);
-    //     if (!hh || hh.m_player is not PlayerController player)
-    //         return;
-
-    //     int nHearts = guihc.extantHearts.Count;
-    //     if (nHearts == 0)
-    //         return; // we have nothing to do if there are no hearts
-
-    //     if (!player.gameObject.GetComponent<UnderAdrenalineEffects>())
-    //         nHearts = 0; // if we don't have this item, we have 0 adrenaline hearts
-
-    //     AdrenalineHeartOverlay overlay = guihc.gameObject.GetOrAddComponent<AdrenalineHeartOverlay>();
-    //     int aHearts = overlay.adrenalineHearts.Count;
-    //     if (aHearts == nHearts)
-    //         return; // if our current and cached hearts are the same, we have nothing to do
-
-    //     float scale = Pixelator.Instance.CurrentTileScale;
-
-    //     // Remove old hearts as necessary (all hearts except the first have a grandparent that manages them)
-    //     dfControl heartManager = guihc.extantHearts[0].Parent;
-    //     if (heartManager.Parent)
-    //         heartManager = heartManager.Parent;
-    //     if (!heartManager) // should never happen
-    //     {
-    //         if (C.DEBUG_BUILD)
-    //             ETGModConsole.Log($"NO HEART MANAGER");
-    //         return;
-    //     }
-
-    //     for (int i = aHearts - 1; i >= nHearts; --i)
-    //     {
-    //         overlay.adrenalineHearts[i].transform.parent = null;
-    //         heartManager.RemoveControl(overlay.adrenalineHearts[i].GetComponent<dfControl>());
-    //         UnityEngine.Object.Destroy(overlay.adrenalineHearts[i]);
-    //         overlay.adrenalineHearts.RemoveAt(i);
-    //     }
-
-    //     // Add new hearts as necessary
-    //     for (int i = aHearts; i < nHearts; ++i)
-    //     {
-    //         dfSprite heart = guihc.extantHearts[i];
-    //         if (!heart)
-    //             continue;
-    //         GameObject gameObject = UnityEngine.Object.Instantiate(_AdrenalineHeart.gameObject);
-    //         gameObject.transform.parent = guihc.transform.parent;
-    //         gameObject.layer = guihc.gameObject.layer;
-    //         dfSprite component = gameObject.GetComponent<dfSprite>();
-    //         component.BringToFront();
-    //         heartManager.AddControl(component);
-    //         heartManager.BringToFront();
-    //         component.ZOrder = heart.ZOrder - 1;
-    //         component.RelativePosition = heart.RelativePosition + new Vector3(scale, 2 * scale, 0f);
-    //         component.Size = component.SpriteInfo.sizeInPixels * scale;
-    //         overlay.adrenalineHearts.Add(gameObject);
-
-    //         gameObject.transform.parent = heart.transform;  // make sure it disappears when minimap or pause is toggled
-    //     }
-    // }
 
     public override void OnFirstPickup(PlayerController player)
     {
@@ -148,10 +78,13 @@ public class AdrenalineShot : CwaffPassive
             return; // nothing to do if we're not in control of our character
 
         this._adrenalineTimer -= BraveTime.DeltaTime;
-        float heartRate =
-            (this._adrenalineTimer > 30) ? 2f   :
-            (this._adrenalineTimer > 10) ? 1f   :
-            (this._adrenalineTimer > 3)  ? 0.5f : 0.25f;
+        float heartRate = this._adrenalineTimer switch
+        {
+            > 30 => 2f,
+            > 10 => 1f,
+            > 3  => 0.5f,
+            _    => 0.25f,
+        };
         if (BraveTime.ScaledTimeSinceStartup - _LastHeartbeatTime > heartRate)
         {
             _LastHeartbeatTime = BraveTime.ScaledTimeSinceStartup;
