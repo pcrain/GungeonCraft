@@ -7,6 +7,7 @@
 - Fixed Bubblebeam permanently changing the color of some projectiles fired by enemies even when they aren't enbubbled
 - Fixed camera not properly resetting when killing a boss with Ticonderogun
 - Fixed King's Law projectiles colliding with doors even when behind the player
+- Gave Gunbrella, King's Law, Maestro, Pistol Whip, Starmageddon, and Yggdrashell the ability to fire even when up against walls
 
 ## 1.18.0 (2024-08-27)
 

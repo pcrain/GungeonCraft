@@ -51,7 +51,8 @@ public class Ticonderogun : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24, curse: 2f)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24,
+            curse: 2f, attacksThroughWalls: true)
           .AddToShop(ItemBuilder.ShopType.Cursula);
         gun.SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, customClip: true));
         gun.QuickUpdateGunAnimation("eraser_charge", returnToIdle : false);

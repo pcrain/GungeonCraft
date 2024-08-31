@@ -818,7 +818,7 @@ public static class Extensions
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
     float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
-    GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true)
+    GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false)
   {
     gun.quality = quality;
     gun.reloadTime = reloadTime;
@@ -834,6 +834,7 @@ public static class Extensions
     gun.CanReloadNoMatterAmmo = canReloadNoMatterAmmo;
     gun.Volley.ModulesAreTiers = modulesAreTiers;
     gun.GainsRateOfFireAsContinueAttack = rampUpFireRate;
+    gun.CanAttackThroughObjects = attacksThroughWalls;
     if (rampUpFireRate)
       gun.RateOfFireMultiplierAdditionPerSecond = rampUpFactor;
 

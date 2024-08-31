@@ -16,10 +16,10 @@ public class Groundhog : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Groundhog>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.0f, ammo: 50, shootFps: 14, reloadFps: 4, chargeFps: (int)_BASE_FPS);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.0f, ammo: 50, shootFps: 14, reloadFps: 4,
+              chargeFps: (int)_BASE_FPS, attacksThroughWalls: true);
             gun.SetChargeAudio("groundhog_burrow_sound", 11);
             gun.LoopAnimation(gun.chargeAnimation, 15);
-            gun.CanAttackThroughObjects = true;
 
         Groundhog groundhog = gun.gameObject.GetComponent<Groundhog>();
             groundhog.preventRollingWhenCharging = true;

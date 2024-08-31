@@ -26,7 +26,7 @@ public class Yggdrashell : CwaffGun
     {
         Gun gun = Lazy.SetupGun<Yggdrashell>(ItemName, ShortDescription, LongDescription, Lore);
             gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, shootFps: 14, reloadFps: 4,
-                doesScreenShake: false, modulesAreTiers: true);
+                doesScreenShake: false, modulesAreTiers: true, attacksThroughWalls: true);
             gun.CanAttackThroughObjects = true;
 
         gun.Volley.projectiles = new(){
