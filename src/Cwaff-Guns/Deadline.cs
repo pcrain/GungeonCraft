@@ -11,6 +11,7 @@ public class Deadline : CwaffGun
     public static string Lore             = "Not intended to be a weapon at all, this gun was used primarily as a tool for setting up dodge roll training rooms for newbie Gungeoneers. After an accidental crossing of the beams (an act generally known not to be a great idea) left seven injured, the engineer responsible for designing the tool publicly apologized for the incident. Immediately afterwards, he returned to a private meeting room with his colleagues, who unanimously agreed the explosion was freakin' awesome. High fives and fist bumps were promptly exchanged all around.";
 
     private const float _SIGHT_WIDTH = 2.0f;
+    private const float _EXPLOSION_DELAY = 1.0f;
 
     internal static ExplosionData _DeadlineExplosion = null;
     internal static GameObject _SplodeVFX;
@@ -251,9 +252,9 @@ public class Deadline : CwaffGun
 
     }
 
-    public static void CreateALaser(Vector2 start, Vector2 end)
+    public static void CreateALaser(Vector2 start, Vector2 end, bool mastered)
     {
-        _MyLasers.Add(new GameObject().AddComponent<DeadlineLaser>().Setup(start, end, (end - start).ToAngle()));
+        _MyLasers.Add(new GameObject().AddComponent<DeadlineLaser>().Setup(start, end, (end - start).ToAngle(), mastered));
         CheckForLaserIntersections();
     }
 
@@ -287,11 +288,10 @@ public class Deadline : CwaffGun
         if (closestIndex >= 0)
         {
             newest.UpdateEndPoint(closestPosition);
-            newest.InitiateDeathSequenceAt(Vector2.zero,false);
-            _MyLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true);
+            newest.InitiateDeathSequenceAt(Vector2.zero,false, _EXPLOSION_DELAY);
+            _MyLasers[closestIndex].InitiateDeathSequenceAt(closestPosition.ToVector3ZisY(-1f),true, _EXPLOSION_DELAY);
             ETGModMainBehaviour.Instance.gameObject.Play("gaster_blaster_sound_effect");
-
-            new FakeExplosion(UnityEngine.Object.Instantiate(_SplodeVFX, closestPosition, Quaternion.identity));
+            new FakeExplosion(UnityEngine.Object.Instantiate(_SplodeVFX, closestPosition, Quaternion.identity), maxLifetime: _EXPLOSION_DELAY);
         }
 
         for (int i = _MyLasers.Count - 1; i >= 0; i--)
@@ -303,27 +303,27 @@ public class Deadline : CwaffGun
 
     private class FakeExplosion
     {
-        private const float _START_SCALE  = 0.0f;
         private const float _END_SCALE    = 1.5f;
         private const float _RPS          = 1080.0f;
-        private const float _MAX_LIFETIME = 1.0f;
 
         private GameObject _theExplosionVFX;
         private float _lifetime = 0.0f;
+        private float _maxLifetime = 0.0f;
 
-        public FakeExplosion(GameObject go)
+        public FakeExplosion(GameObject go, float maxLifetime)
         {
             this._theExplosionVFX = go;
+            this._maxLifetime = maxLifetime;
             GameManager.Instance.StartCoroutine(Explode());
         }
 
         private IEnumerator Explode()
         {
-            while(this._lifetime < _MAX_LIFETIME)
+            while(this._lifetime < this._maxLifetime)
             {
                 this._lifetime += BraveTime.DeltaTime;
-                float curScale = _START_SCALE + (_END_SCALE - _START_SCALE)*(this._lifetime/_MAX_LIFETIME);
-                this._theExplosionVFX.transform.localScale = new Vector3(curScale,curScale,curScale);
+                float curScale = _END_SCALE * (this._lifetime / this._maxLifetime);
+                this._theExplosionVFX.transform.localScale = new Vector3(curScale, curScale, curScale);
                 this._theExplosionVFX.transform.rotation = Quaternion.Euler(0,0,_RPS*this._lifetime);
                 yield return null;
             }
@@ -335,8 +335,8 @@ public class Deadline : CwaffGun
 
     private class DeadlineLaser : MonoBehaviour
     {
-        private static float _GrowthTime = 0.15f;
-        private static float _ExplosionDelay = 1.0f;
+        private const float _GROWTH_TIME = 0.15f;
+        private const float _EXPLOSION_DELAY_MASTERED = 0.4f;
 
         private float _length;
         private float _angle;
@@ -345,6 +345,7 @@ public class Deadline : CwaffGun
         private Color _color;
         private float _power = 0;
         private float _lifeTime = 0.0f;
+        private bool _mastered = false;
 
         public Vector2 start;
         public Vector2 end;
@@ -353,7 +354,7 @@ public class Deadline : CwaffGun
         public bool markedForDestruction = false;
         public bool dead = false;
 
-        public DeadlineLaser Setup(Vector2 p1, Vector2 p2, float angle)
+        public DeadlineLaser Setup(Vector2 p1, Vector2 p2, float angle, bool mastered)
         {
             this.start        = p1;
             this.end          = p2;
@@ -361,24 +362,26 @@ public class Deadline : CwaffGun
             this._angle       = angle;
             this._color       = Color.red;
             this._power       = 0;
+            this._mastered    = mastered;
             UpdateLaser();
             return this;
         }
 
-        public void UpdateEndPoint(Vector2 newEnd)
+        public void UpdateEndPoint(Vector2 newEnd, bool andUpdate = true)
         {
             this.end     = newEnd;
             this._length = C.PIXELS_PER_TILE*Vector2.Distance(this.start,this.end);
-            UpdateLaser();
+            if (andUpdate)
+                UpdateLaser();
         }
 
-        public void InitiateDeathSequenceAt(Vector3 ipoint, bool explode = false)
+        public void InitiateDeathSequenceAt(Vector3 ipoint, bool explode, float timer)
         {
             if (markedForDestruction)
                 return;
             this.markedForDestruction = true;
             this._ipoint = ipoint;
-            GameManager.Instance.StartCoroutine(ExplodeViolentlyAt(explode));
+            GameManager.Instance.StartCoroutine(ExplodeViolentlyAt(explode, timer));
         }
 
         private void Update()
@@ -393,7 +396,7 @@ public class Deadline : CwaffGun
                 return;
 
             this._lifeTime += BraveTime.DeltaTime;
-            float curLength = this._length * Mathf.Min(1,this._lifeTime/_GrowthTime);
+            float curLength = this._length * Mathf.Min(1,this._lifeTime/_GROWTH_TIME);
 
             bool needToRecreate = false;
             if (color.HasValue)
@@ -416,12 +419,22 @@ public class Deadline : CwaffGun
                 this.laserComp.dimensions = new Vector2(curLength, 1);
                 this.laserMat.SetFloat("_EmissivePower", this._power);
             }
+
+            if (this.markedForDestruction || !this._mastered)
+                return;
+            if (Lazy.NearestEnemyInLineOfSight(out Vector2 ipoint, this.start, this.start + this._angle.ToVector(curLength)) is not AIActor target)
+                return;
+
+            UpdateEndPoint(ipoint, andUpdate: false); // avoid infinite recursion
+            InitiateDeathSequenceAt(ipoint.ToVector3ZisY(-1f), true, _EXPLOSION_DELAY_MASTERED);
+            ETGModMainBehaviour.Instance.gameObject.Play("gaster_blaster_sound_effect_short");
+            new FakeExplosion(UnityEngine.Object.Instantiate(_SplodeVFX, ipoint, Quaternion.identity), maxLifetime: _EXPLOSION_DELAY_MASTERED);
         }
 
-        private IEnumerator ExplodeViolentlyAt(bool explode)
+        private IEnumerator ExplodeViolentlyAt(bool explode, float timer)
         {
             UpdateLaser(color : Color.cyan);
-            yield return new WaitForSeconds(_ExplosionDelay);
+            yield return new WaitForSeconds(timer);
 
             if (explode)
                 Exploder.Explode(this._ipoint, _DeadlineExplosion, Vector2.zero);
@@ -456,7 +469,7 @@ public class DeadlineProjectile : MonoBehaviour
         if (!start.HasValue)
             return;
 
-        Deadline.CreateALaser(start.Value, end.Value);
+        Deadline.CreateALaser(start.Value, end.Value, pc.HasSynergy(Synergy.MASTERY_DEADLINE));
         p.DieInAir();
     }
 }

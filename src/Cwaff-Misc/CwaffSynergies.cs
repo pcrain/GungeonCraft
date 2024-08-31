@@ -151,6 +151,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfKingsLaw>(MASTERY_KINGS_LAW, KingsLaw.ItemName);
         // Enbubbled projectiles gain the ability to enbubble other projectiles on collision.
         NewMastery<MasteryOfBubblebeam>(MASTERY_BUBBLEBEAM, Bubblebeam.ItemName);
+        // Deadline lasers act as tripwires and detonate whenever an enemy crosses them.
+        NewMastery<MasteryOfDeadline>(MASTERY_DEADLINE, Deadline.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -386,6 +388,7 @@ internal class MasteryOfQuarterPounder  : MasteryDummyItem {}
 internal class MasteryOfTiconderogun    : MasteryDummyItem {}
 internal class MasteryOfKingsLaw        : MasteryDummyItem {}
 internal class MasteryOfBubblebeam      : MasteryDummyItem {}
+internal class MasteryOfDeadline        : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -447,4 +450,5 @@ public enum Synergy {
     MASTERY_TICONDEROGUN,
     MASTERY_KINGS_LAW,
     MASTERY_BUBBLEBEAM,
+    MASTERY_DEADLINE,
 };

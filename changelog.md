@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.18.1 (TBD)
-- Added masteries for Ticonderogun, King's Law, and Bubblebeam
+- Added masteries for Ticonderogun, King's Law, Bubblebeam, and Deadline
 - Added 2 new synergies
 - Fixed dummy items being able to appear in synergy chests
 - Fixed Bubblebeam permanently changing the color of some projectiles fired by enemies even when they aren't enbubbled

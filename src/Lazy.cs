@@ -501,26 +501,36 @@ public static class Lazy
         return false;
     }
 
-    /// <summary>Determine whether any enemy is in an line between start and end (does not account for walls)</summary>
-    public static AIActor NearestEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true)
+    /// <summary>Determine whether any enemy is in an line between start and end</summary>
+    public static AIActor NearestEnemyInLineOfSight(out Vector2 ipoint, Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
         AIActor nearest = null;
         float nearestSqrDist = float.MaxValue;
         start.SafeGetEnemiesInRoom(ref _TempEnemies);
+        ipoint = Vector2.zero;
         foreach (AIActor enemy in _TempEnemies)
         {
             if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
                 continue;
             PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
+            if (accountForWalls && !start.HasLineOfSight(collider.UnitCenter))
+                continue;
             if (!BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
                 continue;
             float sqrDist = (enemy.CenterPosition - start).sqrMagnitude;
             if (sqrDist > nearestSqrDist)
                 continue;
+            ipoint = intersection;
             nearestSqrDist = sqrDist;
             nearest = enemy;
         }
         return nearest;
+    }
+
+    /// <summary>Determine whether any enemy is in an line between start and end</summary>
+    public static AIActor NearestEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
+    {
+        return NearestEnemyInLineOfSight(out _, start, end, canBeNeutral, accountForWalls);
     }
 
     /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
