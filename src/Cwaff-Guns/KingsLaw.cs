@@ -165,8 +165,10 @@ public class KingsLaw : CwaffGun
 
     public override void PostProcessProjectile(Projectile projectile)
     {
+        if (!this.PlayerOwner)
+            return;
         if (projectile.gameObject.GetComponent<KingsLawBullets>() is KingsLawBullets klb)
-            klb.Setup(this);
+            klb.Setup(this, this.PlayerOwner.HasSynergy(Synergy.MASTERY_KINGS_LAW));
     }
 }
 
@@ -195,14 +197,16 @@ public class KingsLawBullets : MonoBehaviour
     private bool             _naturalSpawn          = false;
     private KingsLaw         _king                  = null;
     private Gun              _gun                   = null;
+    private bool             _mastered              = false;
 
-    public void Setup(KingsLaw king)
+    public void Setup(KingsLaw king, bool mastered)
     {
-        this._index = king.GetNextIndex();
-        this._batch = king.GetBatch();
+        this._index        = king.GetNextIndex();
+        this._batch        = king.GetBatch();
         this._naturalSpawn = true;
-        this._king = king;
-        this._gun  = king.gameObject.GetComponent<Gun>();
+        this._king         = king;
+        this._gun          = king.gameObject.GetComponent<Gun>();
+        this._mastered     = mastered;
     }
 
     private void Start()
@@ -219,7 +223,12 @@ public class KingsLawBullets : MonoBehaviour
         this._offsetMag    = baseOffset.y;
         this._offsetRing   = baseOffset.z;
 
-        this._projectile.specRigidbody.OnPreRigidbodyCollision += SkipCorpseCollisions;
+        this._projectile.specRigidbody.OnPreRigidbodyCollision += SkipCorpseAndDoorCollisions;
+        if (this._mastered)
+        {
+            this._projectile.PenetratesInternalWalls = true;
+            this._projectile.specRigidbody.OnPreTileCollision += this._projectile.OnPreTileCollision;
+        }
 
         StartCoroutine(TheLaw());
     }
@@ -230,10 +239,13 @@ public class KingsLawBullets : MonoBehaviour
         this._runeSmall.SafeDestroy();
     }
 
-    private void SkipCorpseCollisions(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    private void SkipCorpseAndDoorCollisions(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
         if (otherRigidbody.GetComponent<AIActor>() is AIActor actor && (!actor.healthHaver || actor.healthHaver.IsDead))
             PhysicsEngine.SkipCollision = true;
+        else if (otherRigidbody.transform.parent && otherRigidbody.transform.parent.GetComponent<DungeonDoorController>() is DungeonDoorController door)
+            if (!this._projectile.specRigidbody.CollideWithTileMap)
+                PhysicsEngine.SkipCollision = true; // skip door collisions when not coliding with tile map
     }
 
     private IEnumerator TheLaw()
@@ -286,7 +298,7 @@ public class KingsLawBullets : MonoBehaviour
 
             ownerCenter = this._owner.CenterPosition;
             targetAngle = this._owner.m_currentGunAngle;
-            originalPlayerPosition = this._owner.CurrentGun.barrelOffset.PositionVector2();
+            originalPlayerPosition = this._owner.CurrentGun.barrelOffset.PositionVector2() + targetAngle.ToVector(2f);
 
             float behindPlayerAngle = targetAngle + 180f;
             Vector2 offset          = (behindPlayerAngle + this._offsetAngle).Clamp360().ToVector(this._offsetMag);
@@ -334,10 +346,20 @@ public class KingsLawBullets : MonoBehaviour
         this._projectile.specRigidbody.Reinitialize();
         _projectile.SendInDirection(targetDir, true);
         this._projectile.gameObject.Play("knife_gun_launch");
+        if (this._mastered)
+        {
+            this._projectile.shouldRotate = true;
+            HomingModifier homing = this._projectile.gameObject.AddComponent<HomingModifier>();
+            homing.AngularVelocity = Mathf.Max(homing.AngularVelocity, 360f);
+            homing.HomingRadius    = Mathf.Max(homing.HomingRadius, 36f);
+        }
 
         // Post-launch: wait for the projectiles to pass the player's original point at their launch, then re-enable tile collision
+        float ignoreTileTime = 2.0f; // don't ignore collisions for more than 2 seconds regardless of what happens
         while (this._owner && this._projectile && this._projectile.isActiveAndEnabled)
         {
+            if ((ignoreTileTime -= BraveTime.DeltaTime) <= 0)
+                break;
             float angleToPlayerOriginalPosition = (this._projectile.transform.position.XY() - originalPlayerPosition).ToAngle();
             if (angleToPlayerOriginalPosition.IsNearAngle(targetAngle, 90f))
                 break;

@@ -147,6 +147,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfQuarterPounder>(MASTERY_QUARTER_POUNDER, QuarterPounder.ItemName);
         // Ticonderogun can be reloaded to switch to eraser mode, which reflects encircled enemy bullets.
         NewMastery<MasteryOfTiconderogun>(MASTERY_TICONDEROGUN, Ticonderogun.ItemName);
+        // King's Law projectiles phase through walls and home in on enemies after launching.
+        NewMastery<MasteryOfKingsLaw>(MASTERY_KINGS_LAW, KingsLaw.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -380,6 +382,7 @@ internal class MasteryOfIronMaid        : MasteryDummyItem {}
 internal class MasteryOfAlligator       : MasteryDummyItem {}
 internal class MasteryOfQuarterPounder  : MasteryDummyItem {}
 internal class MasteryOfTiconderogun    : MasteryDummyItem {}
+internal class MasteryOfKingsLaw        : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -439,4 +442,5 @@ public enum Synergy {
     MASTERY_ALLIGATOR,
     MASTERY_QUARTER_POUNDER,
     MASTERY_TICONDEROGUN,
+    MASTERY_KINGS_LAW,
 };
