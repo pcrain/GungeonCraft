@@ -22,27 +22,27 @@ You can download the mod or read more about it [https://thunderstore.io/c/enter-
 }
 
 VANILLA_ITEMS = {
-  "hyper_light_blaster"    : ("Hyper Light Blaster", "Hyper_Light_Blaster.png"),
-  "sunlight_javelin"       : ("Sunlight Javelin", "Sunlight_Javelin.png"),
-  "laser_lotus"            : ("Laser Lotus", "Laser_Lotus.png"),
-  "bubble_blaster"         : ("Bubble Blaster", "Bubble_Blaster.png"),
-  "gun_soul"               : ("Gun Soul", "Gun_Soul.png"),
-  "decoy"                  : ("Decoy", "Decoy.png"),
-  "explosive_decoy"        : ("Explosive Decoy", "Explosive_Decoy.png"),
-  "nanomachines"           : ("Nanomachines", "Nanomachines.png"),
-  "heroine"                : ("Heroine", "Heroine.png"),
-  "master_of_unlocking"    : ("Master of Unlocking", "Master_of_Unlocking.png"),
-  "metronome"              : ("Metronome", "Metronome.png"),
-  "backpack"               : ("Backpack", "Backpack.png"),
-  "laser_sight"            : ("Laser Sight", "Laser_Sight.png"),
-  "amulet_of_the_pit_lord" : ("Amulet of the Pit Lord", "Amulet_of_the_Pit_Lord.png"),
-  "singularity"            : ("Singularity", "Singularity.png"),
-  "stuffed_star"           : ("Stuffed Star", "Stuffed_Star.png"),
-  "shotgun_coffee"         : ("Shotgun Coffee", "Shotgun_Coffee.png"),
-  "loot_bag"               : ("Loot Bag", "Loot_Bag.png"),
-  "grappling_hook"         : ("Grappling Hook", "Grappling_Hook.png"),
-  "disarming_personality"  : ("Disarming Personality", "Disarming_Personality.png"),
-  "portable_table_device"  : ("Portable Table Device", "Portable_Table_Device.png"),
+  # "hyper_light_blaster"    : ("Hyper Light Blaster", "Hyper_Light_Blaster.png"),
+  # "sunlight_javelin"       : ("Sunlight Javelin", "Sunlight_Javelin.png"),
+  # "laser_lotus"            : ("Laser Lotus", "Laser_Lotus.png"),
+  # "bubble_blaster"         : ("Bubble Blaster", "Bubble_Blaster.png"),
+  # "gun_soul"               : ("Gun Soul", "Gun_Soul.png"),
+  # "decoy"                  : ("Decoy", "Decoy.png"),
+  # "explosive_decoy"        : ("Explosive Decoy", "Explosive_Decoy.png"),
+  # "nanomachines"           : ("Nanomachines", "Nanomachines.png"),
+  # "heroine"                : ("Heroine", "Heroine.png"),
+  # "master_of_unlocking"    : ("Master of Unlocking", "Master_of_Unlocking.png"),
+  # "metronome"              : ("Metronome", "Metronome.png"),
+  # "backpack"               : ("Backpack", "Backpack.png"),
+  # "laser_sight"            : ("Laser Sight", "Laser_Sight.png"),
+  # "amulet_of_the_pit_lord" : ("Amulet of the Pit Lord", "Amulet_of_the_Pit_Lord.png"),
+  # "singularity"            : ("Singularity", "Singularity.png"),
+  # "stuffed_star"           : ("Stuffed Star", "Stuffed_Star.png"),
+  # "shotgun_coffee"         : ("Shotgun Coffee", "Shotgun_Coffee.png"),
+  # "loot_bag"               : ("Loot Bag", "Loot_Bag.png"),
+  # "grappling_hook"         : ("Grappling Hook", "Grappling_Hook.png"),
+  # "disarming_personality"  : ("Disarming Personality", "Disarming_Personality.png"),
+  # "portable_table_device"  : ("Portable Table Device", "Portable_Table_Device.png"),
 }
 
 def applyGunDataOverrides(gunData):
@@ -279,9 +279,14 @@ def scanSynergies(passives, actives, guns):
           itemnames.append(e["itemname"])
           continue
         continue
-      if (e := VANILLA_ITEMS.get(m.replace('"',""), None)) is not None:
+      item_id = m.replace('"',"")
+      if (e := VANILLA_ITEMS.get(item_id, None)) is not None:
           filenames.append(f"""[[File:{e[1]}]]""")
           itemnames.append(e[0])
+      else:
+          cap_item = " ".join([(w if w in ["of", "the"] else w.title()) for w in item_id.replace("_"," ").split()])
+          filenames.append(f"""[[File:{cap_item.replace(" ","_")}.png]]""")
+          itemnames.append(cap_item)
     if len(filenames) < 2:
       continue
     desc = re.sub(r"""^\s*//\s*""","", lines[i-1])
