@@ -2,7 +2,7 @@
 
 ## 1.18.1 (TBD)
 - Added mastery for Ticonderogun
-- Added 1 new synergy
+- Added 2 new synergies
 - Fixed dummy items from being able to appear in synergy chests
 - Fixed Bubblebeam permanently changing the color of some projectiles fired by enemies even when they aren't enbubbled
 - Fixed camera not properly resetting when killing a boss with Ticonderogun

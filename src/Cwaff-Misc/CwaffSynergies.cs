@@ -95,6 +95,8 @@ public static class CwaffSynergies
         NewSynergy(LOOKUP_TABLE, "Lookup Table", new[]{IName(Femtobyte.ItemName), "portable_table_device"});
         // Spawns 5 turtles upon getting hit
         NewSynergy(TROLLEY_PROBLEM, "Trolley Problem", new[]{IName(DerailGun.ItemName), "turtle_problem"});
+        // Ticonderogun's leaves fire goop along drawn lines
+        NewSynergy(DRAW_FIRE, "Draw Fire", new[]{IName(Ticonderogun.ItemName), "hot_lead"});
       #endregion
 
       #region Masteries
@@ -411,6 +413,7 @@ public enum Synergy {
     BLANK_EXPRESSION,
     LOOKUP_TABLE,
     TROLLEY_PROBLEM,
+    DRAW_FIRE,
 
     // Masteries
     MASTERY_GRANDMASTER,

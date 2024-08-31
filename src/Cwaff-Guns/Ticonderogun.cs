@@ -85,6 +85,12 @@ public class Ticonderogun : CwaffGun
         base.OnSwitchedAwayFromThisGun();
     }
 
+    public override void OnSwitchedToThisGun()
+    {
+        base.OnSwitchedToThisGun();
+        ToggleEraserSprites();
+    }
+
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
         base.OnReloadPressed(player, gun, manualReload);
@@ -107,6 +113,7 @@ public class Ticonderogun : CwaffGun
         this.gun.reloadAnimation = $"{baseName}_reload";
         this.gun.chargeAnimation = $"{baseName}_charge";
         this.gun.shootAnimation  = $"{baseName}_fire";
+        this.gun.spriteAnimator.Stop();
         this.gun.PlayIdleAnimation();
     }
 
@@ -446,6 +453,11 @@ public class Ticonderogun : CwaffGun
 
         // Play some nice VFX
         SpawnManager.SpawnVFX(_SparklePrefab, pencilPos, Quaternion.identity, ignoresPools: false);
+
+        // Check for synergies
+        if (this._owner.HasSynergy(Synergy.DRAW_FIRE))
+            if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.FireDef) is DeadlyDeadlyGoopManager gooper)
+                gooper.AddGoopCircle(pencilPos, 0.75f);
 
         // If we have too many points, remove everything and start over
         if (this._extantPoints.Count >= _POINT_CAP)
