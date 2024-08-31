@@ -149,6 +149,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfTiconderogun>(MASTERY_TICONDEROGUN, Ticonderogun.ItemName);
         // King's Law projectiles phase through walls and home in on enemies after launching.
         NewMastery<MasteryOfKingsLaw>(MASTERY_KINGS_LAW, KingsLaw.ItemName);
+        // Enbubbled projectiles gain the ability to enbubble other projectiles on collision.
+        NewMastery<MasteryOfBubblebeam>(MASTERY_BUBBLEBEAM, Bubblebeam.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -383,6 +385,7 @@ internal class MasteryOfAlligator       : MasteryDummyItem {}
 internal class MasteryOfQuarterPounder  : MasteryDummyItem {}
 internal class MasteryOfTiconderogun    : MasteryDummyItem {}
 internal class MasteryOfKingsLaw        : MasteryDummyItem {}
+internal class MasteryOfBubblebeam      : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -443,4 +446,5 @@ public enum Synergy {
     MASTERY_QUARTER_POUNDER,
     MASTERY_TICONDEROGUN,
     MASTERY_KINGS_LAW,
+    MASTERY_BUBBLEBEAM,
 };

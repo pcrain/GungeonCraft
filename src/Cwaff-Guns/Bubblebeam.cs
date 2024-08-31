@@ -77,6 +77,7 @@ public class BubblebeamProjectile : MonoBehaviour
     private PlayerController _owner;
     private Bubblebeam _gun;
     private float _force = 0f;
+    private bool _mastered = false;
 
     private void Start()
     {
@@ -87,6 +88,7 @@ public class BubblebeamProjectile : MonoBehaviour
 
         if (this._owner.CurrentGun is Gun gun)
             this._gun = gun.gameObject.GetComponent<Bubblebeam>();
+        this._mastered = this._owner.HasSynergy(Synergy.MASTERY_BUBBLEBEAM);
 
         this._force = this._projectile.baseData.force;
         this._projectile.baseData.force = 0f; // don't want to apply normal knockback
@@ -140,8 +142,12 @@ public class BubblebeamProjectile : MonoBehaviour
 
     private void EnbubbleProjectile(Projectile p)
     {
-        if (p.specRigidbody)
-            p.gameObject.GetOrAddComponent<EnbubbledBehaviour>().PushBubble(this._projectile, this._force);
+        if (!p.specRigidbody)
+            return;
+        EnbubbledBehaviour eb = p.gameObject.GetOrAddComponent<EnbubbledBehaviour>();
+        if (this._mastered)
+            eb._mastered = true;
+        eb.PushBubble(this._projectile, this._force);
     }
 
     private const float _BASE_ENBUBBLE_ENEMY_CHANCE = 0.5f;
@@ -165,7 +171,10 @@ public class BubblebeamProjectile : MonoBehaviour
             return;
         if (bs.ImmuneToStun)
             return;
-        actor.gameObject.AddComponent<EnbubbledBehaviour>().PushBubble(this._projectile, this._force);
+        EnbubbledBehaviour eb = actor.gameObject.AddComponent<EnbubbledBehaviour>();
+        if (this._mastered)
+            eb._mastered = true;
+        eb.PushBubble(this._projectile, this._force);
     }
 }
 
@@ -175,6 +184,8 @@ public class EnbubbledBehaviour : MonoBehaviour
     private const string _FLIGHT_REASON = "Enbubbled";
     private const float _MIN_DRIFT = 2.5f;
     private const float _BUBBLE_DRIFT_DECAY = 1f;
+
+    internal bool _mastered = false;
 
     private Shader _oldShader = null;
     private GameObject _vfx = null;
@@ -287,7 +298,7 @@ public class EnbubbledBehaviour : MonoBehaviour
         this._proj.collidesWithEnemies = true;
         this._proj.collidesWithPlayer = false;
         this._proj.collidesWithProjectiles = true;
-        this._proj.collidesOnlyWithPlayerProjectiles = true;
+        this._proj.collidesOnlyWithPlayerProjectiles = !this._mastered;
         if (this._proj.sprite)
         {
             this._oldShader = this._proj.sprite.renderer.material.shader;
@@ -299,14 +310,48 @@ public class EnbubbledBehaviour : MonoBehaviour
 
         this._proj.BulletScriptSettings.surviveTileCollisions = true;
         this._body.OnCollision += this.OnAnyCollision;
+        if (this._mastered)
+            this._body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
         this._proj.OnDestruction += this.OnDestruction;
         this._parent = this._proj.transform;
         this._startPos = this._proj.SafeCenter;
         this._parentSprite = this._proj.sprite;
     }
 
+    private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        if (!otherRigidbody || !otherRigidbody.gameObject || otherRigidbody.projectile is not Projectile p)
+            return;
+        if (p.Owner is PlayerController)
+            return;
+        PhysicsEngine.SkipCollision = true;
+        if (!this._proj || !this._mastered || p.gameObject.GetComponent<EnbubbledBehaviour>())
+            return;
+
+        EnbubbledBehaviour eb = p.gameObject.AddComponent<EnbubbledBehaviour>();
+        eb._mastered = true;
+        eb.PushBubble(this._proj, Mathf.Max(this._proj.baseData.force, 10f));
+        this.PushBubble(p, Mathf.Max(p.baseData.force, 10f));
+
+        CwaffVFX.SpawnBurst(
+            prefab           : Bubblebeam._BurstBubbleVFX,
+            numToSpawn       : 10,
+            basePosition     : this._proj.SafeCenter,
+            positionVariance : 1f,
+            velocityVariance : 5f,
+            velType          : CwaffVFX.Vel.Random,
+            rotType          : CwaffVFX.Rot.Random,
+            lifetime         : 0.5f,
+            fadeOutTime      : 0.1f
+          );
+        base.gameObject.Play("bubble_pop_sound");
+    }
+
     private void OnDestruction(Projectile proj)
     {
+        proj.specRigidbody.OnCollision -= this.OnAnyCollision;
+        proj.specRigidbody.OnPreRigidbodyCollision -= this.OnPreRigidbodyCollision;
+        proj.OnDestruction -= this.OnDestruction;
         if (proj.sprite)
         {
             proj.sprite.usesOverrideMaterial = false;
@@ -328,16 +373,11 @@ public class EnbubbledBehaviour : MonoBehaviour
               this._proj.SendInDirection(newVel2, true);
           return;
       }
-      if (this._proj)
-      {
-          BurstYourBubble();
-          return;
-      }
       if (collision.OtherRigidbody is not SpeculativeRigidbody other)
         return;
       if (other.gameObject.GetComponent<Projectile>() is Projectile p)
       {
-        if (!p.gameObject.GetComponent<BubblebeamProjectile>())
+        if (p.Owner is PlayerController && !p.gameObject.GetComponent<BubblebeamProjectile>())
         {
             p.DieInAir();
             BurstYourBubble();
@@ -354,6 +394,8 @@ public class EnbubbledBehaviour : MonoBehaviour
       PhysicsEngine.PostSliceVelocity = newVel;
       if (this._enemy)
         this._enemy.KnockbackVelocity = newVel;
+      else if (this._proj)
+        this._proj.SendInDirection(newVel, true);
     }
 
     private void BurstYourBubble()
