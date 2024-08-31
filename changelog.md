@@ -3,12 +3,13 @@
 ## 1.18.1 (TBD)
 - Added masteries for Ticonderogun, King's Law, and Bubblebeam
 - Added 2 new synergies
-- Fixed dummy items from being able to appear in synergy chests
+- Fixed dummy items being able to appear in synergy chests
 - Fixed Bubblebeam permanently changing the color of some projectiles fired by enemies even when they aren't enbubbled
 - Fixed projectiles enbubbled by Bubblebeam getting stuck on the back wall of the Bullet King's boss room
 - Fixed camera not properly resetting when killing a boss with Ticonderogun
 - Fixed King's Law projectiles colliding with doors even when behind the player
 - Gave Gunbrella, King's Law, Maestro, Pistol Whip, Starmageddon, and Yggdrashell the ability to fire even when up against walls
+- Fixed Groundhog being able to hit Gripmasters during their invulnerable phase, causing them to constantly damage the player once unstunned
 
 ## 1.18.0 (2024-08-27)
 

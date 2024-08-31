@@ -118,7 +118,7 @@ public class Groundhog : CwaffGun
       RoomHandler room = player.CurrentRoom;
       foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
       {
-        if (enemy.healthHaver is not HealthHaver hh || !hh.IsVulnerable || !hh.IsAlive || !enemy.specRigidbody/* || enemy.IsFlying*/)
+        if (enemy.healthHaver is not HealthHaver hh || !hh.IsVulnerable || hh.IsDead || hh.PreventAllDamage || !enemy.specRigidbody/* || enemy.IsFlying*/)
           continue;
         float dist = (enemy.CenterPosition - shockwaveCenter).magnitude;
         if (dist < minRange || dist > maxRange)
