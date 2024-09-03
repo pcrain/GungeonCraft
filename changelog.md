@@ -5,6 +5,7 @@
 - Fixed Yggdrashell's Earth Armor activating from damage sources that would not have dealt damage to the player
 - Fixed game manager issue with custom VFX sometimes freezing in place and never disappearing when starting a new run
 - Fixed looping charge sounds for Gunflower and Yggdrashell continuing to play while the game is paused
+- Fixed Gunflower's light beam persisting if switched or dropped while firing
 
 ## 1.18.1 (2024-08-31)
 

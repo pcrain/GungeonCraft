@@ -167,4 +167,25 @@ public class Gunflower : CwaffGun
             if (this._lights[i])
                 this._lights[i].LightIntensity = 0f;
     }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        base.OnDroppedByPlayer(player);
+        DismissLights();
+    }
+
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        base.OnSwitchedAwayFromThisGun();
+        DismissLights();
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        if (this && this._lights != null)
+            for (int i = 0; i < this._lights.Count; ++i)
+                if (this._lights[i] && this._lights[i].gameObject)
+                    UnityEngine.Object.Destroy(this._lights[i].gameObject);
+    }
 }
