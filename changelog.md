@@ -6,6 +6,9 @@
 - Fixed game manager issue with custom VFX sometimes freezing in place and never disappearing when starting a new run
 - Fixed looping charge sounds for Gunflower and Yggdrashell continuing to play while the game is paused
 - Fixed Gunflower's light beam persisting if switched or dropped while firing
+- Buffed 4D Bullets:
+	- Bullets now only lose 33% of their power (instead of 50%) after phasing through a wall
+	- Bullets no longer lose power multiple times when phasing through multiple walls
 - Rebalanced Kaliber's Justice:
 	- Key blessing no longer grants keys if player possesses Shelleton Key
 	- Blank blessing can no longer grant Blank Bullets or Elder Blank if the player already has them
