@@ -6,6 +6,12 @@
 - Fixed game manager issue with custom VFX sometimes freezing in place and never disappearing when starting a new run
 - Fixed looping charge sounds for Gunflower and Yggdrashell continuing to play while the game is paused
 - Fixed Gunflower's light beam persisting if switched or dropped while firing
+- Rebalanced Kaliber's Justice:
+	- Key blessing no longer grants keys if player possesses Shelleton Key
+	- Blank blessing can no longer grant Blank Bullets or Elder Blank if the player already has them
+	- Undroppable items can no longer be taken from the player
+	- Kaliber's Justice now ignores invulnerability when taking health from the player
+	- Removed ability to grant an active item since it was buggy and couldn't trigger under any sane circumstance anyway
 
 ## 1.18.1 (2024-08-31)
 

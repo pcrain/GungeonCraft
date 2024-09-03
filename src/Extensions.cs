@@ -443,6 +443,15 @@ public static class Extensions
     return false;
   }
 
+  /// <summary>Get a passive item owned by the player</summary>
+  public static bool HasPassive(this PlayerController p, int id)
+  {
+    for (int i = 0; i < p.passiveItems.Count; ++i)
+      if (p.passiveItems[i].PickupObjectId == id)
+        return true;
+    return false;
+  }
+
   /// <summary>Get an active item owned by the player</summary>
   public static bool HasActive<T>(this PlayerController p) where T : PlayerItem
   {
@@ -452,11 +461,29 @@ public static class Extensions
     return false;
   }
 
+  /// <summary>Get an active item owned by the player</summary>
+  public static bool HasActive(this PlayerController p, int id)
+  {
+    for (int i = 0; i < p.activeItems.Count; ++i)
+      if (p.activeItems[i].PickupObjectId == id)
+        return true;
+    return false;
+  }
+
   /// <summary>Get a gun owned by the player</summary>
   public static bool HasGun<T>(this PlayerController p) where T : Gun
   {
     for (int i = 0; i < p.inventory.AllGuns.Count; ++i)
       if (p.inventory.AllGuns[i] is T)
+        return true;
+    return false;
+  }
+
+  /// <summary>Get a gun owned by the player</summary>
+  public static bool HasGun(this PlayerController p, int id)
+  {
+    for (int i = 0; i < p.inventory.AllGuns.Count; ++i)
+      if (p.inventory.AllGuns[i].PickupObjectId == id)
         return true;
     return false;
   }

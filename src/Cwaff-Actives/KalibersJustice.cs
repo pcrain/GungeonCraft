@@ -1,5 +1,7 @@
 namespace CwaffingTheGungy;
 
+using static NeedStatus;
+
 public class KalibersJustice : CwaffActive
 {
     public static string ItemName         = "Kaliber's Justice";
@@ -46,12 +48,12 @@ public class KalibersJustice : CwaffActive
             // ETGModConsole.Log($"  user's need for {need.type} is {need.status}");
             switch(need.status)
             {
-                case NeedStatus.Minimal:   minimal.Add(need);   break;
-                case NeedStatus.Lacking:   lacking.Add(need);   break;
-                case NeedStatus.Enough:    enough.Add(need);    break;
-                case NeedStatus.Plenty:    plenty.Add(need);    break;
-                case NeedStatus.Excessive: excessive.Add(need); break;
-                default: break;
+                case Minimal:   minimal.Add(need);   break;
+                case Lacking:   lacking.Add(need);   break;
+                case Enough:    enough.Add(need);    break;
+                case Plenty:    plenty.Add(need);    break;
+                case Excessive: excessive.Add(need); break;
+                default:                             break;
             }
         }
 
@@ -99,7 +101,7 @@ public class KalibersJustice : CwaffActive
             switch(whatToOffer.Value.type)
             {
                 case NeedType.Health:
-                    user.healthHaver.ApplyDamage(big ? 3.5f : 2.0f, Vector2.zero, "Balance", CoreDamageTypes.None, DamageCategory.Unstoppable);
+                    user.healthHaver.ApplyDamage(big ? 3.5f : 2.0f, Vector2.zero, "Balance", CoreDamageTypes.None, DamageCategory.Unstoppable, true);
                     break;
                 case NeedType.Armor:
                     user.healthHaver.Armor -= (big ? 4 : 2);
@@ -133,7 +135,7 @@ public class KalibersJustice : CwaffActive
                             if (n < 50 && !big && (gunToDrop.quality == ItemQuality.S || gunToDrop.quality == ItemQuality.A))
                                 continue; // try not to drop rare items if we're not doing a big trade
                         }
-                        if (gunToDrop)
+                        if (gunToDrop && gunToDrop.CanActuallyBeDropped(user))
                             UnityEngine.Object.Destroy(user.ForceDropGun(gunToDrop).gameObject);
                         else
                             ETGModConsole.Log($"dropping a gun went horrifically wrong o.o");
@@ -151,32 +153,32 @@ public class KalibersJustice : CwaffActive
                             if (n < 50 && !big && (passiveToDrop.quality == ItemQuality.S || passiveToDrop.quality == ItemQuality.A))
                                 continue; // try not to drop rare items if we're not doing a big trade
                         }
-                        if (passiveToDrop)
+                        if (passiveToDrop && passiveToDrop.CanActuallyBeDropped(user))
                             UnityEngine.Object.Destroy(user.DropPassiveItem(passiveToDrop).gameObject);
                         else
                             ETGModConsole.Log($"dropping a passive went horrifically wrong o.o");
                     }
                     break;
-                case NeedType.Actives:
-                    for (int i = 0; i < (big ? 2 : 1); ++i)
-                    {
-                        PlayerItem activeToDrop = null;
-                        for (int n = 0; n < 100; ++n)
-                        {
-                            activeToDrop = user.activeItems.ChooseRandom();
-                            if (activeToDrop == this)
-                                continue;
-                            if (!activeToDrop.CanActuallyBeDropped(user))
-                                continue;
-                            if (n < 50 && !big && (activeToDrop.quality == ItemQuality.S || activeToDrop.quality == ItemQuality.A))
-                                continue; // try not to drop rare items if we're not doing a big trade
-                        }
-                        if (activeToDrop)
-                            UnityEngine.Object.Destroy(user.DropActiveItem(activeToDrop).gameObject);
-                        else
-                            ETGModConsole.Log($"dropping an active went horrifically wrong o.o");
-                    }
-                    break;
+                // case NeedType.Actives:
+                //     for (int i = 0; i < (big ? 2 : 1); ++i)
+                //     {
+                //         PlayerItem activeToDrop = null;
+                //         for (int n = 0; n < 100; ++n)
+                //         {
+                //             activeToDrop = user.activeItems.ChooseRandom();
+                //             if (activeToDrop == this)
+                //                 continue;
+                //             if (!activeToDrop.CanActuallyBeDropped(user))
+                //                 continue;
+                //             if (n < 50 && !big && (activeToDrop.quality == ItemQuality.S || activeToDrop.quality == ItemQuality.A))
+                //                 continue; // try not to drop rare items if we're not doing a big trade
+                //         }
+                //         if (activeToDrop && activeToDrop.CanActuallyBeDropped(user))
+                //             UnityEngine.Object.Destroy(user.DropActiveItem(activeToDrop).gameObject);
+                //         else
+                //             ETGModConsole.Log($"dropping an active went horrifically wrong o.o");
+                //     }
+                //     break;
             }
         }
 
@@ -205,7 +207,9 @@ public class KalibersJustice : CwaffActive
                 LootEngine.SpawnItem(ItemHelper.Get(big ? Items.Akey47 : Items.ShelletonKey).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                 break;
             case NeedType.Blanks:
-                LootEngine.SpawnItem(ItemHelper.Get(big ? Items.ElderBlank : Items.BlankBullets).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+                Items blankItem = (big && !user.HasPassive((int)Items.BlankBullets)) ? Items.BlankBullets : Items.ElderBlank;
+                if (!user.HasPassive((int)blankItem))
+                    LootEngine.SpawnItem(ItemHelper.Get(blankItem).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                 for (int i = 0; i < (big ? 4 : 2); ++i)
                     LootEngine.SpawnItem(ItemHelper.Get(Items.Blank).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
                 break;
@@ -236,10 +240,10 @@ public class KalibersJustice : CwaffActive
                     break;
                 }
                 break;
-            case NeedType.Actives:
-                LootEngine.SpawnItem(ItemHelper.Get(Items.Backpack).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
-                LootEngine.SpawnItem(ItemHelper.Get(big ? Items.Relodestone : Items.PortableTurret).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
-                break;
+            // case NeedType.Actives:
+            //     LootEngine.SpawnItem(ItemHelper.Get(Items.Backpack).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+            //     LootEngine.SpawnItem(ItemHelper.Get(big ? Items.Relodestone : Items.PortableTurret).gameObject, SpotNear(where), Vector2.zero, 0f, true, true, false);
+            //     break;
         }
 
         GameObject vfx = Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.tileMapVertical.effects[0].effects[0].effect;
@@ -276,63 +280,68 @@ public class KalibersJustice : CwaffActive
         List<Need> needs = new();
         #region Health
             Need healthNeed = new Need(NeedType.Health);
-            float health = user.healthHaver.currentHealth;
-            if (user.ForceZeroHealthState) healthNeed.status = NeedStatus.Enough;
-            else if (health <= 1f)         healthNeed.status = NeedStatus.Minimal;
-            else if (health <= 2f)         healthNeed.status = NeedStatus.Lacking;
-            else if (health <= 4f)         healthNeed.status = NeedStatus.Enough;
-            else if (health <= 6f)         healthNeed.status = NeedStatus.Plenty;
-            else                           healthNeed.status = NeedStatus.Excessive;
+            healthNeed.status = user.ForceZeroHealthState ? Enough : user.healthHaver.currentHealth switch {
+                <= 1f => Minimal,
+                <= 2f => Lacking,
+                <= 4f => Enough,
+                <= 6f => Plenty,
+                _     => Excessive,
+            };
             needs.Add(healthNeed);
         #endregion
 
         #region Armor
             Need armorNeed = new Need(NeedType.Armor);
-            int adjustedArmor = (int)user.healthHaver.currentArmor;
-            if (user.ForceZeroHealthState)
-                adjustedArmor -= 1;
-            else
-                adjustedArmor += 1;
-            if      (adjustedArmor <= 2) armorNeed.status = NeedStatus.Minimal;
-            else if (adjustedArmor <= 3) armorNeed.status = NeedStatus.Lacking;
-            else if (adjustedArmor <= 5) armorNeed.status = NeedStatus.Enough;
-            else if (adjustedArmor <= 8) armorNeed.status = NeedStatus.Plenty;
-            else                         armorNeed.status = NeedStatus.Excessive;
+            int adjustedArmor = (int)user.healthHaver.currentArmor + (user.ForceZeroHealthState ? -1 : 1);
+            armorNeed.status = adjustedArmor switch {
+                <= 2 => Minimal,
+                <= 3 => Lacking,
+                <= 5 => Enough,
+                <= 8 => Plenty,
+                _    => Excessive,
+            };
             needs.Add(armorNeed);
         #endregion
 
         #region Money
             Need moneyNeed = new Need(NeedType.Money);
             int money = GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency;
-            if      (money < 10)  moneyNeed.status = NeedStatus.Minimal;
-            else if (money < 25)  moneyNeed.status = NeedStatus.Lacking;
-            else if (money < 100) moneyNeed.status = NeedStatus.Enough;
-            else if (money < 200) moneyNeed.status = NeedStatus.Plenty;
-            else                  moneyNeed.status = NeedStatus.Excessive;
+            moneyNeed.status = money switch {
+                < 10  => Minimal,
+                < 25  => Lacking,
+                < 100 => Enough,
+                < 200 => Plenty,
+                _     => Excessive,
+            };
             needs.Add(moneyNeed);
         #endregion
 
         #region Keys
             Need keysNeed = new Need(NeedType.Keys);
             int keys = GameManager.Instance.PrimaryPlayer.carriedConsumables.KeyBullets;
-            bool infKeys = GameManager.Instance.PrimaryPlayer.carriedConsumables.InfiniteKeys;
-            bool hasAkey47 = Lazy.AnyoneHasGun((int)Items.Akey47);
-            if (infKeys || hasAkey47) keysNeed.status = NeedStatus.Enough;
-            else if (keys == 0)       keysNeed.status = NeedStatus.Minimal;
-            else if (keys <= 2)       keysNeed.status = NeedStatus.Lacking;
-            else if (keys <= 4)       keysNeed.status = NeedStatus.Enough;
-            else if (keys <= 6)       keysNeed.status = NeedStatus.Plenty;
-            else                      keysNeed.status = NeedStatus.Excessive;
+            bool infKeys = GameManager.Instance.PrimaryPlayer.carriedConsumables.InfiniteKeys
+              || Lazy.AnyoneHasGun((int)Items.Akey47) || Lazy.AnyoneHas((int)Items.ShelletonKey);
+            if (infKeys && keys < 4)
+                keys = 4;
+            keysNeed.status = keys switch {
+                > 6 => Excessive,
+                > 4 => Plenty,
+                > 2 => Enough,
+                > 0 => Lacking,
+                _   => Minimal,
+            };
             needs.Add(keysNeed);
         #endregion
 
         #region Blanks
             Need blanksNeed = new Need(NeedType.Blanks);
-            if      (user.Blanks == 0) blanksNeed.status = NeedStatus.Minimal;
-            else if (user.Blanks == 1) blanksNeed.status = NeedStatus.Lacking;
-            else if (user.Blanks <= 3) blanksNeed.status = NeedStatus.Enough;
-            else if (user.Blanks <= 5) blanksNeed.status = NeedStatus.Plenty;
-            else                       blanksNeed.status = NeedStatus.Excessive;
+            keysNeed.status = user.Blanks switch {
+                > 5 => Excessive,
+                > 3 => Plenty,
+                > 1 => Enough,
+                > 0 => Lacking,
+                _   => Minimal,
+            };
             needs.Add(blanksNeed);
         #endregion
 
@@ -348,15 +357,15 @@ public class KalibersJustice : CwaffActive
                     averageGunAmmoPercent += ((float)g.CurrentAmmo / (float)g.AdjustedMaxAmmo);
             }
             if (gunsWithAmmo == 0)
-                ammoNeed.status = NeedStatus.Enough;
+                ammoNeed.status = Enough;
             else
             {
                 averageGunAmmoPercent /= (float)gunsWithAmmo;
-                if      (averageGunAmmoPercent < 0.34f) ammoNeed.status = NeedStatus.Minimal;
-                else if (averageGunAmmoPercent < 0.50f) ammoNeed.status = NeedStatus.Lacking;
-                else if (averageGunAmmoPercent < 0.67f) ammoNeed.status = NeedStatus.Enough;
-                else if (averageGunAmmoPercent < 0.75f) ammoNeed.status = NeedStatus.Plenty;
-                else                                    ammoNeed.status = NeedStatus.Excessive;
+                if      (averageGunAmmoPercent < 0.34f) ammoNeed.status = Minimal;
+                else if (averageGunAmmoPercent < 0.50f) ammoNeed.status = Lacking;
+                else if (averageGunAmmoPercent < 0.67f) ammoNeed.status = Enough;
+                else if (averageGunAmmoPercent < 0.75f) ammoNeed.status = Plenty;
+                else                                    ammoNeed.status = Excessive;
             }
             needs.Add(ammoNeed);
         #endregion
@@ -366,11 +375,11 @@ public class KalibersJustice : CwaffActive
             int numGuns = user.inventory.AllGuns.Count;
             ItemQuality bestGunQuality = (user.inventory.AllGuns.HighestQualityItem() is PickupObject pg)
                 ? pg.quality : ItemQuality.D;
-            if      (numGuns <= 2 || bestGunQuality == ItemQuality.D) gunsNeed.status = NeedStatus.Minimal;
-            else if (numGuns <= 4 || bestGunQuality == ItemQuality.C) gunsNeed.status = NeedStatus.Lacking;
-            else if (numGuns <= 6 || bestGunQuality == ItemQuality.B) gunsNeed.status = NeedStatus.Enough;
-            else if (numGuns <= 8 || bestGunQuality == ItemQuality.A) gunsNeed.status = NeedStatus.Plenty;
-            else                                                                   gunsNeed.status = NeedStatus.Excessive;
+            if      (numGuns <= 2 || bestGunQuality == ItemQuality.D) gunsNeed.status = Minimal;
+            else if (numGuns <= 4 || bestGunQuality == ItemQuality.C) gunsNeed.status = Lacking;
+            else if (numGuns <= 6 || bestGunQuality == ItemQuality.B) gunsNeed.status = Enough;
+            else if (numGuns <= 8 || bestGunQuality == ItemQuality.A) gunsNeed.status = Plenty;
+            else                                                      gunsNeed.status = Excessive;
             needs.Add(gunsNeed);
         #endregion
 
@@ -379,27 +388,28 @@ public class KalibersJustice : CwaffActive
             int numPassives = user.passiveItems.Count;
             ItemQuality bestPassiveQuality = (user.passiveItems.HighestQualityItem() is PickupObject pp)
                 ? pp.quality : ItemQuality.D;
-            if      (numPassives < 2 || bestPassiveQuality == ItemQuality.D) passivesNeed.status = NeedStatus.Minimal;
-            else if (numPassives < 4 || bestPassiveQuality == ItemQuality.C) passivesNeed.status = NeedStatus.Lacking;
-            else if (numPassives < 6 || bestPassiveQuality == ItemQuality.B) passivesNeed.status = NeedStatus.Enough;
-            else if (numPassives < 8 || bestPassiveQuality == ItemQuality.A) passivesNeed.status = NeedStatus.Plenty;
-            else                                                                          passivesNeed.status = NeedStatus.Excessive;
+            if      (numPassives < 2 || bestPassiveQuality == ItemQuality.D) passivesNeed.status = Minimal;
+            else if (numPassives < 4 || bestPassiveQuality == ItemQuality.C) passivesNeed.status = Lacking;
+            else if (numPassives < 6 || bestPassiveQuality == ItemQuality.B) passivesNeed.status = Enough;
+            else if (numPassives < 8 || bestPassiveQuality == ItemQuality.A) passivesNeed.status = Plenty;
+            else                                                             passivesNeed.status = Excessive;
             needs.Add(passivesNeed);
         #endregion
 
-        #region Actives
-            Need activesNeed = new Need(NeedType.Actives);
-            int numActives = user.activeItems.Count;
-            ItemQuality bestActiveQuality = (user.activeItems.HighestQualityItem() is PickupObject pa)
-                ? pa.quality : ItemQuality.D;
-            if (user.activeItems.Count == 1 && user.activeItems[0] == this)
-                activesNeed.status = NeedStatus.Enough;
-            else if (numActives  < 2 || bestActiveQuality == ItemQuality.D) activesNeed.status = NeedStatus.Lacking;
-            else if (numActives  < 3 || bestActiveQuality == ItemQuality.C) activesNeed.status = NeedStatus.Enough;
-            else if (numActives  < 4 || bestActiveQuality == ItemQuality.A) activesNeed.status = NeedStatus.Plenty;
-            else                                                                         activesNeed.status = NeedStatus.Excessive;
-            needs.Add(activesNeed);
-        #endregion
+        //NOTE: this literally cannot ever trigger since Kaliber's Justice itself will always count as having "Enough"
+        // #region Actives
+        //     Need activesNeed = new Need(NeedType.Actives);
+        //     int numActives = user.activeItems.Count;
+        //     ItemQuality bestActiveQuality = (user.activeItems.HighestQualityItem() is PickupObject pa)
+        //         ? pa.quality : ItemQuality.D;
+        //     if (user.activeItems.Count == 1 && user.activeItems[0] == this)
+        //         activesNeed.status = Enough;
+        //     else if (numActives  < 2 || bestActiveQuality == ItemQuality.D) activesNeed.status = Lacking;
+        //     else if (numActives  < 3 || bestActiveQuality == ItemQuality.C) activesNeed.status = Enough;
+        //     else if (numActives  < 4 || bestActiveQuality == ItemQuality.A) activesNeed.status = Plenty;
+        //     else                                                            activesNeed.status = Excessive;
+        //     needs.Add(activesNeed);
+        // #endregion
 
         return needs;
     }
@@ -414,7 +424,7 @@ internal enum NeedType {
     Ammo,
     Guns,
     Passives,
-    Actives,
+    // Actives, //NOTE: can't activate
     // Curse / Cleansing,
     Nothing,
 }
@@ -434,6 +444,6 @@ internal struct Need
     public Need(NeedType type)
     {
         this.type = type;
-        this.status = NeedStatus.Enough;
+        this.status = Enough;
     }
 }
