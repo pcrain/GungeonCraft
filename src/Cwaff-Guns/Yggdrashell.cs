@@ -15,7 +15,6 @@ public class Yggdrashell : CwaffGun
     internal static tk2dBaseSprite _ArmorVFXSprite = null;
     internal static GameObject _LeafVFX            = null;
 
-    private uint _soundId                    = 0;
     private int _kills                       = 0;
     private float _lifeForce                 = 0f;
     private bool _protectionActive           = false;
@@ -112,13 +111,7 @@ public class Yggdrashell : CwaffGun
     {
         base.Update();
         bool shouldPlaySound = this.gun && this.gun.IsFiring;
-        if (shouldPlaySound && this._soundId == 0)
-            this._soundId = this.gun.LoopSound("entangle_loop", loopPointMs: 1500, rewindAmountMs: 1500 - 1000);
-        else if (!shouldPlaySound && this._soundId > 0)
-        {
-            AkSoundEngine.StopPlayingID(this._soundId);
-            this._soundId = 0;
-        }
+        this.gun.LoopSoundIf(shouldPlaySound, "entangle_loop", loopPointMs: 1500, rewindAmountMs: 1500 - 1000);
         if (this.gun.IsFiring && (BraveTime.ScaledTimeSinceStartup - this._lastParticleTime) > _PARTICLE_RATE)
         {
             this._lastParticleTime = BraveTime.ScaledTimeSinceStartup;

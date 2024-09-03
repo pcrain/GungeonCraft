@@ -401,31 +401,80 @@ public static class Lazy
             _SoundTimers[soundName] -= BraveTime.DeltaTime;
             yield return null;
         }
-        source.Play($"{soundName}_stop_all");
+        source.Play($"{soundName}_stop_all"); //TODO: probably better to use AkSoundEngine.StopPlayingID()
         _SoundTimers.Remove(soundName);
     }
 
-    public static uint LoopSound(this MonoBehaviour behav, string soundName, int loopPointMs, int rewindAmountMs)
+    /// <summary>Helper class for making sure looping sounds are cleaned up properly</summary>
+    private class LoopingSoundHandler : MonoBehaviour
     {
-        uint eventId = AkSoundEngine.PostEvent(soundName, behav.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
-        behav.StartCoroutine(LoopSound_CR(behav.gameObject, eventId, soundName, loopPointMs, rewindAmountMs));
-        return eventId;
+        private const float _TIMEOUT = 0.1f;
+
+        private class LoopingSoundData
+        {
+            public uint id;
+            public float timer;
+        }
+
+        private static List<LoopingSoundData> _LoopTimers = new(16);
+
+        private void Update()
+        {
+            for (int i = _LoopTimers.Count - 1; i >= 0; --i)
+            {
+                LoopingSoundData lsd = _LoopTimers[i];
+                if ((BraveTime.ScaledTimeSinceStartup - lsd.timer) < _TIMEOUT)
+                    continue;
+                AkSoundEngine.StopPlayingID(lsd.id);
+                _LoopTimers.RemoveAt(i);
+            }
+        }
+
+        public void NewSound(uint soundId, GameObject gameObject)
+        {
+            _LoopTimers.Add(new(){
+                id = AkSoundEngine.PostEvent(soundId, gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition),
+                timer = BraveTime.ScaledTimeSinceStartup,
+            });
+        }
+
+        public void RefreshSoundTimer(uint playingId)
+        {
+            for (int i = 0; i < _LoopTimers.Count; ++i)
+                if (_LoopTimers[i].id == playingId)
+                {
+                    _LoopTimers[i].timer = BraveTime.ScaledTimeSinceStartup;
+                    return;
+                }
+        }
     }
 
-    private static IEnumerator LoopSound_CR(GameObject gameObject, uint eventId, string soundName, int loopPointMs, int rewindAmountMs)
+    private static readonly uint[] _PlayingIds = new uint[16]; //NOTE: hopefully safe to assume no more than 16 sounds are playing on the same object
+    /// <summary>Loops a sound between two loop points while condition `play` is true, stops it otherwise</summary>
+    public static void LoopSoundIf(this MonoBehaviour behav, bool play, string soundName, int loopPointMs, int rewindAmountMs)
     {
-      yield return new WaitForSeconds(0.5f);  // GetSourcePlayPosition() will fail if we don't wait a bit
-      while (true)
-      {
-        int pos;
-        AKRESULT status = AkSoundEngine.GetSourcePlayPosition(eventId, out pos);
-        if (status != AKRESULT.AK_Success)
-            break;
-        if (pos >= loopPointMs)
-            AkSoundEngine.SeekOnEvent(soundName, gameObject, pos - rewindAmountMs);
-        yield return null;
-      }
-      yield break;
+        uint soundId = AkSoundEngine.GetIDFromString(soundName);
+        uint count = (uint)_PlayingIds.Length;
+        if (AkSoundEngine.GetPlayingIDsFromGameObject(behav.gameObject, ref count, _PlayingIds) != AKRESULT.AK_Success)
+            return; // bad game object, bail out
+        for (int i = 0; i < count; i++)
+        {
+            uint playingId = _PlayingIds[i];
+            if (AkSoundEngine.GetEventIDFromPlayingID(playingId) != soundId)
+                continue;
+            if (!play)
+            {
+                AkSoundEngine.StopPlayingID(playingId); // sound shouldn't be playing but is, so stop it now
+                return;
+            }
+            GameManager.Instance.GetOrAddComponent<LoopingSoundHandler>().RefreshSoundTimer(playingId);
+            AkSoundEngine.PostEvent(soundName + (GameManager.Instance.IsPaused ? "_pause" : "_resume"), behav.gameObject);
+            if (AkSoundEngine.GetSourcePlayPosition(playingId, out int pos) == AKRESULT.AK_Success && pos >= loopPointMs)
+                AkSoundEngine.SeekOnEvent(soundId, behav.gameObject, pos - rewindAmountMs); // sound should be playing and is, so just check if we need to loop
+            return;
+        }
+        if (play) // sound should be playing but isn't, so play it now
+            GameManager.Instance.GetOrAddComponent<LoopingSoundHandler>().NewSound(soundId, behav.gameObject);
     }
 
     /// <summary>Create some smoke VFX at the specified position</summary>

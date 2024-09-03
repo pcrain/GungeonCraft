@@ -14,7 +14,6 @@ public class Gunflower : CwaffGun
 
     private List<AdditionalBraveLight> _lights = new();
     private ModuleShootData _cachedShootData = null;
-    private uint _soundId = 0;
     private bool _revved = false;
 
     public static void Init()
@@ -36,13 +35,7 @@ public class Gunflower : CwaffGun
         base.Update();
         UpdateNutrients();
         bool shouldPlaySound = this.gun && this.gun.IsFiring;
-        if (shouldPlaySound && this._soundId == 0)
-            this._soundId = this.gun.LoopSound("gunflower_fire_sound", loopPointMs: 1750, rewindAmountMs: 1750 - 1177);
-        else if (!shouldPlaySound && this._soundId > 0)
-        {
-            AkSoundEngine.StopPlayingID(this._soundId);
-            this._soundId = 0;
-        }
+        this.gun.LoopSoundIf(shouldPlaySound, "gunflower_fire_sound", loopPointMs: 1750, rewindAmountMs: 1750 - 1177);
         if (GetExtantBeam() is BasicBeamController beam && beam.State == BeamState.Firing)
         {
             if (!this._revved)
