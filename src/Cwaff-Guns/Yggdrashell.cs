@@ -200,6 +200,8 @@ public class Yggdrashell : CwaffGun
     {
         if (!this._protectionActive || !this.PlayerOwner)
             return;
+        if (data == EventArgs.Empty || data.ModifiedDamage <= 0f || !hh.IsVulnerable)
+            return; // if we weren't going to take damage anyway, nothing to do
         data.ModifiedDamage = 0f;
         hh.TriggerInvulnerabilityPeriod();
         Lazy.DoDamagedFlash(hh);

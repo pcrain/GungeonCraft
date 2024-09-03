@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.18.2 (TBD)
+
+- Fixed Yggdrashell's Earth Armor activating from damage sources that would not have dealt damage to the player
+
 ## 1.18.1 (2024-08-31)
 
 #### Features:
