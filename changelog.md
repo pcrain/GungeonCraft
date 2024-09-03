@@ -1,20 +1,25 @@
 # Changelog
 
-## 1.18.2 (TBD)
+## 1.18.2 (2024-09-03)
 
-- Fixed Yggdrashell's Earth Armor activating from damage sources that would not have dealt damage to the player
-- Fixed game manager issue with custom VFX sometimes freezing in place and never disappearing when starting a new run
-- Fixed looping charge sounds for Gunflower and Yggdrashell continuing to play while the game is paused
-- Fixed Gunflower's light beam persisting if switched or dropped while firing
-- Buffed 4D Bullets:
-	- Bullets now only lose 33% of their power (instead of 50%) after phasing through a wall
-	- Bullets no longer lose power multiple times when phasing through multiple walls
+#### Balance Changes:
+
 - Rebalanced Kaliber's Justice:
 	- Key blessing no longer grants keys if player possesses Shelleton Key
 	- Blank blessing can no longer grant Blank Bullets or Elder Blank if the player already has them
 	- Undroppable items can no longer be taken from the player
 	- Kaliber's Justice now ignores invulnerability when taking health from the player
 	- Removed ability to grant an active item since it was buggy and couldn't trigger under any sane circumstance anyway
+- Buffed 4D Bullets:
+	- Bullets now only lose 33% of their power (instead of 50%) after phasing through a wall
+	- Bullets no longer lose power multiple times when phasing through multiple walls
+	- 
+#### Bugfixes:
+
+- Fixed Yggdrashell's Earth Armor activating from damage sources that would not have dealt damage to the player
+- Fixed game manager issue with custom VFX sometimes freezing in place and never disappearing when starting a new run
+- Fixed looping charge sounds for Gunflower and Yggdrashell continuing to play while the game is paused
+- Fixed Gunflower's lighting effects persisting if switched or dropped while firing
 
 ## 1.18.1 (2024-08-31)
 
