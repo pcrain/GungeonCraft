@@ -3,6 +3,7 @@
 ## 1.18.2 (TBD)
 
 - Fixed Yggdrashell's Earth Armor activating from damage sources that would not have dealt damage to the player
+- Fixed game manager issue with custom VFX sometimes freezing in place and never disappearing when starting a new run
 
 ## 1.18.1 (2024-08-31)
 

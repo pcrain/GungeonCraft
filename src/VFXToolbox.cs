@@ -969,13 +969,15 @@ public partial class CwaffVFX // private
     /// <summary>Manager for our pooled projectiles</summary>
     private class CwaffVFXManager : MonoBehaviour
     {
-        [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadNextLevel))]
-        [HarmonyPatch(typeof(MainMenuController), nameof(MainMenuController.Start))]
+        [HarmonyPatch]
         private class CwaffVFXManagerAutostartPatch
         {
+            [HarmonyPatch(typeof(GameManager), nameof(GameManager.Start))]
+            [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadNextLevel))]
+            [HarmonyPatch(typeof(MainMenuController), nameof(MainMenuController.Start))]
             static void Postfix()
             {
-                // Lazy.DebugLog($"initializing CwaffVFXManager");
+                // Lazy.DebugLog($"initializing new CwaffVFXManager");
                 GameManager.Instance.GetOrAddComponent<CwaffVFXManager>();
             }
         }
