@@ -10,6 +10,7 @@ public class Starmageddon : CwaffGun
     internal static ProjectileModule _MasteryModule = null;
     internal static CwaffTrailController _StarmageddonTrailPrefab = null;
     internal static CwaffTrailController _MeteorTrailPrefab = null;
+    private static List<Vector2> _EnemyWeights = new(16);
 
     internal bool _mastered = false;
 
@@ -17,6 +18,7 @@ public class Starmageddon : CwaffGun
     private int _curBatch  = 0;
     private bool _masteryVolleyReplaced = false;
     private DamageTypeModifier _fireImmunity = null;
+    private ListDictionary _EffectiveHealth = new();
 
     public static void Init()
     {
@@ -131,33 +133,30 @@ public class Starmageddon : CwaffGun
         base.OnPlayerPickup(player);
     }
 
-    internal static Dictionary<AIActor, float> _EffectiveHealth = new();
-
     /// <summary>Select a random target, weighted by inverse square distance to player and accounting for enemies that are already being targeted.</summary>
     internal GameActor SmartFindTarget(float damage)
     {
         if (!this.PlayerOwner)
             return null;
 
-        List<AIActor> livingEnemies = new();
-        List<Vector2> weights = new();
-        int i = 0;
-        foreach(AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
+        List<AIActor> roomEnemies = this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom();
+        _EnemyWeights.Clear();
+        for (int i = 0; i < roomEnemies.Count; ++i)
         {
+            AIActor enemy = roomEnemies[i];
             if (!enemy || !enemy.healthHaver || !enemy.healthHaver.IsAlive || !enemy.healthHaver.IsVulnerable || !enemy.IsWorthShootingAt)
                 continue;
             if (!_EffectiveHealth.TryGetValue(enemy, out float estHealth))
-                estHealth = _EffectiveHealth[enemy] = enemy.healthHaver.currentHealth;
-            livingEnemies.Add(enemy);
+                _EffectiveHealth[enemy] = estHealth = enemy.healthHaver.currentHealth;
             if (estHealth > -damage) // allow for one extra hit beyond what would kill an enemy
-                weights.Add(new(i++, 1f / (enemy.CenterPosition - this.PlayerOwner.CenterPosition).sqrMagnitude));
+                _EnemyWeights.Add(new(i, 1f / (enemy.CenterPosition - this.PlayerOwner.CenterPosition).sqrMagnitude));
             else
-                weights.Add(new(i++, 0.0001f));
+                _EnemyWeights.Add(new(i, 0.0001f));
         }
-        if (livingEnemies.Count == 0)
+        if (_EnemyWeights.Count == 0)
             return null;
-        AIActor target = livingEnemies[weights.WeightedRandom()];
-        _EffectiveHealth[target] -= damage;
+        AIActor target = roomEnemies[_EnemyWeights.WeightedRandom()];
+        _EffectiveHealth[target] = (float)_EffectiveHealth[target] - damage;
         return target;
     }
 

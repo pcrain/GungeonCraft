@@ -2664,4 +2664,16 @@ public static class Extensions
       return player.CenterPosition;
     return room.GetRandomVisibleClearSpot(2, 2).ToVector2();
   }
+
+  /// <summary>Implementation of TryGetValue for ListDictionary</summary>
+  public static bool TryGetValue<K, V>(this ListDictionary d, K key, out V value)
+  {
+    if (d.Contains(key))
+    {
+        value = (V)d[key];
+        return true;
+    }
+    value = default;
+    return false;
+  }
 }
