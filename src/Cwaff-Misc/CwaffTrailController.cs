@@ -318,6 +318,8 @@ public class CwaffTrailController : BraveBehaviour
     {
       this.body.OnCollision -= UpdateOnCollision;
       this.body.OnPostRigidbodyMovement -= PostRigidbodyMovement;
+      if (this.body.projectile)
+        this.body.projectile.OnDestruction -= this.OnProjectileDestruction;
     }
     while (m_bones.Count > 0)
     {
