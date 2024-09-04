@@ -111,6 +111,8 @@ public class CwaffTrailController : BraveBehaviour
   [ShowInInspectorIf("UsesDispersalParticles", false)]
   public GameObject DispersalParticleSystemPrefab;
 
+  private SpeculativeRigidbody body;
+
   private tk2dBaseSprite parent_sprite;
 
   private tk2dTiledSprite trail_sprite;
@@ -153,8 +155,8 @@ public class CwaffTrailController : BraveBehaviour
   {
     get
     {
-      if (base.specRigidbody)
-        return base.specRigidbody.Position.UnitPosition;
+      if (this.body)
+        return this.body.Position.UnitPosition;
       if (parent_sprite)
         return parent_sprite.WorldCenter;
       return base.transform.position;
@@ -163,17 +165,17 @@ public class CwaffTrailController : BraveBehaviour
 
   public void Start()
   {
-    base.specRigidbody = base.transform.parent.GetComponent<SpeculativeRigidbody>();
-    if (base.specRigidbody)
-      base.specRigidbody.Initialize();
+    this.body = base.transform.parent.GetComponent<SpeculativeRigidbody>();
+    if (this.body)
+      this.body.Initialize();
     parent_sprite = base.transform.parent.gameObject.GetComponent<tk2dBaseSprite>();
     // base.transform.parent = SpawnManager.Instance.VFX; //NOTE: need to be parented to our projectiles so we get destroyed properly
     base.transform.rotation = Quaternion.identity;
     base.transform.position = Vector3.zero;
-    if (base.specRigidbody && base.specRigidbody.projectile && base.specRigidbody.projectile.Owner is PlayerController)
+    if (this.body && this.body.projectile && this.body.projectile.Owner is PlayerController)
     {
-      m_projectileScale = (base.specRigidbody.projectile.Owner as PlayerController).BulletScaleModifier;
-      base.specRigidbody.projectile.OnDestruction += this.OnProjectileDestruction;
+      m_projectileScale = (this.body.projectile.Owner as PlayerController).BulletScaleModifier;
+      this.body.projectile.OnDestruction += this.OnProjectileDestruction;
     }
     base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("FG_Critical"));
     trail_sprite = GetComponent<tk2dTiledSprite>();
@@ -193,10 +195,10 @@ public class CwaffTrailController : BraveBehaviour
       m_bones.First.Value.IsAnimating = true;
     if (UsesDispersalParticles)
       m_dispersalParticles = GlobalDispersalParticleManager.GetSystemForPrefab(DispersalParticleSystemPrefab);
-    if (base.specRigidbody)
+    if (this.body)
     {
-      base.specRigidbody.OnCollision += this.UpdateOnCollision;
-      base.specRigidbody.OnPostRigidbodyMovement += this.PostRigidbodyMovement;
+      this.body.OnCollision += this.UpdateOnCollision;
+      this.body.OnPostRigidbodyMovement += this.PostRigidbodyMovement;
     }
   }
 
@@ -305,17 +307,17 @@ public class CwaffTrailController : BraveBehaviour
   public void LateUpdate()
   {
     base.transform.rotation = Quaternion.identity; //NOTE: if we're parented to a projectile, prevent our bones from rotating
-    if (!base.specRigidbody && !this.disconnected)
+    if (!this.body && !this.disconnected)
       HandleExtension(TruePosition); //NOTE: this will never get called otherwise if we don't have a rigid body
     UpdateIfDirty();
   }
 
   public override void OnDestroy()
   {
-    if (base.specRigidbody)
+    if (this.body)
     {
-      base.specRigidbody.OnCollision -= UpdateOnCollision;
-      base.specRigidbody.OnPostRigidbodyMovement -= PostRigidbodyMovement;
+      this.body.OnCollision -= UpdateOnCollision;
+      this.body.OnPostRigidbodyMovement -= PostRigidbodyMovement;
     }
     while (m_bones.Count > 0)
     {
@@ -328,11 +330,11 @@ public class CwaffTrailController : BraveBehaviour
 
   public void DisconnectFromSpecRigidbody()
   {
-    if (!base.specRigidbody)
+    if (!this.body)
       return;
-    base.specRigidbody.OnCollision -= UpdateOnCollision;
-    base.specRigidbody.OnPostRigidbodyMovement -= PostRigidbodyMovement;
-    base.specRigidbody = null;
+    this.body.OnCollision -= UpdateOnCollision;
+    this.body.OnPostRigidbodyMovement -= PostRigidbodyMovement;
+    this.body = null;
     base.transform.parent = null; // make sure we don't keep transforming with whatever rigid body we were attached to
     this.destroyOnEmpty = true; // make sure our bones get returned to the pool
     this.disconnected = true; // don't call HandleExtension() any more
@@ -340,7 +342,7 @@ public class CwaffTrailController : BraveBehaviour
 
   private void UpdateOnCollision(CollisionData obj)
   {
-    Vector2 specRigidbodyPosition = base.specRigidbody.Position.UnitPosition + PhysicsEngine.PixelToUnit(obj.NewPixelsToMove);
+    Vector2 specRigidbodyPosition = this.body.Position.UnitPosition + PhysicsEngine.PixelToUnit(obj.NewPixelsToMove);
     HandleExtension(specRigidbodyPosition);
     m_bones.Last.Value.Hide = true;
     m_bones.AddLast(Bone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX, m_bones.Last.Value.HeightOffset));
@@ -349,7 +351,7 @@ public class CwaffTrailController : BraveBehaviour
 
   private void PostRigidbodyMovement(SpeculativeRigidbody rigidbody, Vector2 unitDelta, IntVector2 pixelDelta)
   {
-    HandleExtension(base.specRigidbody.Position.UnitPosition);
+    HandleExtension(this.body.Position.UnitPosition);
     UpdateIfDirty();
   }
 
@@ -382,8 +384,8 @@ public class CwaffTrailController : BraveBehaviour
       m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX, heightOffset));
       m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX, heightOffset));
     }
-    if (base.specRigidbody && base.specRigidbody.projectile && base.specRigidbody.projectile.OverrideTrailPoint.HasValue)
-      toPosition = base.specRigidbody.projectile.OverrideTrailPoint.Value;
+    if (this.body && this.body.projectile && this.body.projectile.OverrideTrailPoint.HasValue)
+      toPosition = this.body.projectile.OverrideTrailPoint.Value;
     ExtendBonesTo(toPosition + boneSpawnOffset);
     m_isDirty = true;
   }

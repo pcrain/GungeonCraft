@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.18.3 (TBD)
+
+- Fixed null deref caused by improperly updating Zag projectile trails upon colliding with walls
+
 ## 1.18.2 (2024-09-03)
 
 #### Balance Changes:
@@ -13,7 +17,7 @@
 - Buffed 4D Bullets:
 	- Bullets now only lose 33% of their power (instead of 50%) after phasing through a wall
 	- Bullets no longer lose power multiple times when phasing through multiple walls
-	- 
+
 #### Bugfixes:
 
 - Fixed Yggdrashell's Earth Armor activating from damage sources that would not have dealt damage to the player
