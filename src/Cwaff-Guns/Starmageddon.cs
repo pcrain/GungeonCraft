@@ -131,6 +131,36 @@ public class Starmageddon : CwaffGun
         base.OnPlayerPickup(player);
     }
 
+    internal static Dictionary<AIActor, float> _EffectiveHealth = new();
+
+    /// <summary>Select a random target, weighted by inverse square distance to player and accounting for enemies that are already being targeted.</summary>
+    internal GameActor SmartFindTarget(float damage)
+    {
+        if (!this.PlayerOwner)
+            return null;
+
+        List<AIActor> livingEnemies = new();
+        List<Vector2> weights = new();
+        int i = 0;
+        foreach(AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
+        {
+            if (!enemy || !enemy.healthHaver || !enemy.healthHaver.IsAlive || !enemy.healthHaver.IsVulnerable || !enemy.IsWorthShootingAt)
+                continue;
+            if (!_EffectiveHealth.TryGetValue(enemy, out float estHealth))
+                estHealth = _EffectiveHealth[enemy] = enemy.healthHaver.currentHealth;
+            livingEnemies.Add(enemy);
+            if (estHealth > -damage) // allow for one extra hit beyond what would kill an enemy
+                weights.Add(new(i++, 1f / (enemy.CenterPosition - this.PlayerOwner.CenterPosition).sqrMagnitude));
+            else
+                weights.Add(new(i++, 0.0001f));
+        }
+        if (livingEnemies.Count == 0)
+            return null;
+        AIActor target = livingEnemies[weights.WeightedRandom()];
+        _EffectiveHealth[target] -= damage;
+        return target;
+    }
+
     private void Reset()
     {
         if (this._nextIndex == 0)
@@ -138,6 +168,7 @@ public class Starmageddon : CwaffGun
 
         this._nextIndex = 0;
         ++this._curBatch;
+        _EffectiveHealth.Clear();
     }
 
     public int GetNextIndex() => this._nextIndex++;
@@ -280,7 +311,7 @@ public class StarmageddonProjectile : MonoBehaviour
 
         // Phase 5 -- falling on enemies
         this._state = State.FALLING;
-        GameActor target = FindTarget();
+        GameActor target = sm ? sm.SmartFindTarget(this._projectile.baseData.damage) : FindTarget();
         Vector2 targetPos = (target ? target.CenterPosition : this._owner.RandomPosInCurrentRoom())
             + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value * (this._owner ? this._owner.AccuracyMult() : 1f));
         float fallSpeed = 150f.AddRandomSpread(10f);

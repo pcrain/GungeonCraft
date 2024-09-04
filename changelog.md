@@ -3,7 +3,8 @@
 ## 1.18.3 (TBD)
 
 - Added mastery for Starmageddon
-- Made Starmageddon projectile target random spots in the current room instead of the player when no enemies are found
+- Made Starmageddon projectiles intelligently avoid targeting enemies that other Starmageddon projectiles will kill 
+- Made Starmageddon projectiles target random spots in the current room instead of the player when no enemies are found
 - Fixed null deref caused by improperly updating Zag projectile trails upon colliding with walls
 
 ## 1.18.2 (2024-09-03)
