@@ -2637,4 +2637,31 @@ public static class Extensions
         return true;
     return false;
   }
+
+  /// <summary>Get the name of the default clip for a sprite animator</summary>
+  public static string DefaultClipName(this tk2dSpriteAnimator animator)
+  {
+      if (!animator)
+          return "no animator";
+      if (animator.DefaultClip == null)
+          return "no default clip";
+      if (animator.DefaultClip.frames == null || animator.DefaultClip.frames.Length == 0)
+          return "no default clip frames";
+      tk2dSpriteAnimationFrame frame = animator.DefaultClip.frames[0];
+      if (!frame.spriteCollection)
+          return "no sprite collection";
+      return frame.spriteCollection.spriteDefinitions[frame.spriteId].name;
+  }
+
+  //NOTE: this skews towards the bottom of the room for some reason
+  /// <summary>Returns a random position in the GameActor's current room</summary>
+  public static Vector2 RandomPosInCurrentRoom(this PlayerController player)
+  {
+    if (!player)
+      player = GameManager.Instance.BestActivePlayer;
+    RoomHandler room = player.CurrentRoom;
+    if (room == null)
+      return player.CenterPosition;
+    return room.GetRandomVisibleClearSpot(2, 2).ToVector2();
+  }
 }

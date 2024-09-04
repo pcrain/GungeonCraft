@@ -153,6 +153,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfBubblebeam>(MASTERY_BUBBLEBEAM, Bubblebeam.ItemName);
         // Deadline lasers act as tripwires and detonate whenever an enemy crosses them.
         NewMastery<MasteryOfDeadline>(MASTERY_DEADLINE, Deadline.ItemName);
+        // Starmageddon fires meteors that deal splash damage and set the ground ablaze, and passively grants fire immunity.
+        NewMastery<MasteryOfStarmageddon>(MASTERY_STARMAGEDDON, Starmageddon.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -389,6 +391,7 @@ internal class MasteryOfTiconderogun    : MasteryDummyItem {}
 internal class MasteryOfKingsLaw        : MasteryDummyItem {}
 internal class MasteryOfBubblebeam      : MasteryDummyItem {}
 internal class MasteryOfDeadline        : MasteryDummyItem {}
+internal class MasteryOfStarmageddon    : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -451,4 +454,5 @@ public enum Synergy {
     MASTERY_KINGS_LAW,
     MASTERY_BUBBLEBEAM,
     MASTERY_DEADLINE,
+    MASTERY_STARMAGEDDON,
 };

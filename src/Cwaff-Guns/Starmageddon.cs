@@ -7,17 +7,24 @@ public class Starmageddon : CwaffGun
     public static string LongDescription  = "Fires projectiles that orbit the player while fire is held. Projectiles ascend when fire is released and fall upon semi-random enemies after a short delay. Enemies closer to the player are more likely to be targeted.";
     public static string Lore             = "A mythical weapon feared and revered by many as the 'Gun That Shall Fire the Final Shot', it is said to launch projectiles heavenward and rain meteoric destruction upon the lands. Fortunately for humanity, the weapon's projectiles only get to ascend about 50 feet before hitting the Gungeon's ceiling, making it a rare example of a gun that is actually *weakened* by the Gungeon's magic.";
 
+    internal static ProjectileModule _MasteryModule = null;
     internal static CwaffTrailController _StarmageddonTrailPrefab = null;
+    internal static CwaffTrailController _MeteorTrailPrefab = null;
+
+    internal bool _mastered = false;
 
     private int _nextIndex = 0;
     private int _curBatch  = 0;
+    private bool _masteryVolleyReplaced = false;
+    private DamageTypeModifier _fireImmunity = null;
 
     public static void Init()
     {
-        Lazy.SetupGun<Starmageddon>(ItemName, ShortDescription, LongDescription, Lore)
+        Gun gun = Lazy.SetupGun<Starmageddon>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FULLAUTO, reloadTime: 1.0f, ammo: 900, shootFps: 20, chargeFps: 20,
-            reloadFps: 30, loopReloadAt: 0, attacksThroughWalls: true)
-          .InitProjectile(GunData.New(clipSize: 30, cooldown: 0.125f, angleVariance: 15.0f,
+            reloadFps: 30, loopReloadAt: 0, attacksThroughWalls: true);
+
+        gun.InitProjectile(GunData.New(clipSize: 30, cooldown: 0.125f, angleVariance: 15.0f,
             shootStyle: ShootStyle.Automatic, damage: 8.0f, speed: 60.0f, range: 999999f, spawnSound: "starmageddon_fire_sound",
             sprite: "starmageddon_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, useDummyChargeModule: true, customClip: true,
             // overrideColliderPixelSizes: new IntVector2(128, 128), //WARNING: large hitboxes apparently lag the game????
@@ -25,6 +32,24 @@ public class Starmageddon : CwaffGun
           .Attach<StarmageddonProjectile>();
 
         _StarmageddonTrailPrefab = VFX.CreateSpriteTrailObject("starmageddon_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
+        _MeteorTrailPrefab = VFX.CreateSpriteTrailObject("starmageddon_meteor_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
+
+        _MasteryModule = new ProjectileModule().InitSingleProjectileModule(GunData.New(clipSize: 30, cooldown: 0.125f, angleVariance: 15.0f,
+            shootStyle: ShootStyle.Automatic, damage: 16.0f, speed: 60.0f, range: 999999f, spawnSound: "starmageddon_fire_sound",
+            sprite: "meteor_projectile", fps: 12, anchor: Anchor.MiddleCenter, customClip: true, fire: 1.0f, shrapnelMinVelocity: 8f, shrapnelMaxVelocity: 16f,
+            shrapnelVFX: VFX.Create("meteor_shrapnel"), shrapnelCount: 10, baseProjectile: Items._38Special.Projectile(), gun: gun));
+
+        _MasteryModule.projectiles[0]
+            .Attach<StarmageddonProjectile>()
+            .Attach<GoopModifier>(g => {
+                g.goopDefinition       = EasyGoopDefinitions.FireDef;
+                g.SpawnGoopOnCollision = true;
+                g.CollisionSpawnRadius = 1f;
+                g.SpawnGoopInFlight    = false;})
+            .Attach<ExplosiveModifier>(e => {
+                e.IgnoreQueues = true;
+                e.explosionData = Explosions.DefaultSmall.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 1.0f, preventPlayerForce: true, shake: false);
+            });
     }
 
     public override void Update()
@@ -32,8 +57,24 @@ public class Starmageddon : CwaffGun
         base.Update();
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        if (this.PlayerOwner is not PlayerController)
+        if (this.PlayerOwner is not PlayerController player)
             return;
+
+        if (!this._mastered)
+            this._mastered = player.HasSynergy(Synergy.MASTERY_STARMAGEDDON);
+        if (this._mastered && !this._masteryVolleyReplaced)
+        {
+            player.healthHaver.damageTypeModifiers.AddUnique(this._fireImmunity);
+            // NOTE: only replace first module, don't replace dummy charge module
+            ProjectileVolleyData projectileVolleyData = ScriptableObject.CreateInstance<ProjectileVolleyData>();
+            projectileVolleyData.projectiles = new(){
+                ProjectileModule.CreateClone(_MasteryModule), ProjectileModule.CreateClone(this.gun.RawSourceVolley.projectiles[1]) };
+            this.gun.RawSourceVolley = projectileVolleyData;
+
+            player.stats.RecalculateStats(player); // makes sure the volley is actually updated
+            this._masteryVolleyReplaced = true;
+        }
+
         if (this.gun.IsCharging)
             return;
 
@@ -64,6 +105,7 @@ public class Starmageddon : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
+        player.healthHaver.damageTypeModifiers.TryRemove(this._fireImmunity);
         Reset();
     }
 
@@ -71,6 +113,22 @@ public class Starmageddon : CwaffGun
     {
         base.OnSwitchedAwayFromThisGun();
         Reset();
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._fireImmunity);
+        base.OnDestroy();
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        this._fireImmunity ??= new DamageTypeModifier {
+            damageType = CoreDamageTypes.Fire,
+            damageMultiplier = 0f,
+        };
+        base.OnPlayerPickup(player);
     }
 
     private void Reset()
@@ -98,6 +156,7 @@ public class StarmageddonProjectile : MonoBehaviour
     private int              _batch                 = 0;
     private bool             _naturalSpawn          = false;
     private float            _spawnTime             = 0f;
+    private bool             _mastered              = false;
 
     private State _state = State.NEUTRAL;
 
@@ -125,8 +184,13 @@ public class StarmageddonProjectile : MonoBehaviour
 
     private void OnProjectileDestruction(Projectile p)
     {
-        p.gameObject.Play("starmageddon_bullet_impact_sound_1");
-        p.gameObject.Play("starmageddon_bullet_impact_sound_2");
+        if (this._mastered)
+            p.gameObject.Play("starmageddon_meteor_impact_sound");
+        else
+        {
+            p.gameObject.Play("starmageddon_bullet_impact_sound_1");
+            p.gameObject.Play("starmageddon_bullet_impact_sound_2");
+        }
     }
 
     private void Update()
@@ -140,7 +204,6 @@ public class StarmageddonProjectile : MonoBehaviour
     {
         // Setup
         this._projectile.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
-        this._projectile.sprite.SetGlowiness(glowAmount: 70f, glowColor: Color.yellow);
 
         // Phase 1 -- initial fire
         if (this._owner.CurrentGun.GetComponent<Starmageddon>() is Starmageddon sm)
@@ -148,9 +211,14 @@ public class StarmageddonProjectile : MonoBehaviour
             this._index = sm.GetNextIndex();
             this._batch = sm.GetBatch();
             this._naturalSpawn = true;
+            this._mastered = sm._mastered;
         }
         else
             sm = null;
+        if (this._mastered)
+            this._projectile.sprite.SetGlowiness(glowAmount: 1f, glowColor: Color.red);
+        else
+            this._projectile.sprite.SetGlowiness(glowAmount: 70f, glowColor: Color.yellow);
         this._projectile.specRigidbody.CollideWithTileMap = false;
         this._projectile.specRigidbody.CollideWithOthers = false;
         this._projectile.specRigidbody.Reinitialize();
@@ -196,7 +264,8 @@ public class StarmageddonProjectile : MonoBehaviour
         this._projectile.SetSpeed(200f);
         this._projectile.SendInDirection(Vector2.up, true);
         this._projectile.baseData.range = float.MaxValue;
-        CwaffTrailController tc = this._projectile.AddTrailToProjectileInstance(Starmageddon._StarmageddonTrailPrefab);
+        CwaffTrailController tc = this._projectile.AddTrailToProjectileInstance(
+          this._mastered ? Starmageddon._MeteorTrailPrefab : Starmageddon._StarmageddonTrailPrefab);
         tc.gameObject.SetGlowiness(10f);
         yield return null; // wait a frame so we can properly set the trails to unoccluded without being overwritten
         tc.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
@@ -204,15 +273,16 @@ public class StarmageddonProjectile : MonoBehaviour
         DepthLookupManager.ProcessRenderer(tc.sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
 
         // Phase 4 -- hang time
-        this._projectile.gameObject.Play("starmageddon_bullet_launch_sound");
+        this._projectile.gameObject.Play(this._mastered ? "starmageddon_meteor_launch_sound" : "starmageddon_bullet_launch_sound");
         yield return new WaitForSeconds(0.25f);
-        this._projectile.gameObject.Play("starmageddon_bullet_fall_sound");
+        this._projectile.gameObject.Play(this._mastered ? "starmageddon_meteor_fall_sound" : "starmageddon_bullet_fall_sound");
         yield return new WaitForSeconds(0.25f / (this._owner ? this._owner.ProjSpeedMult() : 1f));
 
         // Phase 5 -- falling on enemies
         this._state = State.FALLING;
         GameActor target = FindTarget();
-        Vector2 targetPos = target.CenterPosition + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value * (this._owner ? this._owner.AccuracyMult() : 1f));
+        Vector2 targetPos = (target ? target.CenterPosition : this._owner.RandomPosInCurrentRoom())
+            + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value * (this._owner ? this._owner.AccuracyMult() : 1f));
         float fallSpeed = 150f.AddRandomSpread(10f);
         float fallAngle = 270f.AddRandomSpread(24f);
         float fallTime = 0.35f.AddRandomSpread(0.25f);
@@ -251,6 +321,6 @@ public class StarmageddonProjectile : MonoBehaviour
                 livingEnemies.Add(enemy);
                 weights.Add(new(i++, 1f / (enemy.CenterPosition - this._owner.CenterPosition).sqrMagnitude));
             }
-        return (livingEnemies.Count == 0) ? this._owner :  livingEnemies[weights.WeightedRandom()];
+        return (livingEnemies.Count == 0) ? null : livingEnemies[weights.WeightedRandom()];
     }
 }
