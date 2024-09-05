@@ -6,6 +6,10 @@
 - Made Starmageddon projectiles intelligently avoid targeting enemies that other Starmageddon projectiles will kill 
 - Made Starmageddon projectiles target random spots in the current room instead of the player when no enemies are found
 - Fixed null deref caused by improperly updating Zag projectile trails upon colliding with walls
+- Reworked Macchi Auto: 
+	- Coffee goop now slows time by 50% while the player is standing in it
+	- Coffee goop now doubles movement speed, roll speed, reload speed, and rate of fire while the player is standing in it
+	- (The net effect of the above changes slows down everything but the player by 50%, making overdosing enemies with caffeine more viable)
 - Rebalanced Yggdrashell:
 	- Halved the amount of life force needed per level to increase vine strength (i.e., gun now builds strength twice as fast)
 	- Increased base damage of each level by 50% (with above change, effectively builds strength 3x as fast)

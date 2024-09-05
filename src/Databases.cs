@@ -1187,7 +1187,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
                 stackMode                    = GameActorEffect.EffectStackingMode.Refresh,
                 duration                     = 0.05f,
                 maxStackedDuration           = 0.05f,
-                SpeedMultiplier              = 1.5f,
+                SpeedMultiplier              = 2.0f,
                 CooldownMultiplier           = 1f,
                 OnlyAffectPlayerWhenGrounded = true,
             };

@@ -103,29 +103,21 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
 {
     private static StatModifier[] _CaffeineGoopBuffs = null;
 
+    private static GameObject _DummyCaffeineTimeScaleObject = null;
+
     public override void OnEffectApplied(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f)
     {
         base.OnEffectApplied(actor, effectData, partialAmount);
         if (actor is not PlayerController player)
             return;
-        if (SpeedMultiplier == 1f)
-            return;
+        if (!_DummyCaffeineTimeScaleObject)
+            _DummyCaffeineTimeScaleObject = new();
+        float inverseSpeed = 1f / SpeedMultiplier;
+        BraveTime.SetTimeScaleMultiplier(inverseSpeed, _DummyCaffeineTimeScaleObject);
         _CaffeineGoopBuffs ??= new[] {  //NOTE: speed handled by base GameActorSpeedEffect
-            new StatModifier(){
-                amount      = 1.2f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.RateOfFire,
-            },
-            new StatModifier(){
-                amount      = 1.2f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
-            },
-            new StatModifier(){
-                amount      = 0.8f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.ReloadSpeed,
-            },
+            PlayerStats.StatType.RateOfFire.Mult(SpeedMultiplier),
+            PlayerStats.StatType.DodgeRollSpeedMultiplier.Mult(SpeedMultiplier),
+            PlayerStats.StatType.ReloadSpeed.Mult(inverseSpeed),
         };
         foreach (StatModifier stat in _CaffeineGoopBuffs)
             player.ownerlessStatModifiers.Add(stat);
@@ -136,9 +128,10 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
         base.OnEffectRemoved(actor, effectData);
         if (actor is not PlayerController player)
             return;
-        if (SpeedMultiplier == 1f)
-            return;
         foreach (StatModifier stat in _CaffeineGoopBuffs)
             player.ownerlessStatModifiers.Remove(stat);
+        if (!_DummyCaffeineTimeScaleObject)
+            _DummyCaffeineTimeScaleObject = new();
+        BraveTime.SetTimeScaleMultiplier(1.0f, _DummyCaffeineTimeScaleObject);
     }
 }
