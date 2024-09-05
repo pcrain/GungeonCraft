@@ -4,7 +4,7 @@ public class MacchiAuto : CwaffGun
 {
     public static string ItemName         = "Macchi Auto";
     public static string ShortDescription = "Espresso Shots";
-    public static string LongDescription  = "Fires a stream of coffee that inflicts a stacking caffeinated status on enemies, increasing their speed and inflicting damage over time.";
+    public static string LongDescription  = "Fires a stream of coffee that inflicts a stacking caffeinated status on enemies, increasing their speed and inflicting damage over time. Standing inside a pool of coffee on the ground slows down the passage of time for all objects other than the player.";
     public static string Lore             = "This gun was designed to answer one simple question: 'what would happen if you filled a water gun with espresso?' While the gun's designer may have been the first and only person to ever ask this question, it turns out many of the Gundead are actually very sensitive to caffeine and enter a berserker-like state when exposed to it. Assuming you can stay out of their warpath, the caffeine quickly takes its toll on even the most resilient among the Gundead.";
 
     internal static OverdoseEffect _OverdoseEffect = null;
