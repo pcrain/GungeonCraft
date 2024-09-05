@@ -139,6 +139,7 @@ public class KALI : CwaffGun
         if (projectile.GetComponent<KaliProjectile>() is not KaliProjectile kp)
             return;
 
+        kp.Mastered = this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_KALI);
         if (kp.GetChargeLevel() == 3)
             this._timeShifter.GetComponent<KaliTimeshifter>().Reset();
         projectile.transform.DoMovingDistortionWave(distortionIntensity: 2.5f, distortionRadius: 0.25f, maxRadius: 0.25f, duration: 0.75f);
@@ -149,6 +150,8 @@ public class KaliProjectile : MonoBehaviour
 {
     [SerializeField]
     private int _chargeLevel = 0;
+
+    public bool Mastered { get; internal set; }
 
     private void Start()
     {
@@ -191,19 +194,22 @@ public class KaliProjectile : MonoBehaviour
     public void SetChargeLevel(int level) => this._chargeLevel = level;
     public int GetChargeLevel() => this._chargeLevel;
 
-    private static void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
+    private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
     {
         enemy.gameObject.Play("kali_impact_sound");
     }
 
-    private static void OnWillKillEnemy(Projectile p, SpeculativeRigidbody body)
+    private void OnWillKillEnemy(Projectile p, SpeculativeRigidbody body)
     {
         if (!body.aiActor || body.aiActor.IsABoss(canBeDead: true))
             return;
         tk2dBaseSprite glowyBoi = body.aiActor.sprite.DuplicateInWorld();
         glowyBoi.SetGlowiness(300f, overrideColor: Color.cyan, glowColor: Color.cyan, clampBrightness: false);
         glowyBoi.StartCoroutine(CriticalGlow(glowyBoi));
-        body.aiActor.EraseFromExistence(true);
+        if (this.Mastered)
+            body.aiActor.EraseFromExistenceWithRewards(true);
+        else
+            body.aiActor.EraseFromExistence(true);
     }
 
     private static IEnumerator CriticalGlow(tk2dBaseSprite sprite)

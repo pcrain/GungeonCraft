@@ -157,6 +157,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfStarmageddon>(MASTERY_STARMAGEDDON, Starmageddon.ItemName);
         // Subtractor Beam shots that only hit one enemy use that enemy as the damage source for Subtractor Beam's next shot.
         NewMastery<MasteryOfSubtractorBeam>(MASTERY_SUBTRACTOR_BEAM, SubtractorBeam.ItemName);
+        // Shots ignore the invulnerable phases of most enemies and no longer prevent enemies from dropping casings or other rewards.
+        NewMastery<MasteryOfKALI>(MASTERY_KALI, KALI.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -395,6 +397,7 @@ internal class MasteryOfBubblebeam      : MasteryDummyItem {}
 internal class MasteryOfDeadline        : MasteryDummyItem {}
 internal class MasteryOfStarmageddon    : MasteryDummyItem {}
 internal class MasteryOfSubtractorBeam  : MasteryDummyItem {}
+internal class MasteryOfKALI            : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -459,4 +462,5 @@ public enum Synergy {
     MASTERY_DEADLINE,
     MASTERY_STARMAGEDDON,
     MASTERY_SUBTRACTOR_BEAM,
+    MASTERY_KALI,
 };

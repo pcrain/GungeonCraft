@@ -4,7 +4,7 @@
 
 #### Features:
 
-- Added masteries for Starmageddon and Subtractor Beam
+- Added masteries for Starmageddon, Subtractor Beam, and K.A.L.I.
 
 #### Balance Changes:
 

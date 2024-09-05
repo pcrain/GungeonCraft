@@ -52,6 +52,7 @@ static class ProjectileHandleDamagePatches
         cursor.Emit(OpCodes.Call, typeof(DamageAdjuster).GetMethod("AdjustDamageStatic", BindingFlags.Static | BindingFlags.NonPublic));
     }
 
+    //TODO: rewrite using spapi's guidelines
     //NOTE: used by Armor Piercing Rounds to ignore reflection / invulnerability frames for enemies like Lead Maiden
     [HarmonyILManipulator]
     private static void ArmorPiercingIL(ILContext il)
