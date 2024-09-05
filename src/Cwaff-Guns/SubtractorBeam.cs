@@ -13,12 +13,16 @@ public class SubtractorBeam : CwaffGun
     internal static CwaffTrailController _RedTrailPrefab;
     internal static GameObject _HitEffects;
 
+    internal bool _mastered = false;
+    internal HealthHaver _lastHitEnemy = null;
+
     public static void Init()
     {
         Lazy.SetupGun<SubtractorBeam>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 1.25f, ammo: 300, idleFps: 10, shootFps: 24, reloadFps: 30,
             muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter,
             reloadAudio: "subtractor_beam_reload_sound", banFromBlessedRuns: true)
+          .Attach<SubtractorBeamAmmoDisplay>()
           .InitProjectile(GunData.New(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 0.0f, speed: 300.0f, force: 0.0f, range: 300.0f, customClip: true, spawnSound: "subtractor_beam_fire_sound", uniqueSounds: true))
           .Attach<PierceProjModifier>(pierce => {
@@ -31,7 +35,6 @@ public class SubtractorBeam : CwaffGun
         _RedTrailPrefab = VFX.CreateSpriteTrailObject("subtractor_beam_red_mid", fps: 60, startAnim: "subtractor_beam_red_start",
             softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
         _HitEffects = VFX.Create("subtractor_beam_hit_effect", 12, scale: 0.5f, emissivePower: 10f);
-
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -44,6 +47,12 @@ public class SubtractorBeam : CwaffGun
     {
         WhoAreTheyAgain();
         base.OnDestroy();
+    }
+
+    public override void OnSwitchedToThisGun()
+    {
+        base.OnSwitchedToThisGun();
+        this._mastered = this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_SUBTRACTOR_BEAM);
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -99,6 +108,45 @@ public class SubtractorBeam : CwaffGun
             enemy.GetComponent<Nametag>().SetName($"{enemy.healthHaver.GetCurrentHealth()}");
         }
     }
+
+    internal void SetLastEnemy(HealthHaver enemy)
+    {
+        if (this._mastered)
+            this._lastHitEnemy = enemy;
+    }
+
+    internal HealthHaver GetLastEnemy()
+    {
+        HealthHaver next = this._lastHitEnemy;
+        this._lastHitEnemy = null;
+        return next;
+    }
+}
+
+public class SubtractorBeamAmmoDisplay : CustomAmmoDisplay
+{
+    private Gun _gun;
+    private SubtractorBeam _sub;
+    private PlayerController _owner;
+    private void Start()
+    {
+        this._gun = base.GetComponent<Gun>();
+        this._sub = this._gun.gameObject.GetComponent<SubtractorBeam>();
+        this._owner = this._gun.CurrentOwner as PlayerController;
+    }
+
+    public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+    {
+        if (!this._sub || !this._sub._mastered)
+            return false;
+
+        uic.SetAmmoCountLabelColor(Color.white);
+        uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
+        uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
+        float damage = this._sub._lastHitEnemy ? this._sub._lastHitEnemy.currentHealth : 0f;
+        uic.GunAmmoCountLabel.Text = $"[color #66dd66]{damage}[/color]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+        return true;
+    }
 }
 
 public class SubtractorProjectile : MonoBehaviour
@@ -108,36 +156,53 @@ public class SubtractorProjectile : MonoBehaviour
     private Projectile _projectile;
     private PlayerController _owner;
 
-    private bool _hitFirstEnemy    = false;
-    private float _damage          = 0f;
-    private float _postHitDamage   = 0f;
+    private HealthHaver _hitFirstEnemy  = null;
+    private bool _hitTwoEnemies         = false;
+    private float _damage               = 0f;
+    private float _postHitDamage        = 0f;
     private CwaffTrailController _trail = null;
+    private SubtractorBeam _gun         = null;
 
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
-        this._owner      = this._projectile.Owner as PlayerController;
-        this._trail      = this._projectile.AddTrailToProjectileInstance(SubtractorBeam._GreenTrailPrefab);
-            this._trail.gameObject.SetGlowiness(100f);
+        this._owner = this._projectile.Owner as PlayerController;
+
+        if (this._owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<SubtractorBeam>() is SubtractorBeam sub)
+        {
+            this._gun = sub;
+            this._hitFirstEnemy = sub.GetLastEnemy();
+            this._damage = Mathf.Max(0f, this._hitFirstEnemy ? this._hitFirstEnemy.currentHealth : 0f);
+            this._projectile.baseData.damage = this._damage;
+        }
+
+        this._trail = this._projectile.AddTrailToProjectileInstance(
+          this._hitFirstEnemy ? SubtractorBeam._RedTrailPrefab : SubtractorBeam._GreenTrailPrefab);
+        this._trail.gameObject.SetGlowiness(100f);
 
         this._projectile.sprite.renderer.enabled                = false;
-        this._projectile.OnHitEnemy                            += this.OnHitEnemy;
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+        this._projectile.OnHitEnemy                            += this.OnHitEnemy;
+        this._projectile.OnDestruction                         += this.OnDestruction;
+    }
+
+    private void OnDestruction(Projectile proj)
+    {
+        if (this._gun && !this._hitTwoEnemies)
+            this._gun.SetLastEnemy(this._hitFirstEnemy);
     }
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
     {
-        if ((other.specRigidbody.GetComponent<AIActor>() is not AIActor enemy) || !enemy.IsHostile(canBeNeutral: true))
+        if ((other.specRigidbody.GetComponent<AIActor>() is not AIActor enemy) || !enemy.IsHostile(canBeNeutral: true) || this._hitFirstEnemy == enemy.healthHaver)
         {
             PhysicsEngine.SkipCollision = true;
             return;
         }
-
-        this._projectile.m_hasPierced = false; // reset pierce damange penalty from 0.5 to 1.0
-
         if (!this._hitFirstEnemy)
             return;
 
+        this._projectile.m_hasPierced = false; // reset pierce damange penalty from 0.5 to 1.0
         this._postHitDamage = this._damage - enemy.healthHaver.GetCurrentHealth();
     }
 
@@ -148,8 +213,8 @@ public class SubtractorProjectile : MonoBehaviour
 
         if (!this._hitFirstEnemy)
         {
-            this._hitFirstEnemy = true;
-            this._damage = enemy.healthHaver.GetCurrentHealth();
+            this._hitFirstEnemy = enemy.healthHaver;
+            this._damage = this._hitFirstEnemy.GetCurrentHealth();
             this._projectile.baseData.damage = this._damage;
             if (this._trail)
                 this._trail.DisconnectFromSpecRigidbody(); // we want to have a red trail after hitting the enemy, but want the old green trail around as well
@@ -164,6 +229,7 @@ public class SubtractorProjectile : MonoBehaviour
 
         enemy.gameObject.PlayUnique("subtractor_beam_impact_sound");
 
+        this._hitTwoEnemies              = true;
         this._damage                     = this._postHitDamage;
         this._projectile.baseData.damage = this._damage;
         if (this._damage <= 0)

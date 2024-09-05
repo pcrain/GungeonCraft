@@ -2,18 +2,24 @@
 
 ## 1.18.3 (TBD)
 
-- Added mastery for Starmageddon
-- Made Starmageddon projectiles intelligently avoid targeting enemies that other Starmageddon projectiles will kill 
-- Made Starmageddon projectiles target random spots in the current room instead of the player when no enemies are found
-- Fixed null deref caused by improperly updating Zag projectile trails upon colliding with walls
+#### Features:
+
+- Added masteries for Starmageddon and Subtractor Beam
+
+#### Balance Changes:
+
 - Reworked Macchi Auto: 
 	- Coffee goop now slows time by 50% while the player is standing in it
 	- Coffee goop now doubles movement speed, roll speed, reload speed, and rate of fire while the player is standing in it
 	- (The net effect of the above changes slows down everything but the player by 50%, making overdosing enemies with caffeine more viable)
+- Rebalanced Starmageddon: 
+	- Projectiles intelligently avoid targeting enemies that other Starmageddon projectiles will kill 
+	- Projectiles target random spots in the current room instead of the player when no enemies are found
 - Rebalanced Yggdrashell:
 	- Halved the amount of life force needed per level to increase vine strength (i.e., gun now builds strength twice as fast)
 	- Increased base damage of each level by 50% (with above change, effectively builds strength 3x as fast)
 	- Increased ammo consumption from 3 per second to 5 per second
+
 - Changed Suncaster's quality from S to A (requires too much setup to be a truly S tier weapon)
 - Changed Glockarina's quality from A to B (DPS is too low and other effects don't quite make up for it)
 - Changed Scotsman's gun class from PISTOL to EXPLOSIVE
@@ -21,6 +27,10 @@
 - Changed Carpet Bomber's gun class from CHARGE to EXPLOSIVE
 - Changed Derail Gun's gun class from RIFLE to EXPLOSIVE
 - Changed Subtractor Beam's gun class from FULLAUTO to RIFLE
+
+#### Bugfixes:
+
+- Fixed null deref caused by improperly updating Zag projectile trails upon colliding with walls
 
 ## 1.18.2 (2024-09-03)
 

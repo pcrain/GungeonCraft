@@ -155,6 +155,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfDeadline>(MASTERY_DEADLINE, Deadline.ItemName);
         // Starmageddon fires meteors that deal splash damage and set the ground ablaze, and passively grants fire immunity.
         NewMastery<MasteryOfStarmageddon>(MASTERY_STARMAGEDDON, Starmageddon.ItemName);
+        // Subtractor Beam shots that only hit one enemy use that enemy as the damage source for Subtractor Beam's next shot.
+        NewMastery<MasteryOfSubtractorBeam>(MASTERY_SUBTRACTOR_BEAM, SubtractorBeam.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -392,6 +394,7 @@ internal class MasteryOfKingsLaw        : MasteryDummyItem {}
 internal class MasteryOfBubblebeam      : MasteryDummyItem {}
 internal class MasteryOfDeadline        : MasteryDummyItem {}
 internal class MasteryOfStarmageddon    : MasteryDummyItem {}
+internal class MasteryOfSubtractorBeam  : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -455,4 +458,5 @@ public enum Synergy {
     MASTERY_BUBBLEBEAM,
     MASTERY_DEADLINE,
     MASTERY_STARMAGEDDON,
+    MASTERY_SUBTRACTOR_BEAM,
 };
