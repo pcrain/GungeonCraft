@@ -21,7 +21,7 @@ public class CarpetBomber : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.5f, ammo: 360, shootFps: 30, reloadFps: 20,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.EXPLOSIVE, reloadTime: 1.5f, ammo: 360, shootFps: 30, reloadFps: 20,
             chargeFps: (int)(1f / _CHARGE_PER_PROJECTILE), loopChargeAt: 10, muzzleVFX: "muzzle_carpet_bomber", muzzleFps: 30,
             muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound")
           .SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18)

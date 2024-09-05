@@ -36,6 +36,7 @@ public class Starmageddon : CwaffGun
         _StarmageddonTrailPrefab = VFX.CreateSpriteTrailObject("starmageddon_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
         _MeteorTrailPrefab = VFX.CreateSpriteTrailObject("starmageddon_meteor_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
 
+        //REFACTOR: possibly switch over to VolleyReplacementSynergyProcessor
         _MasteryModule = new ProjectileModule().InitSingleProjectileModule(GunData.New(clipSize: 30, cooldown: 0.125f, angleVariance: 15.0f,
             shootStyle: ShootStyle.Automatic, damage: 16.0f, speed: 60.0f, range: 999999f, spawnSound: "starmageddon_fire_sound",
             sprite: "meteor_projectile", fps: 12, anchor: Anchor.MiddleCenter, customClip: true, fire: 1.0f, shrapnelMinVelocity: 8f, shrapnelMaxVelocity: 16f,

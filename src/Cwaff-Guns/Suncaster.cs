@@ -33,7 +33,7 @@ public class Suncaster : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,
             canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false, shootFps: 30, reloadFps: 40)
           .Attach<SuncasterAmmoDisplay>();
 

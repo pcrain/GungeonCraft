@@ -57,7 +57,7 @@ public class Glockarina : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Glockarina>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 400, canReloadNoMatterAmmo: true,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 400, canReloadNoMatterAmmo: true,
             shootFps: 24, reloadFps: 20, muzzleFrom: Items.Mailbox, fireAudio: "glockarina_shoot_sound", reloadAudio: "glockarina_reload_sound")
           .Attach<GlockarinaAmmoDisplay>()
           .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f, damage: 7.5f, customClip: true,

@@ -9,6 +9,7 @@ public class Yggdrashell : CwaffGun
 
     private const float _PARTICLE_RATE          = 0.03f;
     private const float _LIFEFORCE_VALUE        = 100f;
+    private const float _ACCUM_RATE             = 2f;
     private static readonly float[] _Thresholds = [0f, 1f * _LIFEFORCE_VALUE, 3f * _LIFEFORCE_VALUE, 6f * _LIFEFORCE_VALUE, 10f * _LIFEFORCE_VALUE];
 
     internal static tk2dBaseSprite _HeartVFXSprite = null;
@@ -61,9 +62,9 @@ public class Yggdrashell : CwaffGun
     private static ProjectileModule SetupMod(int level, Gun gun)
     {
         Projectile projectile = Items._38Special.CloneProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Beam,
-          doBeamSetup: false, damage: 10f * level));
+          doBeamSetup: false, damage: 15f * level));
             projectile.AddRaidenBeamPrefab($"yggdrashell_beam_{level}", fps: 20, maxTargets: 1, targetOffscreen: true);
-        ProjectileModule mod = new ProjectileModule().SetAttributes(GunData.New(gun: gun, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Beam, ammoCost: 3, customClip: true));
+        ProjectileModule mod = new ProjectileModule().SetAttributes(GunData.New(gun: gun, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Beam, ammoCost: 5, customClip: true));
         mod.projectiles = new(){projectile};
         return mod;
     }
@@ -74,7 +75,7 @@ public class Yggdrashell : CwaffGun
             return;
         int effectiveHealth = Mathf.Max(1, Mathf.FloorToInt(player.ForceZeroHealthState ? player.healthHaver.currentArmor : player.healthHaver.currentHealth));
         float maxLifeForce = effectiveHealth * _LIFEFORCE_VALUE;
-        this._lifeForce = Mathf.Min(this._lifeForce + damageThisTick, maxLifeForce);
+        this._lifeForce = Mathf.Min(this._lifeForce + damageThisTick * _ACCUM_RATE, maxLifeForce);
         if (!this._protectionActive && this._lifeForce >= maxLifeForce)
         {
             this._protectionActive = true;

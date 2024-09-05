@@ -43,6 +43,7 @@ public class Gunbrella : CwaffGun
           .Attach<GunbrellaProjectile>()
           .Assign(out Projectile proj);
 
+        //REFACTOR: possibly switch over to VolleyReplacementSynergyProcessor
         _MasteryModule = new ProjectileModule(){projectiles = new(){ proj }}.SetAttributes(GunData.New(
             gun: gun, ammoCost: 1, clipSize: -1, cooldown: 0.05f, shootStyle: ShootStyle.Automatic, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
 
