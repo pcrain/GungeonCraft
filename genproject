@@ -13,18 +13,29 @@ gfxchecksums="./obj/_${namespace}-checksums-gfx"     #file containing checksums 
 audiochecksums="./obj/_${namespace}-checksums-audio" #file containing checksums of all audio files to determine rebuilding audio bank
 externalupdate="./obj/_${namespace}-externalupdate"  #file containing the last time an external resource was added
 audioupdate="./obj/_${namespace}-audioupdate"        #file containing the last time an audio resource / csv was added / updated
-# dllname="./bin/Debug/${projectname}.dll"         #Debug DLL name, directly based on the project name
-dllname="./bin/Release/${projectname}.dll"       #Release DLL name
-dotnet35path="$(pwd)/_dotNETFramework/v3.5"      #Path to .NET 3.5 developer assemblies (from NUGet)
-USEXTERNALASSEMBLY=0                             #Whether to use the external Assembly-Csharp.dll or the one bundled in the source directory
+USEXTERNALASSEMBLY=0                             #Whether to use the external or bundled Assembly-Csharp.dll -- couldn't get external working ):
 UPDATEDLLS=0                                     #Set to 1 if any new DLLS are added to make sure they're copied correctly to bin/Debug
-#Could not get the external assembly working ):
+
+#Easy colors (condensed)
+  BLN="\e[0m"   ; UND="\e[1;4m" ; INV="\e[1;7m" ; CRT="\e[1;41m";
+  BLK="\e[1;30m"; RED="\e[1;31m"; GRN="\e[1;32m"; YLW="\e[1;33m";
+  BLU="\e[1;34m"; MGN="\e[1;35m"; CYN="\e[1;36m"; WHT="\e[1;37m";
+debugbuild="$( [ "false" == "$(cat 'src/Common.cs' | grep -m1 'DEBUG_BUILD' | cut -f 2 -d '=' | cut -f 1 -d ';' | tr -d ' ')" ]; echo "$?" )"
+if [ "$debugbuild" == "1" ]; then
+  buildType="Debug"
+  buildColor="$YLW"
+else
+  buildType="Release"
+  buildColor="$GRN"
+fi
+dllname="./bin/${buildType}/${projectname}.dll" #Release DLL name
+
+dotnet35path="$(pwd)/_dotNETFramework/v3.5"      #Path to .NET 3.5 developer assemblies (from NUGet)
 shaderfile="cwaffshaders"
 windowsshaderassetpath="/home/pretzel/workspace/gungeon-projects/gungy-shaders/Gungy Shaders/Assets/AssetBundles/Windows/${shaderfile}"
 macosshaderassetpath="/home/pretzel/workspace/gungeon-projects/gungy-shaders/Gungy Shaders/Assets/AssetBundles/OSX/${shaderfile}"
 linuxshaderassetpath="/home/pretzel/workspace/gungeon-projects/gungy-shaders/Gungy Shaders/Assets/AssetBundles/Linux/${shaderfile}"
 projectversion="$(cat 'src/Common.cs' | grep 'MOD_VERSION' | cut -f 2 -d '"')"
-debugbuild="$( [ "false" == "$(cat 'src/Common.cs' | grep -m1 'DEBUG_BUILD' | cut -f 2 -d '=' | cut -f 1 -d ';' | tr -d ' ')" ]; echo "$?" )"
 manifesttemplate=`cat <<HERE
 {
   "name": "$projectname",
@@ -45,14 +56,14 @@ if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
   # dllname="./bin/Release/${projectname}.dll" #Release DLL name
 fi
 
+if [ $thunderstore -eq 1 ]&& [ $debugbuild -gt 0 ]; then
+  echo -e "[${RED}@${BLN}] Trying to build Thunderstore package from debug build, refusing"
+  exit
+fi
+
 #Base directory we're copying our plugin to
 plugindir="/xmedia/pretzel/Steam/steamapps/common/Enter the Gungeon/BepInEx/plugins"
 pluginspritesdir="${plugindir}/sprites" #plugin sprite directory
-
-#Easy colors (condensed)
-  BLN="\e[0m"   ; UND="\e[1;4m" ; INV="\e[1;7m" ; CRT="\e[1;41m";
-  BLK="\e[1;30m"; RED="\e[1;31m"; GRN="\e[1;32m"; YLW="\e[1;33m";
-  BLU="\e[1;34m"; MGN="\e[1;35m"; CYN="\e[1;36m"; WHT="\e[1;37m";
 
 #Variable tracking if anything actually needs to be rebuilt
 rebuild=0
@@ -204,7 +215,7 @@ echo -e "[${GRN}>${BLN}] Scanning for EtG DLLs"
 unitydllpath="packages/EtG.UnityEngine.1.0.0/lib"
 while read -r line; do
   if [ $UPDATEDLLS -eq 1 ]; then
-    newpath="./bin/Debug/${line}.dll"
+    newpath="./bin/${buildType}/${line}.dll"
     if [ ! -e "$newpath" ]; then
       /bin/cp "${unitydllpath}/${line}.dll" "${newpath}"
     fi
@@ -221,7 +232,7 @@ while read -r line; do
   if [ $UPDATEDLLS -eq 1 ]; then
     basename="$(echo "${line}" | rev | cut -f1 -d $'\\' | rev)"
     separated="$(echo "${line}" | sed -re 's@\\@/@g')"
-    newpath="./bin/Debug/${basename}"
+    newpath="./bin/${buildType}/${basename}"
     if [ ! -e "$newpath" ]; then
       /bin/cp "${separated}" "${newpath}"
     fi
@@ -368,10 +379,10 @@ if [ $rebuild -eq 1 ]; then
   fi
 
   #Actually rebuild the project
-  echo -e "[${GRN}>${BLN}] Building project"
+  echo -e "[${GRN}>${BLN}] Building $buildColor$buildType$BLN project"
   # cat "${projfile}" | sed '/Assembly-CSharp-Full/,+3d' > "${projfile}.fixed"
   # if [ $thunderstore -eq 1 ]; then
-    dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary" -property:Configuration=Release
+    dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary" -property:Configuration="$buildType"
   # else
   #   dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary"
   # fi
@@ -397,26 +408,22 @@ if [ $thunderstore -eq 1 ]; then
   echo -e "[${GRN}>${BLN}] Regenerating item tips"
   ./gen-itemtips.py
   echo -e "[${GRN}>${BLN}] Assembling Thunderstore package"
-  if [ $debugbuild -gt 0 ]; then
-    echo -e "[${RED}@${BLN}] Trying to build Thunderstore package from debug build, refusing"
-  else
-    tdir="./_thunderstore_package"
-    /bin/mkdir -p "${tdir}"
-    cat "./readme.md" | sed -re 's@\(previews/@\(https://raw.githubusercontent.com/pcrain/GungeonCraft/master/previews/@g' > "${tdir}/README.md" # change images to absolute github links so Thunderstore can display inline images
-    /bin/cp -f "./changelog.md" "${tdir}/CHANGELOG.md"
-    /bin/cp -f "./previews/icon.png" "${tdir}/icon.png"
-    echo "${manifesttemplate}" > "${tdir}/manifest.json"
-    /bin/cp "${dllname}" "${tdir}"
+  tdir="./_thunderstore_package"
+  /bin/mkdir -p "${tdir}"
+  cat "./readme.md" | sed -re 's@\(previews/@\(https://raw.githubusercontent.com/pcrain/GungeonCraft/master/previews/@g' > "${tdir}/README.md" # change images to absolute github links so Thunderstore can display inline images
+  /bin/cp -f "./changelog.md" "${tdir}/CHANGELOG.md"
+  /bin/cp -f "./previews/icon.png" "${tdir}/icon.png"
+  echo "${manifesttemplate}" > "${tdir}/manifest.json"
+  /bin/cp "${dllname}" "${tdir}"
 
-    cd "${tdir}"
-    /bin/rm -f "${projectname}.zip"
-    zip -q "${projectname}.zip" ./*
-    cd ..
-    /bin/rm -f ./bin/*.zip
-    zippath="./bin/${projectname}_${projectversion}_$(date +%F_%H-%M-%S).zip"
-    /bin/mv "${tdir}/${projectname}.zip" "${zippath}"
-    echo -e "[${GRN}>${BLN}]   Created package ${CYN}${zippath}${BLN}"
-  fi
+  cd "${tdir}"
+  /bin/rm -f "${projectname}.zip"
+  zip -q "${projectname}.zip" ./*
+  cd ..
+  /bin/rm -f ./bin/*.zip
+  zippath="./bin/${projectname}_${projectversion}_$(date +%F_%H-%M-%S).zip"
+  /bin/mv "${tdir}/${projectname}.zip" "${zippath}"
+  echo -e "[${GRN}>${BLN}]   Created package ${CYN}${zippath}${BLN}"
 fi
 
 #Launch the game if "-g" flag was passed

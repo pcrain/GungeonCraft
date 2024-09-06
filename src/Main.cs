@@ -71,6 +71,10 @@ public class Initialisation : BaseUnityPlugin
     {
         try
         {
+            #if DEBUG
+                // ConstructorProfiler.Enable();
+                // ConstructorProfiler.Toggle();
+            #endif
             var watch = System.Diagnostics.Stopwatch.StartNew();
             System.Diagnostics.Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
             long oldMemory = currentProcess.WorkingSet64;
@@ -78,7 +82,7 @@ public class Initialisation : BaseUnityPlugin
             {
                 #if DEBUG
                     ETGModConsole.Log("Cwaffing the Gungy initializing...[DEBUG BUILD]");
-                #else
+                #else // in theory shouldn't be able to reach this part anymore since C.DEBUG_BUILD is synced
                     ETGModConsole.Log("Cwaffing the Gungy initializing...[RELEASE BUILD]");
                 #endif
             }
@@ -421,8 +425,7 @@ public class Initialisation : BaseUnityPlugin
 
             watch.Stop();
             ETGModConsole.Log($"Yay! :D Initialized <color=#{ColorUtility.ToHtmlStringRGB(C.MOD_COLOR).ToLower()}>{C.MOD_NAME} v{C.MOD_VERSION}</color> in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
-            if (C.DEBUG_BUILD)
-            {
+            #if DEBUG
                 ETGModConsole.Log($"  {setupEarlyHarmonyWatch.ElapsedMilliseconds, 5}ms       setupEarlyHarmony");
                 ETGModConsole.Log($"  {setupLateHarmonyWatch.ElapsedMilliseconds,  5}ms ASYNC setupLateHarmony ");
                 ETGModConsole.Log($"  {setupAtlasesWatch.ElapsedMilliseconds,      5}ms       setupAtlases     ");
@@ -446,7 +449,7 @@ public class Initialisation : BaseUnityPlugin
                 //HACK: disable ETG debug log
                 // if (C.DEBUG_BUILD)
                 //     Application.logMessageReceived -= ETGModDebugLogMenu.Logger;
-            }
+            #endif
         }
         catch (Exception e)
         {
@@ -455,6 +458,8 @@ public class Initialisation : BaseUnityPlugin
         }
         finally
         {
+            if (C.DEBUG_BUILD)
+                ConstructorProfiler.Toggle();
             C._ModSetupFinished = true; // make sure setup-specific harmony patches get disabled even if an error occurs
         }
         if (C.DEBUG_BUILD)

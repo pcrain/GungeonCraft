@@ -110,6 +110,7 @@ public static class ConstructorProfiler
     private static string[] AssFilter = new[] { "Assembly-CSharp", "UnityEngine" };
     private static Dictionary<string, StackData> CallCounter = new Dictionary<string, StackData>();
 
+    [System.Diagnostics.Conditional("DEBUG")]
     public static void Enable()
     {
         Harmony harmony = new Harmony(nameof(ConstructorProfiler));
@@ -175,6 +176,7 @@ public static class ConstructorProfiler
 
     private static bool _Adding = false;
     private static MethodInfo AddCallMethodInfo = typeof(ConstructorProfiler).GetMethod(nameof(AddCall), AccessTools.all);
+    [System.Diagnostics.Conditional("DEBUG")]
     private static void AddCall()
     {
         if (!run || _Adding)
@@ -197,10 +199,11 @@ public static class ConstructorProfiler
     }
 
     private static bool run;
+    [System.Diagnostics.Conditional("DEBUG")]
     public static void Toggle()
     {
-        if (!Input.GetKeyDown(KeyCode.B))
-            return;
+        // if (!Input.GetKeyDown(KeyCode.B))
+        //     return;
 
         if (!run)
         {

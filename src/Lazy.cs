@@ -5,17 +5,17 @@ public static class Lazy
 {
     internal static tk2dSpriteCollectionData _GunSpriteCollection = null;
 
-    //NOTE: System.Diagnostics.Conditional can be used to strip out methods from release builds, but we're only using RELEASE builds for now so not needed
+    //NOTE: System.Diagnostics.Conditional can be used to strip out methods from release builds
     // https://stackoverflow.com/questions/49251621/will-c-sharp-compiler-strip-out-empty-methods
     /// <summary>Log with the console only in debug mode</summary>
-    // [System.Diagnostics.Conditional("DEBUG")]
+    [System.Diagnostics.Conditional("DEBUG")]
     public static void DebugLog(object text)
     {
         ETGModConsole.Log(text);
     }
 
     /// <summary>Warn with the console only in debug mode</summary>
-    // [System.Diagnostics.Conditional("DEBUG")]
+    [System.Diagnostics.Conditional("DEBUG")]
     public static void DebugWarn(string text)
     {
         ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
