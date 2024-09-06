@@ -47,8 +47,9 @@ public static class FancyShopBuilder
     Func<PlayerController, PickupObject, int, bool> onSteal = null
     )
   {
-    if (C.DEBUG_BUILD)
+    #if DEBUG
       ETGModConsole.Log($"Setting up shop for {npcName}");
+    #endif
 
     moddedItems ??= new();
     string npcNameUpper = npcName.ToUpper();

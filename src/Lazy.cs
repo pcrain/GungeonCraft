@@ -96,15 +96,17 @@ public static class Lazy
             _CustomPickups[typeof(TItemSpecific)] = item; // register item in pickup by type database
             _CustomPickupIds[typeof(TItemSpecific)] = item.PickupObjectId; // register item in pickup id by type database
         }
-        if (C.DEBUG_BUILD && !hideFromAmmonomicon)
-        {
-            if (item is Gun)
-                ETGModConsole.Log($"Lazy Initialized Gun: {baseItemName} ({item.DisplayName})");
-            else if (item is PlayerItem)
-                ETGModConsole.Log($"Lazy Initialized Active: {baseItemName} ({item.DisplayName})");
-            else
-                ETGModConsole.Log($"Lazy Initialized Passive: {baseItemName} ({item.DisplayName})");
-        }
+        #if DEBUG
+            if (!hideFromAmmonomicon)
+            {
+                if (item is Gun)
+                    ETGModConsole.Log($"Lazy Initialized Gun: {baseItemName} ({item.DisplayName})");
+                else if (item is PlayerItem)
+                    ETGModConsole.Log($"Lazy Initialized Active: {baseItemName} ({item.DisplayName})");
+                else
+                    ETGModConsole.Log($"Lazy Initialized Passive: {baseItemName} ({item.DisplayName})");
+            }
+        #endif
         return item;
     }
 

@@ -99,20 +99,17 @@ public static class ModdedShopItemAdder
             return;
         _OurShopsInitialized = true;
 
-        if (C.DEBUG_BUILD)
-            Debug.Log($"scanning custom items: ");
+        Lazy.DebugLog($"scanning custom items: ");
         foreach (GameObject shop in FancyShopBuilder.DelayedModdedLootAdditions.Keys)
         {
-            if (C.DEBUG_BUILD)
-                Debug.Log($"  looking in shop {shop.name}");
+            Lazy.DebugLog($"  looking in shop {shop.name}");
             GenericLootTable lootTable = shop.GetComponent<BaseShopController>().shopItems;
             foreach (string moddedItem in FancyShopBuilder.DelayedModdedLootAdditions[shop])
             {
                 PickupObject moddedPickup = Lazy.GetModdedItem(moddedItem);
                 if (!moddedPickup)
                     continue; // mod not loaded or item not found
-                if (C.DEBUG_BUILD)
-                    Debug.Log($"    adding modded item {moddedPickup.EncounterNameOrDisplayName} to shop");
+                Lazy.DebugLog($"    adding modded item {moddedPickup.EncounterNameOrDisplayName} to shop");
                 lootTable.AddItemToPool(moddedPickup.PickupObjectId);
             }
         }
@@ -124,8 +121,7 @@ public static class ModdedShopItemAdder
             return;
         _ModdedShopsInitialized = true;
 
-        if (C.DEBUG_BUILD)
-            ETGModConsole.Log($"scanning custom shops: ");
+        Lazy.DebugLog($"scanning custom shops: ");
         var watch = System.Diagnostics.Stopwatch.StartNew();
         foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
@@ -136,8 +132,7 @@ public static class ModdedShopItemAdder
             Type perModShopController = assembly.GetType("NpcApi.CustomShopController");
             if (perModShopApi == null || perModShopController == null)
                 continue;
-            if (C.DEBUG_BUILD)
-                Debug.Log($"  found assembly: {assembly.GetName().Name}");
+            Lazy.DebugLog($"  found assembly: {assembly.GetName().Name}");
 
             // See if the assembly has actually defined builtShops
             FieldInfo builtShopsInfo = perModShopApi.GetField("builtShops", BindingFlags.Public | BindingFlags.Static);
@@ -161,8 +156,7 @@ public static class ModdedShopItemAdder
         // Add our items to shops registered through Alexandria
         AddOurItemsToModdedShops(Alexandria.NPCAPI.ShopAPI.builtShops);
         watch.Stop();
-        if (C.DEBUG_BUILD)
-            ETGModConsole.Log($"  initialized modded shop items in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
+        Lazy.DebugLog($"  initialized modded shop items in "+(watch.ElapsedMilliseconds/1000.0f)+" seconds");
     }
 
     private static void AddOurItemsToModdedShops(Dictionary<string, GameObject> builtShops)
@@ -173,8 +167,7 @@ public static class ModdedShopItemAdder
                 continue;
             if (bsc.shopItems is not GenericLootTable shopItems)
                 continue;
-            if (C.DEBUG_BUILD)
-                Debug.Log($"    found shop {entry.Key}");
+            Lazy.DebugLog($"    found shop {entry.Key}");
             if (!_ModdedShopNameMap.ContainsKey(entry.Key))
                 continue;
 
@@ -186,8 +179,7 @@ public static class ModdedShopItemAdder
 
             foreach(int itemToAdd in _ModdedShopItems[_ModdedShopNameMap[entry.Key]])
             {
-                if (C.DEBUG_BUILD)
-                    Debug.Log($"      adding {itemToAdd} == {PickupObjectDatabase.GetById(itemToAdd).EncounterNameOrDisplayName} with weight 1");
+                Lazy.DebugLog($"      adding {itemToAdd} == {PickupObjectDatabase.GetById(itemToAdd).EncounterNameOrDisplayName} with weight 1");
                 shopItems.AddItemToPool(itemToAdd);
             }
         }

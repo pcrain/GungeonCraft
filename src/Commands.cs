@@ -153,8 +153,8 @@ public class FlowCommands {
     }
 
     public static void Install() {
-        if (CwaffDungeonFlow.KnownFlows != null && CwaffDungeonFlow.KnownFlows.Count > 0) {
-            foreach (DungeonFlow flow in CwaffDungeonFlow.KnownFlows) {
+        if (CwaffDungeonFlow._KnownFlows != null && CwaffDungeonFlow._KnownFlows.Count > 0) {
+            foreach (DungeonFlow flow in CwaffDungeonFlow._KnownFlows) {
                 if (flow.name != null && flow.name != string.Empty) { knownFlows.Add(flow.name.ToLower()); }
             }
         }

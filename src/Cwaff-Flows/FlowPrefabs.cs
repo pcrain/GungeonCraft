@@ -4,46 +4,42 @@ namespace CwaffingTheGungy;
 public class CwaffDungeonPrefabs {
 
     // Materials
-    public static Material SpaceFog;
-
-    // Custom Textures
-    public static Texture2D BulletManMonochromeTexture;
-    public static Texture2D BulletManUpsideDownTexture;
+    // public static Material SpaceFog;
 
     // Rat Trap Door
-    public static GameObject RatTrapdoor;
+    // public static GameObject RatTrapdoor;
 
     // Room Prefabs
-    public static PrototypeDungeonRoom shop02;
-    public static PrototypeDungeonRoom fusebombroom01;
+    // public static PrototypeDungeonRoom shop02;
+    // public static PrototypeDungeonRoom fusebombroom01;
     public static PrototypeDungeonRoom elevator_entrance;
-    public static PrototypeDungeonRoom gungeon_entrance;
-    public static PrototypeDungeonRoom gungeon_entrance_bossrush;
-    public static PrototypeDungeonRoom elevator_maintenance_room;
-    public static PrototypeDungeonRoom test_entrance;
+    // public static PrototypeDungeonRoom gungeon_entrance;
+    // public static PrototypeDungeonRoom gungeon_entrance_bossrush;
+    // public static PrototypeDungeonRoom elevator_maintenance_room;
+    // public static PrototypeDungeonRoom test_entrance;
     public static PrototypeDungeonRoom exit_room_basic;
-    public static PrototypeDungeonRoom boss_foyer;
-    public static PrototypeDungeonRoom gungeon_rewardroom_1;
-    public static PrototypeDungeonRoom paradox_04;
-    public static PrototypeDungeonRoom paradox_04_copy;
-    public static PrototypeDungeonRoom blobulordroom01;
-    public static PrototypeDungeonRoom doublebeholsterroom01;
-    public static PrototypeDungeonRoom bossstatuesroom01;
-    public static PrototypeDungeonRoom oldbulletking_room_01;
-    public static PrototypeDungeonRoom DragunBossFoyerRoom;
-    public static PrototypeDungeonRoom DraGunRoom01;
-    public static PrototypeDungeonRoom DraGunExitRoom;
-    public static PrototypeDungeonRoom DraGunEndTimesRoom;
-    public static PrototypeDungeonRoom BlacksmithShop;
-    public static PrototypeDungeonRoom GatlingGullRoom05;
-    public static PrototypeDungeonRoom letsgetsomeshrines_001;
-    public static PrototypeDungeonRoom shop_special_key_01;
-    public static PrototypeDungeonRoom square_hub;
-    public static PrototypeDungeonRoom subshop_muncher_01;
-    public static PrototypeDungeonRoom black_market;
-    public static PrototypeDungeonRoom gungeon_checkerboard;
-    public static PrototypeDungeonRoom gungeon_normal_fightinaroomwithtonsoftraps;
-    public static PrototypeDungeonRoom gungeon_gauntlet_001;
+    // public static PrototypeDungeonRoom boss_foyer;
+    // public static PrototypeDungeonRoom gungeon_rewardroom_1;
+    // public static PrototypeDungeonRoom paradox_04;
+    // public static PrototypeDungeonRoom paradox_04_copy;
+    // public static PrototypeDungeonRoom blobulordroom01;
+    // public static PrototypeDungeonRoom doublebeholsterroom01;
+    // public static PrototypeDungeonRoom bossstatuesroom01;
+    // public static PrototypeDungeonRoom oldbulletking_room_01;
+    // public static PrototypeDungeonRoom DragunBossFoyerRoom;
+    // public static PrototypeDungeonRoom DraGunRoom01;
+    // public static PrototypeDungeonRoom DraGunExitRoom;
+    // public static PrototypeDungeonRoom DraGunEndTimesRoom;
+    // public static PrototypeDungeonRoom BlacksmithShop;
+    // public static PrototypeDungeonRoom GatlingGullRoom05;
+    // public static PrototypeDungeonRoom letsgetsomeshrines_001;
+    // public static PrototypeDungeonRoom shop_special_key_01;
+    // public static PrototypeDungeonRoom square_hub;
+    // public static PrototypeDungeonRoom subshop_muncher_01;
+    // public static PrototypeDungeonRoom black_market;
+    // public static PrototypeDungeonRoom gungeon_checkerboard;
+    // public static PrototypeDungeonRoom gungeon_normal_fightinaroomwithtonsoftraps;
+    // public static PrototypeDungeonRoom gungeon_gauntlet_001;
 
     // // Secret rooms from Rat Trap door
     // public static PrototypeDungeonRoom ResourcefulRat_LongMinecartRoom_01;
@@ -132,51 +128,51 @@ public class CwaffDungeonPrefabs {
 
     public static void InitCustomPrefabs(AssetBundle sharedAssets, AssetBundle sharedAssets2, AssetBundle braveResources, AssetBundle enemiesBase) {
 
-        Dungeon TutorialDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Tutorial");
-        Dungeon CastleDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Castle");
-        Dungeon GungeonDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Gungeon");
+        // Dungeon TutorialDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Tutorial");
+        // Dungeon CastleDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Castle");
+        // Dungeon GungeonDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Gungeon");
         Dungeon SewerDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Sewer");
-        Dungeon MinesDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Mines");
-        Dungeon ratDungeon = DungeonDatabase.GetOrLoadByName("base_resourcefulrat");
-        Dungeon CathedralDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Cathedral");
-        Dungeon BulletHellDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_BulletHell");
-        Dungeon ForgeDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Forge");
-        Dungeon CatacombsDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Catacombs");
-        Dungeon NakatomiDungeonPrefab = DungeonDatabase.GetOrLoadByName("base_nakatomi");
+        // Dungeon MinesDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Mines");
+        // Dungeon ratDungeon = DungeonDatabase.GetOrLoadByName("base_resourcefulrat");
+        // Dungeon CathedralDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Cathedral");
+        // Dungeon BulletHellDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_BulletHell");
+        // Dungeon ForgeDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Forge");
+        // Dungeon CatacombsDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Catacombs");
+        // Dungeon NakatomiDungeonPrefab = DungeonDatabase.GetOrLoadByName("base_nakatomi");
 
-        SpaceFog = ItemHelper.Get(Items.MrAccretionJr).gameObject.GetComponent<GunParticleSystemController>().TargetSystem.gameObject.GetComponent<ParticleSystemRenderer>().materials[0];
+        // SpaceFog = ItemHelper.Get(Items.MrAccretionJr).gameObject.GetComponent<GunParticleSystemController>().TargetSystem.gameObject.GetComponent<ParticleSystemRenderer>().materials[0];
 
-        RatTrapdoor = MinesDungeonPrefab.RatTrapdoor;
+        // RatTrapdoor = MinesDungeonPrefab.RatTrapdoor;
 
-        shop02 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("shop02");
-        fusebombroom01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("fusebombroom01");
+        // shop02 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("shop02");
+        // fusebombroom01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("fusebombroom01");
         elevator_entrance = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("elevator entrance");
-        gungeon_entrance = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("Gungeon Entrance");
-        elevator_maintenance_room = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("ElevatorMaintenanceRoom");
-        test_entrance = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("test entrance");
+        // gungeon_entrance = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("Gungeon Entrance");
+        // elevator_maintenance_room = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("ElevatorMaintenanceRoom");
+        // test_entrance = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("test entrance");
         exit_room_basic = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("exit_room_basic");
-        boss_foyer = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("boss foyer");
-        gungeon_rewardroom_1 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("gungeon_rewardroom_1");
-        paradox_04 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("paradox_04");
-        paradox_04_copy = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("paradox_04 copy");
-        blobulordroom01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("BlobulordRoom01");
-        doublebeholsterroom01 = CwaffDungeonFlow.LoadOfficialFlow("Secret_DoubleBeholster_Flow").AllNodes[2].overrideExactRoom;
-        bossstatuesroom01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("bossstatuesroom01");
-        oldbulletking_room_01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("oldbulletking_room_01");
-        DragunBossFoyerRoom = ForgeDungeonPrefab.PatternSettings.flows[0].AllNodes[1].overrideExactRoom;
-        DraGunRoom01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("dragunroom01");
-        DraGunExitRoom = ForgeDungeonPrefab.PatternSettings.flows[0].AllNodes[3].overrideExactRoom;
-        DraGunEndTimesRoom = ForgeDungeonPrefab.PatternSettings.flows[0].AllNodes[12].overrideExactRoom;
-        BlacksmithShop = ForgeDungeonPrefab.PatternSettings.flows[0].AllNodes[10].overrideExactRoom;
-        GatlingGullRoom05 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("GatlingGullRoom05");
-        letsgetsomeshrines_001 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("letsgetsomeshrines_001");
-        shop_special_key_01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("shop_special_key_01");
-        square_hub = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("square hub");
-        subshop_muncher_01 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("subshop_muncher_01");
-        black_market = sharedAssets.LoadAsset<PrototypeDungeonRoom>("Black Market");
-        gungeon_checkerboard = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("gungeon_checkerboard");
-        gungeon_normal_fightinaroomwithtonsoftraps = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("gungeon_normal_fightinaroomwithtonsoftraps");
-        gungeon_gauntlet_001 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("gungeon_gauntlet_001");
+        // boss_foyer = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("boss foyer");
+        // gungeon_rewardroom_1 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("gungeon_rewardroom_1");
+        // paradox_04 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("paradox_04");
+        // paradox_04_copy = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("paradox_04 copy");
+        // blobulordroom01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("BlobulordRoom01");
+        // doublebeholsterroom01 = LoadOfficialFlow("Secret_DoubleBeholster_Flow").AllNodes[2].overrideExactRoom;
+        // bossstatuesroom01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("bossstatuesroom01");
+        // oldbulletking_room_01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("oldbulletking_room_01");
+        // DragunBossFoyerRoom = ForgeDungeonPrefab.PatternSettings.flows[0].AllNodes[1].overrideExactRoom;
+        // DraGunRoom01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("dragunroom01");
+        // DraGunExitRoom = ForgeDungeonPrefab.PatternSettings.flows[0].AllNodes[3].overrideExactRoom;
+        // DraGunEndTimesRoom = ForgeDungeonPrefab.PatternSettings.flows[0].AllNodes[12].overrideExactRoom;
+        // BlacksmithShop = ForgeDungeonPrefab.PatternSettings.flows[0].AllNodes[10].overrideExactRoom;
+        // GatlingGullRoom05 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("GatlingGullRoom05");
+        // letsgetsomeshrines_001 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("letsgetsomeshrines_001");
+        // shop_special_key_01 = sharedAssets.LoadAsset<PrototypeDungeonRoom>("shop_special_key_01");
+        // square_hub = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("square hub");
+        // subshop_muncher_01 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("subshop_muncher_01");
+        // black_market = sharedAssets.LoadAsset<PrototypeDungeonRoom>("Black Market");
+        // gungeon_checkerboard = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("gungeon_checkerboard");
+        // gungeon_normal_fightinaroomwithtonsoftraps = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("gungeon_normal_fightinaroomwithtonsoftraps");
+        // gungeon_gauntlet_001 = sharedAssets2.LoadAsset<PrototypeDungeonRoom>("gungeon_gauntlet_001");
 
         // BonusChestRooms = new PrototypeDungeonRoom[] {
         //     sharedAssets2.LoadAsset<PrototypeDungeonRoom>("lockedcellminireward_01"),
@@ -327,18 +323,35 @@ public class CwaffDungeonPrefabs {
         // gatlinggull_noTileVisualOverrides = new PrototypeDungeonRoom[0];
 
         // Null any Dungeon prefabs you call up when done else you'll break level generation for that prefab on future level loads!
-        TutorialDungeonPrefab = null;
-        CastleDungeonPrefab = null;
-        GungeonDungeonPrefab = null;
+        // TutorialDungeonPrefab = null;
+        // CastleDungeonPrefab = null;
+        // GungeonDungeonPrefab = null;
         SewerDungeonPrefab = null;
-        MinesDungeonPrefab = null;
-        ratDungeon = null;
-        CathedralDungeonPrefab = null;
-        BulletHellDungeonPrefab = null;
-        ForgeDungeonPrefab = null;
-        CatacombsDungeonPrefab = null;
-        NakatomiDungeonPrefab = null;
+        // MinesDungeonPrefab = null;
+        // ratDungeon = null;
+        // CathedralDungeonPrefab = null;
+        // BulletHellDungeonPrefab = null;
+        // ForgeDungeonPrefab = null;
+        // CatacombsDungeonPrefab = null;
+        // NakatomiDungeonPrefab = null;
 
         // ETGModConsole.Log("InitCustomPrefabs finished");
     }
+
+    // public static DungeonFlow LoadOfficialFlow(string target) {
+    //     string flowName = target;
+    //     if (flowName.Contains("/")) { flowName = target.Substring(target.LastIndexOf("/") + 1); }
+    //     AssetBundle m_assetBundle_orig = ResourceManager.LoadAssetBundle("flows_base_001");
+    //     DebugTime.RecordStartTime();
+    //     DungeonFlow result = m_assetBundle_orig.LoadAsset<DungeonFlow>(flowName);
+    //     DebugTime.Log("AssetBundle.LoadAsset<DungeonFlow>({0})", new object[] { flowName });
+    //     if (result == null) {
+    //         Debug.Log("ERROR: Requested DungeonFlow not found!\nCheck that you provided correct DungeonFlow name and that it actually exists!");
+    //         m_assetBundle_orig = null;
+    //         return null;
+    //     } else {
+    //         m_assetBundle_orig = null;
+    //         return result;
+    //     }
+    // }
 }

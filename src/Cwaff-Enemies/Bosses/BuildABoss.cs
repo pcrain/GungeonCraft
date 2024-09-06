@@ -911,8 +911,9 @@ public static class BH
     string realPath = resourcePath.Replace('/', '.') + ".";
 
     // Load all of our sprites into a dictionary of ordered lists of names
-    if (C.DEBUG_BUILD)
+    #if DEBUG
       ETGModConsole.Log($"loading sprites from {resourcePath}");
+    #endif
     Dictionary<string,string[]> spriteMaps = new Dictionary<string,string[]>();
     // foreach (string s in ResourceExtractor.GetResourceNames())
     string bossName = resourcePath.Split('/').Last();  //HACK: assuming boss sprites are in their own folder, probably not the best

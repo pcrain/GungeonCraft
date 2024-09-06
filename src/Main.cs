@@ -369,7 +369,7 @@ public class Initialisation : BaseUnityPlugin
                     encounterAssets = ResourceManager.LoadAssetBundle("encounters_base_001");
 
                     CwaffDungeonPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
-                    CwaffDungeonFlow.InitDungeonFlowsAndHooks(sharedAssets2);
+                    CwaffDungeonFlow.InitDungeonFlows(sharedAssets2);
                 } catch (Exception ex) {
                     ETGModConsole.Log("[CtG] ERROR: Exception occured while building prefabs!", true);
                     Debug.LogException(ex);
@@ -458,8 +458,8 @@ public class Initialisation : BaseUnityPlugin
         }
         finally
         {
-            if (C.DEBUG_BUILD)
-                ConstructorProfiler.Toggle();
+            // if (C.DEBUG_BUILD)
+            //     ConstructorProfiler.Toggle();
             C._ModSetupFinished = true; // make sure setup-specific harmony patches get disabled even if an error occurs
         }
         if (C.DEBUG_BUILD)

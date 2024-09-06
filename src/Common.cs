@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 public class C // constants and common variables
 {
-    public static readonly bool DEBUG_BUILD = false; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+    public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
     public const string MOD_NAME     = "GungeonCraft";
     public const string MOD_INT_NAME = "CwaffingTheGungy";
@@ -63,33 +63,30 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
             string path = s.Replace('.','/');
             string[] tokens = path.Split('/');
             string baseName = tokens[tokens.Length - 1];
-            MatchCollection matches = _NumberAtEnd.Matches(baseName);
+            Match match = _NumberAtEnd.Match(baseName);
             // If we aren't numbered at the end, we're just a singular sprite
-            if (matches.Count == 0)
+            if (!match.Success)
             {
                 if (!tempMap.ContainsKey(baseName))
                     tempMap[baseName] = new string[1];
                 tempMap[baseName][0] = path;
                 continue;
             }
-            foreach (Match match in matches)
+            string name = match.Groups[1].Value;
+            if (name.Length == 0)
+                continue; // don't allow 0-length keys
+            int index = Int32.Parse(match.Groups[3].Value);
+            if (index == 0)
+                continue; // don't allow 0 for an index
+            if (!tempMap.ContainsKey(name))
+                tempMap[name] = new string[index];
+            if (index > tempMap[name].Length)
             {
-                string name = match.Groups[1].Value;
-                if (name.Length == 0)
-                    continue; // don't allow 0-length keys
-                int index = Int32.Parse(match.Groups[3].Value);
-                if (index == 0)
-                    continue; // don't allow 0 for an index
-                if (!tempMap.ContainsKey(name))
-                    tempMap[name] = new string[index];
-                if (index > tempMap[name].Length)
-                {
-                    string[] arr = tempMap[name];
-                    Array.Resize(ref arr, index);
-                    tempMap[name] = arr;
-                }
-                tempMap[name][index - 1] = path;
+                string[] arr = tempMap[name];
+                Array.Resize(ref arr, index);
+                tempMap[name] = arr;
             }
+            tempMap[name][index - 1] = path;
         }
 
         // Convert our arrays to lists
