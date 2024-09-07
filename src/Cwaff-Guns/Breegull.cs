@@ -158,7 +158,7 @@ public class Breegull : CwaffGun
             uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
 
             string uiString = Breegull._Eggs[this._breegull._currentEggType].ui;
-            uic.GunAmmoCountLabel.Text = $"[sprite \"{uiString}\"]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+            uic.GunAmmoCountLabel.Text = $"[sprite \"{uiString}\"]\n{this._owner.VanillaAmmoDisplay()}";
             return true;
         }
     }

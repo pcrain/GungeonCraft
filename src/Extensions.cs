@@ -2676,4 +2676,14 @@ public static class Extensions
     value = default;
     return false;
   }
+
+  /// <summary>Helper function to print out vanilla ammo display for a gun</summary>
+  public static string VanillaAmmoDisplay(this PlayerController player)
+  {
+    if (player.CurrentGun is not Gun gun) return string.Empty;
+    if (gun.IsUndertaleGun)               return "0/0";
+    if (gun.InfiniteAmmo)                 return "[sprite \"infinite-big\"]";
+    if (gun.AdjustedMaxAmmo > 0)          return gun.CurrentAmmo + "/" + gun.AdjustedMaxAmmo;
+                                          return gun.CurrentAmmo.ToString();
+  }
 }

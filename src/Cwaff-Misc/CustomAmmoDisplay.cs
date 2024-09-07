@@ -11,6 +11,9 @@ public abstract class CustomAmmoDisplay : MonoBehaviour
           return false; // no custom ammo override, so use the vanilla behavior
         if (!ammoDisplay.DoCustomAmmoDisplay(uic))
           return false; // custom ammo override does not want to change vanilla behavior
+        if (uic.m_cachedGun && uic.m_cachedGun.GetComponent<CustomAmmoDisplay>())
+          return true; // our custom ammo overrides already account for positioning weirdness, so don't adjust if our last gun had an override
+                       // NOTE: without this, ammo displays for guns that toggle infinite ammo (e.g., with magazine rack) shift slowly offscreen
 
         // Need to do some vanilla postprocessing to make sure label alignment doesn't get all screwed up
         Gun currentGun = guns.CurrentGun;

@@ -3,6 +3,7 @@
 ## 1.18.4 (TBD)
 
 - Fixed buffs from Macchi Auto's coffee goop sometimes persisting when no longer standing in coffee
+- Fixed guns with custom ammo displays not properly displaying whether they had infinite ammo (e.g., from Magazine Rack)
 
 ## 1.18.3 (2024-09-05)
 

@@ -348,7 +348,7 @@ public class GlockarinaAmmoDisplay : CustomAmmoDisplay
                 return false;
         }
 
-        uic.GunAmmoCountLabel.Text = $"[sprite \"{uiString}\"]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+        uic.GunAmmoCountLabel.Text = $"[sprite \"{uiString}\"]\n{this._owner.VanillaAmmoDisplay()}";
         return true;
     }
 }

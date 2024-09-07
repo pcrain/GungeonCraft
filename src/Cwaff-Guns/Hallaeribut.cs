@@ -155,9 +155,9 @@ public class Hallaeribut : CwaffGun
             uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
             uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
             if (this._hal._state == Famished)
-                uic.GunAmmoCountLabel.Text = $"[color #bb33bb]{this._hal._state}[/color]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+                uic.GunAmmoCountLabel.Text = $"[color #bb33bb]{this._hal._state}[/color]\n{this._owner.VanillaAmmoDisplay()}";
             else
-                uic.GunAmmoCountLabel.Text = $"{this._hal._state}\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+                uic.GunAmmoCountLabel.Text = $"{this._hal._state}\n{this._owner.VanillaAmmoDisplay()}";
             return true;
         }
     }

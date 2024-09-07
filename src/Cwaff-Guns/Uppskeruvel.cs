@@ -264,7 +264,7 @@ public class UppskeruvelAmmoDisplay : CustomAmmoDisplay
         uic.SetAmmoCountLabelColor(Color.white);
         uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
         uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
-        uic.GunAmmoCountLabel.Text = $"[sprite \"soul_sprite_ui_icon\"][color #6666dd]x{this._uppies.souls}[/color]\n{this._gun.CurrentAmmo}/{this._gun.AdjustedMaxAmmo}";
+        uic.GunAmmoCountLabel.Text = $"[sprite \"soul_sprite_ui_icon\"][color #6666dd]x{this._uppies.souls}[/color]\n{this._owner.VanillaAmmoDisplay()}";
         return true;
     }
 }
