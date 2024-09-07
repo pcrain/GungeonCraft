@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.18.4 (TBD)
+
+- Fixed buffs from Macchi Auto's coffee goop sometimes persisting when no longer standing in coffee
+
 ## 1.18.3 (2024-09-05)
 
 #### Features:

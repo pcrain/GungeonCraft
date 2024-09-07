@@ -120,7 +120,8 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
             PlayerStats.StatType.ReloadSpeed.Mult(inverseSpeed),
         };
         foreach (StatModifier stat in _CaffeineGoopBuffs)
-            player.ownerlessStatModifiers.Add(stat);
+            player.ownerlessStatModifiers.AddUnique(stat);
+        player.stats.RecalculateStats(player);
     }
 
     public override void OnEffectRemoved(GameActor actor, RuntimeGameActorEffectData effectData)
@@ -129,7 +130,8 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
         if (actor is not PlayerController player)
             return;
         foreach (StatModifier stat in _CaffeineGoopBuffs)
-            player.ownerlessStatModifiers.Remove(stat);
+            player.ownerlessStatModifiers.TryRemove(stat);
+        player.stats.RecalculateStats(player);
         if (!_DummyCaffeineTimeScaleObject)
             _DummyCaffeineTimeScaleObject = new();
         BraveTime.SetTimeScaleMultiplier(1.0f, _DummyCaffeineTimeScaleObject);
