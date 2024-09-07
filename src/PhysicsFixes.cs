@@ -4,7 +4,7 @@ public static class PhysicsPatches
 {
   /// <summary>Optimized version of PhysicsEngine.Pointcast(IntVector2, ...) without unnecessary delegate creation</summary>
   [HarmonyPatch]
-  private class OptimiseIntVectorPointcastPatch
+  private static class OptimiseIntVectorPointcastPatch
   {
       static MethodBase TargetMethod() {
         return typeof(PhysicsEngine).GetMethod("Pointcast", new Type[] {
@@ -81,6 +81,30 @@ public static class PhysicsPatches
         result = null;
         __result = false; // original return value
         return false; // skip the original method
+      }
+  }
+
+  /// <summary>Optimizations for preventing player projectile prefabs from constructing unnecessary objects</summary>
+  [HarmonyPatch(typeof(SpawnManager), nameof(SpawnManager.SpawnProjectile), typeof(GameObject), typeof(Vector3), typeof(Quaternion), typeof(bool))]
+  private class SpawnManagerSpawnProjectilePatch
+  {
+      private static HashSet<GameObject> _Processed = new();
+
+      static void Prefix(SpawnManager __instance, GameObject prefab, Vector3 position, Quaternion rotation, bool ignoresPools)
+      {
+          if (_Processed.Contains(prefab))
+            return;
+          if (prefab.GetComponent<Projectile>() is not Projectile proj)
+            return;
+          if (!proj.AppliesPoison)                        { proj.healthEffect               = null; }
+          if (!proj.AppliesSpeedModifier)                 { proj.speedEffect                = null; }
+          if (!proj.AppliesCharm)                         { proj.charmEffect                = null; }
+          if (!proj.AppliesFreeze)                        { proj.freezeEffect               = null; }
+          if (!proj.AppliesCheese)                        { proj.cheeseEffect               = null; }
+          if (!proj.AppliesBleed)                         { proj.bleedEffect                = null; }
+          if (!proj.AppliesFire)                          { proj.fireEffect                 = null; }
+          if (!proj.baseData.UsesCustomAccelerationCurve) { proj.baseData.AccelerationCurve = null; }
+          _Processed.Add(prefab);
       }
   }
 }
