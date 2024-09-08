@@ -347,21 +347,21 @@ public static class Extensions
   /// <summary>Set the Alpha of a GameObject's sprite</summary>
   public static void SetAlpha(this GameObject g, float a)
   {
-    if (g.GetComponent<Renderer>() is Renderer r)
+    if (g && g.GetComponent<Renderer>() is Renderer r)
       r.SetAlpha(a);
   }
 
   /// <summary>Set the Alpha of a Component's sprite (attached to the base component)</summary>
   public static void SetAlpha(this Component c, float a)
   {
-    if (c.gameObject.GetComponent<Renderer>() is Renderer r)
+    if (c && c.gameObject && c.gameObject.GetComponent<Renderer>() is Renderer r)
       r.SetAlpha(a);
   }
 
   /// <summary>Set the Alpha of a GameObject's sprite immediately and avoid the 1-frame opacity delay upon creation</summary>
   public static void SetAlphaImmediate(this GameObject g, float a)
   {
-    if (g.GetComponent<Renderer>() is not Renderer r)
+    if (!g || g.GetComponent<Renderer>() is not Renderer r)
       return;
     r.SetAlpha(a);
     if (g.GetComponent<tk2dSpriteAnimator>() is tk2dSpriteAnimator animator)
@@ -371,7 +371,7 @@ public static class Extensions
   /// <summary>Set the Alpha of a Component's sprite immediately and avoid the 1-frame opacity delay upon creation</summary>
   public static void SetAlphaImmediate(this Component c, float a)
   {
-    if (c.gameObject.GetComponent<Renderer>() is not Renderer r)
+    if (!c || !c.gameObject || c.gameObject.GetComponent<Renderer>() is not Renderer r)
       return;
     r.SetAlpha(a);
     if (c.gameObject.GetComponent<tk2dSpriteAnimator>() is tk2dSpriteAnimator animator)

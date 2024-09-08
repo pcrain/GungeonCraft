@@ -4,6 +4,7 @@
 
 - Fixed buffs from Macchi Auto's coffee goop sometimes persisting when no longer standing in coffee
 - Fixed guns with custom ammo displays not properly displaying whether they had infinite ammo (e.g., from Magazine Rack)
+- Fixed (hopefully) null deref caused by King's Law updating nonexistent muzzle vfx
 
 ## 1.18.3 (2024-09-05)
 
