@@ -8,7 +8,7 @@ public class Scotsman : CwaffGun
     public static string Lore             = "Hailing straight from the Motherland, this weapon is a favorite among the explosion-loving Scots whose name it bears. The gun's sticky projectiles and ability to detonate them on command takes out much of the guesswork involved when using traditional firearms, ensuring substantial destructive output even when its wielder happens to be drunk, half-blind, or both.";
 
     private const float _MAX_RETICLE_RANGE = 16f;
-    private const float _BASE_EXPLOSION_DAMAGE = 10f;
+    private const float _BASE_EXPLOSION_DAMAGE = 24f;
 
     internal static ExplosionData _ScotsmanExplosion = null;
 

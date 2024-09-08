@@ -8,23 +8,26 @@ public class DeadRinger : CwaffPassive
 {
     public static string ItemName         = "Dead Ringer";
     public static string ShortDescription = "Tactical Defeat";
-    public static string LongDescription  = "Feign death and become stealthed upon taking damage. Shooting while stealthed deals 10x damage and removes stealth.";
+    public static string LongDescription  = "Feign death and become stealthed upon taking damage. Shooting while stealthed deals 10x damage and removes stealth. Projectiles deal 5x damage for 2 seconds after breaking stealth.";
     public static string Lore             = "Developed by the French government for use by their elite secret agents in case of their inevitable failure, this marvelous gadget takes making lemonade out of lemons to the next level.";
 
-    internal const float _DEAD_RINGER_DAMAGE_MULT = 10.0f;
-    internal const float _LENIENCE                = 0.75f; // minimum time after getting hit we can decloak (to prevent instantly losing cloak in panic)
-    internal const float _DECOY_LIFE              = 3f;
+    internal const float _DEAD_RINGER_STEALTH_MULT   = 10.0f;
+    internal const float _DEAD_RINGER_SURPRISE_MULT  = 5.0f;
+    internal const float _DEAD_RINGER_SURPRISE_TIMER = 2.0f;
+    internal const float _LENIENCE                   = 0.75f; // minimum time after getting hit we can decloak (to prevent instantly losing cloak in panic)
+    internal const float _DECOY_LIFE                 = 3f;
 
     internal static GameObject _CorpsePrefab;
     internal static GameObject _DecoyPrefab;
     internal static GameObject _ExplosiveDecoyPrefab;
 
     private float _lastActivationTime = 0.0f;
+    private float _lastDecloakTime = 0.0f;
 
     public static void Init()
     {
         PassiveItem item  = Lazy.SetupPassive<DeadRinger>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.B;
+        item.quality      = ItemQuality.C;
         _CorpsePrefab     = BraveResources.Load("Global Prefabs/PlayerCorpse") as GameObject;
 
         _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();
@@ -38,6 +41,7 @@ public class DeadRinger : CwaffPassive
     {
         base.Pickup(player);
         player.OnReceivedDamage += this.OnReceivedDamage;
+        this.Owner.PostProcessProjectile += this.SneakAttackProcessor;
     }
 
     public override void DisableEffect(PlayerController player)
@@ -46,6 +50,7 @@ public class DeadRinger : CwaffPassive
         if (!player)
             return;
         player.OnReceivedDamage -= this.OnReceivedDamage;
+        player.PostProcessProjectile -= this.SneakAttackProcessor;
         BreakStealth(player);
     }
 
@@ -105,7 +110,6 @@ public class DeadRinger : CwaffPassive
         if (this.Owner.CurrentGun)
             this.Owner.CurrentGun.CeaseAttack(false);
         this.Owner.OnDidUnstealthyAction += BreakStealth;
-        this.Owner.PostProcessProjectile += SneakAttackProcessor;
         // if (!CanAnyBossOrNPCSee(this.Owner)) // don't need this check, we can feign death in front of them
         this.Owner.SetIsStealthed(true, "DeadRinger");
         this.Owner.SetCapableOfStealing(true, "DeadRinger");
@@ -129,9 +133,9 @@ public class DeadRinger : CwaffPassive
         if (JustBecameStealthy())
             return; // don't lose stealth immediately if we shoot right when we get shot
 
+        this._lastDecloakTime = BraveTime.ScaledTimeSinceStartup;
         this.Owner.ClearOverrideShader();
         this.Owner.OnDidUnstealthyAction -= BreakStealth;
-        this.Owner.PostProcessProjectile -= SneakAttackProcessor;
         this.Owner.SetIsStealthed(false, "DeadRinger");
         this.Owner.SetCapableOfStealing(false, "DeadRinger");
         this.Owner.gameObject.Play("medigun_heal_detach");
@@ -145,10 +149,16 @@ public class DeadRinger : CwaffPassive
 
     private void SneakAttackProcessor(Projectile proj, float _)
     {
-        if (JustBecameStealthy())
+        if (JustBecameStealthy() || !this.Owner)
             return; // don't get sneak attack bonus immediately unless we become unstealthed
-        if (this.Owner && this.Owner.IsStealthed)
-            proj.baseData.damage *= _DEAD_RINGER_DAMAGE_MULT;
+        if (this.Owner.IsStealthed)
+            proj.baseData.damage *= _DEAD_RINGER_STEALTH_MULT;
+        else if ((BraveTime.ScaledTimeSinceStartup - this._lastDecloakTime) < _DEAD_RINGER_SURPRISE_TIMER)
+            proj.baseData.damage *= _DEAD_RINGER_SURPRISE_MULT;
+        else
+            return;
+
+        proj.AdjustPlayerProjectileTint(Color.gray, 2);
     }
 
     private void DoSmokeAroundPlayer(int amount)

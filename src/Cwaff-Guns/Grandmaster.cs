@@ -28,7 +28,7 @@ public class Grandmaster : CwaffGun
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350, shootFps: 24, reloadFps: 16,
             muzzleFrom: Items.Mailbox, fireAudio: "chess_gun_fire", reloadAudio: "chess_gun_reload")
           .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
-            speed: 30f, damage: 5.5f, force: 9f, range: 1000f, shouldRotate: false))
+            speed: 30f, damage: 10f, force: 9f, range: 1000f, shouldRotate: false))
           .AddAnimations(
             AnimatedBullet.Create(refClip: ref _PawnSprite,        name: "chess_pawn",         scale: 0.8f, anchor: Anchor.MiddleCenter),
             AnimatedBullet.Create(refClip: ref _RookSprite,        name: "chess_rook",         scale: 0.8f, anchor: Anchor.MiddleCenter),

@@ -5,6 +5,11 @@
 - Fixed buffs from Macchi Auto's coffee goop sometimes persisting when no longer standing in coffee
 - Fixed guns with custom ammo displays not properly displaying whether they had infinite ammo (e.g., from Magazine Rack)
 - Fixed (hopefully) null deref caused by King's Law updating nonexistent muzzle vfx
+- Buffed Grandmaster's projectile damage from 5.5 to 10
+- Buffed Scotsman's projectile explosion damage from 10 to 24
+- Buffed Dead Ringer:
+	- Changed quality from B to C (requires taking damage to activate damage buffs)
+	- Dead Ringer now deals 5x damage for 2 seconds after breaking stealth
 
 ## 1.18.3 (2024-09-05)
 
