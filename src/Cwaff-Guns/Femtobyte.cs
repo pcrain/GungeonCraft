@@ -606,8 +606,8 @@ public class Femtobyte : CwaffGun
                 tk2dBaseSprite chestSprite = chest.sprite;
                 chestObject.transform.position -= chestSprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter).ToVector3ZUp();
                 chestSprite.UpdateZDepth();
-                chest.Initialize();
                 chest.MimicGuid = null;
+                chest.Initialize();
                 chest.m_room = room;
                 chest.IsLocked = d.locked;
                 if (chest.LockAnimator != null)

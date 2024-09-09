@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.18.5 ()
+
+- Fixed argument null exception caused by chests spawned in by Femtobyte trying to transform into invalid Mimics
+
 ## 1.18.4 (2024-09-07)
 
 #### Balance Changes:
