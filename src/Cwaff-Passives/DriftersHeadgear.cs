@@ -76,7 +76,7 @@ public class HLDRoll : CustomDodgeRoll
 
     public bool isHyped = false;  // whether the hyped synergy is active
 
-    public override void BeginDodgeRoll()
+    protected override void BeginDodgeRoll()
     {
         base.BeginDodgeRoll();
         if (!(this.isHyped && this.owner))
@@ -99,7 +99,7 @@ public class HLDRoll : CustomDodgeRoll
                 oclm.MakeGlowy();
     }
 
-    public override IEnumerator ContinueDodgeRoll()
+    protected override IEnumerator ContinueDodgeRoll()
     {
         float dashspeed = DASH_SPEED * (this.isHyped ? 1.2f : 1.0f);
         float dashtime = DASH_TIME;

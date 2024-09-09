@@ -1,25 +1,9 @@
 namespace CwaffingTheGungy;
 
-public interface ICustomDodgeRoll
+public class CustomDodgeRoll : MonoBehaviour
 {
-    public bool dodgeButtonHeld   { get; set; }
-    public bool isDodging         { get; set; }
-    public PlayerController owner { get; set; }
-
-    public bool canDodge      { get; }  // if false, disables a CustomDodgeRoll from activating
-    public bool canMultidodge { get; }  // if true, enables dodging while already mid-dodge
-    public bool putsOutFire   { get; }  // if true, puts out fires when the dodge roll starts up
-
-    public void BeginDodgeRoll();  // called once before a dodge roll begins
-    public IEnumerator ContinueDodgeRoll();  // called every frame until dodge roll ends
-    public void FinishDodgeRoll(); // called once after a dodge roll ends
-    public void AbortDodgeRoll(); // called if the dodge roll is interrupted prematurely
-}
-
-public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
-{
-    public bool dodgeButtonHeld   { get; set; }
-    public bool isDodging         { get; set; }
+    public bool dodgeButtonHeld   { get; protected set; }
+    public bool isDodging         { get; private set; }
     public PlayerController owner { get; set; }
 
     private static List<CustomDodgeRoll> _Overrides = new();
@@ -32,7 +16,7 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
     private class CustomDodgeRollPatch
     {
         static bool Prefix(ref PlayerController __instance, Vector2 direction, ref bool __result)
-        {//INVESTIGATE FOR SLOWDOWN
+        {
             PlayerController player = __instance;
             // Make sure we can actually have all of our movements available (fixes not being able to dodge roll in the Aimless Void)
             if (player.CurrentInputState != PlayerInputState.AllInput || !player.AcceptingNonMotionInput || player.IsDodgeRolling)
@@ -70,7 +54,21 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
         }
     }
 
-    public virtual void BeginDodgeRoll()
+    //NOTE: opening chests disable input until the item get animation finishes playing,
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.TriggerItemAcquisition))]
+    private class PlayerControllerTriggerItemAcquisitionPatch
+    {
+        static void Prefix(PlayerController __instance)
+        {
+            if (__instance.passiveItems == null)
+                return;
+            foreach (PassiveItem p in __instance.passiveItems)
+                if (p && p.GetComponent<CustomDodgeRoll>() is CustomDodgeRoll cdr)
+                    cdr.AbortDodgeRoll();
+        }
+    }
+
+    protected virtual void BeginDodgeRoll()
     {
         // any dodge setup code should be here
         if (!this.owner)
@@ -79,24 +77,26 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
         // by default, we want to make sure we can put out fires at the beginning of our dodge roll
         if (this.putsOutFire && this.owner.CurrentFireMeterValue > 0f)
         {
-            this.owner.CurrentFireMeterValue = Mathf.Max(0f, this.owner.CurrentFireMeterValue -= 0.5f);
+            this.owner.CurrentFireMeterValue = Mathf.Max(0f, this.owner.CurrentFireMeterValue - 0.5f);
             if (this.owner.CurrentFireMeterValue == 0f)
                 this.owner.IsOnFire = false;
         }
     }
 
-    public virtual void FinishDodgeRoll()
+    protected virtual void FinishDodgeRoll(bool aborted = false)
     {
-        // any succesful dodge cleanup code should be here
+        // any succesful (or aborted) dodge cleanup code should be here
     }
 
-    public virtual void AbortDodgeRoll()
+    public void AbortDodgeRoll()
     {
-        // any aborted dodge cleanup code should be here
+        if (!isDodging)
+            return;
+        FinishDodgeRoll(aborted: true);
         isDodging = false;
     }
 
-    public virtual IEnumerator ContinueDodgeRoll()
+    protected virtual IEnumerator ContinueDodgeRoll()
     {
         // code to execute while dodge rolling should be here
         yield break;
@@ -109,7 +109,8 @@ public class CustomDodgeRoll : MonoBehaviour, ICustomDodgeRoll
         IEnumerator script = ContinueDodgeRoll();
         while(isDodging && script.MoveNext())
             yield return script.Current;
-        FinishDodgeRoll();
+        if (isDodging)
+            FinishDodgeRoll();
         isDodging = false;
         yield break;
     }

@@ -168,7 +168,7 @@ public class GyroscopeRoll : CustomDodgeRoll
             this.owner.IsOnFire = false;
     }
 
-    public override IEnumerator ContinueDodgeRoll()
+    protected override IEnumerator ContinueDodgeRoll()
     {
         float minDashSpeed = GetDodgeRollSpeed(); // Min speed of our dash
         float maxDashSpeed = minDashSpeed * 5.0f; // Max speed of our dash
@@ -376,7 +376,7 @@ public class GyroscopeRoll : CustomDodgeRoll
         yield break;
     }
 
-    public override void FinishDodgeRoll()
+    protected override void FinishDodgeRoll(bool aborted = false)
     {
         #region Cleanup
             if (this.stumbleClip != null)
