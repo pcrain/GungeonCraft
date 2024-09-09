@@ -294,7 +294,10 @@ public class AlligatorCableHandler : MonoBehaviour
     private void LateUpdate()
     {
         if (!this._owner || !this._owner.CurrentGun || (this._targetingEnemy && !(this._enemy && this._enemy.healthHaver && this._enemy.healthHaver.IsAlive)))
+        {
             UnityEngine.Object.Destroy(this);
+            return;
+        }
 
         if (!this._startTransform)
             this._startTransform = this._owner.CurrentGun.barrelOffset;
