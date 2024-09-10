@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.18.5 (TBD)
+## 1.18.5 (2024-09-09)
 
 - Fixed argument null exception caused by chests spawned in by Femtobyte trying to transform into invalid Mimics
 - Fixed null deref caused by Alligator's cables trying to position themselves at the barrel of a non-existent gun
