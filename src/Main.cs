@@ -446,6 +446,7 @@ public class Initialisation : BaseUnityPlugin
                 long newMemory = currentProcess.WorkingSet64;
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
                 ETGModMainBehaviour.Instance.gameObject.Play("vc_kirby_appeal01");
+                // ETGModConsole.Log($"you've played {GameStatsManager.Instance.GetPlayerStatValue(TrackedStats.TIME_PLAYED)} seconds");
                 //HACK: disable ETG debug log
                 // if (C.DEBUG_BUILD)
                 //     Application.logMessageReceived -= ETGModDebugLogMenu.Logger;

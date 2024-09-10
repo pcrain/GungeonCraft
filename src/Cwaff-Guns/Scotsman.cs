@@ -17,6 +17,7 @@ public class Scotsman : CwaffGun
     private Vector2 _aimPoint                = Vector2.zero;
     private int _nextIndex                   = 0;
     private Vector2 _whereIsThePlayerLooking = Vector2.zero;
+    private bool _mastered                   = false;
 
     public static void Init()
     {
@@ -42,18 +43,61 @@ public class Scotsman : CwaffGun
         DetonateStickies(player);
     }
 
+    public override void OnSwitchedToThisGun()
+    {
+        base.OnSwitchedToThisGun();
+        if (this._meshRenderer)
+            this._meshRenderer.enabled = true;
+    }
+
     public override void OnSwitchedAwayFromThisGun()
     {
         if (this.PlayerOwner is PlayerController pc)
             pc.forceAimPoint = null;
+        if (this._meshRenderer)
+            this._meshRenderer.enabled = false;
         base.OnSwitchedAwayFromThisGun();
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        player.OnEnteredCombat += this.OnEnteredCombat;
+        base.OnPlayerPickup(player);
+    }
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        player.OnEnteredCombat -= this.OnEnteredCombat;
+        if (this._meshRenderer)
+            this._meshRenderer.enabled = false;
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
+        {
             this.PlayerOwner.forceAimPoint = null;
+            this.PlayerOwner.OnEnteredCombat -= this.OnEnteredCombat;
+        }
+        if (this._coneMeshObject)
+            UnityEngine.Object.Destroy(this._coneMeshObject);
         base.OnDestroy();
+    }
+
+    private LinkedList<MinorBreakable> _roomBreakables = new();
+    private void OnEnteredCombat()
+    {
+        if (!this.PlayerOwner)
+            return;
+        if (this.PlayerOwner.CurrentRoom is not RoomHandler currentRoom)
+            return;
+        this._roomBreakables.Clear();
+        foreach (MinorBreakable minorBreakable in StaticReferenceManager.AllMinorBreakables)
+        {
+            if (!minorBreakable || minorBreakable.IsBroken || minorBreakable.CenterPoint.GetAbsoluteRoom() != currentRoom)
+                continue;
+            this._roomBreakables.AddLast(minorBreakable);
+        }
     }
 
     public override void Update()
@@ -82,6 +126,16 @@ public class Scotsman : CwaffGun
             this._aimPoint = player.CenterPosition + player.m_currentGunAngle.ToVector(_MAX_RETICLE_RANGE);
     }
 
+    private void LateUpdate()
+    {
+        if (!this.PlayerOwner)
+            return;
+        if (!this._mastered)
+            this._mastered = this.PlayerOwner.HasSynergy(Synergy.MASTERY_SCOTSMAN);
+        if (this._mastered)
+            UpdateExplosiveDecor();
+    }
+
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
@@ -105,8 +159,139 @@ public class Scotsman : CwaffGun
                 remainingStickies.Add(sticky);
         }
         this._extantStickies = remainingStickies;
+        if (DetonateTheWorld(pc))
+            anythingDetonated = true;
         if (anythingDetonated)
             pc.gameObject.Play("stickybomblauncher_det");
+    }
+
+    private List<AIActor> _activeEnemiesInRoom = new();
+    private bool DetonateTheWorld(PlayerController pc)
+    {
+        if (!this._mastered || !this.gun || !this.gun.barrelOffset || pc.CurrentRoom is not RoomHandler room)
+            return false;
+
+        bool anythingDetonated = false;
+        int numBreakables = this._roomBreakables.Count;
+        Vector3 barrelPos = this.gun.barrelOffset.position;
+        float gunAngle = pc.m_currentGunAngle;
+
+        // Nuke the decor
+        for (int i = 0; i < numBreakables; ++i)
+        {
+            LinkedListNode<MinorBreakable> node = this._roomBreakables.First;
+            this._roomBreakables.RemoveFirst();
+            //NOTE: LinkedListNode.Value returns true-ish even if the MinorBreakable is invalid, so need explicit !b check
+            if (node.Value is not MinorBreakable b || !b || !b.isActiveAndEnabled || b.IsBroken)
+                continue;
+            Vector3 bpos = (b.sprite ? b.sprite.WorldCenter : b.transform.position);
+            Vector2 delta = bpos - barrelPos;
+            if (delta.sqrMagnitude > _CONE_SQR_MAG || Mathf.Abs((delta.ToAngle() - gunAngle).Clamp180()) > (0.5f * _CONE_SPREAD))
+            {
+                this._roomBreakables.AddLast(node);
+                continue;
+            }
+            if (!b.explodesOnBreak || b.explosionData == null)
+            {
+                ExplosionData ed = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData.Clone();
+                ed.damageToPlayer = 0f;
+                Exploder.Explode(position: bpos, data: ed, sourceNormal: Vector2.zero, ignoreQueues: true);
+            }
+            else
+                b.Break();
+            anythingDetonated = true;
+        }
+
+        // Nuke the tables
+        ReadOnlyCollection<IPlayerInteractable> roomInteractables = room.GetRoomInteractables();
+        for (int i = 0; i < roomInteractables.Count; i++)
+        {
+            if (!room.IsRegistered(roomInteractables[i]))
+                continue;
+            if (roomInteractables[i] is not FlippableCover flippableCover || flippableCover.IsFlipped || flippableCover.IsGilded)
+                continue;
+            if (!flippableCover.m_breakable)
+                continue;
+            flippableCover.m_breakable.ApplyDamage(9999f, Vector2.zero, false, true);
+            ExplosionData ed = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData.Clone();
+            ed.damageToPlayer = 0f;
+            Exploder.Explode(position: (flippableCover.sprite ? flippableCover.sprite.WorldCenter : flippableCover.transform.position),
+              data: ed, sourceNormal: Vector2.zero, ignoreQueues: true);
+            anythingDetonated = true;
+        }
+
+        // Nuke the enemies
+        room.SafeGetEnemiesInRoom(ref this._activeEnemiesInRoom);
+        for (int j = this._activeEnemiesInRoom.Count - 1; j >= 0; j--)
+        {
+            AIActor enemy = this._activeEnemiesInRoom[j];
+            if (!enemy || enemy.IsSignatureEnemy)
+                continue;
+            if (enemy.healthHaver is not HealthHaver healthHaver || healthHaver.IsDead || healthHaver.IsBoss)
+                continue;
+            if (enemy.GetComponent<ExplodeOnDeath>() is not ExplodeOnDeath component || component.immuneToIBombApp)
+                continue;
+
+            Vector2 delta = enemy.CenterPosition - barrelPos.XY();
+            if (delta.sqrMagnitude > _CONE_SQR_MAG || Mathf.Abs((delta.ToAngle() - gunAngle).Clamp180()) > (0.5f * _CONE_SPREAD))
+                continue;
+
+            healthHaver.ApplyDamage(2.1474836E+09f, Vector2.zero, "DetonateTheWorld", CoreDamageTypes.None, DamageCategory.Normal, true);
+            anythingDetonated = true;
+        }
+        return anythingDetonated;
+    }
+
+    private GameObject _coneMeshObject = null;
+    private Mesh _mesh = null;
+    private MeshRenderer _meshRenderer = null;
+    private Vector3[] _vertices;
+    private const int _CONE_SEGMENTS = 4;
+    private const float _CONE_SPREAD = 30f;
+    private const float _CONE_START = -0.5f * _CONE_SPREAD;
+    private const float _CONE_GAP = _CONE_SPREAD / _CONE_SEGMENTS;
+    private const float _CONE_MAG = 12f;
+    private const float _CONE_SQR_MAG = _CONE_MAG * _CONE_MAG;
+    private void UpdateExplosiveDecor()
+    {
+        if (!this || this.PlayerOwner is not PlayerController player || player.CurrentGun != this.gun)
+            return;
+
+        if (!this._coneMeshObject || !this._mesh || !this._meshRenderer)
+        {
+            this._coneMeshObject = new GameObject("scotsman_targeting_cone");
+            this._coneMeshObject.SetLayerRecursively(LayerMask.NameToLayer("FG_Critical"));
+
+            this._mesh = new Mesh();
+
+            this._vertices  = new Vector3[_CONE_SEGMENTS + 2];
+            int[] triangles = new int[3 * _CONE_SEGMENTS];
+            for (int i = 0; i < _CONE_SEGMENTS; i++) //NOTE: triangle fan
+            {
+                triangles[i * 3]     = 0;
+                triangles[i * 3 + 1] = i + 1;
+                triangles[i * 3 + 2] = i + 2;
+            }
+            this._mesh.vertices  = this._vertices;
+            this._mesh.triangles = triangles;
+            this._mesh.uv        = new Vector2[_CONE_SEGMENTS + 2];
+
+            this._coneMeshObject.AddComponent<MeshFilter>().mesh = this._mesh;
+
+            this._meshRenderer = this._coneMeshObject.AddComponent<MeshRenderer>();
+            Material mat = this._meshRenderer.material = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
+            mat.shader = ShaderCache.Acquire("tk2d/BlendVertexColorAlphaTintableTilted");
+            mat.SetColor("_OverrideColor", new Color(1.0f, 0.0f, 0.0f, 0.15f));
+        }
+
+        // rebuild cone mesh
+        Vector3 basePos = this._vertices[0] = this.gun.barrelOffset.position;
+        float startAngle = player.m_currentGunAngle + _CONE_START;
+        for (int i = 0; i <= _CONE_SEGMENTS; ++i)
+            this._vertices[i + 1] = basePos + (startAngle + i * _CONE_GAP).ToVector3(_CONE_MAG);
+        this._mesh.vertices = this._vertices; // necessary to actually trigger an update for some reason
+        this._mesh.RecalculateBounds();
+        this._mesh.RecalculateNormals();
     }
 }
 

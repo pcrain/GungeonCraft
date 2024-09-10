@@ -123,6 +123,12 @@ public static class Extensions
     return magnitude * (Vector2)(Quaternion.Euler(0f, 0f, self) * Vector2.right);
   }
 
+  /// <summary>Convert degrees to a Vector3 angle</summary>
+  public static Vector3 ToVector3(this float self, float magnitude = 1f)
+  {
+    return magnitude * (Quaternion.Euler(0f, 0f, self) * Vector3.right);
+  }
+
   /// <summary>Rotate a Vector2 by specified number of degrees</summary>
   public static Vector2 Rotate(this Vector2 self, float rotation)
   {
@@ -2557,6 +2563,32 @@ public static class Extensions
           doScreenShake          = shake,
           playDefaultSFX         = true,
           ignoreList             = _NoIgnores,
+          effect                 = effect.effect,
+          ss                     = effect.ss,
+      };
+  }
+
+  /// <summary>Creates a new explosion based on preexisting explosion data</summary>
+  public static ExplosionData Clone(this ExplosionData effect)
+  {
+      return new ExplosionData()
+      {
+          forceUseThisRadius     = effect.forceUseThisRadius,
+          pushRadius             = effect.pushRadius,
+          damageRadius           = effect.damageRadius,
+          damageToPlayer         = effect.damageToPlayer,
+          doDamage               = effect.doDamage,
+          damage                 = effect.damage,
+          doDestroyProjectiles   = effect.doDestroyProjectiles,
+          doForce                = effect.doForce,
+          force                  = effect.force,
+          debrisForce            = effect.debrisForce,
+          preventPlayerForce     = effect.preventPlayerForce,
+          explosionDelay         = effect.explosionDelay,
+          usesComprehensiveDelay = effect.usesComprehensiveDelay,
+          doScreenShake          = effect.doScreenShake,
+          playDefaultSFX         = effect.playDefaultSFX,
+          ignoreList             = effect.ignoreList,
           effect                 = effect.effect,
           ss                     = effect.ss,
       };

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.19.0 (TBD)
+
+- Added Mastery for Scotsman
+
 ## 1.18.5 (2024-09-09)
 
 - Fixed argument null exception caused by chests spawned in by Femtobyte trying to transform into invalid Mimics

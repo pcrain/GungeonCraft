@@ -159,6 +159,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfSubtractorBeam>(MASTERY_SUBTRACTOR_BEAM, SubtractorBeam.ItemName);
         // Shots ignore the invulnerable phases of most enemies and no longer prevent enemies from dropping casings or other rewards.
         NewMastery<MasteryOfKALI>(MASTERY_KALI, KALI.ItemName);
+        // Reloading detonates any decor or explosive enemies in a large cone in front of the player. Exploding decor will not damage the player, but explosive enemies will.
+        NewMastery<MasteryOfScotsman>(MASTERY_SCOTSMAN, Scotsman.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -398,6 +400,7 @@ internal class MasteryOfDeadline        : MasteryDummyItem {}
 internal class MasteryOfStarmageddon    : MasteryDummyItem {}
 internal class MasteryOfSubtractorBeam  : MasteryDummyItem {}
 internal class MasteryOfKALI            : MasteryDummyItem {}
+internal class MasteryOfScotsman        : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -463,4 +466,5 @@ public enum Synergy {
     MASTERY_STARMAGEDDON,
     MASTERY_SUBTRACTOR_BEAM,
     MASTERY_KALI,
+    MASTERY_SCOTSMAN,
 };
