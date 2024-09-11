@@ -161,6 +161,10 @@ public static class CwaffSynergies
         NewMastery<MasteryOfKALI>(MASTERY_KALI, KALI.ItemName);
         // Reloading detonates any decor or explosive enemies in a large cone in front of the player. Exploding decor will not damage the player, but explosive enemies will.
         NewMastery<MasteryOfScotsman>(MASTERY_SCOTSMAN, Scotsman.ItemName);
+        // Carpet Bomber's charge rate is quadrupled and projectiles travel twice as quickly
+        NewMastery<MasteryOfCarpetBomber>(MASTERY_CARPET_BOMBER, CarpetBomber.ItemName)
+            .MultChargeRate(4f).MultProjSpeed(2f);
+
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -366,6 +370,8 @@ public static class CwaffSynergies
         { e.statModifiers.Add(StatType.AdditionalClipCapacityMultiplier.Mult(a)); return e; }
     public static AdvancedSynergyEntry MultChargeRate(this AdvancedSynergyEntry e, float a)
         { e.statModifiers.Add(StatType.ChargeAmountMultiplier.Mult(a)); return e; }
+    public static AdvancedSynergyEntry MultProjSpeed(this AdvancedSynergyEntry e, float a)
+        { e.statModifiers.Add(StatType.ProjectileSpeed.Mult(a)); return e; }
 
 }
 
@@ -401,6 +407,7 @@ internal class MasteryOfStarmageddon    : MasteryDummyItem {}
 internal class MasteryOfSubtractorBeam  : MasteryDummyItem {}
 internal class MasteryOfKALI            : MasteryDummyItem {}
 internal class MasteryOfScotsman        : MasteryDummyItem {}
+internal class MasteryOfCarpetBomber    : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -467,4 +474,5 @@ public enum Synergy {
     MASTERY_SUBTRACTOR_BEAM,
     MASTERY_KALI,
     MASTERY_SCOTSMAN,
+    MASTERY_CARPET_BOMBER,
 };

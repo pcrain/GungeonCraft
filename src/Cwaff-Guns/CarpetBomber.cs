@@ -18,10 +18,12 @@ public class CarpetBomber : CwaffGun
 
     internal static ExplosionData _CarpetExplosion = null;
 
+    private bool _mastered = false;
+
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.EXPLOSIVE, reloadTime: 1.5f, ammo: 360, shootFps: 30, reloadFps: 20,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.EXPLOSIVE, reloadTime: 1.5f, ammo: 720, shootFps: 30, reloadFps: 20,
             chargeFps: (int)(1f / _CHARGE_PER_PROJECTILE), loopChargeAt: 10, muzzleVFX: "muzzle_carpet_bomber", muzzleFps: 30,
             muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound")
           .SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18)
@@ -61,21 +63,29 @@ public class CarpetBomber : CwaffGun
         } //REFACTOR: charge level builder
 
         // Initialize our explosion data
-        _CarpetExplosion = Explosions.ExplosiveRounds.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false);
+        _CarpetExplosion = Explosions.ExplosiveRounds.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 1.5f, preventPlayerForce: true, shake: false);
     }
 
     public override void Update()
     {
         base.Update();
-        if (this.PlayerOwner) // Synchronize ammo clips between projectile modules as necessary
-            this.gun.SynchronizeReloadAcrossAllModules();
+        if (!this.PlayerOwner)
+            return;
+
+        this.gun.SynchronizeReloadAcrossAllModules(); // Synchronize ammo clips between projectile modules as necessary
+        bool mastered = this.PlayerOwner.HasSynergy(Synergy.MASTERY_CARPET_BOMBER);
+        if (mastered != this._mastered)
+        {
+            this.gun.SetAnimationFPS(this.gun.chargeAnimation, (int)((mastered ? 4f : 1f) / _CHARGE_PER_PROJECTILE));
+            this._mastered = mastered;
+        }
     }
 }
 
 public class CarpetProjectile : MonoBehaviour
 {
     private const int _MAX_BOUNCES          = 3;
-    private const float _AIR_FRICTION       = 0.8f;
+    private const float _AIR_FRICTION       = 0.90f;
     private const float _BOUNCE_FRICTION    = 0.75f;
 
     private Projectile _projectile          = null;

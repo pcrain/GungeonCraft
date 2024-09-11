@@ -1613,7 +1613,7 @@ public static class Extensions
   /// <summary>Apply friction to a projectile and update the cached baseData.speed</summary>
   public static void ApplyFriction(this Projectile p, float friction)
   {
-    //WARNING: can't use FastPow here as it isn't accurate enough (e.g., slows down RC Launcher projectiles at higher frame raters)
+    //WARNING: can't use FastPow here as it isn't accurate enough (e.g., slows down RC Launcher projectiles at higher frame rates)
     // p.baseData.speed *= (float)Lazy.FastPow(friction, p.LocalDeltaTime * C.FPS);
     p.baseData.speed *= Mathf.Pow(friction, p.LocalDeltaTime * C.FPS);
     p.UpdateSpeed();

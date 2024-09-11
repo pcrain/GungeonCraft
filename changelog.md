@@ -2,7 +2,11 @@
 
 ## 1.19.0 (TBD)
 
-- Added Mastery for Scotsman
+- Added masteries for Scotsman and Carpet Bomber
+- Buffed Carpet Bomber
+	- Increased ammo from 360 to 720
+	- Increased explosion radius from 0.5 to 1.5
+	- Increased drag from 0.8 to 0.9 (slows down less in the air)
 
 ## 1.18.5 (2024-09-09)
 
