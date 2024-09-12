@@ -1081,6 +1081,8 @@ public partial class CwaffVFX // private
         if (this._changesScale)
             this._endScale = endScale.Value;
 
+        this._sprite.usesOverrideMaterial = true;
+        this._material = this._sprite.renderer.material;
         if (emissivePower > 0)
         {
             Color emitColor = emissiveColor ?? Color.white;
@@ -1088,7 +1090,7 @@ public partial class CwaffVFX // private
             this._material.SetFloat("_EmissivePower", emissivePower);
             this._material.SetFloat("_EmissiveColorPower", 1.55f);
             this._material.SetColor("_EmissiveColor", emitColor);
-            this._material.SetColor("_OverrideColor", emitColor);
+            // this._material.SetColor("_OverrideColor", emitColor);
         }
         else
             this._material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");

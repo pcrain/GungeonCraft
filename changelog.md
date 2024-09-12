@@ -8,6 +8,7 @@
 	- Increased explosion radius from 0.5 to 1.5
 	- Increased drag from 0.8 to 0.9 (slows down less in the air)
 - Fixed null deref caused by Racket Launcher projectiles trying to home in on their targets after the projectiles themselves were destroyed
+- Fixed several emissive VFX not actually emitting light
 
 ## 1.18.5 (2024-09-09)
 

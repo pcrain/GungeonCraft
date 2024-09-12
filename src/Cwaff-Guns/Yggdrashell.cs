@@ -216,7 +216,7 @@ public class Yggdrashell : CwaffGun
             endScale         : 0.1f,
             randomFrame      : true,
             emissiveColor    : Color.green,
-            emissivePower    : 100f
+            emissivePower    : 10f
           );
 
         this.OnReceivedDamage(this.PlayerOwner);
