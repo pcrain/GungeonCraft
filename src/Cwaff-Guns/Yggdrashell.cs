@@ -12,6 +12,7 @@ public class Yggdrashell : CwaffGun
     private const float _ACCUM_RATE             = 2f;
     private static readonly float[] _Thresholds = [0f, 1f * _LIFEFORCE_VALUE, 3f * _LIFEFORCE_VALUE, 6f * _LIFEFORCE_VALUE, 10f * _LIFEFORCE_VALUE];
 
+    internal static Color _EarthBlankColor         = new Color(0.75f, 1.0f, 0.75f, 1f);
     internal static tk2dBaseSprite _HeartVFXSprite = null;
     internal static tk2dBaseSprite _ArmorVFXSprite = null;
     internal static GameObject _LeafVFX            = null;
@@ -200,7 +201,7 @@ public class Yggdrashell : CwaffGun
         hh.TriggerInvulnerabilityPeriod();
         Lazy.DoDamagedFlash(hh);
         this._protectionActive = false;
-        this.PlayerOwner.ForceBlank();
+        this.PlayerOwner.DoColorfulBlank(_EarthBlankColor);
         this.PlayerOwner.gameObject.Play("yggdrashell_protection_activate_sound");
         CwaffVFX.SpawnBurst(
             prefab           : _LeafVFX,

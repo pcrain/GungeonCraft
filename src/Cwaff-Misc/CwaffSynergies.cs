@@ -164,7 +164,8 @@ public static class CwaffSynergies
         // Carpet Bomber's charge rate is quadrupled and projectiles travel twice as quickly
         NewMastery<MasteryOfCarpetBomber>(MASTERY_CARPET_BOMBER, CarpetBomber.ItemName)
             .MultChargeRate(4f).MultProjSpeed(2f);
-
+        // Soul-linked enemies may take damage instead of the player whenever the player gets hit. The chance per enemy is equal to 25% + (5% * Curse), capping at 75% per enemy.
+        NewMastery<MasteryOfSoulKaliber>(MASTERY_SOUL_KALIBER, SoulKaliber.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -408,6 +409,7 @@ internal class MasteryOfSubtractorBeam  : MasteryDummyItem {}
 internal class MasteryOfKALI            : MasteryDummyItem {}
 internal class MasteryOfScotsman        : MasteryDummyItem {}
 internal class MasteryOfCarpetBomber    : MasteryDummyItem {}
+internal class MasteryOfSoulKaliber     : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -475,4 +477,5 @@ public enum Synergy {
     MASTERY_KALI,
     MASTERY_SCOTSMAN,
     MASTERY_CARPET_BOMBER,
+    MASTERY_SOUL_KALIBER,
 };

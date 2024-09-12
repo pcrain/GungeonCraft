@@ -2,13 +2,16 @@
 
 ## 1.19.0 (TBD)
 
-- Added masteries for Scotsman and Carpet Bomber
+- Added masteries for Scotsman, Carpet Bomber, and Soul Kaliber
 - Buffed Carpet Bomber
 	- Increased ammo from 360 to 720
 	- Increased explosion radius from 0.5 to 1.5
 	- Increased drag from 0.8 to 0.9 (slows down less in the air)
+- Increased Soul Kaliber's ammo from 250 to 444
+- Tweaked visuals on Yggdrashell's Earth Armor activation
 - Fixed null deref caused by Racket Launcher projectiles trying to home in on their targets after the projectiles themselves were destroyed
 - Fixed several emissive VFX not actually emitting light
+- Fixed Soul Kaliber's soul link effect not working on bosses, Keybullet Kin, and Chance Kin
 
 ## 1.18.5 (2024-09-09)
 

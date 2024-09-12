@@ -2718,4 +2718,43 @@ public static class Extensions
     if (gun.AdjustedMaxAmmo > 0)          return gun.CurrentAmmo + "/" + gun.AdjustedMaxAmmo;
                                           return gun.CurrentAmmo.ToString();
   }
+
+  private static GameObject _MiniBlankVFX = null;
+  /// <summary>Do a mini-blank effect with a custom color</summary>
+  public static void DoColorfulMiniBlank(this PlayerController user, Color color, Vector2? position = null)
+  {
+      Vector2 pos = position ?? user.CenterPosition;
+      SilencerInstance silencerInstance = new GameObject("silencer").AddComponent<SilencerInstance>();
+      silencerInstance.TriggerSilencer(pos, 20f, 5f, null, 0f, 3f, 3f, 3f, 30f, 3f, 0.25f, user);
+
+      _MiniBlankVFX ??= (GameObject)BraveResources.Load("Global VFX/BlankVFX_Ghost");
+      GameObject blankVfx = UnityEngine.Object.Instantiate(_MiniBlankVFX, pos.ToVector3ZUp(pos.y), Quaternion.identity);
+          tk2dSprite blankVfxSprite = blankVfx.GetComponentInChildren<tk2dSprite>();
+          blankVfxSprite.usesOverrideMaterial = true;
+          blankVfxSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+          blankVfxSprite.renderer.material.SetColor("_OverrideColor", color.WithAlpha(0.25f));
+      UnityEngine.Object.Destroy(blankVfx, 1f);
+
+      user.DoVibration(Vibration.Time.Quick, Vibration.Strength.Medium);
+  }
+
+  private static GameObject _BlankVFX = null;
+  /// <summary>Do a blank effect with a custom color</summary>
+  public static void DoColorfulBlank(this PlayerController user, Color color, Vector2? position = null)
+  // public void DoColorfulBlank(float overrideRadius = 25f, float overrideTimeAtMaxRadius = 0.5f, bool silent = false, bool breaksWalls = true, Vector2? overrideCenter = null, bool breaksObjects = true, float overrideForce = -1f)
+  {
+      Vector2 pos = position ?? user.CenterPosition;
+      SilencerInstance silencerInstance = new GameObject("silencer").AddComponent<SilencerInstance>();
+      silencerInstance.TriggerSilencer(pos, 50f, 25f, null, 0.15f, 0.2f, 50, 10, 140f, 15, 0.5f, user, true);
+
+      _BlankVFX ??= (GameObject)BraveResources.Load("Global VFX/BlankVFX");
+      GameObject blankVfx = UnityEngine.Object.Instantiate(_BlankVFX, pos.ToVector3ZUp(pos.y), Quaternion.identity);
+          tk2dSprite blankVfxSprite = blankVfx.GetComponentInChildren<tk2dSprite>();
+          blankVfxSprite.usesOverrideMaterial = true;
+          blankVfxSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+          blankVfxSprite.renderer.material.SetColor("_OverrideColor", color.WithAlpha(0.25f));
+      UnityEngine.Object.Destroy(blankVfx, 1f);
+
+      user.DoVibration(Vibration.Time.Quick, Vibration.Strength.Medium);
+  }
 }

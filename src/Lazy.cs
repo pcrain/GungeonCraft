@@ -1064,6 +1064,7 @@ public static class Lazy
         AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", gameObject);
     }
 
+    //TODO: this doesn't actually seem to work on the player, which is all we ever use it on..unsure why though
     /// <summary>Do a brief flash after taking damage [yoinked from HealthHaver.ApplyDamageDirectional()]</summary>
     public static void DoDamagedFlash(HealthHaver hh)
     {
@@ -1071,15 +1072,17 @@ public static class Lazy
             return;
 
         if (hh.m_flashOnHitCoroutine != null)
+        {
             hh.StopCoroutine(hh.m_flashOnHitCoroutine);
-        hh.m_flashOnHitCoroutine = null;
+            hh.m_flashOnHitCoroutine = null;
+        }
         if (hh.materialsToFlash == null)
         {
             hh.materialsToFlash = new List<Material>();
             hh.outlineMaterialsToFlash = new List<Material>();
             hh.sourceColors = new List<Color>();
         }
-        if ((bool)hh.gameActor)
+        if (hh.gameActor)
             for (int k = 0; k < hh.materialsToFlash.Count; k++)
                 hh.materialsToFlash[k].SetColor("_OverrideColor", hh.gameActor.CurrentOverrideColor);
         if (hh.outlineMaterialsToFlash != null)
