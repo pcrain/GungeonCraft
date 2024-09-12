@@ -95,6 +95,7 @@ public class TennisBall : MonoBehaviour
     private bool                _returning     = false;
     private bool                _missedPlayer  = false;
     private bool                _dead          = false;
+    private bool                _dieNextFrame  = false;
     private RacketLauncher      _parentGun     = null;
     private EasyTrailBullet     _trail         = null;
     private float               _baseSpeed     = 0f;
@@ -149,8 +150,6 @@ public class TennisBall : MonoBehaviour
         this._baseSpeed  = this._projectile.baseData.speed;
         this._baseDamage = this._projectile.baseData.damage;
         this._baseForce  = this._projectile.baseData.force;
-
-        // this._projectile.gameObject.Play("racket_hit");
     }
 
     private void ReflectProjectiles(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
@@ -201,6 +200,7 @@ public class TennisBall : MonoBehaviour
         this._dead = true;
         this._projectile.gameObject.Play("monkey_tennis_bounce_second");
         this._projectile.DieInAir(suppressInAirEffects: true);
+        UnityEngine.Object.Destroy(this);
     }
 
     public bool Whackable()
@@ -246,8 +246,9 @@ public class TennisBall : MonoBehaviour
     {
         if (this._dead)
             return;
-        if (this._returning)
+        if (this._returning && !this._dieNextFrame)
         {
+            this._dieNextFrame = true;
             UnityEngine.Object.Destroy(this._bounce);
             StartCoroutine(DieNextFrame()); // avoid glitch with bounce modifier messing with debris object velocity
             return;
@@ -273,7 +274,7 @@ public class TennisBall : MonoBehaviour
 
     private void Update()
     {
-        if (this._dead || this._missedPlayer)
+        if (this._dead || this._missedPlayer || !this._projectile)
             return;
 
         Vector2 curVelocity = this._projectile.LastVelocity.normalized;
@@ -281,7 +282,8 @@ public class TennisBall : MonoBehaviour
         // Returning to the player
         if (this._returning)
         {
-            HomeTowardsTarget(this._owner.CenterPosition, curVelocity);
+            if (this._owner)
+                HomeTowardsTarget(this._owner.CenterPosition, curVelocity);
             return;
         }
 
