@@ -264,9 +264,17 @@ public class KiBlastBehavior : MonoBehaviour
         this._projectile.gameObject.Play("ki_blast_sound_stop_all");
         this._projectile.gameObject.PlayUnique("ki_blast_return_sound");
         int enemiesToCheck = 10;
-        while ((!enemy || !enemy.healthHaver || enemy.healthHaver.currentHealth <= 0) && --enemiesToCheck >= 0)
-            enemy = room.GetRandomActiveEnemy(false);
-        float angle = enemy ? (enemy.CenterPosition - player.CenterPosition).ToAngle() : Lazy.RandomAngle();
+        bool success = true;
+        while (!enemy || !enemy.isActiveAndEnabled || !enemy.healthHaver || enemy.healthHaver.IsDead)
+        {
+            if (--enemiesToCheck < 0)
+            {
+                success = false;
+                break;
+            }
+            enemy = room.GetRandomActiveEnemy(true);
+        }
+        float angle = success ? (enemy.CenterPosition - player.CenterPosition).ToAngle() : Lazy.RandomAngle();
         SlashDoer.DoSwordSlash(
             position        : player.CenterPosition,
             angle           : angle,
