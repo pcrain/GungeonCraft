@@ -17,8 +17,8 @@ public class Yggdrashell : CwaffGun
     internal static tk2dBaseSprite _ArmorVFXSprite = null;
     internal static GameObject _LeafVFX            = null;
 
-    private int _kills                       = 0;
-    private float _lifeForce                 = 0f;
+    public float lifeForce                 = 0f;
+
     private bool _protectionActive           = false;
     private float _lastParticleTime          = 0f;
     private ModuleShootData _cachedShootData = null;
@@ -76,8 +76,8 @@ public class Yggdrashell : CwaffGun
             return;
         int effectiveHealth = Mathf.Max(1, Mathf.FloorToInt(player.ForceZeroHealthState ? player.healthHaver.currentArmor : player.healthHaver.currentHealth));
         float maxLifeForce = effectiveHealth * _LIFEFORCE_VALUE;
-        this._lifeForce = Mathf.Min(this._lifeForce + damageThisTick * _ACCUM_RATE, maxLifeForce);
-        if (!this._protectionActive && this._lifeForce >= maxLifeForce)
+        this.lifeForce = Mathf.Min(this.lifeForce + damageThisTick * _ACCUM_RATE, maxLifeForce);
+        if (!this._protectionActive && this.lifeForce >= maxLifeForce)
         {
             this._protectionActive = true;
             player.DoGenericItemActivation(this.PlayerOwner.ForceZeroHealthState ? _ArmorVFXSprite : _HeartVFXSprite, playSound: "yggdrashell_protection_ready_sound");
@@ -99,7 +99,7 @@ public class Yggdrashell : CwaffGun
               );
         }
         int oldTier = this.gun.CurrentStrengthTier;
-        this.gun.CurrentStrengthTier = _Thresholds.FirstLT(this._lifeForce) - 1;
+        this.gun.CurrentStrengthTier = _Thresholds.FirstLT(this.lifeForce) - 1;
         if (oldTier < this.gun.CurrentStrengthTier)
         {
             this._cachedShootData = null; // reset particle effects
@@ -160,7 +160,7 @@ public class Yggdrashell : CwaffGun
 
     private void OnReceivedDamage(PlayerController player)
     {
-        this._lifeForce = 0;
+        this.lifeForce = 0;
         int oldTier = this.gun.CurrentStrengthTier;
         this.gun.CurrentStrengthTier = 0;
         if (oldTier == this.gun.CurrentStrengthTier)
@@ -221,5 +221,24 @@ public class Yggdrashell : CwaffGun
           );
 
         this.OnReceivedDamage(this.PlayerOwner);
+    }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        base.MidGameSerialize(data, i);
+        data.Add(this.lifeForce);
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+        base.MidGameDeserialize(data, ref i);
+        this.lifeForce = (float)data[i++];
+        this.gun.CurrentStrengthTier = _Thresholds.FirstLT(this.lifeForce) - 1;
+
+        PlayerController player = this.PlayerOwner;
+        int effectiveHealth = Mathf.Max(1, Mathf.FloorToInt(
+            player.ForceZeroHealthState ? player.healthHaver.currentArmor : player.healthHaver.currentHealth));
+        float maxLifeForce = effectiveHealth * _LIFEFORCE_VALUE;
+        this._protectionActive = this.lifeForce >= maxLifeForce;
     }
 }
