@@ -30,7 +30,7 @@ public class IronMaid : CwaffGun
         gun.AddSynergyModules(Synergy.MASTERY_IRON_MAID, new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, ammoCost: 0, clipSize: 20, cooldown: 0.1f,
           shootStyle: ShootStyle.SemiAutomatic, angleFromAim: 20f, angleVariance: 8f, ignoredForReloadPurposes: true, mirror: true, baseProjectile: proj)));
 
-        gun.AddReticle<CwaffReticle>(reticleVFX : VFX.BasicReticle, reticleAlpha : 0.2f, visibility : CwaffReticle.Visibility.ALWAYS, smoothLerp: true);
+        gun.AddReticle<CwaffReticle>(reticleVFX : VFX.BasicReticle, reticleAlpha : 0.4f, visibility : CwaffReticle.Visibility.ALWAYS, smoothLerp: true);
     }
 
     private GameObject GetTargetEnemy(CwaffReticle reticle) => this._targetEnemy ? this._targetEnemy.gameObject : null;

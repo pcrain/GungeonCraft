@@ -14,6 +14,8 @@
 - Fixed Soul Kaliber's soul link effect not working on bosses, Keybullet Kin, and Chance Kin
 - Fixed (again, for real hopefully) null deref in Ki Blast caused by trying to redirect projectiles to nonexistent enemies
 - Fixed Yggdrashell losing all built life force when dropped or when saving and reloading
+- Increased visibility of Iron Maid's reticle
+- Fixed rare null deref when [REDCATED] [REDACTED] for [REDACTED]
 
 ## 1.18.5 (2024-09-09)
 

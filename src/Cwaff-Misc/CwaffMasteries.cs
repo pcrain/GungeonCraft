@@ -238,8 +238,14 @@ public class MasteryRitualComponent : MonoBehaviour
 
   private static void PrepareForMasteryRitual(DebrisObject pickup)
   {
+    if (!pickup)
+      return;
+
     pickup.OnGrounded -= PrepareForMasteryRitual;
-    MasteryRitualComponent ritComp = pickup.GetComponentInChildren<Gun>().gameObject.GetOrAddComponent<MasteryRitualComponent>();
+    if (pickup.GetComponentInChildren<Gun>() is not Gun gun || !gun.gameObject)
+      return; // rare, but has somehow happened at least once
+
+    MasteryRitualComponent ritComp = gun.gameObject.GetOrAddComponent<MasteryRitualComponent>();
     _RitualGuns.Add(ritComp);
     UpdateMasteryRitualStatus(blankUser: null);
   }
