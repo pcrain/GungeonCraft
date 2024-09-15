@@ -496,7 +496,9 @@ public static class GunBuilder
       if (b.beamEmission > 0f)
       {
         beamComp.sprite.usesOverrideMaterial = true;
-        beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+        //TODO: verify this change doesn't break things
+        // beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+        beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
         beamComp.sprite.renderer.material.SetFloat("_EmissivePower", b.beamEmission);
       }
       if (b.beamReflections >= 0f)
@@ -735,6 +737,23 @@ public static class GunBuilder
           _DummyChargeModule.customAmmoType      = "white";
     }
     gun.Volley.projectiles.Add(ProjectileModule.CreateClone(_DummyChargeModule, false, gun.Volley.projectiles.Count));
+  }
+
+  /// <summary>Duplicates a gun's default module, optionally clones the projectiles and/or adds it to the gun, and returns the new module</summary>
+  public static ProjectileModule DuplicateDefaultModule(this Gun gun, bool cloneProjectiles = true, bool add = true)
+  {
+    ProjectileModule mod = ProjectileModule.CreateClone(gun.DefaultModule);
+    if (add)
+      gun.Volley.projectiles.Add(mod);
+    if (!cloneProjectiles)
+      return mod;
+
+    //WARNING: doesn't clone charge / final projectiles yet
+    if (mod.projectiles != null)
+      for (int i = 0; i < mod.projectiles.Count; ++i)
+        mod.projectiles[i] = mod.projectiles[i].Clone();
+
+    return mod;
   }
 
   /// <summary>Dummy class for suppressing reload animations on guns with reload times of 0</summary>

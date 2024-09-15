@@ -1464,6 +1464,7 @@ public static class Extensions
       // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<BasicBeamController>());
 
       // Create the beam itself using our resource map lookup
+      //WARN: beam sprites must use the entire width / height of the canvas since bounding boxes are determined using trimmed bounds
       BasicBeamController beamComp = projectile.FixedGenerateBeamPrefab(
           beamAnimationPaths          : ResMap.Get($"{spriteName}_mid"),
           beamFPS                     : fps,
@@ -2756,5 +2757,14 @@ public static class Extensions
       UnityEngine.Object.Destroy(blankVfx, 1f);
 
       user.DoVibration(Vibration.Time.Quick, Vibration.Strength.Medium);
+  }
+
+  /// <summary>Add a component to a gameObject, perform setup if necessary, and return the gameObject</summary>
+  public static GameObject Attach<T>(this GameObject go, Action<T> predicate = null, bool allowDuplicates = false) where T : MonoBehaviour
+  {
+    T component = allowDuplicates ? go.gameObject.AddComponent<T>() : go.gameObject.GetOrAddComponent<T>();
+    if (predicate != null)
+      predicate(component);
+    return go;
   }
 }

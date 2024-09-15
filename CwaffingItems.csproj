@@ -192,6 +192,7 @@
     <Compile Include="src\Cwaff-Guns\Nycterian.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
     <Compile Include="src\Cwaff-Guns\RacketLauncher.cs"/>
+    <Compile Include="src\Cwaff-Guns\Chroma.cs"/>
     <Compile Include="src\Cwaff-Guns\Scotsman.cs"/>
     <Compile Include="src\Cwaff-Guns\Hallaeribut.cs"/>
     <Compile Include="src\Cwaff-Guns\Natascha.cs"/>

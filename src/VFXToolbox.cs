@@ -18,6 +18,7 @@ public static class VFX
     public static GameObject MiniPickup;
     public static GameObject MasterySigil;
     public static GameObject BasicReticle;
+    public static GameObject SinglePixel;
 
     public static void Init()
     {
@@ -25,6 +26,7 @@ public static class VFX
         MiniPickup = VFX.Create("mini_pickup", fps: 12, loops: false);
         MasterySigil = VFX.Create("mastery_sigil");
         BasicReticle = VFX.Create("basic_reticle");
+        SinglePixel = VFX.Create("single_pixel");
     }
 
     /// <summary>Register an animation for a VFX object</summary>
@@ -601,6 +603,8 @@ public static class VFX
                 SetupBeamPart(animation, impactVFXAnimationPaths, "beam_impact", beamImpactFPS, null, null, impactColliderVertices, anchorOverride: Anchor.MiddleCenter);
                 beamController.impactAnimation = "beam_impact";
             }
+            else
+                beamController.impactAnimation = null;
 
             //---------------Sets up the animaton for the VFX that plays when the beam is charging
             if (chargeVFXAnimationPaths != null)
@@ -609,6 +613,8 @@ public static class VFX
                     wrapMode: loopCharge ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once);
                 beamController.chargeAnimation = "beam_charge";
             }
+            else
+                beamController.chargeAnimation = null;
 
             //--------------Sets up the animation for the very start of the beam (muzzle flash)
             if (startVFXAnimationPaths != null)
@@ -821,10 +827,12 @@ public partial class CwaffVFX // public
     /// <param name="flipX">Whether the VFX sprite should be flipped on the X axis.</param>
     /// <param name="flipY">Whether the VFX sprite should be flipped on the Y axis.</param>
     /// <param name="anchorTransform">If non-null, projectile moves as its anchor transform moves (not a real parent since that causes pooling issues).</param>
+    /// <param name="overrideColor">If non-null, projectile is given an override color at the shader lever.</param>
+    /// <param name="emitColorPower">Emissive color power of the VFX. Ignored if fadeOutTime is non-null.</param>
     public static void Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null,
         bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1,
-        bool flipX = false, bool flipY = false, Transform anchorTransform = null)
+        bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f)
     {
         CwaffVFX c = (_DespawnedVFX.Count > 0) ? _DespawnedVFX.Pop() : new();
         if (c._node == null)
@@ -848,7 +856,9 @@ public partial class CwaffVFX // public
             specificFrame : specificFrame,
             flipX         : flipX,
             flipY         : flipY,
-            anchorTransform: anchorTransform
+            anchorTransform: anchorTransform,
+            overrideColor : overrideColor,
+            emitColorPower : emitColorPower
             );
     }
 
@@ -886,10 +896,12 @@ public partial class CwaffVFX // public
     /// <param name="flipX">Whether the VFX sprite should be flipped on the X axis.</param>
     /// <param name="flipY">Whether the VFX sprite should be flipped on the Y axis.</param>
     /// <param name="anchorTransform">If non-null, projectile moves as its anchor transform moves (not a real parent since that causes pooling issues).</param>
+    /// <param name="overrideColor">If non-null, projectile is given an override color at the shader lever.</param>
+    /// <param name="emitColorPower">Emissive color power of the VFX. Ignored if fadeOutTime is non-null.</param>
     public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false,
         bool uniform = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false,
-        Transform anchorTransform = null)
+        Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
@@ -930,7 +942,9 @@ public partial class CwaffVFX // public
                 height        : height,
                 randomFrame   : randomFrame,
                 specificFrame : specificFrame,
-                anchorTransform: anchorTransform
+                anchorTransform: anchorTransform,
+                overrideColor : overrideColor,
+                emitColorPower : emitColorPower
                 );
         }
     }
@@ -1028,7 +1042,8 @@ public partial class CwaffVFX // private
     private void Setup(GameObject prefab, Vector3 position, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null,
-        bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false, Transform anchorTransform = null)
+        bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null,
+        float emitColorPower = 1.55f)
     {
         this._shouldDespawn = false;
         this._vfx.SetActive(true);
@@ -1085,12 +1100,11 @@ public partial class CwaffVFX // private
         this._material = this._sprite.renderer.material;
         if (emissivePower > 0)
         {
-            Color emitColor = emissiveColor ?? Color.white;
             this._material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
             this._material.SetFloat("_EmissivePower", emissivePower);
-            this._material.SetFloat("_EmissiveColorPower", 1.55f);
-            this._material.SetColor("_EmissiveColor", emitColor);
-            // this._material.SetColor("_OverrideColor", emitColor);
+            this._material.SetFloat("_EmissiveColorPower", emitColorPower);
+            this._material.SetColor("_EmissiveColor", emissiveColor ?? Color.white);
+            this._material.SetColor("_OverrideColor", overrideColor ?? Color.white);
         }
         else
             this._material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");

@@ -265,6 +265,7 @@ public class Initialisation : BaseUnityPlugin
                 Groundhog.Init();
                 DerailGun.Init();
                 Yggdrashell.Init();
+                Chroma.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

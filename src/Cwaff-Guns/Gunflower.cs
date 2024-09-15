@@ -13,7 +13,6 @@ public class Gunflower : CwaffGun
     internal static GameObject _DecayVFX;
 
     private List<AdditionalBraveLight> _lights = new();
-    private ModuleShootData _cachedShootData = null;
     private bool _revved = false;
 
     public static void Init()
@@ -112,19 +111,6 @@ public class Gunflower : CwaffGun
                 );
         if (consumesGoop)
             DeadlyDeadlyGoopManager.DelayedClearGoopsInRadius(player.CenterPosition, 1f);
-    }
-
-    private BeamController GetExtantBeam()
-    {
-        if (_cachedShootData == null)
-        {
-            if (!this.gun || !this.gun.IsFiring || this.gun.m_moduleData == null || this.gun.DefaultModule == null)
-                return null;
-            if (!this.gun.m_moduleData.TryGetValue(this.gun.DefaultModule, out ModuleShootData data))
-                return null;
-            this._cachedShootData = data;
-        }
-        return this._cachedShootData.beam;
     }
 
     private void DismissLights(int startIndex = 0)

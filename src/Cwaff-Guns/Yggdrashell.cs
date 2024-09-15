@@ -21,7 +21,6 @@ public class Yggdrashell : CwaffGun
 
     private bool _protectionActive           = false;
     private float _lastParticleTime          = 0f;
-    private ModuleShootData _cachedShootData = null;
 
     public static void Init()
     {
@@ -102,7 +101,7 @@ public class Yggdrashell : CwaffGun
         this.gun.CurrentStrengthTier = _Thresholds.FirstLT(this.lifeForce) - 1;
         if (oldTier < this.gun.CurrentStrengthTier)
         {
-            this._cachedShootData = null; // reset particle effects
+            ClearCachedShootData(); // reset particle effects
             this.gun.gameObject.Play("yggdrashell_power_up_sound");
             this.gun.CeaseAttack();
             this.gun.Attack();
@@ -137,19 +136,6 @@ public class Yggdrashell : CwaffGun
         }
     }
 
-    private CwaffRaidenBeamController GetExtantBeam()
-    {
-        if (_cachedShootData == null)
-        {
-            if (!this.gun || !this.gun.IsFiring || this.gun.m_moduleData == null || this.gun.DefaultModule == null)
-                return null;
-            if (!this.gun.m_moduleData.TryGetValue(this.gun.DefaultModule, out ModuleShootData data))
-                return null;
-            this._cachedShootData = data;
-        }
-        return this._cachedShootData.beam as CwaffRaidenBeamController;
-    }
-
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
@@ -166,7 +152,7 @@ public class Yggdrashell : CwaffGun
         if (oldTier == this.gun.CurrentStrengthTier)
             return;
 
-        this._cachedShootData = null; // reset particle effects
+        ClearCachedShootData(); // reset particle effects
         if (!this.gun.IsFiring)
             return;
 

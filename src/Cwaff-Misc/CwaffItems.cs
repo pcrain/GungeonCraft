@@ -44,6 +44,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   private bool                              _usesDynamicBarrelPosition = false; // whether the gun uses dynamic barrel offsets
   private Dictionary<string, List<Vector3>> _barrelOffsets             = null;  // list of dynamic barrel offsets for each of a gun's animations
   private Vector3                           _defaultBarrelOffset       = Vector3.zero; // the default barrel offset for guns with dynamic offsets
+  private ModuleShootData                   _cachedShootData           = null; // cached firing data for getting info on extant beams, etc.
 
   public  bool                              hideAmmo                   = false;  // whether our ammo display is visible
   public  bool                              preventMovingWhenCharging    = false;  // whether holding the gun prevents the player from moving
@@ -179,6 +180,21 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   // public void BraveOnLevelWasLoaded()
   // {
   // }
+
+  protected void ClearCachedShootData() => this._cachedShootData = null;
+
+  protected BeamController GetExtantBeam()
+  {
+      if (this._cachedShootData == null)
+      {
+          if (!this.gun || !this.gun.IsFiring || this.gun.m_moduleData == null || this.gun.DefaultModule == null)
+              return null;
+          if (!this.gun.m_moduleData.TryGetValue(this.gun.DefaultModule, out ModuleShootData data))
+              return null;
+          this._cachedShootData = data;
+      }
+      return this._cachedShootData.beam;
+  }
 
   /// <summary>Completely hides a gun's ammo like blasphemy</summary>
   [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateUIGun))]
