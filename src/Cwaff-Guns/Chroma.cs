@@ -1,14 +1,14 @@
 namespace CwaffingTheGungy;
 
+using System;
 using static PigmentType;
 
 /* TODO:
     - color switcher ground rune
+    - fix enemies spawning in with old shaders
 
     - pigment ammo display
-    - enemy shaders
 
-    - enemy pigment calculations
     - pigment damage calculations
 
     - beam impact animations
@@ -38,7 +38,7 @@ public class Chroma : CwaffGun
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, shootFps: 4, modulesAreTiers: true);
 
         gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
-            shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, /*customClip: true, */ammoCost: 5, angleVariance: 0f,
+            shootStyle: ShootStyle.Beam, damage: 10f, speed: -1f, /*customClip: true, */ammoCost: 5, angleVariance: 0f,
             beamSprite: "chroma_beam", beamFps: 60, beamChargeFps: 8, beamImpactFps: 14,
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0f, beamEmission: 1500f))
           .Attach<ChromaProjectile>();
@@ -90,17 +90,27 @@ public class Chroma : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
-        //
+
+        foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
+            OnEnemySpawn(enemy);
+        ETGMod.AIActor.OnPreStart -= OnEnemySpawn;
+        ETGMod.AIActor.OnPreStart += OnEnemySpawn;
+    }
+
+    private static void OnEnemySpawn(AIActor enemy)
+    {
+        enemy.gameObject.GetOrAddComponent<Desaturator>();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
-        //
+        ETGMod.AIActor.OnPreStart -= OnEnemySpawn;
     }
 
     public override void OnDestroy()
     {
+        ETGMod.AIActor.OnPreStart -= OnEnemySpawn;
         if (this.PlayerOwner)
         {
             //
@@ -143,23 +153,15 @@ public class Chroma : CwaffGun
               );
     }
 
-    public static void DropPigment(AIActor enemy)
+    public static void DropPigment(AIActor enemy, PigmentType color)
     {
         Vector2 ppos = enemy.CenterPosition;
-        // TODO: actual per-enemy pigment calculations
-        // int red      = 1;
-        // int green    = 1;
-        // int blue     = 1;
-        for (int i = 0; i < 3; ++i)
-        {
-            int redGreenOrBlue = i;
-            float angle = Lazy.RandomAngle();
-            Vector2 finalPos = ppos + BraveMathCollege.DegreesToVector(angle);
-            Chroma._PigmentPrefab.Instantiate(finalPos).GetComponent<PigmentDrop>()
-              .Setup(
-                velocity : angle.ToVector(Uppskeruvel._SOUL_LAUNCH_SPEED * UnityEngine.Random.Range(0.8f, 1.2f)),
-                pigment  : (PigmentType)i);
-        }
+        float angle = Lazy.RandomAngle();
+        Vector2 finalPos = ppos + BraveMathCollege.DegreesToVector(angle);
+        Chroma._PigmentPrefab.Instantiate(finalPos).GetComponent<PigmentDrop>()
+          .Setup(
+            velocity : angle.ToVector(Uppskeruvel._SOUL_LAUNCH_SPEED * UnityEngine.Random.Range(0.8f, 1.2f)),
+            pigment  : color);
     }
 
     public void AcquirePigment()
@@ -173,6 +175,163 @@ public enum PigmentType
     RED,
     GREEN,
     BLUE
+}
+
+public class Desaturator : MonoBehaviour
+{
+    private static readonly Dictionary<string, IntVector3> _PigmentLookupDict = new();
+
+    private AIActor _enemy;
+    private float _lastKnownHealth = -1.0f;
+    private float _saturation = 0.0f;
+    private bool _didSetup = false;
+    private bool _addedShader = false;
+    private List<Material> _desatMats = new();
+    private bool _gotPigment = false;
+
+    private int _rTotal = 0;
+    private int _gTotal = 0;
+    private int _bTotal = 0;
+
+    private float _rFrac = 0.0f;
+    private float _gFrac = 0.0f;
+    private float _bFrac = 0.0f;
+
+    private void Start()
+    {
+        Setup();
+    }
+
+    private void Setup()
+    {
+        if (this._didSetup)
+            return;
+
+        this._didSetup = true;
+        if (base.gameObject.GetComponent<AIActor>() is not AIActor enemy)
+            return;
+
+        this._enemy = enemy;
+        //NOTE: doesn't work
+        // if (this._enemy.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
+        //     body.OnPreRigidbodyCollision += this.OnMightTakeDamage;
+    }
+
+    // private void OnMightTakeDamage(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    // {
+    //     ETGModConsole.Log($"might take damage");
+    //     UpdateLastKnownHealth();
+    // }
+
+    private void AddShader(tk2dBaseSprite sprite)
+    {
+        sprite.usesOverrideMaterial = true;
+        Material mat = sprite.renderer.material;
+        mat.shader = CwaffShaders.ChromaShader;
+        mat.SetFloat("_Saturation", 1f);
+        mat.SetFloat("_BandStrength", 0f);
+        mat.SetFloat("_HueShift", 0f);
+        mat.SetFloat("_EmissivePower", 0f);
+        this._desatMats.Add(mat);
+        this._addedShader = true;
+    }
+
+    internal void UpdateLastKnownHealth()
+    {
+        Setup();
+        if (this._enemy && this._enemy.healthHaver is HealthHaver hh)
+            this._lastKnownHealth = hh.currentHealth;
+    }
+
+    private const float _PIGMENT_FACTOR = 0.03f; // conversion rate from sprite pigment to actual pigment
+
+    private static readonly Dictionary<Texture, Texture2D> _ReadableTexes = new();
+
+    private static IntVector3 ComputePigmentForEnemy(string guid)
+    {
+        AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
+        // ETGModConsole.Log($"looking up {prefab.ActorName}");
+        if (prefab.gameObject.GetComponent<tk2dSpriteAnimator>() is not tk2dSpriteAnimator animator)
+            return IntVector3.zero;
+        if (animator.library is not tk2dSpriteAnimation library)
+            return IntVector3.zero;
+        if (library.FirstValidClip is not tk2dSpriteAnimationClip clip || clip.frames == null || clip.frames.Length == 0)
+            return IntVector3.zero;
+        if (clip.frames[0].spriteCollection.spriteDefinitions[clip.frames[0].spriteId] is not tk2dSpriteDefinition def)
+            return IntVector3.zero;
+        if (!def.material || def.material.mainTexture is not Texture mainTex)
+            return IntVector3.zero;
+
+        // ETGModConsole.Log($"  got def {def.name}");
+        float r = 0;
+        float g = 0;
+        float b = 0;
+        if (!_ReadableTexes.TryGetValue(mainTex, out Texture2D tex))
+            tex = _ReadableTexes[mainTex] = (mainTex as Texture2D).GetRW();
+        Color[] pixels = tex.GetPixels(
+            x: Mathf.RoundToInt(def.uvs[0].x * tex.width),
+            y: Mathf.RoundToInt(def.uvs[0].y * tex.height),
+            blockWidth: Mathf.RoundToInt((def.uvs[3].x - def.uvs[0].x) * tex.width),
+            blockHeight: Mathf.RoundToInt((def.uvs[3].y - def.uvs[0].y) * tex.height)
+            );
+        int npixels = pixels.Length;
+        for (int i = 0; i < npixels; ++i)
+        {
+            Color pixel = pixels[i];
+            if (pixel.a < 0.5f)
+                continue;
+            r += pixel.r;
+            g += pixel.g;
+            b += pixel.b;
+        }
+
+        return new((int)(_PIGMENT_FACTOR * r), (int)(_PIGMENT_FACTOR * g), (int)(_PIGMENT_FACTOR * b));
+    }
+
+    internal void DoPigmentChecks()
+    {
+        string guid = this._enemy.EnemyGuid;
+        if (!this._enemy || string.IsNullOrEmpty(guid) || this._enemy.healthHaver is not HealthHaver hh)
+            return;
+
+        if (!this._gotPigment)
+        {
+            if (!_PigmentLookupDict.TryGetValue(guid, out IntVector3 rgb))
+            {
+                rgb = _PigmentLookupDict[guid] = ComputePigmentForEnemy(guid);
+                ETGModConsole.Log($"  got {rgb.x}, {rgb.y}, {rgb.z}");
+            }
+            this._rTotal = rgb.x;
+            this._gTotal = rgb.y;
+            this._bTotal = rgb.z;
+        }
+
+        if (_lastKnownHealth >= 0.0f)
+        {
+            float pigmentLost = (Mathf.Max(0f, this._lastKnownHealth) - Mathf.Max(0f, hh.currentHealth)) / hh.AdjustedMaxHealth;
+            if (pigmentLost > 0)
+            {
+                this._rFrac += pigmentLost * this._rTotal;
+                this._gFrac += pigmentLost * this._gTotal;
+                this._bFrac += pigmentLost * this._bTotal;
+                // ETGModConsole.Log($"pigment levels {this._rFrac}, {this._gFrac}, {this._bFrac}");
+                for (; this._rFrac >= 1.0f; this._rFrac -= 1.0f)
+                    Chroma.DropPigment(this._enemy.aiActor, (PigmentType)0);
+                for (; this._gFrac >= 1.0f; this._gFrac -= 1.0f)
+                    Chroma.DropPigment(this._enemy.aiActor, (PigmentType)1);
+                for (; this._bFrac >= 1.0f; this._bFrac -= 1.0f)
+                    Chroma.DropPigment(this._enemy.aiActor, (PigmentType)2);
+                this._saturation -= pigmentLost;
+            }
+        }
+
+        this._lastKnownHealth = hh.currentHealth;
+        if (!this._addedShader)
+            this._enemy.ApplyShader(AddShader);
+        foreach (Material mat in this._desatMats)
+            if (mat)
+                mat.SetFloat("_Saturation", this._saturation);
+    }
 }
 
 public class ChromaProjectile : MonoBehaviour
@@ -191,23 +350,14 @@ public class ChromaProjectile : MonoBehaviour
         if (this._owner.CurrentGun is Gun gun)
             this._gun = gun.gameObject.GetComponent<Chroma>();
 
-        this._projectile.OnHitEnemy += this.OnMightKillEnemy;
+        this._projectile.OnHitEnemy += this.OnHitEnemy;
     }
 
-    private void Update()
+    private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool willKill)
     {
-      // enter update code here
-    }
-
-    private void OnDestroy()
-    {
-      // enter destroy code here
-    }
-
-    private void OnMightKillEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool willKill)
-    {
-        if (willKill && enemy && enemy.aiActor)
-            Chroma.DropPigment(enemy.aiActor);
+        if (!enemy)
+            return;
+        enemy.gameObject.GetOrAddComponent<Desaturator>().DoPigmentChecks();
     }
 }
 

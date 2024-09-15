@@ -1733,6 +1733,23 @@ public static class Replicant
     }
 }
 
+/// <summary>Class for holding 3 ints</summary>
+public struct IntVector3 {
+    public int x;
+    public int y;
+    public int z;
+
+    public static readonly IntVector3 zero = new();
+    public static readonly IntVector3 one  = new(1, 1, 1);
+
+    public IntVector3(int x = 0, int y = 0, int z = 0)
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+}
+
 /// <summary>Class to draw an animated targeting line between two points (currently unused, relocated from Maestro for code cleanup purposes)</summary>
 // public class AnimatedTargetingLine
 // {

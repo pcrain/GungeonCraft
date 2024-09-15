@@ -1092,6 +1092,26 @@ public static class Extensions
     return material;
   }
 
+
+  /// <summary>Add a shader to a gameObject, and return the material for that shader</summary>
+  public static Material AddShader(this Renderer renderer, Shader shader, bool atBeginning = true)
+  {
+    Material[] array = renderer.sharedMaterials;
+    Array.Resize(ref array, array.Length + 1);
+    Material material = new Material(shader);
+    material.SetTexture("_MainTex", array[0].GetTexture("_MainTex"));
+    if (atBeginning)
+    {
+      for (int i = array.Length - 1; i > 1; --i)
+        array[i] = array[i - 1];
+      array[1] = material;
+    }
+    else
+      array[array.Length - 1] = material;
+    renderer.sharedMaterials = array;
+    return material;
+  }
+
   /// <summary>Check if a goop position is electrificed</summary>
   public static bool IsPositionElectrified(this DeadlyDeadlyGoopManager goopManager, Vector2 position)
   {

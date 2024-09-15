@@ -9,6 +9,7 @@ public static class CwaffShaders
     public static Shader ElectricShader = null;
     public static Shader EmissiveAlphaShader = null;
     public static Shader CorruptShader = null;
+    public static Shader ChromaShader = null;
     public static Texture2D DigitizeTexture = null;
     public static Texture2D StarsTexture = null;
     public static Texture2D NoiseTexture = null;
@@ -47,6 +48,7 @@ public static class CwaffShaders
             StarsTexture = shaderBundle.LoadAsset<Texture2D>("assets/startexture_cropped.png");
             EmissiveAlphaShader = shaderBundle.LoadAsset<Shader>("assets/emissivealphashader.shader");
             CorruptShader = shaderBundle.LoadAsset<Shader>("assets/corruptshader.shader");
+            ChromaShader = shaderBundle.LoadAsset<Shader>("assets/chromashiftshader.shader");
         }
     }
 
