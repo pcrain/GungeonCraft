@@ -24,6 +24,8 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action<Projectile> OnBankBulletOwnerAssigned;
     // Runs whenever a player enters a new room (either / both of old and new room may be null)
     public static Action<PlayerController, RoomHandler, RoomHandler> OnChangedRooms;
+    // Runs whenever a corpse is created
+    public static Action<DebrisObject, AIActor> OnCorpseCreated;
 
     internal static bool _OnFirstFloor = false;
     internal static bool _RunJustStarted = false;
@@ -145,6 +147,37 @@ public static class CwaffEvents // global custom events we can listen for
             if (OnChangedRooms != null)
                 OnChangedRooms(__instance, _LastRoom[id], __instance.CurrentRoom);
             _LastRoom[id] = __instance.CurrentRoom;
+        }
+    }
+
+
+    [HarmonyPatch(typeof(AIActor), nameof(AIActor.ForceDeath))]
+    private class OnCorpseCreatedPatch
+    {
+        [HarmonyILManipulator]
+        private static void OnCorpseCreatedIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            ILLabel endOfCorpseBranch = null;
+            if (!cursor.TryGotoNext(MoveType.After,
+              instr => instr.MatchLdloc((byte)17), // V_17 == component3 == corpse DebrisObject
+              instr => instr.MatchLdnull(),
+              instr => instr.MatchCall<UnityEngine.Object>("op_Inequality"),
+              instr => instr.MatchBrfalse(out endOfCorpseBranch)
+              ))
+                return;
+
+            cursor.GotoLabel(endOfCorpseBranch, MoveType.Before, setTarget: true);
+            cursor.Emit(OpCodes.Ldloc_S, (byte)17);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Call, typeof(OnCorpseCreatedPatch).GetMethod(nameof(OnCorpseCreatedPatch.OnCorpseCreatedFunc), BindingFlags.Static | BindingFlags.NonPublic));
+            return;
+        }
+
+        private static void OnCorpseCreatedFunc(DebrisObject debris, AIActor original)
+        {
+            if (OnCorpseCreated != null)
+                OnCorpseCreated(debris, original);
         }
     }
 }

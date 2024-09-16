@@ -994,6 +994,17 @@ public static class Lazy
         int bestMatchStrength = 0;
         int bestSpriteId = -1;
 
+        if (enemy.GetComponent<AIAnimator>() is AIAnimator animator
+            && enemy.GetComponent<tk2dSpriteAnimator>() is tk2dSpriteAnimator spriteAnimator
+            && animator.IdleAnimation.Type != DirectionalAnimation.DirectionType.None)
+        {
+            string idleName = animator.IdleAnimation.GetInfo(270f).name;
+            // Lazy.DebugLog($"  found idle clip name {idleName}");
+            tk2dSpriteAnimationClip idleClip = spriteAnimator.GetClipByName(idleName);
+            if (idleClip != null && idleClip.frames != null && idleClip.frames.Length > 0)
+                return idleClip.frames[0].spriteId;
+        }
+
         tk2dSpriteDefinition[] defs = enemy.sprite.collection.spriteDefinitions;
         for (int i = 0; i < defs.Length; ++i)
         {
@@ -1020,23 +1031,10 @@ public static class Lazy
                 }
             }
         }
-        if (bestSpriteId == -1)
-        {
-            bestSpriteId = enemy.sprite.spriteId;
-            // ETGModConsole.Log("  no matches, options: ");
-            for (int i = 0; i < defs.Length; ++i)
-            {
-                tk2dSpriteDefinition sd = defs[i];
-                // if (sd.name.Contains("001"))
-                //     ETGModConsole.Log("    "+sd.name);
-            }
-        }
-        else
-        {
-            // ETGModConsole.Log("  found "+defs[bestSpriteId].name);
-        }
 
-        return bestSpriteId;
+        if (bestSpriteId >= 0)
+            return bestSpriteId;
+        return enemy.sprite.collection.FirstValidDefinitionIndex;
     }
 
 

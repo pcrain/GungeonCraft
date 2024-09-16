@@ -4,15 +4,10 @@ using System;
 using static PigmentType;
 
 /* TODO:
-    - color switcher ground rune
-
     - pigment ammo display
 
-    - tint corpses
-    - save serialization
-    - impact vfx
     - gun animations
-    - better sounds
+    - save serialization
     - lore
 */
 
@@ -23,8 +18,8 @@ public class Chroma : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    private const float _BASE_PARTICLE_RATE = 0.3f;
-    private const float _PER_LEVEL_PARTICLE_RATE = 0.03f;
+    private const float _BASE_PARTICLE_RATE = 0.5f;
+    private const float _PER_LEVEL_PARTICLE_RATE = 0.05f;
 
     internal static GameObject _PigmentPrefab = null;
 
@@ -43,7 +38,7 @@ public class Chroma : CwaffGun
 
         gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
             shootStyle: ShootStyle.Beam, damage: 10f, speed: -1f, /*customClip: true, */ammoCost: 5, angleVariance: 0f,
-            beamSprite: "chroma_beam", beamFps: 60, beamChargeFps: 8, beamImpactFps: 14,
+            beamSprite: "chroma_beam", beamFps: 60, beamChargeFps: 8, beamImpactFps: 30,
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0f, beamEmission: 1500f))
           .Attach<ChromaProjectile>();
 
@@ -69,15 +64,28 @@ public class Chroma : CwaffGun
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
         base.OnReloadPressed(player, gun, manualReload);
-        if (!manualReload || !player.AcceptingNonMotionInput || gun.IsFiring)
+        if (!manualReload || !player.AcceptingNonMotionInput)
             return;
+        bool wasFiring = gun.IsFiring;
+        if (wasFiring)
+            gun.CeaseAttack();
         this.gun.CurrentStrengthTier = (this.gun.CurrentStrengthTier + 1) % 3;
+        UpdateBeamShaders();
+        if (wasFiring)
+            gun.Attack();
+    }
+
+    private void UpdateBeamShaders()
+    {
+        int i = this.gun.CurrentStrengthTier;
+        Material mat = this.gun.DefaultModule.projectiles[0].GetComponent<BasicBeamController>().sprite.renderer.material;
+        mat.SetFloat("_EmissivePower", 300f * (1 + this._pigmentPowers[i]));
     }
 
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
-        //
+        UpdateBeamShaders();
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -86,11 +94,29 @@ public class Chroma : CwaffGun
 
         foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
             OnEnemySpawn(enemy);
-        ETGMod.AIActor.OnPreStart -= OnEnemySpawn;
-        ETGMod.AIActor.OnPreStart += OnEnemySpawn;
+        ETGMod.AIActor.OnPreStart -= this.OnEnemySpawn;
+        ETGMod.AIActor.OnPreStart += this.OnEnemySpawn;
+        CwaffEvents.OnCorpseCreated -= TransferDesaturatedShadersToCorpse;
+        CwaffEvents.OnCorpseCreated += TransferDesaturatedShadersToCorpse;
+        UpdateBeamShaders();
     }
 
-    private static void OnEnemySpawn(AIActor enemy)
+    private static void TransferDesaturatedShadersToCorpse(DebrisObject debris, AIActor original)
+    {
+        if (original.GetComponent<Desaturator>() is not Desaturator desat)
+            return;
+        if (debris.gameObject.GetComponent<tk2dSprite>() is not tk2dSprite sprite)
+            return;
+        sprite.usesOverrideMaterial = true;
+        Material mat = sprite.renderer.material;
+        mat.shader = CwaffShaders.ChromaShader;
+        mat.SetFloat("_Saturation", desat._saturation);
+        mat.SetFloat("_BandStrength", 0f);
+        mat.SetFloat("_HueShift", 0f);
+        mat.SetFloat("_EmissivePower", 0f);
+    }
+
+    private void OnEnemySpawn(AIActor enemy)
     {
         enemy.gameObject.GetOrAddComponent<Desaturator>();
     }
@@ -98,15 +124,16 @@ public class Chroma : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
-        ETGMod.AIActor.OnPreStart -= OnEnemySpawn;
+        ETGMod.AIActor.OnPreStart -= this.OnEnemySpawn;
+        CwaffEvents.OnCorpseCreated -= TransferDesaturatedShadersToCorpse;
     }
 
     public override void OnDestroy()
     {
-        ETGMod.AIActor.OnPreStart -= OnEnemySpawn;
         if (this.PlayerOwner)
         {
-            //
+            ETGMod.AIActor.OnPreStart -= this.OnEnemySpawn;
+            CwaffEvents.OnCorpseCreated -= TransferDesaturatedShadersToCorpse; //NOTE: not completely robust if two copies of the gun exist
         }
         base.OnDestroy();
     }
@@ -174,7 +201,7 @@ public class Chroma : CwaffGun
 
     public override void PostProcessBeam(BeamController beam)
     {
-        const float _BOOST_PER_LEVEL = 0.2f;
+        const float _BOOST_PER_LEVEL = 0.25f;
 
         if (beam.projectile is not Projectile projectile)
             return;
@@ -183,15 +210,28 @@ public class Chroma : CwaffGun
 
         //NOTE: this won't update until after firing a new beam
         int level = this._pigmentPowers[this.gun.CurrentStrengthTier];
-        #if DEBUG
-            string color = this.gun.CurrentStrengthTier switch {
-                0 => "red",
-                1 => "green",
-                _ => "blue"
-            };
-            ETGModConsole.Log($"firing with level {level} {color} pigment == {_BOOST_PER_LEVEL * level} boost");
-        #endif
+        // #if DEBUG
+        //     string color = this.gun.CurrentStrengthTier switch {
+        //         0 => "red",
+        //         1 => "green",
+        //         _ => "blue"
+        //     };
+        //     ETGModConsole.Log($"firing with level {level} {color} pigment == {_BOOST_PER_LEVEL * level} boost");
+        // #endif
         projectile.baseData.damage *= (1f + _BOOST_PER_LEVEL * level);
+
+        int i = this.gun.CurrentStrengthTier;
+        Color c = PigmentDrop._Primaries[i];
+        tk2dSprite sprite = (beam as BasicBeamController).m_impactSprite;
+        sprite.usesOverrideMaterial = true;
+        Material mat = sprite.renderer.material;
+        mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+        mat.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+        mat.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+        mat.SetFloat("_EmissivePower", 400f);
+        mat.SetFloat("_EmissiveColorPower", 8f);
+        mat.SetColor("_EmissiveColor", c);
+        mat.SetColor("_OverrideColor", Color.Lerp(c, Color.white, 0.5f));
     }
 
     private class ChromaAmmoDisplay : CustomAmmoDisplay
@@ -238,9 +278,9 @@ public class Desaturator : MonoBehaviour
 {
     private static readonly Dictionary<string, IntVector3> _PigmentLookupDict = new();
 
+    internal float _saturation = 1.0f;
     private AIActor _enemy;
     private float _lastKnownHealth = -1.0f;
-    private float _saturation = 1.0f;
     private bool _didSetup = false;
     private bool _addedShader = false;
     private List<Material> _desatMats = new();
@@ -267,20 +307,8 @@ public class Desaturator : MonoBehaviour
             return;
 
         this._didSetup = true;
-        if (base.gameObject.GetComponent<AIActor>() is not AIActor enemy)
-            return;
-
-        this._enemy = enemy;
-        //NOTE: doesn't work
-        // if (this._enemy.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
-        //     body.OnPreRigidbodyCollision += this.OnMightTakeDamage;
+        this._enemy = base.gameObject.GetComponent<AIActor>();
     }
-
-    // private void OnMightTakeDamage(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
-    // {
-    //     ETGModConsole.Log($"might take damage");
-    //     UpdateLastKnownHealth();
-    // }
 
     private void AddShader(tk2dBaseSprite sprite)
     {
@@ -306,12 +334,10 @@ public class Desaturator : MonoBehaviour
 
     private static IntVector3 ComputePigmentForEnemy(string guid)
     {
-        const float _PIGMENT_FACTOR = 0.5f; // conversion rate from sprite pigment to actual pigment
-
         AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
         Lazy.DebugLog($"looking up {prefab.ActorName}");
-        tk2dSpriteDefinition def = prefab.sprite.collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(prefab)];
-        Lazy.DebugLog($"  got def {def.name}");
+        tk2dSpriteDefinition def = prefab.GetComponent<tk2dSprite>().collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(prefab)];
+        // Lazy.DebugLog($"  got def {def.name}");
 
         float r = 0;
         float g = 0;
@@ -319,36 +345,56 @@ public class Desaturator : MonoBehaviour
         Texture mainTex = def.material.mainTexture;
         if (!_ReadableTexes.TryGetValue(mainTex, out Texture2D tex))
             tex = _ReadableTexes[mainTex] = (mainTex as Texture2D).GetRW();
-        int w = tex.width;
-        int h = tex.height;
         Color[] pixels = tex.GetPixels(
-            x           : Mathf.RoundToInt(def.uvs[0].x * w),
-            y           : Mathf.RoundToInt(def.uvs[0].y * h),
-            blockWidth  : Mathf.RoundToInt((def.uvs[3].x - def.uvs[0].x) * w),
-            blockHeight : Mathf.RoundToInt((def.uvs[3].y - def.uvs[0].y) * h)
+            x           : Mathf.RoundToInt(def.uvs[0].x * tex.width),
+            y           : Mathf.RoundToInt(def.uvs[0].y * tex.height),
+            blockWidth  : Mathf.RoundToInt((def.uvs[3].x - def.uvs[0].x) * tex.width),
+            blockHeight : Mathf.RoundToInt((def.uvs[3].y - def.uvs[0].y) * tex.height)
             );
         int npixels = pixels.Length;
         for (int i = 0; i < npixels; ++i)
         {
             Color pixel = pixels[i];
             if (pixel.a < 0.5f)
-                continue;
-            r += pixel.r;
-            g += pixel.g;
-            b += pixel.b;
+                continue; // mostly-transparent pixels don't count
+            Color.RGBToHSV(pixel, out float h, out float s, out float v);
+            if (s < 0.33f)
+                continue; // mostly-gray pixels don't count
+            h *= 6.0f;
+            if (h < 0.5f || h > 5.5f)
+                r += 1.0f;
+            else if (h < 1.5f)
+            {
+                r += 0.5f;
+                g += 0.5f;
+            }
+            else if (h < 2.5f)
+                g += 1.0f;
+            else if (h < 3.5f)
+            {
+                g += 0.5f;
+                b += 0.5f;
+            }
+            else if (h < 4.5f)
+                b += 1.0f;
+            else if (h < 5.5f)
+            {
+                b += 0.5f;
+                r += 0.5f;
+            }
         }
-        float norm = Mathf.Clamp(prefab.healthHaver.maximumHealth, 10, 1000) / (r + g + b);
+        float norm = Mathf.Clamp(prefab.healthHaver.maximumHealth, 10, 1000) / Mathf.Max(1f, r + g + b);
         r = Mathf.Max(1f, r * norm);
         g = Mathf.Max(1f, g * norm);
         b = Mathf.Max(1f, b * norm);
-
-        return new(Mathf.CeilToInt(_PIGMENT_FACTOR * r), Mathf.CeilToInt(_PIGMENT_FACTOR * g), Mathf.CeilToInt(_PIGMENT_FACTOR * b));
+        return new(Mathf.CeilToInt(r), Mathf.CeilToInt(g), Mathf.CeilToInt(b));
     }
 
     internal float GetPigmentMult(PigmentType pigment) => this.damageScales[(int)pigment];
 
     internal void DoPigmentChecks(PigmentType hitPigment, bool willKill)
     {
+        const float _PIGMENT_FACTOR = 0.25f; // conversion rate from sprite pigment to actual pigment
         const float RESIST = 0.25f;
         const float WEAK   = 2.0f;
 
@@ -361,11 +407,11 @@ public class Desaturator : MonoBehaviour
             if (!_PigmentLookupDict.TryGetValue(guid, out IntVector3 rgb))
             {
                 rgb = _PigmentLookupDict[guid] = ComputePigmentForEnemy(guid);
-                Lazy.DebugLog($"got {rgb.x}, {rgb.y}, {rgb.z}");
+                Lazy.DebugLog($"  got rgb {rgb.x}, {rgb.y}, {rgb.z}");
             }
-            this._rTotal = rgb.x;
-            this._gTotal = rgb.y;
-            this._bTotal = rgb.z;
+            this._rTotal = Mathf.CeilToInt(_PIGMENT_FACTOR * rgb.x);
+            this._gTotal = Mathf.CeilToInt(_PIGMENT_FACTOR * rgb.y);
+            this._bTotal = Mathf.CeilToInt(_PIGMENT_FACTOR * rgb.z);
 
             // shots do 25%, 100%, or 200% damage depending on pigment weaknesses
             int sum = (rgb.x + rgb.y + rgb.z);
@@ -443,7 +489,6 @@ public class ChromaProjectile : MonoBehaviour
         this._baseDamage = this._projectile.baseData.damage;
     }
 
-    private const float _DRAIN_SOUND_TIMER = 0.1f;
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool willKill)
     {
         if (!enemy)
@@ -454,13 +499,10 @@ public class ChromaProjectile : MonoBehaviour
         float mult = desat.GetPigmentMult(this._pigment);
         //NOTE: sets damage on a one frame delay since setting it before hit would require patches beam controller logic before it applies damage
         this._projectile.baseData.damage = this._baseDamage * mult;
-        //TODO: fix sounds
         if (mult > 1f)
             this._owner.LoopSoundIf(true, "chroma_drain_sound");
         else if (mult < 1f)
-            this._owner.LoopSoundIf(true, "knife_hit_wall_sound");
-        else
-            this._owner.LoopSoundIf(true, "lightwing_fire_sound");
+            this._owner.LoopSoundIf(true, "chroma_resist_sound");
     }
 }
 
@@ -477,7 +519,7 @@ public class PigmentDrop : MonoBehaviour
     const float _PARTICLE_RATE      = 0.167f;
 
     internal static readonly List<Color> _Primaries = [
-        new(230f / 255f, 87f   / 255f, 149f / 255f), //red
+        new(230f / 255f, 87f  / 255f, 149f / 255f), //red
         new(149f / 255f, 230f / 255f, 87f  / 255f), //green
         new( 90f / 255f, 180f / 255f, 230f / 255f), //blue
     ];
@@ -583,15 +625,5 @@ public class PigmentDrop : MonoBehaviour
         else
             this._velocity = this._velocity.normalized;
         base.transform.position = this._basePos.HoverAt(amplitude: _BOB_HEIGHT, frequency: _BOB_SPEED);
-
-        // TODO: dissipate when leaving room
-        // if (this._lifetime > _MAX_LIFE)
-        // {
-        //     CwaffVFX.SpawnBurst(prefab: Outbreak._OutbreakSmokeVFX, numToSpawn: 4, basePosition: base.transform.position,
-        //         baseVelocity: Vector2.zero, velocityVariance: 0.5f, velType: CwaffVFX.Vel.Radial, rotType: CwaffVFX.Rot.Random,
-        //         lifetime: 0.3f, fadeOutTime: 0.6f);
-        //     UnityEngine.Object.Destroy(base.gameObject);
-        //     return;
-        // }
     }
 }
