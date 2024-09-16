@@ -232,3 +232,5 @@ starmageddon_meteor_fall_sound,-1.0,1,sound,0
 starmageddon_meteor_impact_sound,-1.0,1,sound,0
 starmageddon_meteor_launch_sound,-2.0,1,sound,0
 kaliber_protection_activate_sound,3.5,1,sound,0
+chroma_fire_sound,0.0,1,sound,0
+chroma_drain_sound,4.0,1,sound,0

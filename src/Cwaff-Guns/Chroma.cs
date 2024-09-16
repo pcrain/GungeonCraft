@@ -5,14 +5,16 @@ using static PigmentType;
 
 /* TODO:
     - color switcher ground rune
-    - fix enemies spawning in with old shaders
 
     - pigment ammo display
 
     - pigment damage calculations
+    - pigment drop calculations
 
+    - fix hollowpoint not working
+    - tint corpses
+    - save serialization
     - beam impact animations
-    - beam sounds
     - gun animations
     - lore
 */
@@ -24,7 +26,8 @@ public class Chroma : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    private const float _PARTICLE_RATE = 0.05f;
+    private const float _BASE_PARTICLE_RATE = 0.3f;
+    private const float _PER_LEVEL_PARTICLE_RATE = 0.03f;
 
     internal static GameObject _PigmentPrefab = null;
 
@@ -32,10 +35,14 @@ public class Chroma : CwaffGun
     public int greenPigment = 0;
     public int bluePigment  = 0;
 
+    private readonly int[] _pigmentPowers = [0, 0, 0];
+    private bool _ammoDisplayDirty = true;
+
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Chroma>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, shootFps: 4, modulesAreTiers: true);
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, shootFps: 4, modulesAreTiers: true)
+          .Attach<ChromaAmmoDisplay>();
 
         gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
             shootStyle: ShootStyle.Beam, damage: 10f, speed: -1f, /*customClip: true, */ammoCost: 5, angleVariance: 0f,
@@ -61,12 +68,6 @@ public class Chroma : CwaffGun
         _PigmentPrefab = VFX.Create("pigment_ball_white_small").Attach<PigmentDrop>();
     }
 
-    public override void PostProcessProjectile(Projectile projectile)
-    {
-        base.PostProcessProjectile(projectile);
-        //
-    }
-
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
         base.OnReloadPressed(player, gun, manualReload);
@@ -78,12 +79,6 @@ public class Chroma : CwaffGun
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
-        //
-    }
-
-    public override void OnSwitchedAwayFromThisGun()
-    {
-        base.OnSwitchedAwayFromThisGun();
         //
     }
 
@@ -124,7 +119,8 @@ public class Chroma : CwaffGun
         if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
             return;
 
-        if (GetExtantBeam() is BasicBeamController beam && beam.State == BeamState.Firing)
+        this.gun.LoopSoundIf(this.gun.IsFiring, "chroma_fire_sound");
+        if (this.gun.IsFiring && GetExtantBeam() is BasicBeamController beam && beam.State == BeamState.Firing)
             UpdateParticles(beam);
     }
 
@@ -132,7 +128,8 @@ public class Chroma : CwaffGun
     private void UpdateParticles(BasicBeamController beam)
     {
         float now = BraveTime.ScaledTimeSinceStartup;
-        if ((now - this._lastParticleSpawn) < _PARTICLE_RATE)
+        float particleSpawnRate = (_BASE_PARTICLE_RATE - _PER_LEVEL_PARTICLE_RATE * this._pigmentPowers[this.gun.CurrentStrengthTier]);
+        if ((now - this._lastParticleSpawn) < particleSpawnRate)
             return;
 
         this._lastParticleSpawn = now;
@@ -164,9 +161,71 @@ public class Chroma : CwaffGun
             pigment  : color);
     }
 
-    public void AcquirePigment()
+    public static int PigmentPower(int pigmentNum) => 1 + (int)Mathf.Max(0, Mathf.Log(Mathf.Max(1, pigmentNum), 2) - 3);
+
+    public void AcquirePigment(PigmentType pigment)
     {
-        // ETGModConsole.Log($"pigment obtained!");
+        if (pigment == RED)
+            this._pigmentPowers[0] = PigmentPower(++this.redPigment);
+        else if (pigment == GREEN)
+            this._pigmentPowers[1] = PigmentPower(++this.greenPigment);
+        else if (pigment == BLUE)
+            this._pigmentPowers[2] = PigmentPower(++this.bluePigment);
+        this._ammoDisplayDirty = true;
+    }
+
+    public override void PostProcessBeam(BeamController beam)
+    {
+        const float _BOOST_PER_LEVEL = 0.2f;
+
+        if (beam.projectile is not Projectile projectile)
+            return;
+        if (this.PlayerOwner is not PlayerController pc)
+            return;
+
+        //NOTE: this won't update until after firing a new beam
+        int level = this._pigmentPowers[this.gun.CurrentStrengthTier];
+        #if DEBUG
+            string color = this.gun.CurrentStrengthTier switch {
+                0 => "red",
+                1 => "green",
+                _ => "blue"
+            };
+            ETGModConsole.Log($"firing with level {level} {color} pigment == {_BOOST_PER_LEVEL * level} boost");
+        #endif
+        projectile.baseData.damage *= (1f + _BOOST_PER_LEVEL * level);
+    }
+
+    private class ChromaAmmoDisplay : CustomAmmoDisplay
+    {
+        private Gun _gun;
+        private Chroma _chroma;
+        private PlayerController _owner;
+        private string _ammoText = "";
+
+        private void Start()
+        {
+            this._gun = base.GetComponent<Gun>();
+            this._chroma = this._gun.GetComponent<Chroma>();
+            this._owner = this._gun.CurrentOwner as PlayerController;
+        }
+
+        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+        {
+            if (!this._owner)
+                return false;
+
+            uic.SetAmmoCountLabelColor(Color.white);
+            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
+            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
+            if (this._chroma._ammoDisplayDirty)
+            {
+                this._ammoText = $"[color #dd6666]{this._chroma._pigmentPowers[0]}[/color] [color #66dd66]{this._chroma._pigmentPowers[1]}[/color] [color #6666dd]{this._chroma._pigmentPowers[2]}[/color]";
+                this._chroma._ammoDisplayDirty = false;
+            }
+            uic.GunAmmoCountLabel.Text = $"{this._ammoText}\n{this._owner.VanillaAmmoDisplay()}";
+            return true;
+        }
     }
 }
 
@@ -183,7 +242,7 @@ public class Desaturator : MonoBehaviour
 
     private AIActor _enemy;
     private float _lastKnownHealth = -1.0f;
-    private float _saturation = 0.0f;
+    private float _saturation = 1.0f;
     private bool _didSetup = false;
     private bool _addedShader = false;
     private List<Material> _desatMats = new();
@@ -243,38 +302,56 @@ public class Desaturator : MonoBehaviour
             this._lastKnownHealth = hh.currentHealth;
     }
 
-    private const float _PIGMENT_FACTOR = 0.03f; // conversion rate from sprite pigment to actual pigment
-
     private static readonly Dictionary<Texture, Texture2D> _ReadableTexes = new();
 
     private static IntVector3 ComputePigmentForEnemy(string guid)
     {
-        AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
-        // ETGModConsole.Log($"looking up {prefab.ActorName}");
-        if (prefab.gameObject.GetComponent<tk2dSpriteAnimator>() is not tk2dSpriteAnimator animator)
-            return IntVector3.zero;
-        if (animator.library is not tk2dSpriteAnimation library)
-            return IntVector3.zero;
-        if (library.FirstValidClip is not tk2dSpriteAnimationClip clip || clip.frames == null || clip.frames.Length == 0)
-            return IntVector3.zero;
-        if (clip.frames[0].spriteCollection.spriteDefinitions[clip.frames[0].spriteId] is not tk2dSpriteDefinition def)
-            return IntVector3.zero;
-        if (!def.material || def.material.mainTexture is not Texture mainTex)
-            return IntVector3.zero;
+        const float _PIGMENT_FACTOR = 0.04f; // conversion rate from sprite pigment to actual pigment
 
-        // ETGModConsole.Log($"  got def {def.name}");
+        AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
+        Lazy.DebugLog($"looking up {prefab.ActorName}");
+        if (prefab.gameObject.GetComponent<tk2dSpriteAnimator>() is not tk2dSpriteAnimator animator)
+        {
+            Lazy.DebugLog($"  no animator");
+            return IntVector3.zero;
+        }
+        if (animator.library is not tk2dSpriteAnimation library)
+        {
+            Lazy.DebugLog($"  no library");
+            return IntVector3.zero;
+        }
+        if (library.FirstValidClip is not tk2dSpriteAnimationClip clip || clip.frames == null || clip.frames.Length == 0)
+        {
+            Lazy.DebugLog($"  no clip");
+            return IntVector3.zero;
+        }
+        if (clip.frames[0].spriteCollection.spriteDefinitions[clip.frames[0].spriteId] is not tk2dSpriteDefinition def)
+        {
+            Lazy.DebugLog($"  no def");
+            return IntVector3.zero;
+        }
+        if (!def.material || def.material.mainTexture is not Texture mainTex)
+        {
+            Lazy.DebugLog($"  no texture");
+            return IntVector3.zero;
+        }
+
+        Lazy.DebugLog($"  got def {def.name}");
         float r = 0;
         float g = 0;
         float b = 0;
         if (!_ReadableTexes.TryGetValue(mainTex, out Texture2D tex))
             tex = _ReadableTexes[mainTex] = (mainTex as Texture2D).GetRW();
+        int w = tex.width;
+        int h = tex.height;
         Color[] pixels = tex.GetPixels(
-            x: Mathf.RoundToInt(def.uvs[0].x * tex.width),
-            y: Mathf.RoundToInt(def.uvs[0].y * tex.height),
-            blockWidth: Mathf.RoundToInt((def.uvs[3].x - def.uvs[0].x) * tex.width),
-            blockHeight: Mathf.RoundToInt((def.uvs[3].y - def.uvs[0].y) * tex.height)
+            x           : Mathf.RoundToInt(def.uvs[0].x * w),
+            y           : Mathf.RoundToInt(def.uvs[0].y * h),
+            blockWidth  : Mathf.RoundToInt((def.uvs[3].x - def.uvs[0].x) * w),
+            blockHeight : Mathf.RoundToInt((def.uvs[3].y - def.uvs[0].y) * h)
             );
         int npixels = pixels.Length;
+        int nopaque = 0;
         for (int i = 0; i < npixels; ++i)
         {
             Color pixel = pixels[i];
@@ -283,23 +360,28 @@ public class Desaturator : MonoBehaviour
             r += pixel.r;
             g += pixel.g;
             b += pixel.b;
+            ++nopaque;
         }
+        float norm = ((float)nopaque) / (r + g + b);
+        r *= norm;
+        g *= norm;
+        b *= norm;
 
         return new((int)(_PIGMENT_FACTOR * r), (int)(_PIGMENT_FACTOR * g), (int)(_PIGMENT_FACTOR * b));
     }
 
     internal void DoPigmentChecks()
     {
-        string guid = this._enemy.EnemyGuid;
-        if (!this._enemy || string.IsNullOrEmpty(guid) || this._enemy.healthHaver is not HealthHaver hh)
+        if (!this._enemy || this._enemy.healthHaver is not HealthHaver hh || string.IsNullOrEmpty(this._enemy.EnemyGuid))
             return;
+        string guid = this._enemy.EnemyGuid;
 
         if (!this._gotPigment)
         {
             if (!_PigmentLookupDict.TryGetValue(guid, out IntVector3 rgb))
             {
                 rgb = _PigmentLookupDict[guid] = ComputePigmentForEnemy(guid);
-                ETGModConsole.Log($"  got {rgb.x}, {rgb.y}, {rgb.z}");
+                Lazy.DebugLog($"got {rgb.x}, {rgb.y}, {rgb.z}");
             }
             this._rTotal = rgb.x;
             this._gTotal = rgb.y;
@@ -353,10 +435,13 @@ public class ChromaProjectile : MonoBehaviour
         this._projectile.OnHitEnemy += this.OnHitEnemy;
     }
 
+    private const float _DRAIN_SOUND_TIMER = 0.1f;
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool willKill)
     {
         if (!enemy)
             return;
+
+        this._projectile.LoopSoundIf(true, "chroma_drain_sound");
         enemy.gameObject.GetOrAddComponent<Desaturator>().DoPigmentChecks();
     }
 }
@@ -371,7 +456,7 @@ public class PigmentDrop : MonoBehaviour
     const float _HOME_ACCEL         = 44f;  // acceleration per second towards player
     const float _FRICTION           = 0.96f;
     const float _MAX_LIFE           = 10f;  // time before despawning
-    const float _PARTICLE_RATE      = 0.1f;
+    const float _PARTICLE_RATE      = 0.167f;
 
     internal static readonly List<Color> _Primaries = [
         new(230f / 255f, 87f   / 255f, 149f / 255f), //red
@@ -441,7 +526,7 @@ public class PigmentDrop : MonoBehaviour
                 return;
 
             if (this._owner.FindGun<Chroma>() is Chroma chroma)
-                chroma.AcquirePigment();
+                chroma.AcquirePigment(this._pigment);
             base.gameObject.PlayUnique("pigment_collect_sound");
             CwaffVFX.SpawnBurst(
                 prefab           : VFX.SinglePixel,

@@ -452,8 +452,8 @@ public static class Lazy
     }
 
     private static readonly uint[] _PlayingIds = new uint[16]; //NOTE: hopefully safe to assume no more than 16 sounds are playing on the same object
-    /// <summary>Loops a sound between two loop points while condition `play` is true, stops it otherwise</summary>
-    public static void LoopSoundIf(this MonoBehaviour behav, bool play, string soundName, int loopPointMs, int rewindAmountMs)
+    /// <summary>Loops a sound between two loop points if condition `play` is true, stops it otherwise</summary>
+    public static void LoopSoundIf(this MonoBehaviour behav, bool play, string soundName, int loopPointMs = 0, int rewindAmountMs = 0)
     {
         uint soundId = AkSoundEngine.GetIDFromString(soundName);
         uint count = (uint)_PlayingIds.Length;
@@ -471,7 +471,7 @@ public static class Lazy
             }
             GameManager.Instance.GetOrAddComponent<LoopingSoundHandler>().RefreshSoundTimer(playingId);
             AkSoundEngine.PostEvent(soundName + (GameManager.Instance.IsPaused ? "_pause" : "_resume"), behav.gameObject);
-            if (AkSoundEngine.GetSourcePlayPosition(playingId, out int pos) == AKRESULT.AK_Success && pos >= loopPointMs)
+            if (loopPointMs > 0 && AkSoundEngine.GetSourcePlayPosition(playingId, out int pos) == AKRESULT.AK_Success && pos >= loopPointMs)
                 AkSoundEngine.SeekOnEvent(soundId, behav.gameObject, pos - rewindAmountMs); // sound should be playing and is, so just check if we need to loop
             return;
         }
