@@ -8,14 +8,11 @@ using static PigmentType;
 
     - pigment ammo display
 
-    - pigment damage calculations
-    - pigment drop calculations
-
-    - fix hollowpoint not working
     - tint corpses
     - save serialization
-    - beam impact animations
+    - impact vfx
     - gun animations
+    - better sounds
     - lore
 */
 
@@ -55,6 +52,7 @@ public class Chroma : CwaffGun
         {
             ProjectileModule mod = i > 0 ? gun.DuplicateDefaultModule() : gun.DefaultModule;
             Projectile p = mod.projectiles[0];
+            p.GetComponent<ChromaProjectile>()._pigment = (PigmentType)i;
             BasicBeamController beamComp = p.gameObject.GetComponent<BasicBeamController>();
             Color c = PigmentDrop._Primaries[i];
             Material mat = beamComp.sprite.renderer.material;
@@ -256,6 +254,8 @@ public class Desaturator : MonoBehaviour
     private float _gFrac = 0.0f;
     private float _bFrac = 0.0f;
 
+    private float[] damageScales = [1.0f, 1.0f, 1.0f];
+
     private void Start()
     {
         Setup();
@@ -306,40 +306,17 @@ public class Desaturator : MonoBehaviour
 
     private static IntVector3 ComputePigmentForEnemy(string guid)
     {
-        const float _PIGMENT_FACTOR = 0.04f; // conversion rate from sprite pigment to actual pigment
+        const float _PIGMENT_FACTOR = 0.5f; // conversion rate from sprite pigment to actual pigment
 
         AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
         Lazy.DebugLog($"looking up {prefab.ActorName}");
-        if (prefab.gameObject.GetComponent<tk2dSpriteAnimator>() is not tk2dSpriteAnimator animator)
-        {
-            Lazy.DebugLog($"  no animator");
-            return IntVector3.zero;
-        }
-        if (animator.library is not tk2dSpriteAnimation library)
-        {
-            Lazy.DebugLog($"  no library");
-            return IntVector3.zero;
-        }
-        if (library.FirstValidClip is not tk2dSpriteAnimationClip clip || clip.frames == null || clip.frames.Length == 0)
-        {
-            Lazy.DebugLog($"  no clip");
-            return IntVector3.zero;
-        }
-        if (clip.frames[0].spriteCollection.spriteDefinitions[clip.frames[0].spriteId] is not tk2dSpriteDefinition def)
-        {
-            Lazy.DebugLog($"  no def");
-            return IntVector3.zero;
-        }
-        if (!def.material || def.material.mainTexture is not Texture mainTex)
-        {
-            Lazy.DebugLog($"  no texture");
-            return IntVector3.zero;
-        }
-
+        tk2dSpriteDefinition def = prefab.sprite.collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(prefab)];
         Lazy.DebugLog($"  got def {def.name}");
+
         float r = 0;
         float g = 0;
         float b = 0;
+        Texture mainTex = def.material.mainTexture;
         if (!_ReadableTexes.TryGetValue(mainTex, out Texture2D tex))
             tex = _ReadableTexes[mainTex] = (mainTex as Texture2D).GetRW();
         int w = tex.width;
@@ -351,7 +328,6 @@ public class Desaturator : MonoBehaviour
             blockHeight : Mathf.RoundToInt((def.uvs[3].y - def.uvs[0].y) * h)
             );
         int npixels = pixels.Length;
-        int nopaque = 0;
         for (int i = 0; i < npixels; ++i)
         {
             Color pixel = pixels[i];
@@ -360,18 +336,22 @@ public class Desaturator : MonoBehaviour
             r += pixel.r;
             g += pixel.g;
             b += pixel.b;
-            ++nopaque;
         }
-        float norm = ((float)nopaque) / (r + g + b);
-        r *= norm;
-        g *= norm;
-        b *= norm;
+        float norm = Mathf.Clamp(prefab.healthHaver.maximumHealth, 10, 1000) / (r + g + b);
+        r = Mathf.Max(1f, r * norm);
+        g = Mathf.Max(1f, g * norm);
+        b = Mathf.Max(1f, b * norm);
 
-        return new((int)(_PIGMENT_FACTOR * r), (int)(_PIGMENT_FACTOR * g), (int)(_PIGMENT_FACTOR * b));
+        return new(Mathf.CeilToInt(_PIGMENT_FACTOR * r), Mathf.CeilToInt(_PIGMENT_FACTOR * g), Mathf.CeilToInt(_PIGMENT_FACTOR * b));
     }
 
-    internal void DoPigmentChecks()
+    internal float GetPigmentMult(PigmentType pigment) => this.damageScales[(int)pigment];
+
+    internal void DoPigmentChecks(PigmentType hitPigment, bool willKill)
     {
+        const float RESIST = 0.25f;
+        const float WEAK   = 2.0f;
+
         if (!this._enemy || this._enemy.healthHaver is not HealthHaver hh || string.IsNullOrEmpty(this._enemy.EnemyGuid))
             return;
         string guid = this._enemy.EnemyGuid;
@@ -386,6 +366,21 @@ public class Desaturator : MonoBehaviour
             this._rTotal = rgb.x;
             this._gTotal = rgb.y;
             this._bTotal = rgb.z;
+
+            // shots do 25%, 100%, or 200% damage depending on pigment weaknesses
+            int sum = (rgb.x + rgb.y + rgb.z);
+            if (sum > 0)
+            {
+                float rgbNorm = 1f / sum;
+                float rNorm = rgb.x * rgbNorm;
+                float gNorm = rgb.y * rgbNorm;
+                float bNorm = rgb.z * rgbNorm;
+                this.damageScales[2] = (rNorm < 0.16f) ? RESIST : (rNorm > 0.45f) ? WEAK : 1f; // blue pigment damage based on red pigment in enemy
+                this.damageScales[0] = (gNorm < 0.16f) ? RESIST : (gNorm > 0.45f) ? WEAK : 1f; // red pigment damage based on green pigment in enemy
+                this.damageScales[1] = (bNorm < 0.16f) ? RESIST : (bNorm > 0.45f) ? WEAK : 1f; // green pigment damage based on blue pigment in enemy
+            }
+
+            this._gotPigment = true;
         }
 
         if (_lastKnownHealth >= 0.0f)
@@ -407,6 +402,14 @@ public class Desaturator : MonoBehaviour
             }
         }
 
+        if (willKill)
+        {
+            PigmentType bonusPigment = (PigmentType)(((int)hitPigment + 2) % 3); // red gives bonus blue, blue gives bonus green, and green gives bonus red
+            int bonusAmount = (int)(Mathf.Log(Mathf.Max(1f, hh.AdjustedMaxHealth), 2));
+            for (int i = 0; i < bonusAmount; ++i)
+                Chroma.DropPigment(this._enemy.aiActor, bonusPigment);
+        }
+
         this._lastKnownHealth = hh.currentHealth;
         if (!this._addedShader)
             this._enemy.ApplyShader(AddShader);
@@ -418,9 +421,13 @@ public class Desaturator : MonoBehaviour
 
 public class ChromaProjectile : MonoBehaviour
 {
+    [SerializeField]
+    internal PigmentType _pigment;
+
     private Projectile _projectile;
     private PlayerController _owner;
     private Chroma _gun;
+    private float _baseDamage = 0.0f;
 
     private void Start()
     {
@@ -433,6 +440,7 @@ public class ChromaProjectile : MonoBehaviour
             this._gun = gun.gameObject.GetComponent<Chroma>();
 
         this._projectile.OnHitEnemy += this.OnHitEnemy;
+        this._baseDamage = this._projectile.baseData.damage;
     }
 
     private const float _DRAIN_SOUND_TIMER = 0.1f;
@@ -441,8 +449,18 @@ public class ChromaProjectile : MonoBehaviour
         if (!enemy)
             return;
 
-        this._projectile.LoopSoundIf(true, "chroma_drain_sound");
-        enemy.gameObject.GetOrAddComponent<Desaturator>().DoPigmentChecks();
+        Desaturator desat = enemy.gameObject.GetOrAddComponent<Desaturator>();
+        desat.DoPigmentChecks(this._pigment, willKill);
+        float mult = desat.GetPigmentMult(this._pigment);
+        //NOTE: sets damage on a one frame delay since setting it before hit would require patches beam controller logic before it applies damage
+        this._projectile.baseData.damage = this._baseDamage * mult;
+        //TODO: fix sounds
+        if (mult > 1f)
+            this._owner.LoopSoundIf(true, "chroma_drain_sound");
+        else if (mult < 1f)
+            this._owner.LoopSoundIf(true, "knife_hit_wall_sound");
+        else
+            this._owner.LoopSoundIf(true, "lightwing_fire_sound");
     }
 }
 
@@ -512,6 +530,20 @@ public class PigmentDrop : MonoBehaviour
               );
         }
 
+        if (_ChromaId < 0)
+            _ChromaId = Lazy.PickupId<Chroma>();
+        if (!this._owner)
+            foreach (PlayerController player in GameManager.Instance.AllPlayers)
+            {
+                if (!player || !player.isActiveAndEnabled || player.IsGhost)
+                    continue;
+                // if ((base.transform.position.XY() - player.CenterPosition).sqrMagnitude > _ATTRACT_RADIUS_SQR)
+                //     continue;
+                if (!player.HasGun(_ChromaId))
+                    continue;
+                this._owner = player;
+            }
+
         if (this._owner)
         {
             Vector2 delta = (this._owner.CenterPosition - base.transform.position.XY());
@@ -561,18 +593,5 @@ public class PigmentDrop : MonoBehaviour
         //     UnityEngine.Object.Destroy(base.gameObject);
         //     return;
         // }
-
-        if (_ChromaId < 0)
-            _ChromaId = Lazy.PickupId<Chroma>();
-        foreach (PlayerController player in GameManager.Instance.AllPlayers)
-        {
-            if (!player || !player.isActiveAndEnabled || player.IsGhost)
-                continue;
-            if ((base.transform.position.XY() - player.CenterPosition).sqrMagnitude > _ATTRACT_RADIUS_SQR)
-                continue;
-            if (!player.HasGun(_ChromaId))
-                continue;
-            this._owner = player;
-        }
     }
 }
