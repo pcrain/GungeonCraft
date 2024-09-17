@@ -1,15 +1,6 @@
 namespace CwaffingTheGungy;
 
-using System;
 using static PigmentType;
-
-/* TODO:
-    - pigment ammo display
-
-    - gun animations
-    - save serialization
-    - lore
-*/
 
 public class Chroma : CwaffGun
 {
@@ -33,11 +24,12 @@ public class Chroma : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Chroma>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, shootFps: 4, modulesAreTiers: true)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, idleFps: 20, shootFps: 60,
+            modulesAreTiers: true)
           .Attach<ChromaAmmoDisplay>();
 
         gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
-            shootStyle: ShootStyle.Beam, damage: 10f, speed: -1f, /*customClip: true, */ammoCost: 5, angleVariance: 0f,
+            shootStyle: ShootStyle.Beam, damage: 7f, speed: -1f, /*customClip: true, */ammoCost: 5, angleVariance: 0f,
             beamSprite: "chroma_beam", beamFps: 60, beamChargeFps: 8, beamImpactFps: 30,
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0f, beamEmission: 1500f))
           .Attach<ChromaProjectile>();
@@ -70,6 +62,7 @@ public class Chroma : CwaffGun
         if (wasFiring)
             gun.CeaseAttack();
         this.gun.CurrentStrengthTier = (this.gun.CurrentStrengthTier + 1) % 3;
+        this._ammoDisplayDirty = true;
         UpdateBeamShaders();
         if (wasFiring)
             gun.Attack();
@@ -85,6 +78,7 @@ public class Chroma : CwaffGun
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
+        RecalculateAllPigmentPowers();
         UpdateBeamShaders();
     }
 
@@ -98,6 +92,7 @@ public class Chroma : CwaffGun
         ETGMod.AIActor.OnPreStart += this.OnEnemySpawn;
         CwaffEvents.OnCorpseCreated -= TransferDesaturatedShadersToCorpse;
         CwaffEvents.OnCorpseCreated += TransferDesaturatedShadersToCorpse;
+        RecalculateAllPigmentPowers();
         UpdateBeamShaders();
     }
 
@@ -186,22 +181,30 @@ public class Chroma : CwaffGun
             pigment  : color);
     }
 
-    public static int PigmentPower(int pigmentNum) => 1 + (int)Mathf.Max(0, Mathf.Log(Mathf.Max(1, pigmentNum), 2) - 3);
+    private const int _MAX_PIGMENT_LEVEL = 10;
+    private static readonly int[] _LEVELS = [16,  32,  64,  128,  256,  512,  1024, 2048, 4096, 9999999];
+    // private static readonly int[] _LEVELS = [100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 9999999];
+    public static int PigmentPower(int pigmentNum) => 1 + _LEVELS.FirstGT(pigmentNum);
+    // 0, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096
+    // public static int PigmentPower(int pigmentNum) => Mathf.Clamp((int)(Mathf.Log(Mathf.Max(1, pigmentNum), 2) - 2), 1, _MAX_PIGMENT_LEVEL);
 
     public void AcquirePigment(PigmentType pigment)
     {
+        int i = (int)pigment;
+        int oldPigment = this._pigmentPowers[i];
         if (pigment == RED)
-            this._pigmentPowers[0] = PigmentPower(++this.redPigment);
+            this._pigmentPowers[i] = PigmentPower(++this.redPigment);
         else if (pigment == GREEN)
-            this._pigmentPowers[1] = PigmentPower(++this.greenPigment);
+            this._pigmentPowers[i] = PigmentPower(++this.greenPigment);
         else if (pigment == BLUE)
-            this._pigmentPowers[2] = PigmentPower(++this.bluePigment);
-        this._ammoDisplayDirty = true;
+            this._pigmentPowers[i] = PigmentPower(++this.bluePigment);
+        if (oldPigment != this._pigmentPowers[i])
+            this._ammoDisplayDirty = true;
     }
 
     public override void PostProcessBeam(BeamController beam)
     {
-        const float _BOOST_PER_LEVEL = 0.25f;
+        const float _BOOST_PER_LEVEL = 0.2f;
 
         if (beam.projectile is not Projectile projectile)
             return;
@@ -234,6 +237,31 @@ public class Chroma : CwaffGun
         mat.SetColor("_OverrideColor", Color.Lerp(c, Color.white, 0.5f));
     }
 
+    private void RecalculateAllPigmentPowers()
+    {
+        this._pigmentPowers[0] = PigmentPower(this.redPigment);
+        this._pigmentPowers[1] = PigmentPower(this.greenPigment);
+        this._pigmentPowers[2] = PigmentPower(this.bluePigment);
+        this._ammoDisplayDirty = true;
+    }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        base.MidGameSerialize(data, i);
+        data.Add(this.redPigment);
+        data.Add(this.greenPigment);
+        data.Add(this.bluePigment);
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+        base.MidGameDeserialize(data, ref i);
+        this.redPigment = (int)data[i++];
+        this.greenPigment = (int)data[i++];
+        this.bluePigment = (int)data[i++];
+        RecalculateAllPigmentPowers();
+    }
+
     private class ChromaAmmoDisplay : CustomAmmoDisplay
     {
         private Gun _gun;
@@ -258,10 +286,11 @@ public class Chroma : CwaffGun
             uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
             if (this._chroma._ammoDisplayDirty)
             {
-                this._ammoText = $"[color #dd6666]{this._chroma._pigmentPowers[0]}[/color] [color #66dd66]{this._chroma._pigmentPowers[1]}[/color] [color #6666dd]{this._chroma._pigmentPowers[2]}[/color]";
+                int[] pp = this._chroma._pigmentPowers;
+                this._ammoText = $"[sprite \"pigment_red_ui{1+pp[0]}\"] [sprite \"pigment_green_ui{1+pp[1]}\"] [sprite \"pigment_blue_ui{1+pp[2]}\"] \n[color {PigmentDrop._HexPrimaries[this._gun.CurrentStrengthTier]}]";
                 this._chroma._ammoDisplayDirty = false;
             }
-            uic.GunAmmoCountLabel.Text = $"{this._ammoText}\n{this._owner.VanillaAmmoDisplay()}";
+            uic.GunAmmoCountLabel.Text = $"{this._ammoText}{this._owner.VanillaAmmoDisplay()}[/color]";
             return true;
         }
     }
@@ -335,7 +364,7 @@ public class Desaturator : MonoBehaviour
     private static IntVector3 ComputePigmentForEnemy(string guid)
     {
         AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
-        Lazy.DebugLog($"looking up {prefab.ActorName}");
+        // Lazy.DebugLog($"looking up {prefab.ActorName}");
         tk2dSpriteDefinition def = prefab.GetComponent<tk2dSprite>().collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(prefab)];
         // Lazy.DebugLog($"  got def {def.name}");
 
@@ -407,7 +436,7 @@ public class Desaturator : MonoBehaviour
             if (!_PigmentLookupDict.TryGetValue(guid, out IntVector3 rgb))
             {
                 rgb = _PigmentLookupDict[guid] = ComputePigmentForEnemy(guid);
-                Lazy.DebugLog($"  got rgb {rgb.x}, {rgb.y}, {rgb.z}");
+                // Lazy.DebugLog($"  got rgb {rgb.x}, {rgb.y}, {rgb.z}");
             }
             this._rTotal = Mathf.CeilToInt(_PIGMENT_FACTOR * rgb.x);
             this._gTotal = Mathf.CeilToInt(_PIGMENT_FACTOR * rgb.y);
@@ -458,7 +487,10 @@ public class Desaturator : MonoBehaviour
 
         this._lastKnownHealth = hh.currentHealth;
         if (!this._addedShader)
+        {
             this._enemy.ApplyShader(AddShader);
+            this._enemy.SetOutlines(true);
+        }
         foreach (Material mat in this._desatMats)
             if (mat)
                 mat.SetFloat("_Saturation", this._saturation);
@@ -522,6 +554,12 @@ public class PigmentDrop : MonoBehaviour
         new(230f / 255f, 87f  / 255f, 149f / 255f), //red
         new(149f / 255f, 230f / 255f, 87f  / 255f), //green
         new( 90f / 255f, 180f / 255f, 230f / 255f), //blue
+    ];
+
+    internal static readonly List<string> _HexPrimaries = [
+        "#E65795", //red
+        "#95E657", //green
+        "#5795E6", //blue
     ];
 
     internal static int _ChromaId = -1;

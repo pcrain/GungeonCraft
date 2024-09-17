@@ -2624,38 +2624,38 @@ public static class Extensions
     return proj;
   }
 
-  /// <summary>Given a non-increasing array of floats vals, returns the first index i for which val >= vals[i].</summary>
-  public static int FirstGE(this float[] vals, float val)
+  /// <summary>Given a non-increasing array of numbers, returns the first index i for which val >= vals[i].</summary>
+  public static int FirstGE<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
-      if (val >= vals[i])
+      if (vals[i].CompareTo(val) >= 0)
         return i;
     return vals.Length;
   }
 
-  /// <summary>Given a non-increasing array of floats vals, returns the first index i for which val > vals[i].</summary>
-  public static int FirstGT(this float[] vals, float val)
+  /// <summary>Given a non-increasing array of numbers, returns the first index i for which val > vals[i].</summary>
+  public static int FirstGT<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
-      if (val > vals[i])
+      if (vals[i].CompareTo(val) > 0)
         return i;
     return vals.Length;
   }
 
-  /// <summary>Given a non-decreasing array of floats vals, returns the first index i for which val <= vals[i].</summary>
-  public static int FirstLE(this float[] vals, float val)
+  /// <summary>Given a non-decreasing array of numbers, returns the first index i for which val <= vals[i].</summary>
+  public static int FirstLE<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
-      if (val <= vals[i])
+      if (vals[i].CompareTo(val) <= 0)
         return i;
     return vals.Length;
   }
 
-  /// <summary>Given a non-decreasing array of floats vals, returns the first index i for which val < vals[i].</summary>
-  public static int FirstLT(this float[] vals, float val)
+  /// <summary>Given a non-decreasing array of numbers, returns the first index i for which val < vals[i].</summary>
+  public static int FirstLT<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
-      if (val < vals[i])
+      if (vals[i].CompareTo(val) < 0)
         return i;
     return vals.Length;
   }
