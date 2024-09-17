@@ -59,9 +59,9 @@ public class Chroma : CwaffGun
         if (!manualReload || !player.AcceptingNonMotionInput)
             return;
         bool wasFiring = gun.IsFiring;
+        this.gun.CurrentStrengthTier = (this.gun.CurrentStrengthTier + 1) % 3;
         if (wasFiring)
             gun.CeaseAttack();
-        this.gun.CurrentStrengthTier = (this.gun.CurrentStrengthTier + 1) % 3;
         this._ammoDisplayDirty = true;
         UpdateBeamShaders();
         if (wasFiring)
