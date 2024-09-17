@@ -100,7 +100,7 @@ public class MidasProjectile : MonoBehaviour
             s.CollideWithTileMap = false;
             s.PixelColliders     = new List<PixelCollider>{pixelCollider};
             s.Initialize();
-        statue.AddComponent<GoldenDeath>();
+        statue.AddComponent<GoldenDeath>()._paletteTexture = enemy.aiActor.optionalPalette;
 
         // if (enemy.aiActor.IsABoss()) // Unsure why this doesn't trigger normally, but this seems to fix it
         //     enemy.aiActor.ParentRoom.HandleRoomClearReward(); //TODO: it's possible non-boss room rewards also don't spawn if final enemy is midas'd...look into later
@@ -123,6 +123,7 @@ public class GoldenDeath : MonoBehaviour, IPlayerInteractable
     private const float _PART_LIFE     = 0.5f;
     private const float _PART_EMIT     = 20f;
 
+    internal Texture2D _paletteTexture;
     private float _lifetime;
     private bool _decaying;
     private tk2dSprite _sprite;
@@ -139,7 +140,13 @@ public class GoldenDeath : MonoBehaviour, IPlayerInteractable
         this._body = base.gameObject.GetComponent<SpeculativeRigidbody>();
         this._sprite = base.gameObject.GetComponent<tk2dSprite>();
         this._sprite.usesOverrideMaterial = true;
-        this._sprite.renderer.material.shader = CwaffShaders.GoldShader;
+        Material mat = this._sprite.renderer.material;
+        mat.shader = CwaffShaders.GoldShader;
+        if (this._paletteTexture)
+        {
+            mat.SetFloat("_UsePalette", 1f);
+            mat.SetTexture("_PaletteTex", this._paletteTexture);
+        }
 
         CwaffVFX.SpawnBurst(prefab: QuarterPounder._MidasParticleVFX, numToSpawn: _NUM_PARTICLES, basePosition: this._sprite.WorldCenter,
             positionVariance: _PART_SPREAD, baseVelocity: Vector2.zero, velocityVariance: _PART_SPEED, velType: CwaffVFX.Vel.Radial,

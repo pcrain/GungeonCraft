@@ -2,6 +2,7 @@
 
 ## 1.19.0 (TBD)
 
+- Added Chroma
 - Added masteries for Scotsman, Carpet Bomber, and Soul Kaliber
 - Buffed Carpet Bomber
 	- Increased ammo from 360 to 720
@@ -16,6 +17,7 @@
 - Fixed Yggdrashell losing all built life force when dropped or when saving and reloading
 - Increased visibility of Iron Maid's reticle
 - Fixed rare null deref when [REDCATED] [REDACTED] for [REDACTED]
+- Fixed Quarter Pounder's gold shaders not working properly on Shotgun Kin variants
 
 ## 1.18.5 (2024-09-09)
 
