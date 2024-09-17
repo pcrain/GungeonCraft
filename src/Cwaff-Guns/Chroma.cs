@@ -5,8 +5,8 @@ using static PigmentType;
 public class Chroma : CwaffGun
 {
     public static string ItemName         = "Chroma";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Spectroscopic";
+    public static string LongDescription  = "Fires beams that extract pigment from enemies. Reloading cycles through red, green, and blue beams, which gain power from their respective pigments. Each beam is most effective at extracting the next pigment in the cycle (e.g., red > green > blue > red), and deals increased or reduced damage depending on the presence of that pigment in the enemy.";
     public static string Lore             = "TBD";
 
     private const float _BASE_PARTICLE_RATE = 0.5f;
@@ -104,11 +104,13 @@ public class Chroma : CwaffGun
             return;
         sprite.usesOverrideMaterial = true;
         Material mat = sprite.renderer.material;
-        mat.shader = CwaffShaders.ChromaShader;
+        mat.shader = CwaffShaders.DesatShader;
         mat.SetFloat("_Saturation", desat._saturation);
-        mat.SetFloat("_BandStrength", 0f);
-        mat.SetFloat("_HueShift", 0f);
-        mat.SetFloat("_EmissivePower", 0f);
+        if (original.optionalPalette != null)
+        {
+            mat.SetFloat("_UsePalette", 1f);
+            mat.SetTexture("_PaletteTex", original.optionalPalette);
+        }
     }
 
     private void OnEnemySpawn(AIActor enemy)
@@ -343,11 +345,8 @@ public class Desaturator : MonoBehaviour
     {
         sprite.usesOverrideMaterial = true;
         Material mat = sprite.renderer.material;
-        mat.shader = CwaffShaders.ChromaShader;
+        mat.shader = CwaffShaders.DesatShader;
         mat.SetFloat("_Saturation", 1f);
-        mat.SetFloat("_BandStrength", 0f);
-        mat.SetFloat("_HueShift", 0f);
-        mat.SetFloat("_EmissivePower", 0f);
         this._desatMats.Add(mat);
         this._addedShader = true;
     }
@@ -361,10 +360,21 @@ public class Desaturator : MonoBehaviour
 
     private static readonly Dictionary<Texture, Texture2D> _ReadableTexes = new();
 
+    private static Color GetPaletteColor(Texture2D palette, float red)
+    {
+        const double INV_TEXEL_SIZE = 0.5;
+        double x = red * 15.9375; // 255 / 16
+        double texX = Math.Floor(x) * 0.0625 + 0.4;
+        double texY = Math.Sign(x) * Math.Abs(x - Math.Truncate(x)) + 0.4;
+        int pixX = (int)Math.Round(INV_TEXEL_SIZE * texX * palette.width);
+        int pixY = (int)Math.Round(INV_TEXEL_SIZE * texY * palette.height);
+        return palette.GetPixel(pixX, pixY);
+    }
+
     private static IntVector3 ComputePigmentForEnemy(string guid)
     {
         AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
-        // Lazy.DebugLog($"looking up {prefab.ActorName}");
+        // Lazy.DebugLog($"looking up pigment for {prefab.ActorName}");
         tk2dSpriteDefinition def = prefab.GetComponent<tk2dSprite>().collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(prefab)];
         // Lazy.DebugLog($"  got def {def.name}");
 
@@ -374,6 +384,7 @@ public class Desaturator : MonoBehaviour
         Texture mainTex = def.material.mainTexture;
         if (!_ReadableTexes.TryGetValue(mainTex, out Texture2D tex))
             tex = _ReadableTexes[mainTex] = (mainTex as Texture2D).GetRW();
+        Texture2D paletteTex = prefab.optionalPalette ? prefab.optionalPalette.GetRW() : null;
         Color[] pixels = tex.GetPixels(
             x           : Mathf.RoundToInt(def.uvs[0].x * tex.width),
             y           : Mathf.RoundToInt(def.uvs[0].y * tex.height),
@@ -386,8 +397,10 @@ public class Desaturator : MonoBehaviour
             Color pixel = pixels[i];
             if (pixel.a < 0.5f)
                 continue; // mostly-transparent pixels don't count
+            if (paletteTex)
+                pixel = GetPaletteColor(paletteTex, pixel.r);
             Color.RGBToHSV(pixel, out float h, out float s, out float v);
-            if (s < 0.33f)
+            if (s < 0.25f)
                 continue; // mostly-gray pixels don't count
             h *= 6.0f;
             if (h < 0.5f || h > 5.5f)

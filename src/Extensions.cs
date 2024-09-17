@@ -2548,6 +2548,15 @@ public static class Extensions
       for (int i = 0; i < enemy.transform.childCount; ++i)
         if (enemy.transform.GetChild(i).GetComponent<tk2dSprite>() is tk2dSprite sprite)
           shaderFunc(sprite);
+    if (enemy.optionalPalette != null)
+    {
+        Material mat = enemy.sprite.renderer.material;
+        if (mat.HasProperty("_PaletteTex"))
+        {
+          mat.SetFloat("_UsePalette", 1f);
+          mat.SetTexture("_PaletteTex", enemy.optionalPalette);
+        }
+    }
   }
 
   /// <summary>Get the current goop data for a position in the world.</summary>
