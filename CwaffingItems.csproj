@@ -56,6 +56,7 @@
     <Compile Include="src\Cwaff-Passives\DriftersHeadgear.cs"/>
     <Compile Include="src\Cwaff-Passives\PlotArmor.cs"/>
     <Compile Include="src\Cwaff-Passives\EchoChamber.cs"/>
+    <Compile Include="src\Cwaff-Passives\Allay.cs"/>
     <Compile Include="src\Cwaff-Passives\AstralProjector.cs"/>
     <Compile Include="src\Cwaff-Passives\TryhardSnacks.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
@@ -243,6 +244,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffItems.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffPrerequisite.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffRaidenBeamController.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffCompanion.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedShrines.cs"/>
     <Compile Include="src\Cwaff-Misc\CustomDodgeRoll.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>

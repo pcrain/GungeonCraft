@@ -310,6 +310,21 @@ public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffI
   }
 }
 
+public abstract class CwaffCompanion : CompanionItem, ICwaffItem
+{
+  public override void Pickup(PlayerController player)
+  {
+    if (!this.m_pickedUpThisRun) // must come before base.Pickup()
+      OnFirstPickup(player);
+    base.Pickup(player);
+  }
+
+  public virtual void OnFirstPickup(PlayerController player)
+  {
+
+  }
+}
+
 public interface ICustomBlankDoer
 {
   public void OnCustomBlankedProjectile(Projectile p);

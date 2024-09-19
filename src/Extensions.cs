@@ -2796,4 +2796,34 @@ public static class Extensions
       predicate(component);
     return go;
   }
+
+  /// <summary>Create an animation and add it to a sprite collection</summary>
+  public static tk2dSpriteAnimationClip AddAnimation(this tk2dSpriteCollectionData coll, string spriteName, string animName = null, float fps = 4,
+      int loopStart = 0, Anchor? adjustToAnchor = null)
+  {
+      if (ResMap.Get(spriteName, quietFailure: true) is not List<string> spritePaths)
+          return null;
+
+      tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() {
+          name      = animName ?? spriteName,
+          fps       = fps,
+          frames    = new tk2dSpriteAnimationFrame[spritePaths.Count],
+          loopStart = loopStart,
+          wrapMode  =
+              (loopStart > 0)  ? tk2dSpriteAnimationClip.WrapMode.LoopSection :
+              (loopStart == 0) ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once
+      };
+
+
+      bool adjustAnchor = adjustToAnchor.HasValue;
+      Anchor anchor = adjustToAnchor ?? default;
+      for (int i = 0; i < spritePaths.Count; i++)
+      {
+          int frameSpriteId = coll.GetSpriteIdByName(spritePaths[i]);
+          if (adjustAnchor)
+            coll.spriteDefinitions[frameSpriteId].BetterConstructOffsetsFromAnchor(anchor);
+          clip.frames[i] = new() { spriteId = frameSpriteId, spriteCollection = coll };
+      }
+      return clip;
+  }
 }

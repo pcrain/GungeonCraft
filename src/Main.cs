@@ -341,6 +341,7 @@ public class Initialisation : BaseUnityPlugin
                 VolcanicAmmolet.Init();
                 TryhardSnacks.Init();
                 BulletproofTablecloth.Init();
+                Allay.Init();
 
                 setupPassivesWatch.Stop();
             #endregion
