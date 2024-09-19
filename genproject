@@ -56,9 +56,15 @@ if [ $# -gt 0 ] && [ "$1" == "-t" ]; then
   # dllname="./bin/Release/${projectname}.dll" #Release DLL name
 fi
 
-if [ $thunderstore -eq 1 ]&& [ $debugbuild -gt 0 ]; then
-  echo -e "[${RED}@${BLN}] Trying to build Thunderstore package from debug build, refusing"
-  exit
+if [ $thunderstore -eq 1 ]; then
+  if [ "$(task count proj:release status:pending)" -gt 0 ]; then
+    echo -e "[${YLW}#${BLN}] Trying to build Thunderstore package with release tasks pending, refusing\n"
+    task proj:release rc.report.next.columns=id,description rc.report.next.labels=ID,description | tail +3
+    exit
+  elif [ $debugbuild -gt 0 ]; then
+    echo -e "[${RED}@${BLN}] Trying to build Thunderstore package from debug build, refusing"
+    exit
+  fi
 fi
 
 #Base directory we're copying our plugin to
