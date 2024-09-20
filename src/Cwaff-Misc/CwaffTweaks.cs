@@ -48,18 +48,12 @@ public static class CwaffTweaks
                 {
                     Prefix = "pet",
                     Type = DirectionalAnimation.DirectionType.TwoWayHorizontal,
-                    Flipped = new DirectionalAnimation.FlipType[]{
-                        DirectionalAnimation.FlipType.None,
-                        DirectionalAnimation.FlipType.None,
-                        // DirectionalAnimation.FlipType.Mirror,
-                        // DirectionalAnimation.FlipType.Mirror,
-                    },
+                    Flipped = new DirectionalAnimation.FlipType[2],
                     AnimNames = new string[2]{"pet_right","pet_left"},
                 }
             };
 
-            if (cc.sprite.aiAnimator.OtherAnimations == null)
-                cc.sprite.aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>();
+            cc.sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
             cc.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
 
         }

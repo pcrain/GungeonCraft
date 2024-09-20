@@ -93,26 +93,35 @@ public static class CwaffCompanionBuilder
 
     private static DirectionalAnimation.DirectionType AutoDetectDirectionFromSpriteName(string name)
     {
-        if (ResMap.Get($"{name}_north_northeast", quietFailure: true) != null)
+        if (ResMap.Has($"{name}_north_northeast"))
             return SixteenWay;
-        if (ResMap.Get($"{name}_northeast", quietFailure: true) != null)
+        if (ResMap.Has($"{name}_northeast"))
             return EightWayOrdinal;
-        if (ResMap.Get($"{name}_north", quietFailure: true) != null)
+        if (ResMap.Has($"{name}_north"))
             return FourWayCardinal;
-        if (ResMap.Get($"{name}_front_right", quietFailure: true) != null)
+        if (ResMap.Has($"{name}_front_right"))
         {
-            if (ResMap.Get($"{name}_right", quietFailure: true) != null)
+            if (ResMap.Has($"{name}_right"))
                 return EightWay;
-            if (ResMap.Get($"{name}_front", quietFailure: true) != null)
+            if (ResMap.Has($"{name}_front"))
                 return SixWay;
             return FourWay;
         }
-        if (ResMap.Get($"{name}_right", quietFailure: true) != null)
+        if (ResMap.Has($"{name}_right"))
             return TwoWayHorizontal;
-        if (ResMap.Get($"{name}_front", quietFailure: true) != null)
+        if (ResMap.Has($"{name}_front"))
             return TwoWayVertical;
-        if (ResMap.Get($"{name}", quietFailure: true) != null)
+        if (ResMap.Has(name))
             return Single;
         return None;
+    }
+
+    public static void MakeIntangible(this CwaffCompanionController friend)
+    {
+        friend.CanCrossPits = true;
+        friend.aiActor.healthHaver.PreventAllDamage = true;
+        friend.aiActor.CollisionDamage = 0f;
+        friend.aiActor.specRigidbody.CollideWithOthers = false;
+        friend.aiActor.specRigidbody.CollideWithTileMap = false;
     }
 }

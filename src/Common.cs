@@ -44,6 +44,8 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
         return null;
     }
 
+    public static bool Has(string resource) => _ResMap.ContainsKey(resource);
+
     // Gets only the basenames for each item in a list of strings
     public static List<string> Base(this List<string> paths)
     {
