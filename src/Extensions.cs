@@ -2827,6 +2827,7 @@ public static class Extensions
       return clip;
   }
 
+  /// <summary>Runs actor.HandlePitChecks() logic to determine if an actor will definitely fall at their current position</summary>
   public static bool WillDefinitelyFall(this GameActor actor)
   {
     Rect source = default(Rect);
@@ -2850,5 +2851,27 @@ public static class Extensions
     flag5 |= dungeon.data.isWall((int)rect.xMax, (int)rect.yMax);
     flag6 |= dungeon.data.isWall((int)rect.center.x, (int)rect.center.y);
     return flag2 && flag3 && flag4 && flag5 && flag6;
+  }
+
+  /// <summary>Returns true iff pos is over or within one unit of a pit cell</summary>
+  public static bool NearPit(this Vector2 pos)
+  {
+      DungeonData dd = GameManager.Instance.Dungeon.data;
+      IntVector2 ipos = pos.ToIntVector2(VectorConversions.Floor);
+      for (int x = ipos.x - 1; x <= ipos.x + 1; ++x)
+      {
+          for (int y = ipos.y - 1; y <= ipos.y + 1; ++y)
+          {
+              IntVector2 cpos = new(x, y);
+              if (!dd.CheckInBoundsAndValid(cpos))
+                  continue;
+              if (dd[cpos] is not CellData cell)
+                  continue;
+              if (cell.type == CellType.PIT)
+                  return true;
+          }
+      }
+
+      return false;
   }
 }
