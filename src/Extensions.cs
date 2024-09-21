@@ -2874,4 +2874,14 @@ public static class Extensions
 
       return false;
   }
+
+  public static bool InBounds(this Vector2 pos, bool wallsOk = false)
+  {
+    IntVector2 ipos = pos.ToIntVector2(VectorConversions.Floor);
+    DungeonData dd = GameManager.Instance.Dungeon.data;
+    if (ipos.x >= 0 && ipos.x < dd.Width && ipos.y >= 0 && ipos.y < dd.Height)
+      return dd[ipos] != null && (wallsOk || dd[ipos].type != CellType.WALL);
+    return false;
+  }
 }
+

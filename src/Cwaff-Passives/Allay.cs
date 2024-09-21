@@ -1,11 +1,8 @@
 namespace CwaffingTheGungy;
 
-using System;
 using static AllayCompanion.AllayMovementBehavior.State;
 
-
 /* TODO:
-    - add smoother movement
     - add better animations
     - add sounds
     - add vfx
@@ -29,6 +26,7 @@ public class Allay : CwaffCompanion
 
         AllayCompanion friend = item.InitCompanion<AllayCompanion>(baseFps: 12);
         friend.MakeIntangible();
+        friend.aiActor.specRigidbody.CollideWithTileMap = true;
         friend.aiActor.MovementSpeed = 7f;
         friend.aiActor.HasShadow = false;
 
@@ -47,7 +45,7 @@ public class AllayCompanion : CwaffCompanionController
         /* Behavior sketch:
           - spinning near a grounded item while allay is in follow mode makes allay pick up the nearest item and switch to scout mode
           - petting an allay in scout mode makes it drop its item and switch to follow mode
-          - in scout mode, allay has a 10% chance to find a duplicate of its current item on room clear
+          - in scout mode, allay has a 10% chance to find a copy of its held item on room clear
             - each item found decreases successive item find chance to 9%, 8%, 7%, etc. down to 1%
           - allays cannot pick up enemies that are too large or are immune to pits
         */
@@ -62,6 +60,8 @@ public class AllayCompanion : CwaffCompanionController
             ITEM_LOCATE,   // (scout mode) moving towards successfully located an item after combat ended
             ITEM_DANCE,    // (scout mode) circle around located item once near enough
         }
+
+        private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f;
 
         public float PathInterval = 0.25f;
         public float IdealRadius = 3f;
@@ -89,8 +89,8 @@ public class AllayCompanion : CwaffCompanionController
         private float _cumulativeGunRotation = 0f;
         private float _zeroRotationTime = 0f;
         private float _lastGunAngle = 0f;
-
-        private static bool _DebugTrace = false;
+        private Vector2 _lastVel = default;
+        private float _bobAmount = 0f;
 
         public override void Start()
         {
@@ -99,56 +99,47 @@ public class AllayCompanion : CwaffCompanionController
             m_aiActor.FallingProhibited = true;
             m_aiActor.PathableTiles |= CellTypes.PIT;
             m_aiActor.MovementModifiers += AdjustMovement;
+            m_aiActor.sprite.HeightOffGround = 2f;
+            m_aiActor.sprite.UpdateZDepth();
             m_companionController.m_owner.OnRoomClearEvent += PossiblyFindCopyOfHeldItem;
+            m_aiActor.specRigidbody.OnTileCollision += OnTileCollision;
 
             #if DEBUG
                 Commands._OnDebugKeyPressed += ShowState;
             #endif
         }
 
-        private void PossiblyFindCopyOfHeldItem(PlayerController controller)
-        {
-            if (!this._scouting || this._heldItemId == -1)
-                return;
-
-            this._targetItem = LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(this._heldItemId).gameObject,
-                m_companionController.aiActor.sprite.WorldBottomCenter.ToVector3ZUp(),
-                UnityEngine.Random.insideUnitCircle.normalized,
-                0.1f,
-                doDefaultItemPoof: true).gameObject.GetComponent<PickupObject>();
-            this._state = ITEM_LOCATE;
-        }
-
 #if DEBUG
         private void ShowState()
-            {
-                Vector2 myPos = m_aiActor.sprite.WorldCenter;
-                Vector2 adjustedTarget = this._targetPos + (m_aiActor.transform.position.XY() - myPos);
+        {
+            Vector2 myPos = m_aiActor.sprite.WorldCenter;
+            Vector2 adjustedTarget = this._targetPos + (m_aiActor.transform.position.XY() - myPos);
 
-                ETGModConsole.Log($"allay status");
-                ETGModConsole.Log($"  state is {this._state}");
-                ETGModConsole.Log($"  held item is {this._heldItemId}");
-                ETGModConsole.Log($"  held enemy is {(this._heldActor ? this._heldActor.ActorName : "none")}");
-                ETGModConsole.Log($"  reached target? {ReachedTarget()}");
-                ETGModConsole.Log($"  done pathing? {m_aiActor.PathComplete}");
-                ETGModConsole.Log($"  has path? {m_aiActor.Path != null}");
-                ETGModConsole.Log($"  transform pos {m_aiActor.transform.position.XY()}");
-                ETGModConsole.Log($"  sprite center {myPos}");
-                ETGModConsole.Log($"  target pos {this._targetPos}");
-                ETGModConsole.Log($"  target square distance {(this._targetPos - myPos).sqrMagnitude}");
-
-                _DebugTrace = !_DebugTrace;
-            }
-        #endif
+            ETGModConsole.Log($"allay status");
+            ETGModConsole.Log($"  state is {this._state}");
+            ETGModConsole.Log($"  held item is {this._heldItemId}");
+            ETGModConsole.Log($"  held enemy is {(this._heldActor ? this._heldActor.ActorName : "none")}");
+            ETGModConsole.Log($"  reached target? {ReachedTarget()}");
+            ETGModConsole.Log($"  done pathing? {m_aiActor.PathComplete}");
+            ETGModConsole.Log($"  has path? {m_aiActor.Path != null}");
+            ETGModConsole.Log($"  transform pos {m_aiActor.transform.position.XY()}");
+            ETGModConsole.Log($"  sprite center {myPos}");
+            ETGModConsole.Log($"  target pos {this._targetPos}");
+            ETGModConsole.Log($"  target square distance {(this._targetPos - myPos).sqrMagnitude}");
+        }
+#endif
 
         public override void Destroy()
         {
+            DropItem();
+            DropEnemy(droppedEarly: true);
             if (m_aiActor)
                 m_aiActor.MovementModifiers += AdjustMovement;
             if (m_companionController && m_companionController.m_owner)
                 m_companionController.m_owner.OnRoomClearEvent += PossiblyFindCopyOfHeldItem;
-            Commands._OnDebugKeyPressed -= ShowState;
+            #if DEBUG
+                Commands._OnDebugKeyPressed -= ShowState;
+            #endif
             base.Destroy();
         }
 
@@ -158,8 +149,33 @@ public class AllayCompanion : CwaffCompanionController
             DecrementTimer(ref m_repathTimer);
         }
 
+        private void OnTileCollision(CollisionData tileCollision)
+        {
+            if (tileCollision.CollidedX)
+                this._lastVel = this._lastVel.WithX(0);
+            if (tileCollision.CollidedY)
+                this._lastVel = this._lastVel.WithY(0);
+        }
+
+        private void PossiblyFindCopyOfHeldItem(PlayerController controller)
+        {
+            if (!this._scouting || this._heldItemId == -1 || controller.CurrentRoom == null)
+                return;
+            if (UnityEngine.Random.value > _ROOM_CLEAR_ITEM_CHANCE)
+                return;
+
+            this._targetItem = LootEngine.SpawnItem(
+                PickupObjectDatabase.GetById(this._heldItemId).gameObject,
+                controller.CurrentRoom.GetBestRewardLocation(IntVector2.One).ToVector3(),
+                UnityEngine.Random.insideUnitCircle.normalized,
+                0.1f,
+                doDefaultItemPoof: true).gameObject.GetComponent<PickupObject>();
+            this._state = ITEM_LOCATE;
+        }
+
         private AIActor FindCarriableEnemy()
         {
+            const float _MAX_BASE_HEALTH = 40f;
             PlayerController owner = m_companionController.m_owner;
             if (owner.CurrentRoom is not RoomHandler room)
                 return null;
@@ -168,7 +184,7 @@ public class AllayCompanion : CwaffCompanionController
             GameLevelDefinition level = GameManager.Instance.GetLastLoadedLevelDefinition();
             if (level != null)
                 floorHealthMod *= level.enemyHealthMultiplier;
-            float maxHealth = 40f * floorHealthMod;
+            float maxHealth = _MAX_BASE_HEALTH * floorHealthMod;
 
             Vector2 myPos = m_aiActor.specRigidbody.UnitCenter;
             AIActor nearest = null;
@@ -178,7 +194,7 @@ public class AllayCompanion : CwaffCompanionController
             {
                 if (!enemy || !enemy.isActiveAndEnabled || enemy == this._lastDroppedActor)
                     continue;
-                if (!enemy.IsWorthShootingAt || enemy.IsFlying || enemy.FallingProhibited)
+                if (!enemy.IsWorthShootingAt || enemy.IsFlying || enemy.FallingProhibited || enemy.IsFalling)
                     continue;
                 if (enemy.healthHaver is not HealthHaver hh || hh.maximumHealth >= maxHealth)
                     continue;
@@ -199,6 +215,7 @@ public class AllayCompanion : CwaffCompanionController
             return nearest;
         }
 
+        private static readonly List<int> _PickupWhitelist = [(int)Items.GlassGuonStone];
         private PickupObject FindCarriableItem(bool nearby = false)
         {
             const float _MAX_ITEM_DIST = 5f;
@@ -206,22 +223,24 @@ public class AllayCompanion : CwaffCompanionController
             PlayerController owner = m_companionController.m_owner;
             if (owner.CurrentRoom is not RoomHandler room)
                 return null;
-            if (StaticReferenceManager.AllDebris is not List<DebrisObject> allDebris)
-                return null;
-            for (int j = 0; j < allDebris.Count; j++)
+            foreach (DebrisObject d in CwaffEvents._DebrisPickups)
             {
-                if (allDebris[j] is not DebrisObject d || !d.IsPickupObject || d.transform.position.GetAbsoluteRoom() != room)
+                if (!d || d.transform.position.GetAbsoluteRoom() != room)
                     continue;
-                GameObject dobj = d.gameObject;
-                HealthPickup component     = dobj.GetComponent<HealthPickup>();
-                AmmoPickup component2      = dobj.GetComponent<AmmoPickup>();
-                KeyBulletPickup component3 = dobj.GetComponent<KeyBulletPickup>();
-                SilencerItem component4    = dobj.GetComponent<SilencerItem>();
-                if (!(component || component2 || component3 || component4))
+                if (d.gameObject.GetComponent<PickupObject>() is not PickupObject pickup)
+                    continue;
+                if (pickup.IsBeingSold)
+                    continue;
+                bool health      = pickup is HealthPickup healthPickup && !healthPickup.m_pickedUp;
+                bool ammo        = pickup is AmmoPickup ammoPickup && !ammoPickup.m_pickedUp;
+                bool key         = pickup is KeyBulletPickup keyPickup;
+                bool blank       = pickup is SilencerItem blankPickup && !blankPickup.m_pickedUp;
+                bool whitelisted = _PickupWhitelist.Contains(pickup.PickupObjectId);
+                if (!(health || ammo || key || blank || whitelisted))
                     continue;
                 float sqrDist = (owner.CenterPosition - d.transform.position.XY()).sqrMagnitude;
                 if (nearby == (sqrDist < _MAX_ITEM_DIST_SQR))
-                    return dobj.GetComponent<PickupObject>();
+                    return pickup.GetComponent<PickupObject>();
             }
             return null;
         }
@@ -241,7 +260,7 @@ public class AllayCompanion : CwaffCompanionController
                 if (cell == null || cell.type != CellType.PIT || cell.fallingPrevented)
                     continue;
                 float dist = (cellPos - ipos).sqrMagnitude;
-                if (found && dist > nearest)
+                if (dist > nearest)
                     continue;
                 found = true;
                 nearest = dist;
@@ -267,7 +286,7 @@ public class AllayCompanion : CwaffCompanionController
             PlayerController owner = m_companionController.m_owner;
 
             // set up a sane default state
-            DropEnemy();
+            DropEnemy(droppedEarly: true);
             this._scouting = this._scouting && this._heldItemId >= 0 && !m_companionController.IsBeingPet;
             if (!this._scouting)
                 DropItem();
@@ -366,10 +385,9 @@ public class AllayCompanion : CwaffCompanionController
                 case ITEM_DANCE:
                     return true;
                 case ENEMY_CARRY:
-                    return m_aiActor.IsOverPit && (this._heldActor as AIActor).IsOverPit &&
-                        (this._heldActor.WillDefinitelyFall() || DeltaToTarget().sqrMagnitude < 0.1f);
+                    return m_aiActor.IsOverPit && (this._heldActor.WillDefinitelyFall() || DeltaToTarget().sqrMagnitude < 0.1f);
                 case OWNER_FOLLOW:
-                    return (Vector2.Distance(this._targetPos, m_aiActor.CenterPosition) <= IdealRadius);
+                    return (Vector2.Distance(this._targetPos, m_aiActor.CenterPosition) <= IdealRadius) && m_aiActor.CenterPosition.InBounds();
                 case ITEM_RETRIEVE:
                     return (Vector2.Distance(this._targetPos, m_aiActor.CenterPosition) <= IdealRadius) && !m_aiActor.CenterPosition.NearPit();
                 case ENEMY_SEEK:
@@ -464,13 +482,14 @@ public class AllayCompanion : CwaffCompanionController
 
             if (this._targetActor.behaviorSpeculator is BehaviorSpeculator bs)
             {
-                // bs.InterruptAndDisable();
+                bs.InterruptAndDisable();
                 bs.Stun(3600f, false);
             }
 
             SpeculativeRigidbody body = m_companionController.specRigidbody;
             SpeculativeRigidbody other = this._targetActor.specRigidbody;
             body.RegisterCarriedRigidbody(other);
+            body.CollideWithTileMap = false;
 
             Vector2 myPos = m_companionController.aiActor.sprite.WorldCenter;
             Vector2 offset = this._targetActor.transform.position.XY() - other.UnitCenter;
@@ -481,8 +500,6 @@ public class AllayCompanion : CwaffCompanionController
             other.CollideWithOthers = false;
             other.CollideWithTileMap = false;
             other.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.LowObstacle));
-            // other.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.PlayerHitBox));
-            // other.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
             if (this._targetActor.knockbackDoer is KnockbackDoer kb)
                 kb.knockbackMultiplier = 0f;
             this._targetActor.FallingProhibited = true;
@@ -490,7 +507,6 @@ public class AllayCompanion : CwaffCompanionController
             this._heldActor = this._targetActor;
             this._targetActor = null;
             FindNearestPit(m_companionController.transform.position, out IntVector2 pitPos);
-            // CheckNearbyPits(pitPos);
             this._pitPos = pitPos.ToVector2() + new Vector2(0.5f, 0.5f); // center of pit cell
             this._targetPos = this._pitPos;
             this._state = ENEMY_CARRY;
@@ -499,12 +515,12 @@ public class AllayCompanion : CwaffCompanionController
 
         private void DropEnemyInPit()
         {
-            DropEnemy();
+            DropEnemy(droppedEarly: false);
             this._state = OWNER_FOLLOW;
             DetermineNewTarget();
         }
 
-        private void DropEnemy()
+        private void DropEnemy(bool droppedEarly = false)
         {
             if (!this._heldActor)
                 return;
@@ -518,8 +534,6 @@ public class AllayCompanion : CwaffCompanionController
             other.CollideWithOthers = true;
             other.CollideWithTileMap = true;
             other.RemoveCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.LowObstacle));
-            // other.RemoveCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.PlayerHitBox));
-            // other.RemoveCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
             if (this._heldActor.knockbackDoer is KnockbackDoer kb)
                 kb.knockbackMultiplier = 1f;
             this._heldActor.FallingProhibited = false;
@@ -529,11 +543,11 @@ public class AllayCompanion : CwaffCompanionController
                 bs.enabled = true;
             }
             other.Reinitialize();
-            if (DeltaToTarget().sqrMagnitude < 0.1f && !this._heldActor.WillDefinitelyFall())
+            other.CorrectForWalls();
+            if (!droppedEarly && DeltaToTarget().sqrMagnitude < 0.1f && !this._heldActor.WillDefinitelyFall())
             {
                 // Lazy.DebugWarn("FORCING GAME ACTOR TO FALL UNNATURALLY, HOPE NOBODY NOTICES");
-                //NOTE: this does in fact happen a lot, pits are wonky and pathfinding isn't fantastic
-                this._heldActor.ForceFall();
+                this._heldActor.ForceFall(); //NOTE: this does in fact happen a lot, pits are wonky and pathfinding isn't fantastic
             }
 
             this._lastDroppedActor = this._heldActor;
@@ -562,7 +576,6 @@ public class AllayCompanion : CwaffCompanionController
             this._targetActor = m_companionController.m_owner;
             if (this._state == ITEM_INSPECT)
             {
-                ETGModConsole.Log($"entering scouting mode");
                 this._scouting = true;
                 this._state = OWNER_FOLLOW;
             }
@@ -606,6 +619,7 @@ public class AllayCompanion : CwaffCompanionController
             m_aiActor.ClearPath();
             if (this._state == ITEM_LOCATE)
             {
+                m_aiActor.specRigidbody.CollideWithTileMap = false;
                 this._targetAngle = (m_aiActor.specRigidbody.UnitCenter - this._targetPos).ToAngle();
                 this._state = ITEM_DANCE;
             }
@@ -692,14 +706,42 @@ public class AllayCompanion : CwaffCompanionController
             return adjustedTarget - bottomLeft;
         }
 
+        private void UpdateMovementSpeed()
+        {
+            float sqrDist = (m_aiActor.sprite.WorldCenter - this._targetPos).sqrMagnitude;
+            float newSpeed = Mathf.Clamp(sqrDist, 5, this._state == ENEMY_CARRY ? 12f : 20f);
+            m_aiActor.MovementSpeed = newSpeed;
+        }
+
         private void AdjustMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
         {
+            UpdateMovementSpeed();
             DoSpinningChecks();
-            if (DoDancingChecks())
+            if (DoDancingChecks() || m_companionController.IsBeingPet)
                 return;
+            bool inBounds = m_aiActor.specRigidbody.UnitBottomCenter.InBounds();
+            if (inBounds && this._state != ENEMY_CARRY && !m_aiActor.specRigidbody.CollideWithTileMap)
+            {
+                m_aiActor.specRigidbody.CollideWithTileMap = true;
+                m_aiActor.specRigidbody.CorrectForWalls();
+            }
+
             Vector2 delta = DeltaToTarget();
-            if (delta.sqrMagnitude < _SNAP_DIST_SQR)
-                voluntaryVel += 2f * delta.normalized;
+            if (!inBounds || (m_aiActor.PathComplete && !ReachedTarget()))
+                voluntaryVel = m_aiActor.MovementSpeed * delta.normalized; // move towards our target if we're stuck
+            else if (this._state != OWNER_FOLLOW && delta.sqrMagnitude < _SNAP_DIST_SQR)
+                voluntaryVel += 2f * delta.normalized; // nudge towards our target if we're close
+
+            if (voluntaryVel.sqrMagnitude > 1f || this._lastVel.sqrMagnitude > 1f)
+                voluntaryVel = Lazy.SmoothestLerp(this._lastVel, voluntaryVel, inBounds ? 2f : 10f);
+            this._lastVel = voluntaryVel;
+            if (voluntaryVel != Vector2.zero)
+            {
+                this._bobAmount = 0f;
+                return;
+            }
+            this._bobAmount += 6f * BraveTime.DeltaTime;
+            voluntaryVel = new Vector2(0, 0.5f * Mathf.Sin(this._bobAmount));
         }
 
         private bool DoDancingChecks()
@@ -736,7 +778,9 @@ public class AllayCompanion : CwaffCompanionController
             DecrementTimer(ref m_idleTimer);
 
             UpdateStateAndTargetPosition();
-            if (CorrectForInaccessibleCell())
+            if (OffScreenAndInDifferentRoom())
+                m_aiActor.CompanionWarp(m_companionController.m_owner.CenterPosition);
+            else if (CorrectForInaccessibleCell())
                 {} // current cell is inaccessible, do nothing else
             else if (ReachedTarget())
                 OnReachedTarget();
@@ -748,6 +792,15 @@ public class AllayCompanion : CwaffCompanionController
             // #endif
 
             return BehaviorResult.SkipRemainingClassBehaviors;
+        }
+
+        private bool OffScreenAndInDifferentRoom()
+        {
+            RoomHandler ownerRoom = m_companionController.m_owner.CurrentRoom;
+            Vector2 pos = m_aiActor.CenterPosition;
+            if (ownerRoom != null && ownerRoom == pos.GetAbsoluteRoom())
+                return false;
+            return !GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.05f);
         }
     }
 }

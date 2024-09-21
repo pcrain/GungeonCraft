@@ -180,4 +180,27 @@ public static class CwaffEvents // global custom events we can listen for
                 OnCorpseCreated(debris, original);
         }
     }
+
+    //REFACTOR: put this in some sort of caching class
+    internal static List<DebrisObject> _DebrisPickups = new();
+
+    [HarmonyPatch(typeof(DebrisObject), nameof(DebrisObject.Start))]
+    private class DebrisObjectStartPatch
+    {
+        static void Postfix(DebrisObject __instance)
+        {
+            if (__instance.IsPickupObject)
+                _DebrisPickups.Add(__instance);
+        }
+    }
+
+    [HarmonyPatch(typeof(DebrisObject), nameof(DebrisObject.OnDestroy))]
+    private class DebrisObjectOnDestroyPatch
+    {
+        static void Prefix(DebrisObject __instance)
+        {
+            if (__instance.IsPickupObject)
+                _DebrisPickups.TryRemove(__instance);
+        }
+    }
 }
