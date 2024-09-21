@@ -2826,4 +2826,29 @@ public static class Extensions
       }
       return clip;
   }
+
+  public static bool WillDefinitelyFall(this GameActor actor)
+  {
+    Rect source = default(Rect);
+    source.min = PhysicsEngine.PixelToUnitMidpoint(actor.specRigidbody.PrimaryPixelCollider.LowerLeft);
+    source.max = PhysicsEngine.PixelToUnitMidpoint(actor.specRigidbody.PrimaryPixelCollider.UpperRight);
+    Rect rect = new Rect(source);
+    actor.ModifyPitVectors(ref rect);
+    Dungeon dungeon = GameManager.Instance.Dungeon;
+    bool flag2 = dungeon.ShouldReallyFall(rect.min);
+    bool flag3 = dungeon.ShouldReallyFall(new Vector3(rect.xMax, rect.yMin));
+    bool flag4 = dungeon.ShouldReallyFall(new Vector3(rect.xMin, rect.yMax));
+    bool flag5 = dungeon.ShouldReallyFall(rect.max);
+    bool flag6 = dungeon.ShouldReallyFall(rect.center);
+    bool overPitAtAll = flag2 || flag3 || flag4 || flag5 || flag6;
+    if (!overPitAtAll)
+      return false;
+
+    flag2 |= dungeon.data.isWall((int)rect.xMin, (int)rect.yMin);
+    flag3 |= dungeon.data.isWall((int)rect.xMax, (int)rect.yMin);
+    flag4 |= dungeon.data.isWall((int)rect.xMin, (int)rect.yMax);
+    flag5 |= dungeon.data.isWall((int)rect.xMax, (int)rect.yMax);
+    flag6 |= dungeon.data.isWall((int)rect.center.x, (int)rect.center.y);
+    return flag2 && flag3 && flag4 && flag5 && flag6;
+  }
 }

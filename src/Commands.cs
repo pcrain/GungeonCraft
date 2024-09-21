@@ -5,6 +5,8 @@ public class Commands
     internal static bool _DebugStealth    = false;
     internal static bool _DebugCameraLock = false;
 
+    internal static Action _OnDebugKeyPressed = null;
+
     public static void Init()
     {
         if (!C.DEBUG_BUILD)
@@ -127,6 +129,12 @@ public class Commands
             if (Input.GetKeyDown(KeyCode.E)) // throw an error immediately
             {
                 __instance.GetComponent<Projectile>().DieInAir();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha0)) // call debug events
+            {
+                if (_OnDebugKeyPressed != null)
+                    _OnDebugKeyPressed();
             }
 
             return true;
