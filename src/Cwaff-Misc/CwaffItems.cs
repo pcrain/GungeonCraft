@@ -295,6 +295,16 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           return false;    // skip the original method
       }
   }
+
+  /// <summary>Patch to prevent guns from being thrown</summary>
+  [HarmonyPatch(typeof(Gun), nameof(Gun.PrepGunForThrow))]
+  private class GunPrepGunForThrowPatch
+  {
+      static bool Prefix(Gun __instance)
+      {
+          return !__instance.gameObject.GetComponent<Unthrowable>();
+      }
+  }
 }
 
 public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffItem
@@ -342,3 +352,6 @@ public interface ICustomBlankDoer
       }
   }
 }
+
+/// <summary>Dummy class to prevent guns from being thrown</summary>
+public class Unthrowable : MonoBehaviour {}

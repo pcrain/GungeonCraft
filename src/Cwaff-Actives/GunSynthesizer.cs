@@ -187,6 +187,7 @@ public class GunSynthesizer : CwaffActive
 
             gun.CanBeDropped = false;
             gun.CanBeSold = false;
+            gun.Attach<Unthrowable>();
             this._owner.inventory.GunLocked.SetOverride(_OVERRIDE, true);
 
             if (!gun.InfiniteAmmo)
@@ -199,7 +200,6 @@ public class GunSynthesizer : CwaffActive
         {
             if (!this._gun)
                 return;
-            this._gun.m_prepThrowTime = -999f; //HACK: prevent the gun from being thrown
             this._gun.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");  // force holographics
         }
     }

@@ -131,6 +131,15 @@ public class Commands
                 __instance.GetComponent<Projectile>().DieInAir();
             }
 
+            if (Input.GetKeyDown(KeyCode.Z)) // set ammo to 1 / max
+            {
+                Gun gun = GameManager.Instance.PrimaryPlayer.CurrentGun;
+                if (gun.CurrentAmmo > 1)
+                    gun.CurrentAmmo = 1;
+                else
+                    gun.CurrentAmmo = gun.AdjustedMaxAmmo;
+            }
+
             if (Input.GetKeyDown(KeyCode.Alpha0)) // call debug events
             {
                 if (_OnDebugKeyPressed != null)

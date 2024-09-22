@@ -3,6 +3,7 @@
 ## 1.19.1 (2024-09-22)
 
 - Fixed major breakage in Yggdrashell and Hallaeribut caused by faulty refactor
+- Fixed preparation sound still playing when attempting to throw unthrowable guns
 - Updated readme since I forgot for 1.19.0
 
 ## 1.19.0 (2024-09-22)

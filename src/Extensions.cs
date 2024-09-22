@@ -2883,5 +2883,54 @@ public static class Extensions
       return dd[ipos] != null && (wallsOk || dd[ipos].type != CellType.WALL);
     return false;
   }
+
+  //NOTE: couldn't get this to work ):
+  // public static void UpdateAmmonomiconSprite(this PickupObject item, int spriteId)
+  // {
+  //   int pickupID = item.PickupObjectId;
+  //   string newName = item.sprite.collection.spriteDefinitions[spriteId].name;
+  //   ETGModConsole.Log($"updating ammonomicon sprite");
+  //   ETGModConsole.Log($"  old: {item.encounterTrackable.journalData.AmmonomiconSprite}");
+  //   PickupObjectDatabase.GetById(item.PickupObjectId).encounterTrackable.journalData.AmmonomiconSprite = newName;
+  //   PickupObjectDatabase.GetById(item.PickupObjectId).GetComponent<EncounterTrackable>().journalData.AmmonomiconSprite = newName;
+  //   item.encounterTrackable.journalData.AmmonomiconSprite = newName;
+  //   item.gameObject.GetComponent<EncounterTrackable>().journalData.AmmonomiconSprite = newName;
+  //   ETGModConsole.Log($"  new: {item.encounterTrackable.journalData.AmmonomiconSprite}");
+
+  //   var pages = AmmonomiconController.Instance.m_extantPageMap;
+  //   if (pages.TryGetValue(AmmonomiconPageRenderer.PageType.EQUIPMENT_LEFT, out AmmonomiconPageRenderer ePage))
+  //   {
+  //     ETGModConsole.Log($"1");
+  //     Transform transform = ePage.guiManager.transform.Find("Scroll Panel").Find("Scroll Panel");
+  //     ETGModConsole.Log($"2");
+  //     dfPanel component = transform.Find("Guns Panel").GetComponent<dfPanel>();
+  //     ETGModConsole.Log($"3");
+  //     dfPanel component5 = component.transform.GetChild(0).GetComponent<dfPanel>();
+  //     ETGModConsole.Log($"4");
+  //     dfPanel component6 = transform.Find("Active Items Panel").GetComponent<dfPanel>();
+  //     ETGModConsole.Log($"5");
+  //     component5 = component6.transform.GetChild(0).GetComponent<dfPanel>();
+  //     ETGModConsole.Log($"6 with {component5.controls.Count} controls");
+  //     foreach (dfControl control in component5.controls)
+  //     {
+  //       if (control is not dfButton button)
+  //         continue;
+  //       ETGModConsole.Log($" 7");
+  //       if (button.GetComponent<AmmonomiconPokedexEntry>() is not AmmonomiconPokedexEntry dex)
+  //         continue;
+  //       ETGModConsole.Log($"  8");
+  //       if (dex.pickupID != pickupID)
+  //         continue;
+  //       ETGModConsole.Log($"  9");
+  //       dex.m_childSprite.spriteId = spriteId;
+  //       dex.m_childSprite = null;
+  //       ETGModConsole.Log($"  10");
+  //       component6.PerformLayout();
+  //       // ePage.RebuildRenderData();
+  //       ePage.DoRefreshData();
+  //       break;
+  //     }
+  //   }
+  // }
 }
 

@@ -34,6 +34,7 @@ public class Hallaeribut : CwaffGun
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.2f, ammo: 800, shootFps: 24, reloadFps: 16,
             loopReloadAt: 0, muzzleVFX: "muzzle_hallaeribut", muzzleFps: 30, muzzleScale: 0.5f, fireAudio: "chomp_small_sound",
             reloadAudio: "chomp_small_sound", modulesAreTiers: true)
+          .Attach<Unthrowable>() // throwing circumvents a primary mechanic, so don't allow it
           .Attach<HallaeributAmmoDisplay>();
 
         Projectile proj = gun.InitProjectile(GunData.New(sprite: "hallaeribut_projectile", fps: 24, scale: 0.75f, clipSize: 32, cooldown: 0.33f,

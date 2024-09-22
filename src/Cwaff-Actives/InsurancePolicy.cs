@@ -123,6 +123,12 @@ public class InsurancePolicy : CwaffActive
         base.sprite.SetSprite(GetSpriteIdForCharacter());
     }
 
+    // public override void Pickup(PlayerController player)
+    // {
+    //     base.Pickup(player);
+    //     this.UpdateAmmonomiconSprite(GetSpriteIdForCharacter()); // Update sprite in Ammonomicon to match the character (doesn't work ): )
+    // }
+
     public static void InsuranceCheck()
     {
         GameManager.Instance.StartCoroutine(InsuranceCheck_CR());

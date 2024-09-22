@@ -35,7 +35,8 @@ public class OmnidirectionalLaser : CwaffGun
         Gun gun = Lazy.SetupGun<OmnidirectionalLaser>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250, handedness: GunHandedness.NoHanded,
             idleFps: _BASE_FPS, shootFps: _BASE_FPS, loopFireAt: 0, preventRotation: true, suppressReloadAnim: true)
-          .SetFireAudio("omni_spin_sound", 0, 1, 2, 3, 4, 5, 6, 7);
+          .SetFireAudio("omni_spin_sound", 0, 1, 2, 3, 4, 5, 6, 7)
+          .Attach<Unthrowable>(); // throwing looks stupid, so don't allow it
 
         gun.AddFlippedCarryPixelOffsets(offset: new IntVector2(5, -4), flippedOffset: new IntVector2(4, -4),
           offsetPilot:       new IntVector2(5, -4), flippedOffsetPilot:       new IntVector2(5, -4),
