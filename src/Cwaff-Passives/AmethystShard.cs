@@ -6,8 +6,8 @@ public class AmethystShard : CwaffCompanion
 {
     public static string ItemName         = "Amethyst Shard";
     public static string ShortDescription = "Allay Your Worries";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Spawns a friendly Allay. While in combat, the Allay will attempt to grab small enemies and drop them into pits. Out of combat, the Allay will bring nearby minor collectibles to the player. Spinning around near a minor collectible will cause the Allay to pick it up and enter scouting mode, providing a small chance to find items of the same type when clearing a room. Interacting with the Allay will cause it to drop any held items.";
+    public static string Lore             = "A shiny purple gemstone normally found in geodes deep underground. It's not particularly useful in its own right, but folk tales claim these gemstones attract certain playful creatures with a love for relocating trinkets they find on the ground.";
 
     public static string CompanionName    = "Allay";
 
@@ -19,12 +19,9 @@ public class AmethystShard : CwaffCompanion
         PassiveItem item  = Lazy.SetupPassive<AmethystShard>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
 
-        string companionName = CompanionName.ToID();
-        AllayCompanion friend = item.InitCompanion<AllayCompanion>(friendName: companionName, baseFps: 12);
+        AllayCompanion friend = item.InitCompanion<AllayCompanion>(friendName: CompanionName.ToID(), baseFps: 12);
         friend.MakeIntangible();
         friend.aiActor.specRigidbody.CollideWithTileMap = true;
-        friend.aiActor.MovementSpeed = 7f;
-        friend.aiActor.HasShadow = false;
 
         BehaviorSpeculator bs = friend.gameObject.GetComponent<BehaviorSpeculator>();
         bs.MovementBehaviors.Add(new AllayCompanion.AllayMovementBehavior());
@@ -78,16 +75,14 @@ public class AllayCompanion : CwaffCompanionController
             ITEM_DANCE,    // (scout mode) circle around located item once near enough
         }
 
-        // #if DEBUG
-        //     private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f;
-        // #else
-        //     private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
-        // #endif
-        private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
+        #if DEBUG
+            private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f;
+        #else
+            private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
+        #endif
 
         public float PathInterval = 0.25f;
         public float IdealRadius = 3f;
-        public string RollAnimation = "roll";
 
         [NonSerialized]
         public bool TemporarilyDisabled;

@@ -7,7 +7,7 @@ public class Chroma : CwaffGun
     public static string ItemName         = "Chroma";
     public static string ShortDescription = "Spectroscopic";
     public static string LongDescription  = "Fires beams that extract pigment from enemies. Reloading cycles through red, green, and blue beams, which gain power from their respective pigments. Each beam is most effective at extracting the next pigment in the cycle (e.g., red > green > blue > red), and deals increased or reduced damage depending on the presence of that pigment in the enemy.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A device designed for extracting pigment-containing compounds from inorganic materials for the purpose of high-end nail polish production. Retail models have a carbon scanner preventing the beams from firing at organic material, but removing the scanner is trivial and makes for a bizarrely effective weapon in a pinch.";
 
     private const float _BASE_PARTICLE_RATE = 0.5f;
     private const float _PER_LEVEL_PARTICLE_RATE = 0.05f;

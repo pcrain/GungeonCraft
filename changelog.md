@@ -1,25 +1,33 @@
 # Changelog
 
-## 1.19.0 (TBD)
+## 1.19.0 (2024-09-22)
+
+#### Features:
 
 - Added Chroma and Amethyst Shard
 - Added masteries for Scotsman, Carpet Bomber, and Soul Kaliber
+- Added new hat "The Infamous" (sprites thanks to gustavin!)
+
+#### Balance Changes and Polish:
+
 - Buffed Carpet Bomber
 	- Increased ammo from 360 to 720
 	- Increased explosion radius from 0.5 to 1.5
 	- Increased drag from 0.8 to 0.9 (slows down less in the air)
 - Increased Soul Kaliber's ammo from 250 to 444
+- Made enemies tossed off of Vladimir deal damage to other enemies
 - Tweaked visuals on Yggdrashell's Earth Armor activation
+- Increased visibility of Iron Maid's reticle
+
+#### Bugfixes:
+
 - Fixed null deref caused by Racket Launcher projectiles trying to home in on their targets after the projectiles themselves were destroyed
 - Fixed several emissive VFX not actually emitting light
 - Fixed Soul Kaliber's soul link effect not working on bosses, Keybullet Kin, and Chance Kin
 - Fixed (again, for real hopefully) null deref in Ki Blast caused by trying to redirect projectiles to nonexistent enemies
 - Fixed Yggdrashell losing all built life force when dropped or when saving and reloading
-- Increased visibility of Iron Maid's reticle
 - Fixed rare null deref when [REDCATED] [REDACTED] for [REDACTED]
 - Fixed Quarter Pounder's gold shaders not working properly on Shotgun Kin variants
-- Enemies tossed off of Vladimir can now damage other enemies
-- Added new hat "The Infamous" (sprite thanks to gustavin!)
 
 ## 1.18.5 (2024-09-09)
 

@@ -52,7 +52,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - [Lynceus](https://thunderstore.io/c/enter-the-gungeon/p/Lynceus/): Alien Nailgun
 
-  - Misc. edits combined from several sources by me: Breegull, Ki Blast, Racket Launcher, Sub Machine Gun, Ticonderogun
+  - Misc. edits combined from several sources by me: Breegull, Ki Blast, Racket Launcher, Sub Machine Gun, Ticonderogun, Chroma
 
   - Most gun animations are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
 

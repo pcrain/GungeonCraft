@@ -123,5 +123,6 @@ public static class CwaffCompanionBuilder
         friend.aiActor.CollisionDamage = 0f;
         friend.aiActor.specRigidbody.CollideWithOthers = false;
         friend.aiActor.specRigidbody.CollideWithTileMap = false;
+        friend.aiActor.HasShadow = false;
     }
 }
