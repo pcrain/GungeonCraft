@@ -2,35 +2,54 @@ namespace CwaffingTheGungy;
 
 using static AllayCompanion.AllayMovementBehavior.State;
 
-/* TODO:
-    - add better animations
-*/
-
-public class Allay : CwaffCompanion
+public class AmethystShard : CwaffCompanion
 {
-    public static string ItemName         = "Allay";
-    public static string ShortDescription = "TBD";
+    public static string ItemName         = "Amethyst Shard";
+    public static string ShortDescription = "Allay Your Worries";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
+    public static string CompanionName    = "Allay";
+
+    public int itemsFound = 0;
+    public int scoutItemId = -1;
+
     public static void Init()
     {
-        PassiveItem item  = Lazy.SetupPassive<Allay>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = Lazy.SetupPassive<AmethystShard>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
 
-        AllayCompanion friend = item.InitCompanion<AllayCompanion>(friendName: "allay", baseFps: 12);
+        string companionName = CompanionName.ToID();
+        AllayCompanion friend = item.InitCompanion<AllayCompanion>(friendName: companionName, baseFps: 12);
         friend.MakeIntangible();
         friend.aiActor.specRigidbody.CollideWithTileMap = true;
         friend.aiActor.MovementSpeed = 7f;
         friend.aiActor.HasShadow = false;
 
-        string companionName = ItemName.ToID();
         BehaviorSpeculator bs = friend.gameObject.GetComponent<BehaviorSpeculator>();
-        bs.MovementBehaviors.Add(new AllayCompanion.AllayMovementBehavior {
-            IdleAnimations = [$"{companionName}_idle"],
-            });
+        bs.MovementBehaviors.Add(new AllayCompanion.AllayMovementBehavior());
 
         AllayCompanion._AllaySparkles = VFX.Create("allay_sparkles", fps: 10, loops: false);
+    }
+
+    public override void DisableEffect(PlayerController player)
+    {
+        this.scoutItemId = -1;
+        base.DisableEffect(player);
+    }
+
+    public override void MidGameSerialize(List<object> data)
+    {
+        base.MidGameSerialize(data);
+        data.Add(itemsFound);
+        data.Add(scoutItemId);
+    }
+
+    public override void MidGameDeserialize(List<object> data)
+    {
+        base.MidGameDeserialize(data);
+        itemsFound = (int)data[0];
+        scoutItemId = (int)data[1];
     }
 }
 
@@ -62,12 +81,11 @@ public class AllayCompanion : CwaffCompanionController
         #if DEBUG
             private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f;
         #else
-            private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f / 16f;
+            private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
         #endif
 
         public float PathInterval = 0.25f;
         public float IdealRadius = 3f;
-        public string[] IdleAnimations;
         public string RollAnimation = "roll";
 
         [NonSerialized]
@@ -85,7 +103,6 @@ public class AllayCompanion : CwaffCompanionController
         private State _state = OWNER_FOLLOW;
         private bool _scouting = false;
         private Vector2 _pitPos = default;
-        private int _heldItemId = -1;
         private tk2dSprite _heldItemRenderer = null;
         private GameActor _lastDroppedActor = null;
         private float _cumulativeGunRotation = 0f;
@@ -94,6 +111,8 @@ public class AllayCompanion : CwaffCompanionController
         private Vector2 _lastVel = default;
         private float _bobAmount = 0f;
         private bool _wasBeingPet = false;
+        private AmethystShard _allayItem = null;
+        private int _heldItemId = -1;
 
         public override void Start()
         {
@@ -106,7 +125,28 @@ public class AllayCompanion : CwaffCompanionController
             m_aiActor.sprite.UpdateZDepth();
             m_companionController.m_owner.OnRoomClearEvent += PossiblyFindCopyOfHeldItem;
             m_aiActor.specRigidbody.OnTileCollision += OnTileCollision;
-            m_aiActor.gameObject.Play("allay_spawn_sound");
+
+            if (!GameManager.Instance.IsLoadingLevel)
+                m_aiActor.gameObject.Play("allay_spawn_sound");
+
+            // find our corresponding companion item and read data from it
+            if (m_companionController.m_owner is PlayerController owner)
+            {
+                foreach(PassiveItem passive in owner.passiveItems)
+                {
+                    if (passive is not AmethystShard allayItem || allayItem.ExtantCompanion != m_gameObject)
+                        continue;
+                    this._allayItem = allayItem;
+                    break;
+                }
+            }
+
+            if (this._allayItem && this._allayItem.scoutItemId != -1)
+            {
+                this._heldItemId = this._allayItem.scoutItemId;
+                SetupHeldItemRenderer();
+                this._scouting = true;
+            }
 
             #if DEBUG
                 Commands._OnDebugKeyPressed += ShowState;
@@ -163,11 +203,12 @@ public class AllayCompanion : CwaffCompanionController
 
         private void PossiblyFindCopyOfHeldItem(PlayerController controller)
         {
-            if (!this._scouting || this._heldItemId == -1 || controller.CurrentRoom == null)
+            if (!this._scouting || this._heldItemId == -1 || controller.CurrentRoom == null || !this._allayItem)
                 return;
-            if (UnityEngine.Random.value > _ROOM_CLEAR_ITEM_CHANCE)
+            if (UnityEngine.Random.value > Mathf.Max(_ROOM_CLEAR_ITEM_CHANCE - 0.01f * this._allayItem.itemsFound, 0.025f))
                 return;
 
+            ++this._allayItem.itemsFound;
             this._targetItem = LootEngine.SpawnItem(
                 PickupObjectDatabase.GetById(this._heldItemId).gameObject,
                 controller.CurrentRoom.GetBestRewardLocation(IntVector2.One).ToVector3(),
@@ -471,11 +512,11 @@ public class AllayCompanion : CwaffCompanionController
         private void BecomeIdle()
         {
             m_aiActor.ClearPath();
-            if (m_idleTimer <= 0f && IdleAnimations != null && IdleAnimations.Length > 0)
-            {
-                m_aiAnimator.PlayUntilFinished(IdleAnimations[UnityEngine.Random.Range(0, IdleAnimations.Length)]);
-                m_idleTimer = UnityEngine.Random.Range(3, 10);
-            }
+            // if (m_idleTimer <= 0f && IdleAnimations != null && IdleAnimations.Length > 0)
+            // {
+            //     m_aiAnimator.PlayUntilFinished(IdleAnimations[UnityEngine.Random.Range(0, IdleAnimations.Length)]);
+            //     m_idleTimer = UnityEngine.Random.Range(3, 10);
+            // }
         }
 
         private void GrabEnemy()
@@ -561,6 +602,19 @@ public class AllayCompanion : CwaffCompanionController
             this._heldActor = null;
         }
 
+        private void SetupHeldItemRenderer()
+        {
+            PickupObject pickup = PickupObjectDatabase.GetById(this._heldItemId);
+            tk2dSprite pickupSprite = pickup.gameObject.GetComponent<tk2dSprite>();
+            this._heldItemRenderer = Lazy.SpriteObject(pickupSprite.collection, pickupSprite.spriteId);
+            this._heldItemRenderer.HeightOffGround = -2f;
+            this._heldItemRenderer.UpdateZDepth();
+            this._heldItemRenderer.PlaceAtPositionByAnchor(m_companionController.aiActor.sprite.WorldCenter, Anchor.UpperCenter);
+            m_companionController.sprite.AttachRenderer(this._heldItemRenderer);
+            this._heldItemRenderer.gameObject.transform.parent = m_companionController.sprite.transform;
+            SpriteOutlineManager.AddOutlineToSprite(this._heldItemRenderer, Color.black);
+        }
+
         private void GrabItem()
         {
             if (!this._targetItem)
@@ -570,19 +624,15 @@ public class AllayCompanion : CwaffCompanionController
             }
 
             this._heldItemId = this._targetItem.PickupObjectId;
-            this._heldItemRenderer = Lazy.SpriteObject(this._targetItem.sprite.collection, this._targetItem.sprite.spriteId);
-            this._heldItemRenderer.HeightOffGround = -2f;
-            this._heldItemRenderer.UpdateZDepth();
-            this._heldItemRenderer.PlaceAtPositionByAnchor(m_companionController.aiActor.sprite.WorldCenter, Anchor.UpperCenter);
-            m_companionController.sprite.AttachRenderer(this._heldItemRenderer);
-            this._heldItemRenderer.gameObject.transform.parent = m_companionController.sprite.transform;
-            SpriteOutlineManager.AddOutlineToSprite(this._heldItemRenderer, Color.black);
+            SetupHeldItemRenderer();
             UnityEngine.Object.Destroy(this._targetItem.gameObject);
 
             this._targetItem = null;
             this._targetActor = m_companionController.m_owner;
             if (this._state == ITEM_INSPECT)
             {
+                if (this._allayItem)
+                    this._allayItem.scoutItemId = this._heldItemId;
                 this._scouting = true;
                 this._state = OWNER_FOLLOW;
             }
@@ -604,13 +654,15 @@ public class AllayCompanion : CwaffCompanionController
 
         private void DropItem()
         {
-            if (this._heldItemId != -1)
+            if (this._heldItemId != -1 && !GameManager.Instance.IsLoadingLevel)
                 LootEngine.SpawnItem(
                     PickupObjectDatabase.GetById(this._heldItemId).gameObject,
                     m_aiActor.sprite.WorldBottomCenter.ToVector3ZUp(),
                     UnityEngine.Random.insideUnitCircle.normalized,
                     0.1f);
             this._heldItemId = -1;
+            if (this._allayItem && !GameManager.Instance.IsLoadingLevel)
+                this._allayItem.scoutItemId = -1;
 
             if (this._heldItemRenderer)
             {
@@ -721,13 +773,27 @@ public class AllayCompanion : CwaffCompanionController
             m_aiActor.MovementSpeed = newSpeed;
         }
 
+        private void DoSparkles()
+        {
+            const float _SPARKLE_RATE = 0.06f;
+            float now = BraveTime.ScaledTimeSinceStartup;
+            if ((now - this._lastSparkle) < _SPARKLE_RATE)
+                return;
+            this._lastSparkle = now;
+            CwaffVFX.Spawn(prefab: _AllaySparkles, position: m_aiActor.CenterPosition, rotation: Lazy.RandomEulerZ(),
+                endScale: 0.1f, lifetime: 0.5f, fadeOutTime: 1.0f, randomFrame: true);
+        }
+
         private float _lastSparkle = 0.0f;
         private void AdjustMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
         {
             UpdateMovementSpeed();
             DoSpinningChecks();
             if (DoDancingChecks())
+            {
+                DoSparkles();
                 return;
+            }
 
             if (m_companionController.IsBeingPet)
             {
@@ -755,15 +821,8 @@ public class AllayCompanion : CwaffCompanionController
                 voluntaryVel = Lazy.SmoothestLerp(this._lastVel, voluntaryVel, inBounds ? 6f : 10f);
             this._lastVel = voluntaryVel;
 
-            float now = BraveTime.ScaledTimeSinceStartup;
-            const float _SPARKLE_RATE = 0.06f;
-            if ((now - this._lastSparkle) >= _SPARKLE_RATE)
-            {
-                if (voluntaryVel.sqrMagnitude > 10f)
-                    CwaffVFX.Spawn(prefab: _AllaySparkles, position: m_aiActor.CenterPosition, rotation: Lazy.RandomEulerZ(),
-                        endScale: 0.1f, lifetime: 0.5f, fadeOutTime: 1.0f, randomFrame: true);
-                this._lastSparkle = now;
-            }
+            if (voluntaryVel.sqrMagnitude > 10f)
+                DoSparkles();
 
             if (voluntaryVel != Vector2.zero)
             {
@@ -819,8 +878,8 @@ public class AllayCompanion : CwaffCompanionController
             UpdateStateAndTargetPosition();
             if (OffScreenAndInDifferentRoom())
                 m_aiActor.CompanionWarp(m_companionController.m_owner.CenterPosition);
-            else if (CorrectForInaccessibleCell())
-                {} // current cell is inaccessible, do nothing else
+            // else if (CorrectForInaccessibleCell())
+            //     {} // current cell is inaccessible, do nothing else
             else if (ReachedTarget())
                 OnReachedTarget();
             else
