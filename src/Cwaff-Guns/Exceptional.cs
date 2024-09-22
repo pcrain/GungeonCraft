@@ -107,7 +107,8 @@ public class Exceptional : CwaffGun
         Lazy.SpawnChestWithSpecificItem(
           pickup: Lazy.Pickup<Exceptional>(),
           position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success),
-          overrideChestQuality: ItemQuality.S);
+          overrideChestQuality: ItemQuality.S,
+          overrideJunk: true);
     }
 
     public class ExceptionalAmmoDisplay : CustomAmmoDisplay

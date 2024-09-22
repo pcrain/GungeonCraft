@@ -78,11 +78,12 @@ public class AllayCompanion : CwaffCompanionController
             ITEM_DANCE,    // (scout mode) circle around located item once near enough
         }
 
-        #if DEBUG
-            private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f;
-        #else
-            private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
-        #endif
+        // #if DEBUG
+        //     private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f;
+        // #else
+        //     private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
+        // #endif
+        private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
 
         public float PathInterval = 0.25f;
         public float IdealRadius = 3f;

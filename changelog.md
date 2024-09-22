@@ -2,7 +2,7 @@
 
 ## 1.19.0 (TBD)
 
-- Added Chroma
+- Added Chroma and Amethyst Shard
 - Added masteries for Scotsman, Carpet Bomber, and Soul Kaliber
 - Buffed Carpet Bomber
 	- Increased ammo from 360 to 720
@@ -18,6 +18,8 @@
 - Increased visibility of Iron Maid's reticle
 - Fixed rare null deref when [REDCATED] [REDACTED] for [REDACTED]
 - Fixed Quarter Pounder's gold shaders not working properly on Shotgun Kin variants
+- Enemies tossed off of Vladimir can now damage other enemies
+- Added new hat "The Infamous" (sprite thanks to gustavin!)
 
 ## 1.18.5 (2024-09-09)
 

@@ -641,13 +641,15 @@ public static class Lazy
     }
 
     /// <summary>Spawn a chest with a single guaranteed item inside of it</summary>
-    public static Chest SpawnChestWithSpecificItem(PickupObject pickup, IntVector2 position, ItemQuality? overrideChestQuality = null)
+    public static Chest SpawnChestWithSpecificItem(PickupObject pickup, IntVector2 position, ItemQuality? overrideChestQuality = null, bool overrideJunk = false)
     {
       Chest chestPrefab =
         GameManager.Instance.RewardManager.GetTargetChestPrefab(overrideChestQuality ?? pickup.quality)
         ?? GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.B);
       Chest chest = Chest.Spawn(chestPrefab, position);
       chest.forceContentIds = new(){pickup.PickupObjectId};
+      if (overrideJunk)
+        chest.overrideJunkId = pickup.PickupObjectId;
       return chest;
     }
 

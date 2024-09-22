@@ -1,4 +1,5 @@
-﻿namespace CwaffingTheGungy;
+﻿
+namespace CwaffingTheGungy;
 
 public class Vladimir : CwaffGun
 {
@@ -148,9 +149,23 @@ public class Vladimir : CwaffGun
         if (enemy.behaviorSpeculator)
             enemy.behaviorSpeculator.ResetStun(duration: 1f, createVFX: true);
         if (enemy.specRigidbody)
+        {
             enemy.specRigidbody.MoveTowardsTargetOrWall(start: this.PlayerOwner.CenterPosition, target: this.gun.barrelOffset.position.XY());
+            enemy.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
+            enemy.specRigidbody.OnPreRigidbodyCollision += DealDamageWhenTossedAtEnemies;
+        }
         if (enemy.knockbackDoer)
             enemy.knockbackDoer.ApplyKnockback(direction: launchDir, force: _LAUNCH_FORCE);
+    }
+
+    private void DealDamageWhenTossedAtEnemies(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        if (!otherRigidbody || !otherRigidbody.aiActor || !myRigidbody || !myRigidbody.healthHaver)
+            return;
+        myRigidbody.OnPreRigidbodyCollision -= DealDamageWhenTossedAtEnemies;
+        AIActor aIActor = otherRigidbody.aiActor;
+        if (aIActor.IsNormalEnemy && aIActor.healthHaver)
+            aIActor.healthHaver.ApplyDamage(myRigidbody.healthHaver.GetMaxHealth(), myRigidbody.Velocity, ItemName);
     }
 
     public void AbsorbProjectile(Projectile p)

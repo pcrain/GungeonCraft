@@ -63,6 +63,8 @@ public class Cammy
             "psog:baby_good_candle",
             // Knife to a Gunfight
             "ski:baby_good_dodogama",
+            // GungeonCraft
+            "cg:amethyst_shard",
         };
 
         // if (C.DEBUG_BUILD)  // test some wonky offsets

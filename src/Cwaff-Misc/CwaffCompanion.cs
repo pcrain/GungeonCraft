@@ -78,7 +78,7 @@ public static class CwaffCompanionBuilder
                 Lazy.RuntimeWarn($"  FAILED TO ADD CLIP {aname}");
                 return null;
             }
-            Lazy.DebugLog($"  added clip {aname}");
+            // Lazy.DebugLog($"  added clip {aname}");
             animNames[i] = aname;
             clips.Add(clip);
         }
