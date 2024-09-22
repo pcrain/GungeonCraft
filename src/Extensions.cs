@@ -2637,7 +2637,7 @@ public static class Extensions
   public static int FirstGE<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
-      if (vals[i].CompareTo(val) >= 0)
+      if (val.CompareTo(vals[i]) >= 0)
         return i;
     return vals.Length;
   }
@@ -2646,7 +2646,7 @@ public static class Extensions
   public static int FirstGT<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
-      if (vals[i].CompareTo(val) > 0)
+      if (val.CompareTo(vals[i]) > 0)
         return i;
     return vals.Length;
   }
@@ -2655,7 +2655,7 @@ public static class Extensions
   public static int FirstLE<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
-      if (vals[i].CompareTo(val) <= 0)
+      if (val.CompareTo(vals[i]) <= 0)
         return i;
     return vals.Length;
   }
@@ -2664,7 +2664,7 @@ public static class Extensions
   public static int FirstLT<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
-      if (vals[i].CompareTo(val) < 0)
+      if (val.CompareTo(vals[i]) < 0)
         return i;
     return vals.Length;
   }

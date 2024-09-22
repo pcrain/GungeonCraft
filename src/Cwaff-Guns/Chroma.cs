@@ -186,7 +186,7 @@ public class Chroma : CwaffGun
     private const int _MAX_PIGMENT_LEVEL = 10;
     private static readonly int[] _LEVELS = [16,  32,  64,  128,  256,  512,  1024, 2048, 4096, 9999999];
     // private static readonly int[] _LEVELS = [100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 9999999];
-    public static int PigmentPower(int pigmentNum) => 1 + _LEVELS.FirstGT(pigmentNum);
+    public static int PigmentPower(int pigmentNum) => 1 + _LEVELS.FirstLT(pigmentNum);
     // 0, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096
     // public static int PigmentPower(int pigmentNum) => Mathf.Clamp((int)(Mathf.Log(Mathf.Max(1, pigmentNum), 2) - 2), 1, _MAX_PIGMENT_LEVEL);
 
