@@ -235,3 +235,7 @@ kaliber_protection_activate_sound,3.5,1,sound,0
 chroma_fire_sound,0.0,1,sound,0
 chroma_drain_sound,4.0,1,sound,0
 chroma_resist_sound,-2.0,1,sound,0
+allay_drop_sound,3.0,1,sound,0
+allay_find_sound,3.0,1,sound,0
+allay_pet_sound,3.0,1,sound,0
+allay_spawn_sound,3.0,1,sound,0

@@ -4,12 +4,6 @@ using static AllayCompanion.AllayMovementBehavior.State;
 
 /* TODO:
     - add better animations
-    - add sounds
-    - add vfx
-
-    - optimize logic
-    - bug squashing
-    - balancing
 */
 
 public class Allay : CwaffCompanion
@@ -24,7 +18,7 @@ public class Allay : CwaffCompanion
         PassiveItem item  = Lazy.SetupPassive<Allay>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
 
-        AllayCompanion friend = item.InitCompanion<AllayCompanion>(baseFps: 12);
+        AllayCompanion friend = item.InitCompanion<AllayCompanion>(friendName: "allay", baseFps: 12);
         friend.MakeIntangible();
         friend.aiActor.specRigidbody.CollideWithTileMap = true;
         friend.aiActor.MovementSpeed = 7f;
@@ -35,11 +29,15 @@ public class Allay : CwaffCompanion
         bs.MovementBehaviors.Add(new AllayCompanion.AllayMovementBehavior {
             IdleAnimations = [$"{companionName}_idle"],
             });
+
+        AllayCompanion._AllaySparkles = VFX.Create("allay_sparkles", fps: 10, loops: false);
     }
 }
 
 public class AllayCompanion : CwaffCompanionController
 {
+    internal static GameObject _AllaySparkles;
+
     public class AllayMovementBehavior : MovementBehaviorBase
     {
         /* Behavior sketch:
@@ -61,7 +59,11 @@ public class AllayCompanion : CwaffCompanionController
             ITEM_DANCE,    // (scout mode) circle around located item once near enough
         }
 
-        private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f;
+        #if DEBUG
+            private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f;
+        #else
+            private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f / 16f;
+        #endif
 
         public float PathInterval = 0.25f;
         public float IdealRadius = 3f;
@@ -91,6 +93,7 @@ public class AllayCompanion : CwaffCompanionController
         private float _lastGunAngle = 0f;
         private Vector2 _lastVel = default;
         private float _bobAmount = 0f;
+        private bool _wasBeingPet = false;
 
         public override void Start()
         {
@@ -103,6 +106,7 @@ public class AllayCompanion : CwaffCompanionController
             m_aiActor.sprite.UpdateZDepth();
             m_companionController.m_owner.OnRoomClearEvent += PossiblyFindCopyOfHeldItem;
             m_aiActor.specRigidbody.OnTileCollision += OnTileCollision;
+            m_aiActor.gameObject.Play("allay_spawn_sound");
 
             #if DEBUG
                 Commands._OnDebugKeyPressed += ShowState;
@@ -170,6 +174,7 @@ public class AllayCompanion : CwaffCompanionController
                 UnityEngine.Random.insideUnitCircle.normalized,
                 0.1f,
                 doDefaultItemPoof: true).gameObject.GetComponent<PickupObject>();
+            m_aiActor.gameObject.Play("allay_find_sound");
             this._state = ITEM_LOCATE;
         }
 
@@ -223,13 +228,11 @@ public class AllayCompanion : CwaffCompanionController
             PlayerController owner = m_companionController.m_owner;
             if (owner.CurrentRoom is not RoomHandler room)
                 return null;
-            foreach (DebrisObject d in CwaffEvents._DebrisPickups)
+            int n = CwaffEvents._DebrisPickups.Count;
+            for (int i = 0; i < n; ++i)
             {
-                if (!d || d.transform.position.GetAbsoluteRoom() != room)
-                    continue;
-                if (d.gameObject.GetComponent<PickupObject>() is not PickupObject pickup)
-                    continue;
-                if (pickup.IsBeingSold)
+                PickupObject pickup = CwaffEvents._DebrisPickups[i];
+                if (!pickup || pickup.IsBeingSold)
                     continue;
                 bool health      = pickup is HealthPickup healthPickup && !healthPickup.m_pickedUp;
                 bool ammo        = pickup is AmmoPickup ammoPickup && !ammoPickup.m_pickedUp;
@@ -238,7 +241,9 @@ public class AllayCompanion : CwaffCompanionController
                 bool whitelisted = _PickupWhitelist.Contains(pickup.PickupObjectId);
                 if (!(health || ammo || key || blank || whitelisted))
                     continue;
-                float sqrDist = (owner.CenterPosition - d.transform.position.XY()).sqrMagnitude;
+                if (pickup.transform.position.GetAbsoluteRoom() != room) // save a more expensive check for later
+                    continue;
+                float sqrDist = (owner.CenterPosition - pickup.transform.position.XY()).sqrMagnitude;
                 if (nearby == (sqrDist < _MAX_ITEM_DIST_SQR))
                     return pickup.GetComponent<PickupObject>();
             }
@@ -421,7 +426,7 @@ public class AllayCompanion : CwaffCompanionController
             }
         }
 
-        //NOTE: from MachoBraceSynergyProcessor::Update()
+        //NOTE: adapted from MachoBraceSynergyProcessor::Update()
         private void DoSpinningChecks()
         {
             if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel || GameManager.Instance.IsPaused || BraveTime.DeltaTime == 0.0f)
@@ -457,6 +462,7 @@ public class AllayCompanion : CwaffCompanionController
             if (FindCarriableItem(nearby: true) is not PickupObject item)
                 return;
 
+            m_aiActor.gameObject.Play("allay_find_sound");
             this._state = ITEM_INSPECT;
             this._targetItem = item;
             this._targetActor = null;
@@ -516,6 +522,7 @@ public class AllayCompanion : CwaffCompanionController
         private void DropEnemyInPit()
         {
             DropEnemy(droppedEarly: false);
+            m_aiActor.gameObject.Play("allay_drop_sound");
             this._state = OWNER_FOLLOW;
             DetermineNewTarget();
         }
@@ -589,6 +596,7 @@ public class AllayCompanion : CwaffCompanionController
         private void DropItemNearPlayer()
         {
             DropItem();
+            m_aiActor.gameObject.Play("allay_drop_sound");
             this._targetActor = null;
             this._state = OWNER_FOLLOW;
             DetermineNewTarget();
@@ -599,7 +607,7 @@ public class AllayCompanion : CwaffCompanionController
             if (this._heldItemId != -1)
                 LootEngine.SpawnItem(
                     PickupObjectDatabase.GetById(this._heldItemId).gameObject,
-                    m_companionController.aiActor.sprite.WorldBottomCenter.ToVector3ZUp(),
+                    m_aiActor.sprite.WorldBottomCenter.ToVector3ZUp(),
                     UnityEngine.Random.insideUnitCircle.normalized,
                     0.1f);
             this._heldItemId = -1;
@@ -713,12 +721,23 @@ public class AllayCompanion : CwaffCompanionController
             m_aiActor.MovementSpeed = newSpeed;
         }
 
+        private float _lastSparkle = 0.0f;
         private void AdjustMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
         {
             UpdateMovementSpeed();
             DoSpinningChecks();
-            if (DoDancingChecks() || m_companionController.IsBeingPet)
+            if (DoDancingChecks())
                 return;
+
+            if (m_companionController.IsBeingPet)
+            {
+                if (!this._wasBeingPet)
+                    m_aiActor.gameObject.Play("allay_pet_sound");
+                this._wasBeingPet = true;
+                return;
+            }
+
+            this._wasBeingPet = false;
             bool inBounds = m_aiActor.specRigidbody.UnitBottomCenter.InBounds();
             if (inBounds && this._state != ENEMY_CARRY && !m_aiActor.specRigidbody.CollideWithTileMap)
             {
@@ -733,8 +752,19 @@ public class AllayCompanion : CwaffCompanionController
                 voluntaryVel += 2f * delta.normalized; // nudge towards our target if we're close
 
             if (voluntaryVel.sqrMagnitude > 1f || this._lastVel.sqrMagnitude > 1f)
-                voluntaryVel = Lazy.SmoothestLerp(this._lastVel, voluntaryVel, inBounds ? 2f : 10f);
+                voluntaryVel = Lazy.SmoothestLerp(this._lastVel, voluntaryVel, inBounds ? 6f : 10f);
             this._lastVel = voluntaryVel;
+
+            float now = BraveTime.ScaledTimeSinceStartup;
+            const float _SPARKLE_RATE = 0.06f;
+            if ((now - this._lastSparkle) >= _SPARKLE_RATE)
+            {
+                if (voluntaryVel.sqrMagnitude > 10f)
+                    CwaffVFX.Spawn(prefab: _AllaySparkles, position: m_aiActor.CenterPosition, rotation: Lazy.RandomEulerZ(),
+                        endScale: 0.1f, lifetime: 0.5f, fadeOutTime: 1.0f, randomFrame: true);
+                this._lastSparkle = now;
+            }
+
             if (voluntaryVel != Vector2.zero)
             {
                 this._bobAmount = 0f;
@@ -759,6 +789,15 @@ public class AllayCompanion : CwaffCompanionController
             m_aiActor.specRigidbody.Reinitialize();
             m_aiActor.aiAnimator.FacingDirection = (nextPos - pos).ToAngle();
             return true;
+        }
+
+        private bool OffScreenAndInDifferentRoom()
+        {
+            Vector2 pos = m_aiActor.CenterPosition;
+            if (GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.4f))
+                return false;
+            RoomHandler ownerRoom = m_companionController.m_owner.CurrentRoom;
+            return (ownerRoom == null || ownerRoom != pos.GetAbsoluteRoom());
         }
 
         public override BehaviorResult Update()
@@ -792,15 +831,6 @@ public class AllayCompanion : CwaffCompanionController
             // #endif
 
             return BehaviorResult.SkipRemainingClassBehaviors;
-        }
-
-        private bool OffScreenAndInDifferentRoom()
-        {
-            RoomHandler ownerRoom = m_companionController.m_owner.CurrentRoom;
-            Vector2 pos = m_aiActor.CenterPosition;
-            if (ownerRoom != null && ownerRoom == pos.GetAbsoluteRoom())
-                return false;
-            return !GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.05f);
         }
     }
 }

@@ -182,15 +182,15 @@ public static class CwaffEvents // global custom events we can listen for
     }
 
     //REFACTOR: put this in some sort of caching class
-    internal static List<DebrisObject> _DebrisPickups = new();
+    internal static List<PickupObject> _DebrisPickups = new();
 
     [HarmonyPatch(typeof(DebrisObject), nameof(DebrisObject.Start))]
     private class DebrisObjectStartPatch
     {
         static void Postfix(DebrisObject __instance)
         {
-            if (__instance.IsPickupObject)
-                _DebrisPickups.Add(__instance);
+            if (__instance.IsPickupObject && __instance.gameObject.GetComponent<PickupObject>() is PickupObject pickup)
+                _DebrisPickups.Add(pickup);
         }
     }
 
@@ -199,8 +199,8 @@ public static class CwaffEvents // global custom events we can listen for
     {
         static void Prefix(DebrisObject __instance)
         {
-            if (__instance.IsPickupObject)
-                _DebrisPickups.TryRemove(__instance);
+            if (__instance.IsPickupObject && __instance.gameObject.GetComponent<PickupObject>() is PickupObject pickup)
+                _DebrisPickups.TryRemove(pickup);
         }
     }
 }

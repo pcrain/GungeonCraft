@@ -8,7 +8,7 @@ public abstract class CwaffCompanionController : CompanionController
 
 public static class CwaffCompanionBuilder
 {
-    public static Friend InitCompanion<Friend>(this PassiveItem item, int baseFps = 4, List<string> extraAnims = null)
+    public static Friend InitCompanion<Friend>(this PassiveItem item, string friendName = null, int baseFps = 4, List<string> extraAnims = null)
         where Friend : CwaffCompanionController
     {
         if (item is not CwaffCompanion cc)
@@ -17,7 +17,7 @@ public static class CwaffCompanionBuilder
             return null;
         }
 
-        string name = item.itemName.ToID();
+        string name = (friendName ?? item.itemName).ToID();
 
         Friend friend = CompanionBuilder.BuildPrefab(name, $"{C.MOD_PREFIX}:{name}_companion", $"{name}_idle_001", IntVector2.Zero, IntVector2.One)
           .AddComponent<Friend>();
