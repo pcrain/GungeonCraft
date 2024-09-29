@@ -6,7 +6,7 @@ public class C // constants and common variables
 
     public const string MOD_NAME     = "GungeonCraft";
     public const string MOD_INT_NAME = "CwaffingTheGungy";
-    public const string MOD_VERSION  = "1.19.1";
+    public const string MOD_VERSION  = "1.19.2";
     public const string MOD_GUID     = "pretzel.etg.cwaff";
     public const string MOD_PREFIX   = "cg";
 

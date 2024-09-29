@@ -2,6 +2,7 @@ namespace CwaffingTheGungy;
 
 public static class CwaffHats
 {
+    private static int _NumHats = 0;
     public static void Init()
     {
       if (C.DEBUG_BUILD)
@@ -9,6 +10,7 @@ public static class CwaffHats
         EasyHat(name: "debug_hat",      offset: null, excluded: true);
         EasyHat(name: "debug_glasses",  offset: null, onEyes: true, excluded: true);
         EasyHat(name: "arrow_hat",      offset: null, fps: 8, locked: true, excluded: true);
+        _NumHats -= 3;
       }
       EasyHat(name: "toad_hat",              offset: new IntVector2( 0, -3));
       EasyHat(name: "bunny_hood",            offset: new IntVector2( 0, -3));
@@ -99,6 +101,8 @@ public static class CwaffHats
 
       EasyHat(name: "the_infamous",          offset: new IntVector2( 0, -3), autoFlip: true);
       EasyHat(name: "bumbler",               offset: new IntVector2( 0, -3), autoFlip: true);
+
+      Lazy.DebugLog($"Successfully initialized {_NumHats} hats! C:");
     }
 
     private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null, bool excluded = false, bool? autoFlip = null, Hat.HatDepthType? depth = null)
@@ -123,5 +127,6 @@ public static class CwaffHats
         // showSilhouetteWhenLocked: true,
         excludeFromHatRoom: excluded
         );
+        ++_NumHats;
     }
 }
