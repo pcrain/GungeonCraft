@@ -13,7 +13,7 @@ public class Wavefront : CwaffGun
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320, idleFps: 12, shootFps: 50, reloadFps: 16,
             muzzleVFX: "muzzle_wavefront", muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 10f, fireAudio: "wavefront_fire_sound")
           .SetReloadAudio("wavefront_reload_sound", 0, 6, 12, 18)
-          .InitProjectile(GunData.New(clipSize: 8, cooldown: 0.125f, shootStyle: ShootStyle.Automatic, range: 999999f, speed: 60f, shouldRotate: true,
+          .InitProjectile(GunData.New(damage: 12f, clipSize: 8, cooldown: 0.125f, shootStyle: ShootStyle.Automatic, range: 999999f, speed: 60f, shouldRotate: true,
             customClip: true, sprite: "wavefront_projectile_alt", scale: 0.25f, fps: 24, anchor: Anchor.MiddleCenter))
           .SetEnemyImpactVFX(VFX.CreatePool("wavefront_impact_particles", fps: 24, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f, emissivePower: 2f))
           .Attach<TeslaProjectileBehavior>();
@@ -22,8 +22,8 @@ public class Wavefront : CwaffGun
 
 public class TeslaProjectileBehavior : MonoBehaviour
 {
-    private const float _LIFESPAN   =  30.0f; // projectiles dissipate after 30 seconds
-    private const float _ACCEL      = 500.0f;
+    private const float _LIFESPAN   =  10.0f; // projectiles dissipate after 30 seconds
+    private const float _ACCEL      = 350.0f;
     private const float _MIN_SPEED  =  60.0f;
     private const float _MAX_SPEED  =  90.0f;
     private const float _PRECESSION =   1.0f; // speed at which projectiles change their angle of orbit around the player

@@ -12,7 +12,7 @@ public class AmazonPrimer : CwaffActive
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<AmazonPrimer>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.B;
+        item.quality      = ItemQuality.A;
         item.consumable   = true;
         item.CanBeDropped = true;
 

@@ -8,7 +8,14 @@
 - Fixed Hand Cannon being able to stun companions
 - Fixed Frisbee colliding with orbitals (e.g., Guon Stones and certain companions)
 - Fixed issue with enemies launched by Vladimir colliding with Vladimir itself, causing unpredictable knockback angles
-- Insurance Policy sprites in Insurance Shop now match the player when possible (for vanilla characters)
+- Made Insurance Policy sprites in Insurance Shop now match the player when possible (i.e., for vanilla characters)
+- Fixed flipped sprites when facing left with The Infamous Hat
+- Changed Vacuum Cleaner's ammo display sprite for amount of debris vacuumed to something more suitable (hopefully)
+- Rebalanced Wavefront:
+	- Increased projectile damage from 8 to 12
+	- Increased projectile orbit radius by about 40%
+	- Decreased max projectile lifetime from 30 seconds to 10 seconds
+- Changed Amazon Primer's quality from B to A (extremely strong if you have a lot of casings near the end floors)
 
 ## 1.19.1 (2024-09-22)
 
