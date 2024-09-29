@@ -8,6 +8,7 @@
 - Fixed Hand Cannon being able to stun companions
 - Fixed Frisbee colliding with orbitals (e.g., Guon Stones and certain companions)
 - Fixed issue with enemies launched by Vladimir colliding with Vladimir itself, causing unpredictable knockback angles
+- Insurance Policy sprites in Insurance Shop now match the player when possible (for vanilla characters)
 
 ## 1.19.1 (2024-09-22)
 

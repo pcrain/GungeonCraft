@@ -89,6 +89,7 @@ public class Kevlar
         shop.SetShotAnimation(paths: ResMap.Get("kevlar_offended"), fps: 8);
 
         shop.shop.AddComponent<PreventMultipleInsuranceShopSpawns>();
+        shop.shop.AddComponent<UpdateInsuranceSpritesToMatchCharacter>();
     }
 
     private static bool PlayerHasGoodItem(SpawnConditions conds)
@@ -121,5 +122,26 @@ public class Kevlar
             Kevlar._SpawnedThisRun = true;
         }
     }
-}
 
+    private class UpdateInsuranceSpritesToMatchCharacter : MonoBehaviour
+    {
+        private void Start()
+        {
+            if (!base.gameObject || !base.gameObject.transform || base.gameObject.transform.parent is not Transform shopTransform)
+                return;
+            foreach (Transform child in shopTransform)
+            {
+                if (!child || !child.gameObject)
+                    continue;
+                CustomShopItemController[] shopItems = child.gameObject.GetComponentsInChildren<CustomShopItemController>();
+                if (shopItems == null || shopItems.Length == 0)
+                    continue;
+                foreach (CustomShopItemController shopItem in shopItems)
+                    if (shopItem.item is InsurancePolicy)
+                        shopItem.sprite.SetSprite(InsurancePolicy.GetSpriteIdForCharacter());
+            }
+        }
+    }
+
+
+}
