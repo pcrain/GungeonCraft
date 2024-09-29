@@ -98,6 +98,7 @@ public static class CwaffHats
       EasyHat(name: "viking_helmet",         offset: new IntVector2( 0, -3));
 
       EasyHat(name: "the_infamous",          offset: new IntVector2( 0, -3), autoFlip: true);
+      EasyHat(name: "bumbler",               offset: new IntVector2( 0, -3), autoFlip: true);
     }
 
     private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null, bool excluded = false, bool? autoFlip = null, Hat.HatDepthType? depth = null)

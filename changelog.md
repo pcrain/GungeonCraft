@@ -2,6 +2,7 @@
 
 ## 1.19.2 (2024-09-29)
 
+- Added new Bumbler hat C:
 - Fixed null deref caused by Soul Kaliber attempting to apply soul link damage to non-existent enemies
 
 ## 1.19.1 (2024-09-22)
