@@ -7,6 +7,7 @@
 - Fixed invalid operation exception caused by logic for Hand Cannon's slap
 - Fixed Hand Cannon being able to stun companions
 - Fixed Frisbee colliding with orbitals (e.g., Guon Stones and certain companions)
+- Fixed issue with enemies launched by Vladimir colliding with Vladimir itself, causing unpredictable knockback angles
 
 ## 1.19.1 (2024-09-22)
 

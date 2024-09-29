@@ -102,6 +102,7 @@ public class Vladimir : CwaffGun
             if (!hh.IsAlive)
             {
                 enemy.specRigidbody.RegisterSpecificCollisionException(player.specRigidbody);
+                enemy.specRigidbody.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile));
                 TossOff(enemy: enemy, launchDir: launchDir);
             }
         }
@@ -155,7 +156,11 @@ public class Vladimir : CwaffGun
             enemy.specRigidbody.OnPreRigidbodyCollision += DealDamageWhenTossedAtEnemies;
         }
         if (enemy.knockbackDoer)
+        {
+            enemy.knockbackDoer.m_activeKnockbacks.Clear();
+            enemy.knockbackDoer.ClearContinuousKnockbacks();
             enemy.knockbackDoer.ApplyKnockback(direction: launchDir, force: _LAUNCH_FORCE);
+        }
     }
 
     private void DealDamageWhenTossedAtEnemies(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
