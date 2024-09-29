@@ -193,14 +193,11 @@ public class SoulLinkStatus : MonoBehaviour
 
     public bool ShareThePain(float damage)
     {
-        HealthHaver hh = this._enemy.healthHaver;
-        float curHealth = hh.currentHealth;
-        float maxHealth = hh.maximumHealth;
-        hh.ApplyDamage(damage, new Vector2(0f,0f), "Soul Link",
-            CoreDamageTypes.Magic, DamageCategory.Unstoppable,
-            true, null, false);
-        hh.knockbackDoer.ApplyKnockback(new Vector2(0f,0f), 2f);
+        if (!this._enemy || this._enemy.healthHaver is not HealthHaver hh || hh.IsDead)
+            return false;
 
+        hh.ApplyDamage(damage, Vector2.zero, "Soul Link", CoreDamageTypes.Magic, DamageCategory.Unstoppable, true, null, false);
+        hh.knockbackDoer.ApplyKnockback(new Vector2(0f,0f), 2f);
         if (this._lastVfxTime + _MAX_VFX_RATE > BraveTime.ScaledTimeSinceStartup)
             return false; // don't play any sounds
 
