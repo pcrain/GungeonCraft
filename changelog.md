@@ -6,6 +6,7 @@
 - Fixed null deref caused by Soul Kaliber attempting to apply soul link damage to non-existent enemies
 - Fixed invalid operation exception caused by logic for Hand Cannon's slap
 - Fixed Hand Cannon being able to stun companions
+- Fixed Frisbee colliding with orbitals (e.g., Guon Stones and certain companions)
 
 ## 1.19.1 (2024-09-22)
 
