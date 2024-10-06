@@ -140,9 +140,6 @@ public class SubtractorBeamAmmoDisplay : CustomAmmoDisplay
         if (!this._sub || !this._sub._mastered)
             return false;
 
-        uic.SetAmmoCountLabelColor(Color.white);
-        uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-        uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
         float damage = this._sub._lastHitEnemy ? this._sub._lastHitEnemy.currentHealth : 0f;
         uic.GunAmmoCountLabel.Text = $"[color #66dd66]{damage}[/color]\n{this._owner.VanillaAmmoDisplay()}";
         return true;

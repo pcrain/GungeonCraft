@@ -187,10 +187,6 @@ public class SuncasterAmmoDisplay : CustomAmmoDisplay
         if (!this._owner)
             return false;
 
-        uic.SetAmmoCountLabelColor(Color.white);
-        Vector3 relVec = Vector3.zero;
-        uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-        uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
         int prismsLeft = this._suncaster.maxPrisms - this._suncaster.extantPrisms.Count;
         uic.GunAmmoCountLabel.Text = $"[sprite \"prism_ui_icon\"][color #6666dd]x{prismsLeft}[/color]\n{this._gun.CurrentAmmo}";
         return true;

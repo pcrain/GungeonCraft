@@ -151,8 +151,6 @@ public class KiBlastAmmoDisplay : CustomAmmoDisplay
             return false;
 
         uic.SetAmmoCountLabelColor(Color.cyan);
-        uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-        uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
         uic.GunAmmoCountLabel.Text = $"{this._gun.CurrentAmmo} Ki";
         return true;
     }

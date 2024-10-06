@@ -153,10 +153,6 @@ public class Breegull : CwaffGun
             if (!this._owner)
                 return false;
 
-            uic.SetAmmoCountLabelColor(Color.white);
-            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
-
             string uiString = Breegull._Eggs[this._breegull._currentEggType].ui;
             uic.GunAmmoCountLabel.Text = $"[sprite \"{uiString}\"]\n{this._owner.VanillaAmmoDisplay()}";
             return true;

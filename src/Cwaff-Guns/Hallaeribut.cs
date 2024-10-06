@@ -152,9 +152,6 @@ public class Hallaeribut : CwaffGun
             if (!this._owner)
                 return false;
 
-            uic.SetAmmoCountLabelColor(Color.white);
-            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
             if (this._hal._state == Famished)
                 uic.GunAmmoCountLabel.Text = $"[color #bb33bb]{this._hal._state}[/color]\n{this._owner.VanillaAmmoDisplay()}";
             else

@@ -809,10 +809,7 @@ public class Femtobyte : CwaffGun
             if (!this._owner)
                 return false;
 
-            uic.SetAmmoCountLabelColor(Color.white);
-            uic.GunAmmoCountLabel.AutoSize = true; // enable dynamic width
-            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
+            // uic.GunAmmoCountLabel.AutoSize = true; // enable dynamic width
 
             if (this._femto._displayNameDirty || this._cachedDisplayName.IsNullOrWhiteSpace())
             {

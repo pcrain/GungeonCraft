@@ -332,11 +332,6 @@ public class GlockarinaAmmoDisplay : CustomAmmoDisplay
         if (!this._owner)
             return false;
 
-        uic.SetAmmoCountLabelColor(Color.white);
-        Vector3 relVec = Vector3.zero;
-        uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-        uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
-
         string uiString = null;
         switch(this._glock._mode)
         {

@@ -194,10 +194,6 @@ public class VacuumCleaner : CwaffGun
             if (!this._owner)
                 return false;
 
-            uic.SetAmmoCountLabelColor(Color.white);
-            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
-
             if (this._owner.HasSynergy(Synergy.MASTERY_VACUUM_CLEANER))
                 uic.GunAmmoCountLabel.Text = $"[sprite \"corpse_ui\"]x{this._vac.corpsesSucked}\n[sprite \"vacuum_debris_ui\"]x{this._vac.debrisSucked}";
             else

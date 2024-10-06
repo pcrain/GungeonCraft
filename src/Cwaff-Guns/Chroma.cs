@@ -283,9 +283,6 @@ public class Chroma : CwaffGun
             if (!this._owner)
                 return false;
 
-            uic.SetAmmoCountLabelColor(Color.white);
-            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
             if (this._chroma._ammoDisplayDirty)
             {
                 int[] pp = this._chroma._pigmentPowers;

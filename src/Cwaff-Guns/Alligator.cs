@@ -171,9 +171,6 @@ public class Alligator : CwaffGun
             if (!this._owner)
                 return false;
 
-            uic.SetAmmoCountLabelColor(Color.white);
-            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
             string energy = Mathf.RoundToInt(_ENERGY_MULT * this._alligator.energyProduction).ToString();
             uic.GunAmmoCountLabel.Text = $"[color #00ffff]{energy}[/color][sprite \"charge_ui\"]\n{this._owner.VanillaAmmoDisplay()}";
             return true;

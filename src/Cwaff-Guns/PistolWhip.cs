@@ -88,9 +88,6 @@ public class PistolWhip : CwaffGun
             if (!this._owner || !this._owner.HasSynergy(Synergy.MASTERY_PISTOL_WHIP))
                 return false;
 
-            uic.SetAmmoCountLabelColor(Color.white);
-            uic.GunAmmoCountLabel.AutoHeight = true; // enable multiline text
-            uic.GunAmmoCountLabel.ProcessMarkup = true; // enable multicolor text
             uic.GunAmmoCountLabel.Text = $"[sprite \"mini_blank_ui\"]x{this.whip.miniBlanks}\n[sprite \"infinite-big\"]";
             return true;
         }
