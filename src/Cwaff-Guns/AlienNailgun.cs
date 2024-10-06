@@ -24,13 +24,15 @@ public class AlienNailgun : CwaffGun
     internal static HashSet<AIActor> _Replicants   = new();
 
     private Coroutine _dnaReconstruct       = null;
-    private List<string> _registeredEnemies = new();
     private int _spawnIndex                 = -1;
     private string _targetGuid              = null;
     private float _curChargeTime            = 0.0f;
     private bool _constructionComplete      = false;
     private List<GameObject> _fragments     = new();
     private GameObject _preview             = null;
+
+    [SerializeField]
+    private List<string> _registeredEnemies = new();
 
     public static void Init()
     {
@@ -68,6 +70,8 @@ public class AlienNailgun : CwaffGun
 
         if (this._preview) // only cycle if the preview is already visible, otherwise just show the current selection
             this._spawnIndex = (this._spawnIndex + 1) % this._registeredEnemies.Count;
+        if (this._spawnIndex < 0)
+            this._spawnIndex = 0;
         SwitchEnemyToSpawn(this._registeredEnemies[this._spawnIndex]);
     }
 
@@ -169,6 +173,8 @@ public class AlienNailgun : CwaffGun
         StaticReferenceManager.ProjectileAdded += CheckFromReplicantOwner;
         CwaffEvents.OnBankBulletOwnerAssigned -= CheckFromReplicantOwner;
         CwaffEvents.OnBankBulletOwnerAssigned += CheckFromReplicantOwner;
+        player.OnAnyEnemyReceivedDamage -= this.CheckIfEnemyKilled;
+        player.OnAnyEnemyReceivedDamage += this.CheckIfEnemyKilled;
         base.OnPlayerPickup(player);
         player.OnRoomClearEvent += DestroyReplicants;
     }
@@ -176,15 +182,51 @@ public class AlienNailgun : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         player.OnRoomClearEvent -= DestroyReplicants;
+        player.OnAnyEnemyReceivedDamage -= this.CheckIfEnemyKilled;
         StopReconstruction();
         DestroyReplicants(player);
         base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnAnyEnemyReceivedDamage -= this.CheckIfEnemyKilled;
+        base.OnDestroy();
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
         StopReconstruction();
+    }
+
+    private void CheckIfEnemyKilled(float damage, bool fatal, HealthHaver enemy)
+    {
+        if (!this)
+        {
+            Lazy.RuntimeWarn("Calling an event from a nonexistent Alien Nailgun, tell pretzel");
+            return;
+        }
+        if (!fatal)
+            return;
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+        if (!player.IsInCombat || !player.HasSynergy(Synergy.MASTERY_ALIEN_NAILGUN))
+            return;
+        if (enemy.aiActor is not AIActor actor)
+            return;
+        if (string.IsNullOrEmpty(actor.EnemyGuid))
+            return;
+        if (!this._registeredEnemies.Contains(actor.EnemyGuid))
+            return;
+
+        AIActor replicant = Replicant.Create(actor.EnemyGuid, actor.CenterPosition, ApplyReplicantShaders, hasCollision: false);
+        if (!replicant)
+            return;
+
+        _Replicants.Add(replicant);
+        player.gameObject.Play("replicant_created_sound");
     }
 
     private static void CheckFromReplicantOwner(Projectile p)

@@ -24,7 +24,7 @@ public static class Lazy
     /// <summary>Warn with the console</summary>
     public static void RuntimeWarn(string text)
     {
-        ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
+        ETGModConsole.Log($"<color=#ffffaaff>{text}; tell Captain Pretzel</color>");
     }
 
     private static readonly Dictionary<Type, PickupObject> _CustomPickups = new();

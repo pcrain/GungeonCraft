@@ -2,10 +2,10 @@
 
 ## 1.19.3 (TBD)
 
-- Added masteries for Lightwing, Magunet, and Derail Gun
+- Added masteries for Lightwing, Magunet, Derail Gun, and Alien Nailgun
 
 - Fixed potential null deref caused by Magunet being destroyed while holding debris in stasis
-- Magunet debris now pushes enemies back 
+- Fixed Alien Nailgun losing all DNA information when dropped and picked back up
 
 ## 1.19.2 (2024-09-29)
 

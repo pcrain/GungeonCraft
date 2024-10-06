@@ -173,6 +173,8 @@ public static class CwaffSynergies
             .MultSpread(0.5f).MultProjSpeed(2f);
         // Derail gun leaks oil onto the ground while active and produces green fire that doesn't harm the player.
         NewMastery<MasteryOfDerailGun>(MASTERY_DERAIL_GUN, DerailGun.ItemName);
+        // Killing any enemy instantly spawns a replicant of that enemy if Alien Nailgun has previously registered its DNA, regardless of active gun.
+        NewMastery<MasteryOfAlienNailgun>(MASTERY_ALIEN_NAILGUN, AlienNailgun.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -420,6 +422,7 @@ internal class MasteryOfSoulKaliber     : MasteryDummyItem {}
 internal class MasteryOfLightwing       : MasteryDummyItem {}
 internal class MasteryOfMagunet         : MasteryDummyItem {}
 internal class MasteryOfDerailGun       : MasteryDummyItem {}
+internal class MasteryOfAlienNailgun    : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -491,4 +494,5 @@ public enum Synergy {
     MASTERY_LIGHTWING,
     MASTERY_MAGUNET,
     MASTERY_DERAIL_GUN,
+    MASTERY_ALIEN_NAILGUN,
 };
