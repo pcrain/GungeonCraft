@@ -131,6 +131,7 @@ public class Alyx : CwaffGun
         // If we've decayed at all, create poison goop under our feet
         if (newAmmo < this.gun.CurrentAmmo || newMaxAmmo < this.gun.GetBaseMaxAmmo())
         {
+            //REFACTOR: cache this
             if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef) is DeadlyDeadlyGoopManager gooper)
             {
                 if (this.PlayerOwner)

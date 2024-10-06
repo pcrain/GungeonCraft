@@ -1098,6 +1098,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
     public static GoopDefinition SeltzerGoop;
     public static GoopDefinition CoffeeGoop;
     public static GoopDefinition HolyGoop;
+    public static GoopDefinition GreenOilGoop;
 
     public static List<GoopDefinition> ColorGoops = new List<GoopDefinition>();
     public static List<Color> ColorGoopColors     = new List<Color>
@@ -1213,5 +1214,9 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
                 CooldownMultiplier           = 1f,
                 OnlyAffectPlayerWhenGrounded = false,
             };
+
+        //Set up Green Oil Goop
+        GreenOilGoop = UnityEngine.Object.Instantiate<GoopDefinition>(OilDef);
+            GreenOilGoop.UsesGreenFire = true;
     }
 }

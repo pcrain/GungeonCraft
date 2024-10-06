@@ -171,6 +171,8 @@ public static class CwaffSynergies
         // Debris is launched faster and with less spread, and pierces through enemies.
         NewMastery<MasteryOfMagunet>(MASTERY_MAGUNET, Magunet.ItemName)
             .MultSpread(0.5f).MultProjSpeed(2f);
+        // Derail gun leaks oil onto the ground while active and produces green fire that doesn't harm the player.
+        NewMastery<MasteryOfDerailGun>(MASTERY_DERAIL_GUN, DerailGun.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -417,6 +419,7 @@ internal class MasteryOfCarpetBomber    : MasteryDummyItem {}
 internal class MasteryOfSoulKaliber     : MasteryDummyItem {}
 internal class MasteryOfLightwing       : MasteryDummyItem {}
 internal class MasteryOfMagunet         : MasteryDummyItem {}
+internal class MasteryOfDerailGun       : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -487,4 +490,5 @@ public enum Synergy {
     MASTERY_SOUL_KALIBER,
     MASTERY_LIGHTWING,
     MASTERY_MAGUNET,
+    MASTERY_DERAIL_GUN,
 };

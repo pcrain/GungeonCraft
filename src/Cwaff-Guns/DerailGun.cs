@@ -7,6 +7,8 @@ public class DerailGun : CwaffGun
     public static string LongDescription  = "Fires high-velocity miniature train engines that spread oil as they travel and explode violently upon impact.";
     public static string Lore             = "The brainchild of a smart alec researcher who was tasked with designing a rail gun that used the most highly-conductive materials available. In a rare case of two wrongs making a right, the heat generated when launching the cheap plastic train projectiles had the tendency to melt them back into petroleum in transit, posing a hilarious fire hazard when properly misused.";
 
+    private static DeadlyDeadlyGoopManager _OilGooper = null;
+
     public static void Init()
     {
         Lazy.SetupGun<DerailGun>(ItemName, ShortDescription, LongDescription, Lore)
@@ -45,6 +47,8 @@ public class DerailGun : CwaffGun
         player.OnReceivedDamage += this.OnReceivedDamage;
         gun.SetAnimationFPS(gun.idleAnimation, 11); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.Play();
+        if (!_OilGooper)
+            _OilGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.GreenOilGoop);
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -79,5 +83,14 @@ public class DerailGun : CwaffGun
             return;
         if (!this.gun.IsReloading && this.gun.ClipShotsRemaining < Mathf.Min(this.gun.ClipCapacity, this.gun.CurrentAmmo))
             this.gun.Reload(); // force reload immediately after firing to prevent single frame of idle animation looking funny
+        if (_OilGooper && this.PlayerOwner.HasSynergy(Synergy.MASTERY_DERAIL_GUN))
+            _OilGooper.AddGoopCircle(this.PlayerOwner.SpriteBottomCenter.XY() - this.PlayerOwner.m_currentGunAngle.ToVector(1f), 0.75f);
+    }
+
+    public override void PostProcessProjectile(Projectile projectile)
+    {
+        base.PostProcessProjectile(projectile);
+        if (_OilGooper && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_DERAIL_GUN))
+            projectile.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.GreenOilGoop;
     }
 }
