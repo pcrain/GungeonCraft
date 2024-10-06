@@ -166,6 +166,8 @@ public static class CwaffSynergies
             .MultChargeRate(4f).MultProjSpeed(2f);
         // Soul-linked enemies may take damage instead of the player whenever the player gets hit. The chance per enemy is equal to 25% + (5% * Curse), capping at 75% per enemy.
         NewMastery<MasteryOfSoulKaliber>(MASTERY_SOUL_KALIBER, SoulKaliber.ItemName);
+        // Birds can phase through inner walls and collect up to three bullets on the way back from an enemy.
+        NewMastery<MasteryOfLightwing>(MASTERY_LIGHTWING, Lightwing.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -410,6 +412,7 @@ internal class MasteryOfKALI            : MasteryDummyItem {}
 internal class MasteryOfScotsman        : MasteryDummyItem {}
 internal class MasteryOfCarpetBomber    : MasteryDummyItem {}
 internal class MasteryOfSoulKaliber     : MasteryDummyItem {}
+internal class MasteryOfLightwing       : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -478,4 +481,5 @@ public enum Synergy {
     MASTERY_SCOTSMAN,
     MASTERY_CARPET_BOMBER,
     MASTERY_SOUL_KALIBER,
+    MASTERY_LIGHTWING,
 };

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.19.3 (TBD)
+
+- Added mastery for Lightwing
+
 ## 1.19.2 (2024-09-29)
 
 #### Features:

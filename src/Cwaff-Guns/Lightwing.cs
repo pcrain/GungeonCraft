@@ -1,4 +1,5 @@
-﻿namespace CwaffingTheGungy;
+﻿
+namespace CwaffingTheGungy;
 
 public class Lightwing : CwaffGun
 {
@@ -53,8 +54,9 @@ public class LightwingProjectile : MonoBehaviour
     private Projectile _targetProjectile = null;
     private EasyTrailBullet _trail       = null;
     private float _topSpeed              = 0f;
-    private bool _retrievedAmmo          = false;
+    private int _retrievedAmmo           = 0;
     private float _speedMult             = 1.0f;
+    private bool _mastered               = false;
     private State _state_internal        = State.NEUTRAL;
 
     private State _state
@@ -110,6 +112,7 @@ public class LightwingProjectile : MonoBehaviour
         if (!this._projectile.FiredForFree() && this._owner.CurrentGun.GetComponent<Lightwing>() is Lightwing lightwing)
             this._gun = this._owner.CurrentGun;
 
+        this._mastered = this._owner.HasSynergy(Synergy.MASTERY_LIGHTWING);
         this._topSpeed = this._projectile.baseData.speed;
         this._speedMult = this._owner.ProjSpeedMult();
         this._projectile.baseData.speed = _START_SPEED * this._speedMult;
@@ -117,6 +120,8 @@ public class LightwingProjectile : MonoBehaviour
         this._projectile.specRigidbody.OnCollision += this.OnCollision;
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         this._projectile.m_usesNormalMoveRegardless = true; // ignore all motion module overrides, we have very specific pathing requirements
+        if (this._mastered)
+            this._projectile.specRigidbody.OnPreTileCollision += this.OnPreTileCollision;
 
         this._trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
             this._trail.StartWidth = 0.35f;
@@ -125,6 +130,42 @@ public class LightwingProjectile : MonoBehaviour
             this._trail.StartColor = Color.white;
             this._trail.BaseColor  = Color.white;
             this._trail.EndColor   = Color.white;
+    }
+
+    private void OnPreTileCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, PhysicsEngine.Tile tile, PixelCollider tilePixelCollider)
+    {
+        if (this._state == State.RETURNING)
+            PhysicsEngine.SkipCollision = true;
+    }
+
+    private void DetermineTargetProjectile()
+    {
+        tk2dBaseSprite sprite = this._targetProjectile ? this._targetProjectile.sprite : null;
+        if (sprite && sprite.renderer.enabled && _targetProjectile.isActiveAndEnabled)
+            return;
+
+        this._targetProjectile = null;
+        // first try to find a projectile to latch onto
+        float closestSquareDistance = 9999f;
+        foreach (Projectile p in StaticReferenceManager.AllProjectiles)
+        {
+            if (!p.isActiveAndEnabled)
+                continue;
+            if (p.Owner != this._target)
+                continue;
+            float sqrDistance = (p.transform.position - this._projectile.transform.position).sqrMagnitude;
+            if (sqrDistance > closestSquareDistance)
+                continue;
+            closestSquareDistance = sqrDistance;
+            this._targetProjectile = p;
+        }
+        // if we still can't find a projectile to target, give up and return to player empty handed
+        if (this._targetProjectile == null)
+        {
+            this._target = this._owner;
+            this._state = State.RETURNING;
+            return;
+        }
     }
 
     private void Update()
@@ -156,32 +197,9 @@ public class LightwingProjectile : MonoBehaviour
                     haveTarget = false;
                 break;
             case State.RETRIEVING:
-                tk2dBaseSprite sprite = this._targetProjectile ? this._targetProjectile.sprite : null;
-                if (!sprite || !sprite.renderer.enabled || !this._targetProjectile.isActiveAndEnabled)
-                {
-                    this._targetProjectile = null;
-                    // first try to find a projectile to latch onto
-                    float closestSquareDistance = 9999f;
-                    foreach (Projectile p in StaticReferenceManager.AllProjectiles)
-                    {
-                        if (!p.isActiveAndEnabled)
-                            continue;
-                        if (p.Owner != this._target)
-                            continue;
-                        float sqrDistance = (p.transform.position - this._projectile.transform.position).sqrMagnitude;
-                        if (sqrDistance > closestSquareDistance)
-                            continue;
-                        closestSquareDistance = sqrDistance;
-                        this._targetProjectile = p;
-                    }
-                    // if we still can't find a projectile to target, give up and return to player empty handed
-                    if (this._targetProjectile == null)
-                    {
-                        this._target = this._owner;
-                        this._state  = State.RETURNING;
-                        return;
-                    }
-                }
+                DetermineTargetProjectile();
+                if (this._state != State.RETRIEVING)
+                    return;  // we failed to find a target projectile
                 targetPos = this._targetProjectile.SafeCenter;
                 break;
         }
@@ -253,21 +271,30 @@ public class LightwingProjectile : MonoBehaviour
             return; // we collided with a projectile that wasn't owned by the enemy we were originally targeting
 
         projectile.DieInAir(allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: true);
-        this._topSpeed                           *= _HUNT_SPEED_SCALE;
-        this._projectile.baseData.damage         *= _HUNT_DAMAGE_SCALE;
-        this._projectile.collidesWithProjectiles  = false;
+        this._topSpeed                   *= _HUNT_SPEED_SCALE;
+        this._projectile.baseData.damage *= _HUNT_DAMAGE_SCALE;
 
         if (this._state == State.NEUTRAL)
         {
             base.gameObject.Play("lightwing_hunt_sound");
             this._target = enemy;
             this._state  = State.HUNTING;
+            this._projectile.collidesWithProjectiles  = false;
         }
         else
         {
-            this._retrievedAmmo = true;
-            this._target        = this._owner;
-            this._state         = State.RETURNING;
+            ++this._retrievedAmmo;
+            if (!this._mastered || this._retrievedAmmo >= 3)
+            {
+                this._target = this._owner;
+                this._projectile.collidesWithProjectiles  = false;
+                this._state = State.RETURNING;
+            }
+            else
+            {
+                this._targetProjectile = null;
+                DetermineTargetProjectile();
+            }
         }
     }
 
@@ -291,7 +318,7 @@ public class LightwingProjectile : MonoBehaviour
     private void DissipateNearPlayer()
     {
         if (this._gun)
-            this._gun.GainAmmo(this._retrievedAmmo ? 2 : 1);
+            this._gun.GainAmmo(this._retrievedAmmo + 1);
         this._projectile.DieInAir();
         UnityEngine.Object.Destroy(this);
     }
