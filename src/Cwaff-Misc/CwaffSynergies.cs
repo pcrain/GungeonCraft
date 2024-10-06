@@ -168,6 +168,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfSoulKaliber>(MASTERY_SOUL_KALIBER, SoulKaliber.ItemName);
         // Birds can phase through inner walls and collect up to three bullets on the way back from an enemy.
         NewMastery<MasteryOfLightwing>(MASTERY_LIGHTWING, Lightwing.ItemName);
+        // Debris is launched faster and with less spread, and pierces through enemies.
+        NewMastery<MasteryOfMagunet>(MASTERY_MAGUNET, Magunet.ItemName)
+            .MultSpread(0.5f).MultProjSpeed(2f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -413,6 +416,7 @@ internal class MasteryOfScotsman        : MasteryDummyItem {}
 internal class MasteryOfCarpetBomber    : MasteryDummyItem {}
 internal class MasteryOfSoulKaliber     : MasteryDummyItem {}
 internal class MasteryOfLightwing       : MasteryDummyItem {}
+internal class MasteryOfMagunet         : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -482,4 +486,5 @@ public enum Synergy {
     MASTERY_CARPET_BOMBER,
     MASTERY_SOUL_KALIBER,
     MASTERY_LIGHTWING,
+    MASTERY_MAGUNET,
 };

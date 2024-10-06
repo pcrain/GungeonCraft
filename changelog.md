@@ -2,7 +2,10 @@
 
 ## 1.19.3 (TBD)
 
-- Added mastery for Lightwing
+- Added masteries for Lightwing and Magunet
+
+- Fixed potential null deref caused by Magunet being destroyed while holding debris in stasis
+- Magunet debris now pushes enemies back 
 
 ## 1.19.2 (2024-09-29)
 

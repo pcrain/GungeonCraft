@@ -206,20 +206,18 @@ public class MagnetParticle : MonoBehaviour
 
     private void LaunchDebrisInStasis(Vector2 velocity)
     {
-        int collisionWidth = 8;
-        if (base.gameObject.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody srb)
-            UnityEngine.Object.Destroy(srb);
-        SpeculativeRigidbody body = this._debris.specRigidbody = base.gameObject.AddComponent<SpeculativeRigidbody>();
+        const int COLLISION_WIDTH = 8;
+        SpeculativeRigidbody body = this._debris.specRigidbody = base.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
+        body.ClearSpecificCollisionExceptions();
         body.CollideWithTileMap = true;
         body.CollideWithOthers  = true;
         body.PixelColliders     = new List<PixelCollider>{new(){
             CollisionLayer         = CollisionLayer.Projectile,
-            Enabled                = true,
             ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
-            ManualOffsetX          = collisionWidth / -2,
-            ManualOffsetY          = collisionWidth / -2,
-            ManualWidth            = collisionWidth,
-            ManualHeight           = collisionWidth,
+            ManualOffsetX          = COLLISION_WIDTH / -2,
+            ManualOffsetY          = COLLISION_WIDTH / -2,
+            ManualWidth            = COLLISION_WIDTH,
+            ManualHeight           = COLLISION_WIDTH,
         }};
 
         DebrisProjectile p    = base.gameObject.AddComponent<DebrisProjectile>();
@@ -257,7 +255,12 @@ public class MagnetParticle : MonoBehaviour
             prefab: this._debris.IsCorpse ? Magunet._DebrisBigImpactVFX : Magunet._DebrisImpactVFX,
             position: body.UnitCenter + Lazy.RandomVector(0.5f),
             rotation: Quaternion.identity);
-        UnityEngine.Object.Destroy(bullet.gameObject);
+
+        //NOTE: RegisterSpecificCollisionException() is never cleared and assumes our body is regenerated every time we re-become a projectie
+        if (bullet.Owner is PlayerController player && player.HasSynergy(Synergy.MASTERY_MAGUNET))
+            bullet.specRigidbody.RegisterSpecificCollisionException(body);
+        else
+            UnityEngine.Object.Destroy(bullet.gameObject);
     }
 
     // Using LateUpdate() here so alpha is updated correctly
@@ -290,10 +293,10 @@ public class MagnetParticle : MonoBehaviour
         {
             if (this._inStasis)
             {
-                PlayerController owner = this._gun.CurrentOwner as PlayerController;
+                PlayerController owner = this._gun ? this._gun.CurrentOwner as PlayerController : null;
                 float launchAngle = this._statisAngle * (Magunet._SPREAD / 180f) * (owner ? owner.AccuracyMult() : 1f);
                 float gunAngle = this._gun ? this._gun.CurrentAngle : Lazy.RandomAngle();
-                LaunchDebrisInStasis((gunAngle + launchAngle).ToVector(UnityEngine.Random.Range(_MIN_LAUNCH_SPEED, _MAX_LAUNCH_SPEED)));
+                LaunchDebrisInStasis((gunAngle + launchAngle).ToVector((owner ? owner.ProjSpeedMult() : 1f) * UnityEngine.Random.Range(_MIN_LAUNCH_SPEED, _MAX_LAUNCH_SPEED)));
                 return;
             }
             UnityEngine.Object.Destroy(this);
