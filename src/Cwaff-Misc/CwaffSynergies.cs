@@ -103,6 +103,8 @@ public static class CwaffSynergies
         NewSynergy(CHEATO_PAGE, "Cheato Page", new[]{IName(Breegull.ItemName), "book_of_chest_anatomy"});
         // Standing over healthy goops restore Camera's ammo as well as Gunflower's
         NewSynergy(PHOTOSYNTHESIS, "Photosynthesis", new[]{IName(Gunflower.ItemName), "camera"});
+        // Grants immunity to contact damage while holding Alien Engine and immunity to most other forms of damage while firing Alien Engine.
+        NewSynergy(TANK_ENGINE, "Tank Engine", new[]{IName(DerailGun.ItemName), "alien_engine"});
       #endregion
 
       #region Masteries
@@ -473,6 +475,7 @@ public enum Synergy {
     PIERCING_GAZE,
     CHEATO_PAGE,
     PHOTOSYNTHESIS,
+    TANK_ENGINE,
 
     // Masteries
     MASTERY_GRANDMASTER,

@@ -1,3 +1,4 @@
+
 namespace CwaffingTheGungy;
 
 public class DerailGun : CwaffGun
@@ -44,6 +45,7 @@ public class DerailGun : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
+        player.healthHaver.ModifyDamage += this.OnMightTakeDamage;
         player.OnReceivedDamage += this.OnReceivedDamage;
         gun.SetAnimationFPS(gun.idleAnimation, 11); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.Play();
@@ -51,9 +53,21 @@ public class DerailGun : CwaffGun
             _OilGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.GreenOilGoop);
     }
 
+    private void OnMightTakeDamage(HealthHaver haver, HealthHaver.ModifyDamageEventArgs args)
+    {
+        if (haver.gameActor is not PlayerController player)
+            return;
+        if (!player.CurrentGun || !player.CurrentGun.IsFiring || player.CurrentGun.PickupObjectId != (int)Items.AlienEngine)
+            return;
+        if (!player.HasSynergy(Synergy.TANK_ENGINE))
+            return;
+        args.ModifiedDamage = 0f;
+    }
+
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
+        player.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
         player.OnReceivedDamage -= this.OnReceivedDamage;
         gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.StopAndResetFrameToDefault();
@@ -62,7 +76,10 @@ public class DerailGun : CwaffGun
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
+        {
+            this.PlayerOwner.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
             this.PlayerOwner.OnReceivedDamage -= this.OnReceivedDamage;
+        }
         base.OnDestroy();
     }
 
@@ -92,5 +109,17 @@ public class DerailGun : CwaffGun
         base.PostProcessProjectile(projectile);
         if (_OilGooper && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_DERAIL_GUN))
             projectile.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.GreenOilGoop;
+    }
+
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.ReceivesTouchDamage), MethodType.Getter)]
+    private class PlayerControllerReceivesTouchDamagePatch
+    {
+        static bool Prefix(PlayerController __instance, ref bool __result)
+        {
+            if (!__instance.HasSynergy(Synergy.TANK_ENGINE) || __instance.CurrentGun.PickupObjectId != (int)Items.AlienEngine)
+                return true; // call the original method
+            __result = false; // change the original result
+            return false;    // skip the original method
+        }
     }
 }
