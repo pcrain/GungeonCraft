@@ -12,6 +12,7 @@
 - Changed Gorgun Eye's quality from B to A (extremely powerful, especially in single enemy rooms or against strong enemies)
 - Changed base damage of all of Breegull's eggs from 5 to 7
 - Fixed [REDACTED]'s attacks only ever targeting the first player during co-op, even if they're not alive
+- Fixed Gun Muncher icons persisting on minimap when digitized by Femtobyte
 
 ## 1.19.2 (2024-09-29)
 

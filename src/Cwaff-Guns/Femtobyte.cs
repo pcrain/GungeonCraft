@@ -257,6 +257,22 @@ public class Femtobyte : CwaffGun
         return true;
     }
 
+    private static void RemoveMuncherRoomIcons(SpeculativeRigidbody body)
+    {
+        if (body.gameObject.GetComponent<GunberMuncherController>() is not GunberMuncherController muncher)
+            return;
+        if (body.UnitCenter.GetAbsoluteRoom() is not RoomHandler room)
+            return;
+        if (!Minimap.Instance.roomToIconsMap.TryGetValue(room, out List<GameObject> roomIcons))
+            return;
+        for (int i = 0; i < roomIcons.Count; ++i)
+            if (roomIcons[i].name.Contains("Muncher"))
+            {
+                Minimap.Instance.DeregisterRoomIcon(room, roomIcons[i]);
+                break;
+            }
+    }
+
     private bool DigitizeSpecial(SpeculativeRigidbody body, PrefabData data)
     {
         if (data.prefab != null)
@@ -269,6 +285,8 @@ public class Femtobyte : CwaffGun
             CwaffShaders.Digitize<tk2dSlicedSprite>(sliced);
         else
             CwaffShaders.Digitize(body.sprite);
+
+        RemoveMuncherRoomIcons(body);
         UnityEngine.Object.Destroy(body.gameObject);
         return true;
     }
