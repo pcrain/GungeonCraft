@@ -95,10 +95,12 @@ public static class CwaffSynergies
         NewSynergy(LOOKUP_TABLE, "Lookup Table", new[]{IName(Femtobyte.ItemName), "portable_table_device"});
         // Spawns 5 turtles upon getting hit.
         NewSynergy(TROLLEY_PROBLEM, "Trolley Problem", new[]{IName(DerailGun.ItemName), "turtle_problem"});
-        // Ticonderogun's leaves fire goop along drawn lines.
+        // Ticonderogun leaves fire goop along drawn lines.
         NewSynergy(DRAW_FIRE, "Draw Fire", new[]{IName(Ticonderogun.ItemName), "hot_lead"});
         // Gorgun Eye's effect pierces walls and can affect multiple enemies in line of sight.
         NewSynergy(PIERCING_GAZE, "Piercing Gaze", new[]{IName(GorgunEye.ItemName), "ghost_bullets"});
+        // Breegull's normal eggs can be fired for free
+        NewSynergy(CHEATO_PAGE, "Cheato Page", new[]{IName(Breegull.ItemName), "book_of_chest_anatomy"});
       #endregion
 
       #region Masteries
@@ -467,6 +469,7 @@ public enum Synergy {
     TROLLEY_PROBLEM,
     DRAW_FIRE,
     PIERCING_GAZE,
+    CHEATO_PAGE,
 
     // Masteries
     MASTERY_GRANDMASTER,

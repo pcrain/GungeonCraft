@@ -38,7 +38,7 @@ public class Breegull : CwaffGun
           .SetReloadAudio("breegull_reload_sound", 0, 4, 8)
           .Attach<BreegullAmmoDisplay>();
 
-        _EggNormal = gun.InitProjectile(GunData.New(sprite: "breegull_projectile_normal", clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 5.0f,
+        _EggNormal = gun.InitProjectile(GunData.New(sprite: "breegull_projectile_normal", clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.0f,
             shrapnelVFX: VFX.Create("breegull_impact_normal"), shrapnelCount: 10, destroySound: "egg_hit_enemy_sound", customClip: true));
 
         //WARNING: CloneProjectile from anything other than a vanilla gun causes weird issues on MacOS and Linux???
@@ -49,7 +49,7 @@ public class Breegull : CwaffGun
         _EggIce       = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_ice", shrapnelVFX: VFX.Create("breegull_impact_ice"), freeze: 0.75f));
         _EggClockwork = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_clockwork", shrapnelVFX: VFX.Create("breegull_impact_clockwork")))
           .Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultSmall.With(
-            damage: 5f, force: 20f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false))
+            damage: 7f, force: 20f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false))
           .Attach<HomingModifier>(home => { home.HomingRadius = 10f; home.AngularVelocity = 720f; });
 
         _Eggs = new List<EggData>() {
@@ -106,6 +106,7 @@ public class Breegull : CwaffGun
     {
         base.OnPlayerPickup(player);
         player.OnRollStarted += this.OnDodgeRoll;
+        UpdateEggs(playSound: false);
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -124,13 +125,15 @@ public class Breegull : CwaffGun
     private void OnDodgeRoll(PlayerController player, Vector2 dirVec)
     {
         if (player.CurrentGun == this.gun && player.HasSynergy(Synergy.TALON_TROT))
-            player.gameObject.Play("kazooi_roll_sound");
+            player.gameObject.Play("kazooi_roll_sound");  //REFACTOR: rename sound
     }
 
     private void UpdateEggs(bool playSound = false)
     {
         EggData e = _Eggs[this._currentEggType];
         this.gun.DefaultModule.ammoCost = e.ammo;  //BUG: with certain items, the ammo cost here seems to be ignored...can't replicate though
+        if (this._currentEggType == 0 && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.CHEATO_PAGE))
+            this.gun.DefaultModule.ammoCost = 0; //BUG: can't do infinite ammo until alexandria ammo display bug is fixed with PlayerController.InfiniteAmmo
         if (playSound)
             base.gameObject.Play(e.sound);
     }
