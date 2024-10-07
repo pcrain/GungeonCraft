@@ -177,6 +177,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfAlienNailgun>(MASTERY_ALIEN_NAILGUN, AlienNailgun.ItemName);
         // Vladimir increases curse by 1 for every 10 enemies killed, gains power for every point of curse the player has, and passively prevents Lord of the Jammed from spawning.
         NewMastery<MasteryOfVladimir>(MASTERY_VLADIMIR, Vladimir.ItemName);
+        // Maestro reflects projectiles twice as quickly and does not consume ammo unless a projectile is reflected.
+        NewMastery<MasteryOfMaestro>(MASTERY_MAESTRO, Maestro.ItemName)
+            .MultFireRate(2.0f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -426,6 +429,7 @@ internal class MasteryOfMagunet         : MasteryDummyItem {}
 internal class MasteryOfDerailGun       : MasteryDummyItem {}
 internal class MasteryOfAlienNailgun    : MasteryDummyItem {}
 internal class MasteryOfVladimir        : MasteryDummyItem {}
+internal class MasteryOfMaestro         : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -499,4 +503,5 @@ public enum Synergy {
     MASTERY_DERAIL_GUN,
     MASTERY_ALIEN_NAILGUN,
     MASTERY_VLADIMIR,
+    MASTERY_MAESTRO,
 };

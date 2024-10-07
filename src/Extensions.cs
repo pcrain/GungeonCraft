@@ -1148,7 +1148,7 @@ public static class Extensions
   }
 
   /// <summary>Returns true if a projectile was fired from a gun without depleting ammo</summary>
-  public static bool FiredForFree(this Projectile proj, Gun gun, ProjectileModule mod)
+  public static bool FiredForFreeOld(this Projectile proj, Gun gun, ProjectileModule mod)
   {
     if (proj.Owner is PlayerController pc && pc.InfiniteAmmo.Value)
       return true;

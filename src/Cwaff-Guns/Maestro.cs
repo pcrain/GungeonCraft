@@ -230,6 +230,12 @@ public class Maestro : CwaffGun
         DetermineTargetEnemyIfNecessary();
         if (this._targetProjectile)
             RedirectProjectile(this._targetProjectile, this._targetEnemy, projectile);
+        if (this.gun.CanGainAmmo && !projectile.FiredForFree())
+            if (!this._targetProjectile && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_MAESTRO))
+            {
+                this.gun.GainAmmo(1);
+                this.gun.MoveBulletsIntoClip(1);
+            }
         projectile.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
     }
 }
