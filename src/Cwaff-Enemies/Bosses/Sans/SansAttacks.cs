@@ -41,7 +41,7 @@ public partial class SansBoss : AIActor
 
     public override IEnumerator Top()
     {
-      GameManager.Instance.PrimaryPlayer.gameObject.Play(SOUND_SHOOT);
+      base.Projectile.gameObject.Play(SOUND_SHOOT);
 
       Vector2 startSpeed   = this.RealVelocity();
       float rotationNormal = ((this.rotationOverride ?? startSpeed.ToAngle()) + 90f).Clamp180();
@@ -132,16 +132,19 @@ public partial class SansBoss : AIActor
 
     private IEnumerator DoTheThing(bool orange)
     {
-      GameManager.Instance.PrimaryPlayer.gameObject.Play("undertale_eyeflash");
-      Vector2 ppos = GameManager.Instance.PrimaryPlayer.CenterPosition;
+      PlayerController target = GameManager.Instance.GetRandomActivePlayer();
+      theBoss.gameObject.Play("undertale_eyeflash");
+      Vector2 ppos = target.CenterPosition;
       for (float i = 1f; i <= 4f; ++i)
         DoomZone(ppos - i*0.5f*Vector2.right, ppos + i*0.5f*Vector2.right, i, 0.5f, 1, orange ? orangeReticle : blueReticle);
       List<Vector2> points = new PathRect(base.roomBulletBounds).SampleUniform(COUNT);
       yield return Wait(LENIENCE);
       for(int wave = 0; wave < WAVES; ++wave)
       {
-        GameManager.Instance.PrimaryPlayer.gameObject.Play(SOUND_SHOOT);
-        ppos      = GameManager.Instance.PrimaryPlayer.CenterPosition;
+        if (!target)
+          target = GameManager.Instance.GetRandomActivePlayer();
+        theBoss.gameObject.Play(SOUND_SHOOT);
+        ppos      = target.CenterPosition;
         int count = 0;
         foreach(Vector2 p in points)
         {
@@ -161,7 +164,7 @@ public partial class SansBoss : AIActor
 
     protected override List<FluidBulletInfo> BuildChain()
     {
-      GameManager.Instance.PrimaryPlayer.gameObject.Play("sans_laugh");
+      theBoss.gameObject.Play("sans_laugh");
       return
       Run(DoTheThing())
         .And(DoTheThing(reverse: true))
@@ -339,8 +342,6 @@ public partial class SansBoss : AIActor
 
     private IEnumerator DoTheThing(string direction)
     {
-      PlayerController p = GameManager.Instance.PrimaryPlayer;
-
       PathLine segment;
         if (direction.Equals("up"))         segment = this.slamBoundsPath.Top();
         else if (direction.Equals("down"))  segment = this.slamBoundsPath.Bottom();
@@ -349,8 +350,15 @@ public partial class SansBoss : AIActor
         else /* should never happen */      segment = this.slamBoundsPath.Top();
       Vector2 target =  segment.At(0.5f);
 
-      Vector2 delta    = (target - p.CenterPosition);
+      PlayerController p1 = GameManager.Instance.BestActivePlayer;
+      PlayerController p2 = GameManager.Instance.GetOtherPlayer(p1);
+      if (!p2 || p2.healthHaver.IsDead)
+        p2 = p1;
+
+      Vector2 delta    = (target - p1.CenterPosition);
+      Vector2 delta2   = (target - p2.CenterPosition);
       Vector2 gravity  = GRAVITY*delta.normalized;
+      Vector2 gravity2 = GRAVITY*delta2.normalized;
       Vector2 gravityB = GRAVITY*(target - theBoss.CenterPosition).normalized;
       Vector2 baseVel  = -VELOCITY * gravityB;
       Speed s = new Speed(BASESPEED,SpeedType.Absolute);
@@ -364,35 +372,63 @@ public partial class SansBoss : AIActor
         yield return Wait(SHOTDELAY);
       }
 
-      p.SetInputOverride("comeonandslam");
-      p.ForceStopDodgeRoll();
       int collisionmask = CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox, CollisionLayer.EnemyCollider, CollisionLayer.Projectile);
-      p.specRigidbody.AddCollisionLayerIgnoreOverride(collisionmask);
-      Vector2 slamStart        = base.roomSlamBounds.position;
-      Vector2 slamEnd          = base.roomSlamBounds.position + base.roomSlamBounds.size;
-      Vector2 finalPos         = Vector2.zero;
-      p.specRigidbody.Velocity = Vector2.zero;
-      int framesToReachTarget = Mathf.FloorToInt(Mathf.Sqrt(2*delta.magnitude/GRAVITY)); // solve x = (0.5*a*t*t) for t
+      Vector2[] finalPos       = [Vector2.zero, Vector2.zero];
+      int framesToReachTarget  = Mathf.FloorToInt(Mathf.Sqrt(2*Mathf.Min(delta.magnitude, delta2.magnitude)/GRAVITY)); // solve x = (0.5*a*t*t) for t
+      if (p1 == p2)
+        p2 = null;
+
+      p1.SetInputOverride("comeonandslam");
+      p1.ForceStopDodgeRoll();
+      p1.specRigidbody.AddCollisionLayerIgnoreOverride(collisionmask);
+      p1.specRigidbody.Velocity = Vector2.zero;
+      if (p2)
+      {
+        p2.SetInputOverride("comeonandslam");
+        p2.ForceStopDodgeRoll();
+        p2.specRigidbody.AddCollisionLayerIgnoreOverride(collisionmask);
+        p2.specRigidbody.Velocity = Vector2.zero;
+      }
+
       for (int frames = 0; frames < framesToReachTarget; ++frames)
       {
-        p.specRigidbody.Velocity += gravity;
-        Vector2 oldPos = p.specRigidbody.Position.GetPixelVector2();
-        Vector2 newPos = oldPos + p.specRigidbody.Velocity;
-        if (BraveMathCollege.LineSegmentRectangleIntersection(oldPos, newPos, segment.start, segment.end, ref finalPos))
+        p1.specRigidbody.Velocity += gravity;
+        Vector2 oldPos = p1.specRigidbody.Position.GetPixelVector2();
+        Vector2 newPos = oldPos + p1.specRigidbody.Velocity;
+        if (BraveMathCollege.LineSegmentRectangleIntersection(oldPos, newPos, segment.start, segment.end, ref finalPos[0]))
           break;
-        p.transform.position = newPos;
-        p.specRigidbody.Reinitialize();
+        p1.transform.position = newPos;
+        p1.specRigidbody.Reinitialize();
+        if (p2)
+        {
+          p2.specRigidbody.Velocity += gravity2;
+          Vector2 oldPos2 = p2.specRigidbody.Position.GetPixelVector2();
+          Vector2 newPos2 = oldPos2 + p2.specRigidbody.Velocity;
+          if (BraveMathCollege.LineSegmentRectangleIntersection(oldPos2, newPos2, segment.start, segment.end, ref finalPos[1]))
+            break;
+          p2.transform.position = newPos2;
+          p2.specRigidbody.Reinitialize();
+        }
         yield return Wait(1);
       }
-      p.specRigidbody.RemoveCollisionLayerIgnoreOverride(collisionmask);
-      p.specRigidbody.Velocity = Vector2.zero;
-      p.transform.position = (finalPos != Vector2.zero) ? finalPos : target;
-      p.specRigidbody.Reinitialize();
+      p1.specRigidbody.RemoveCollisionLayerIgnoreOverride(collisionmask);
+      p1.specRigidbody.Velocity = Vector2.zero;
+      p1.transform.position = (finalPos[0] != Vector2.zero) ? finalPos[0] : target;
+      p1.specRigidbody.Reinitialize();
+      if (p2)
+      {
+        p2.specRigidbody.RemoveCollisionLayerIgnoreOverride(collisionmask);
+        p2.specRigidbody.Velocity = Vector2.zero;
+        p2.transform.position = (finalPos[1] != Vector2.zero) ? finalPos[1] : target;
+        p2.specRigidbody.Reinitialize();
+      }
       yield return Wait(1);
 
-      p.ClearInputOverride("comeonandslam");
+      p1.gameObject.Play("undertale_damage");
+      p1.ClearInputOverride("comeonandslam");
+      if (p2)
+        p2.ClearInputOverride("comeonandslam");
       GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f,6f,0.5f,0f), null);
-      p.gameObject.Play("undertale_damage");
     }
   }
 
@@ -425,9 +461,11 @@ public partial class SansBoss : AIActor
 
     private IEnumerator DoTheThing()
     {
+      PlayerController target = GameManager.Instance.GetRandomActivePlayer();
       for (int i = 0; i < PHASES; ++i)
       {
-        PlayerController target = GameManager.Instance.PrimaryPlayer;
+        if (!target)
+          target = GameManager.Instance.GetRandomActivePlayer();
         theBoss.gameObject.Play("sans_laugh");
         Vector2 ppos = target.CenterPosition;
         List<Vector2> spawnPoints = new List<Vector2>(STREAMSPERPHASE);
@@ -564,7 +602,7 @@ public partial class SansBoss : AIActor
 
     private IEnumerator DoTheThing()
     {
-      Vector2 incidentDirection, centerPoint, playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
+      Vector2 incidentDirection, centerPoint, playerpos = GameManager.Instance.GetRandomActivePlayer().CenterPosition;
       do
       {
         incidentDirection = Lazy.RandomAngle().ToVector();
@@ -672,7 +710,7 @@ public partial class SansBoss : AIActor
 
     private IEnumerator DoTheThing()
     {
-      Vector2 playerpos = GameManager.Instance.PrimaryPlayer.CenterPosition;
+      Vector2 playerpos = GameManager.Instance.GetRandomActivePlayer().CenterPosition;
       for (int j = 0; j < COUNT; j++)
       {
         if (j % 2 == 0)
@@ -732,7 +770,7 @@ public partial class SansBoss : AIActor
         {
           DoomZone(points[i], points[i].RaycastToWall(angle, base.roomBulletBounds), 1f, COUNT / 15.0f, 20);
           if (i % 2 == 0)
-            GameManager.Instance.PrimaryPlayer.gameObject.Play(SOUND_SPAWN_QUIET);
+            theBoss.gameObject.Play(SOUND_SPAWN_QUIET);
         }
         yield return this.Wait(SPAWN_DELAY);
       }
@@ -740,7 +778,7 @@ public partial class SansBoss : AIActor
       {
         this.Fire(Offset.OverridePosition(points[i]), new Direction(angle, DirectionType.Absolute), new Speed(speed), new SecretBullet());
         if (i % 2 == 1)
-          GameManager.Instance.PrimaryPlayer.gameObject.Play(SOUND_SHOOT);
+          theBoss.gameObject.Play(SOUND_SHOOT);
         yield return this.Wait(SPAWN_DELAY);
       }
       yield break;

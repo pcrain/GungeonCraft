@@ -11,6 +11,7 @@
 - Gorgun Eye can now target non-hostile enemies such as Keybullet Kin and Chance Kin
 - Changed Gorgun Eye's quality from B to A (extremely powerful, especially in single enemy rooms or against strong enemies)
 - Changed base damage of all of Breegull's eggs from 5 to 7
+- Fixed [REDACTED]'s attacks only ever targeting the first player during co-op, even if they're not alive
 
 ## 1.19.2 (2024-09-29)
 
