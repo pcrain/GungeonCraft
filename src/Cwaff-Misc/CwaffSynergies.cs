@@ -97,11 +97,11 @@ public static class CwaffSynergies
         NewSynergy(TROLLEY_PROBLEM, "Trolley Problem", new[]{IName(DerailGun.ItemName), "turtle_problem"});
         // Ticonderogun leaves fire goop along drawn lines.
         NewSynergy(DRAW_FIRE, "Draw Fire", new[]{IName(Ticonderogun.ItemName), "hot_lead"});
-        // Gorgun Eye's effect pierces walls and can affect multiple enemies in line of sight.
+        // Gorgun Eye's effect pierces walls and enemies, stunning all enemies in the direction the player is facing.
         NewSynergy(PIERCING_GAZE, "Piercing Gaze", new[]{IName(GorgunEye.ItemName), "ghost_bullets"});
-        // Breegull's normal eggs can be fired for free
+        // Breegull's normal eggs can be fired for free.
         NewSynergy(CHEATO_PAGE, "Cheato Page", new[]{IName(Breegull.ItemName), "book_of_chest_anatomy"});
-        // Standing over healthy goops restore Camera's ammo as well as Gunflower's
+        // Standing over healthy goops restore Camera's ammo as well as Gunflower's.
         NewSynergy(PHOTOSYNTHESIS, "Photosynthesis", new[]{IName(Gunflower.ItemName), "camera"});
         // Grants immunity to contact damage while holding Alien Engine and immunity to most other forms of damage while firing Alien Engine.
         NewSynergy(TANK_ENGINE, "Tank Engine", new[]{IName(DerailGun.ItemName), "alien_engine"});
@@ -174,12 +174,12 @@ public static class CwaffSynergies
             .MultChargeRate(4f).MultProjSpeed(2f);
         // Soul-linked enemies may take damage instead of the player whenever the player gets hit. The chance per enemy is equal to 25% + (5% * Curse), capping at 75% per enemy.
         NewMastery<MasteryOfSoulKaliber>(MASTERY_SOUL_KALIBER, SoulKaliber.ItemName);
-        // Birds can phase through inner walls and collect up to three bullets on the way back from an enemy.
+        // Birds can phase through inner walls and collect up to three projectiles on the way back from an enemy.
         NewMastery<MasteryOfLightwing>(MASTERY_LIGHTWING, Lightwing.ItemName);
         // Debris is launched faster and with less spread, and pierces through enemies.
         NewMastery<MasteryOfMagunet>(MASTERY_MAGUNET, Magunet.ItemName)
             .MultSpread(0.5f).MultProjSpeed(2f);
-        // Derail gun leaks oil onto the ground while active and produces green fire that doesn't harm the player.
+        // Derail Gun continuously leaks oil onto the ground while held. When ignited, the oil produces green fire that doesn't harm the player.
         NewMastery<MasteryOfDerailGun>(MASTERY_DERAIL_GUN, DerailGun.ItemName);
         // Killing any enemy instantly spawns a replicant of that enemy if Alien Nailgun has previously registered its DNA, regardless of active gun.
         NewMastery<MasteryOfAlienNailgun>(MASTERY_ALIEN_NAILGUN, AlienNailgun.ItemName);

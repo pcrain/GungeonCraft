@@ -1,18 +1,27 @@
 # Changelog
 
-## 1.19.3 (TBD)
+## 1.19.3 (2024-10-07)
+
+#### Features:
 
 - Added masteries for Lightwing, Magunet, Derail Gun, Alien Nailgun, Vladimir, and Maestro
 - Added 4 new synergies
 
-- Fixed potential null deref caused by Magunet being destroyed while holding debris in stasis
-- Fixed Alien Nailgun losing all DNA information when dropped and picked back up
+#### Balance Changes and Polish:
+
 - Vladimir now has piercing and can hit multiple enemies simultaneously
+- Nycterian's projectiles now pierce once to more effectively draw fire
 - Gorgun Eye can now target non-hostile enemies such as Keybullet Kin and Chance Kin
 - Changed Gorgun Eye's quality from B to A (extremely powerful, especially in single enemy rooms or against strong enemies)
 - Changed base damage of all of Breegull's eggs from 5 to 7
+
+#### Bugfixes and Misc:
+
+- Fixed potential null deref caused by Magunet being destroyed while holding debris in stasis
+- Fixed Alien Nailgun losing all DNA information when dropped and picked back up
 - Fixed [REDACTED]'s attacks only ever targeting the first player during co-op, even if they're not alive
 - Fixed Gun Muncher icons persisting on minimap when digitized by Femtobyte
+- Updated required Alexandria version to 0.4.12 for custom ammo display migration
 
 ## 1.19.2 (2024-09-29)
 
