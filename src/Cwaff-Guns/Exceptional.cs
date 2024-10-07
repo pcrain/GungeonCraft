@@ -97,16 +97,30 @@ public class Exceptional : CwaffGun
 
     public static void Exceptionalizationizer(string text, string stackTrace, LogType type)
     {
+        if (_Spawned)
+            return;
         if (type != LogType.Exception)
             return;
         if (++_ExceptionalPower < _ERRORS_BEFORE_SPAWNING)
             return;
-        if (_Spawned)
-            return;
         _Spawned = true;
+        if (GameManager.Instance.BestActivePlayer.IsInCombat)
+            GameManager.Instance.BestActivePlayer.OnRoomClearEvent += SpawnErrorChestOnceCombatEnds;
+        else
+            SpawnErrorChestImmediately();
+    }
+
+    private static void SpawnErrorChestOnceCombatEnds(PlayerController player)
+    {
+        player.OnRoomClearEvent -= SpawnErrorChestOnceCombatEnds;
+        SpawnErrorChestImmediately();
+    }
+
+    private static void SpawnErrorChestImmediately()
+    {
         Lazy.SpawnChestWithSpecificItem(
           pickup: Lazy.Pickup<Exceptional>(),
-          position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success),
+          position: GameManager.Instance.BestActivePlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success),
           overrideChestQuality: ItemQuality.S,
           overrideJunk: true);
     }
