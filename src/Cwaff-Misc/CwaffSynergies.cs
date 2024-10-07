@@ -97,6 +97,8 @@ public static class CwaffSynergies
         NewSynergy(TROLLEY_PROBLEM, "Trolley Problem", new[]{IName(DerailGun.ItemName), "turtle_problem"});
         // Ticonderogun's leaves fire goop along drawn lines.
         NewSynergy(DRAW_FIRE, "Draw Fire", new[]{IName(Ticonderogun.ItemName), "hot_lead"});
+        // Gorgun Eye's effect pierces walls and can affect multiple enemies in line of sight.
+        NewSynergy(PIERCING_GAZE, "Piercing Gaze", new[]{IName(GorgunEye.ItemName), "ghost_bullets"});
       #endregion
 
       #region Masteries
@@ -464,6 +466,7 @@ public enum Synergy {
     LOOKUP_TABLE,
     TROLLEY_PROBLEM,
     DRAW_FIRE,
+    PIERCING_GAZE,
 
     // Masteries
     MASTERY_GRANDMASTER,

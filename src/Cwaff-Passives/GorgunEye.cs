@@ -14,12 +14,13 @@ public class GorgunEye : CwaffPassive
     private static readonly Color _StoneColor        = new Color(0.5f, 0.5f, 0.5f, 1.0f);
     private static GameActorHealthEffect _GorgunTint = null;
 
-    private AIActor _afflictedEnemy = null;
+    private List<AIActor> _afflictedEnemies = new();
+    private List<AIActor> _afflictedEnemiesAlt = new();
 
     public static void Init()
     {
         PassiveItem item  = Lazy.SetupPassive<GorgunEye>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.B;
+        item.quality      = ItemQuality.A;
         item.AddToSubShop(ItemBuilder.ShopType.Cursula);
         item.AddToShop(ModdedShopType.Handy);
 
@@ -42,13 +43,17 @@ public class GorgunEye : CwaffPassive
         if (this.Owner is not PlayerController player)
             return;
 
+        bool pierces = player.HasSynergy(Synergy.PIERCING_GAZE);
+        bool blankStare = player.HasSynergy(Synergy.BLANK_STARE);
+
+        this._afflictedEnemiesAlt.Clear();
         Vector2 ppos         = player.CenterPosition;
         float gunAngle       = player.m_currentGunAngle;
         AIActor closestEnemy = null;
         float closestDist    = 999999f;
         foreach(AIActor enemy in player.CurrentRoom.SafeGetEnemiesInRoom())
         {
-            if (!enemy || !enemy.IsHostileAndNotABoss())
+            if (!enemy || !enemy.IsHostileAndNotABoss(canBeNeutral: true))
                 continue; // enemy is not one we should be targeting
             if (!enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
                 continue; // enemy cannot be stunned
@@ -57,6 +62,12 @@ public class GorgunEye : CwaffPassive
             Vector2 delta = epos - ppos;
             if (!delta.IsNearAngle(gunAngle, _CONE_RADIUS))
                 continue; // enemy is not within our vision range
+
+            if (pierces)
+            {
+                this._afflictedEnemiesAlt.Add(enemy);
+                continue;
+            }
 
             float dist = delta.sqrMagnitude;
             if (dist >= closestDist)
@@ -71,22 +82,27 @@ public class GorgunEye : CwaffPassive
             closestDist  = dist;
         }
 
-        if (closestEnemy != this._afflictedEnemy)
+        if (!pierces && closestEnemy)
+            this._afflictedEnemiesAlt.Add(closestEnemy);
+
+        foreach (AIActor enemy in this._afflictedEnemiesAlt)
         {
-            if (this._afflictedEnemy)
-            {
-                this._afflictedEnemy.RemoveEffect(_EFFECT_NAME);
-                if (player.HasSynergy(Synergy.BLANK_STARE) && this._afflictedEnemy.behaviorSpeculator is BehaviorSpeculator bs && !bs.ImmuneToStun)
-                    bs.Stun(1f);
-            }
-            if (closestEnemy)
-            {
-                closestEnemy.ApplyEffect(_GorgunTint);
-                closestEnemy.gameObject.PlayUnique("gorgun_eye_activate");
-            }
-            this._afflictedEnemy = closestEnemy;
+            enemy.behaviorSpeculator.Stun(_STUN_LINGER_TIME, createVFX: false);
+            if (this._afflictedEnemies.Contains(enemy))
+                continue;
+            enemy.ApplyEffect(_GorgunTint);
+            enemy.gameObject.PlayUnique("gorgun_eye_activate");
         }
-        if (this._afflictedEnemy)
-            closestEnemy.behaviorSpeculator.Stun(_STUN_LINGER_TIME, createVFX: false);
+
+        foreach (AIActor enemy in this._afflictedEnemies)
+        {
+            if (!enemy || this._afflictedEnemiesAlt.Contains(enemy))
+                continue;
+            enemy.RemoveEffect(_GorgunTint);
+            if (blankStare && enemy.behaviorSpeculator is BehaviorSpeculator bs && !bs.ImmuneToStun)
+                bs.Stun(1f);
+        }
+
+        BraveUtility.Swap(ref this._afflictedEnemies, ref this._afflictedEnemiesAlt);
     }
 }
