@@ -1,4 +1,5 @@
 ﻿
+
 namespace CwaffingTheGungy;
 
 public class Vladimir : CwaffGun
@@ -10,11 +11,15 @@ public class Vladimir : CwaffGun
 
     internal const float _LAUNCH_FORCE                 = 150f;
     internal const float _SKEWER_DAMAGE                = 14.0f;
+    internal const float _CURSE_DAMAGE_SCALING         = 4.0f;
+    internal const int   _ENEMIES_PER_CURSE            = 10;
 
     internal static List<Vector3> _IdleBarrelOffsets   = new();
     internal static List<Vector3> _ShootBarrelOffsets  = new();
     internal static List<Vector3> _ChargeBarrelOffsets = new();
     internal static GameObject _AbsorbVFX              = null;
+
+    internal int _enemiesKilled                        = 0;
 
     private List<AIActor> _skeweredEnemies             = new();
     private int _power                                 = 0;
@@ -29,6 +34,7 @@ public class Vladimir : CwaffGun
           .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 7.0f, speed: 1f, range: 0.01f, sprite: "vladimir_hitbox", hideAmmo: true))  // low range ensures the projectile dissipates swiftly
           .SetAllImpactVFX(VFX.CreatePool("vladimir_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f))
+          .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; })
           .Attach<VladimirProjectile>();
 
         _AbsorbVFX = VFX.Create("vladimir_impale_projectile_vfx", emissivePower: 1f);
@@ -161,6 +167,12 @@ public class Vladimir : CwaffGun
             enemy.knockbackDoer.ClearContinuousKnockbacks();
             enemy.knockbackDoer.ApplyKnockback(direction: launchDir, force: _LAUNCH_FORCE);
         }
+        if (!this.PlayerOwner || !this.PlayerOwner.HasSynergy(Synergy.MASTERY_VLADIMIR))
+            return;
+        if (++this._enemiesKilled < _ENEMIES_PER_CURSE)
+            return;
+        this._enemiesKilled -= _ENEMIES_PER_CURSE;
+        this.PlayerOwner.IncreaseCurse();
     }
 
     private void DealDamageWhenTossedAtEnemies(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -187,7 +199,28 @@ public class Vladimir : CwaffGun
         // this.gun.sprite.gameObject.SetGlowiness(250f);
     }
 
-    private class ImpaledOnGunBehaviour : SkipAllCollisionsBehavior {}
+    public override void PostProcessProjectile(Projectile projectile)
+    {
+        base.PostProcessProjectile(projectile);
+        if (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_VLADIMIR))
+            projectile.baseData.damage += _CURSE_DAMAGE_SCALING * Mathf.Max(0f, this.PlayerOwner.Curse());
+    }
+
+    internal class ImpaledOnGunBehaviour : SkipAllCollisionsBehavior {}
+
+    [HarmonyPatch(typeof(Dungeon), nameof(Dungeon.SpawnCurseReaper))]
+    private class PreventLotJSpawnWhenMasteredPatch
+    {
+        static bool Prefix(Dungeon __instance)
+        {
+            if (GameManager.Instance.PrimaryPlayer.HasSynergy(Synergy.MASTERY_VLADIMIR))
+                return false;
+            if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
+                if (GameManager.Instance.SecondaryPlayer.HasSynergy(Synergy.MASTERY_VLADIMIR))
+                    return false;
+            return true;
+        }
+    }
 }
 
 public class VladimirProjectile : MonoBehaviour
@@ -208,7 +241,14 @@ public class VladimirProjectile : MonoBehaviour
             return;
 
         this._gun = v;
+        this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
         this._projectile.OnHitEnemy += this.OnHitEnemy;
+    }
+
+    private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        if (otherRigidbody.gameObject.GetComponent<Vladimir.ImpaledOnGunBehaviour>())
+            PhysicsEngine.SkipCollision = true;
     }
 
     private void Update()
@@ -234,7 +274,21 @@ public class VladimirProjectile : MonoBehaviour
 
     private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
     {
-        if (!killed && enemy)
+        if (!enemy)
+            return;
+        if (!killed)
+        {
             this._gun.Impale(enemy.aiActor);
+            return;
+        }
+
+        if (!this._gun || this._gun.PlayerOwner is not PlayerController player)
+            return;
+        if (!player.HasSynergy(Synergy.MASTERY_VLADIMIR))
+            return;
+        if (++this._gun._enemiesKilled < Vladimir._ENEMIES_PER_CURSE)
+            return;
+        this._gun._enemiesKilled -= Vladimir._ENEMIES_PER_CURSE;
+        player.IncreaseCurse();
     }
 }

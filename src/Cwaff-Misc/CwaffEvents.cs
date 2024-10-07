@@ -26,6 +26,8 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action<PlayerController, RoomHandler, RoomHandler> OnChangedRooms;
     // Runs whenever a corpse is created
     public static Action<DebrisObject, AIActor> OnCorpseCreated;
+    // Runs whenever stats are recalculated
+    public static Action<PlayerController> OnStatsRecalculated;
 
     internal static bool _OnFirstFloor = false;
     internal static bool _RunJustStarted = false;
@@ -150,7 +152,6 @@ public static class CwaffEvents // global custom events we can listen for
         }
     }
 
-
     [HarmonyPatch(typeof(AIActor), nameof(AIActor.ForceDeath))]
     private class OnCorpseCreatedPatch
     {
@@ -201,6 +202,23 @@ public static class CwaffEvents // global custom events we can listen for
         {
             if (__instance.IsPickupObject && __instance.gameObject.GetComponent<PickupObject>() is PickupObject pickup)
                 _DebrisPickups.TryRemove(pickup);
+        }
+    }
+
+    //REFACTOR: use this for more mastery checks
+    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.RecalculateStatsInternal))]
+    private class PlayerStatsRecalculateStatsInternalPatch
+    {
+        private static bool _CurrentlyRecalculatingStats = false;
+        static void Postfix(PlayerStats __instance, PlayerController owner)
+        {
+            if (_CurrentlyRecalculatingStats)
+                return;
+
+            _CurrentlyRecalculatingStats = true; // prevent infinite recursion
+            if (OnStatsRecalculated != null)
+                OnStatsRecalculated(owner);
+            _CurrentlyRecalculatingStats = false;
         }
     }
 }

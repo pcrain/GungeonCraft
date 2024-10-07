@@ -175,6 +175,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfDerailGun>(MASTERY_DERAIL_GUN, DerailGun.ItemName);
         // Killing any enemy instantly spawns a replicant of that enemy if Alien Nailgun has previously registered its DNA, regardless of active gun.
         NewMastery<MasteryOfAlienNailgun>(MASTERY_ALIEN_NAILGUN, AlienNailgun.ItemName);
+        // Vladimir increases curse by 1 for every 10 enemies killed, gains power for every point of curse the player has, and passively prevents Lord of the Jammed from spawning.
+        NewMastery<MasteryOfVladimir>(MASTERY_VLADIMIR, Vladimir.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -423,6 +425,7 @@ internal class MasteryOfLightwing       : MasteryDummyItem {}
 internal class MasteryOfMagunet         : MasteryDummyItem {}
 internal class MasteryOfDerailGun       : MasteryDummyItem {}
 internal class MasteryOfAlienNailgun    : MasteryDummyItem {}
+internal class MasteryOfVladimir        : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -495,4 +498,5 @@ public enum Synergy {
     MASTERY_MAGUNET,
     MASTERY_DERAIL_GUN,
     MASTERY_ALIEN_NAILGUN,
+    MASTERY_VLADIMIR,
 };

@@ -2,10 +2,11 @@
 
 ## 1.19.3 (TBD)
 
-- Added masteries for Lightwing, Magunet, Derail Gun, and Alien Nailgun
+- Added masteries for Lightwing, Magunet, Derail Gun, Alien Nailgun, and Vladimir
 
 - Fixed potential null deref caused by Magunet being destroyed while holding debris in stasis
 - Fixed Alien Nailgun losing all DNA information when dropped and picked back up
+- Vladimir now has piercing and can hit multiple enemies simultaneously
 
 ## 1.19.2 (2024-09-29)
 
