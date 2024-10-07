@@ -88,6 +88,8 @@ public class Gunflower : CwaffGun
         if (nutrition > 0)
         {
             this.gun.GainAmmo(nutrition);
+            if (player.HasSynergy(Synergy.PHOTOSYNTHESIS) && player.GetGun((int)Items.Camera) is Gun camera)
+                camera.GainAmmo(nutrition);
             this.gun.gameObject.PlayOnce("starmageddon_bullet_impact_sound_2");
         }
         else if (nutrition < 0)

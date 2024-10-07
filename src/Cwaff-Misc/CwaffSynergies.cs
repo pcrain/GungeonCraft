@@ -101,6 +101,8 @@ public static class CwaffSynergies
         NewSynergy(PIERCING_GAZE, "Piercing Gaze", new[]{IName(GorgunEye.ItemName), "ghost_bullets"});
         // Breegull's normal eggs can be fired for free
         NewSynergy(CHEATO_PAGE, "Cheato Page", new[]{IName(Breegull.ItemName), "book_of_chest_anatomy"});
+        // Standing over healthy goops restore Camera's ammo as well as Gunflower's
+        NewSynergy(PHOTOSYNTHESIS, "Photosynthesis", new[]{IName(Gunflower.ItemName), "camera"});
       #endregion
 
       #region Masteries
@@ -470,6 +472,7 @@ public enum Synergy {
     DRAW_FIRE,
     PIERCING_GAZE,
     CHEATO_PAGE,
+    PHOTOSYNTHESIS,
 
     // Masteries
     MASTERY_GRANDMASTER,
