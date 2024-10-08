@@ -372,7 +372,6 @@ public class AimuHakureiProjectileMotionModule : ProjectileMotionModule
         _initialized         = true;
         _xDisplacement       = 0f;
         _yDisplacement       = 0f;
-        m_timeElapsed        = 0f;
     }
 
     public override void Move(Projectile source, Transform projectileTransform, tk2dBaseSprite projectileSprite, SpeculativeRigidbody specRigidbody, ref float m_timeElapsed, ref Vector2 m_currentDirection, bool Inverted, bool shouldRotate)

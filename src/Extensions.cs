@@ -1446,7 +1446,7 @@ public static class Extensions
   /// <summary>Get the player's current gun charge rate multiplier</summary>
   public static float ChargeMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.ChargeAmountMultiplier);
 
-  /// <summary>Get the player's current gun charge rate multiplier</summary>
+  /// <summary>Get the player's current curse level</summary>
   public static float Curse(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.Curse);
 
   /// <summary>returns true if sprite a overlaps sprite b in the world</summary>

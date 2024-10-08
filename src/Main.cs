@@ -266,6 +266,7 @@ public class Initialisation : BaseUnityPlugin
                 DerailGun.Init();
                 Yggdrashell.Init();
                 Chroma.Init();
+                Oddjob.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

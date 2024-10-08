@@ -207,6 +207,7 @@
     <Compile Include="src\Cwaff-Guns\SchrodingersGat.cs"/>
     <Compile Include="src\Cwaff-Guns\KingsLaw.cs"/>
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
+    <Compile Include="src\Cwaff-Guns\Oddjob.cs"/>
     <Compile Include="src\Cwaff-Guns\OmnidirectionalLaser.cs"/>
     <Compile Include="src\Cwaff-Guns\Gunbrella.cs"/>
     <Compile Include="src\Cwaff-Guns\Maestro.cs"/>
