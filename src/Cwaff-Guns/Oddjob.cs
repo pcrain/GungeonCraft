@@ -3,27 +3,43 @@ namespace CwaffingTheGungy;
 public class Oddjob : CwaffGun
 {
     public static string ItemName         = "Oddjob";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Hat Tricks";
+    public static string LongDescription  = "Travels in a circular arc towards the enemy closest to the player's line of sight, sawing through anything in its path before returning to the player. Cannot be switched out or dropped while in flight. Increases curse by 0.5 while in inventory.";
     public static string Lore             = "TBD";
+
+    internal static GameObject _Sparks = null;
+    internal static Hat _OddjobHat = null;
+
+    private Projectile _extantOddjobProj = null;
+    private string _capiHatName = null;
 
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Oddjob>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
-                muzzleFrom: Items.Mailbox, fireAudio: "paintball_shoot_sound", reloadAudio: "paintball_reload_sound");
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 1, shootFps: 60, reloadFps: 4,
+                muzzleFrom: Items.Mailbox, canGainAmmo: false, suppressReloadLabel: true, curse: 0.5f);
+            gun.Attach<Unthrowable>();
+            gun.carryPixelOffset = new IntVector2(3, 11);
+            gun.OnlyUsesIdleInWeaponBox = true;
 
-        gun.InitProjectile(GunData.New(sprite: "oddjob_projectile", clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 9.0f, speed: 40f, range: 9999f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound",
-            shouldRotate: false))
+        gun.InitProjectile(GunData.New(sprite: "oddjob_projectile", clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+            damage: 30.0f, speed: 40f, range: 9999f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound",
+            hitWallSound: "paintball_impact_wall_sound", shouldRotate: false, fps: 30, preventOrbiting: true))
           .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; })
           .Attach<OddjobProjectile>();
+
+      _Sparks = VFX.Create("oddjob_sparks");
+      _OddjobHat = CwaffHats.EasyHat(name: "oddjob_hat", offset: new IntVector2( 0, -3), excluded: true);
     }
 
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        //
+        if (!projectile.FiredForFree())
+        {
+            this._extantOddjobProj = projectile;
+            RemoveHatFromHead();
+        }
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -35,32 +51,71 @@ public class Oddjob : CwaffGun
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
-        //
+        PutHatOnHead();
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
-        //
+        RemoveHatFromHead();
     }
 
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
-        //
+        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
-        //
+        RemoveHatFromHead();
+    }
+
+    private void ReturnHatProjectile()
+    {
+        if (this._extantOddjobProj)
+            this._extantOddjobProj.DieInAir();
+        this.gun.CurrentAmmo = 1;
+        this.gun.MoveBulletsIntoClip(1);
+    }
+
+    private void PutHatOnHead()
+    {
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+        if (player.gameObject.GetComponent<HatController>() is not HatController hc)
+            return;
+        if (player.CurrentHat() is Hat hat)
+        {
+            if (hat.hatName == _OddjobHat.hatName)
+                return;
+            this._capiHatName = hat.hatName.GetDatabaseFriendlyHatName();
+        }
+        hc.SetHat(_OddjobHat);
+    }
+
+    private void RemoveHatFromHead()
+    {
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+        if (player.gameObject.GetComponent<HatController>() is not HatController hc)
+            return;
+        if (hc.CurrentHat is Hat curHat && curHat.hatName == _OddjobHat.hatName)
+            hc.RemoveCurrentHat();
+        if (string.IsNullOrEmpty(this._capiHatName))
+            return;
+        if (Hatabase.Hats.TryGetValue(this._capiHatName, out Hat origHat))
+            hc.SetHat(origHat);
+        this._capiHatName = null;
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
         {
-            //
+            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+            RemoveHatFromHead();
         }
         base.OnDestroy();
     }
@@ -68,20 +123,125 @@ public class Oddjob : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
+        bool gunSpriteEnabled = (!this.PlayerOwner);
+        if (gunSpriteEnabled != this.gun.sprite.renderer.enabled)
+        {
+            this.gun.sprite.renderer.enabled = gunSpriteEnabled;
+            if (gunSpriteEnabled)
+                SpriteOutlineManager.AddOutlineToSprite(this.gun.sprite, Color.black, 0.2f, 0.05f);
+            else if (SpriteOutlineManager.HasOutline(this.gun.sprite))
+                SpriteOutlineManager.RemoveOutlineFromSprite(this.gun.sprite);
+        }
+        if (!this.PlayerOwner)
             return;
 
-        //
+        bool holdingHat = !this._extantOddjobProj;
+        this.gun.CanBeDropped = holdingHat;
+        this.gun.CanBeSold = holdingHat;
+        this.PlayerOwner.inventory.GunLocked.SetOverride(ItemName, !holdingHat);
+        if (holdingHat && this.gun.CurrentAmmo == 0)
+        {
+            ReturnHatProjectile();
+            PutHatOnHead();
+            SpawnManager.SpawnVFX(Breegull._TalonDust, this.PlayerOwner.sprite.WorldTopCenter, Quaternion.identity);
+            this.gun.PlayIdleAnimation();
+        }
+    }
+
+    private void OnTriedToInitiateAttack(PlayerController player)
+    {
+        if (!player || player.CurrentGun != this.gun)
+            return; // inactive, do normal firing stuff
+        if (this._extantOddjobProj)
+            player.SuppressThisClick = true; // can't fire more than one hat at once
     }
 }
 
 public class OddjobProjectile : MonoBehaviour
 {
+    private const float _SPARK_RATE = 0.05f;
+
+    internal bool _collidedLastFrame = false;
+    internal bool _returning = false;
+
+    private Projectile _proj;
+    private float _lastSparkTime = 0;
+    private List<HealthHaver> _hitThisFrame = new();
+    private List<HealthHaver> _hitLastFrame = new();
+
     private void Start()
     {
-        Projectile p = base.GetComponent<Projectile>();
-        p.specRigidbody.CollideWithTileMap = false;
-        p.OverrideMotionModule = new OddjobProjectileMotionModule();
+        this._proj = base.GetComponent<Projectile>();
+        this._proj.specRigidbody.CollideWithTileMap = false;
+        this._proj.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+        OddjobProjectileMotionModule motionModule = new OddjobProjectileMotionModule();
+        this._proj.OverrideMotionModule = motionModule;
+        if (this._proj.Owner is PlayerController player)
+            motionModule.ForceInvert = player.SpriteFlipped;
+        else
+            motionModule.ForceInvert = Lazy.CoinFlip();
+
+        EasyTrailBullet trail = base.gameObject.AddComponent<EasyTrailBullet>();
+            // trail.TrailPos   = p.transform.position.XY() + new Vector2(5f / C.PIXELS_PER_TILE, 5f / C.PIXELS_PER_TILE); // offset by middle of the sprite
+            trail.StartWidth = 0.5f;
+            trail.EndWidth   = 0.05f;
+            trail.LifeTime   = 0.1f;
+            trail.BaseColor  = new Color(0.5f, 0.5f, 0.5f);
+            trail.StartColor = Color.Lerp(trail.BaseColor, Color.white, 0.5f);
+            trail.EndColor   = trail.BaseColor;
+    }
+
+    private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        if (!this._proj || otherRigidbody.gameActor is not AIActor enemy)
+            return;
+        PhysicsEngine.SkipCollision = true;
+        if (this._returning || !enemy.healthHaver || enemy.healthHaver.IsDead)
+            return;
+
+        this._hitThisFrame.Add(enemy.healthHaver);
+        if (!enemy.healthHaver.IsBoss && !enemy.healthHaver.IsSubboss)
+        {
+            enemy.ClearPath();
+            if (enemy.behaviorSpeculator.IsInterruptable)
+                enemy.behaviorSpeculator.Interrupt();
+            enemy.behaviorSpeculator.Stun(1f);
+        }
+        this._collidedLastFrame = true;
+        float now = BraveTime.ScaledTimeSinceStartup;
+        if ((now - this._lastSparkTime) >= _SPARK_RATE)
+        {
+            this._lastSparkTime = now;
+            CwaffVFX.SpawnBurst(prefab: Oddjob._Sparks, numToSpawn: 10, basePosition: myRigidbody.UnitBottomCenter,
+              minVelocity: 10f, velocityVariance: 5f, rotType: CwaffVFX.Rot.Random, lifetime: 0.2f, fadeOutTime: 0.05f);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        this.LoopSoundIf(false, "oddjob_saw_sound");
+        this._hitThisFrame.Clear();
+        UpdateCollisionData();
+    }
+
+    private void UpdateCollisionData()
+    {
+        foreach (HealthHaver hh in this._hitLastFrame)
+            if (hh && !hh.IsDead && hh.IsVulnerable && !this._hitThisFrame.Contains(hh))
+                hh.ApplyDamage(this._proj.baseData.damage, Vector2.zero, this._proj.OwnerName);
+        BraveUtility.Swap(ref this._hitThisFrame, ref this._hitLastFrame);
+        this._hitThisFrame.Clear();
+        this._collidedLastFrame = false;
+    }
+
+    private void Update()
+    {
+        if (BraveTime.DeltaTime == 0.0f)
+            return;
+
+        this.LoopSoundIf(this._collidedLastFrame, "oddjob_saw_sound");
+        this.LoopSoundIf(!this._collidedLastFrame, "oddjob_spin_sound");
+        UpdateCollisionData();
     }
 }
 
@@ -107,6 +267,7 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
     private float _circleTraveled;
     private RoomHandler _startRoom;
     private float _returnTime;
+    private OddjobProjectile _oddProj;
 
     private void ResetAngle(float angleDiff)
     {
@@ -129,11 +290,11 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
     private const float _RADIAL_SHIFT_RATE     = 8f;    // rate at which projectile shifts along radial path lines, in units per second
     private const float _RETURN_PERCENT        = 0.75f; // percent of path to complete before trying to return to the player
     private const float _MAX_RETURN_TIME       = 1.0f;  // time to wait before teleporting to the player after traveling
-    private const float _MAX_RETURN_SQR_RADIUS = 1.0f;  // distance from player the projectile needs to be to vanish and restore ammo
+    private const float _MAX_RETURN_SQR_RADIUS = 0.2f;  // square distance from player the projectile needs to be to vanish and restore ammo
+    private const float _SAW_SPEED             = 0.1f;  // fractional speed the projectile moves when actively colliding with an enemy
 
     private void Initialize(Vector2 lastPosition, Transform projectileTransform, float m_timeElapsed, Vector2 m_currentDirection, bool shouldRotate)
     {
-        // ETGModConsole.Log($"thrown from {lastPosition} at angle {m_currentDirection.ToAngle()}");
         _privateLastPosition = lastPosition;
         _initialRightVector  = ((!shouldRotate) ? m_currentDirection : projectileTransform.right.XY());
         _initialUpVector     = ((!shouldRotate) ? (Quaternion.Euler(0f, 0f, 90f) * m_currentDirection) : projectileTransform.up);
@@ -142,7 +303,6 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
         _yDisplacement       = 0f;
 
         float aimAngle = _initialRightVector.ToAngle();
-        // TODO: figure out if distance or angle is better for target tracking; both have their pros and cons
         AIActor firstEnemy = Lazy.NearestEnemyWithinConeOfVision(lastPosition, aimAngle, _SCAN_DELTA,
           useNearestAngleInsteadOfDistance: false, maxDistance: 2f * _MAX_TOSS_RADIUS, ignoreWalls: true);
         if (firstEnemy)
@@ -150,18 +310,15 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
         else
             _circleCenter = lastPosition + _NO_TARGET_TOSS_RADIUS * _initialRightVector.normalized;
 
-        // Lazy.DebugLog($"  center at {_circleCenter}");
         Vector2 centerDelta = lastPosition - _circleCenter;
         _circleRadius = centerDelta.magnitude;
         _circleSqrRadius = _circleRadius * _circleRadius;
-        // Lazy.DebugLog($"  radius is {_circleRadius}");
         _circleCircum = 2f * Mathf.PI * _circleRadius;
-        // Lazy.DebugLog($"  circum is {_circleCircum}");
         _startAngleFromCenter = centerDelta.ToAngle();
-        // Lazy.DebugLog($"  startAngle is {_startAngleFromCenter}");
         _curAngleFromCenter = _startAngleFromCenter;
         _circleTraveled = 0f;
         _startRoom = lastPosition.GetAbsoluteRoom();
+        // ETGModConsole.Log($"start angle is {_startAngleFromCenter}");
 
         /* THE PLAN:
             - figure out position of enemy directly in front of where player is aiming
@@ -218,22 +375,34 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
 
     public override void Move(Projectile source, Transform projectileTransform, tk2dBaseSprite projectileSprite, SpeculativeRigidbody specRigidbody, ref float m_timeElapsed, ref Vector2 m_currentDirection, bool Inverted, bool shouldRotate)
     {
+        if (!this._oddProj)
+        {
+            this._oddProj = source.gameObject.GetComponent<OddjobProjectile>();
+            if (!this._oddProj)
+            {
+                Lazy.RuntimeWarn("Moving Oddjob projectile without a projectile!");
+                return;
+            }
+        }
+
         ProjectileData baseData = source.baseData;
         Vector2 curPos = ((!projectileSprite) ? projectileTransform.position.XY() : projectileSprite.WorldCenter);
         if (!_initialized)
             Initialize(curPos, projectileTransform, m_timeElapsed, m_currentDirection, shouldRotate);
 
         m_timeElapsed   += BraveTime.DeltaTime;
-        _circleTraveled += BraveTime.DeltaTime * baseData.speed;
+        float travelRate = this._oddProj._collidedLastFrame ? _SAW_SPEED : 1.0f;
+        _circleTraveled += BraveTime.DeltaTime * baseData.speed * travelRate;
         float percentDone = _circleTraveled / _circleCircum;
-        if (percentDone > _RETURN_PERCENT)
+        if (percentDone > _RETURN_PERCENT && !this._oddProj._collidedLastFrame)
         {
+            this._oddProj._returning = true;
             if (!source.Owner || ((_returnTime += BraveTime.DeltaTime) > _MAX_RETURN_TIME))
             {
                 source.DieInAir();
                 return;
             }
-            Vector2 ownerDelta = (source.Owner.CenterPosition - curPos);
+            Vector2 ownerDelta = (source.Owner.sprite.WorldTopCenter - curPos);
             if (ownerDelta.sqrMagnitude < _MAX_RETURN_SQR_RADIUS)
             {
                 source.DieInAir();
@@ -249,8 +418,9 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
 
 
         // find enemies that are close to our path and coming up ahead
-        float targetAngle = _startAngleFromCenter + 360f * percentDone;
-        FindUpcomingTargets(targetAngle: targetAngle, clockwise: !Inverted);
+        bool clockwise = Inverted == ForceInvert;
+        float targetAngle = _startAngleFromCenter + (clockwise ? 360f : -360f) * percentDone;
+        FindUpcomingTargets(targetAngle: targetAngle, clockwise: clockwise);
 
         // determine whether we need to adjust our radius from the center based on the enemy's distance
         float targetRadius = _circleRadius;
@@ -259,11 +429,9 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
         float curRadius = (curPos - _circleCenter).magnitude;
         float maxShift = _RADIAL_SHIFT_RATE * BraveTime.DeltaTime;
         float nextRadius = curRadius + Mathf.Clamp(targetRadius - curRadius, -maxShift, maxShift);
-        // if (Mathf.Abs(nextRadius - _circleRadius) > 0.001f)
-        //     System.Console.WriteLine($"adjusting radius to {nextRadius - _circleRadius}");
 
         // actually determine our target position based on target angle and radius, and update velocity
-        Vector2 targetPos = _circleCenter + (Inverted ? -targetAngle : targetAngle).ToVector(nextRadius);
+        Vector2 targetPos = _circleCenter + targetAngle.ToVector(nextRadius);
         Vector2 velocity = (targetPos - curPos) / BraveTime.DeltaTime;
         specRigidbody.Velocity = velocity;
     }

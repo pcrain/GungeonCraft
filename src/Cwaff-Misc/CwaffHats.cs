@@ -105,9 +105,10 @@ public static class CwaffHats
       Lazy.DebugLog($"Successfully initialized {_NumHats} hats! C:");
     }
 
-    private static void EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null, bool excluded = false, bool? autoFlip = null, Hat.HatDepthType? depth = null)
+    internal static Hat EasyHat(string name, IntVector2? offset = null, bool onEyes = false, int fps = 1, bool locked = false, string displayName = null, bool excluded = false, bool? autoFlip = null, Hat.HatDepthType? depth = null)
     {
-      HatUtility.SetupHat(
+      ++_NumHats;
+      return HatUtility.SetupHat(
         name: displayName ?? name.Replace("_", " ").ToTitleCaseInvariant(),
         spritePaths: Lazy.Combine(
           ResMap.Get($"{name}_south",     true),
@@ -127,6 +128,5 @@ public static class CwaffHats
         // showSilhouetteWhenLocked: true,
         excludeFromHatRoom: excluded
         );
-        ++_NumHats;
     }
 }

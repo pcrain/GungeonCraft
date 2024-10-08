@@ -239,3 +239,4 @@ allay_drop_sound,3.0,1,sound,0
 allay_find_sound,3.0,1,sound,0
 allay_pet_sound,3.0,1,sound,0
 allay_spawn_sound,3.0,1,sound,0
+oddjob_spin_sound,0.0,0,sound,0

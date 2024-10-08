@@ -851,8 +851,10 @@ public static class Extensions
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
     float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
-    GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false)
+    GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false)
   {
+    CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
+
     gun.quality = quality;
     gun.reloadTime = reloadTime;
     gun.gunClass = gunClass;
@@ -888,6 +890,8 @@ public static class Extensions
 
     if (dynamicBarrelOffsets)
       CwaffGun.SetUpDynamicBarrelOffsets(gun);
+    if (suppressReloadLabel)
+      cg.suppressReloadLabel = true;
 
     if (curse != 0f)
       gun.AddStatToGun(PlayerStats.StatType.Curse, curse, StatModifier.ModifyMethod.ADDITIVE);
@@ -2540,6 +2544,9 @@ public static class Extensions
       return _EnemyNames[guid] = entry.PrimaryDisplayName;
     return _EnemyNames[guid] = StringTableManager.GetEnemiesString(entry.PrimaryDisplayName);
   }
+
+  /// <summary>Get an enemy's Ammonomicon display name from their gameObject</summary>
+  public static string AmmonomiconName(this AIActor enemy) => enemy.EnemyGuid.AmmonomiconName();
 
   /// <summary>Apply a shader to an enemy using a specific shader function</summary>
   public static void ApplyShader(this AIActor enemy, Action<tk2dBaseSprite> shaderFunc, bool includeHands = true, bool includeGun = false)

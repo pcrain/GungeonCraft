@@ -47,8 +47,9 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   private ModuleShootData                   _cachedShootData           = null; // cached firing data for getting info on extant beams, etc.
 
   public  bool                              hideAmmo                   = false;  // whether our ammo display is visible
-  public  bool                              preventMovingWhenCharging    = false;  // whether holding the gun prevents the player from moving
-  public  bool                              preventRollingWhenCharging   = false;  // whether holding the gun prevents the player from dodge rolling
+  public  bool                              suppressReloadLabel        = false;  // whether to suppress reload label when out of ammo
+  public  bool                              preventMovingWhenCharging  = false;  // whether holding the gun prevents the player from moving
+  public  bool                              preventRollingWhenCharging = false;  // whether holding the gun prevents the player from dodge rolling
 
   public static void SetUpDynamicBarrelOffsets(Gun gun)
   {
@@ -303,6 +304,18 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       static bool Prefix(Gun __instance)
       {
           return !__instance.gameObject.GetComponent<Unthrowable>();
+      }
+  }
+
+  /// <summary>Patch to prevent guns from flashing the reload label</summary>
+  [HarmonyPatch(typeof(GameUIRoot), nameof(GameUIRoot.InformNeedsReload))]
+  private class GameUIRootInformNeedsReloadPatch
+  {
+      static bool Prefix(GameUIRoot __instance, PlayerController attachPlayer, Vector3 offset, float customDuration, string customKey)
+      {
+        if (attachPlayer && attachPlayer.CurrentGun is Gun gun && gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
+          return !cg.suppressReloadLabel; // skip the original method if we are suppressing reload labels
+        return true;     // call the original method
       }
   }
 }
