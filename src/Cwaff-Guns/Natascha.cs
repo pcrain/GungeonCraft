@@ -128,7 +128,7 @@ public class Natascha : CwaffGun
     //TODO: this might be useful for other guns
     private int ComputeAnimationSpeed()
     {
-        float fireMultiplier = this.PlayerOwner.stats.GetStatValue(PlayerStats.StatType.RateOfFire) * this.GetSpinupFireRate();
+        float fireMultiplier = this.PlayerOwner.stats.GetStatValue(PlayerStats.StatType.RateOfFire) * this.GetDynamicFireRate();
         float cooldownTime   = (this.gun.DefaultModule.cooldownTime + this.gun.gunCooldownModifier) / fireMultiplier;
         float fps            = ((float)_FIRE_ANIM_FRAMES / cooldownTime);
         return 1 + Mathf.CeilToInt(fps); // add 1 to FPS to make sure the animation doesn't skip a loop
@@ -158,41 +158,6 @@ public class Natascha : CwaffGun
         this.PlayerOwner.stats.RecalculateStatsWithoutRebuildingGunVolleys(this.PlayerOwner); //Alexandria helper
     }
 
-    public float GetSpinupFireRate() => (this._speedMult / (1f + _MAX_SPIN_UP));
-
-    private static float ModifyRateOfFire(Gun gun)
-    {
-        return (gun.GetComponent<Natascha>() is Natascha nat) ? nat.GetSpinupFireRate() : 1f;
-    }
-
-    /// <summary>Use Natascha's custom rate of fire spinup code</summary>
-    /// <remarks>Only works if GainsRateOfFireAsContinueAttack is true</remarks>
-    [HarmonyPatch(typeof(Gun), nameof(Gun.HandleModuleCooldown), MethodType.Enumerator)]
-    private class NataschaSpinupPatch
-    {
-        [HarmonyILManipulator]
-        private static void NataschaSpinupIL(ILContext il, MethodBase original)
-        {
-            ILCursor cursor = new ILCursor(il);
-            Type ot = original.DeclaringType;
-
-            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchAdd())) // immediately after the first add is where we're looking for
-                return;
-
-            cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
-            cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
-            cursor.Emit(OpCodes.Call, typeof(Natascha).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
-            cursor.Emit(OpCodes.Mul);  // multiply the additional natascha rate of fire by fireMultiplier
-
-            // if (!cursor.TryGotoNext(MoveType.After,
-            //   instr => instr.MatchLdfld<Gun>("m_continuousAttackTime"),
-            //   instr => instr.MatchMul()))
-            //     return;
-
-            // // load the gun itself onto the stack and call our fire speed
-            // cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
-            // cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
-            // cursor.Emit(OpCodes.Call, typeof(Natascha).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
-        }
-    }
+    //NOTE: Only works if GainsRateOfFireAsContinueAttack is true (i.e., rampUpFireRate: true is set in attributes)
+    public override float GetDynamicFireRate() => (this._speedMult / (1f + _MAX_SPIN_UP));
 }

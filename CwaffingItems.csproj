@@ -204,6 +204,7 @@
     <Compile Include="src\Cwaff-Guns\CarpetBomber.cs"/>
     <Compile Include="src\Cwaff-Guns\Breegull.cs"/>
     <Compile Include="src\Cwaff-Guns\Ticonderogun.cs"/>
+    <Compile Include="src\Cwaff-Guns\Overflow.cs"/>
     <Compile Include="src\Cwaff-Guns\SchrodingersGat.cs"/>
     <Compile Include="src\Cwaff-Guns\KingsLaw.cs"/>
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
@@ -251,6 +252,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Misc\AtlasHelper.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffBezierMesh.cs"/>
     <Compile Include="src\Cwaff-Misc\Hotfixes.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHats.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTrailController.cs"/>

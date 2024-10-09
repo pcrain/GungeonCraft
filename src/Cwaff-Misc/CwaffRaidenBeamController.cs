@@ -38,7 +38,7 @@ public class CwaffRaidenBeamController : BeamController
     internal static void Return(LinkedListNode<Bone> bone)
     {
       _BonePool.AddLast(bone);
-      System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
+      // System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
     }
 
     internal static void ReturnAll(ref LinkedList<Bone> bones)

@@ -2932,5 +2932,11 @@ public static class Extensions
   //     }
   //   }
   // }
+
+  /// <summary>Get the default animation for a game object</summary>
+  public static tk2dSpriteAnimationClip DefaultAnimation(this GameObject vfx)
+  {
+    return vfx.GetComponent<tk2dSpriteAnimator>().library.clips[0];
+  }
 }
 

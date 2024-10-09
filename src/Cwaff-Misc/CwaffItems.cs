@@ -178,6 +178,45 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   {
   }
 
+  /// <summary>Determines the fire rate of the gun.</summary>
+  public virtual float GetDynamicFireRate() => 1.0f;
+
+  /// <summary>Use Natascha's custom rate of fire spinup code</summary>
+  /// <remarks>Only works if GainsRateOfFireAsContinueAttack is true</remarks>
+  [HarmonyPatch(typeof(Gun), nameof(Gun.HandleModuleCooldown), MethodType.Enumerator)]
+  private class DynamicSpinupPatch
+  {
+      [HarmonyILManipulator]
+      private static void DynamicSpinupIL(ILContext il, MethodBase original)
+      {
+          ILCursor cursor = new ILCursor(il);
+          Type ot = original.DeclaringType;
+
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchAdd())) // immediately after the first add is where we're looking for
+              return;
+
+          cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
+          cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
+          cursor.Emit(OpCodes.Call, typeof(DynamicSpinupPatch).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
+          cursor.Emit(OpCodes.Mul);  // multiply the additional natascha rate of fire by fireMultiplier
+
+          // if (!cursor.TryGotoNext(MoveType.After,
+          //   instr => instr.MatchLdfld<Gun>("m_continuousAttackTime"),
+          //   instr => instr.MatchMul()))
+          //     return;
+
+          // // load the gun itself onto the stack and call our fire speed
+          // cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
+          // cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
+          // cursor.Emit(OpCodes.Call, typeof(Natascha).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
+      }
+
+      private static float ModifyRateOfFire(Gun gun)
+      {
+          return (gun.GetComponent<CwaffGun>() is CwaffGun cg) ? cg.GetDynamicFireRate() : 1f;
+      }
+  }
+
   // public void BraveOnLevelWasLoaded()
   // {
   // }

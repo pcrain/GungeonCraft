@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.20.0 (TBD)
+
+- Removed Yggdrashell debug output from console
+
 ## 1.19.3 (2024-10-07)
 
 #### Features:

@@ -42,12 +42,6 @@ public class Oddjob : CwaffGun
         }
     }
 
-    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
-    {
-        base.OnReloadPressed(player, gun, manualReload);
-        //
-    }
-
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
