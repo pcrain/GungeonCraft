@@ -205,11 +205,12 @@ public class PathCurve : PathShape
     this.p3     = p3;
     if (rawControlPoints)
       return;
+    // https://math.stackexchange.com/questions/301736/how-do-i-find-a-bezier-curve-that-goes-through-a-series-of-points
     // convert control points to passthrough points
     Vector2 t1 = -5f * p0 + 18 * p1 - 9 * p2 + 2 * p3;
     Vector2 t2 = -5f * p3 + 18 * p2 - 9 * p1 + 2 * p0;
-    this.p1 = t1;
-    this.p2 = t2;
+    this.p1 = t1 / 6f;
+    this.p2 = t2 / 6f;
   }
   // 3-argument constructor uses middle point twice
   public PathCurve(Vector2 p0, Vector2 pmid, Vector2 p3, bool rawControlPoints = false)

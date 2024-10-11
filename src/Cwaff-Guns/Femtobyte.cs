@@ -163,7 +163,7 @@ public class Femtobyte : CwaffGun
         _ImpactBits = VFX.Create("femtobyte_projectile_vfx");
     }
 
-    private static bool IsWhiteListedPrefab(GameObject bodyObject, out PrefabData trapPrefab)
+    internal static bool IsWhiteListedPrefab(GameObject bodyObject, out PrefabData trapPrefab)
     {
         string name = bodyObject.name.Replace("(Clone)","").TrimEnd().ToLowerInvariant();
         // ETGModConsole.Log($"looking up {name} in prefab whitelist");

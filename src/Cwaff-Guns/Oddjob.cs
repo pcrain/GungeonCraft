@@ -16,7 +16,7 @@ public class Oddjob : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Oddjob>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 1, shootFps: 60, reloadFps: 4,
+            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 1, shootFps: 60, reloadFps: 4,
                 muzzleFrom: Items.Mailbox, canGainAmmo: false, suppressReloadLabel: true, curse: 0.5f);
             gun.Attach<Unthrowable>();
             gun.carryPixelOffset = new IntVector2(3, 11);
@@ -29,7 +29,7 @@ public class Oddjob : CwaffGun
           .Attach<OddjobProjectile>();
 
       _Sparks = VFX.Create("oddjob_sparks");
-      _OddjobHat = CwaffHats.EasyHat(name: "oddjob_hat", offset: new IntVector2( 0, -3), excluded: true);
+      _OddjobHat = CwaffHats.EasyHat(name: "oddjob_hat", offset: new IntVector2(0, -3), excluded: true);
     }
 
     public override void PostProcessProjectile(Projectile projectile)

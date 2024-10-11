@@ -5,15 +5,11 @@ public class CwaffBezierMesh : MonoBehaviour
 {
   private class Bone
   {
-    private static int _Counter = 0;
-
-    public Vector2 pos;
-
-    public Vector2 normal;
-
+    private static readonly LinkedList<Bone> _BonePool = new();
     private static int _BonesCreated = 0;
 
-    private static readonly LinkedList<Bone> _BonePool = new();
+    public Vector2 pos;
+    public Vector2 normal;
 
     internal static LinkedListNode<Bone> Rent(Vector2 pos)
     {
@@ -87,7 +83,6 @@ public class CwaffBezierMesh : MonoBehaviour
 
   private void Start()
   {
-    // base.transform.parent = SpawnManager.Instance.VFX;
     base.transform.rotation = Quaternion.identity;
     base.transform.position = Vector3.zero;
     m_sprite = this.GetOrAddComponent<tk2dTiledSprite>();
@@ -99,18 +94,15 @@ public class CwaffBezierMesh : MonoBehaviour
     m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.untrimmedBoundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
   }
 
+  private static readonly Quaternion _Rot90 = Quaternion.Euler(0f, 0f, 90f);
   private void Update()
   {
     m_globalTimer += BraveTime.DeltaTime;
     Bone.ReturnAll(ref m_bones);
     DrawMainBezierCurve(startPos, startPos + Vector2.down, endPos + Vector2.up, endPos);
-    LinkedListNode<Bone> linkedListNode = m_bones.First;
-    while (linkedListNode != null && linkedListNode != m_bones.Last)
-    {
-      linkedListNode.Value.normal = (Quaternion.Euler(0f, 0f, 90f) * (linkedListNode.Next.Value.pos - linkedListNode.Value.pos)).normalized;
-      linkedListNode = linkedListNode.Next;
-    }
-    if (m_bones.Count > 0)
+    for (LinkedListNode<Bone> n = m_bones.First; n != m_bones.Last; n = n.Next)
+      n.Value.normal = (_Rot90 * (n.Next.Value.pos - n.Value.pos)).normalized;
+    if (m_bones.Count > 1)
       m_bones.Last.Value.normal = m_bones.Last.Previous.Value.normal;
   }
 
@@ -118,12 +110,11 @@ public class CwaffBezierMesh : MonoBehaviour
   {
     m_minBonePosition = new Vector2(float.MaxValue, float.MaxValue);
     m_maxBonePosition = new Vector2(float.MinValue, float.MinValue);
-    for (LinkedListNode<Bone> linkedListNode = m_bones.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
+    for (LinkedListNode<Bone> n = m_bones.First; n != null; n = n.Next)
     {
-      m_minBonePosition = Vector2.Min(m_minBonePosition, linkedListNode.Value.pos);
-      m_maxBonePosition = Vector2.Max(m_maxBonePosition, linkedListNode.Value.pos);
+      m_minBonePosition = Vector2.Min(m_minBonePosition, n.Value.pos);
+      m_maxBonePosition = Vector2.Max(m_maxBonePosition, n.Value.pos);
     }
-    Vector2 vector = new Vector2(m_minBonePosition.x, m_minBonePosition.y) - base.transform.position.XY();
     base.transform.position = new Vector3(m_minBonePosition.x, m_minBonePosition.y);
     m_sprite.HeightOffGround = 0.5f;
     m_sprite.ForceBuild();
@@ -162,7 +153,7 @@ public class CwaffBezierMesh : MonoBehaviour
     mainBezierPoint4 = p3;
   }
 
-  private Vector2 GetPointOnMainBezier(float t)
+  public Vector2 GetPointOnMainBezier(float t)
   {
     return BraveMathCollege.CalculateBezierPoint(t, mainBezierPoint1, mainBezierPoint2, mainBezierPoint3, mainBezierPoint4);
   }
@@ -180,9 +171,9 @@ public class CwaffBezierMesh : MonoBehaviour
     int numSubtilesInSprite = spritePixelLength / 4;
     int lastBoneIndex = Mathf.Max(m_bones.Count - 1, 0);
     int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
-    boundsCenter = (m_minBonePosition + m_maxBonePosition) / 2f;
-    boundsExtents = (m_maxBonePosition - m_minBonePosition) / 2f;
-    LinkedListNode<Bone> linkedListNode = m_bones.First;
+    boundsCenter = 0.5f * (m_maxBonePosition + m_minBonePosition);
+    boundsExtents = 0.5f * (m_maxBonePosition - m_minBonePosition);
+    LinkedListNode<Bone> bone = m_bones.First;
     int verticesDrawn = 0;
     int animationFrame = Mathf.FloorToInt(Mathf.Repeat(m_globalTimer * animation.fps, animation.frames.Length));
     tk2dSpriteAnimationFrame frame = animation.frames[animationFrame];
@@ -196,11 +187,11 @@ public class CwaffBezierMesh : MonoBehaviour
       for (int j = 0; j <= lastSubtileIndex; j++)
       {
         float fractionOfSubtileToDraw = 1f;
+        Bone curBone = bone.Value;
+        Bone nextBone = bone.Next.Value;
         if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex)
-          fractionOfSubtileToDraw = Vector2.Distance(linkedListNode.Next.Value.pos, linkedListNode.Value.pos);
+          fractionOfSubtileToDraw = Vector2.Distance(nextBone.pos, curBone.pos);
         int uvCurrent = offset + verticesDrawn;
-        Bone curBone = linkedListNode.Value;
-        Bone nextBone = linkedListNode.Next.Value;
         pos[uvCurrent++] = (curBone.pos  + curBone.normal  * segmentSprite.position0.y - m_minBonePosition).ToVector3ZUp(/*40*/0f);
         pos[uvCurrent++] = (nextBone.pos + nextBone.normal * segmentSprite.position1.y - m_minBonePosition).ToVector3ZUp(/*40*/0f);
         pos[uvCurrent++] = (curBone.pos  + curBone.normal  * segmentSprite.position2.y - m_minBonePosition).ToVector3ZUp(/*40*/0f);
@@ -214,8 +205,7 @@ public class CwaffBezierMesh : MonoBehaviour
         uv[uvCurrent++] = maxUV;
         verticesDrawn += 4;
         numSpritesDrawn += fractionOfSubtileToDraw / m_spriteSubtileWidth;
-        if (linkedListNode != null)
-          linkedListNode = linkedListNode.Next;
+        bone = bone.Next;
       }
     }
   }

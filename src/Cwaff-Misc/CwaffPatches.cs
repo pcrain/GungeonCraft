@@ -152,7 +152,7 @@ static class ProjectileOnTileCollisionPatches
 
 [HarmonyPatch(typeof(Gun), nameof(Gun.ShootSingleProjectile))]
 static class ShootSingleProjectilePatch
-{
+{ //REFACTOR: the accuracy modifiers can all be consolidated
     // NOTE: used by MMAiming to increase reload speed while standing still
     [HarmonyILManipulator]
     private static void ReduceSpreadWhenIdleIL(ILContext il, MethodBase original)
@@ -181,6 +181,21 @@ static class ShootSingleProjectilePatch
 
         cursor.Emit(OpCodes.Ldloc_0);  // load PlayerController type
         cursor.Emit(OpCodes.Call, typeof(BionicFinger).GetMethod("ModifySpreadIfSemiautomatic", BindingFlags.Static | BindingFlags.NonPublic));
+    }
+
+    // NOTE: used by CwaffGun to dynamically adjust spread
+    [HarmonyILManipulator]
+    private static void DynamicAccuracyIL(ILContext il, MethodBase original)
+    {
+        ILCursor cursor = new ILCursor(il);
+
+        if (!cursor.TryGotoNext(MoveType.After,
+            instr => instr.MatchLdcI4(2),
+            instr => instr.MatchCallvirt<PlayerStats>("GetStatValue")))
+            return;
+
+        cursor.Emit(OpCodes.Ldarg_0);  // load Gun type
+        cursor.Emit(OpCodes.Call, typeof(CwaffGun).GetMethod("ModifyAccuracy", BindingFlags.Static | BindingFlags.NonPublic));
     }
 
     // NOTE: used by CwaffProjectile to determine if a projectile was fired for free

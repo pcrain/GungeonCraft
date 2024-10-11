@@ -162,7 +162,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       OnActualReload(player, gun, manual);
       this._hasReloaded = false;
     }
-    if (player.AcceptingNonMotionInput && !gun.IsReloading && manual && (gun.ClipShotsRemaining >= gun.ClipCapacity))
+    if (player.AcceptingNonMotionInput && !gun.IsReloading && manual && (gun.ClipShotsRemaining >= Mathf.Min(gun.ClipCapacity, gun.CurrentAmmo)))
     {
       OnFullClipReload(player, gun);
     }
@@ -215,6 +215,15 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       {
           return (gun.GetComponent<CwaffGun>() is CwaffGun cg) ? cg.GetDynamicFireRate() : 1f;
       }
+  }
+
+  /// <summary>Determines an additional dynamic accuracy multiplier for the gun.</summary>
+  public virtual float GetDynamicAccuracy() => 1.0f;
+
+  // NOTE: called by patch in CwaffPatches
+  private static float ModifyAccuracy(float oldSpread, Gun gun)
+  {
+      return oldSpread * ((gun.GetComponent<CwaffGun>() is CwaffGun cg) ? cg.GetDynamicAccuracy() : 1f);
   }
 
   // public void BraveOnLevelWasLoaded()
@@ -355,6 +364,29 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
         if (attachPlayer && attachPlayer.CurrentGun is Gun gun && gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
           return !cg.suppressReloadLabel; // skip the original method if we are suppressing reload labels
         return true;     // call the original method
+      }
+  }
+
+  /// <summary>Patch to allow the ammo display to show more than 125 shots for non-beam weapons</summary>
+  [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateAmmoUIForModule))]
+  private class ShowMoreThan125ShotsPatch
+  {
+      [HarmonyILManipulator]
+      private static void ShowMoreThan125ShotsIL(ILContext il)
+      {
+          ILCursor cursor = new ILCursor(il);
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcI4(125)))
+            return;
+
+          cursor.Emit(OpCodes.Ldarg, 8); // load currentGun
+          cursor.Emit(OpCodes.Call, typeof(ShowMoreThan125ShotsPatch).GetMethod(nameof(ShowMoreThan125ShotsPatch.CheckGun), BindingFlags.Static | BindingFlags.NonPublic));
+      }
+
+      private static int CheckGun(int oldCount, Gun gun)
+      {
+        if (gun && gun.gameObject.GetComponent<CwaffGun>())
+          return 500;
+        return oldCount;
       }
   }
 }

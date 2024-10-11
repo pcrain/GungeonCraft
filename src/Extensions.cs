@@ -1040,7 +1040,12 @@ public static class Extensions
   /// <summary>Set up custom ammo types from default resource paths and adds it to a projectile module</summary>
   public static void SetupCustomAmmoClip(this ProjectileModule mod, GunData b)
   {
-      string clipname    = b.gun.EncounterNameOrDisplayName.InternalName();
+      mod.SetupCustomAmmoClip(b.gun.EncounterNameOrDisplayName.InternalName());
+  }
+
+  /// <summary>Set up custom ammo types from a specific resource path and adds it to a projectile module</summary>
+  public static void SetupCustomAmmoClip(this ProjectileModule mod, string clipname)
+  {
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
       mod.customAmmoType = AtlasHelper.GetOrAddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
   }
