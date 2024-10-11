@@ -2,7 +2,9 @@
 
 ## 1.20.0 (TBD)
 
+- Added Oddjob and Overflow
 - Removed Yggdrashell debug output from console
+- Visually tweaked Credit Card to allow player to go into debt by up to 500 casings instead of granting 500 casings while held (mechanically, it works the same)
 
 ## 1.19.3 (2024-10-07)
 

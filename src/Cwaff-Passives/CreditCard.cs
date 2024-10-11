@@ -4,7 +4,7 @@ public class CreditCard : CwaffPassive
 {
     public static string ItemName         = "Credit Card";
     public static string ShortDescription = "Shop 'til You Drop";
-    public static string LongDescription  = "Grants 500 shells while picked up. Grants 1 curse for every 50 shells below 500, and 1 coolness for every 50 shells above 500. Cannot be dropped when possessing fewer than 500 shells.";
+    public static string LongDescription  = "Allows the player to go into debt by up to 500 casings. Grants 1 coolness for every 50 casings held, and 1 curse for every 50 casings in debt. Cannot be dropped while in debt.";
     public static string Lore             = "Perhaps the greatest emblem of 20th century economics, this handy little piece of plastic gives unprecedented purchasing power for all of your Gungeon needs. Comes with the teensiest of interest rates, charged directly to your soul for your convenience.";
 
     internal const int _BASE_CREDIT      = 500;
@@ -90,5 +90,38 @@ public class CreditCard : CwaffPassive
         curseMod.amount   = (newCurrency > _BASE_CREDIT) ? 0 : ((_BASE_CREDIT - newCurrency) / _CREDIT_DELTA);
         coolMod.amount    = (newCurrency < _BASE_CREDIT) ? 0 : ((newCurrency - _BASE_CREDIT) / _CREDIT_DELTA);
         this.Owner.stats.RecalculateStats(this.Owner);
+    }
+
+    [HarmonyPatch(typeof(GameUIRoot), nameof(GameUIRoot.UpdatePlayerConsumables))]
+    private class GameUIRootUpdatePlayerConsumablesPatch
+    {
+        static void Postfix(GameUIRoot __instance, PlayerConsumables playerConsumables)
+        {
+            if (__instance.p_playerCoinSprite == null)
+                __instance.p_playerCoinSprite = __instance.p_playerCoinLabel.Parent.GetComponentInChildren<dfSprite>();
+            if (!Lazy.AnyoneHas<CreditCard>())
+            {
+                __instance.p_playerCoinLabel.Color = Color.white;
+                __instance.p_playerCoinSprite.SpriteName = "ui_coin_idle_002";
+                return;
+            }
+
+            int adjCoins = playerConsumables.Currency - _BASE_CREDIT;
+            __instance.p_playerCoinLabel.Color = adjCoins >= 0 ? Color.yellow : Color.red;
+            __instance.p_playerCoinLabel.ProcessMarkup = true;
+            __instance.p_playerCoinLabel.Text = IntToStringSansGarbage.GetStringForInt(adjCoins);
+            __instance.p_playerCoinSprite.SpriteName = "credit_card_icon_ui";
+        }
+    }
+
+    [HarmonyPatch(typeof(GameUIRoot), nameof(GameUIRoot.ShowCoreUI))]
+    private class GameUIRootShowCoreUIPatch
+    {
+        static void Postfix(GameUIRoot __instance, string reason)
+        {
+            if (!__instance.p_playerCoinLabel || !__instance.p_playerCoinLabel.Parent || !__instance.p_playerCoinLabel.Parent.Parent)
+                return; // prevent null reference when loading level
+            __instance.UpdatePlayerConsumables(GameManager.Instance.PrimaryPlayer.carriedConsumables);
+        }
     }
 }
