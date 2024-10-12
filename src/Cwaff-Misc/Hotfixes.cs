@@ -378,37 +378,29 @@ public static class CoopTurboModeHotfix
         private static void CoopTurboModeFixHookIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-            // cursor.DumpILOnce("CoopTurboModeFixHookIL");
 
             if (!cursor.TryGotoNext(MoveType.After,
               instr => instr.MatchLdfld<PlayerController>("m_turboSpeedModifier"),
-              instr => instr.OpCode == OpCodes.Callvirt  // can't match List<StatModified>::Add() for some reason
-              ))
+              instr => instr.OpCode == OpCodes.Callvirt))  // can't match List<StatModified>::Add() for some reason
                 return; // failed to find what we need
 
-            // Recalculate stats after adjusting turbo speed modifier (mirrors IL code for other calls to stats.RecalculateStats())
+            // Recalculate stats after adjusting turbo speed modifier
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Ldfld, typeof(PlayerController).GetField("stats", BindingFlags.Instance | BindingFlags.Public));
-            cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Ldc_I4_0);
-            cursor.Emit(OpCodes.Ldc_I4_0);
-            cursor.Emit(OpCodes.Callvirt, typeof(PlayerStats).GetMethod("RecalculateStats", BindingFlags.Instance | BindingFlags.Public));
+            cursor.CallPrivate(typeof(CoopTurboModePatch), nameof(RecalculateTurboStats));
 
             if (!cursor.TryGotoNext(MoveType.After,
               instr => instr.MatchLdfld<PlayerController>("m_turboRollSpeedModifier"),
-              instr => instr.OpCode == OpCodes.Callvirt  // can't match List<StatModified>::Add() for some reason
-              ))
+              instr => instr.OpCode == OpCodes.Callvirt))  // can't match List<StatModified>::Add() for some reason
                 return; // failed to find what we need
 
-            // Recalculate stats after adjusting turbo roll speed modifier (mirrors IL code for other calls to stats.RecalculateStats())
+            // Recalculate stats after adjusting turbo roll speed modifier
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Ldfld, typeof(PlayerController).GetField("stats", BindingFlags.Instance | BindingFlags.Public));
-            cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Ldc_I4_0);
-            cursor.Emit(OpCodes.Ldc_I4_0);
-            cursor.Emit(OpCodes.Callvirt, typeof(PlayerStats).GetMethod("RecalculateStats", BindingFlags.Instance | BindingFlags.Public));
+            cursor.CallPrivate(typeof(CoopTurboModePatch), nameof(RecalculateTurboStats));
+        }
 
-            return;
+        private static void RecalculateTurboStats(PlayerController player)
+        {
+            player.stats.RecalculateStats(player);
         }
     }
 }
