@@ -10,7 +10,8 @@
 - Updated required Alexandria version to 0.4.13 for custom ammo display bugfixes
 - Reduced Calculator's quality from B to C (stackable active items are relatively uncommon so utility is limited)
 - Made Aimu Hakurei an infinite ammo gun rather than a 0-ammo-cost gun (to prevent duct taping it to other guns)
-- Made using Duct Tape to attach Chroma, Hallaeribut, or Yggdrashell to another gun only transfer the currently active projectile type rather than all projectile types 
+- Made using Duct Tape to attach Chroma, Hallaeribut, or Yggdrashell to another gun only transfer the currently active projectile type rather than all projectile types
+- Tweaked some Ammonomicon descriptions for clarity and grammar 
 
 ## 1.19.3 (2024-10-07)
 

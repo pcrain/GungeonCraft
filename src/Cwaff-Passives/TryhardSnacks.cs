@@ -5,7 +5,7 @@ public class TryhardSnacks : CwaffPassive
     public static string ItemName         = "Tryhard Snacks";
     public static string ShortDescription = "Spawn Camping";
     public static string LongDescription  = "Projectiles deal 10x damage to enemies that spawned in less than a second ago.";
-    public static string Lore             = "A bag of triangular snacks shaped in the image of Mt. Dew, a holy place where tryhards have made pilgrimages to hone their tryharding skills for generations. Those who make the pilgrimage learn to embody the core values of alertness, preparedness, ruthlessness, smack-talking, and teabagging. Each bite-size morsel is crafted to refinforces these values, along with one's stomach lining.";
+    public static string Lore             = "A bag of triangular snacks shaped in the image of Mt. Dew, a holy place where tryhards have made pilgrimages to hone their tryharding skills for generations. Those who make the pilgrimage learn to embody the core values of alertness, preparedness, ruthlessness, smack-talking, and teabagging. Each bite-sized morsel is crafted to refinforce these values, as well as one's stomach lining.";
 
     internal static Dictionary<AIActor, float> _EngageTimes = new();
 

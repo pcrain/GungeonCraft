@@ -30,19 +30,26 @@ public static class Lazy
     private static readonly Dictionary<Type, PickupObject> _CustomPickups = new();
     private static readonly Dictionary<Type, int> _CustomPickupIds = new();
     private static ProjectileModule _BaseModule = null;
+    private static GenericLootTable _GunLoot = null;
+    private static GenericLootTable _ItemLoot = null;
     /// <summary>Perform basic initialization for a new passive, active, or gun item definition.</summary>
-    public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
+    public static TItemClass SetupItem<TItemClass, TItemSpecific>(string itemName, string shortDescription, string longDescription, string lore,
+      bool hideFromAmmonomicon = false, float weight = 1f)
         where TItemClass : PickupObject   // must be PickupObject for passive items, PlayerItem for active items, or Gun for guns
         where TItemSpecific : TItemClass  // must be a subclass of TItemClass
     {
+        _GunLoot ??= GameManager.Instance.RewardManager.GunsLootTable;
+        _ItemLoot ??= GameManager.Instance.RewardManager.ItemsLootTable;
+
         string baseItemName = itemName.InternalName();  //get saner gun name for commands
         string internalName = C.MOD_PREFIX+":"+baseItemName;
         string ammonomiconSprite;
         IDs.InternalNames[itemName] = internalName;
 
         TItemClass item;
+        bool isGun = typeof(TItemClass) == typeof(Gun);
 
-        if (typeof(TItemClass) == typeof(Gun))
+        if (isGun)
         {
             _BaseModule ??= Items._38Special.AsGun().DefaultModule;
 
@@ -86,12 +93,14 @@ public static class Lazy
         item.SetShortDescription(shortDescription);
         item.SetLongDescription($"{longDescription}\n\n{lore}");
         ETGMod.Databases.Items.Add(item);
+        if (weight != 1f)  // adjust loot pool weight if it's not the default
+            (isGun ? _GunLoot : _ItemLoot).defaultItemDrops.elements.Last().weight = weight;
 
         if (hideFromAmmonomicon)
             item.encounterTrackable.journalData.SuppressInAmmonomicon = true;
 
         IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
-        if (typeof(TItemClass) != typeof(Gun))
+        if (!isGun)
         {
             _CustomPickups[typeof(TItemSpecific)] = item; // register item in pickup by type database
             _CustomPickupIds[typeof(TItemSpecific)] = item.PickupObjectId; // register item in pickup id by type database
@@ -155,29 +164,35 @@ public static class Lazy
     /// <summary>
     /// Perform basic initialization for a new passive item definition.
     /// </summary>
-    public static PassiveItem SetupPassive<T>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
+    public static PassiveItem SetupPassive<T>(string itemName, string shortDescription, string longDescription, string lore,
+        bool hideFromAmmonomicon = false, float weight = 1f)
         where T : PassiveItem
     {
-        return SetupItem<PassiveItem, T>(itemName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        return SetupItem<PassiveItem, T>(itemName, shortDescription, longDescription, lore,
+          hideFromAmmonomicon: hideFromAmmonomicon, weight: weight);
     }
 
     /// <summary>
     /// Perform basic initialization for a new active item definition.
     /// </summary>
-    public static PlayerItem SetupActive<T>(string itemName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
+    public static PlayerItem SetupActive<T>(string itemName, string shortDescription, string longDescription, string lore,
+        bool hideFromAmmonomicon = false, float weight = 1f)
         where T : PlayerItem
     {
-        return SetupItem<PlayerItem, T>(itemName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        return SetupItem<PlayerItem, T>(itemName, shortDescription, longDescription, lore,
+          hideFromAmmonomicon: hideFromAmmonomicon, weight: weight);
     }
 
     private static readonly List<Gun> _GunsToFinalize = new();
     /// <summary>
     /// Perform basic initialization for a new gun definition.
     /// </summary>
-    public static Gun SetupGun<T>(string gunName, string shortDescription, string longDescription, string lore, bool hideFromAmmonomicon = false)
+    public static Gun SetupGun<T>(string gunName, string shortDescription, string longDescription, string lore,
+        bool hideFromAmmonomicon = false, float weight = 1f)
         where T : GunBehaviour
     {
-        Gun gun = SetupItem<Gun, Gun>(gunName, shortDescription, longDescription, lore, hideFromAmmonomicon: hideFromAmmonomicon);
+        Gun gun = SetupItem<Gun, Gun>(gunName, shortDescription, longDescription, lore,
+          hideFromAmmonomicon: hideFromAmmonomicon, weight: weight);
         gun.gameObject.AddComponent<T>();
         _CustomPickups[typeof(T)] = gun; // register gun in pickup by type database
         _CustomPickupIds[typeof(T)] = gun.PickupObjectId; // register gun in pickup id by type database
@@ -202,7 +217,7 @@ public static class Lazy
 
     public static void FinalizeGuns()
     {
-        foreach (Gun gun in _GunsToFinalize)
+        foreach (Gun gun in _GunsToFinalize) // fix displayed shoot styles in ammonomicon
             EncounterDatabase.GetEntry(gun.encounterTrackable.EncounterGuid).shootStyleInt = (int)gun.DefaultModule.shootStyle;
         _GunsToFinalize.Clear();
     }
