@@ -236,7 +236,7 @@ static class CorruptNotificationPatch
         cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("notifyParams"));
         cursor.Emit(OpCodes.Ldarg_0); // load enumerator type
         cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
-        cursor.CallPrivate(typeof(CorruptNotificationPatch), nameof(CorruptNotificationPatch.Corrupt));
+        cursor.CallPrivate(typeof(CorruptNotificationPatch), nameof(Corrupt));
         return;
     }
 

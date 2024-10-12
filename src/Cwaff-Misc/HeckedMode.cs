@@ -350,7 +350,7 @@ public static class HeckedMode
                 return; // couldn't find the appropriate hook
 
             // we have a brfalse immediately after us that skips the method we want to call, so just replace that with out own method
-            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.HeckedModeShouldSkipPrefireStateCheck)); // replace it with our own
+            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedModeShouldSkipPrefireStateCheck)); // replace it with our own
         }
     }
 
@@ -365,7 +365,7 @@ public static class HeckedMode
                 return; // couldn't find the appropriate hook
 
             cursor.Remove(); // remove the string.IsNullOrEmpty check
-            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.HeckedModeShouldSkipPrefireAnimationCheck)); // replace it with our own
+            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedModeShouldSkipPrefireAnimationCheck)); // replace it with our own
         }
     }
 
@@ -483,7 +483,7 @@ public static class HeckedMode
               ))
                 return; // couldn't find the appropriate hook
 
-            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.AdjustHeckedFuseTimers));
+            cursor.CallPrivate(typeof(HeckedMode), nameof(AdjustHeckedFuseTimers));
         }
     }
 
@@ -502,7 +502,7 @@ public static class HeckedMode
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<GameActor>("get_IsStealthed")))
                 return; // couldn't find the appropriate hook
 
-            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.IsReallyStealthed));
+            cursor.CallPrivate(typeof(HeckedMode), nameof(IsReallyStealthed));
         }
     }
 
@@ -531,7 +531,7 @@ public static class HeckedMode
                 return; // couldn't find the appropriate hook
 
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.ForceJammedBosses));
+            cursor.CallPrivate(typeof(HeckedMode), nameof(ForceJammedBosses));
         }
     }
 

@@ -14,12 +14,12 @@ public static class ArmorUIOffsetFix
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Pixelator>(nameof(Pixelator.CurrentTileScale))))
                 return;
             // motionGroupParent.Width -= 0f;
-            cursor.CallPrivate(typeof(ArmorUIOffsetFix), nameof(ArmorUIOffsetFix.Zero));
+            cursor.CallPrivate(typeof(ArmorUIOffsetFix), nameof(Zero));
 
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Pixelator>(nameof(Pixelator.CurrentTileScale))))
                 return;
             // motionGroupParent.Height -= 0f;
-            cursor.CallPrivate(typeof(ArmorUIOffsetFix), nameof(ArmorUIOffsetFix.Zero));
+            cursor.CallPrivate(typeof(ArmorUIOffsetFix), nameof(Zero));
         }
         return;
     }
@@ -39,7 +39,7 @@ public static class TrailControllerUpdatePatch
             return;
 
         cursor.Emit(OpCodes.Ldarg_0); // TrailController
-        cursor.CallPrivate(typeof(TrailControllerUpdatePatch), nameof(TrailControllerUpdatePatch.KeepAliveWhenEmpty));
+        cursor.CallPrivate(typeof(TrailControllerUpdatePatch), nameof(KeepAliveWhenEmpty));
     }
 
     private static int KeepAliveWhenEmpty(int oldCount, TrailController trail)
@@ -63,7 +63,7 @@ public static class ModulesAreTiersBurstFirePatch
         cursor.Emit(OpCodes.Ldarg_0); // Gun instance
         cursor.Emit(OpCodes.Ldloc_S, (byte)4); // V_4 == projectileModule
         cursor.Emit(OpCodes.Ldloc_3); // V_3 == i (loop iterator)
-        cursor.CallPrivate(typeof(ModulesAreTiersBurstFirePatch), nameof(ModulesAreTiersBurstFirePatch.IsCurrentBurstModule));
+        cursor.CallPrivate(typeof(ModulesAreTiersBurstFirePatch), nameof(IsCurrentBurstModule));
     }
 
     private static int IsCurrentBurstModule(int unadjustBurstShotCount, Gun gun, ProjectileModule mod, int i)
@@ -129,7 +129,7 @@ public static class AmmonomiconPageRendererHotfix
                 ))
                 return;
             cursor.Emit(OpCodes.Ldloc_S, (byte)12); // V_12 == m == iterator over passive items
-            cursor.CallPrivate(typeof(SuppressFakeItemOnVictoryScreenPatch), nameof(SuppressFakeItemOnVictoryScreenPatch.ShouldSuppressItemFromVictoryScreen));
+            cursor.CallPrivate(typeof(SuppressFakeItemOnVictoryScreenPatch), nameof(ShouldSuppressItemFromVictoryScreen));
             cursor.Emit(OpCodes.Brtrue, passiveLoopEndLabel);
             // if we don't branch, repopulate the stack
             cursor.Emit(OpCodes.Ldarg_0);
@@ -291,7 +291,7 @@ public static class QuickRestartRoomCacheHotfix
             //     return;
 
             cursor.Emit(OpCodes.Ldarg_0); // load the game manager
-            cursor.CallPrivate(typeof(QuickRestartRoomCacheHotfix), nameof(QuickRestartRoomCacheHotfix.ForcePreprocessRunForQuickStart));
+            cursor.CallPrivate(typeof(QuickRestartRoomCacheHotfix), nameof(ForcePreprocessRunForQuickStart));
         }
     }
 
@@ -338,7 +338,7 @@ public static class BadItemOffsetsFromChestHotfix
             cursor.Emit(OpCodes.Ldloc_S, (byte)7); // V_7 == the original vector
             cursor.Emit(OpCodes.Ldloc_S, (byte)3); // V_3 == the pickup object
             cursor.Emit(OpCodes.Ldloc_S, (byte)8); // V_8 == sprite for our chest prize
-            cursor.CallPrivate(typeof(BadItemOffsetsFromChestPatch), nameof(BadItemOffsetsFromChestPatch.DetermineActualOffset));
+            cursor.CallPrivate(typeof(BadItemOffsetsFromChestPatch), nameof(DetermineActualOffset));
             cursor.Emit(OpCodes.Stloc_S, (byte)7); // store the new vector in V_7
         }
 
@@ -421,11 +421,11 @@ public static class DragunFightHotfix
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.Emit(OpCodes.Ldarg_2);
             cursor.Emit(OpCodes.Ldarg_3);
-            cursor.CallPrivate(typeof(DragunFightHotfix), nameof(DragunFightHotfix.BossTriggerZoneSanityCheck));
+            cursor.CallPrivate(typeof(DragunFightHotfix), nameof(BossTriggerZoneSanityCheck));
 
             // Sanity check the healthhaver to make sure it's not a boss without an ObjectVisibilityManager
             if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<HealthHaver>("get_IsBoss")))
-                cursor.CallPrivate(typeof(DragunFightHotfix), nameof(DragunFightHotfix.HealthHaverSanityCheck));
+                cursor.CallPrivate(typeof(DragunFightHotfix), nameof(HealthHaverSanityCheck));
             return;
         }
     }

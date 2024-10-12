@@ -322,7 +322,7 @@ public static class CwaffSynergies
                 return;
             cursor.Emit(OpCodes.Ldarg_0); // PlayerStats instance
             cursor.Emit(OpCodes.Ldarg_1); // PlayerController owner
-            cursor.CallPrivate(typeof(RecalculateMasteriesPatch), nameof(RecalculateMasteriesPatch.CheckForNewMasteries));
+            cursor.CallPrivate(typeof(RecalculateMasteriesPatch), nameof(CheckForNewMasteries));
             ILLabel continueAsNormalLabel = cursor.DefineLabel();
             cursor.Emit(OpCodes.Brfalse, continueAsNormalLabel);
             cursor.Emit(OpCodes.Ret);

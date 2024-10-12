@@ -124,7 +124,7 @@ public class Jugglernaut : CwaffGun
                 return;
 
             cursor.Emit(OpCodes.Ldarg_0); // load the gun
-            cursor.CallPrivate(typeof(JugglernautCeaseAttackPatch), nameof(JugglernautCeaseAttackPatch.ShouldUpdateAttachPoints));
+            cursor.CallPrivate(typeof(JugglernautCeaseAttackPatch), nameof(ShouldUpdateAttachPoints));
         }
 
         private static bool ShouldUpdateAttachPoints(bool origVal, Gun gun)

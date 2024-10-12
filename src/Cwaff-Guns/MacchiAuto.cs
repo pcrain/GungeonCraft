@@ -50,7 +50,7 @@ public class MacchiAuto : CwaffGun
 
             // BeamController is already on the stack here
             cursor.Emit(OpCodes.Ldloc_S, (byte)30); // V_30 == the enemy gameActor
-            cursor.CallPrivate(typeof(BeamApplyArbitraryStatusEffectPatch), nameof(BeamApplyArbitraryStatusEffectPatch.ApplyExtraBeamStatusEffects));
+            cursor.CallPrivate(typeof(BeamApplyArbitraryStatusEffectPatch), nameof(ApplyExtraBeamStatusEffects));
             cursor.Emit(OpCodes.Ldarg_0); // put the BeamController back on the call stack
         }
 

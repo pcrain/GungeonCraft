@@ -36,7 +36,7 @@ public class ReflexAmmolet : CwaffBlankModificationItem
                 return;
 
             cursor.Emit(OpCodes.Ldarg, user);
-            cursor.CallPrivate(typeof(ReflexAmmoletReflectPatch), nameof(ReflexAmmoletReflectPatch.BlankShouldReflect));
+            cursor.CallPrivate(typeof(ReflexAmmoletReflectPatch), nameof(BlankShouldReflect));
         }
     }
 
@@ -65,7 +65,7 @@ public class ReflexAmmolet : CwaffBlankModificationItem
             cursor.Index += 2; // skip over playercontroller and float
             cursor.Emit(OpCodes.Ldarg, user);  // push playercontroller back on the stack
             // increase speed to 50 if we have Reflex Ammolet
-            cursor.CallPrivate(typeof(ReflexAmmoletSpeedPatch), nameof(ReflexAmmoletSpeedPatch.ReflectSpeed));
+            cursor.CallPrivate(typeof(ReflexAmmoletSpeedPatch), nameof(ReflectSpeed));
         }
     }
 }

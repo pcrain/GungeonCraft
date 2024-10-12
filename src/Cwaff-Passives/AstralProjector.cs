@@ -184,7 +184,7 @@ public class AstralProjector : CwaffPassive
                 cursor.Emit(OpCodes.Ldc_R4, 0.01f); // replace the check for 0.01f as arg1
 
                 // call our method with player instance and original threshold value as args
-                cursor.CallPrivate(typeof(AstralProjector), nameof(AstralProjector.PreventRigidbodyCastDuringHandlePlayerInput));
+                cursor.CallPrivate(typeof(AstralProjector), nameof(PreventRigidbodyCastDuringHandlePlayerInput));
                 // the return value from our hook is now on the stack, replacing 0.01f with 999f if we have the item
                 // this ensures the RigidBodyCast() will never happen
             }
@@ -198,7 +198,7 @@ public class AstralProjector : CwaffPassive
                 cursor.Emit(OpCodes.Ldc_R4, -0.01f); // replace the check for -0.01f as arg1
 
                 // call our method with player instance and original threshold value as args
-                cursor.CallPrivate(typeof(AstralProjector), nameof(AstralProjector.PreventRigidbodyCastDuringHandlePlayerInput));
+                cursor.CallPrivate(typeof(AstralProjector), nameof(PreventRigidbodyCastDuringHandlePlayerInput));
                 // the return value from our hook is now on the stack, replacing -0.01f with -999f if we have the item
                 // this ensures the RigidBodyCast() will never happen
             }

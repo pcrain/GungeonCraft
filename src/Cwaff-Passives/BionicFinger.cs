@@ -34,7 +34,7 @@ public class BionicFinger : CwaffPassive
                 cursor.Index += 2; // skip the next two instructions so we still have m_controllerSemiAutoTimer on the stack
                 cursor.Remove(); // remove the get_ControllerFakeSemiAutoCooldown() instruction
                 cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
-                cursor.CallPrivate(typeof(BionicFinger), nameof(BionicFinger.OverrideSemiAutoCooldown)); // replace with our own custom hook
+                cursor.CallPrivate(typeof(BionicFinger), nameof(OverrideSemiAutoCooldown)); // replace with our own custom hook
                 break; // we only care about the first occurrence of this pattern in the function
             }
         }

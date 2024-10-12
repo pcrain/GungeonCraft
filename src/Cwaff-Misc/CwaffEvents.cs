@@ -171,7 +171,7 @@ public static class CwaffEvents // global custom events we can listen for
             cursor.GotoLabel(endOfCorpseBranch, MoveType.Before, setTarget: true);
             cursor.Emit(OpCodes.Ldloc_S, (byte)17);
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.CallPrivate(typeof(OnCorpseCreatedPatch), nameof(OnCorpseCreatedPatch.OnCorpseCreatedFunc));
+            cursor.CallPrivate(typeof(OnCorpseCreatedPatch), nameof(OnCorpseCreatedFunc));
             return;
         }
 

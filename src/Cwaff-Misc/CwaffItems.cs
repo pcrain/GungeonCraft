@@ -197,18 +197,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
           cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
           cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
-          cursor.CallPrivate(typeof(DynamicSpinupPatch), nameof(DynamicSpinupPatch.ModifyRateOfFire));
+          cursor.CallPrivate(typeof(DynamicSpinupPatch), nameof(ModifyRateOfFire));
           cursor.Emit(OpCodes.Mul);  // multiply the additional natascha rate of fire by fireMultiplier
-
-          // if (!cursor.TryGotoNext(MoveType.After,
-          //   instr => instr.MatchLdfld<Gun>("m_continuousAttackTime"),
-          //   instr => instr.MatchMul()))
-          //     return;
-
-          // // load the gun itself onto the stack and call our fire speed
-          // cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
-          // cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
-          // cursor.CallPrivate(typeof(Natascha), nameof(Natascha.ModifyRateOfFire));
       }
 
       private static float ModifyRateOfFire(Gun gun)
@@ -257,10 +247,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
               return;
 
           cursor.Emit(OpCodes.Ldloc_0);
-          cursor.CallPrivate(typeof(GameUIAmmoControllerUpdateUIGunPatch),
-            nameof(GameUIAmmoControllerUpdateUIGunPatch.CheckHideAmmo));
-
-          return;
+          cursor.CallPrivate(typeof(GameUIAmmoControllerUpdateUIGunPatch), nameof(CheckHideAmmo));
       }
 
       private static bool CheckHideAmmo(bool oldValue, Gun gun)
@@ -297,8 +284,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
               instr => instr.MatchCallvirt<InControl.OneAxisInputControl>("get_WasPressed")))
               return;
           cursor.Emit(OpCodes.Ldarg_0);
-          cursor.CallPrivate(typeof(SecondaryReloadPatch), nameof(SecondaryReloadPatch.CheckSecondaryReload));
-          return;
+          cursor.CallPrivate(typeof(SecondaryReloadPatch), nameof(CheckSecondaryReload));
       }
 
       private static bool CheckSecondaryReload(bool oldValue, PlayerController player)
@@ -379,7 +365,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
             return;
 
           cursor.Emit(OpCodes.Ldarg, 8); // load currentGun
-          cursor.CallPrivate(typeof(ShowMoreThan125ShotsPatch), nameof(ShowMoreThan125ShotsPatch.CheckGun));
+          cursor.CallPrivate(typeof(ShowMoreThan125ShotsPatch), nameof(CheckGun));
       }
 
       private static int CheckGun(int oldCount, Gun gun)
@@ -414,8 +400,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
           // arg1 == mergeGun is already on the stack and needs to be restored after branch
           cursor.Emit(OpCodes.Ldloc_1); // load i
-          cursor.CallPrivate(typeof(DuctTapeItemCombineVolleysPatch),
-            nameof(DuctTapeItemCombineVolleysPatch.ShouldDuctTapeModule));
+          cursor.CallPrivate(typeof(DuctTapeItemCombineVolleysPatch), nameof(ShouldDuctTapeModule));
           cursor.Emit(OpCodes.Brfalse, loopEnd); // skip the current loop iteration
           cursor.Emit(OpCodes.Ldarg_1); // restore mergeGun on stack if we don't skip the current loop iteration
       }
