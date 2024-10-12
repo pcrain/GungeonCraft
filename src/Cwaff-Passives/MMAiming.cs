@@ -17,7 +17,7 @@ public class MMAiming : CwaffPassive
     }
 
     // NOTE: called by patch in CwaffPatches
-    private static float ModifySpreadIfIdle(float oldSpread, PlayerController player)
+    internal static float ModifySpreadIfIdle(float oldSpread, PlayerController player)
     {
         // if (player.m_playerCommandedDirection != Vector2.zero) //NOTE: this happens inside HandlePlayerInput(), where m_playerCommandedDirection is always zero
         if ((player.m_activeActions.Move.Vector.sqrMagnitude > 0.1f) || !player.HasPassive<MMAiming>())

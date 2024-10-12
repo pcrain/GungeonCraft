@@ -350,7 +350,7 @@ public static class HeckedMode
                 return; // couldn't find the appropriate hook
 
             // we have a brfalse immediately after us that skips the method we want to call, so just replace that with out own method
-            cursor.Emit(OpCodes.Call, typeof(HeckedMode).GetMethod("HeckedModeShouldSkipPrefireStateCheck", BindingFlags.Static | BindingFlags.NonPublic)); // replace it with our own
+            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.HeckedModeShouldSkipPrefireStateCheck)); // replace it with our own
         }
     }
 
@@ -365,7 +365,7 @@ public static class HeckedMode
                 return; // couldn't find the appropriate hook
 
             cursor.Remove(); // remove the string.IsNullOrEmpty check
-            cursor.Emit(OpCodes.Call, typeof(HeckedMode).GetMethod("HeckedModeShouldSkipPrefireAnimationCheck", BindingFlags.Static | BindingFlags.NonPublic)); // replace it with our own
+            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.HeckedModeShouldSkipPrefireAnimationCheck)); // replace it with our own
         }
     }
 
@@ -483,8 +483,7 @@ public static class HeckedMode
               ))
                 return; // couldn't find the appropriate hook
 
-            cursor.Emit(OpCodes.Call,
-                typeof(HeckedMode).GetMethod("AdjustHeckedFuseTimers", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.AdjustHeckedFuseTimers));
         }
     }
 
@@ -503,8 +502,7 @@ public static class HeckedMode
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<GameActor>("get_IsStealthed")))
                 return; // couldn't find the appropriate hook
 
-            cursor.Emit(OpCodes.Call,
-                typeof(HeckedMode).GetMethod("IsReallyStealthed", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.IsReallyStealthed));
         }
     }
 
@@ -533,8 +531,7 @@ public static class HeckedMode
                 return; // couldn't find the appropriate hook
 
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Call,
-                typeof(HeckedMode).GetMethod("ForceJammedBosses", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(HeckedMode), nameof(HeckedMode.ForceJammedBosses));
         }
     }
 

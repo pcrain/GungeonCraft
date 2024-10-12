@@ -16,7 +16,7 @@ static class MinorBreakablePrecollisionPatches
         // Skip past the part where the MinorBreakable actually breaks if we have the VeryFragileProjectile component
         ILLabel projectileIsNotFragileLabel = cursor.DefineLabel();
         cursor.Emit(OpCodes.Ldloc_0);
-        cursor.Emit(OpCodes.Call, typeof(VeryFragileProjectile).GetMethod("IsVeryFragile", BindingFlags.Static | BindingFlags.Public));
+        cursor.CallPrivate(typeof(VeryFragileProjectile), nameof(VeryFragileProjectile.IsVeryFragile));
         cursor.Emit(OpCodes.Brfalse, projectileIsNotFragileLabel);
         cursor.Emit(OpCodes.Ret);
         cursor.MarkLabel(projectileIsNotFragileLabel);
@@ -32,7 +32,7 @@ static class MinorBreakablePrecollisionPatches
 
         cursor.Emit(OpCodes.Ldarg, 1); // SpeculativeRigidbody myRigidbody
         cursor.Emit(OpCodes.Ldarg, 3); // SpeculativeRigidbody otherRigidbody
-        cursor.Emit(OpCodes.Call, typeof(ScavengingArms).GetMethod("HandleCollisionWithMinorBreakable", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(ScavengingArms), nameof(ScavengingArms.HandleCollisionWithMinorBreakable));
     }
 }
 
@@ -49,7 +49,7 @@ static class ProjectileHandleDamagePatches
                                        // float damage is already on stack
         cursor.Emit(OpCodes.Ldarg_0);  // load Projectile this onto stack
         cursor.Emit(OpCodes.Ldarg_1);  // load SpeculativeRigidbody rigidbody onto stack
-        cursor.Emit(OpCodes.Call, typeof(DamageAdjuster).GetMethod("AdjustDamageStatic", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(DamageAdjuster), nameof(DamageAdjuster.AdjustDamageStatic));
     }
 
     //TODO: rewrite using spapi's guidelines
@@ -62,7 +62,7 @@ static class ProjectileHandleDamagePatches
 
         cursor.Emit(OpCodes.Ldarg_0); // load Projectile this onto stack
         cursor.Emit(OpCodes.Ldarg_1); // load SpeculativeRigidbody rigidbody onto stack
-        cursor.Emit(OpCodes.Call, typeof(ArmorPiercingRounds).GetMethod("PossiblyDisableArmor", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(ArmorPiercingRounds), nameof(ArmorPiercingRounds.PossiblyDisableArmor));
         cursor.Emit(OpCodes.Stloc, shouldPierce);
 
         // the original method returns early if ReflectProjectiles returns true, so patch that really quickly
@@ -136,7 +136,7 @@ static class ProjectileOnRigidbodyCollisionPatches
 
         cursor.Emit(OpCodes.Ldarg_0); // this Projectile
         cursor.Emit(OpCodes.Ldloc_S, (byte)5); // v_5 == flag == whether we hit an enemy (true) or other object (false)
-        cursor.Emit(OpCodes.Call, typeof(CwaffProjectile).GetMethod("PlayCollisionSounds", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(CwaffProjectile), nameof(CwaffProjectile.PlayCollisionSounds));
     }
 }
 
@@ -165,7 +165,7 @@ static class ShootSingleProjectilePatch
             return;
 
         cursor.Emit(OpCodes.Ldloc_0);  // load PlayerController type
-        cursor.Emit(OpCodes.Call, typeof(MMAiming).GetMethod("ModifySpreadIfIdle", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(MMAiming), nameof(MMAiming.ModifySpreadIfIdle));
     }
 
     // NOTE: used by Bionic Finger synergy to reduce spread while firing semiautomatic weapons
@@ -180,7 +180,7 @@ static class ShootSingleProjectilePatch
             return;
 
         cursor.Emit(OpCodes.Ldloc_0);  // load PlayerController type
-        cursor.Emit(OpCodes.Call, typeof(BionicFinger).GetMethod("ModifySpreadIfSemiautomatic", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(BionicFinger), nameof(BionicFinger.ModifySpreadIfSemiautomatic));
     }
 
     // NOTE: used by CwaffGun to dynamically adjust spread
@@ -195,7 +195,7 @@ static class ShootSingleProjectilePatch
             return;
 
         cursor.Emit(OpCodes.Ldarg_0);  // load Gun type
-        cursor.Emit(OpCodes.Call, typeof(CwaffGun).GetMethod("ModifyAccuracy", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(CwaffGun), nameof(CwaffGun.ModifyAccuracy));
     }
 
     // NOTE: used by CwaffProjectile to determine if a projectile was fired for free
@@ -211,7 +211,7 @@ static class ShootSingleProjectilePatch
         cursor.Emit(OpCodes.Ldloc_S, (byte)10);  // V_10 == our projectile
         cursor.Emit(OpCodes.Ldarg_0);  // load Gun
         cursor.Emit(OpCodes.Ldarg_1);  // load ProjectileModule
-        cursor.Emit(OpCodes.Call, typeof(CwaffProjectile).GetMethod("DetermineIfFiredForFree", BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(CwaffProjectile), nameof(CwaffProjectile.DetermineIfFiredForFree));
     }
 }
 

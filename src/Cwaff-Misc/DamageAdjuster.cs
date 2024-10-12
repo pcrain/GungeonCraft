@@ -4,7 +4,7 @@ namespace CwaffingTheGungy;
 public abstract class DamageAdjuster : MonoBehaviour
 {
     // NOTE: called by patch in CwaffPatches
-    private static float AdjustDamageStatic(float currentDamage, Projectile proj, SpeculativeRigidbody body)
+    internal static float AdjustDamageStatic(float currentDamage, Projectile proj, SpeculativeRigidbody body)
     {
         if (body.GetComponent<AIActor>() is not AIActor enemy)
             return currentDamage;

@@ -14,12 +14,12 @@ public static class ArmorUIOffsetFix
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Pixelator>(nameof(Pixelator.CurrentTileScale))))
                 return;
             // motionGroupParent.Width -= 0f;
-            cursor.Emit(OpCodes.Call, typeof(ArmorUIOffsetFix).GetMethod(nameof(ArmorUIOffsetFix.Zero), BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(ArmorUIOffsetFix), nameof(ArmorUIOffsetFix.Zero));
 
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Pixelator>(nameof(Pixelator.CurrentTileScale))))
                 return;
             // motionGroupParent.Height -= 0f;
-            cursor.Emit(OpCodes.Call, typeof(ArmorUIOffsetFix).GetMethod(nameof(ArmorUIOffsetFix.Zero), BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(ArmorUIOffsetFix), nameof(ArmorUIOffsetFix.Zero));
         }
         return;
     }
@@ -39,8 +39,7 @@ public static class TrailControllerUpdatePatch
             return;
 
         cursor.Emit(OpCodes.Ldarg_0); // TrailController
-        cursor.Emit(OpCodes.Call, typeof(TrailControllerUpdatePatch).GetMethod(nameof(TrailControllerUpdatePatch.KeepAliveWhenEmpty),
-            BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(TrailControllerUpdatePatch), nameof(TrailControllerUpdatePatch.KeepAliveWhenEmpty));
     }
 
     private static int KeepAliveWhenEmpty(int oldCount, TrailController trail)
@@ -64,8 +63,7 @@ public static class ModulesAreTiersBurstFirePatch
         cursor.Emit(OpCodes.Ldarg_0); // Gun instance
         cursor.Emit(OpCodes.Ldloc_S, (byte)4); // V_4 == projectileModule
         cursor.Emit(OpCodes.Ldloc_3); // V_3 == i (loop iterator)
-        cursor.Emit(OpCodes.Call, typeof(ModulesAreTiersBurstFirePatch).GetMethod(nameof(ModulesAreTiersBurstFirePatch.IsCurrentBurstModule),
-          BindingFlags.Static | BindingFlags.NonPublic));
+        cursor.CallPrivate(typeof(ModulesAreTiersBurstFirePatch), nameof(ModulesAreTiersBurstFirePatch.IsCurrentBurstModule));
     }
 
     private static int IsCurrentBurstModule(int unadjustBurstShotCount, Gun gun, ProjectileModule mod, int i)
@@ -131,7 +129,7 @@ public static class AmmonomiconPageRendererHotfix
                 ))
                 return;
             cursor.Emit(OpCodes.Ldloc_S, (byte)12); // V_12 == m == iterator over passive items
-            cursor.Emit(OpCodes.Call, typeof(SuppressFakeItemOnVictoryScreenPatch).GetMethod("ShouldSuppressItemFromVictoryScreen", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(SuppressFakeItemOnVictoryScreenPatch), nameof(SuppressFakeItemOnVictoryScreenPatch.ShouldSuppressItemFromVictoryScreen));
             cursor.Emit(OpCodes.Brtrue, passiveLoopEndLabel);
             // if we don't branch, repopulate the stack
             cursor.Emit(OpCodes.Ldarg_0);
@@ -293,7 +291,7 @@ public static class QuickRestartRoomCacheHotfix
             //     return;
 
             cursor.Emit(OpCodes.Ldarg_0); // load the game manager
-            cursor.Emit(OpCodes.Call, typeof(QuickRestartRoomCacheHotfix).GetMethod("ForcePreprocessRunForQuickStart", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(QuickRestartRoomCacheHotfix), nameof(QuickRestartRoomCacheHotfix.ForcePreprocessRunForQuickStart));
         }
     }
 
@@ -340,8 +338,7 @@ public static class BadItemOffsetsFromChestHotfix
             cursor.Emit(OpCodes.Ldloc_S, (byte)7); // V_7 == the original vector
             cursor.Emit(OpCodes.Ldloc_S, (byte)3); // V_3 == the pickup object
             cursor.Emit(OpCodes.Ldloc_S, (byte)8); // V_8 == sprite for our chest prize
-            cursor.Emit(OpCodes.Call, typeof(BadItemOffsetsFromChestPatch).GetMethod(nameof(BadItemOffsetsFromChestPatch.DetermineActualOffset),
-                BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(BadItemOffsetsFromChestPatch), nameof(BadItemOffsetsFromChestPatch.DetermineActualOffset));
             cursor.Emit(OpCodes.Stloc_S, (byte)7); // store the new vector in V_7
         }
 
@@ -432,16 +429,16 @@ public static class DragunFightHotfix
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.Emit(OpCodes.Ldarg_2);
             cursor.Emit(OpCodes.Ldarg_3);
-            cursor.Emit(OpCodes.Call, typeof(DragunFightHotfix).GetMethod("BossTriggerZoneSanityCheck"));
+            cursor.CallPrivate(typeof(DragunFightHotfix), nameof(DragunFightHotfix.BossTriggerZoneSanityCheck));
 
             // Sanity check the healthhaver to make sure it's not a boss without an ObjectVisibilityManager
             if (cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<HealthHaver>("get_IsBoss")))
-                cursor.Emit(OpCodes.Call, typeof(DragunFightHotfix).GetMethod("HealthHaverSanityCheck"));
+                cursor.CallPrivate(typeof(DragunFightHotfix), nameof(DragunFightHotfix.HealthHaverSanityCheck));
             return;
         }
     }
 
-    public static void BossTriggerZoneSanityCheck(BossTriggerZone zone, SpeculativeRigidbody otherRigidbody, SpeculativeRigidbody myRigidbody, CollisionData collisionData)
+    private static void BossTriggerZoneSanityCheck(BossTriggerZone zone, SpeculativeRigidbody otherRigidbody, SpeculativeRigidbody myRigidbody, CollisionData collisionData)
     {
         if (zone != null && collisionData.OtherPixelCollider != null && StaticReferenceManager.AllHealthHavers != null)
             return; // nothing went wrong
@@ -452,7 +449,7 @@ public static class DragunFightHotfix
     }
 
     internal static bool _SanityCheckFailed = false;
-    public static HealthHaver HealthHaverSanityCheck(HealthHaver hh)
+    private static HealthHaver HealthHaverSanityCheck(HealthHaver hh)
     {
         if (!hh)
         {

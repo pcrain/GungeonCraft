@@ -32,7 +32,7 @@ public class ArmorPiercingRounds : CwaffPassive
     // HACK: a lot of this permanently changes attributes of the enemy and will affect enemies even after ArmorPiercingRounds are disabled.
     //       undecided whether this is a bug or a feature...
     // NOTE: called by patch in CwaffPatches, but used by K.A.L.I. as well, possibly relocate
-    private static bool PossiblyDisableArmor(Projectile p, SpeculativeRigidbody body)
+    internal static bool PossiblyDisableArmor(Projectile p, SpeculativeRigidbody body)
     {
         if (!p || p.Owner is not PlayerController player)
             return false;

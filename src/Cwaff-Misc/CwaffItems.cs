@@ -197,7 +197,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
           cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
           cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
-          cursor.Emit(OpCodes.Call, typeof(DynamicSpinupPatch).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
+          cursor.CallPrivate(typeof(DynamicSpinupPatch), nameof(DynamicSpinupPatch.ModifyRateOfFire));
           cursor.Emit(OpCodes.Mul);  // multiply the additional natascha rate of fire by fireMultiplier
 
           // if (!cursor.TryGotoNext(MoveType.After,
@@ -208,7 +208,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           // // load the gun itself onto the stack and call our fire speed
           // cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
           // cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
-          // cursor.Emit(OpCodes.Call, typeof(Natascha).GetMethod("ModifyRateOfFire", BindingFlags.Static | BindingFlags.NonPublic));
+          // cursor.CallPrivate(typeof(Natascha), nameof(Natascha.ModifyRateOfFire));
       }
 
       private static float ModifyRateOfFire(Gun gun)
@@ -221,7 +221,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public virtual float GetDynamicAccuracy() => 1.0f;
 
   // NOTE: called by patch in CwaffPatches
-  private static float ModifyAccuracy(float oldSpread, Gun gun)
+  internal static float ModifyAccuracy(float oldSpread, Gun gun)
   {
       return oldSpread * ((gun.GetComponent<CwaffGun>() is CwaffGun cg) ? cg.GetDynamicAccuracy() : 1f);
   }
@@ -257,8 +257,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
               return;
 
           cursor.Emit(OpCodes.Ldloc_0);
-          cursor.Emit(OpCodes.Call, typeof(GameUIAmmoControllerUpdateUIGunPatch).GetMethod(
-            nameof(GameUIAmmoControllerUpdateUIGunPatch.CheckHideAmmo), BindingFlags.Static | BindingFlags.NonPublic));
+          cursor.CallPrivate(typeof(GameUIAmmoControllerUpdateUIGunPatch),
+            nameof(GameUIAmmoControllerUpdateUIGunPatch.CheckHideAmmo));
 
           return;
       }
@@ -297,7 +297,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
               instr => instr.MatchCallvirt<InControl.OneAxisInputControl>("get_WasPressed")))
               return;
           cursor.Emit(OpCodes.Ldarg_0);
-          cursor.Emit(OpCodes.Call, typeof(SecondaryReloadPatch).GetMethod(nameof(SecondaryReloadPatch.CheckSecondaryReload), BindingFlags.Static | BindingFlags.NonPublic));
+          cursor.CallPrivate(typeof(SecondaryReloadPatch), nameof(SecondaryReloadPatch.CheckSecondaryReload));
           return;
       }
 
@@ -379,7 +379,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
             return;
 
           cursor.Emit(OpCodes.Ldarg, 8); // load currentGun
-          cursor.Emit(OpCodes.Call, typeof(ShowMoreThan125ShotsPatch).GetMethod(nameof(ShowMoreThan125ShotsPatch.CheckGun), BindingFlags.Static | BindingFlags.NonPublic));
+          cursor.CallPrivate(typeof(ShowMoreThan125ShotsPatch), nameof(ShowMoreThan125ShotsPatch.CheckGun));
       }
 
       private static int CheckGun(int oldCount, Gun gun)
@@ -414,8 +414,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
           // arg1 == mergeGun is already on the stack and needs to be restored after branch
           cursor.Emit(OpCodes.Ldloc_1); // load i
-          cursor.Emit(OpCodes.Call, typeof(DuctTapeItemCombineVolleysPatch).GetMethod(
-            nameof(DuctTapeItemCombineVolleysPatch.ShouldDuctTapeModule), BindingFlags.Static | BindingFlags.NonPublic));
+          cursor.CallPrivate(typeof(DuctTapeItemCombineVolleysPatch),
+            nameof(DuctTapeItemCombineVolleysPatch.ShouldDuctTapeModule));
           cursor.Emit(OpCodes.Brfalse, loopEnd); // skip the current loop iteration
           cursor.Emit(OpCodes.Ldarg_1); // restore mergeGun on stack if we don't skip the current loop iteration
       }

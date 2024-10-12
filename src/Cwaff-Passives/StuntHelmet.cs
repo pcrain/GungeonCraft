@@ -46,7 +46,7 @@ public class StuntHelmet : CwaffPassive
 
                 // after finding the check that ignores explosion damage if we're ethereal, we also want to completely ignore damage if we have the Stunt Helmet
                 cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
-                cursor.Emit(OpCodes.Call, typeof(StuntHelmet).GetMethod("PlayerHasStuntHelmet", BindingFlags.Static | BindingFlags.NonPublic));
+                cursor.CallPrivate(typeof(StuntHelmet), nameof(StuntHelmet.PlayerHasStuntHelmet));
                 cursor.Emit(OpCodes.Brtrue, branchPoint);
             #endregion
 
@@ -67,14 +67,14 @@ public class StuntHelmet : CwaffPassive
 
                 ILLabel branchToTakeIfNoHelmet = cursor.DefineLabel();
                 cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
-                cursor.Emit(OpCodes.Call, typeof(StuntHelmet).GetMethod("PlayerHasStuntHelmet", BindingFlags.Static | BindingFlags.NonPublic));
+                cursor.CallPrivate(typeof(StuntHelmet), nameof(StuntHelmet.PlayerHasStuntHelmet));
                 cursor.Emit(OpCodes.Brfalse, branchToTakeIfNoHelmet);
                     cursor.Emit(OpCodes.Ldloc_S, (byte)26); // V_26 == force multiplier
                     cursor.Emit(OpCodes.Ldc_R4, _EXPLOSION_FORCE_MULT);
                     cursor.Emit(OpCodes.Mul);
                     cursor.Emit(OpCodes.Stloc_S, (byte)26);
                     cursor.Emit(OpCodes.Ldloc_S, (byte)13);
-                    cursor.Emit(OpCodes.Call, typeof(StuntHelmet).GetMethod("DoStuntHelmetBoost", BindingFlags.Static | BindingFlags.NonPublic));
+                    cursor.CallPrivate(typeof(StuntHelmet), nameof(StuntHelmet.DoStuntHelmetBoost));
                     cursor.Emit(OpCodes.Br, branchPoint2);  // skip over the preventPlayerForce check entirely
                 cursor.MarkLabel(branchToTakeIfNoHelmet); // move onto the preventPlayerForce check as normal
             #endregion

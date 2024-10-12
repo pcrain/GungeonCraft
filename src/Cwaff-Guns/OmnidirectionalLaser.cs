@@ -242,7 +242,7 @@ public class OmnidirectionalLaser : CwaffGun
             ++cursor.Index; // move right before the store to prevGunAngleUnmodified (Gun is already on stack)
             cursor.Emit(OpCodes.Ldarg_0); // the gun itself
             cursor.Emit(OpCodes.Ldloc_S, (byte)num2); // num2 is unmodified aim angle
-            cursor.Emit(OpCodes.Call, typeof(OmnidirectionalLaser).GetMethod("ForceGunAngle", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(OmnidirectionalLaser), nameof(OmnidirectionalLaser.ForceGunAngle));
             cursor.Emit(OpCodes.Stloc_S, (byte)num2); // num2 is unmodified aim angle
         }
     }

@@ -87,7 +87,7 @@ public class VeryFragileProjectile : MonoBehaviour
     }
 
     // NOTE: called by patch in CwaffPatches
-    public static bool IsVeryFragile(Projectile p)
+    internal static bool IsVeryFragile(Projectile p)
     {
         return p && p.GetComponent<VeryFragileProjectile>();
     }

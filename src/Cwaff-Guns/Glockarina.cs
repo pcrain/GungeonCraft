@@ -79,7 +79,7 @@ public class Glockarina : CwaffGun
             Type ot = original.DeclaringType;
             if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStfld(ot, ot.GetEnumeratorFieldName("displayTime"))))
                 return; // play our sound right before we begin the item display countdown
-            cursor.Emit(OpCodes.Call, typeof(Glockarina).GetMethod("OnChestOpen", BindingFlags.Static | BindingFlags.NonPublic));
+            cursor.CallPrivate(typeof(Glockarina), nameof(Glockarina.OnChestOpen));
         }
     }
 

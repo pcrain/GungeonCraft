@@ -157,7 +157,7 @@ public class AstralProjector : CwaffPassive
         this.Owner.gameObject.PlayUnique("phase_through_wall_sound");
     }
 
-    public static float PreventRigidbodyCastDuringHandlePlayerInput(PlayerController pc, float inValue)
+    private static float PreventRigidbodyCastDuringHandlePlayerInput(PlayerController pc, float inValue)
     {
         if (pc.HasPassive<AstralProjector>())
             return inValue > 0 ? 999f : -999f; // replace the value we're checking against with something absurdly high so we avoid doing RigidBodyCasts
@@ -184,7 +184,7 @@ public class AstralProjector : CwaffPassive
                 cursor.Emit(OpCodes.Ldc_R4, 0.01f); // replace the check for 0.01f as arg1
 
                 // call our method with player instance and original threshold value as args
-                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput"));
+                cursor.CallPrivate(typeof(AstralProjector), nameof(AstralProjector.PreventRigidbodyCastDuringHandlePlayerInput));
                 // the return value from our hook is now on the stack, replacing 0.01f with 999f if we have the item
                 // this ensures the RigidBodyCast() will never happen
             }
@@ -198,7 +198,7 @@ public class AstralProjector : CwaffPassive
                 cursor.Emit(OpCodes.Ldc_R4, -0.01f); // replace the check for -0.01f as arg1
 
                 // call our method with player instance and original threshold value as args
-                cursor.Emit(OpCodes.Call, typeof(AstralProjector).GetMethod("PreventRigidbodyCastDuringHandlePlayerInput"));
+                cursor.CallPrivate(typeof(AstralProjector), nameof(AstralProjector.PreventRigidbodyCastDuringHandlePlayerInput));
                 // the return value from our hook is now on the stack, replacing -0.01f with -999f if we have the item
                 // this ensures the RigidBodyCast() will never happen
             }

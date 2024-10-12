@@ -37,7 +37,7 @@ public class ScavengingArms : CwaffPassive
     }
 
     // NOTE: called by patch in CwaffPatches
-    private static void HandleCollisionWithMinorBreakable(SpeculativeRigidbody myRigidbody, SpeculativeRigidbody otherRigidBody)
+    internal static void HandleCollisionWithMinorBreakable(SpeculativeRigidbody myRigidbody, SpeculativeRigidbody otherRigidBody)
     {
         if (UnityEngine.Random.value > _FIND_AMMO_CHANCE) //NOTE: called first because it's the fastest / most-likely failure point
             return; // unlucky :/

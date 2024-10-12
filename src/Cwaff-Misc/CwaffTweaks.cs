@@ -146,7 +146,7 @@ public static class CwaffTweaks
                 FieldInfo sellPriceField = ot.GetField(sellPriceFieldName, BindingFlags.Instance | BindingFlags.NonPublic);
                 cursor.Emit(OpCodes.Ldarg_0);
                 cursor.Emit(OpCodes.Ldfld, ot.GetField("targetItem", BindingFlags.Instance | BindingFlags.NonPublic));
-                cursor.Emit(OpCodes.Call, typeof(SellJammedLiesPatch).GetMethod(nameof(SellJammedLiesPatch.AdjustPrice), BindingFlags.Static | BindingFlags.NonPublic));
+                cursor.CallPrivate(typeof(SellJammedLiesPatch), nameof(SellJammedLiesPatch.AdjustPrice));
             }
 
             private static int AdjustPrice(int oldPrice, PickupObject p)
