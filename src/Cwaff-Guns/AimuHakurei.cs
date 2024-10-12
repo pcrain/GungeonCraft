@@ -29,7 +29,7 @@ public class AimuHakurei : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, infiniteAmmo: true,
             ammo: 200, canGainAmmo: false, canReloadNoMatterAmmo: true, modulesAreTiers: true, shootFps: 60, muzzleVFX: "muzzle_aimu",
             muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter)
           .AddToShop(ModdedShopType.TimeTrader);

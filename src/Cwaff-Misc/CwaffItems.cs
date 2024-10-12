@@ -389,6 +389,46 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
         return oldCount;
       }
   }
+
+  // REFACTOR: this should allow individual guns to opt out and be relocated to Alexandria eventually
+  /// <summary>Patch to prevent duct tape from duct taping multiple modules at once</summary>
+  [HarmonyPatch(typeof(DuctTapeItem), nameof(DuctTapeItem.CombineVolleys))]
+  private class DuctTapeItemCombineVolleysPatch
+  {
+      [HarmonyILManipulator]
+      private static void DuctTapeItemCombineVolleysIL(ILContext il)
+      {
+          ILCursor cursor = new ILCursor(il);
+          ILLabel loopEnd = null;
+          for (int i = 0; i < 2; ++i) // we're interested in the target of the SECOND occurrence of brfalse
+            if (!cursor.TryGotoNext(MoveType.After,
+              instr => instr.MatchLdfld<ProjectileModule>("runtimeGuid"),
+              instr => instr.MatchBrfalse(out loopEnd) ))
+                return;
+
+          cursor.Index = 0;
+          if (!cursor.TryGotoNext(MoveType.Before,
+            instr => instr.MatchCallvirt<Gun>("get_RawSourceVolley"),
+            instr => instr.MatchLdfld<ProjectileVolleyData>("projectiles") ))
+              return;
+
+          // arg1 == mergeGun is already on the stack and needs to be restored after branch
+          cursor.Emit(OpCodes.Ldloc_1); // load i
+          cursor.Emit(OpCodes.Call, typeof(DuctTapeItemCombineVolleysPatch).GetMethod(
+            nameof(DuctTapeItemCombineVolleysPatch.ShouldDuctTapeModule), BindingFlags.Static | BindingFlags.NonPublic));
+          cursor.Emit(OpCodes.Brfalse, loopEnd); // skip the current loop iteration
+          cursor.Emit(OpCodes.Ldarg_1); // restore mergeGun on stack if we don't skip the current loop iteration
+      }
+
+      private static bool ShouldDuctTapeModule(Gun gun, int i)
+      {
+        if (!gun.Volley || !gun.Volley.ModulesAreTiers || gun.CurrentStrengthTier == i)
+          return true;
+        if (!gun.gameObject.GetComponent<CwaffGun>())
+          return true; // don't affect vanilla guns
+        return false;
+      }
+  }
 }
 
 public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffItem
