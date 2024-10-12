@@ -52,73 +52,43 @@ static class ProjectileHandleDamagePatches
         cursor.CallPrivate(typeof(DamageAdjuster), nameof(DamageAdjuster.AdjustDamageStatic));
     }
 
-    //TODO: rewrite using spapi's guidelines
     //NOTE: used by Armor Piercing Rounds to ignore reflection / invulnerability frames for enemies like Lead Maiden
     [HarmonyILManipulator]
     private static void ArmorPiercingIL(ILContext il)
     {
         ILCursor cursor = new ILCursor(il);
-        VariableDefinition shouldPierce = il.DeclareLocal<bool>();
 
+        // PossiblyDisableArmor() is expensive and has side effects, so cache the result in our own local
+        VariableDefinition shouldPierce = il.DeclareLocal<bool>();
         cursor.Emit(OpCodes.Ldarg_0); // load Projectile this onto stack
         cursor.Emit(OpCodes.Ldarg_1); // load SpeculativeRigidbody rigidbody onto stack
         cursor.CallPrivate(typeof(ArmorPiercingRounds), nameof(ArmorPiercingRounds.PossiblyDisableArmor));
         cursor.Emit(OpCodes.Stloc, shouldPierce);
 
         // the original method returns early if ReflectProjectiles returns true, so patch that really quickly
-        ILLabel preventReflect = null;
-        if (!cursor.TryGotoNext(MoveType.After,
-          instr => instr.MatchCallvirt<SpeculativeRigidbody>("get_ReflectProjectiles"),
-          instr => instr.MatchBrfalse(out preventReflect)
-          ))
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<SpeculativeRigidbody>("get_ReflectProjectiles")))
             return;
         cursor.Emit(OpCodes.Ldloc, shouldPierce);
-        cursor.Emit(OpCodes.Brtrue, preventReflect);
+        cursor.CallPrivate(typeof(ProjectileHandleDamagePatches), nameof(AndNot));
 
         // the original method returns early if QueryInvulnerabilityFrame() returns true, so patch that really quickly
-        ILLabel preventInvulnerable = null;
-        if (!cursor.TryGotoNext(MoveType.After,
-          instr => instr.MatchCallvirt<tk2dSpriteAnimator>("QueryInvulnerabilityFrame"),
-          instr => instr.MatchBrfalse(out preventInvulnerable)
-          ))
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<tk2dSpriteAnimator>("QueryInvulnerabilityFrame")))
             return;
         cursor.Emit(OpCodes.Ldloc, shouldPierce);
-        cursor.Emit(OpCodes.Brtrue, preventInvulnerable);
+        cursor.CallPrivate(typeof(ProjectileHandleDamagePatches), nameof(AndNot));
 
-        // now we need a BUNCH of complicated logic all because ignoreInvulnerabilityFrames is a constant, so we have to rewrite the stack
-        if (!cursor.TryGotoNext(MoveType.After,
-          instr => instr.MatchStloc(8), // V_8 == damageCategory
-          instr => instr.MatchLdarg(2), // hitPixelCollider (parameter)
-          instr => instr.MatchStloc(9)  // hitPixelCollider (local)
-          ))
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(9))) // hitPixelCollider (local)
             return;
 
         // we're right before ApplyDamage(), HealthHaver obj is already on the stack
-        ILLabel pierced = cursor.DefineLabel();
-        ILLabel didNotPierce = cursor.DefineLabel();
-
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcI4(0)))
+            return; // match the load for the hardcoded "false" for ignoreInvulnerabilityFrames
         cursor.Emit(OpCodes.Ldloc, shouldPierce);
-        cursor.Emit(OpCodes.Brfalse, didNotPierce);
-
-        cursor.Emit(OpCodes.Ldloc_S, (byte)4); // V_4 == damage
-        cursor.Emit(OpCodes.Ldloc_S, (byte)5); // V_5 == velocity
-        cursor.Emit(OpCodes.Ldloc_S, (byte)6); // V_6 == ownerName
-        cursor.Emit(OpCodes.Ldloc_S, (byte)7); // V_7 == coreDamageTypes
-        cursor.Emit(OpCodes.Ldc_I4, (int)DamageCategory.Unstoppable); // unstoppable damage
-        cursor.Emit(OpCodes.Ldc_I4_1);         // ignoreInvulnerabilityFrames == true
-        cursor.Emit(OpCodes.Ldloc_S, (byte)9); // V_9 == hit pixel collider
-        cursor.Emit(OpCodes.Ldarg_0);
-        cursor.Emit(OpCodes.Ldfld, typeof(Projectile).GetField("ignoreDamageCaps", BindingFlags.Instance | BindingFlags.Public));
-        cursor.Emit(OpCodes.Callvirt, typeof(HealthHaver).GetMethod("ApplyDamage", BindingFlags.Instance | BindingFlags.Public));
-        cursor.Emit(OpCodes.Br, pierced);
-
-        cursor.MarkLabel(didNotPierce);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<HealthHaver>("ApplyDamage")))
-            return;
-        cursor.MarkLabel(pierced);
-
-        // ETGModConsole.Log($"  patch applied");
+        cursor.CallPrivate(typeof(ProjectileHandleDamagePatches), nameof(ShouldIgnoreInvulnerabilityFrames));
     }
+
+    private static bool AndNot(bool trueVal, bool falseVal) => trueVal && !falseVal;
+    private static bool ShouldIgnoreInvulnerabilityFrames(bool _, bool ignore) => ignore;
 }
 
 [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnRigidbodyCollision))]
