@@ -50,6 +50,7 @@ global using static tk2dBaseSprite;          //Anchor
 global using static PickupObject;            //ItemQuality
 global using static BasicBeamController;     //BeamState
 global using static DeadlyDeadlyGoopManager; //GoopPositionData
+global using static PlayerStats;             //StatType
 
 namespace CwaffingTheGungy;
 
@@ -296,6 +297,7 @@ public class Initialisation : BaseUnityPlugin
                 BulletbotImplant.Init();
                 Frisbee.Init();
                 WeightedRobes.Init();
+                Detergent.Init();
 
                 setupActivesWatch.Stop();
             #endregion

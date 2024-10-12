@@ -243,3 +243,4 @@ oddjob_spin_sound,0.0,0,sound,0
 overflow_drain_sound,-12.0,1,sound,0
 overflow_pump_sound,-7.0,1,sound,0
 overflow_shoot_sound,-5.0,1,sound,0
+detergent_cleanse_sound,-3.0,1,sound,0
