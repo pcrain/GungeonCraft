@@ -19,6 +19,8 @@ namespace CwaffingTheGungy;
     + all bosses are jammed
     + no bullet that can kill the future
 
+    - no default 2 blank restoration per floor (except for ammolets)
+
     x no time slowing (too hard to implement)
 */
 

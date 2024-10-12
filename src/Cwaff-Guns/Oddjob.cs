@@ -4,7 +4,7 @@ public class Oddjob : CwaffGun
 {
     public static string ItemName         = "Oddjob";
     public static string ShortDescription = "Hat Tricks";
-    public static string LongDescription  = "Travels in a circular arc towards the enemy closest to the player's line of sight, sawing through anything in its path before returning to the player. Cannot be switched out or dropped while in flight. Increases curse by 0.5 while in inventory.";
+    public static string LongDescription  = "Travels in a circular arc towards the enemy closest to the player's line of sight, sawing through anything in its path before returning to the player. Cannot be switched out or dropped while in flight. Increases curse by 1 while in inventory.";
     public static string Lore             = "TBD";
 
     internal static GameObject _Sparks = null;
@@ -16,14 +16,14 @@ public class Oddjob : CwaffGun
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Oddjob>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 1, shootFps: 60, reloadFps: 4,
-                muzzleFrom: Items.Mailbox, canGainAmmo: false, suppressReloadLabel: true, curse: 0.5f);
+            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 1, shootFps: 60, reloadFps: 4,
+                muzzleFrom: Items.Mailbox, canGainAmmo: false, suppressReloadLabel: true, curse: 1f);
             gun.Attach<Unthrowable>();
             gun.carryPixelOffset = new IntVector2(3, 11);
             gun.OnlyUsesIdleInWeaponBox = true;
 
         gun.InitProjectile(GunData.New(sprite: "oddjob_projectile", clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 30.0f, speed: 40f, range: 9999f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound",
+            damage: 25.0f, speed: 40f, range: 9999f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound",
             hitWallSound: "paintball_impact_wall_sound", shouldRotate: false, fps: 30, preventOrbiting: true))
           .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; })
           .Attach<OddjobProjectile>();
@@ -222,7 +222,11 @@ public class OddjobProjectile : MonoBehaviour
     {
         foreach (HealthHaver hh in this._hitLastFrame)
             if (hh && !hh.IsDead && hh.IsVulnerable && !this._hitThisFrame.Contains(hh))
+            {
                 hh.ApplyDamage(this._proj.baseData.damage, Vector2.zero, this._proj.OwnerName);
+                if (hh.specRigidbody)
+                    this._proj.specRigidbody.RegisterTemporaryCollisionException(hh.specRigidbody, 0.1f);
+            }
         BraveUtility.Swap(ref this._hitThisFrame, ref this._hitLastFrame);
         this._hitThisFrame.Clear();
         this._collidedLastFrame = false;
