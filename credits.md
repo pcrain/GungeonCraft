@@ -14,9 +14,9 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
     - [Tremor Mod](https://tremormod.fandom.com/wiki/Weapons): Alligator (Snake Devourer), B. B. Gun (SBC), Blackjack (Party Over), Crapshooter (edited Blackhole Cannon), Hand Cannon (Hand Cannon), Platinum Star (recolored Dragon Rafale), Subtractor Beam (Cosmic Assault Rifle), Suncaster (Volcannon), Telefragger (Phantablast)
 
-    - [Antiaris Mod](https://antiaris.fandom.com/wiki/Weapons): Bubblebeam (recolored Boiling Point), Carpet Bomber (Royal Cannon), Seltzer Pelter (Cannon of Nightmares), Uppskeruvel (Devil Dragon), Yggdrashell (Terra Blunderbuss)
+    - [Exodus Mod](https://exodusmod.fandom.com/wiki/Weapons): Aimu Hakurei (Clockwork Annihilator), Chekhov's Gun (Calitoss), Gunbrella (Neombrella), Jugglernaut (Light Grenader), Zag (Ancient Uzi), Overflow (Jolly Roger)
 
-    - [Exodus Mod](https://exodusmod.fandom.com/wiki/Weapons): Aimu Hakurei (Clockwork Annihilator), Chekhov's Gun (Calitoss), Gunbrella (Neombrella), Jugglernaut (Light Grenader), Zag (Ancient Uzi)
+    - [Antiaris Mod](https://antiaris.fandom.com/wiki/Weapons): Bubblebeam (recolored Boiling Point), Carpet Bomber (Royal Cannon), Seltzer Pelter (Cannon of Nightmares), Uppskeruvel (Devil Dragon), Yggdrashell (Terra Blunderbuss)
 
     - [Calamity Mod](https://calamitymod.wiki.gg/wiki/Weapons): Groundhog (Karasawa), Hallaeribut (Leviatitan), King's Law (Soma Prime), Outbreak (Cursed Capper), Widowmaker (Svantechnical)
 
@@ -36,7 +36,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
 #### Original Sprites (please check out the authors' work! <3)
 
-  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Maestro, Missiletoe, Omnidirectional Laser, Starmageddon, Vladimir
+  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Maestro, Missiletoe, Omnidirectional Laser, Starmageddon, Vladimir, Oddjob
 
   - [IdioticMuffin](https://www.reddit.com/r/EnterTheGungeon/comments/et316d/yet_even_more_gun_concepts_for_gungeon/): Grandmaster, [Paintball Cannon](https://www.reddit.com/r/EnterTheGungeon/comments/clkr07/splat_the_gungeon_weapon_concepts/)
 

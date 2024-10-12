@@ -30,20 +30,19 @@ public class Hallaeribut : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Hallaeribut>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Hallaeribut>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.2f, ammo: 800, shootFps: 24, reloadFps: 16,
             loopReloadAt: 0, muzzleVFX: "muzzle_hallaeribut", muzzleFps: 30, muzzleScale: 0.5f, fireAudio: "chomp_small_sound",
             reloadAudio: "chomp_small_sound", modulesAreTiers: true)
           .Attach<Unthrowable>() // throwing circumvents a primary mechanic, so don't allow it
-          .Attach<HallaeributAmmoDisplay>();
-
-        Projectile proj = gun.InitProjectile(GunData.New(sprite: "hallaeribut_projectile", fps: 24, scale: 0.75f, clipSize: 32, cooldown: 0.33f,
+          .Attach<HallaeributAmmoDisplay>()
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(sprite: "hallaeribut_projectile", fps: 24, scale: 0.75f, clipSize: 32, cooldown: 0.33f,
             shootStyle: ShootStyle.Burst, angleVariance: 20f, damage: 9.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f,
             customClip: true))
           .AudioEvent("snap_sound") // play every time animation returns to frame 0, not just on projectile creation
-          .Attach<HallaeributProjectile>();
-
-        proj.AddTrailToProjectilePrefab("hallaeribut_trail", fps: 24, cascadeTimer: C.FRAME, softMaxLength: 1f);
+          .Attach<HallaeributProjectile>()
+          .AddTrailToProjectilePrefab("hallaeribut_trail", fps: 24, cascadeTimer: C.FRAME, softMaxLength: 1f);
 
         ProjectileModule mod = gun.DefaultModule;
         gun.Volley.projectiles = new(_AmmoThresholds.Length - 1);

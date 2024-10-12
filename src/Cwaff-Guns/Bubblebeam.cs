@@ -12,15 +12,13 @@ public class Bubblebeam : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Bubblebeam>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.25f, ammo: 2400, shootFps: 60, reloadFps: 24,
-                fireAudio: "bubble_pop_sound");
-            gun.carryPixelOffset = new IntVector2(14, 4);
-            gun.SetReloadAudio("bubblebeam_close_sound", 1);
-            gun.SetReloadAudio("seltzer_insert_sound", 9);
-            gun.SetReloadAudio("seltzer_shake_sound", 17, 19, 21, 23, 25, 27);
-
-        gun.InitProjectile(GunData.New(sprite: "bubblebeam_projectile", fps: 16, clipSize: 100, cooldown: 0.05f, shootStyle: ShootStyle.Automatic,
+        Lazy.SetupGun<Bubblebeam>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.25f, ammo: 2400, shootFps: 60, reloadFps: 24,
+            fireAudio: "bubble_pop_sound", carryOffset: new IntVector2(14, 4))
+          .SetReloadAudio("bubblebeam_close_sound", 1)
+          .SetReloadAudio("seltzer_insert_sound", 9)
+          .SetReloadAudio("seltzer_shake_sound", 17, 19, 21, 23, 25, 27)
+          .InitProjectile(GunData.New(sprite: "bubblebeam_projectile", fps: 16, clipSize: 100, cooldown: 0.05f, shootStyle: ShootStyle.Automatic,
             collidesWithProjectiles: true, damage: 0.0f, speed: 35f, range: 18f, force: 10f, scale: 0.5f, customClip: true))
           .Attach<BubblebeamProjectile>();
 

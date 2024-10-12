@@ -34,7 +34,8 @@ public class OmnidirectionalLaser : CwaffGun
     {
         Gun gun = Lazy.SetupGun<OmnidirectionalLaser>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250, handedness: GunHandedness.NoHanded,
-            idleFps: _BASE_FPS, shootFps: _BASE_FPS, loopFireAt: 0, preventRotation: true, suppressReloadAnim: true)
+            idleFps: _BASE_FPS, shootFps: _BASE_FPS, loopFireAt: 0, preventRotation: true, suppressReloadAnim: true,
+            onlyUsesIdleInWeaponBox: true) // fixes half-sprite from appearing in weapon box
           .SetFireAudio("omni_spin_sound", 0, 1, 2, 3, 4, 5, 6, 7)
           .Attach<Unthrowable>(); // throwing looks stupid, so don't allow it
 
@@ -51,7 +52,6 @@ public class OmnidirectionalLaser : CwaffGun
         gun.reloadAnimation         = gun.idleAnimation; // animation shouldn't automatically change when reloading
         gun.shootAnimation          = null; // animation shouldn't automatically change when firing
         gun.PreventOutlines         = true; // messes up with two-part rendering
-        gun.OnlyUsesIdleInWeaponBox = true; // fixes half-sprite from appearing in weapon box
 
         for (int i = 1; i <= 8; ++i)
         {

@@ -24,18 +24,17 @@ public class Yggdrashell : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Yggdrashell>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, shootFps: 14, reloadFps: 4,
-                doesScreenShake: false, modulesAreTiers: true, attacksThroughWalls: true);
-            gun.CanAttackThroughObjects = true;
-
-        gun.Volley.projectiles = new(){
+        Lazy.SetupGun<Yggdrashell>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, shootFps: 14, reloadFps: 4,
+            doesScreenShake: false, modulesAreTiers: true, attacksThroughWalls: true)
+          .AssignGun(out Gun gun)
+          .Volley.projectiles = new(){
             SetupMod(level: 1, gun: gun),
             SetupMod(level: 2, gun: gun),
             SetupMod(level: 3, gun: gun),
             SetupMod(level: 4, gun: gun),
             SetupMod(level: 5, gun: gun)
-        };
+          };
 
         _HeartVFXSprite = VFX.Create("yggdrashell_heart_vfx").GetComponent<tk2dBaseSprite>();
         _ArmorVFXSprite = VFX.Create("yggdrashell_armor_vfx").GetComponent<tk2dBaseSprite>();

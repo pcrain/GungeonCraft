@@ -851,7 +851,8 @@ public static class Extensions
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
     float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
-    GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false)
+    GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, bool immobilizeWhileCharging = false,
+    bool onlyUsesIdleInWeaponBox = false)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -870,6 +871,7 @@ public static class Extensions
     gun.Volley.ModulesAreTiers = modulesAreTiers;
     gun.GainsRateOfFireAsContinueAttack = rampUpFireRate;
     gun.CanAttackThroughObjects = attacksThroughWalls;
+    gun.OnlyUsesIdleInWeaponBox = onlyUsesIdleInWeaponBox;
     if (rampUpFireRate)
       gun.RateOfFireMultiplierAdditionPerSecond = rampUpFactor;
 
@@ -892,6 +894,11 @@ public static class Extensions
       CwaffGun.SetUpDynamicBarrelOffsets(gun);
     if (suppressReloadLabel)
       cg.suppressReloadLabel = true;
+    if (immobilizeWhileCharging)
+    {
+      cg.preventMovingWhenCharging = true;
+      cg.preventRollingWhenCharging = true;
+    }
 
     if (curse != 0f)
       gun.AddStatToGun(PlayerStats.StatType.Curse, curse, StatModifier.ModifyMethod.ADDITIVE);

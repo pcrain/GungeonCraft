@@ -15,20 +15,14 @@ public class Groundhog : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Groundhog>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.0f, ammo: 50, shootFps: 14, reloadFps: 4,
-              chargeFps: (int)_BASE_FPS, attacksThroughWalls: true);
-            gun.SetChargeAudio("groundhog_burrow_sound", 11);
-            gun.LoopAnimation(gun.chargeAnimation, 15);
-
-        Groundhog groundhog = gun.gameObject.GetComponent<Groundhog>();
-            groundhog.preventRollingWhenCharging = true;
-            groundhog.preventMovingWhenCharging = true;
-
-        gun.InitProjectile(GunData.New(sprite: null, clipSize: 1, cooldown: 0.75f, shootStyle: ShootStyle.Charged, chargeTime: 2f, hideAmmo: true,
+        Lazy.SetupGun<Groundhog>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.0f, ammo: 50, shootFps: 14, reloadFps: 4,
+            chargeFps: (int)_BASE_FPS, attacksThroughWalls: true, immobilizeWhileCharging: true, loopChargeAt: 15)
+          .SetChargeAudio("groundhog_burrow_sound", 11)
+          .InitProjectile(GunData.New(sprite: null, clipSize: 1, cooldown: 0.75f, shootStyle: ShootStyle.Charged, chargeTime: 2f, hideAmmo: true,
             damage: 50.0f, speed: 25f, range: 100f, force: 30f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound"));
 
-        _EarthClod = VFX.Create("groundhog_rock_vfx", fps: 1, loops: true, anchor: Anchor.MiddleCenter, scale: 1.0f);
+        _EarthClod = VFX.Create("groundhog_rock_vfx");
     }
 
     //NOTE: logic for forcing the gun to only face directly left or right when charging

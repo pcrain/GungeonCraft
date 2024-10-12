@@ -710,6 +710,12 @@ public static class GunBuilder
     return projectileRef = projectile;
   }
 
+  /// <summary>Assign a gun by reference</summary>
+  public static T AssignGun<T>(this T gun, out T gunRef) where T : Gun
+  {
+    return gunRef = gun;
+  }
+
   /// <summary>Add each animation from a list in turn to a projectile and return that projectile</summary>
   public static Projectile AddAnimations(this Projectile proj, params tk2dSpriteAnimationClip[] animations)
   {
@@ -722,27 +728,24 @@ public static class GunBuilder
   /// <summary>Get a dummy charge module and add it to a gun (useful for weapons that need to check if they're being charged)</summary>
   public static void AddDummyChargeModule(this Gun gun)
   {
-    if (_DummyChargeModule == null)
-    {
-        _DummyChargeModule = new();
-          _DummyChargeModule.shootStyle = ShootStyle.Charged;
-          _DummyChargeModule.ammoCost   = 0;  // hides from the UI when duct-taped
-          _DummyChargeModule.chargeProjectiles = new();
-          _DummyChargeModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
-            Projectile = Lazy.NoProjectile(),
-            ChargeTime = float.MaxValue,
-          });
-          _DummyChargeModule.numberOfShotsInClip = 1;
-          _DummyChargeModule.ammoType            = GameUIAmmoType.AmmoType.CUSTOM;
-          _DummyChargeModule.customAmmoType      = "white";
-    }
+    _DummyChargeModule ??= new(){
+      shootStyle = ShootStyle.Charged,
+      ammoCost   = 0,  // hides from the UI when duct-taped
+      chargeProjectiles = new(){ new(){
+        Projectile = Lazy.NoProjectile(),
+        ChargeTime = float.MaxValue,
+      }},
+      numberOfShotsInClip = 1,
+      ammoType            = GameUIAmmoType.AmmoType.CUSTOM,
+      customAmmoType      = "white",
+    };
     gun.Volley.projectiles.Add(ProjectileModule.CreateClone(_DummyChargeModule, false, gun.Volley.projectiles.Count));
   }
 
   /// <summary>Duplicates a gun's default module, optionally clones the projectiles and/or adds it to the gun, and returns the new module</summary>
   public static ProjectileModule DuplicateDefaultModule(this Gun gun, bool cloneProjectiles = true, bool add = true)
   {
-    ProjectileModule mod = ProjectileModule.CreateClone(gun.DefaultModule);
+    ProjectileModule mod = ProjectileModule.CreateClone(gun.DefaultModule, inheritGuid: false);
     if (add)
       gun.Volley.projectiles.Add(mod);
     if (!cloneProjectiles)

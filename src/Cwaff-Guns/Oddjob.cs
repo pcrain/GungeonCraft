@@ -15,14 +15,12 @@ public class Oddjob : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Oddjob>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 1, shootFps: 60, reloadFps: 4,
-                muzzleFrom: Items.Mailbox, canGainAmmo: false, suppressReloadLabel: true, curse: 1f);
-            gun.Attach<Unthrowable>();
-            gun.carryPixelOffset = new IntVector2(3, 11);
-            gun.OnlyUsesIdleInWeaponBox = true;
-
-        gun.InitProjectile(GunData.New(sprite: "oddjob_projectile", clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+        Lazy.SetupGun<Oddjob>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 1, shootFps: 60, reloadFps: 4,
+            muzzleFrom: Items.Mailbox, canGainAmmo: false, suppressReloadLabel: true, curse: 1f, carryOffset: new IntVector2(3, 11),
+            onlyUsesIdleInWeaponBox: true)
+          .Attach<Unthrowable>()
+          .InitProjectile(GunData.New(sprite: "oddjob_projectile", clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 25.0f, speed: 40f, range: 9999f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound",
             hitWallSound: "paintball_impact_wall_sound", shouldRotate: false, fps: 30, preventOrbiting: true))
           .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; })
@@ -57,6 +55,7 @@ public class Oddjob : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
     }
 
@@ -64,6 +63,7 @@ public class Oddjob : CwaffGun
     {
         base.OnDroppedByPlayer(player);
         RemoveHatFromHead();
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
     }
 
     private void ReturnHatProjectile()

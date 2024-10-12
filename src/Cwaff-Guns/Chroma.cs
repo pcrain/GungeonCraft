@@ -23,12 +23,12 @@ public class Chroma : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Chroma>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Chroma>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, idleFps: 20, shootFps: 60,
             modulesAreTiers: true)
-          .Attach<ChromaAmmoDisplay>();
-
-        gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
+          .Attach<ChromaAmmoDisplay>()
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
             shootStyle: ShootStyle.Beam, damage: 7f, speed: -1f, /*customClip: true, */ammoCost: 5, angleVariance: 0f,
             beamSprite: "chroma_beam", beamFps: 60, beamChargeFps: 8, beamImpactFps: 30,
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0f, beamEmission: 1500f))
