@@ -10,7 +10,7 @@ public class Calculator : CwaffPassive
     public static void Init()
     {
         PassiveItem item  = Lazy.SetupPassive<Calculator>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.B;
+        item.quality      = ItemQuality.C;
     }
 
     [HarmonyPatch(typeof(PlayerItem), nameof(PlayerItem.Pickup))]

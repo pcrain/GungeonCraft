@@ -5,6 +5,10 @@
 - Added Oddjob and Overflow
 - Removed Yggdrashell debug output from console
 - Visually tweaked Credit Card to allow player to go into debt by up to 500 casings instead of granting 500 casings while held (mechanically, it works the same)
+- Fixed Maestro's ammo display being too short compared to its ammo
+- Cheato Page synergy now causes Breegull's normal eggs to properly display as infinite ammo
+- Updated required Alexandria version to 0.4.13 for custom ammo display bugfixes
+- Reduced Calculator's quality from B to C (stackable active items are relatively uncommon so utility is limited)
 
 ## 1.19.3 (2024-10-07)
 

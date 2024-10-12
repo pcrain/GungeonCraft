@@ -64,7 +64,7 @@ public static class CwaffSynergies
         NewSynergy(AIM_BOTS, "Aim Bots", new[]{IName(BionicFinger.ItemName), "nanomachines"});
         // Pistol Whip's melee hit deals double damage to Jammed bosses and minibosses, and instantly smites all other Jammed enemies.
         NewSynergy(WICKED_CHILD, "Wicked Child", new[]{IName(PistolWhip.ItemName), IName(HolyWaterGun.ItemName)});
-        // Enemies with guns that are charmed by Sub Machine Gun are given a Heroine.
+        // Sub Machine Gun replaces any guns held by charmed enemies with Heroine.
         NewSynergy(I_NEED_A_HERO, "I Need a Hero", new[]{IName(SubMachineGun.ItemName), "heroine"});
         // Digitized chests are automatically unlocked when re-materialized.
         NewSynergy(KEYGEN, "Keygen", new[]{IName(Femtobyte.ItemName), "master_of_unlocking"});

@@ -133,7 +133,12 @@ public class Breegull : CwaffGun
         EggData e = _Eggs[this._currentEggType];
         this.gun.DefaultModule.ammoCost = e.ammo;  //BUG: with certain items, the ammo cost here seems to be ignored...can't replicate though
         if (this._currentEggType == 0 && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.CHEATO_PAGE))
-            this.gun.DefaultModule.ammoCost = 0; //BUG: can't do infinite ammo until alexandria ammo display bug is fixed with PlayerController.InfiniteAmmo
+        {
+            this.gun.LocalInfiniteAmmo = true;
+            this.gun.DefaultModule.ammoCost = 0;
+        }
+        else
+            this.gun.LocalInfiniteAmmo = false;
         if (playSound)
             base.gameObject.Play(e.sound);
     }
