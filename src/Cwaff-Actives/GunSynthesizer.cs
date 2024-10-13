@@ -25,7 +25,6 @@ public class GunSynthesizer : CwaffActive
 
         ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.PerRoom, _COOLDOWN);
         item.consumable                 = false;
-        item.CanBeDropped               = true;
 
         _SPAWN_VFX = VFX.Create("basic_green_square");
         _SPAWN_VFX.GetComponent<tk2dSprite>().MakeHolographic(green: true);

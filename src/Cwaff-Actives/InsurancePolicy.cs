@@ -40,8 +40,6 @@ public class InsurancePolicy : CwaffActive
     {
         PlayerItem item = Lazy.SetupActive<InsurancePolicy>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality        = ItemQuality.SPECIAL;
-        item.consumable     = true;
-        item.CanBeDropped   = true;
         item.CanBeSold      = false;  // no reselling insurance!
         item.UsesCustomCost = true;
         item.CustomCost     = 30;

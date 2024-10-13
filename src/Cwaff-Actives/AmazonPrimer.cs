@@ -13,8 +13,6 @@ public class AmazonPrimer : CwaffActive
     {
         PlayerItem item = Lazy.SetupActive<AmazonPrimer>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
-        item.consumable   = true;
-        item.CanBeDropped = true;
 
         _PrimeLogo = VFX.Create("prime_logo_overhead", anchor: Anchor.LowerCenter, emissivePower: 100f);
         FakeItem.Create<PrimerSubscription>();

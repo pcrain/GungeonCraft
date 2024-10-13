@@ -26,7 +26,6 @@ public class BorrowedTime : CwaffActive
 
         ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 2);
         item.consumable   = false;
-        item.CanBeDropped = true;
 
         _EmptyId = item.sprite.spriteId;
         _FullId  = item.sprite.collection.GetSpriteIdByName("borrowed_time_full_icon");

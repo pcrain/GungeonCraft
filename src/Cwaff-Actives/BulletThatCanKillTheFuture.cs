@@ -23,8 +23,6 @@ public class BulletThatCanKillTheFuture : CwaffActive
     {
         PlayerItem item   = Lazy.SetupActive<BulletThatCanKillTheFuture>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.SPECIAL;
-        item.consumable   = true;
-        item.CanBeDropped = true;
 
         _Sprite = item.sprite;
         CwaffEvents.OnRunStartFromAnyFloor += ResetBTCKTF;

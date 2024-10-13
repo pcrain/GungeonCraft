@@ -14,7 +14,6 @@ public class IceCream : CwaffActive
         PlayerItem item = Lazy.SetupActive<IceCream>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.consumable   = false;
-        item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 15f);
 
         _HeartVFX = VFX.Create("heart_vfx", fps: 18, emissivePower: 1, emissiveColour: Color.magenta);

@@ -14,7 +14,6 @@ public class GunPowderer : CwaffActive
         PlayerItem item = Lazy.SetupActive<GunPowderer>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         item.consumable   = false;
-        item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 2f);
     }
 

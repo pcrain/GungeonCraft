@@ -29,9 +29,7 @@ public class StackOfTorches : CwaffActive
         item.AddToShop(ModdedShopType.Rusty);
 
         ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.None, 0.1f);
-        item.consumable   = true;
         item.numberOfUses = 64;
-        item.CanBeDropped = true;
 
         _TorchPrefab       = Dissect.FindDefaultResource("DefaultTorch");
         _TorchPurplePrefab = Dissect.FindDefaultResource("DefaultTorchPurple");

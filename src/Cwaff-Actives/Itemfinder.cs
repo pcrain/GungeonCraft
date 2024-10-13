@@ -27,7 +27,6 @@ public class Itemfinder : CwaffActive
         PlayerItem item = Lazy.SetupActive<Itemfinder>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.A;
         item.consumable   = false;
-        item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 1f);
 
         _NormalId = item.sprite.spriteId;

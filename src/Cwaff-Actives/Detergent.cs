@@ -11,7 +11,6 @@ public class Detergent : CwaffActive
     {
         PlayerItem item = Lazy.SetupActive<Detergent>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality    = ItemQuality.B;
-        item.consumable = true;
     }
 
     public override bool CanBeUsed(PlayerController user) => user.Curse() > 0;

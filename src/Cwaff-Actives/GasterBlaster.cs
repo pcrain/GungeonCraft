@@ -18,7 +18,6 @@ public class GasterBlaster : CwaffActive
         PlayerItem item   = Lazy.SetupActive<GasterBlaster>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.SPECIAL;
         item.consumable   = false;
-        item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
 
         _GasterBlast = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 700.0f, speed: 150.0f, force: 70.0f, range: 200.0f,

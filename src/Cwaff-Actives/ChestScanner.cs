@@ -16,7 +16,6 @@ public class ChestScanner : CwaffActive
         item.quality      = ItemQuality.C;
         ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 1);
         item.consumable   = false;
-        item.CanBeDropped = true;
     }
 
     public override void Pickup(PlayerController player)

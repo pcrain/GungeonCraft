@@ -1,10 +1,5 @@
 namespace CwaffingTheGungy;
 
-
-/* TODO:
-    -
-*/
-
 public class BulletbotImplant : CwaffActive
 {
     public static string ItemName         = "Bulletbot Implant";

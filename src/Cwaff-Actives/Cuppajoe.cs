@@ -15,7 +15,6 @@ public class Cuppajoe : CwaffActive
         PlayerItem item = Lazy.SetupActive<Cuppajoe>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
         item.consumable   = false;
-        item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, Caffeination._CRASH_TIME);
     }
 

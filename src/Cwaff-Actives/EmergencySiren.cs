@@ -20,7 +20,6 @@ public class EmergencySiren : CwaffActive
         PlayerItem item = Lazy.SetupActive<EmergencySiren>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.consumable   = false;
-        item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 300f);
 
         _EmergencyMods = new[] {

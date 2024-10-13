@@ -11,8 +11,6 @@ public class ChamberJammer : CwaffActive
     {
         PlayerItem item = Lazy.SetupActive<ChamberJammer>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
-        item.consumable   = true;
-        item.CanBeDropped = true;
 
         FakeItem.Create<UsedChamberJammer>();
     }

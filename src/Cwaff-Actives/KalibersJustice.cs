@@ -16,7 +16,6 @@ public class KalibersJustice : CwaffActive
         PlayerItem item = Lazy.SetupActive<KalibersJustice>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
         item.consumable   = false;
-        item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 1000f);
     }
 

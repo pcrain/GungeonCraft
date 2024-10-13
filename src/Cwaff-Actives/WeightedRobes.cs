@@ -34,7 +34,6 @@ public class WeightedRobes : CwaffActive, ILabelItem
         PlayerItem item   = Lazy.SetupActive<WeightedRobes>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.consumable   = false;
-        item.CanBeDropped = true;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
 
         _InactiveId  = item.sprite.spriteId;
