@@ -27,7 +27,7 @@ static class MinorBreakablePrecollisionPatches
     private static void PlayerCollidesWithMinorBreakableIL(ILContext il)
     {
         ILCursor cursor = new ILCursor(il);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<MinorBreakable>("Break")))
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<MinorBreakable>(nameof(MinorBreakable.Break))))
             return;
 
         cursor.Emit(OpCodes.Ldarg, 1); // SpeculativeRigidbody myRigidbody
@@ -72,7 +72,8 @@ static class ProjectileHandleDamagePatches
         cursor.CallPrivate(typeof(ProjectileHandleDamagePatches), nameof(AndNot));
 
         // the original method returns early if QueryInvulnerabilityFrame() returns true, so patch that really quickly
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<tk2dSpriteAnimator>("QueryInvulnerabilityFrame")))
+        if (!cursor.TryGotoNext(MoveType.After, instr =>
+          instr.MatchCallvirt<tk2dSpriteAnimator>(nameof(tk2dSpriteAnimator.QueryInvulnerabilityFrame))))
             return;
         cursor.Emit(OpCodes.Ldloc, shouldPierce);
         cursor.CallPrivate(typeof(ProjectileHandleDamagePatches), nameof(AndNot));
@@ -99,7 +100,7 @@ static class ProjectileOnRigidbodyCollisionPatches
     private static void ImpactSoundIL(ILContext il)
     {
         ILCursor cursor = new ILCursor(il);
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<Projectile>("HandleKnockback")))
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<Projectile>(nameof(Projectile.HandleKnockback))))
             return;
         if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchLdloc(5))) // v_5 == flag == whether we hit an enemy (true) or other object (false)
             return;
@@ -131,7 +132,7 @@ static class ShootSingleProjectilePatch
 
         if (!cursor.TryGotoNext(MoveType.After,
             instr => instr.MatchLdcI4(2),
-            instr => instr.MatchCallvirt<PlayerStats>("GetStatValue")))
+            instr => instr.MatchCallvirt<PlayerStats>(nameof(PlayerStats.GetStatValue))))
             return;
 
         cursor.Emit(OpCodes.Ldloc_0);  // load PlayerController type
@@ -146,7 +147,7 @@ static class ShootSingleProjectilePatch
 
         if (!cursor.TryGotoNext(MoveType.After,
             instr => instr.MatchLdcI4(2),
-            instr => instr.MatchCallvirt<PlayerStats>("GetStatValue")))
+            instr => instr.MatchCallvirt<PlayerStats>(nameof(PlayerStats.GetStatValue))))
             return;
 
         cursor.Emit(OpCodes.Ldloc_0);  // load PlayerController type
@@ -161,7 +162,7 @@ static class ShootSingleProjectilePatch
 
         if (!cursor.TryGotoNext(MoveType.After,
             instr => instr.MatchLdcI4(2),
-            instr => instr.MatchCallvirt<PlayerStats>("GetStatValue")))
+            instr => instr.MatchCallvirt<PlayerStats>(nameof(PlayerStats.GetStatValue))))
             return;
 
         cursor.Emit(OpCodes.Ldarg_0);  // load Gun type
@@ -175,7 +176,7 @@ static class ShootSingleProjectilePatch
         ILCursor cursor = new ILCursor(il);
 
         if (!cursor.TryGotoNext(MoveType.After,
-            instr => instr.MatchCall<Gun>("ApplyCustomAmmunitionsToProjectile")))
+            instr => instr.MatchCall<Gun>(nameof(Gun.ApplyCustomAmmunitionsToProjectile))))
             return;
 
         cursor.Emit(OpCodes.Ldloc_S, (byte)10);  // V_10 == our projectile

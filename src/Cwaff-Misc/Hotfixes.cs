@@ -125,7 +125,7 @@ public static class AmmonomiconPageRendererHotfix
             if (!cursor.TryGotoNext(MoveType.After,
                 instr => instr.MatchLdarg(0), // this == AmmonomiconPageRenderer instance
                 instr => instr.MatchLdloc((byte)6), // V_6 == playerController
-                instr => instr.MatchLdfld<PlayerController>("passiveItems") // increment iterator
+                instr => instr.MatchLdfld<PlayerController>("passiveItems")
                 ))
                 return;
             cursor.Emit(OpCodes.Ldloc_S, (byte)12); // V_12 == m == iterator over passive items
@@ -329,17 +329,13 @@ public static class BadItemOffsetsFromChestHotfix
         private static void BadItemOffsetsFromChestIL(ILContext il)
         {
             ILCursor cursor = new ILCursor(il);
-            if (!cursor.TryGotoNext(MoveType.Before,
-              instr => instr.MatchStloc((byte)7),  // V_7 == offset vector for chest sprite
-              instr => instr.MatchLdloc((byte)8))) // V_8 == sprite for our chest prize
-                return;
+            for (int i = 0; i < 2; ++i) // interested in 2nd occurrence of store
+                if (!cursor.TryGotoNext((i == 1) ? MoveType.Before : MoveType.After, instr => instr.MatchStloc((byte)7)))
+                    return; // V_7 == offset vector for chest sprite
 
-            ++cursor.Index; // move after stloc v_7
-            cursor.Emit(OpCodes.Ldloc_S, (byte)7); // V_7 == the original vector
             cursor.Emit(OpCodes.Ldloc_S, (byte)3); // V_3 == the pickup object
             cursor.Emit(OpCodes.Ldloc_S, (byte)8); // V_8 == sprite for our chest prize
             cursor.CallPrivate(typeof(BadItemOffsetsFromChestPatch), nameof(DetermineActualOffset));
-            cursor.Emit(OpCodes.Stloc_S, (byte)7); // store the new vector in V_7
         }
 
         private static Vector3 DetermineActualOffset(Vector3 original, PickupObject p, tk2dSprite s)

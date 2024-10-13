@@ -198,12 +198,11 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           cursor.Emit(OpCodes.Ldarg_0);  // load enumerator type
           cursor.Emit(OpCodes.Ldfld, ot.GetEnumeratorField("$this")); // load actual "$this" field
           cursor.CallPrivate(typeof(DynamicSpinupPatch), nameof(ModifyRateOfFire));
-          cursor.Emit(OpCodes.Mul);  // multiply the additional natascha rate of fire by fireMultiplier
       }
 
-      private static float ModifyRateOfFire(Gun gun)
+      private static float ModifyRateOfFire(float oldFireRate, Gun gun)
       {
-          return (gun.GetComponent<CwaffGun>() is CwaffGun cg) ? cg.GetDynamicFireRate() : 1f;
+          return oldFireRate * ((gun.GetComponent<CwaffGun>() is CwaffGun cg) ? cg.GetDynamicFireRate() : 1f);
       }
   }
 
