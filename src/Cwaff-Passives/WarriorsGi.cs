@@ -48,23 +48,23 @@ public class WarriorsGi : CwaffPassive
     {
         this._rateOfFireStat = new StatModifier {
             amount      = 1.00f,
-            statToBoost = PlayerStats.StatType.RateOfFire,
+            statToBoost = StatType.RateOfFire,
             modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
         this._movementSpeedStat = new StatModifier {
             amount      = 1.00f,
-            statToBoost = PlayerStats.StatType.MovementSpeed,
+            statToBoost = StatType.MovementSpeed,
             modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
         this._dodgeRollSpeedStat = new StatModifier {
             amount      = 1.00f,
-            statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
+            statToBoost = StatType.DodgeRollSpeedMultiplier,
             modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
         this._damageStat = new StatModifier {
             amount      = 1.00f,
-            statToBoost = PlayerStats.StatType.Damage,
+            statToBoost = StatType.Damage,
             modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
         this._bossDamageStat = new StatModifier {
             amount      = 1.00f,
-            statToBoost = PlayerStats.StatType.DamageToBosses,
+            statToBoost = StatType.DamageToBosses,
             modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
         this.passiveStatModifiers = new StatModifier[] {
             this._rateOfFireStat,

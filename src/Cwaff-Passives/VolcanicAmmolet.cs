@@ -16,7 +16,7 @@ public class VolcanicAmmolet : CwaffBlankModificationItem, ICustomBlankDoer
     {
         PassiveItem item  = Lazy.SetupPassive<VolcanicAmmolet>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
-        ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
+        ItemBuilder.AddPassiveStatModifier(item, StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
     }
 

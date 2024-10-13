@@ -24,7 +24,7 @@ public class Shine : CwaffPassive
         noSpeed = new StatModifier
         {
             amount      = 0,
-            statToBoost = PlayerStats.StatType.MovementSpeed,
+            statToBoost = StatType.MovementSpeed,
             modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE
         };
 

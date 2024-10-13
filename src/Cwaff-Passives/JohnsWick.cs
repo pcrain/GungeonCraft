@@ -28,11 +28,11 @@ public class JohnsWick : CwaffPassive
         this._flameOff = new StatModifier[]{};
         StatModifier s1 = new StatModifier {
             amount      = _MOVEMENT_BOOST,
-            statToBoost = PlayerStats.StatType.MovementSpeed,
+            statToBoost = StatType.MovementSpeed,
             modifyType  = StatModifier.ModifyMethod.ADDITIVE };
         StatModifier s2 = new StatModifier {
             amount      = _DAMAGE_BOOST,
-            statToBoost = PlayerStats.StatType.Damage,
+            statToBoost = StatType.Damage,
             modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE };
         this._flameOn = (new StatModifier[] { s1, s2 }).ToArray();
         this._wasOnFire = false;

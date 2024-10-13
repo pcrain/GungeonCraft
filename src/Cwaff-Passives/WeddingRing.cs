@@ -23,15 +23,15 @@ public class WeddingRing : CwaffPassive
         item.passiveStatModifiers = new StatModifier[] {
             new StatModifier {
                 amount      = 1.00f,
-                statToBoost = PlayerStats.StatType.ReloadSpeed,
+                statToBoost = StatType.ReloadSpeed,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
             new StatModifier {
                 amount      = 1.00f,
-                statToBoost = PlayerStats.StatType.Damage,
+                statToBoost = StatType.Damage,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
             new StatModifier {
                 amount      = 1.00f,
-                statToBoost = PlayerStats.StatType.DamageToBosses,
+                statToBoost = StatType.DamageToBosses,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE},
         };
     }
@@ -59,7 +59,7 @@ public class WeddingRing : CwaffPassive
     {
         this._commitmentMult = reset ? 1.00f : Mathf.Min(this._commitmentMult + _BONUS_PER_KILL, _MAX_BONUS);
         foreach (StatModifier stat in this.passiveStatModifiers)
-            stat.amount = (stat.statToBoost == PlayerStats.StatType.ReloadSpeed) ? (1.0f / this._commitmentMult) : this._commitmentMult;
+            stat.amount = (stat.statToBoost == StatType.ReloadSpeed) ? (1.0f / this._commitmentMult) : this._commitmentMult;
         player.stats.RecalculateStats(player);
     }
 

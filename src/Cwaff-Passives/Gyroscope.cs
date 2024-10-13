@@ -199,12 +199,12 @@ public class GyroscopeRoll : CustomDodgeRoll
             Vector3 chargeStartPosition = this.owner.transform.position;
 
             this.rollDamageModifier = new StatModifier();
-                this.rollDamageModifier.statToBoost = PlayerStats.StatType.DodgeRollDamage;
+                this.rollDamageModifier.statToBoost = StatType.DodgeRollDamage;
                 this.rollDamageModifier.modifyType = StatModifier.ModifyMethod.MULTIPLICATIVE;
                 this.rollDamageModifier.amount = 1.0f;
                 this.owner.ownerlessStatModifiers.Add(rollDamageModifier);
             this.speedModifier = new StatModifier();
-                this.speedModifier.statToBoost = PlayerStats.StatType.MovementSpeed;
+                this.speedModifier.statToBoost = StatType.MovementSpeed;
                 this.speedModifier.modifyType = StatModifier.ModifyMethod.MULTIPLICATIVE;
                 this.speedModifier.amount = 1.0f;
                 this.owner.ownerlessStatModifiers.Add(speedModifier);

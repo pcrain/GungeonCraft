@@ -205,8 +205,8 @@ public class CwaffRaidenBeamController : BeamController
     PlayerController playerController = base.projectile.Owner as PlayerController;
     if (playerController)
     {
-      damage *= playerController.stats.GetStatValue(PlayerStats.StatType.RateOfFire);
-      damage *= playerController.stats.GetStatValue(PlayerStats.StatType.Damage);
+      damage *= playerController.stats.GetStatValue(StatType.RateOfFire);
+      damage *= playerController.stats.GetStatValue(StatType.Damage);
     }
     if (base.ChanceBasedShadowBullet)
       damage *= 2f;

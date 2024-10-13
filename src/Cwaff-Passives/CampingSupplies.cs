@@ -28,7 +28,7 @@ public class CampingSupplies : CwaffPassive
     private StatModifier _campMod = new StatModifier
     {
         amount      = 1.0f,
-        statToBoost = PlayerStats.StatType.Damage,
+        statToBoost = StatType.Damage,
         modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
     };
 

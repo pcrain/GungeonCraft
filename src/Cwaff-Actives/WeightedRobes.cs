@@ -74,15 +74,15 @@ public class WeightedRobes : CwaffActive, ILabelItem
         this.weightedStats ??= new StatModifier[] {
             new StatModifier {
                 amount      = 0f,
-                statToBoost = PlayerStats.StatType.RateOfFire,
+                statToBoost = StatType.RateOfFire,
                 modifyType  = StatModifier.ModifyMethod.ADDITIVE},
             new StatModifier {
                 amount      = 0f,
-                statToBoost = PlayerStats.StatType.ReloadSpeed,
+                statToBoost = StatType.ReloadSpeed,
                 modifyType  = StatModifier.ModifyMethod.ADDITIVE},
             new StatModifier {
                 amount      = 0f,
-                statToBoost = PlayerStats.StatType.MovementSpeed,
+                statToBoost = StatType.MovementSpeed,
                 modifyType  = StatModifier.ModifyMethod.ADDITIVE},
         };
         int pid = player.PlayerIDX;
@@ -91,15 +91,15 @@ public class WeightedRobes : CwaffActive, ILabelItem
         this.trainingStats[pid] = new StatModifier[] {
             new StatModifier {
                 amount      = 0f,
-                statToBoost = PlayerStats.StatType.RateOfFire,
+                statToBoost = StatType.RateOfFire,
                 modifyType  = StatModifier.ModifyMethod.ADDITIVE},
             new StatModifier {
                 amount      = 0f,
-                statToBoost = PlayerStats.StatType.ReloadSpeed,
+                statToBoost = StatType.ReloadSpeed,
                 modifyType  = StatModifier.ModifyMethod.ADDITIVE},
             new StatModifier {
                 amount      = 0f,
-                statToBoost = PlayerStats.StatType.MovementSpeed,
+                statToBoost = StatType.MovementSpeed,
                 modifyType  = StatModifier.ModifyMethod.ADDITIVE},
         };
         player.ownerlessStatModifiers.AddRange(this.trainingStats[pid]);

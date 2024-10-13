@@ -94,7 +94,7 @@ internal class UsedChamberJammer : FakeItem
         jammedGun.gameObject.AddComponent<ChamberJammedBehavior>().Setup(this._percentAmmoToLose);
         jammedGun.SetBaseMaxAmmo(Mathf.CeilToInt((1f - this._percentAmmoToLose) * jammedGun.GetBaseMaxAmmo()));
         float amountToBoostDamage = 1f / (1f - this._percentAmmoToLose);
-        jammedGun.AddCurrentGunStatModifier(PlayerStats.StatType.Damage, amountToBoostDamage, StatModifier.ModifyMethod.MULTIPLICATIVE);
+        jammedGun.AddCurrentGunStatModifier(StatType.Damage, amountToBoostDamage, StatModifier.ModifyMethod.MULTIPLICATIVE);
         user.stats.RecalculateStats(user);
     }
 

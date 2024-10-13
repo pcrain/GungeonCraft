@@ -21,11 +21,11 @@ public class ComfySlippers : CwaffPassive
         _ComfyBuffs       = new[]{
             new StatModifier {
                 amount      = _MOVEMENT_BOOST,
-                statToBoost = PlayerStats.StatType.MovementSpeed,
+                statToBoost = StatType.MovementSpeed,
                 modifyType  = StatModifier.ModifyMethod.ADDITIVE},
             new StatModifier {
                 amount      = _DODGE_BOOST,
-                statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
+                statToBoost = StatType.DodgeRollSpeedMultiplier,
                 modifyType  = StatModifier.ModifyMethod.ADDITIVE},
         };
     }

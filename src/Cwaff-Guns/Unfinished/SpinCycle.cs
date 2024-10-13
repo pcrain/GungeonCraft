@@ -174,7 +174,7 @@ public class SpinCycle : CwaffGun
         StatModifier m = new StatModifier
         {
             amount      = speed,
-            statToBoost = PlayerStats.StatType.MovementSpeed,
+            statToBoost = StatType.MovementSpeed,
             modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE
         };
         this.gun.passiveStatModifiers = (new StatModifier[] { m }).ToArray();

@@ -120,7 +120,7 @@ public static class CwaffTweaks
             item.quality = ItemQuality.SPECIAL;
             item.ShouldBeExcludedFromShops = true;  // don't show up in shops
             item.passiveStatModifiers = [new StatModifier(){
-                statToBoost = PlayerStats.StatType.Curse,
+                statToBoost = StatType.Curse,
                 amount      = 5,
                 modifyType  = StatModifier.ModifyMethod.ADDITIVE}];
             _PickupId = item.PickupObjectId;

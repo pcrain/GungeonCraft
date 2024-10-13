@@ -1016,7 +1016,7 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
                 {
                     if (aiactor && aiactor.HasBeenEngaged && aiactor.IsNormalEnemy && aiactor.specRigidbody && aiactor.healthHaver)
                     {
-                        if (aiactor.healthHaver.IsBoss) damage *= self.ProjectilePlayerOwner().stats.GetStatValue(PlayerStats.StatType.DamageToBosses);
+                        if (aiactor.healthHaver.IsBoss) damage *= self.ProjectilePlayerOwner().stats.GetStatValue(StatType.DamageToBosses);
                         Vector2 zero = Vector2.zero;
                         if (BraveUtility.LineIntersectsAABB(p1, p2, aiactor.specRigidbody.HitboxPixelCollider.UnitBottomLeft, aiactor.specRigidbody.HitboxPixelCollider.UnitDimensions, out zero))
                         {

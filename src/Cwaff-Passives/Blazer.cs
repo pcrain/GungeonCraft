@@ -23,17 +23,17 @@ public class Blazer : CwaffPassive
             new StatModifier(){
                 amount      = 2.00f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.RateOfFire,
+                statToBoost = StatType.RateOfFire,
             },
             new StatModifier(){
                 amount      = 0.50f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.ReloadSpeed,
+                statToBoost = StatType.ReloadSpeed,
             },
             new StatModifier(){
                 amount      = 2.00f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.ChargeAmountMultiplier,
+                statToBoost = StatType.ChargeAmountMultiplier,
             },
         };
 

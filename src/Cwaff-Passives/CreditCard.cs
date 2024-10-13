@@ -28,11 +28,11 @@ public class CreditCard : CwaffPassive
         this.curseMod = new StatModifier();
             curseMod.amount = 0f;
             curseMod.modifyType = StatModifier.ModifyMethod.ADDITIVE;
-            curseMod.statToBoost = PlayerStats.StatType.Curse;
+            curseMod.statToBoost = StatType.Curse;
         this.coolMod = new StatModifier();
             coolMod.amount = 0f;
             coolMod.modifyType = StatModifier.ModifyMethod.ADDITIVE;
-            coolMod.statToBoost = PlayerStats.StatType.Coolness;
+            coolMod.statToBoost = StatType.Coolness;
         this.passiveStatModifiers = new []{curseMod, coolMod};
     }
 

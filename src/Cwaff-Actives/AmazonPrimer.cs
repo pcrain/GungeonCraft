@@ -50,22 +50,22 @@ public class PrimerSubscription : FakeItem
             new StatModifier(){
                 amount      = 2.00f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.RateOfFire,
+                statToBoost = StatType.RateOfFire,
             },
             new StatModifier(){
                 amount      = 2.00f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.ProjectileSpeed,
+                statToBoost = StatType.ProjectileSpeed,
             },
             new StatModifier(){
                 amount      = 1.25f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.Damage,
+                statToBoost = StatType.Damage,
             },
             new StatModifier(){
                 amount      = 1.25f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.DamageToBosses,
+                statToBoost = StatType.DamageToBosses,
             },
         };
         DoPrimeVFX();

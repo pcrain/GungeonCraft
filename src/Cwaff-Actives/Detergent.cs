@@ -18,7 +18,7 @@ public class Detergent : CwaffActive
 
     public override void DoEffect(PlayerController user)
     {
-        user.ownerlessStatModifiers.Add(PlayerStats.StatType.Curse.Add(-user.Curse()));
+        user.ownerlessStatModifiers.Add(StatType.Curse.Add(-user.Curse()));
         user.stats.RecalculateStats(user);
         user.gameObject.Play("detergent_cleanse_sound");
         CwaffVFX.SpawnBurst(prefab: AllayCompanion._AllaySparkles, numToSpawn: 20,

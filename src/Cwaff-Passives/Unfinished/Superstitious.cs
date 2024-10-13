@@ -54,7 +54,7 @@ public class Superstitious : CwaffPassive
         player.ownerlessStatModifiers.TryRemove(superstitionBuff);
 
         superstitionBuff = new StatModifier();
-        superstitionBuff.statToBoost = PlayerStats.StatType.Damage;
+        superstitionBuff.statToBoost = StatType.Damage;
         float totalboost = Mathf.Pow(1.5f,Mathf.Abs(statboost));
         if (statboost < 0)
             totalboost = 1.0f/totalboost;

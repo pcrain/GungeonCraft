@@ -901,7 +901,7 @@ public static class Extensions
     }
 
     if (curse != 0f)
-      gun.AddStatToGun(PlayerStats.StatType.Curse, curse, StatModifier.ModifyMethod.ADDITIVE);
+      gun.AddStatToGun(StatType.Curse, curse, StatModifier.ModifyMethod.ADDITIVE);
     if (carryOffset.HasValue)
       gun.carryPixelOffset = carryOffset.Value;
 
@@ -1445,25 +1445,25 @@ public static class Extensions
   }
 
   /// <summary>Get the player's current damage multiplier</summary>
-  public static float DamageMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.Damage);
+  public static float DamageMult(this PlayerController p) => p.stats.GetStatValue(StatType.Damage);
 
   /// <summary>Get the player's current accuracy (spread) multiplier</summary>
-  public static float AccuracyMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.Accuracy);
+  public static float AccuracyMult(this PlayerController p) => p.stats.GetStatValue(StatType.Accuracy);
 
   /// <summary>Get the player's current projectile speed multiplier</summary>
-  public static float ProjSpeedMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.ProjectileSpeed);
+  public static float ProjSpeedMult(this PlayerController p) => p.stats.GetStatValue(StatType.ProjectileSpeed);
 
   /// <summary>Get the player's current projectile knockback (force) multiplier</summary>
-  public static float KnockbackMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.KnockbackMultiplier);
+  public static float KnockbackMult(this PlayerController p) => p.stats.GetStatValue(StatType.KnockbackMultiplier);
 
   /// <summary>Get the player's current projectile range multiplier</summary>
-  public static float RangeMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.RangeMultiplier);
+  public static float RangeMult(this PlayerController p) => p.stats.GetStatValue(StatType.RangeMultiplier);
 
   /// <summary>Get the player's current gun charge rate multiplier</summary>
-  public static float ChargeMult(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.ChargeAmountMultiplier);
+  public static float ChargeMult(this PlayerController p) => p.stats.GetStatValue(StatType.ChargeAmountMultiplier);
 
   /// <summary>Get the player's current curse level</summary>
-  public static float Curse(this PlayerController p) => p.stats.GetStatValue(PlayerStats.StatType.Curse);
+  public static float Curse(this PlayerController p) => p.stats.GetStatValue(StatType.Curse);
 
   /// <summary>returns true if sprite a overlaps sprite b in the world</summary>
   public static bool Overlaps(this tk2dBaseSprite a, tk2dBaseSprite b)
@@ -2019,7 +2019,7 @@ public static class Extensions
     player.ownerlessStatModifiers.Add(new(){
         amount      = curse,
         modifyType  = StatModifier.ModifyMethod.ADDITIVE,
-        statToBoost = PlayerStats.StatType.Curse
+        statToBoost = StatType.Curse
     });
     if (updateStats)
       player.stats.RecalculateStats(player);
@@ -2267,7 +2267,7 @@ public static class Extensions
   {
       if (player.CurrentGun is not Gun gun)
           return player.m_overrideGunAngle ?? player.m_currentGunAngle;
-      return gun.gunAngle + (mod ?? gun.DefaultModule).GetAngleForShot(1f, player.stats.GetStatValue(PlayerStats.StatType.Accuracy));
+      return gun.gunAngle + (mod ?? gun.DefaultModule).GetAngleForShot(1f, player.stats.GetStatValue(StatType.Accuracy));
   }
 
   /// <summary>Returns whether a projectile is on a collision path with an enemy, optionally including walls, pixel perfect collision, and outsetting our hitbox</summary>

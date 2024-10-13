@@ -128,7 +128,7 @@ public class Natascha : CwaffGun
     //TODO: this might be useful for other guns
     private int ComputeAnimationSpeed()
     {
-        float fireMultiplier = this.PlayerOwner.stats.GetStatValue(PlayerStats.StatType.RateOfFire) * this.GetDynamicFireRate();
+        float fireMultiplier = this.PlayerOwner.stats.GetStatValue(StatType.RateOfFire) * this.GetDynamicFireRate();
         float cooldownTime   = (this.gun.DefaultModule.cooldownTime + this.gun.gunCooldownModifier) / fireMultiplier;
         float fps            = ((float)_FIRE_ANIM_FRAMES / cooldownTime);
         return 1 + Mathf.CeilToInt(fps); // add 1 to FPS to make sure the animation doesn't skip a loop
@@ -149,11 +149,11 @@ public class Natascha : CwaffGun
         this._speedMult = speedMult;
         gun.AdjustAnimation(gun.shootAnimation, fps: ComputeAnimationSpeed());
 
-        this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
+        this.gun.RemoveStatFromGun(StatType.MovementSpeed);
         if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_NATASCHA))
-            this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f, StatModifier.ModifyMethod.MULTIPLICATIVE);
+            this.gun.AddStatToGun(StatType.MovementSpeed, 1f, StatModifier.ModifyMethod.MULTIPLICATIVE);
         else
-            this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, 1f / (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
+            this.gun.AddStatToGun(StatType.MovementSpeed, 1f / (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
         //NOTE: if we rebuild our stats while firing, certain projectile modifiers like scattershot or backup gun make the gun fire once per frame, so work around that
         this.PlayerOwner.stats.RecalculateStatsWithoutRebuildingGunVolleys(this.PlayerOwner); //Alexandria helper
     }

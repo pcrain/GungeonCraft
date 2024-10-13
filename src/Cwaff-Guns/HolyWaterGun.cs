@@ -78,7 +78,7 @@ public class ExorcismJuice : MonoBehaviour
         pc.ownerlessStatModifiers.Add(new StatModifier() {
             amount      = -0.5f,
             modifyType  = StatModifier.ModifyMethod.ADDITIVE,
-            statToBoost = PlayerStats.StatType.Curse,
+            statToBoost = StatType.Curse,
             });
         pc.stats.RecalculateStats(pc);
 

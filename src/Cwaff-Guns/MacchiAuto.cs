@@ -115,9 +115,9 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
         float inverseSpeed = 1f / SpeedMultiplier;
         BraveTime.SetTimeScaleMultiplier(inverseSpeed, _DummyCaffeineTimeScaleObject);
         _CaffeineGoopBuffs ??= new[] {  //NOTE: speed handled by base GameActorSpeedEffect
-            PlayerStats.StatType.RateOfFire.Mult(SpeedMultiplier),
-            PlayerStats.StatType.DodgeRollSpeedMultiplier.Mult(SpeedMultiplier),
-            PlayerStats.StatType.ReloadSpeed.Mult(inverseSpeed),
+            StatType.RateOfFire.Mult(SpeedMultiplier),
+            StatType.DodgeRollSpeedMultiplier.Mult(SpeedMultiplier),
+            StatType.ReloadSpeed.Mult(inverseSpeed),
         };
         foreach (StatModifier stat in _CaffeineGoopBuffs)
             player.ownerlessStatModifiers.AddUnique(stat);

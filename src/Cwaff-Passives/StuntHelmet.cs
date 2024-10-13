@@ -23,7 +23,7 @@ public class StuntHelmet : CwaffPassive
 
         _StuntStats = new StatModifier {
             amount      = _DAMAGE_ADD,
-            statToBoost = PlayerStats.StatType.Damage,
+            statToBoost = StatType.Damage,
             modifyType  = StatModifier.ModifyMethod.ADDITIVE
             };
     }

@@ -85,44 +85,44 @@ internal class Caffeination : MonoBehaviour
             new StatModifier(){
                 amount      = 1.50f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.RateOfFire,
+                statToBoost = StatType.RateOfFire,
             },
             new StatModifier(){
                 amount      = 1.50f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
+                statToBoost = StatType.DodgeRollSpeedMultiplier,
             },
             new StatModifier(){
                 amount      = 1.50f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.MovementSpeed,
+                statToBoost = StatType.MovementSpeed,
             },
             new StatModifier(){
                 amount      = 0.75f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.ReloadSpeed,
+                statToBoost = StatType.ReloadSpeed,
             },
         };
         this._crashNerfs = new[] {
             new StatModifier(){
                 amount      = 0.65f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.RateOfFire,
+                statToBoost = StatType.RateOfFire,
             },
             new StatModifier(){
                 amount      = 0.75f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.DodgeRollSpeedMultiplier,
+                statToBoost = StatType.DodgeRollSpeedMultiplier,
             },
             new StatModifier(){
                 amount      = 0.65f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.MovementSpeed,
+                statToBoost = StatType.MovementSpeed,
             },
             new StatModifier(){
                 amount      = 1.5f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.ReloadSpeed,
+                statToBoost = StatType.ReloadSpeed,
             },
         };
     }

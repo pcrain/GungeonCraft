@@ -42,10 +42,10 @@ public class Taomislav : CwaffGun
         if (!this.PlayerOwner)
             return;
 
-        this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
-        this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
-        this.gun.RemoveStatFromGun(PlayerStats.StatType.RateOfFire);
-        this.gun.AddStatToGun(PlayerStats.StatType.RateOfFire, 1.0f / this._speedMult, StatModifier.ModifyMethod.MULTIPLICATIVE);
+        this.gun.RemoveStatFromGun(StatType.MovementSpeed);
+        this.gun.AddStatToGun(StatType.MovementSpeed, (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
+        this.gun.RemoveStatFromGun(StatType.RateOfFire);
+        this.gun.AddStatToGun(StatType.RateOfFire, 1.0f / this._speedMult, StatModifier.ModifyMethod.MULTIPLICATIVE);
         this.PlayerOwner.stats.RecalculateStats(this.PlayerOwner);
     }
 }

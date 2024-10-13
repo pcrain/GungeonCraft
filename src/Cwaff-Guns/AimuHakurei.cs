@@ -162,9 +162,9 @@ public class AimuHakurei : CwaffGun
         if (this._focused)
             this.PlayerOwner.gameObject.Play("aimu_focus_sound");
 
-        this.gun.RemoveStatFromGun(PlayerStats.StatType.MovementSpeed);
+        this.gun.RemoveStatFromGun(StatType.MovementSpeed);
         // NOTE: since time is slowed down, the player's effective speed is 0.65 * 0.65. This is intentional
-        this.gun.AddStatToGun(PlayerStats.StatType.MovementSpeed, focus ? 0.65f : 1.0f, StatModifier.ModifyMethod.MULTIPLICATIVE);
+        this.gun.AddStatToGun(StatType.MovementSpeed, focus ? 0.65f : 1.0f, StatModifier.ModifyMethod.MULTIPLICATIVE);
         this.PlayerOwner.stats.RecalculateStats(this.PlayerOwner);
     }
 

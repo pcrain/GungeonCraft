@@ -27,7 +27,7 @@ public class EmergencySiren : CwaffActive
             new StatModifier(){
                 amount      = 2.00f,
                 modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = PlayerStats.StatType.MovementSpeed,
+                statToBoost = StatType.MovementSpeed,
             },
         };
 
