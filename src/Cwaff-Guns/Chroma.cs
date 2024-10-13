@@ -444,10 +444,7 @@ public class Desaturator : MonoBehaviour
         if (!this._gotPigment)
         {
             if (!_PigmentLookupDict.TryGetValue(guid, out IntVector3 rgb))
-            {
                 rgb = _PigmentLookupDict[guid] = ComputePigmentForEnemy(guid);
-                // Lazy.DebugLog($"  got rgb {rgb.x}, {rgb.y}, {rgb.z}");
-            }
             this._rTotal = Mathf.CeilToInt(_PIGMENT_FACTOR * rgb.x);
             this._gTotal = Mathf.CeilToInt(_PIGMENT_FACTOR * rgb.y);
             this._bTotal = Mathf.CeilToInt(_PIGMENT_FACTOR * rgb.z);
@@ -476,7 +473,6 @@ public class Desaturator : MonoBehaviour
                 this._rFrac += pigmentLost * this._rTotal;
                 this._gFrac += pigmentLost * this._gTotal;
                 this._bFrac += pigmentLost * this._bTotal;
-                // ETGModConsole.Log($"pigment levels {this._rFrac}, {this._gFrac}, {this._bFrac}");
                 for (; this._rFrac >= 1.0f; this._rFrac -= 1.0f)
                     Chroma.DropPigment(this._enemy.aiActor, (PigmentType)0);
                 for (; this._gFrac >= 1.0f; this._gFrac -= 1.0f)
@@ -553,7 +549,6 @@ public class PigmentDrop : MonoBehaviour
     internal const float _BOB_SPEED  = 4f;
     internal const float _BOB_HEIGHT = 0.20f;
 
-    const float _ATTRACT_RADIUS_SQR = 25f;  // range before we start homing in on player
     const float _PICKUP_RADIUS_SQR  = 2f;   // range before we are picked up by player
     const float _HOME_ACCEL         = 44f;  // acceleration per second towards player
     const float _FRICTION           = 0.96f;
@@ -627,8 +622,6 @@ public class PigmentDrop : MonoBehaviour
             {
                 if (!player || !player.isActiveAndEnabled || player.IsGhost)
                     continue;
-                // if ((base.transform.position.XY() - player.CenterPosition).sqrMagnitude > _ATTRACT_RADIUS_SQR)
-                //     continue;
                 if (!player.HasGun(_ChromaId))
                     continue;
                 this._owner = player;

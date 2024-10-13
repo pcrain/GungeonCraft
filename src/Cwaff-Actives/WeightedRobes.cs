@@ -166,7 +166,6 @@ public class WeightedRobes : CwaffActive, ILabelItem
         this.weightedStats[1].amount = -2f * trainingStats[1].amount;
         this.weightedStats[2].amount = -2f * trainingStats[2].amount;
         player.stats.RecalculateStats(player);
-        // PrintStats(player);
     }
 
     public override bool CanBeUsed(PlayerController player)

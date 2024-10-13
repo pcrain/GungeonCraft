@@ -192,7 +192,6 @@ public class Jugglernaut : CwaffGun
             debris.shouldUseSRBMotion      = true;
             debris.sprite                  = sprite;
             debris.animatePitFall          = true;
-            // debris.audioEventName          = "monkey_tennis_bounce_first";
             debris.AssignFinalWorldDepth(-0.5f);
             debris.Trigger(Lazy.RandomVector(4f), 1f);
         }

@@ -32,7 +32,6 @@ public class Scotsman : CwaffGun
             damage: _BASE_EXPLOSION_DAMAGE, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter))
           .Attach<Stickybomb>();
 
-        // Initialize our explosion data
         _ScotsmanExplosion = Explosions.ExplosiveRounds.With(damage: _BASE_EXPLOSION_DAMAGE, force: 100f, debrisForce: 10f, radius: 1.5f,
             preventPlayerForce: false, shake: false);
     }

@@ -16,7 +16,6 @@ public class StackOfTorches : CwaffActive
     private static GameObject _TorchBluePrefab   = null;
     private static GameObject _TorchSidePrefab   = null;
     private static GameObject _SconcePrefab      = null;
-    // private static GameObject _LanternPrefab  = null;
     private static List<GameObject> _Torches     = null;
     private static Dictionary<RoomHandler, int> _TorchesInRoom = new();
 
@@ -36,13 +35,11 @@ public class StackOfTorches : CwaffActive
         _TorchBluePrefab   = Dissect.FindDefaultResource("DefaultTorchBlue");
         _TorchSidePrefab   = Dissect.FindDefaultResource("DefaultTorchSide");
         _SconcePrefab      = Dissect.FindDefaultResource("Sconce_Light");
-        // _LanternPrefab = ResourceCache.Acquire("Global Prefabs/Shrine_Lantern") as GameObject;
         _Torches = new(){
             _TorchPrefab,
             _TorchPurplePrefab,
             _TorchBluePrefab,
             _TorchSidePrefab,
-            // _LanternPrefab,
         };
     }
 

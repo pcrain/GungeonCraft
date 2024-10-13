@@ -47,7 +47,6 @@ public class AmmoConservationManual : CwaffPassive
 
             manual._conservedAmmo -= 1f;
             LootEngine.SpawnItem(ItemHelper.Get(Items.Ammo).gameObject, player.CenterPosition, Vector2.zero, 0f, doDefaultItemPoof: true);
-            // p.DoGenericItemActivation(manual);
         }
     }
 

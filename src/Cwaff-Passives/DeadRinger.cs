@@ -91,7 +91,6 @@ public class DeadRinger : CwaffPassive
         corpseSprite.SetSprite(pc.sprite.Collection, pc.sprite.spriteId);
         tk2dSpriteAnimator animator = corpseSprite.gameObject.GetOrAddComponent<tk2dSpriteAnimator>();
         string feignDeathAnimation = ((!pc.UseArmorlessAnim) ? "death_coop" : "death_coop_armorless");
-        // string feignDeathAnimation = "spinfall";
         tk2dSpriteAnimationClip deathClip = pc.spriteAnimator.GetClipByName(feignDeathAnimation);
 
         animator.Play(deathClip, clipStartTime: 0f, overrideFps: 8f, skipEvents: true);
@@ -110,7 +109,6 @@ public class DeadRinger : CwaffPassive
         if (this.Owner.CurrentGun)
             this.Owner.CurrentGun.CeaseAttack(false);
         this.Owner.OnDidUnstealthyAction += BreakStealth;
-        // if (!CanAnyBossOrNPCSee(this.Owner)) // don't need this check, we can feign death in front of them
         this.Owner.SetIsStealthed(true, "DeadRinger");
         this.Owner.SetCapableOfStealing(true, "DeadRinger");
         this._lastActivationTime = BraveTime.ScaledTimeSinceStartup;

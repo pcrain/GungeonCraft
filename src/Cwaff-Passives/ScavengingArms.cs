@@ -33,7 +33,6 @@ public class ScavengingArms : CwaffPassive
 
         // ap.minimapIcon.GetComponent<tk2dSprite>().SetSprite(VFX.Collection, clip.frames[0].spriteId);
         ap.minimapIcon = null; //TODO: nuking the minimap icon since i can't find the base game reference...put back later if i can make a good-looking new one
-        // ETGMod.Databases.Items.Add(ap);
     }
 
     // NOTE: called by patch in CwaffPatches

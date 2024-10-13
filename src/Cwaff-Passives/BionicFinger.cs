@@ -21,7 +21,7 @@ public class BionicFinger : CwaffPassive
     {
         [HarmonyILManipulator]
         private static void HandleGunFiringInternalIL(ILContext il)
-        {
+        { //REFACTOR: clean up to avoid using Remove()
             ILCursor cursor = new ILCursor(il);
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchAdd(), instr => instr.MatchStfld<PlayerController>("m_controllerSemiAutoTimer")))
             {

@@ -248,12 +248,10 @@ public class KiBlastBehavior : MonoBehaviour
         this._projectile.baseData.damage = this._startingDamage * Mathf.Pow(_Scaling, this._numReflections);
 
         this._projectile.Owner = player;
-        // p.AdjustPlayerProjectileTint(Color.green, 2, 0.1f);
         this._projectile.collidesWithPlayer = false;
         this._projectile.collidesWithEnemies = true;
         this._arc.SetNewTarget(enemy.CenterPosition);
 
-        // this._projectile.SetAnimation(KiBlast._KiSprite);
         EasyTrailBullet trail = this._projectile.gameObject.GetComponent<EasyTrailBullet>();
             trail.BaseColor = Color.cyan;
             trail.EndColor = Color.cyan;

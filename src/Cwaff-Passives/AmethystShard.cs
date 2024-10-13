@@ -508,11 +508,6 @@ public class AllayCompanion : CwaffCompanionController
         private void BecomeIdle()
         {
             m_aiActor.ClearPath();
-            // if (m_idleTimer <= 0f && IdleAnimations != null && IdleAnimations.Length > 0)
-            // {
-            //     m_aiAnimator.PlayUntilFinished(IdleAnimations[UnityEngine.Random.Range(0, IdleAnimations.Length)]);
-            //     m_idleTimer = UnityEngine.Random.Range(3, 10);
-            // }
         }
 
         private void GrabEnemy()
@@ -874,8 +869,6 @@ public class AllayCompanion : CwaffCompanionController
             UpdateStateAndTargetPosition();
             if (OffScreenAndInDifferentRoom())
                 m_aiActor.CompanionWarp(m_companionController.m_owner.CenterPosition);
-            // else if (CorrectForInaccessibleCell())
-            //     {} // current cell is inaccessible, do nothing else
             else if (ReachedTarget())
                 OnReachedTarget();
             else

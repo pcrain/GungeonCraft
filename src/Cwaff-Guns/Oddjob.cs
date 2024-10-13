@@ -176,7 +176,6 @@ public class OddjobProjectile : MonoBehaviour
             motionModule.ForceInvert = Lazy.CoinFlip();
 
         EasyTrailBullet trail = base.gameObject.AddComponent<EasyTrailBullet>();
-            // trail.TrailPos   = p.transform.position.XY() + new Vector2(5f / C.PIXELS_PER_TILE, 5f / C.PIXELS_PER_TILE); // offset by middle of the sprite
             trail.StartWidth = 0.5f;
             trail.EndWidth   = 0.05f;
             trail.LifeTime   = 0.1f;
@@ -316,7 +315,6 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
         _curAngleFromCenter = _startAngleFromCenter;
         _circleTraveled = 0f;
         _startRoom = lastPosition.GetAbsoluteRoom();
-        // ETGModConsole.Log($"start angle is {_startAngleFromCenter}");
 
         /* THE PLAN:
             - figure out position of enemy directly in front of where player is aiming

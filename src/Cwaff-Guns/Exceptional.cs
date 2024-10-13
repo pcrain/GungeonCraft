@@ -227,7 +227,7 @@ public class ExceptionalProjectile : MonoBehaviour
 static class CorruptNotificationPatch
 {
     private static void CorruptNotificationIL(ILContext il, MethodBase original)
-    {
+    { //REFACTOR: rewrite to not emit Ldfld
         ILCursor cursor = new ILCursor(il);
         Type ot = original.DeclaringType;
         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall("BraveTime", "get_DeltaTime")))

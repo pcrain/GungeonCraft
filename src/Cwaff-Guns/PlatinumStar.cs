@@ -26,20 +26,6 @@ public class PlatinumStar : CwaffGun
           .Attach<ImmuneToTimestop>();
     }
 
-    // public override void OnPostFired(PlayerController player, Gun gun)
-    // {
-    //     base.OnPostFired(player, gun);
-    //     gun.gameObject.Play("tomislav_shoot");
-    //     // Material m = this.gun.gameObject.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"));
-    //     // m.SetColor("_OverrideColor", Color.yellow);
-    //     // m.SetFloat("_Period", 1.0f);
-    //     // m.SetFloat("_PixelWidth", 5.0f);
-    //     // Material m3 = this.Owner.sprite.gameObject.GetOrAddShader(Shader.Find("Brave/ItemSpecific/LootGlintAdditivePass"));
-    //     // m3.SetColor("_OverrideColor", Color.yellow);
-    //     // m3.SetFloat("_Period", 1.0f);
-    //     // m3.SetFloat("_PixelWidth", 5.0f);
-    // }
-
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manual)
     {
         base.OnReloadPressed(player, gun, manual);

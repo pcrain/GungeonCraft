@@ -112,26 +112,6 @@ public class Vladimir : CwaffGun
                 TossOff(enemy: enemy, launchDir: launchDir);
             }
         }
-
-        // Old code for being able to launch projectiles back, not using for now
-        // if (this._power <= 0)
-        //     return;
-
-        // Vector2 gunPos  = this.gun.barrelOffset.position.XY();
-        // // use our own projectile here if we ever decide to do this for real
-        // Projectile proj = SpawnManager.SpawnProjectile(PistolWhip._PistolWhipProjectile.gameObject, gunPos, this.gun.CurrentAngle.EulerZ()
-        //   ).GetComponent<Projectile>();
-        // proj.Owner               = player;
-        // proj.collidesWithEnemies = true;
-        // proj.collidesWithPlayer  = false;
-        // foreach (AIActor enemy in this._skeweredEnemies)
-        // {
-        //     if (enemy && enemy.specRigidbody)
-        //         proj.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
-        // }
-        // player.gameObject.Play("whip_crack_sound");
-        // if ((--this._power) == 0)
-        //     this.gun.sprite.gameObject.SetGlowiness(0f);
     }
 
     public void Impale(AIActor enemy)
@@ -189,14 +169,8 @@ public class Vladimir : CwaffGun
     {
         this.gun.gameObject.Play("subtractor_beam_fire_sound");
         CwaffVFX.SpawnBurst(prefab: _AbsorbVFX, numToSpawn: 8, basePosition: p.SafeCenter, positionVariance: 0.2f,
-            baseVelocity: Vector2.zero, velocityVariance: 2f, velType: CwaffVFX.Vel.AwayRadial, rotType: CwaffVFX.Rot.None,
-            lifetime: 0.5f, fadeOutTime: 0.5f, emissivePower: 0f, emissiveColor: null, fadeIn: false,
-            uniform: true, startScale: 1.0f, endScale: 1.0f, height: null);
+            velocityVariance: 2f, velType: CwaffVFX.Vel.AwayRadial, lifetime: 0.5f, fadeOutTime: 0.5f, uniform: true);
         p.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: true);
-
-        // Old code for being able to launch projectiles back, not using for now
-        // ++this._power;
-        // this.gun.sprite.gameObject.SetGlowiness(250f);
     }
 
     public override void PostProcessProjectile(Projectile projectile)

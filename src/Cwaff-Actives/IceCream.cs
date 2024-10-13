@@ -104,23 +104,6 @@ public class HappyIceCreamHaver : MonoBehaviour
 
         AdjustBehaviors();
 
-        if (this._enemy.specRigidbody is SpeculativeRigidbody body)
-        {
-            // body.CanPush            = true;
-            // body.CanBePushed        = true;
-            // body.CanCarry           = true;
-            // body.CanBeCarried       = true;
-            // body.CollideWithTileMap = true;
-            // body.CollideWithOthers  = true;
-
-            // body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile | CollisionLayer.PlayerBlocker));
-            // foreach(PixelCollider pc in body.PixelColliders)
-            // {
-            //     // CollisionMask.LayerToMask(CollisionLayer.Projectile | CollisionLayer.PlayerBlocker)
-            //     pc.CollisionLayer = CollisionLayer.PlayerBlocker; // necessary to avoid getting stuck inside enemies
-            // }
-        }
-
         if (this._enemy.healthHaver is HealthHaver hh)
         {
             hh.IsVulnerable = false;

@@ -47,7 +47,6 @@ public class BulletThatCanKillTheFuture : CwaffActive
         if (HeckedMode._HeckedModeStatus == HeckedMode.Hecked.Retrashed)
             return; // no cheating :)
 
-        // ETGModConsole.Log($"FULLY LOADED {GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName}");
         foreach (AdvancedShrineController a in StaticReferenceManager.AllAdvancedShrineControllers)
         {
             if (!a.IsLegendaryHeroShrine)

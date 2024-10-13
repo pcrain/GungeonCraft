@@ -228,7 +228,6 @@ public class TennisBall : MonoBehaviour
         this._missedPlayer = false;
         this._projectile.Speed = this._projectile.baseData.speed;
         this._projectile.SendInDirection(direction, true);
-        // this._projectile.gameObject.Play("racket_hit");
         this._projectile.gameObject.Play("monkey_tennis_hit_return_mid");
         if (this._volleys > 6)
             this._projectile.gameObject.Play("sonic_olympic_smash");

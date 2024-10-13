@@ -33,9 +33,8 @@ public class StuntHelmet : CwaffPassive
     {
         [HarmonyILManipulator]
         private static void StuntExplosionIL(ILContext il)
-        {
+        { //REFACTOR: rewrite to avoid using Mul and Stloc
             ILCursor cursor = new ILCursor(il);
-            // cursor.DumpILOnce("StuntExplosionIL");
 
             #region Ignore all damage from explosions
                 ILLabel branchPoint = null;

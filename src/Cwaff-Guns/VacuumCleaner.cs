@@ -152,14 +152,12 @@ public class VacuumCleaner : CwaffGun
 
         if (debris.IsCorpse && ((++corpsesSucked) >= _CORPSE_PER_ARMOR))
         {
-            // ETGModConsole.Log($"got corpse");
             this.gun.gameObject.Play("vacuum_process_armor_sound");
             corpsesSucked -= _CORPSE_PER_ARMOR;
             LootEngine.SpawnItem(ItemHelper.Get(Items.Armor).gameObject, player.CenterPosition, Vector2.zero, 0f, true, true, false);
         }
         if (debris.IsPickupObject && debris.GetComponent<PickupObject>() is PickupObject pickup && pickup.PickupObjectId == (int)Items.Junk)
         {
-            // ETGModConsole.Log($"got junk");
             this.gun.gameObject.Play("vacuum_process_armor_sound");
             LootEngine.SpawnItem(ItemHelper.Get(Items.Ammo).gameObject, player.CenterPosition, Vector2.zero, 0f, true, true, false);
         }

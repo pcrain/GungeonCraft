@@ -332,7 +332,6 @@ public class StarmageddonProjectile : MonoBehaviour
             }
             yield return null;
         }
-        // this._projectile.specRigidbody.Position = new Position(targetPos);
         this._projectile.specRigidbody.CollideWithOthers = true;
         this._projectile.specRigidbody.Reinitialize();
         yield return null;

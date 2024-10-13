@@ -42,8 +42,6 @@ public class GunSynthesizer : CwaffActive
             gun = Items.Ak47.AsGun(); // fallback in case we can't actually get a proper gun
         MakeSyntheticGun(gun, user);
 
-        // MakeSyntheticGun(Items.PrototypeRailgun.AsGun(), user);
-        // MakeSyntheticGun(PickupObjectDatabase.GetById(IDs.Pickups["deadline"]).GetComponent<Gun>(), user);
         this.m_activeDuration  = _SYNTH_LIFETIME;
         this.m_activeElapsed   = 0f;
         this.IsCurrentlyActive = true;
@@ -106,15 +104,7 @@ public class GunSynthesizer : CwaffActive
         if (this.CurrentRoomCooldown != _COOLDOWN)
             this.CurrentRoomCooldown = _COOLDOWN; // prevent charging while synthetic gun is active
         if ((this.m_activeElapsed >= this.m_activeDuration) || this._currentSyntheticGun.GetComponent<Gun>().CurrentAmmo == 0)
-        {
             DestroySyntheticGun(this.LastOwner);
-            return;
-        }
-        // if ((this._timeLeft -= BraveTime.DeltaTime) <= 0.0f)
-        // {
-        //     DestroySyntheticGun(this.LastOwner);
-        //     return;
-        // }
     }
 
     private const int _FRAGMENT_EDGE = 4;

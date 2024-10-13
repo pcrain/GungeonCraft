@@ -204,7 +204,6 @@ public class ZenkaiAura : MonoBehaviour
         GameObject v = SpawnManager.SpawnVFX(WarriorsGi._SaiyanSpark, (this._saiyan.CenterPosition + Lazy.RandomVector(0.3f)).ToVector3ZUp(10f), Lazy.RandomEulerZ());
             tk2dSprite sprite = v.GetComponent<tk2dSprite>();
             sprite.HeightOffGround = 10f;
-            // DepthLookupManager.AssignRendererToSortingLayer(sprite.renderer, DepthLookupManager.GungeonSortingLayer.FOREGROUND);
             sprite.UpdateZDepth();
 
             float a = _SPARK_ALPHAS[this._zenkaiLevel];

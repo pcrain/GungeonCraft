@@ -161,7 +161,6 @@ public class ChekhovBullet : MonoBehaviour
         this._projectile.specRigidbody.CollideWithOthers  = true;
         this._projectile.specRigidbody.CollideWithTileMap = true;
         this._projectile.SetSpeed(oldSpeed);
-        // this._projectile.SendInDirection(target.Value - this._projectile.SafeCenter, true);
         if (wasElectric)
             this._projectile.damageTypes |= CoreDamageTypes.Electric;
         EasyTrailBullet trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();

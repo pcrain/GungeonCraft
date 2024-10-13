@@ -165,13 +165,7 @@ public class HatchlingBehavior : MonoBehaviour
         if ((this._lastCheck += BraveTime.DeltaTime) < _CHECK_INTERVAL)
             return;
         this._lastCheck = 0.0f;
-
-        if (this._owner.CurrentRoom == _startRoom)
-            return; // don't despawn even if we're offscreen, so long as the player is in the room we spawned in
-
-
-        // Check if we're offscreen, and destroy if so
-        if (!this._actor.Position.OnScreen())
+        if (this._owner.CurrentRoom != _startRoom && !this._actor.Position.OnScreen())
             UnityEngine.Object.Destroy(base.gameObject);
     }
 }

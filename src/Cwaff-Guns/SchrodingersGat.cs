@@ -53,7 +53,6 @@ public class SchrodingersEnemyProjectile : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._enemy = this._projectile.Owner as AIActor;
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-        // this._projectile.ChangeColor(0.1f, Color.black);
     }
 
     private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)

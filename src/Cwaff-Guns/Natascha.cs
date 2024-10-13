@@ -49,7 +49,6 @@ public class Natascha : CwaffGun
             if (this._speedMult == 1.0f)
             {
                 gun.gameObject.Play("minigun_wind_down_stop");
-                // gun.gameObject.Play("minigun_wind_up");
                 gun.gameObject.Play("minigun_spin");
             }
             this.gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(gun.shootAnimation);
@@ -78,7 +77,6 @@ public class Natascha : CwaffGun
         if (this._speedMult == 1.0f)
         {
             gun.gameObject.Play("minigun_wind_down_stop");
-            // gun.gameObject.Play("minigun_wind_up");
             gun.gameObject.Play("minigun_spin");
         }
     }

@@ -63,14 +63,12 @@ public class Outbreak : CwaffGun
 
 public class InfectionBehavior : MonoBehaviour
 {
-    // private const int _STUN_DELAY = 10;
-    // private const int _STUN_TIME  = 3600; // one hour
-
     private Projectile _projectile;
 
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
+        //REFACTOR: don't use lambda
         this._projectile.OnHitEnemy += (Projectile _, SpeculativeRigidbody enemy, bool _) => {
             if (enemy.aiActor && enemy.aiActor.IsHostileAndNotABoss())
                 enemy.aiActor.gameObject.GetOrAddComponent<InfectedBehavior>();

@@ -108,7 +108,6 @@ public class AstralProjector : CwaffPassive
             return;
         }
         this._phased = false;
-        // this._intangibleTimer = 0; BecomeTangible(); // for testing
     }
 
     private void OnPreTileCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, PhysicsEngine.Tile other, PixelCollider otherPixelCollider)
@@ -172,9 +171,8 @@ public class AstralProjector : CwaffPassive
     //   ensuring the RigidBodyCasts will never run under any sane circumstance
         [HarmonyILManipulator]
         private static void HandlePlayerPhasingInputIL(ILContext il)
-        {
+        { //REFACTOR: clean up to avoid Pop and Ldc
             ILCursor cursor = new ILCursor(il);
-            // cursor.DumpILOnce("HandlePlayerPhasingInputIL");
 
             //Replace positive movement checks
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0.01f)))

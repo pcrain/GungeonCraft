@@ -96,12 +96,11 @@ public class Alligator : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (this._mat)
-        {
-            //NOTE: higher strength == lower brightness
-            float s = Mathf.Max(2.0f, 6.0f - Mathf.Log(Mathf.Max(_ENERGY_MULT * (this.energyProduction - 1f), 1f), 4));  // max brightness at 4^4 == 256 energy
-            this._mat.SetFloat("_Strength", s);
-        }
+        if (!this._mat)
+            return;
+        //NOTE: higher strength == lower brightness
+        float s = Mathf.Max(2.0f, 6.0f - Mathf.Log(Mathf.Max(_ENERGY_MULT * (this.energyProduction - 1f), 1f), 4));  // max brightness at 4^4 == 256 energy
+        this._mat.SetFloat("_Strength", s);
     }
 
     private void CalculateEnergyProduction()

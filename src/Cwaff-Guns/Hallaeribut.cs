@@ -221,7 +221,6 @@ public class HallaeributProjectile : MonoBehaviour
                 {
                     if (this._target)
                         this._projectile.SendInDirection(this._target.CenterPosition - this._projectile.SafeCenter, false);
-                    // this._projectile.UpdateSpeed();
                     this._state = State.RELAUNCH;
                 }
                 break;

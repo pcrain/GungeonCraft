@@ -827,8 +827,6 @@ public class Femtobyte : CwaffGun
             if (!this._owner)
                 return false;
 
-            // uic.GunAmmoCountLabel.AutoSize = true; // enable dynamic width
-
             if (this._femto._displayNameDirty || this._cachedDisplayName.IsNullOrWhiteSpace())
             {
                 _SB.Length = 0;

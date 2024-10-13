@@ -120,19 +120,13 @@ public class CarpetProjectile : MonoBehaviour
 
     private void Update()
     {
-        if (!this._projectile)
+        if (!this._projectile || this._bounces == 0)
             return;
 
         if (this._bounces >= _MAX_BOUNCES)
-        {
             this._projectile.DieInAir(suppressInAirEffects: true);
-            return;
-        }
-
-        if (this._bounces == 0)
-            return;
-
-        this._projectile.ApplyFriction(_AIR_FRICTION);
+        else
+            this._projectile.ApplyFriction(_AIR_FRICTION);
     }
 
     public void OnGroundBounce()

@@ -121,12 +121,6 @@ public class InsurancePolicy : CwaffActive
         base.sprite.SetSprite(GetSpriteIdForCharacter());
     }
 
-    // public override void Pickup(PlayerController player)
-    // {
-    //     base.Pickup(player);
-    //     this.UpdateAmmonomiconSprite(GetSpriteIdForCharacter()); // Update sprite in Ammonomicon to match the character (doesn't work ): )
-    // }
-
     public static void InsuranceCheck()
     {
         GameManager.Instance.StartCoroutine(InsuranceCheck_CR());
@@ -183,8 +177,6 @@ public class InsurancePolicy : CwaffActive
         _InsuredItems.Add(nearestPickup.PickupObjectId);
         SaveInsuredItems();
 
-        // Lazy.CustomNotification(nearestPickup.DisplayName,"Item Insured", nearestPickup.sprite,
-        //     color: UINotificationController.NotificationColor.PURPLE);
         base.gameObject.Play("the_sound_of_buying_insurance");
     }
 

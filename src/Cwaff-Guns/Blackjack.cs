@@ -165,7 +165,6 @@ public class ThrownCard : MonoBehaviour
           PickUpPlayingCardScript);
         mi.autoInteract = true;
         mi.transform.rotation = p.transform.rotation;
-        // mi.sprite.usesOverrideMaterial = true;
         mi.sprite.renderer.material = p.sprite.renderer.material;
     }
 

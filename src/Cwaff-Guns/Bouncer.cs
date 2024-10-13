@@ -82,9 +82,9 @@ public class HarmlessUntilBounce : MonoBehaviour
         // skip non-tile collisions if we haven't bounced yet
         if (!otherRigidbody.PrimaryPixelCollider.IsTileCollider)
             PhysicsEngine.SkipCollision = true;
-        else if (otherRigidbody.GetComponent<DungeonPlaceable>() != null)
+        else if (otherRigidbody.GetComponent<DungeonPlaceable>())
             PhysicsEngine.SkipCollision = true;
-        else if (otherRigidbody.GetComponent<MinorBreakable>() != null)
+        else if (otherRigidbody.GetComponent<MinorBreakable>())
             PhysicsEngine.SkipCollision = true;
     }
 

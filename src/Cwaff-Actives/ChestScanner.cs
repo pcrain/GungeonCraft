@@ -42,8 +42,6 @@ public class ChestScanner : CwaffActive
                 continue;
             if (chest.IsOpen || chest.IsBroken)
                 continue;
-            // if (chest.IsMimic)
-            //     continue;
             if (chest.GetAbsoluteParentRoom() != user.CurrentRoom)
                 continue;
             if (chest.gameObject.GetComponent<ScannedChest>())

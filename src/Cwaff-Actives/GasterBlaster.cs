@@ -57,7 +57,6 @@ public class GasterBlaster : CwaffActive
         const float SWING_RADIUS = 16f;
 
         float angle = this._owner.m_currentGunAngle;
-        // Vector2 targetPos = this._owner.CenterPosition - BraveMathCollege.DegreesToVector(angle, 4f);
         Vector2 targetPos = this._owner.CenterPosition.ToNearestWallOrObject((180f + angle).Clamp180(), 0f);
         Vector2 delta = targetPos - this._owner.CenterPosition;
         targetPos = this._owner.CenterPosition + (delta.magnitude - 1f).Clamp(0f, 2f) * delta.normalized;

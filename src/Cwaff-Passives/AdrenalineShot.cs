@@ -11,8 +11,6 @@ public class AdrenalineShot : CwaffPassive
     internal const float _MAX_ADRENALINE_TIME = 60f;
     internal const float _MAX_ADRENALINE_LOSS = 4f; // loss from taking damage while under effects of adrenaline
     internal const int   _CASINGS_FOR_ROBOT   = 20;
-    // internal static int _AdrenalineShotId;
-    // internal static dfSprite _AdrenalineHeart;
     internal static float _LastHeartbeatTime = 0f;
 
     private bool  _adrenalineActive = false;
@@ -158,10 +156,5 @@ public class AdrenalineShot : CwaffPassive
         UnityEngine.Object.Destroy(this.Owner.gameObject.GetComponent<UnderAdrenalineEffects>());
     }
 }
-
-// public class AdrenalineHeartOverlay : MonoBehaviour
-// {
-//     public List<GameObject> adrenalineHearts = new();
-// }
 
 public class UnderAdrenalineEffects : MonoBehaviour {}

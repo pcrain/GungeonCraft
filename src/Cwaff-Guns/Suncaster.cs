@@ -16,7 +16,6 @@ public class Suncaster : CwaffGun
 
     internal static GameObject      _PrismPrefab             = null;
     internal static GameObject      _TraceVFX                = null;
-    // internal static GameObject      _NewTraceVFX             = null;
     internal static CwaffTrailController _SunTrailPrefab          = null;
     internal static CwaffTrailController _SunTrailRefractedPrefab = null;
     internal static CwaffTrailController _SunTrailFinalPrefab     = null;
@@ -418,19 +417,6 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
           this._body.Velocity = Vector2.zero;
         else
           this._body.Velocity *= (float)Lazy.FastPow(_FRICTION, C.FPS * BraveTime.DeltaTime);
-
-        // old trace targeting code, targeting is unused outside of circumstances where there's only one prism so we don't really need this anymore
-
-        // if (((this._last_trace + _TRACE_RATE) < BraveTime.ScaledTimeSinceStartup))
-        // {
-        //   this._last_trace = BraveTime.ScaledTimeSinceStartup;
-        //   CwaffVFX.Spawn(Suncaster._TraceVFX, base.transform.position, velocity: 12f * this._angle, lifetime: 0.5f, fadeOutTime: 0.5f);
-        //   // if (this._trace && this._owner)
-        //   // {
-        //   //   this._newAngle = this._owner.m_currentGunAngle.ToVector().normalized;
-        //   //   CwaffVFX.Spawn(Suncaster._NewTraceVFX, base.transform.position, velocity: 12f * this._newAngle, lifetime: 0.5f, fadeOutTime: 0.5f);
-        //   // }
-        // }
     }
 
     public void SetTarget(SuncasterPrism prism) => this.target = prism;
@@ -449,18 +435,12 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
     {
       if (interactor == this._owner)
         Selfdestruct();
-
-      // this._target = null; // disable auto-targeting
-      // this._autotarget = false;
-      // this._angle = this._newAngle;
-      // base.gameObject.Play("prism_interact_sound");
     }
 
     public void OnEnteredRange(PlayerController interactor)
     {
         if (interactor != this._owner)
           return;
-        // this._trace = true;
         SpriteOutlineManager.AddOutlineToSprite(this._sprite, Color.white, 1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
         this._sprite.UpdateZDepth();
     }
@@ -469,7 +449,6 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
     {
         if (interactor != this._owner)
           return;
-        // this._trace = false;
         SpriteOutlineManager.AddOutlineToSprite(this._sprite, Color.black, 1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
     }
 

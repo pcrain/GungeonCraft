@@ -99,7 +99,6 @@ public class BulletbotImplant : CwaffActive
             GameManager.Instance.OnNewLevelFullyLoaded -= OnNewLevelFullyLoaded;
             GameManager.Instance.OnNewLevelFullyLoaded += OnNewLevelFullyLoaded;
             _ActiveImplants.Add(this);
-            // ETGModConsole.Log($"pickup complete {_ActiveImplants.Count}");
         }
 
         public override void MidGameSerialize(List<object> data)
@@ -119,8 +118,6 @@ public class BulletbotImplant : CwaffActive
             this._companionGuid = (string)data[1];
             this._gunId = (Items)((int)data[2]); //TODO: is this double cast necessary? idk how unboxing works D:
             this._deserialized = true;
-
-            // ETGModConsole.Log($"deserialize complete {this._companionGuid} -> {(int)this._gunId}");
         }
 
         private void ArmCompanion(AIActor companion)
@@ -139,7 +136,6 @@ public class BulletbotImplant : CwaffActive
 
         private static void OnNewLevelFullyLoaded()
         {
-            // ETGModConsole.Log($"levelload complete");
             foreach (UsedBulletbotImplant implant in _ActiveImplants)
             {
                 implant._companion = null;
@@ -166,7 +162,6 @@ public class BulletbotImplant : CwaffActive
         {
             static void Postfix(CompanionItem __instance, PlayerController owner)
             {
-                // ETGModConsole.Log($"companion created");
                 if (!__instance.m_extantCompanion)
                     return;
                 if (__instance.m_extantCompanion.GetComponent<AIActor>() is not AIActor companion)
@@ -200,7 +195,6 @@ public class BulletbotImplant : CwaffActive
                 {
                     if (!implant || !implant._armed || (implant._companion && implant._companion != companion))
                         continue; // if the implant doesn't exist, if it's not armed, or if the reference to the companion is still valid, we're fine
-                    // ETGModConsole.Log($"destroying implant");
                     implant._companion = null;
                     implant._armed = false;
                 }

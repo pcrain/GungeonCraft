@@ -124,7 +124,6 @@ public class Itemfinder : CwaffActive
             else if (treasureQual < _QUALITY_CHANCES[2]) q = ItemQuality.B;
             else if (treasureQual < _QUALITY_CHANCES[1]) q = ItemQuality.C;
             else                                         q = ItemQuality.D;
-            // ETGModConsole.Log($"Seeding treasure {i+1} with quality {q}");
             InitializeSingleTreasureOfQuality(q);
         }
     }
@@ -170,7 +169,6 @@ public class Itemfinder : CwaffActive
             return;
         }
 
-        // ETGModConsole.Log($"Adding treasure to room {room.GetRoomName()} -> {room.area.basePosition}");
         _Treasure.Add(TreasureLocation.Create(quality, spot.ToVector2()));
     }
 }

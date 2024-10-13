@@ -1,9 +1,6 @@
 namespace CwaffingTheGungy;
 
-
-/* TODO:
-     - refactor player variable to use builtin variable
-*/
+//REFACTOR: change player variable to use builtin variable
 
 public class Ticonderogun : CwaffGun
 {

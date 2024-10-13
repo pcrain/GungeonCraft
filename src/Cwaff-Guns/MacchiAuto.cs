@@ -56,7 +56,6 @@ public class MacchiAuto : CwaffGun
 
         private static void ApplyExtraBeamStatusEffects(BeamController beam, GameActor gameActor)
         {
-            // ETGModConsole.Log($"applying extra status effects");
             foreach (GameActorEffect e in beam.projectile.statusEffectsToApply)
                 if (UnityEngine.Random.value < BraveMathCollege.SliceProbability(beam.statusEffectChance, BraveTime.DeltaTime))
                     gameActor.ApplyEffect(e);

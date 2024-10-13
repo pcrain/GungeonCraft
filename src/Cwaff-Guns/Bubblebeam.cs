@@ -474,8 +474,6 @@ public class EnbubbledBehaviour : MonoBehaviour
                 this._enemy.HitByEnemyBullets = false;
                 this._enemy.specRigidbody.RemoveCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile));
             }
-            // if (this._enemyCollisionOverride)
-            //     this._enemy.specRigidbody.RemoveCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
         }
         else if (this._proj && this._proj.specRigidbody)
         {
