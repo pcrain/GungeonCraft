@@ -156,7 +156,7 @@ public class AstralProjector : CwaffPassive
         this.Owner.gameObject.PlayUnique("phase_through_wall_sound");
     }
 
-    private static float PreventRigidbodyCastDuringHandlePlayerInput(PlayerController pc, float inValue)
+    private static float PreventRigidbodyCastDuringHandlePlayerInput(float inValue, PlayerController pc)
     {
         if (pc.HasPassive<AstralProjector>())
             return inValue > 0 ? 999f : -999f; // replace the value we're checking against with something absurdly high so we avoid doing RigidBodyCasts
@@ -171,34 +171,22 @@ public class AstralProjector : CwaffPassive
     //   ensuring the RigidBodyCasts will never run under any sane circumstance
         [HarmonyILManipulator]
         private static void HandlePlayerPhasingInputIL(ILContext il)
-        { //REFACTOR: clean up to avoid Pop and Ldc
+        {
             ILCursor cursor = new ILCursor(il);
 
             //Replace positive movement checks
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(0.01f)))
             {
-                cursor.Emit(OpCodes.Pop); // pop the check for 0.01f itself
-                cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
-                cursor.Emit(OpCodes.Ldc_R4, 0.01f); // replace the check for 0.01f as arg1
-
-                // call our method with player instance and original threshold value as args
+                cursor.Emit(OpCodes.Ldarg_0);
                 cursor.CallPrivate(typeof(AstralProjector), nameof(PreventRigidbodyCastDuringHandlePlayerInput));
-                // the return value from our hook is now on the stack, replacing 0.01f with 999f if we have the item
-                // this ensures the RigidBodyCast() will never happen
             }
 
             // Replcae negative movement checks
             cursor.Index = 0;
             while (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(-0.01f)))
             {
-                cursor.Emit(OpCodes.Pop); // pop the check for -0.01f itself
-                cursor.Emit(OpCodes.Ldarg_0); // load the player instance as arg0
-                cursor.Emit(OpCodes.Ldc_R4, -0.01f); // replace the check for -0.01f as arg1
-
-                // call our method with player instance and original threshold value as args
+                cursor.Emit(OpCodes.Ldarg_0);
                 cursor.CallPrivate(typeof(AstralProjector), nameof(PreventRigidbodyCastDuringHandlePlayerInput));
-                // the return value from our hook is now on the stack, replacing -0.01f with -999f if we have the item
-                // this ensures the RigidBodyCast() will never happen
             }
             return;
         }

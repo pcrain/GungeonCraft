@@ -33,6 +33,7 @@ public class Overflow : CwaffGun
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250, shootFps: 60, reloadFps: 4,
             fireAudio: "overflow_shoot_sound", rampUpFireRate: true, modulesAreTiers: true, muzzleVFX: "muzzle_overflow", muzzleFps: 120,
             muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 10f)
+          .AddToShop(ItemBuilder.ShopType.Goopton)
           .Attach<OverflowAmmoDisplay>();
 
         Projectile baseProj = gun.InitProjectile(GunData.New(sprite: null, clipSize: -1, cooldown: 0.05f, shootStyle: ShootStyle.Automatic,

@@ -33,51 +33,44 @@ public class StuntHelmet : CwaffPassive
     {
         [HarmonyILManipulator]
         private static void StuntExplosionIL(ILContext il)
-        { //REFACTOR: rewrite to avoid using Mul and Stloc
+        {
             ILCursor cursor = new ILCursor(il);
 
-            #region Ignore all damage from explosions
-                ILLabel branchPoint = null;
-                if (!cursor.TryGotoNext(MoveType.After,
-                    instr => instr.MatchLdfld<PlayerController>("IsEthereal"),
-                    instr => instr.MatchBrtrue(out branchPoint)))
-                    return;
+            VariableDefinition hasStuntHelmet = il.DeclareLocal<bool>(); // false by default
 
-                // after finding the check that ignores explosion damage if we're ethereal, we also want to completely ignore damage if we have the Stunt Helmet
+            #region Determine if player is wearing stunt helmet
+                if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(13))) // PlayerController
+                    return;
                 cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
                 cursor.CallPrivate(typeof(StuntHelmet), nameof(PlayerHasStuntHelmet));
-                cursor.Emit(OpCodes.Brtrue, branchPoint);
+                cursor.Emit(OpCodes.Stloc, hasStuntHelmet);
             #endregion
 
-            #region Quadruple all knockback from explosions
-                ILLabel branchPoint2 = null;
-                if (!cursor.TryGotoNext(MoveType.Before,
-                    instr => instr.MatchLdfld<ExplosionData>("preventPlayerForce"),
-                    instr => instr.MatchBrfalse(out branchPoint2)))
+            #region Ignore all damage from explosions
+                if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<PlayerController>("IsEthereal")))
                     return;
+                cursor.Emit(OpCodes.Ldloc, hasStuntHelmet);
+                cursor.CallPrivate(typeof(StuntExplosionPatch), nameof(Or));
+            #endregion
 
-                // IL_0a48: ldarg.0
-                // IL_0a49: ldfld ExplosionData Exploder/<HandleExplosion>c__Iterator4::data
-                // --------WE ARE NOW HERE---------
-                // IL_0a4e: ldfld System.Boolean ExplosionData::preventPlayerForce
-                // IL_0a53: brfalse IL_0a70
-                // IL_0a58: ldloc.s V_10
-                cursor.Index -= 2; // jump back to right after computing num2 = 1f - num / data.pushRadius;
+            #region Override preventPlayerForce
+                if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<ExplosionData>("preventPlayerForce")))
+                    return;
+                cursor.Emit(OpCodes.Ldloc, hasStuntHelmet);
+                cursor.CallPrivate(typeof(StuntExplosionPatch), nameof(AndNot));
+            #endregion
 
-                ILLabel branchToTakeIfNoHelmet = cursor.DefineLabel();
+            #region Quadruple all knockback from explosions and provide a damage boost
+                if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<ExplosionData>("force")))
+                    return;
+                cursor.Emit(OpCodes.Ldloc, hasStuntHelmet);
                 cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
-                cursor.CallPrivate(typeof(StuntHelmet), nameof(PlayerHasStuntHelmet));
-                cursor.Emit(OpCodes.Brfalse, branchToTakeIfNoHelmet);
-                    cursor.Emit(OpCodes.Ldloc_S, (byte)26); // V_26 == force multiplier
-                    cursor.Emit(OpCodes.Ldc_R4, _EXPLOSION_FORCE_MULT);
-                    cursor.Emit(OpCodes.Mul);
-                    cursor.Emit(OpCodes.Stloc_S, (byte)26);
-                    cursor.Emit(OpCodes.Ldloc_S, (byte)13);
-                    cursor.CallPrivate(typeof(StuntHelmet), nameof(DoStuntHelmetBoost));
-                    cursor.Emit(OpCodes.Br, branchPoint2);  // skip over the preventPlayerForce check entirely
-                cursor.MarkLabel(branchToTakeIfNoHelmet); // move onto the preventPlayerForce check as normal
+                cursor.CallPrivate(typeof(StuntHelmet), nameof(DoStuntHelmetBoost));
             #endregion
         }
+
+        private static bool Or(bool val1, bool val2) => val1 || val2;
+        private static bool AndNot(bool val1, bool val2) => val1 && !val2;
     }
 
     private static bool PlayerHasStuntHelmet(PlayerController player)
@@ -85,8 +78,11 @@ public class StuntHelmet : CwaffPassive
         return player && player.HasPassive<StuntHelmet>();
     }
 
-    private static void DoStuntHelmetBoost(PlayerController player)
+    private static float DoStuntHelmetBoost(float origForce, bool hasStuntHelment, PlayerController player)
     {
+        if (!hasStuntHelment)
+            return origForce;
+
         StuntHelmet helmet = player.GetPassive<StuntHelmet>();
         if (helmet._extantDamageBoostCoroutine != null)
         {
@@ -94,6 +90,7 @@ public class StuntHelmet : CwaffPassive
             player.StopCoroutine(helmet._extantDamageBoostCoroutine);
         }
         helmet._extantDamageBoostCoroutine = player.StartCoroutine(HandleDamageBoost(player, helmet));
+        return origForce * _EXPLOSION_FORCE_MULT;
     }
 
     private static IEnumerator HandleDamageBoost(PlayerController target, StuntHelmet helmet)

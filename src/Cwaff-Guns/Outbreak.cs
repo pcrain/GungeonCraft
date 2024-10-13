@@ -1,4 +1,5 @@
-﻿namespace CwaffingTheGungy;
+﻿
+namespace CwaffingTheGungy;
 
 public class Outbreak : CwaffGun
 {
@@ -32,6 +33,8 @@ public class Outbreak : CwaffGun
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
+        if (player.CurrentRoom is not RoomHandler room)
+            return;
         if (gun.GetComponent<Outbreak>() is not Outbreak outbreak)
             return;
 
@@ -40,7 +43,7 @@ public class Outbreak : CwaffGun
         if (_INFECT_TOWARDS_CURSOR)
             target = player.CenterPosition.ToNearestWallOrEnemyOrObject(player.m_currentGunAngle, 1f);
 
-        foreach (AIActor enemy in StaticReferenceManager.AllEnemies) //REFACTOR: limit this to current room
+        foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
         {
             if (enemy.GetComponent<InfectedBehavior>() is not InfectedBehavior infection)
                 continue;
@@ -68,11 +71,13 @@ public class InfectionBehavior : MonoBehaviour
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
-        //REFACTOR: don't use lambda
-        this._projectile.OnHitEnemy += (Projectile _, SpeculativeRigidbody enemy, bool _) => {
-            if (enemy.aiActor && enemy.aiActor.IsHostileAndNotABoss())
-                enemy.aiActor.gameObject.GetOrAddComponent<InfectedBehavior>();
-        };
+        this._projectile.OnHitEnemy += this.OnHitEnemy;
+    }
+
+    private void OnHitEnemy(Projectile proj, SpeculativeRigidbody enemy, bool killed)
+    {
+        if (enemy.aiActor && enemy.aiActor.IsHostileAndNotABoss())
+            enemy.aiActor.gameObject.GetOrAddComponent<InfectedBehavior>();
     }
 
     private void Update()

@@ -24,9 +24,12 @@ public class Bouncer : CwaffGun
           .InitProjectile(GunData.New(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic, damage: _ACCELERATION, speed: _ACCELERATION,
             range: 9999f, sprite: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter, customClip: true,
             overrideColliderPixelSizes: new IntVector2(1,1))) // 1-pixel collider for accurate bounce animation
+          .Attach<BounceProjModifier>(bounce => {
+            bounce.numberOfBounces = 3;
+            bounce.chanceToDieOnBounce = 0f;
+            bounce.onlyBounceOffTiles = true; })
           .Attach<HarmlessUntilBounce>();
 
-        // Initialize our explosion data
         _MiniExplosion = Explosions.DefaultSmall.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false);
     }
 }
@@ -49,13 +52,9 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._owner = pc;
         this._damageMult = this._owner.DamageMult();
 
-        BounceProjModifier bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>(); //REFACTOR: do in setup
-            bounce.numberOfBounces     += 3; // needs to be more than 1 or projectile dies immediately in special handling code below
-            bounce.chanceToDieOnBounce = 0f;
-            bounce.OnBounce += OnBounce;
-            bounce.onlyBounceOffTiles = true;
-
+        BounceProjModifier bounce = base.gameObject.GetComponent<BounceProjModifier>();
         this._maxBounces = bounce.numberOfBounces;
+        bounce.OnBounce += this.OnBounce;
 
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         this._projectile.OnDestruction += this.OnDestruction;

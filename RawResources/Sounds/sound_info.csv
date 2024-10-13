@@ -220,7 +220,7 @@ corruption_sound,1.5,1,sound,0
 gunflower_fire_sound,3.5,1,sound,0
 snap_sound,-8.0,1,sound,1
 chomp_large_sound,0.0,1,sound,1
-kazooi_roll_sound,-2.0,1,sound,1
+kazooie_roll_sound,-2.0,1,sound,1
 bubble_pop_sound,3.0,1,sound,0
 earthquake_sound,5.0,1,sound,0
 yggdrashell_power_up_sound,3.0,1,sound,0

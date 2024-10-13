@@ -1,7 +1,5 @@
 namespace CwaffingTheGungy;
 
-//REFACTOR: change player variable to use builtin variable
-
 public class Ticonderogun : CwaffGun
 {
     public static string ItemName         = "Ticonderogun";
@@ -29,7 +27,6 @@ public class Ticonderogun : CwaffGun
 
     private static float _LastWriteSound         = 0f;    // how long its been since we played the scribbling sound
 
-    private PlayerController _owner              = null;  // player owner of the weapon
     private Vector2? _lastCursorPos              = null;  // position of the pencil cursor last time we updated
     private AIActor _trackedEnemy                = null;  // [controller] the enemy we are currently tracking
     private Projectile _trackedProj              = null;  // [controller] the projectile we are currently tracking
@@ -66,14 +63,12 @@ public class Ticonderogun : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
-        this._owner = player;
         this._eraserMode = false;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         EndCharge();
-        this._owner = null;
         base.OnDroppedByPlayer(player);
     }
 
@@ -118,7 +113,7 @@ public class Ticonderogun : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (!this._owner || BraveTime.DeltaTime == 0.0f)
+        if (!this.PlayerOwner || BraveTime.DeltaTime == 0.0f)
             return;
 
         if (!this.gun.IsCharging)
@@ -151,11 +146,11 @@ public class Ticonderogun : CwaffGun
     private void CheckIfEnemiesAreEncircled(Vector2 hullCenter)
     {
         base.gameObject.Play("pencil_circle_sound");
-        if (!this._owner)
+        if (!this.PlayerOwner)
             return;
 
         List<AIActor> theEncircled = new();
-        foreach (AIActor enemy in this._owner.CurrentRoom.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
             if (enemy && enemy.IsHostile(canBeNeutral: true) && enemy.CenterPosition.IsPointInPolygonHull(this._extantPoints))
                 theEncircled.Add(enemy);
         if (theEncircled.Count == 0)
@@ -170,7 +165,7 @@ public class Ticonderogun : CwaffGun
     private void CheckIfProjectilesAreEncircled(Vector2 hullCenter)
     {
         base.gameObject.Play("pencil_circle_sound");
-        if (!this._owner)
+        if (!this.PlayerOwner)
             return;
 
         foreach (Projectile projectile in StaticReferenceManager.AllProjectiles)
@@ -178,7 +173,7 @@ public class Ticonderogun : CwaffGun
                 PassiveReflectItem.ReflectBullet(
                     p                       : projectile,
                     retargetReflectedBullet : true,
-                    newOwner                : this._owner,
+                    newOwner                : this.PlayerOwner,
                     minReflectedBulletSpeed : 30f,
                     scaleModifier           : 1f,
                     damageModifier          : 1f,
@@ -187,7 +182,7 @@ public class Ticonderogun : CwaffGun
 
     private float ComputeCircleDamage(Vector2 hullCenter, int numEncircled)
     {
-        float baseDamage = _BASE_DAMAGE * this._owner.DamageMult();
+        float baseDamage = _BASE_DAMAGE * this.PlayerOwner.DamageMult();
         switch(numEncircled)
         {
             case 1:  return baseDamage;        // 10 * 1 = 10
@@ -292,17 +287,17 @@ public class Ticonderogun : CwaffGun
     // Choose the enemy with the smallest angle from our aim point that is also within _MAX_CONTROLLER_DIST
     private AIActor ChooseNewEnemyTarget()
     {
-        if (!this._owner)
+        if (!this.PlayerOwner)
             return null;
 
-        float aimAngle = this._owner.m_currentGunAngle;
+        float aimAngle = this.PlayerOwner.m_currentGunAngle;
         float minDelta = _AUTOTARGET_MAX_DELTA;
         AIActor bestEnemy = null;
-        foreach (AIActor enemy in this._owner.CurrentRoom.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
         {
             if (!enemy || !enemy.IsHostile(canBeNeutral: true))
                 continue;
-            Vector2 enemyDelta = (enemy.CenterPosition - this._owner.CenterPosition);
+            Vector2 enemyDelta = (enemy.CenterPosition - this.PlayerOwner.CenterPosition);
             if (enemyDelta.sqrMagnitude > _MAX_CONTROLLER_SQR_DIST)
                 continue;
             float deltaAngle = aimAngle.AbsAngleTo(enemyDelta.ToAngle());
@@ -319,17 +314,17 @@ public class Ticonderogun : CwaffGun
     // Choose the projectile with the smallest angle from our aim point that is also within _MAX_CONTROLLER_DIST
     private Projectile ChooseNewProjectileTarget()
     {
-        if (!this._owner)
+        if (!this.PlayerOwner)
             return null;
 
-        float aimAngle = this._owner.m_currentGunAngle;
+        float aimAngle = this.PlayerOwner.m_currentGunAngle;
         float minDelta = _AUTOTARGET_MAX_DELTA;
         Projectile bestProj = null;
         foreach (Projectile proj in StaticReferenceManager.AllProjectiles)
         {
             if (!proj || !proj.isActiveAndEnabled || proj.Owner is PlayerController)
                 continue;
-            Vector2 projDelta = (proj.SafeCenter - this._owner.CenterPosition);
+            Vector2 projDelta = (proj.SafeCenter - this.PlayerOwner.CenterPosition);
             if (projDelta.sqrMagnitude > _MAX_CONTROLLER_SQR_DIST)
                 continue;
             float deltaAngle = aimAngle.AbsAngleTo(projDelta.ToAngle());
@@ -346,8 +341,8 @@ public class Ticonderogun : CwaffGun
     private Vector2 GetControllerTrackingVector()
     {
         // If we're using a mouse, just use the cursor position, easy
-        if (this._owner.IsKeyboardAndMouse())
-            return this._owner.unadjustedAimPoint.XY();
+        if (this.PlayerOwner.IsKeyboardAndMouse())
+            return this.PlayerOwner.unadjustedAimPoint.XY();
 
         // If we're using a controller, determine if we should be tracking a specific enemy or projectile
         bool restartCharge = false;
@@ -364,7 +359,7 @@ public class Ticonderogun : CwaffGun
             // If we're tracking an enemy, set our target based on the enemy's position and our cursor direction
             if (this._trackedProj)
             {
-                Vector2 target = this._trackedProj.SafeCenter + _ENEMY_TRACK_RADIUS * this._owner.m_activeActions.Aim.Vector;
+                Vector2 target = this._trackedProj.SafeCenter + _ENEMY_TRACK_RADIUS * this.PlayerOwner.m_activeActions.Aim.Vector;
                 if (restartCharge)
                     ResetCharge(target);
                 this._adjustedAimPoint = target; // set our adjusted aim point for when we stop tracking the enemy
@@ -383,7 +378,7 @@ public class Ticonderogun : CwaffGun
             // If we're tracking an enemy, set our target based on the enemy's position and our cursor direction
             if (this._trackedEnemy)
             {
-                Vector2 target = this._trackedEnemy.CenterPosition + _ENEMY_TRACK_RADIUS * this._owner.m_activeActions.Aim.Vector;
+                Vector2 target = this._trackedEnemy.CenterPosition + _ENEMY_TRACK_RADIUS * this.PlayerOwner.m_activeActions.Aim.Vector;
                 if (restartCharge)
                     ResetCharge(target);
                 this._adjustedAimPoint = target; // set our adjusted aim point for when we stop tracking the enemy
@@ -392,10 +387,10 @@ public class Ticonderogun : CwaffGun
         }
 
         // If we're not tracking an enemy, we're just freehanding input
-        this._adjustedAimPoint += this._owner.m_activeActions.Aim.Vector * _TRACKING_SPEED * BraveTime.DeltaTime;
-        Vector2 delta = this._adjustedAimPoint - this._owner.CenterPosition;
+        this._adjustedAimPoint += this.PlayerOwner.m_activeActions.Aim.Vector * _TRACKING_SPEED * BraveTime.DeltaTime;
+        Vector2 delta = this._adjustedAimPoint - this.PlayerOwner.CenterPosition;
         if (delta.magnitude > _MAX_CONTROLLER_DIST)
-            this._adjustedAimPoint = this._owner.CenterPosition + (_MAX_CONTROLLER_DIST * delta.normalized);
+            this._adjustedAimPoint = this.PlayerOwner.CenterPosition + (_MAX_CONTROLLER_DIST * delta.normalized);
         return this._adjustedAimPoint;
     }
 
@@ -415,18 +410,18 @@ public class Ticonderogun : CwaffGun
         }
 
         // If our input has been taken from us (e.g., during a boss cutscene), we need to stop charging
-        if (this._owner.CurrentInputState != PlayerInputState.AllInput)
+        if (this.PlayerOwner.CurrentInputState != PlayerInputState.AllInput)
         {
             EndCharge();
             return;
         }
 
         // Figure out if we should add a new point to our list
-        Vector2 playerPos = this._owner.CenterPosition;
+        Vector2 playerPos = this.PlayerOwner.CenterPosition;
         Vector2 pencilPos = GetControllerTrackingVector();
 
         // Stabilize the camera while we're using this weapon on keyboard and mouse
-        bool usingMouse = this._owner.IsKeyboardAndMouse();
+        bool usingMouse = this.PlayerOwner.IsKeyboardAndMouse();
         GameManager.Instance.MainCameraController.SetManualControl(usingMouse, true);
         if (usingMouse)
             GameManager.Instance.MainCameraController.OverridePosition =
@@ -453,7 +448,7 @@ public class Ticonderogun : CwaffGun
         SpawnManager.SpawnVFX(_SparklePrefab, pencilPos, Quaternion.identity, ignoresPools: false);
 
         // Check for synergies
-        if (this._owner.HasSynergy(Synergy.DRAW_FIRE))
+        if (this.PlayerOwner.HasSynergy(Synergy.DRAW_FIRE))
             if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.FireDef) is DeadlyDeadlyGoopManager gooper)
                 gooper.AddGoopCircle(pencilPos, 0.75f);
 

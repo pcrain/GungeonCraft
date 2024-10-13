@@ -16,6 +16,8 @@ public class Alyx : CwaffGun
     internal static readonly float _AMMO_DECAY_LAMBDA = Mathf.Log(2) / _AMMO_HALF_LIFE_SECS;
     internal static readonly float _GUN_DECAY_LAMBDA  = Mathf.Log(2) / _GUN_HALF_LIFE_SECS;
 
+    private static DeadlyDeadlyGoopManager _PoisonGooper = null;
+
     private DamageTypeModifier _poisonImmunity = null;
     private Coroutine _decayCoroutine = null;
 
@@ -36,6 +38,8 @@ public class Alyx : CwaffGun
     {
         gun.sprite.gameObject.SetGlowiness(50f);
         RecalculateAmmo();
+        if (!_PoisonGooper)
+            _PoisonGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef);
     }
 
     public override void Update()
@@ -131,14 +135,10 @@ public class Alyx : CwaffGun
         // If we've decayed at all, create poison goop under our feet
         if (newAmmo < this.gun.CurrentAmmo || newMaxAmmo < this.gun.GetBaseMaxAmmo())
         {
-            //REFACTOR: cache this
-            if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef) is DeadlyDeadlyGoopManager gooper)
-            {
-                if (this.PlayerOwner)
-                    gooper.AddGoopCircle(this.PlayerOwner.SpriteBottomCenter.XY() - this.PlayerOwner.m_currentGunAngle.ToVector(1f), 0.75f);
-                else
-                    gooper.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
-            }
+            if (this.PlayerOwner)
+                _PoisonGooper.AddGoopCircle(this.PlayerOwner.SpriteBottomCenter.XY() - this.PlayerOwner.m_currentGunAngle.ToVector(1f), 0.75f);
+            else
+                _PoisonGooper.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
         }
 
         this.gun.CurrentAmmo = newAmmo;

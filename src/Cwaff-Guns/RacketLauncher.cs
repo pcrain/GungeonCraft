@@ -20,7 +20,13 @@ public class RacketLauncher : CwaffGun
             idleFps: _IDLE_FPS, shootFps: 60, autoPlay: false)
           .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
             damage: 10.0f, speed: 20.0f, range: 300.0f, force: 12f, sprite: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter,
-            surviveRigidbodyCollisions: true)).Attach<TennisBall>(); // DestroyMode must be set at creation time
+            surviveRigidbodyCollisions: true))
+          .Attach<BounceProjModifier>(bounce => {
+            bounce.numberOfBounces     = 9999;
+            bounce.chanceToDieOnBounce = 0f;
+            bounce.onlyBounceOffTiles  = false;
+            bounce.ExplodeOnEnemyBounce = false; })
+          .Attach<TennisBall>(); // DestroyMode must be set at creation time
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -121,23 +127,13 @@ public class TennisBall : MonoBehaviour
             this._projectile.collidesOnlyWithPlayerProjectiles = false;
             this._projectile.UpdateCollisionMask();
             this._projectile.specRigidbody.OnPreRigidbodyCollision += this.ReflectProjectiles;
-            this._projectile.specRigidbody.OnRigidbodyCollision += (CollisionData rigidbodyCollision) => {
-                this._projectile.SendInDirection(rigidbodyCollision.Normal, false);
-                ReturnToSender();
-            };
-            this._projectile.OnDestruction += (Projectile p) => {
-                if (p.GetComponent<TennisBall>() is TennisBall tc)
-                    this._parentGun.RemoveExtantTennisBall(tc);
-            };
+            this._projectile.specRigidbody.OnRigidbodyCollision += this.OnRigidbodyCollision;
+            this._projectile.OnDestruction += this.OnDestruction;
             this._projectile.gameObject.Play("monkey_tennis_hit_serve");
         }
 
-        this._bounce = this._projectile.gameObject.GetOrAddComponent<BounceProjModifier>(); //REFACTOR: do in setup
-            this._bounce.numberOfBounces     = 9999;
-            this._bounce.chanceToDieOnBounce = 0f;
-            this._bounce.onlyBounceOffTiles  = false;
-            this._bounce.ExplodeOnEnemyBounce = false;
-            this._bounce.OnBounce += this.ReturnToSender;
+        this._bounce = this._projectile.gameObject.GetComponent<BounceProjModifier>();
+        this._bounce.OnBounce += this.ReturnToSender;
 
         this._trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
             this._trail.StartWidth = 0.2f;
@@ -150,6 +146,18 @@ public class TennisBall : MonoBehaviour
         this._baseSpeed  = this._projectile.baseData.speed;
         this._baseDamage = this._projectile.baseData.damage;
         this._baseForce  = this._projectile.baseData.force;
+    }
+
+    private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
+    {
+        this._projectile.SendInDirection(rigidbodyCollision.Normal, false);
+        ReturnToSender();
+    }
+
+    private void OnDestruction(Projectile p)
+    {
+        if (p.GetComponent<TennisBall>() is TennisBall tc)
+            this._parentGun.RemoveExtantTennisBall(tc);
     }
 
     private void ReflectProjectiles(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)

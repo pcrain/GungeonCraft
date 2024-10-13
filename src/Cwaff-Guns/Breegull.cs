@@ -125,7 +125,7 @@ public class Breegull : CwaffGun
     private void OnDodgeRoll(PlayerController player, Vector2 dirVec)
     {
         if (player.CurrentGun == this.gun && player.HasSynergy(Synergy.TALON_TROT))
-            player.gameObject.Play("kazooi_roll_sound");  //REFACTOR: rename sound
+            player.gameObject.Play("kazooie_roll_sound");
     }
 
     private void UpdateEggs(bool playSound = false)

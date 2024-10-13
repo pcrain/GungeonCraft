@@ -33,6 +33,13 @@ public class SeltzerPelter : CwaffGun
         gun.InitProjectile(GunData.New(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
           damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1, anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
           anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))) // prevent uneven colliders from glitching into walls
+        .Attach<BounceProjModifier>(bounce => {
+            bounce.numberOfBounces      = 9999;
+            bounce.chanceToDieOnBounce  = 0f;
+            bounce.onlyBounceOffTiles   = false;
+            bounce.ExplodeOnEnemyBounce = false;
+            bounce.bouncesTrackEnemies  = true;
+            bounce.bounceTrackRadius    = 3f; })
         .Attach<SeltzerProjectile>();
 
         //NOTE: the perfect seltzer stats, do not tweak without testing! (beam damage == DPS)
@@ -83,14 +90,9 @@ public class SeltzerProjectile : MonoBehaviour
         this._canProjectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
         this._canProjectile.shouldRotate = false; // prevent automatic rotation after creation
         this._canProjectile.specRigidbody.OnRigidbodyCollision += OnRigidbodyCollision;
-        this._bounce = this._canProjectile.gameObject.GetOrAddComponent<BounceProjModifier>(); //REFACTOR: do in setup
-            this._bounce.numberOfBounces      = 9999;
-            this._bounce.chanceToDieOnBounce  = 0f;
-            this._bounce.onlyBounceOffTiles   = false;
-            this._bounce.ExplodeOnEnemyBounce = false;
-            this._bounce.bouncesTrackEnemies  = true;
-            this._bounce.bounceTrackRadius    = 3f;
-            this._bounce.OnBounce += this.StartSprayingSoda;
+
+        this._bounce = this._canProjectile.gameObject.GetComponent<BounceProjModifier>();
+        this._bounce.OnBounce += this.StartSprayingSoda;
 
         this._canProjectile.spriteAnimator.Stop(); // stop animating immediately after creation so we can stick with our initial sprite
 
