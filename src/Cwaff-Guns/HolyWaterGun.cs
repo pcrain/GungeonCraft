@@ -75,11 +75,7 @@ public class ExorcismJuice : MonoBehaviour
         if (bullet.GetComponent<BasicBeamController>() is not BasicBeamController beam)
             return;
 
-        pc.ownerlessStatModifiers.Add(new StatModifier() {
-            amount      = -0.5f,
-            modifyType  = StatModifier.ModifyMethod.ADDITIVE,
-            statToBoost = StatType.Curse,
-            });
+        pc.ownerlessStatModifiers.Add(StatType.Curse.Add(-0.5f));
         pc.stats.RecalculateStats(pc);
 
         Texture2D ghostSprite;

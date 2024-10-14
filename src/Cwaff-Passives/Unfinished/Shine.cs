@@ -10,7 +10,7 @@ public class Shine : CwaffPassive
 
     internal static GameObject _ShineVFX = null;
 
-    private static StatModifier noSpeed;
+    private static StatModifier noSpeed = StatType.MovementSpeed.Mult(0f);
 
     private bool dodgeButtonHeld = false;
     private bool isShining = false;
@@ -20,13 +20,6 @@ public class Shine : CwaffPassive
     {
         PassiveItem item  = Lazy.SetupPassive<Shine>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
-
-        noSpeed = new StatModifier
-        {
-            amount      = 0,
-            statToBoost = StatType.MovementSpeed,
-            modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE
-        };
 
         // Can't use resmap because sprite has number in it
         // _ShineVFX = VFX.RegisterVFXObject("Shine", new (){$"{C.MOD_INT_NAME}/Resources/MiscVFX/shine2"},
@@ -118,10 +111,7 @@ public class Shine : CwaffPassive
 
     private void RecomputePlayerSpeed(PlayerController p)
     {
-        if (isShining)
-            this.passiveStatModifiers = (new StatModifier[] { noSpeed }).ToArray();
-        else
-            this.passiveStatModifiers = (new StatModifier[] {  }).ToArray();
+        this.passiveStatModifiers = isShining ? [noSpeed] : [];
         p.stats.RecalculateStats(p, false, false);
     }
 

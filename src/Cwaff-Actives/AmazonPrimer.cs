@@ -44,28 +44,12 @@ public class PrimerSubscription : FakeItem
         this._primer.OnEnteredCombat += AnyPrimers;
         this._primer.OnRoomClearEvent += ThanksForPriming;
         GameManager.Instance.OnNewLevelFullyLoaded += Inflation;
-        this._primeBenefits = new[] {
-            new StatModifier(){
-                amount      = 2.00f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.RateOfFire,
-            },
-            new StatModifier(){
-                amount      = 2.00f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.ProjectileSpeed,
-            },
-            new StatModifier(){
-                amount      = 1.25f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.Damage,
-            },
-            new StatModifier(){
-                amount      = 1.25f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.DamageToBosses,
-            },
-        };
+        this._primeBenefits = [
+            StatType.RateOfFire.Mult(2f),
+            StatType.ProjectileSpeed.Mult(2f),
+            StatType.Damage.Mult(1.25f),
+            StatType.DamageToBosses.Mult(1.25f),
+        ];
         DoPrimeVFX();
     }
 

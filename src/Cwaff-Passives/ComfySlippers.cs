@@ -18,16 +18,10 @@ public class ComfySlippers : CwaffPassive
     {
         PassiveItem item  = Lazy.SetupPassive<ComfySlippers>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
-        _ComfyBuffs       = new[]{
-            new StatModifier {
-                amount      = _MOVEMENT_BOOST,
-                statToBoost = StatType.MovementSpeed,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE},
-            new StatModifier {
-                amount      = _DODGE_BOOST,
-                statToBoost = StatType.DodgeRollSpeedMultiplier,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE},
-        };
+        _ComfyBuffs       = [
+            StatType.MovementSpeed.Add(_MOVEMENT_BOOST),
+            StatType.DodgeRollSpeedMultiplier.Add(_DODGE_BOOST),
+        ];
     }
 
     public override void DisableEffect(PlayerController player)

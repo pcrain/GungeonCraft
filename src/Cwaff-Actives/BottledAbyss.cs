@@ -3,8 +3,8 @@ namespace CwaffingTheGungy;
 public class BottledAbyss : CwaffActive
 {
     public static string ItemName         = "Bottled Abyss";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Stares Back";
+    public static string LongDescription  = "Summons a void under the player that expands to consume all grounded enemies (and players) in a large radius after a brief delay. Does not affect bosses or inanimate objects.";
     public static string Lore             = "TBD";
 
     private const float _EXPAND_TIME   = 2f;

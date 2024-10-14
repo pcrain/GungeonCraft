@@ -3,11 +3,11 @@ namespace CwaffingTheGungy;
 public class PrismaticScope : CwaffPassive
 {
     public static string ItemName         = "Prismatic Scope";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "A Colorful Sight";
+    public static string LongDescription  = "Increases the damage of all beam weapons by 40%.";
     public static string Lore             = "TBD";
 
-    private const float _BEAM_DAMAGE_MULT = 1.7f;
+    private const float _BEAM_DAMAGE_MULT = 1.4f;
 
     internal static GameObject _PrismaticVFX;
 

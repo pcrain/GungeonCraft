@@ -22,13 +22,7 @@ public class EmergencySiren : CwaffActive
         item.consumable   = false;
         item.SetCooldownType(ItemBuilder.CooldownType.Damage, 300f);
 
-        _EmergencyMods = new[] {
-            new StatModifier(){
-                amount      = 2.00f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.MovementSpeed,
-            },
-        };
+        _EmergencyMods = [StatType.MovementSpeed.Mult(2f)];
 
         _SirenVFX = VFX.Create("siren", 36, scale: 0.75f, emissivePower: 50f);
     }

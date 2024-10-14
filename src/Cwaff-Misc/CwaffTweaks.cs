@@ -120,10 +120,7 @@ public static class CwaffTweaks
             PassiveItem item = Lazy.SetupPassive<JammedLies>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
             item.quality = ItemQuality.SPECIAL;
             item.ShouldBeExcludedFromShops = true;  // don't show up in shops
-            item.passiveStatModifiers = [new StatModifier(){
-                statToBoost = StatType.Curse,
-                amount      = 5,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE}];
+            item.passiveStatModifiers = [StatType.Curse.Add(5f)];
             _PickupId = item.PickupObjectId;
         }
 
@@ -174,6 +171,7 @@ public static class CwaffTweaks
             item.quality = ItemQuality.SPECIAL;
             item.ShouldBeExcludedFromShops = true;  // don't show up in shops
             item.CanBeSold = false;
+            item.passiveStatModifiers = [StatType.Coolness.Add(float.Epsilon)];
         }
 
         [HarmonyPatch(typeof(Gun), nameof(Gun.Pickup))]

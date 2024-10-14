@@ -80,50 +80,18 @@ internal class Caffeination : MonoBehaviour
     private void Start()
     {
         this._owner = base.GetComponent<PlayerController>();
-        this._caffeineBuffs = new[] {
-            new StatModifier(){
-                amount      = 1.50f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.RateOfFire,
-            },
-            new StatModifier(){
-                amount      = 1.50f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.DodgeRollSpeedMultiplier,
-            },
-            new StatModifier(){
-                amount      = 1.50f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.MovementSpeed,
-            },
-            new StatModifier(){
-                amount      = 0.75f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.ReloadSpeed,
-            },
-        };
-        this._crashNerfs = new[] {
-            new StatModifier(){
-                amount      = 0.65f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.RateOfFire,
-            },
-            new StatModifier(){
-                amount      = 0.75f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.DodgeRollSpeedMultiplier,
-            },
-            new StatModifier(){
-                amount      = 0.65f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.MovementSpeed,
-            },
-            new StatModifier(){
-                amount      = 1.5f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.ReloadSpeed,
-            },
-        };
+        this._caffeineBuffs = [
+            StatType.RateOfFire.Mult(1.5f),
+            StatType.DodgeRollSpeedMultiplier.Mult(1.5f),
+            StatType.MovementSpeed.Mult(1.5f),
+            StatType.ReloadSpeed.Mult(0.75f),
+        ];
+        this._crashNerfs = [
+            StatType.RateOfFire.Mult(0.65f),
+            StatType.DodgeRollSpeedMultiplier.Mult(0.75f),
+            StatType.MovementSpeed.Mult(0.65f),
+            StatType.ReloadSpeed.Mult(1.5f),
+        ];
     }
 
     private void Update()

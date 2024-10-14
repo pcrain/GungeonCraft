@@ -25,15 +25,9 @@ public class CreditCard : CwaffPassive
     public override void OnFirstPickup(PlayerController player)
     {
         base.OnFirstPickup(player);
-        this.curseMod = new StatModifier();
-            curseMod.amount = 0f;
-            curseMod.modifyType = StatModifier.ModifyMethod.ADDITIVE;
-            curseMod.statToBoost = StatType.Curse;
-        this.coolMod = new StatModifier();
-            coolMod.amount = 0f;
-            coolMod.modifyType = StatModifier.ModifyMethod.ADDITIVE;
-            coolMod.statToBoost = StatType.Coolness;
-        this.passiveStatModifiers = new []{curseMod, coolMod};
+        this.curseMod = StatType.Curse.Add(0f);
+        this.coolMod = StatType.Coolness.Add(0f);
+        this.passiveStatModifiers = [this.curseMod, this.coolMod];
     }
 
     public override void Pickup(PlayerController player)

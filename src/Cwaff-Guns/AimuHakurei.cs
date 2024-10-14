@@ -164,7 +164,7 @@ public class AimuHakurei : CwaffGun
 
         this.gun.RemoveStatFromGun(StatType.MovementSpeed);
         // NOTE: since time is slowed down, the player's effective speed is 0.65 * 0.65. This is intentional
-        this.gun.AddStatToGun(StatType.MovementSpeed, focus ? 0.65f : 1.0f, StatModifier.ModifyMethod.MULTIPLICATIVE);
+        this.gun.AddStatToGun(StatType.MovementSpeed.Mult(focus ? 0.65f : 1.0f));
         this.PlayerOwner.stats.RecalculateStats(this.PlayerOwner);
     }
 

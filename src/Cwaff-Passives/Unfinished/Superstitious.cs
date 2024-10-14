@@ -53,18 +53,12 @@ public class Superstitious : CwaffPassive
 
         player.ownerlessStatModifiers.TryRemove(superstitionBuff);
 
-        superstitionBuff = new StatModifier();
-        superstitionBuff.statToBoost = StatType.Damage;
-        float totalboost = Mathf.Pow(1.5f,Mathf.Abs(statboost));
-        if (statboost < 0)
-            totalboost = 1.0f/totalboost;
-        superstitionBuff.amount = totalboost;
-        superstitionBuff.modifyType = StatModifier.ModifyMethod.MULTIPLICATIVE;
+        superstitionBuff = StatType.Damage.Mult((statboost < 0)
+            ? (1f / Mathf.Pow(1.5f, -statboost))
+            : Mathf.Pow(1.5f, statboost));
 
         player.ownerlessStatModifiers.Add(superstitionBuff);
         player.stats.RecalculateStats(player);
-
-        ETGModConsole.Log("Reloading with stat boost level "+totalboost);
     }
 
     public override void Update()

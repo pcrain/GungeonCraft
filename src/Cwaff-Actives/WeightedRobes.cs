@@ -70,37 +70,19 @@ public class WeightedRobes : CwaffActive, ILabelItem
         player.OnEnteredCombat += this.OnEnteredCombat;
         player.OnRoomClearEvent += this.DidSomeTraining;
         player.OnKilledEnemyContext += this.MaybeKilledBoss;
-        this.weightedStats ??= new StatModifier[] {
-            new StatModifier {
-                amount      = 0f,
-                statToBoost = StatType.RateOfFire,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE},
-            new StatModifier {
-                amount      = 0f,
-                statToBoost = StatType.ReloadSpeed,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE},
-            new StatModifier {
-                amount      = 0f,
-                statToBoost = StatType.MovementSpeed,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE},
-        };
+        this.weightedStats ??= [
+            StatType.RateOfFire.Add(0f),
+            StatType.ReloadSpeed.Add(0f),
+            StatType.MovementSpeed.Add(0f),
+        ];
         int pid = player.PlayerIDX;
         if (this.trainingStats[pid] != null)
             return;
-        this.trainingStats[pid] = new StatModifier[] {
-            new StatModifier {
-                amount      = 0f,
-                statToBoost = StatType.RateOfFire,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE},
-            new StatModifier {
-                amount      = 0f,
-                statToBoost = StatType.ReloadSpeed,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE},
-            new StatModifier {
-                amount      = 0f,
-                statToBoost = StatType.MovementSpeed,
-                modifyType  = StatModifier.ModifyMethod.ADDITIVE},
-        };
+        this.trainingStats[pid] = [
+            StatType.RateOfFire.Add(0f),
+            StatType.ReloadSpeed.Add(0f),
+            StatType.MovementSpeed.Add(0f),
+        ];
         player.ownerlessStatModifiers.AddRange(this.trainingStats[pid]);
         player.stats.RecalculateStats(player);
     }

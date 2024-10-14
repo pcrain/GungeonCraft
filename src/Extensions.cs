@@ -901,7 +901,7 @@ public static class Extensions
     }
 
     if (curse != 0f)
-      gun.AddStatToGun(StatType.Curse, curse, StatModifier.ModifyMethod.ADDITIVE);
+      gun.AddStatToGun(StatType.Curse.Add(curse));
     if (carryOffset.HasValue)
       gun.carryPixelOffset = carryOffset.Value;
 
@@ -2048,11 +2048,7 @@ public static class Extensions
   /// <summary>Increases a player's curse</summary>
   public static void IncreaseCurse(this PlayerController player, float curse = 1f, bool updateStats = true)
   {
-    player.ownerlessStatModifiers.Add(new(){
-        amount      = curse,
-        modifyType  = StatModifier.ModifyMethod.ADDITIVE,
-        statToBoost = StatType.Curse
-    });
+    player.ownerlessStatModifiers.Add(StatType.Curse.Add(curse));
     if (updateStats)
       player.stats.RecalculateStats(player);
   }
@@ -2987,6 +2983,14 @@ public static class Extensions
   public static void CallPrivate(this ILCursor cursor, Type t, string name)
   {
     cursor.Emit(OpCodes.Call, t.GetMethod(name, BindingFlags.Static | BindingFlags.NonPublic));
+  }
+
+  /// <summary>Add a stat modifier directly to a gun's passive stat modifiers</summary>
+  public static void AddStatToGun(this Gun item, StatModifier modifier)
+  {
+      item.passiveStatModifiers ??= [];
+      Array.Resize(ref item.passiveStatModifiers, item.passiveStatModifiers.Length + 1);
+      item.passiveStatModifiers[item.passiveStatModifiers.Length - 1] = modifier;
   }
 }
 

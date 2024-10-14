@@ -25,12 +25,7 @@ public class CampingSupplies : CwaffPassive
     private Vector3 _campfirePos       = Vector3.zero; // active campfire vfx position
     private float _lastCanToss         = 0.0f;
 
-    private StatModifier _campMod = new StatModifier
-    {
-        amount      = 1.0f,
-        statToBoost = StatType.Damage,
-        modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-    };
+    private StatModifier _campMod = StatType.Damage.Mult(1f);
 
     public static void Init()
     {
@@ -57,7 +52,7 @@ public class CampingSupplies : CwaffPassive
     public override void OnFirstPickup(PlayerController player)
     {
         base.OnFirstPickup(player);
-        this.passiveStatModifiers = new StatModifier[] { this._campMod };
+        this.passiveStatModifiers = [this._campMod];
     }
 
     public override void Pickup(PlayerController player)

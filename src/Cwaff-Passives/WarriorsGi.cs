@@ -46,33 +46,18 @@ public class WarriorsGi : CwaffPassive
 
     public override void OnFirstPickup(PlayerController player)
     {
-        this._rateOfFireStat = new StatModifier {
-            amount      = 1.00f,
-            statToBoost = StatType.RateOfFire,
-            modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
-        this._movementSpeedStat = new StatModifier {
-            amount      = 1.00f,
-            statToBoost = StatType.MovementSpeed,
-            modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
-        this._dodgeRollSpeedStat = new StatModifier {
-            amount      = 1.00f,
-            statToBoost = StatType.DodgeRollSpeedMultiplier,
-            modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
-        this._damageStat = new StatModifier {
-            amount      = 1.00f,
-            statToBoost = StatType.Damage,
-            modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
-        this._bossDamageStat = new StatModifier {
-            amount      = 1.00f,
-            statToBoost = StatType.DamageToBosses,
-            modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE};
-        this.passiveStatModifiers = new StatModifier[] {
+        this._rateOfFireStat      = StatType.RateOfFire.Mult(1f);
+        this._movementSpeedStat   = StatType.MovementSpeed.Mult(1f);
+        this._dodgeRollSpeedStat  = StatType.DodgeRollSpeedMultiplier.Mult(1f);
+        this._damageStat          = StatType.Damage.Mult(1f);
+        this._bossDamageStat      = StatType.DamageToBosses.Mult(1f);
+        this.passiveStatModifiers = [
             this._rateOfFireStat,
             this._movementSpeedStat,
             this._dodgeRollSpeedStat,
             this._damageStat,
             this._bossDamageStat,
-        };
+        ];
     }
 
     public override void DisableEffect(PlayerController player)

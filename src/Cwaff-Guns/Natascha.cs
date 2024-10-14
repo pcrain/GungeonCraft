@@ -149,9 +149,9 @@ public class Natascha : CwaffGun
 
         this.gun.RemoveStatFromGun(StatType.MovementSpeed);
         if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_NATASCHA))
-            this.gun.AddStatToGun(StatType.MovementSpeed, 1f, StatModifier.ModifyMethod.MULTIPLICATIVE);
+            this.gun.AddStatToGun(StatType.MovementSpeed.Mult(1f));
         else
-            this.gun.AddStatToGun(StatType.MovementSpeed, 1f / (float)Math.Sqrt(this._speedMult), StatModifier.ModifyMethod.MULTIPLICATIVE);
+            this.gun.AddStatToGun(StatType.MovementSpeed.Mult(1f / (float)Math.Sqrt(this._speedMult)));
         //NOTE: if we rebuild our stats while firing, certain projectile modifiers like scattershot or backup gun make the gun fire once per frame, so work around that
         this.PlayerOwner.stats.RecalculateStatsWithoutRebuildingGunVolleys(this.PlayerOwner); //Alexandria helper
     }

@@ -5,7 +5,7 @@ public class Oddjob : CwaffGun
     public static string ItemName         = "Oddjob";
     public static string ShortDescription = "Hat Tricks";
     public static string LongDescription  = "Travels in a circular arc towards the enemy closest to the player's line of sight, sawing through anything in its path before returning to the player. Cannot be switched out or dropped while in flight. Increases curse by 1 while in inventory.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A hat that once belonged to an aggravatingly short gunman. One would think that he lost his life either in a gun fight or from accidentally decapitating himself with his hat, but the reality is he was done in by another gungeoneer that left their Battery Bullets lying around.";
 
     internal static GameObject _Sparks = null;
     internal static Hat _OddjobHat = null;

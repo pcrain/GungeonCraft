@@ -5,8 +5,8 @@ using static Overflow.ProjType;
 public class Overflow : CwaffGun
 {
     public static string ItemName         = "Overflow";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Contents Under Pressure";
+    public static string LongDescription  = "Fires compressed pellets of goop, decreasing in fire rate and accuracy as ammo is depleted. Can be linked to barrels by interacting with them to siphon goop. Siphoning goop different than the currently held type will drain all held goop before siphoning any new goop.";
     public static string Lore             = "TBD";
 
     private const float _FILL_RATE       = 0.04f; // time per unit of ammo refilled while attached to a barrel with same type

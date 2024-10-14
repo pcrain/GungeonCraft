@@ -3,8 +3,8 @@ namespace CwaffingTheGungy;
 public class Detergent : CwaffActive
 {
     public static string ItemName         = "Detergent";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Next to Godliness";
+    public static string LongDescription  = "Sets curse to 0 upon use.";
     public static string Lore             = "TBD";
 
     public static void Init()

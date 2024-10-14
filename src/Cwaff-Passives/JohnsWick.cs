@@ -25,16 +25,11 @@ public class JohnsWick : CwaffPassive
     public override void OnFirstPickup(PlayerController player)
     {
         base.OnFirstPickup(player);
-        this._flameOff = new StatModifier[]{};
-        StatModifier s1 = new StatModifier {
-            amount      = _MOVEMENT_BOOST,
-            statToBoost = StatType.MovementSpeed,
-            modifyType  = StatModifier.ModifyMethod.ADDITIVE };
-        StatModifier s2 = new StatModifier {
-            amount      = _DAMAGE_BOOST,
-            statToBoost = StatType.Damage,
-            modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE };
-        this._flameOn = (new StatModifier[] { s1, s2 }).ToArray();
+        this._flameOff = [];
+        this._flameOn = [
+            StatType.MovementSpeed.Add(_MOVEMENT_BOOST),
+            StatType.Damage.Mult(_DAMAGE_BOOST),
+        ];
         this._wasOnFire = false;
         this._fireResistance = new DamageTypeModifier {
             damageType = CoreDamageTypes.Fire,

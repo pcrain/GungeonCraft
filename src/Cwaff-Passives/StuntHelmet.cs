@@ -11,7 +11,7 @@ public class StuntHelmet : CwaffPassive
     const float _DAMAGE_ADD           = 2f;
     const float _STUNT_TIME           = 5f;
 
-    internal static StatModifier _StuntStats;
+    internal static StatModifier _StuntStats = StatType.Damage.Add(_DAMAGE_ADD);
 
     private Coroutine _extantDamageBoostCoroutine = null;
 
@@ -20,12 +20,6 @@ public class StuntHelmet : CwaffPassive
         PassiveItem item   = Lazy.SetupPassive<StuntHelmet>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
         item.AddToShop(ModdedShopType.Boomhildr);
-
-        _StuntStats = new StatModifier {
-            amount      = _DAMAGE_ADD,
-            statToBoost = StatType.Damage,
-            modifyType  = StatModifier.ModifyMethod.ADDITIVE
-            };
     }
 
     [HarmonyPatch(typeof(Exploder), nameof(Exploder.HandleExplosion), MethodType.Enumerator)]

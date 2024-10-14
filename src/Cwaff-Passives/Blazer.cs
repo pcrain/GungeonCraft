@@ -9,7 +9,7 @@ public class Blazer : CwaffPassive
 
     internal const  float          _BOOST_TIME = 3f;
     internal static StatModifier[] _Boosts     = null;
-    internal static StatModifier[] _NoBoosts   = new StatModifier[]{};
+    internal static StatModifier[] _NoBoosts   = [];
 
     private bool _boostedEntrance = false;
 
@@ -20,21 +20,9 @@ public class Blazer : CwaffPassive
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         _Boosts = new[] {
-            new StatModifier(){
-                amount      = 2.00f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.RateOfFire,
-            },
-            new StatModifier(){
-                amount      = 0.50f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.ReloadSpeed,
-            },
-            new StatModifier(){
-                amount      = 2.00f,
-                modifyType  = StatModifier.ModifyMethod.MULTIPLICATIVE,
-                statToBoost = StatType.ChargeAmountMultiplier,
-            },
+            StatType.RateOfFire.Mult(2f),
+            StatType.ReloadSpeed.Mult(0.5f),
+            StatType.ChargeAmountMultiplier.Mult(2f),
         };
 
     }
