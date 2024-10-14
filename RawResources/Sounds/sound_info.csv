@@ -244,3 +244,5 @@ overflow_drain_sound,-12.0,1,sound,0
 overflow_pump_sound,-7.0,1,sound,0
 overflow_shoot_sound,-5.0,1,sound,0
 detergent_cleanse_sound,-3.0,1,sound,0
+sound_of_opening_the_abyss,9.0,1,sound,0
+sound_of_the_abyss_calling,6.0,1,sound,0

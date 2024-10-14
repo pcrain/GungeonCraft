@@ -2,7 +2,8 @@
 
 ## 1.20.0 (TBD)
 
-- Added Oddjob and Overflow
+- Added Oddjob, Overflow, Detergent, and Bottled Abyss
+	- Oddjob, Detergent, and Bottled Abyss sprites thanks to Dallan!
 - Removed Yggdrashell debug output from console
 - Visually tweaked Credit Card to allow player to go up to 500 casings in debt instead of granting 500 casings while held (mechanically, it works the same)
 - Fixed Maestro's ammo display being too short compared to its ammo

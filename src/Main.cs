@@ -298,6 +298,7 @@ public class Initialisation : BaseUnityPlugin
                 Frisbee.Init();
                 WeightedRobes.Init();
                 Detergent.Init();
+                BottledAbyss.Init();
 
                 setupActivesWatch.Stop();
             #endregion
