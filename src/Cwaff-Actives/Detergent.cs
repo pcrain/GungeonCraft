@@ -5,11 +5,12 @@ public class Detergent : CwaffActive
     public static string ItemName         = "Detergent";
     public static string ShortDescription = "Next to Godliness";
     public static string LongDescription  = "Sets curse to 0 upon use.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "An ordinary bottle of liquid laundry detergent, often used to repel the Jammed by disguising the scent of contraband inventory. The fresh non-specifically clean scent reminds you of home and provides with you an additional false sense of security.";
 
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<Detergent>(ItemName, ShortDescription, LongDescription, Lore);
+        item.AddToSubShop(ItemBuilder.ShopType.Goopton);
         item.quality    = ItemQuality.B;
     }
 

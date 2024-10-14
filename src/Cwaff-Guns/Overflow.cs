@@ -6,8 +6,8 @@ public class Overflow : CwaffGun
 {
     public static string ItemName         = "Overflow";
     public static string ShortDescription = "Contents Under Pressure";
-    public static string LongDescription  = "Fires compressed pellets of goop, decreasing in fire rate and accuracy as ammo is depleted. Can be linked to barrels by interacting with them to siphon goop. Siphoning goop different than the currently held type will drain all held goop before siphoning any new goop.";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Fires compressed blobs of goop, decreasing in fire rate and accuracy as ammo is depleted. Can be linked to barrels by interacting with them to siphon goop and restore ammo. Siphoning goop different than the currently held type will drain all held goop before siphoning any new goop.";
+    public static string Lore             = "Outfitted with a state-of-the-art magneto-hydraulic compression unit, this weapon was designed by Professor Goopton specifically to take advantage of all of the liquid ammunition found in barrels throughout the Gungeon. Nobody had the heart to tell him the 'ammunition' inside these barrels was actually just various household waste products tossed in by residents of the Breach.";
 
     private const float _FILL_RATE       = 0.04f; // time per unit of ammo refilled while attached to a barrel with same type
     private const float _DRAIN_RATE      = 0.01f; // time per unit of ammo drained while attached to a barrel with different type

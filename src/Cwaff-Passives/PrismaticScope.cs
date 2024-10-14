@@ -5,7 +5,7 @@ public class PrismaticScope : CwaffPassive
     public static string ItemName         = "Prismatic Scope";
     public static string ShortDescription = "A Colorful Sight";
     public static string LongDescription  = "Increases the damage of all beam weapons by 40%.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A thick, multifaceted lens shaped to refract light into a full spectrum of colors. Astute Gungeoneers noticed that installing the lens backwards on their guns served to focus and amplify their light-based projectiles. Even when installed backwards, the smatterings of multicolored light emitted are still highly aesthetic.";
 
     private const float _BEAM_DAMAGE_MULT = 1.4f;
 
@@ -66,10 +66,10 @@ public class PrismaticScope : CwaffPassive
             this._timer -= _PARTICLE_TIME;
             CwaffVFX.SpawnBurst(
                 prefab           : _PrismaticVFX,
-                numToSpawn       : 3,
+                numToSpawn       : 10,
                 basePosition     : this._beam.Origin,
-                baseVelocity     : 6f * this._beam.Direction.normalized,
-                velocityVariance : 2f,
+                baseVelocity     : 12f * this._beam.Direction.normalized,
+                velocityVariance : 4f,
                 spread           : 60f,
                 lifetime         : 0.75f,
                 fadeOutTime      : 0.75f,

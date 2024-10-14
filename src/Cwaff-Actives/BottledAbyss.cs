@@ -5,7 +5,7 @@ public class BottledAbyss : CwaffActive
     public static string ItemName         = "Bottled Abyss";
     public static string ShortDescription = "Stares Back";
     public static string LongDescription  = "Summons a void under the player that expands to consume all grounded enemies (and players) in a large radius after a brief delay. Does not affect bosses or inanimate objects.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A bottle that at first glance contains nothing inside of it, but upon further inspection contains even less. It is highly recommended that any attempt to open the bottle be quickly followed up with running away as fast as possible.";
 
     private const float _EXPAND_TIME   = 2f;
     private const float _HOLD_TIME     = 7f;
@@ -20,7 +20,7 @@ public class BottledAbyss : CwaffActive
         PlayerItem item = Lazy.SetupActive<BottledAbyss>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality    = ItemQuality.C;
         item.consumable = false;
-        ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.PerRoom, 2);
+        ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.PerRoom, 3);
 
         _VoidPrefab = ((GameObject)BraveResources.Load("Global Prefabs/VFX_ParadoxPortal")).ClonePrefab();
         UnityEngine.Object.Destroy(_VoidPrefab.GetComponent<ParadoxPortalController>());
