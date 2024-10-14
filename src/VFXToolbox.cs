@@ -898,10 +898,11 @@ public partial class CwaffVFX // public
     /// <param name="anchorTransform">If non-null, projectile moves as its anchor transform moves (not a real parent since that causes pooling issues).</param>
     /// <param name="overrideColor">If non-null, projectile is given an override color at the shader lever.</param>
     /// <param name="emitColorPower">Emissive color power of the VFX. Ignored if fadeOutTime is non-null.</param>
+    /// <param name="spread">If > 0, applies a random rotation with magnitude up to spread degress to final velocity.</param>
     public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false,
         bool uniform = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false,
-        Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f)
+        Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f, float spread = 0f)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
@@ -921,6 +922,8 @@ public partial class CwaffVFX // public
                 // Vel.InwardRadial => realBaseVelocity - posOffsetAngle.ToVector(minVelocity + velocityVariance),
                 _                => realBaseVelocity,
             };
+            if (spread > 0f)
+                velocity = 0f.AddRandomSpread(spread).EulerZ() * velocity;
             Quaternion rot = rotType switch {
                 Rot.Random   => UnityEngine.Random.Range(0f,360f).EulerZ(),
                 Rot.Position => posOffsetAngle.EulerZ(),

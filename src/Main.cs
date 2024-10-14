@@ -347,6 +347,7 @@ public class Initialisation : BaseUnityPlugin
                 TryhardSnacks.Init();
                 BulletproofTablecloth.Init();
                 AmethystShard.Init();
+                PrismaticScope.Init();
 
                 setupPassivesWatch.Stop();
             #endregion

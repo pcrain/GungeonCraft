@@ -54,6 +54,7 @@
     <Compile Include="src\Cwaff-Passives\Unfinished\ZoolandersDiary.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\DisplayStand.cs"/>
     <Compile Include="src\Cwaff-Passives\AmethystShard.cs"/>
+    <Compile Include="src\Cwaff-Passives\PrismaticScope.cs"/>
     <Compile Include="src\Cwaff-Passives\DriftersHeadgear.cs"/>
     <Compile Include="src\Cwaff-Passives\PlotArmor.cs"/>
     <Compile Include="src\Cwaff-Passives\EchoChamber.cs"/>
