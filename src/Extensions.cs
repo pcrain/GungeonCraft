@@ -1922,6 +1922,29 @@ public static class Extensions
       );
   }
 
+  private static bool _SuppressNextPassivePickupSound = false;
+  /// <summary>Patch to make secret items not play the "Play_OBJ_passive_get_01" sound when picked up</summary>
+  [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.AcquirePassiveItem))]
+  private class PlayerControllerAcquirePassiveItemPatch
+  {
+      [HarmonyILManipulator]
+      private static void PlayerControllerAcquirePassiveItemIL(ILContext il)
+      {
+          ILCursor cursor = new ILCursor(il);
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdstr("Play_OBJ_passive_get_01")))
+            return;
+          cursor.CallPrivate(typeof(PlayerControllerAcquirePassiveItemPatch), nameof(AdjustPickupSound));
+      }
+
+      private static string AdjustPickupSound(string oldSound)
+      {
+        if (!_SuppressNextPassivePickupSound)
+          return oldSound;
+        _SuppressNextPassivePickupSound = false;
+        return string.Empty;
+      }
+  }
+
   /// <summary>Acquire a fake item and put it in a player's inventory (generic version)</summary>
   public static T AcquireFakeItem<T>(this PlayerController player) where T : FakeItem
   {
@@ -1931,6 +1954,7 @@ public static class Extensions
     if (trackable)
       trackable.DoNotificationOnEncounter = false;
     fakePassive.suppressPickupVFX = true;
+    _SuppressNextPassivePickupSound = true;
     fakePassive.Pickup(player);
     return fakePassive;
   }
@@ -1944,8 +1968,16 @@ public static class Extensions
     if (trackable)
       trackable.DoNotificationOnEncounter = false;
     fakePassive.suppressPickupVFX = true;
+    _SuppressNextPassivePickupSound = true;
     fakePassive.Pickup(player);
     return fakePassive;
+  }
+
+  /// <summary>Acquire a passive item and put it in a player's inventory without notification or sound (id version)</summary>
+  public static void AcquireSilently(this PlayerController player, int id)
+  {
+    _SuppressNextPassivePickupSound = true;
+    player.AcquirePassiveItemPrefabDirectly(PickupObjectDatabase.GetById(id) as PassiveItem);
   }
 
   /// <summary>Spawn shrapnel from a projectile</summary>

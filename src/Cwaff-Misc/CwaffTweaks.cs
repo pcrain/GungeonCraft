@@ -12,6 +12,7 @@ public static class CwaffTweaks
         // Other stuff
         JammedLies.Init();
         TheCake.Init();
+        DirtBlock.Init();
     }
 
     private static DirectionalAnimation GetDogPettingAnimation() =>
@@ -76,7 +77,7 @@ public static class CwaffTweaks
 
         private static void Postfix(Chest __instance)
         {
-            if (__instance.overrideJunkId < 0)
+            if (__instance.overrideJunkId != (int)Items.Lies)
                 return;
             if (UnityEngine.Random.value > _SPECIAL_LIES_CHANCE)
                 return;
@@ -154,6 +155,34 @@ public static class CwaffTweaks
                 if (p is JammedLies)
                     return 666;
                 return oldPrice;
+            }
+        }
+    }
+
+    public class DirtBlock : CwaffPassive
+    {
+        public static string ItemName         = "Dirt Block";
+        public static string ShortDescription = "Grass Included!";
+        public static string LongDescription  = "A cubic meter of dirt with grass on top. You're not quite sure where you got it.";
+        public static string Lore             = "";
+
+        private const float _CHANCE_TO_DIRT = 0.0003f;
+
+        public static void Init()
+        {
+            PassiveItem item = Lazy.SetupPassive<DirtBlock>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
+            item.quality = ItemQuality.SPECIAL;
+            item.ShouldBeExcludedFromShops = true;  // don't show up in shops
+            item.CanBeSold = false;
+        }
+
+        [HarmonyPatch(typeof(Gun), nameof(Gun.Pickup))]
+        private class GunPickupPatch
+        {
+            static void Postfix(Gun __instance, PlayerController player)
+            {
+                if (UnityEngine.Random.value < _CHANCE_TO_DIRT)
+                    player.AcquireSilently(Lazy.PickupId<DirtBlock>());
             }
         }
     }
