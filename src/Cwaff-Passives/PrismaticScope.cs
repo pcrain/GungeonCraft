@@ -58,7 +58,7 @@ public class PrismaticScope : CwaffPassive
 
         private void Update()
         {
-            if (this._basicBeam && this._basicBeam.State == BeamState.Charging)
+            if (this._basicBeam && (this._basicBeam.State == BeamState.Charging || this._basicBeam.IsReflectedBeam))
                 return;
             if ((this._timer += BraveTime.DeltaTime) < _PARTICLE_TIME)
                 return;
@@ -66,14 +66,15 @@ public class PrismaticScope : CwaffPassive
             this._timer -= _PARTICLE_TIME;
             CwaffVFX.SpawnBurst(
                 prefab           : _PrismaticVFX,
-                numToSpawn       : 10,
+                numToSpawn       : 5,
                 basePosition     : this._beam.Origin,
-                baseVelocity     : 12f * this._beam.Direction.normalized,
+                baseVelocity     : 16f * this._beam.Direction.normalized,
                 velocityVariance : 4f,
-                spread           : 60f,
-                lifetime         : 0.75f,
-                fadeOutTime      : 0.75f,
-                randomFrame      : true
+                spread           : 30f,
+                lifetime         : 0.25f + 0.5f * UnityEngine.Random.value,
+                randomFrame      : true,
+                emissiveColor    : Color.white,
+                emissivePower    : 100f
               );
         }
     }

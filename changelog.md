@@ -17,6 +17,7 @@
 - Fixed Glockarina's ammo display sometimes displaying information from the previously-equipped gun
 - Fixed K.A.L.I. explosion particles and other various glowing particles not being the correct color after 1.19.0 update
 - Fixed Chroma not emitting particles when firing green or blue beams
+- Fixed Z-depth issue causing certain particles not to render after traveling downwards for a short period
 
 ## 1.19.3 (2024-10-07)
 

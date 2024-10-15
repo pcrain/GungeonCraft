@@ -1142,6 +1142,7 @@ public partial class CwaffVFX // private
             this._sprite.transform.position += (this._anchorTransform.position - this._anchorPos);
             this._anchorPos = this._anchorTransform.position;
         }
+        this._sprite.UpdateZDepth();
 
         if (this._changesScale)
         {
