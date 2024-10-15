@@ -1107,7 +1107,7 @@ public partial class CwaffVFX // private
             this._material.SetFloat("_EmissivePower", emissivePower);
             this._material.SetFloat("_EmissiveColorPower", emitColorPower);
             this._material.SetColor("_EmissiveColor", emissiveColor ?? Color.white);
-            this._material.SetColor("_OverrideColor", overrideColor ?? Color.white);
+            this._material.SetColor("_OverrideColor", overrideColor ?? Color.clear);
         }
         else
             this._material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");

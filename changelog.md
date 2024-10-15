@@ -15,6 +15,7 @@
 - Tweaked some Ammonomicon descriptions for clarity and grammar 
 - Updated required Alexandria version to 0.4.14 for better UI sprite setup
 - Fixed Glockarina's ammo display sometimes displaying information from the previously-equipped gun
+- Fixed K.A.L.I. explosion particles and other various glowing particles not being the correct color after 1.19.0 update
 
 ## 1.19.3 (2024-10-07)
 
