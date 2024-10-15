@@ -1,78 +1,81 @@
 namespace CwaffingTheGungy;
 
 /// <summary>Class for setting up sprites from textures packed with cheetah</summary>
-public static class AtlasHelper
+internal static class AtlasHelper
 {
-    internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
-    private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
+  private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
+  private static readonly List<TempHarmonyPrefix> _TemporaryPatches = new();
+  private static readonly HashSet<string> _CreatedAmmoTypes = new();
 
-    /// <summary>Batches UI sprite additions from a list of sprite definitinos</summary>
-    public static void AddUISpriteBatch(List<tk2dSpriteDefinition> defs)
-    {
+  internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
+
+  /// <summary>Batches UI sprite additions from a list of sprite definitinos</summary>
+  public static void AddUISpriteBatch(List<tk2dSpriteDefinition> defs)
+  {
+    foreach (tk2dSpriteDefinition def in defs)
+      ToolsCharApi.AddUISprite(def);
+  }
+
+  /// <summary>
+  /// Builds and adds multiple new <see cref="dfAtlas.ItemInfo"/>s to <paramref name="atlas"/> with the textures in <paramref name="defs"/> and the names in <paramref name="names"/>.
+  /// </summary>
+  /// <param name="atlas">The <see cref="dfAtlas"/> to add the new <see cref="dfAtlas.ItemInfo"/> to.</param>
+  /// <param name="defs">List of textures to put in the new <see cref="dfAtlas.ItemInfo"/>.</param>
+  /// <returns>The built <see cref="dfAtlas.ItemInfo"/>.</returns>
+  [ObsoleteAttribute("This method is obsolete and exists for future API reference only.", false)]
+  private static List<dfAtlas.ItemInfo> AddMultipleItemsToAtlas(this dfAtlas atlas, List<tk2dSpriteDefinition> defs)
+  {
+      List<dfAtlas.ItemInfo> items = new();
+      int totalWidth = 0;
+      int maxHeight = 0;
       foreach (tk2dSpriteDefinition def in defs)
-        ToolsCharApi.AddUISprite(def);
-    }
-
-    /// <summary>
-    /// Builds and adds multiple new <see cref="dfAtlas.ItemInfo"/>s to <paramref name="atlas"/> with the textures in <paramref name="defs"/> and the names in <paramref name="names"/>.
-    /// </summary>
-    /// <param name="atlas">The <see cref="dfAtlas"/> to add the new <see cref="dfAtlas.ItemInfo"/> to.</param>
-    /// <param name="defs">List of textures to put in the new <see cref="dfAtlas.ItemInfo"/>.</param>
-    /// <returns>The built <see cref="dfAtlas.ItemInfo"/>.</returns>
-    [ObsoleteAttribute("This method is obsolete and exists for future API reference only.", false)]
-    public static List<dfAtlas.ItemInfo> AddMultipleItemsToAtlas(this dfAtlas atlas, List<tk2dSpriteDefinition> defs)
-    {
-        List<dfAtlas.ItemInfo> items = new();
-        int totalWidth = 0;
-        int maxHeight = 0;
-        foreach (tk2dSpriteDefinition def in defs)
+      {
+        totalWidth += (int)(C.PIXELS_PER_TILE * def.untrimmedBoundsDataExtents.x);
+        maxHeight = Mathf.Max(maxHeight, (int)(C.PIXELS_PER_TILE * def.untrimmedBoundsDataExtents.y));
+      }
+      // Find a region with enough horizontal space to contain all of the next textures side by side
+      Rect baseRegion = ToolsCharApi.FindFirstValidEmptySpace(atlas, new IntVector2(totalWidth, maxHeight));
+      int cumulativeWidth = 0;
+      for (int i = 0; i < defs.Count; ++i)
+      {
+        tk2dSpriteDefinition def = defs[i];
+        string name = def.name;
+        if (atlas[name] != null)
         {
-          totalWidth += (int)(C.PIXELS_PER_TILE * def.untrimmedBoundsDataExtents.x);
-          maxHeight = Mathf.Max(maxHeight, (int)(C.PIXELS_PER_TILE * def.untrimmedBoundsDataExtents.y));
+            items.Add(atlas[name]);
+            continue;
         }
-        // Find a region with enough horizontal space to contain all of the next textures side by side
-        Rect baseRegion = ToolsCharApi.FindFirstValidEmptySpace(atlas, new IntVector2(totalWidth, maxHeight));
-        int cumulativeWidth = 0;
-        for (int i = 0; i < defs.Count; ++i)
+        Texture2D tex   = def.material.mainTexture as Texture2D;
+        IntVector2 texOffset = (C.PIXELS_PER_TILE * def.position0.XY()).ToIntVector2();
+        Vector2 texPos  = new Vector2(tex.width * def.uvs[0].x, tex.height * def.uvs[0].y);
+        Vector2 texSize = C.PIXELS_PER_TILE * def.untrimmedBoundsDataExtents;
+        Vector2 croppedTexSize = new Vector2(tex.width * def.uvs[3].x, tex.height * def.uvs[3].y) - texPos;
+        dfAtlas.ItemInfo item = new dfAtlas.ItemInfo
         {
-          tk2dSpriteDefinition def = defs[i];
-          string name = def.name;
-          if (atlas[name] != null)
-          {
-              items.Add(atlas[name]);
-              continue;
-          }
-          Texture2D tex   = def.material.mainTexture as Texture2D;
-          IntVector2 texOffset = (C.PIXELS_PER_TILE * def.position0.XY()).ToIntVector2();
-          Vector2 texPos  = new Vector2(tex.width * def.uvs[0].x, tex.height * def.uvs[0].y);
-          Vector2 texSize = C.PIXELS_PER_TILE * def.untrimmedBoundsDataExtents;
-          Vector2 croppedTexSize = new Vector2(tex.width * def.uvs[3].x, tex.height * def.uvs[3].y) - texPos;
-          dfAtlas.ItemInfo item = new dfAtlas.ItemInfo
-          {
-              border = new RectOffset(),
-              deleted = false,
-              name = name,
-              region = new Rect(
-                (float)baseRegion.x + ((float)cumulativeWidth / atlas.Texture.width),
-                (float)baseRegion.y,
-                (float)texSize.x / atlas.Texture.width,
-                (float)texSize.y / atlas.Texture.height),
-              rotated = false,
-              sizeInPixels = texSize,
-              texture = def.material.mainTexture as Texture2D,
-              textureGUID = name
-          };
-          cumulativeWidth += (int)texSize.x;
-          int startPointX = texOffset.x + Mathf.RoundToInt(item.region.x * atlas.Texture.width);
-          int startPointY = texOffset.y + Mathf.RoundToInt(item.region.y * atlas.Texture.height);
-          atlas.Texture.SetPixels(startPointX, startPointY, (int)croppedTexSize.x, (int)croppedTexSize.y,
-            item.texture.GetPixels((int)texPos.x, (int)texPos.y, (int)croppedTexSize.x, (int)croppedTexSize.y));
-          atlas.AddItem(item);
-        }
-        atlas.Texture.Apply();
+            border = new RectOffset(),
+            deleted = false,
+            name = name,
+            region = new Rect(
+              (float)baseRegion.x + ((float)cumulativeWidth / atlas.Texture.width),
+              (float)baseRegion.y,
+              (float)texSize.x / atlas.Texture.width,
+              (float)texSize.y / atlas.Texture.height),
+            rotated = false,
+            sizeInPixels = texSize,
+            texture = def.material.mainTexture as Texture2D,
+            textureGUID = name
+        };
+        cumulativeWidth += (int)texSize.x;
+        int startPointX = texOffset.x + Mathf.RoundToInt(item.region.x * atlas.Texture.width);
+        int startPointY = texOffset.y + Mathf.RoundToInt(item.region.y * atlas.Texture.height);
+        atlas.Texture.SetPixels(startPointX, startPointY, (int)croppedTexSize.x, (int)croppedTexSize.y,
+          item.texture.GetPixels((int)texPos.x, (int)texPos.y, (int)croppedTexSize.x, (int)croppedTexSize.y));
+        atlas.AddItem(item);
+      }
+      atlas.Texture.Apply();
 
-        return items;
-    }
+      return items;
+  }
 
   /// <summary>Construct a tk2dSpriteDefinition from a segment of a packed texture</summary>
   public static tk2dSpriteDefinition SpriteDefFromSegment(this Texture2D texture, string spriteName, int x, int y, int w, int h, int ox, int oy, int ow, int oh)
@@ -279,7 +282,6 @@ public static class AtlasHelper
     return attachPointDict;
   }
 
-  private static readonly HashSet<string> _CreatedAmmoTypes = new();
   /// <summary>Modification of Alexandria method using our own packed textures</summary>
   public static string GetOrAddCustomAmmoType(string name, string ammoTypeSpritePath, string ammoBackgroundSpritePath)
   {
@@ -325,38 +327,63 @@ public static class AtlasHelper
       return sprite;
   }
 
-  internal static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetById(155).sprite.Collection;
+  private class TempHarmonyPrefix
+  {
+    private Harmony _harmony;
+    public MethodInfo original;
+    public MethodInfo patch;
+    public TempHarmonyPrefix(Harmony harmony, MethodInfo original, MethodInfo patch)
+    {
+      this._harmony = harmony;
+      this.original = original;
+      this.patch    = patch;
+      harmony.Patch(original, prefix: new HarmonyMethod(patch));
+    }
+    public void Unpatch()
+    {
+      this._harmony.Unpatch(this.original, this.patch);
+    }
+  }
 
   /// <summary>Manually initialize some Harmony patches we need very early on to enable threaded setup</summary>
-  public static void InitSetupPatches(Harmony harmony)
+  internal static void InitSetupPatches(Harmony harmony)
   {
       BindingFlags anyFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
       // Load sprites from our own atlases
-      harmony.Patch(typeof(SpriteBuilder).GetMethod("SpriteFromResource", bindingAttr: anyFlags),
-        prefix: new HarmonyMethod(typeof(SpriteFromResourcePatch).GetMethod("Prefix", bindingAttr: anyFlags)));
+      _TemporaryPatches.Add(new(harmony,
+        typeof(SpriteBuilder).GetMethod("SpriteFromResource", bindingAttr: anyFlags),
+        typeof(SpriteFromResourcePatch).GetMethod("Prefix", bindingAttr: anyFlags)));
 
       // Add sprites to collections from our own atlases
-      harmony.Patch(typeof(SpriteBuilder).GetMethod("AddSpriteToCollection", types: new[]{typeof(string), typeof(tk2dSpriteCollectionData), typeof(Assembly)}),
-        prefix: new HarmonyMethod(typeof(AddSpriteToCollectionPatch).GetMethod("Prefix", bindingAttr: anyFlags)));
+      _TemporaryPatches.Add(new(harmony,
+        typeof(SpriteBuilder).GetMethod("AddSpriteToCollection", types: new[]{typeof(string), typeof(tk2dSpriteCollectionData), typeof(Assembly)}),
+        typeof(AddSpriteToCollectionPatch).GetMethod("Prefix", bindingAttr: anyFlags)));
   }
 
-  // NOTE: this is only called by BossBuilder.BuildPrefab() at this point
+  internal static void RemoveSetupPatches(Harmony harmony)
+  {
+    for (int i = _TemporaryPatches.Count - 1; i >= 0; --i)
+      _TemporaryPatches[i].Unpatch();
+    _TemporaryPatches.Clear();
+    // Lazy.DebugLog("  Temporary setup patches removed");
+  }
+
+  // NOTE: used by BossBuilder.BuildPrefab() and CompanionBuilder.BuildPrefab()
   /// <summary>Patched version of Alexandria's SpriteFromResource (manually added through InitSetupPatches())</summary>
   private class SpriteFromResourcePatch
   {
+    private static tk2dSpriteCollectionData itemCollection = null;
+
     public static bool Prefix(string spriteName, GameObject obj, Assembly assembly, ref GameObject __result)
     {
-        if (C._ModSetupFinished)
-          return true; // call original method
-
         // System.Console.WriteLine($"CALLING PATCHED SpriteFromResource for {spriteName}");
         if (obj == null)
           obj = new GameObject();
 
-        tk2dSprite sprite;
-        sprite = obj.AddComponent<tk2dSprite>();
+        tk2dSprite sprite = obj.AddComponent<tk2dSprite>();
 
+        itemCollection ??= PickupObjectDatabase.GetById(155).sprite.Collection;
         int id = SpriteBuilder.AddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(spriteName), itemCollection);
         sprite.SetSprite(itemCollection, id);
         sprite.SortingOrder = 0;
@@ -369,16 +396,13 @@ public static class AtlasHelper
     }
   }
 
-  // NOTE: this should theoretically be unused now, and could possibly be safely removed
+  // NOTE: used extensively for hat setup
   /// <summary>Patched version of Alexandria's AddSpriteToCollection(string, ...) (manually added through InitSetupPatches())</summary>
   private class AddSpriteToCollectionPatch
   {
     public static bool Prefix(string resourcePath, tk2dSpriteCollectionData collection, /*string name, */Assembly assembly, ref int __result)
     {
-        if (C._ModSetupFinished)
-          return true; // call original method
-
-        // ETGModConsole.Log($"CALLING PATCHED AddSpriteToCollection for {resourcePath}");
+        // System.Console.WriteLine($"CALLING PATCHED AddSpriteToCollection for {resourcePath}");
         __result = SpriteBuilder.AddSpriteToCollection(AtlasHelper.NamedSpriteInPackedTexture(resourcePath), collection);
         return false; // skip original method
     }

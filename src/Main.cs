@@ -470,9 +470,9 @@ public class Initialisation : BaseUnityPlugin
         }
         finally
         {
+            AtlasHelper.RemoveSetupPatches(_Harmony); // make sure setup-specific harmony patches get disabled even if an error occurs
             // if (C.DEBUG_BUILD)
             //     ConstructorProfiler.Toggle();
-            C._ModSetupFinished = true; // make sure setup-specific harmony patches get disabled even if an error occurs
         }
         if (C.DEBUG_BUILD)
         {
