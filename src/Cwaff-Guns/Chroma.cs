@@ -64,6 +64,7 @@ public class Chroma : CwaffGun
             gun.CeaseAttack();
         this._ammoDisplayDirty = true;
         UpdateBeamShaders();
+        ClearCachedShootData(); // reset particle effects
         if (wasFiring)
             gun.Attack();
     }
@@ -80,6 +81,7 @@ public class Chroma : CwaffGun
         base.OnSwitchedToThisGun();
         RecalculateAllPigmentPowers();
         UpdateBeamShaders();
+        ClearCachedShootData(); // reset particle effects
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -94,6 +96,7 @@ public class Chroma : CwaffGun
         CwaffEvents.OnCorpseCreated += TransferDesaturatedShadersToCorpse;
         RecalculateAllPigmentPowers();
         UpdateBeamShaders();
+        ClearCachedShootData(); // reset particle effects
     }
 
     private static void TransferDesaturatedShadersToCorpse(DebrisObject debris, AIActor original)
