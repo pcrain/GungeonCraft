@@ -26,6 +26,7 @@
     global using Dungeonator;
     global using HutongGames.PlayMaker; //FSM___ stuff
     global using HutongGames.PlayMaker.Actions; //FSM___ stuff
+    global using Alexandria.CharacterAPI;
     global using Alexandria.ItemAPI;
     global using Alexandria.EnemyAPI;
     global using Alexandria.Misc;
@@ -36,12 +37,14 @@
     global using SaveAPI; // only nonstandard api copied in from elsewhere, hopefully Alexandria standardizes this eventually
 #endregion
 
-global using ResourceExtractor = Alexandria.ItemAPI.ResourceExtractor;
-global using Component         = UnityEngine.Component;
-global using ShopAPI           = Alexandria.NPCAPI.ShopAPI;
-global using RoomFactory       = Alexandria.DungeonAPI.RoomFactory;
-global using ExoticObjects     = Alexandria.DungeonAPI.SetupExoticObjects;
-global using StaticReferences  = Alexandria.DungeonAPI.StaticReferences;
+global using ResourceExtractor        = Alexandria.ItemAPI.ResourceExtractor;
+global using Component                = UnityEngine.Component;
+global using ShopAPI                  = Alexandria.NPCAPI.ShopAPI;
+global using RoomFactory              = Alexandria.DungeonAPI.RoomFactory;
+global using ExoticObjects            = Alexandria.DungeonAPI.SetupExoticObjects;
+global using StaticReferences         = Alexandria.DungeonAPI.StaticReferences;
+global using CustomShopController     = Alexandria.NPCAPI.CustomShopController;
+global using CustomShopItemController = Alexandria.NPCAPI.CustomShopItemController;
 
 global using Gunfiguration;
 

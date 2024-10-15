@@ -6,10 +6,11 @@ public static class AtlasHelper
     internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
     private static readonly Vector2 _TexelSize = new Vector2(0.0625f, 0.0625f);
 
-    /// <summary>Batches UI sprite additions from an alternating list of texture paths and sprite names</summary>
+    /// <summary>Batches UI sprite additions from a list of sprite definitinos</summary>
     public static void AddUISpriteBatch(List<tk2dSpriteDefinition> defs)
     {
-      GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas.AddMultipleItemsToAtlas(defs);
+      foreach (tk2dSpriteDefinition def in defs)
+        ToolsCharApi.AddUISprite(def);
     }
 
     /// <summary>
@@ -18,6 +19,7 @@ public static class AtlasHelper
     /// <param name="atlas">The <see cref="dfAtlas"/> to add the new <see cref="dfAtlas.ItemInfo"/> to.</param>
     /// <param name="defs">List of textures to put in the new <see cref="dfAtlas.ItemInfo"/>.</param>
     /// <returns>The built <see cref="dfAtlas.ItemInfo"/>.</returns>
+    [ObsoleteAttribute("This method is obsolete and exists for future API reference only.", false)]
     public static List<dfAtlas.ItemInfo> AddMultipleItemsToAtlas(this dfAtlas atlas, List<tk2dSpriteDefinition> defs)
     {
         List<dfAtlas.ItemInfo> items = new();
@@ -29,7 +31,7 @@ public static class AtlasHelper
           maxHeight = Mathf.Max(maxHeight, (int)(C.PIXELS_PER_TILE * def.untrimmedBoundsDataExtents.y));
         }
         // Find a region with enough horizontal space to contain all of the next textures side by side
-        Rect baseRegion = atlas.FindFirstValidEmptySpace(new IntVector2(totalWidth, maxHeight));
+        Rect baseRegion = ToolsCharApi.FindFirstValidEmptySpace(atlas, new IntVector2(totalWidth, maxHeight));
         int cumulativeWidth = 0;
         for (int i = 0; i < defs.Count; ++i)
         {
