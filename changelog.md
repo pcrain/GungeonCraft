@@ -1,23 +1,30 @@
 # Changelog
 
-## 1.20.0 (TBD)
+## 1.20.0 (2024-10-15)
+
+#### Features:
 
 - Added Oddjob, Overflow, Detergent, Bottled Abyss, and Prismatic Scope
 	- Oddjob, Detergent, Bottled Abyss, and Prismatic Scope sprites thanks to Dallan!
-- Removed Yggdrashell debug output from console
-- Visually tweaked Credit Card to allow player to go up to 500 casings in debt instead of granting 500 casings while held (mechanically, it works the same)
-- Fixed Maestro's ammo display being too short compared to its ammo
+
+#### Balance Changes and Polish:
+
+- Credit Card now allows the player to go up to 500 casings in debt instead of granting 500 temporary casings while held (UI tweak only - mechanically, it works the same)
 - Cheato Page synergy now causes Breegull's normal eggs to properly display as infinite ammo
-- Updated required Alexandria version to 0.4.13 for custom ammo display bugfixes
 - Reduced Calculator's quality from B to C (stackable active items are relatively uncommon so utility is limited)
 - Made Aimu Hakurei an infinite ammo gun rather than a 0-ammo-cost gun (to prevent duct taping it to other guns)
-- Made using Duct Tape to attach Chroma, Hallaeribut, or Yggdrashell to another gun only transfer the currently active projectile type rather than all projectile types
+- Made attaching Chroma, Hallaeribut, or Yggdrashell to another gun using Duct Tape only transfer the currently active projectile type rather than all projectile types
 - Tweaked some Ammonomicon descriptions for clarity and grammar 
-- Updated required Alexandria version to 0.4.14 for better UI sprite setup
+
+#### Bugfixes and Misc:
+
+- Fixed Maestro's ammo display being too short compared to its ammo
 - Fixed Glockarina's ammo display sometimes displaying information from the previously-equipped gun
-- Fixed K.A.L.I. explosion particles and other various glowing particles not being the correct color after 1.19.0 update
+- Fixed K.A.L.I. explosion particles and other various glowing particles not being the correct color after the 1.19.0 update
 - Fixed Chroma not emitting particles when firing green or blue beams
 - Fixed Z-depth issue causing certain particles not to render after traveling downwards for a short period
+- Removed Yggdrashell debug output from console
+- Updated required Alexandria version to 0.4.14 for custom ammo display bugfixes and better UI sprite setup
 
 ## 1.19.3 (2024-10-07)
 
