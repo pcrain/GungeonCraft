@@ -340,7 +340,8 @@ public class GlockarinaAmmoDisplay : CustomAmmoDisplay
             case Glockarina.Mode.SARIA: uiString = "glockarina_saria_ui_icon"; break;
             case Glockarina.Mode.EMPTY: uiString = "glockarina_empty_ui_icon"; break;
             default:
-                return false;
+                uic.GunAmmoCountLabel.Text = this._owner.VanillaAmmoDisplay();
+                return true;
         }
 
         uic.GunAmmoCountLabel.Text = $"[sprite \"{uiString}\"]\n{this._owner.VanillaAmmoDisplay()}";

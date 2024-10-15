@@ -14,6 +14,7 @@
 - Made using Duct Tape to attach Chroma, Hallaeribut, or Yggdrashell to another gun only transfer the currently active projectile type rather than all projectile types
 - Tweaked some Ammonomicon descriptions for clarity and grammar 
 - Updated required Alexandria version to 0.4.14 for better UI sprite setup
+- Fixed Glockarina's ammo display sometimes displaying information from the previously-equipped gun
 
 ## 1.19.3 (2024-10-07)
 
