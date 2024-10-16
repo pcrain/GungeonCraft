@@ -167,7 +167,7 @@ public static class ModdedShopItemAdder
             if (bsc.shopItems is not GenericLootTable shopItems)
                 continue;
             // Lazy.DebugLog($"    found shop {entry.Key}");
-            if (!_ModdedShopNameMap.ContainsKey(entry.Key))
+            if (!_ModdedShopNameMap.TryGetValue(entry.Key, out ModdedShopType shop))
                 continue;
 
             // if (C.DEBUG_BUILD)
@@ -176,7 +176,7 @@ public static class ModdedShopItemAdder
             //         ETGModConsole.Log($"      contains {item.pickupId} == {PickupObjectDatabase.GetById(item.pickupId).EncounterNameOrDisplayName} with weight {item.weight}");
             // }
 
-            foreach(int itemToAdd in _ModdedShopItems[_ModdedShopNameMap[entry.Key]])
+            foreach(int itemToAdd in _ModdedShopItems[shop])
             {
                 // Lazy.DebugLog($"      adding {itemToAdd} == {PickupObjectDatabase.GetById(itemToAdd).EncounterNameOrDisplayName} with weight 1");
                 shopItems.AddItemToPool(itemToAdd);

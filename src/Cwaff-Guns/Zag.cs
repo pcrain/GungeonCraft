@@ -58,7 +58,7 @@ public class ZagProjectile : MonoBehaviour
         this._projectile.m_usesNormalMoveRegardless = true; // ignore Helix / Orbital bullets
         this._tileCollisionsLeft = _MAX_TILE_COLLISIONS;
 
-        this._trail = this._projectile.AddTrailToProjectileInstance(Zag._ZagTrailPrefab);
+        this._trail = this._projectile.AddTrail(Zag._ZagTrailPrefab);
         this._trail.gameObject.SetGlowiness(10f);
     }
 
@@ -101,7 +101,7 @@ public class ZagProjectile : MonoBehaviour
             this._trail.DisconnectFromSpecRigidbody(); //NOTE: need to disconnect before launching to avoid graphical glitches
         this._projectile.SendInDirection(dirVec: newDir, resetDistance: true, updateRotation: true);
         base.gameObject.PlayUnique("zag_zig_sound");
-        this._trail = this._projectile.AddTrailToProjectileInstance(Zag._ZagTrailPrefab);
+        this._trail = this._projectile.AddTrail(Zag._ZagTrailPrefab);
         this._trail.gameObject.SetGlowiness(10f);
     }
 

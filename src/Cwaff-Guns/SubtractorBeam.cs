@@ -173,7 +173,7 @@ public class SubtractorProjectile : MonoBehaviour
             this._projectile.baseData.damage = this._damage;
         }
 
-        this._trail = this._projectile.AddTrailToProjectileInstance(
+        this._trail = this._projectile.AddTrail(
           this._hitFirstEnemy ? SubtractorBeam._RedTrailPrefab : SubtractorBeam._GreenTrailPrefab);
         this._trail.gameObject.SetGlowiness(100f);
 
@@ -215,7 +215,7 @@ public class SubtractorProjectile : MonoBehaviour
             this._projectile.baseData.damage = this._damage;
             if (this._trail)
                 this._trail.DisconnectFromSpecRigidbody(); // we want to have a red trail after hitting the enemy, but want the old green trail around as well
-            this._trail = this._projectile.AddTrailToProjectileInstance(SubtractorBeam._RedTrailPrefab);
+            this._trail = this._projectile.AddTrail(SubtractorBeam._RedTrailPrefab);
                 this._trail.gameObject.SetGlowiness(100f);
             return;
         }

@@ -151,7 +151,7 @@ public class ChekhovBullet : MonoBehaviour
 
         // Phase 3: launch
         base.gameObject.PlayUnique("chekhovs_gun_launch_sound_alt");
-        this._projectile.AddTrailToProjectileInstance(ChekhovsGun._ChekhovTrailPrefab).gameObject.SetGlowiness(_TRAIL_GLOW);
+        this._projectile.AddTrail(ChekhovsGun._ChekhovTrailPrefab).gameObject.SetGlowiness(_TRAIL_GLOW);
         UnityEngine.Object.Destroy(this._sightline);
         this._sightline = null;
         CwaffVFX.Spawn(ChekhovsGun._ChekhovGunFireVFX, this._gunVfx.transform.position, this._gunVfx.transform.rotation,

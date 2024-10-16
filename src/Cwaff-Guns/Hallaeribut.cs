@@ -42,7 +42,7 @@ public class Hallaeribut : CwaffGun
             customClip: true))
           .AudioEvent("snap_sound") // play every time animation returns to frame 0, not just on projectile creation
           .Attach<HallaeributProjectile>()
-          .AddTrailToProjectilePrefab("hallaeribut_trail", fps: 24, cascadeTimer: C.FRAME, softMaxLength: 1f);
+          .AttachTrail("hallaeribut_trail", fps: 24, cascadeTimer: C.FRAME, softMaxLength: 1f);
 
         ProjectileModule mod = gun.DefaultModule;
         gun.Volley.projectiles = new(_AmmoThresholds.Length - 1);

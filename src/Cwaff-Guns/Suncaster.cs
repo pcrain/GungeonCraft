@@ -214,7 +214,7 @@ public class SuncasterProjectile : MonoBehaviour
     {
         this._proj  = base.GetComponent<Projectile>();
         this._owner = this._proj.ProjectilePlayerOwner();
-        this._trail = this._proj.AddTrailToProjectileInstance(
+        this._trail = this._proj.AddTrail(
           this.charged        ? Suncaster._SunTrailRefractedPrefab :
           (this._gun != null) ? Suncaster._SunTrailPrefab :
                                 Suncaster._SunTrailFinalPrefab);

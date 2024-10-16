@@ -26,7 +26,7 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action<PlayerController, RoomHandler, RoomHandler> OnChangedRooms;
     // Runs whenever a corpse is created
     public static Action<DebrisObject, AIActor> OnCorpseCreated;
-    // Runs whenever stats are recalculated
+    // Runs whenever stats and/or synergies are recalculated
     public static Action<PlayerController> OnStatsRecalculated;
 
     internal static bool _OnFirstFloor = false;
@@ -154,7 +154,7 @@ public static class CwaffEvents // global custom events we can listen for
 
     [HarmonyPatch(typeof(AIActor), nameof(AIActor.ForceDeath))]
     private class OnCorpseCreatedPatch
-    {
+    { //REFACTOR: write better IL code
         [HarmonyILManipulator]
         private static void OnCorpseCreatedIL(ILContext il)
         {

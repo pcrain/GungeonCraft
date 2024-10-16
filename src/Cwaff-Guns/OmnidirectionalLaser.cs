@@ -208,7 +208,7 @@ public class OmnidirectionalLaser : CwaffGun
             ignoreWalls                      : false);
         if (targetPos.HasValue)
             projectile.SendInDirection((targetPos.Value - this.gun.barrelOffset.position.XY()), true, true);
-        projectile.AddTrailToProjectileInstance(_OmniTrailPrefab).gameObject.SetGlowiness(10f);
+        projectile.AddTrail(_OmniTrailPrefab).gameObject.SetGlowiness(10f);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

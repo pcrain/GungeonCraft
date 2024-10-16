@@ -359,25 +359,10 @@ public static class CwaffSynergies
         }
     }
 
-    private static string IName(string itemName)
-    {
-        return IDs.InternalNames[itemName];
-    }
-
-    public static CustomSynergyType Synergy(this Synergy synergy)
-    {
-        return _Synergies[(int)synergy];
-    }
-
-    public static string SynergyName(this Synergy synergy)
-    {
-        return _SynergyNames[(int)synergy];
-    }
-
-    public static bool HasSynergy(this PlayerController player, Synergy synergy)
-    {
-        return player.ActiveExtraSynergies.Contains((int)_SynergyIds[(int)synergy]);
-    }
+    private static string IName(string itemName) => IDs.InternalNames[itemName];
+    public static CustomSynergyType Synergy(this Synergy synergy) => _Synergies[(int)synergy];
+    public static string SynergyName(this Synergy synergy) => _SynergyNames[(int)synergy];
+    public static bool HasSynergy(this PlayerController player, Synergy synergy) => player.ActiveExtraSynergies.Contains((int)_SynergyIds[(int)synergy]);
 
     // stat fixer-uppers
     public static StatModifier Mult(this StatType s, float a) => new(){statToBoost = s, modifyType = ModifyMethod.MULTIPLICATIVE, amount = a};

@@ -295,7 +295,7 @@ public class StarmageddonProjectile : MonoBehaviour
         this._projectile.SetSpeed(200f);
         this._projectile.SendInDirection(Vector2.up, true);
         this._projectile.baseData.range = float.MaxValue;
-        CwaffTrailController tc = this._projectile.AddTrailToProjectileInstance(
+        CwaffTrailController tc = this._projectile.AddTrail(
           this._mastered ? Starmageddon._MeteorTrailPrefab : Starmageddon._StarmageddonTrailPrefab);
         tc.gameObject.SetGlowiness(10f);
         yield return null; // wait a frame so we can properly set the trails to unoccluded without being overwritten

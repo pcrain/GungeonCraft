@@ -948,8 +948,8 @@ public static class Extensions
     return gun;
   }
 
-  /// <summary>Create a prefab trail and add it to a prefab projectile</summary>
-  public static CwaffTrailController AddTrailToProjectilePrefab(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
+  /// <summary>Create a prefab trail, add it to a prefab projectile, and return the projectile.</summary>
+  public static Projectile AttachTrail(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
     float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null,
     Vector2? boneSpawnOffset = null)
   {
@@ -966,19 +966,11 @@ public static class Extensions
       trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
       trail.gameObject.transform.parent = target.transform;
       trail.boneSpawnOffset = boneSpawnOffset ?? Vector2.zero;
-      return trail;
+      return target;
   }
 
-  /// <summary>Add an existing prefab trail to a projectile instance</summary>
-  public static CwaffTrailController AddTrailToProjectileInstance(this Projectile target, CwaffTrailController trail)
-  {
-      GameObject instantiatedTrail = UnityEngine.Object.Instantiate(trail.gameObject);
-      instantiatedTrail.transform.parent = target.transform;
-      return instantiatedTrail.GetComponent<CwaffTrailController>();
-  }
-
-  /// <summary>Add an existing prefab trail to a sprite instance</summary>
-  public static CwaffTrailController AddTrailToSpriteInstance(this tk2dBaseSprite target, CwaffTrailController trail)
+  /// <summary>Add an existing prefab trail to a BraveBehaviour instance and return the trail.</summary>
+  public static CwaffTrailController AddTrail(this BraveBehaviour target, CwaffTrailController trail)
   {
       GameObject instantiatedTrail = UnityEngine.Object.Instantiate(trail.gameObject);
       instantiatedTrail.transform.parent = target.transform;

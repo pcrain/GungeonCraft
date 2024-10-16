@@ -447,7 +447,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
         this._timer   = _SPAWN_TIME;
         this._jiggle  = UnityEngine.Random.Range(-30f,30f);
         this._sprite.SetAlphaImmediate(0.0f);
-        this._trail = this._sprite.AddTrailToSpriteInstance(Uppskeruvel._SoulTrailPrefab);
+        this._trail = this._sprite.AddTrail(Uppskeruvel._SoulTrailPrefab);
         base.gameObject.Play("soul_spawn_sound");
         this._setup   = true;
     }

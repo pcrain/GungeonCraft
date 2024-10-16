@@ -31,7 +31,7 @@ public class DerailGun : CwaffGun
             g.SpawnGoopInFlight      = true;
             g.InFlightSpawnRadius    = 2f;
             g.InFlightSpawnFrequency = 0.01f;})
-          .AddTrailToProjectilePrefab("derail_gun_beam", fps: 15, cascadeTimer: 2f * C.FRAME, softMaxLength: 1f, destroyOnEmpty: true,
+          .AttachTrail("derail_gun_beam", fps: 15, cascadeTimer: 2f * C.FRAME, softMaxLength: 1f, destroyOnEmpty: true,
             boneSpawnOffset: new Vector2(0, -0.375f));
     }
 
