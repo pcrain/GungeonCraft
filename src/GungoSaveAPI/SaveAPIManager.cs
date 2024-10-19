@@ -43,7 +43,7 @@ public static class SaveAPIManager
             SaveTools.SafeMove(SaveTools.PathCombine(SaveManager.SavePath, "01", string.Format(AdvancedGameSave.filePattern, saveSlot)), Path.Combine(SaveManager.SavePath,
                 string.Format(AdvancedGameSave.filePattern, saveSlot)), true);
         }
-        CustomHuntQuests.DoSetup();
+        // CustomHuntQuests.DoSetup(); //HACK: slows down loading so disabling until I need it
         saveHook = new Hook(
             typeof(GameStatsManager).GetMethod("Save", BindingFlags.Public | BindingFlags.Static),
             typeof(SaveAPIManager).GetMethod("SaveHook")

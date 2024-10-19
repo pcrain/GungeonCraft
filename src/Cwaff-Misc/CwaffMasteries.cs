@@ -62,6 +62,8 @@ public static class CwaffMasteries
     [HarmonyPatch(typeof(EncounterTrackable), nameof(EncounterTrackable.GetModifiedDisplayName))]
     private class DisplayMasteryInGunNamePatch
     {
+        private const string MASTERED_STRING = "[color #dd6666]Mastered[/color]\n";
+        private const string NORMAL_STRING = "[color #888888]Normal[/color]\n";
         static void Postfix(EncounterTrackable __instance, ref string __result)
         {  //INVESTIGATE FOR SLOWDOWN
             if (__instance.GetComponent<Gun>() is not Gun gun)
@@ -71,9 +73,9 @@ public static class CwaffMasteries
             if (!gun.IsMasterable())
               return;
             if (player.GetPassive(gun.MasteryTokenId()))
-              __result = $"[color #dd6666]Mastered[/color]\n{__result}";
+              __result = $"{MASTERED_STRING}{__result}";
             else
-              __result = $"[color #888888]Normal[/color]\n{__result}";
+              __result = $"{NORMAL_STRING}{__result}";
         }
     }
 }

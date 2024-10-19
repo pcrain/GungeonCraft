@@ -70,7 +70,7 @@ public class Glockarina : CwaffGun
     }
 
     [HarmonyPatch(typeof(Chest), nameof(Chest.PresentItem), MethodType.Enumerator)]
-    private class ChestOpenPatch
+    private class ChestOpenPatch // REFACTOR: this patch is setup twice due to BadItemOffsetsFromChestHotfix
     {
         [HarmonyILManipulator]
         private static void OnSpewContentsOntoGroundIL(ILContext il, MethodBase original)

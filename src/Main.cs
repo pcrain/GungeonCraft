@@ -192,6 +192,7 @@ public class Initialisation : BaseUnityPlugin
                 System.Diagnostics.Stopwatch setupSaveWatch = null;
                 Thread setupSaveThread = new Thread(() => {
                     setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
+                    //WARNING: setup code has been modified to disable CustomHuntQuests setup, re-enable if needed later
                     SaveAPI.SaveAPIManager.Setup(C.MOD_PREFIX);  // Needed for prerequisite checking and save serialization
                     setupSaveWatch.Stop();
                 });
