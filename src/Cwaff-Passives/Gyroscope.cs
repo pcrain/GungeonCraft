@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Gyroscope : CwaffPassive
+public class Gyroscope : CwaffPassive, ICustomDodgeRollItem
 {
     public static string ItemName         = "Gyroscope";
     public static string ShortDescription = "Spin to Win";
@@ -24,7 +24,7 @@ public class Gyroscope : CwaffPassive
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
     {
-        if(!_dodgeRoller.isDodging)
+        if(!_dodgeRoller._isDodging)
             return;
         Projectile component = otherRigidbody.GetComponent<Projectile>();
 
@@ -40,7 +40,6 @@ public class Gyroscope : CwaffPassive
     {
         base.Pickup(player);
         this._dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
-            this._dodgeRoller.owner = player;
         player.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }
 
@@ -52,6 +51,15 @@ public class Gyroscope : CwaffPassive
         player.specRigidbody.OnPreRigidbodyCollision -= this.OnPreCollision;
         if (this._dodgeRoller)
             this._dodgeRoller.AbortDodgeRoll();
+    }
+
+    // ICustomDodgeRollItem stuff
+    public int ExtraMidairDodgeRolls() => 0;
+    public CustomDodgeRoll CustomDodgeRoll()
+    {
+        if (!this._dodgeRoller)
+            this._dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
+        return this._dodgeRoller;
     }
 }
 
@@ -94,28 +102,28 @@ public class GyroscopeRoll : CustomDodgeRoll
         this.forcedDirection = newDirection;
         if (this.forcedDirection > 180)
         {
-            this.owner.gameObject.Play("undertale_arrow");
+            this._owner.gameObject.Play("undertale_arrow");
             this.forcedDirection -= 360;
         }
 
-        string animName = Lazy.GetBaseIdleAnimationName(this.owner,this.forcedDirection);
-        if (!this.owner.spriteAnimator.IsPlaying(animName))
+        string animName = Lazy.GetBaseIdleAnimationName(this._owner,this.forcedDirection);
+        if (!this._owner.spriteAnimator.IsPlaying(animName))
         {
-            this.owner.spriteAnimator.Stop();
-            this.owner.spriteAnimator.Play(animName);
+            this._owner.spriteAnimator.Stop();
+            this._owner.spriteAnimator.Play(animName);
         }
-        if (this.owner.sprite.FlipX != (Mathf.Abs(this.forcedDirection) > 90f))
+        if (this._owner.sprite.FlipX != (Mathf.Abs(this.forcedDirection) > 90f))
         {
-            this.owner.sprite.FlipX ^= true;
-            if (this.owner.sprite.FlipX)
-                this.owner.sprite.gameObject.transform.localPosition = new Vector3(this.owner.sprite.GetUntrimmedBounds().size.x, 0f, 0f);
+            this._owner.sprite.FlipX ^= true;
+            if (this._owner.sprite.FlipX)
+                this._owner.sprite.gameObject.transform.localPosition = new Vector3(this._owner.sprite.GetUntrimmedBounds().size.x, 0f, 0f);
             else
-                this.owner.sprite.gameObject.transform.localPosition = Vector3.zero;
-            this.owner.sprite.UpdateZDepth();
+                this._owner.sprite.gameObject.transform.localPosition = Vector3.zero;
+            this._owner.sprite.UpdateZDepth();
         }
 
-        this.owner.m_overrideGunAngle = this.forcedDirection;
-        this.owner.forceAimPoint = this.owner.CenterPosition + BraveMathCollege.DegreesToVector(this.forcedDirection);
+        this._owner.m_overrideGunAngle = this.forcedDirection;
+        this._owner.forceAimPoint = this._owner.CenterPosition + BraveMathCollege.DegreesToVector(this.forcedDirection);
     }
 
     private void OnReceivedDamage(PlayerController p)
@@ -126,7 +134,7 @@ public class GyroscopeRoll : CustomDodgeRoll
 
     private float GetDodgeRollSpeed()
     {
-        return (this.owner.rollStats.GetModifiedTime(this.owner) / this.owner.rollStats.GetModifiedDistance(this.owner)) / BraveTime.DeltaTime;
+        return (this._owner.rollStats.GetModifiedTime(this._owner) / this._owner.rollStats.GetModifiedDistance(this._owner)) / BraveTime.DeltaTime;
     }
 
     private void DoElasticCollision(SpeculativeRigidbody b1, SpeculativeRigidbody b2, out Vector2 newv1, out Vector2 newv2, bool ignoreOtherVelocity = false)
@@ -150,22 +158,22 @@ public class GyroscopeRoll : CustomDodgeRoll
         float halfTotalMagnitude = 0.5f * (theirNewVelocity.magnitude + myNewVelocity.magnitude);
         aIActor.knockbackDoer.ApplyKnockback(theirNewVelocity, C.PIXELS_PER_TILE * halfTotalMagnitude);
         this.targetVelocity = this.targetVelocity.magnitude * myNewVelocity.normalized;
-        this.owner.specRigidbody.Velocity = myNewVelocity;
+        this._owner.specRigidbody.Velocity = myNewVelocity;
 
         this.rollDamageModifier.amount = Mathf.Sqrt(this.targetVelocity.magnitude);
-        this.owner.stats.RecalculateStats(this.owner,true);
-        this.owner.ApplyRollDamage(aIActor);
-        this.owner.gameObject.PlayOnce("undertale_damage");
+        this._owner.stats.RecalculateStats(this._owner,true);
+        this._owner.ApplyRollDamage(aIActor);
+        this._owner.gameObject.PlayOnce("undertale_damage");
     }
 
     private void ExtinguishFire()
     {
-        if (this.owner.CurrentFireMeterValue <= 0f)
+        if (this._owner.CurrentFireMeterValue <= 0f)
             return;
 
-        this.owner.CurrentFireMeterValue = Mathf.Max(0f, this.owner.CurrentFireMeterValue - 1.0f * BraveTime.DeltaTime);
-        if (this.owner.CurrentFireMeterValue == 0f)
-            this.owner.IsOnFire = false;
+        this._owner.CurrentFireMeterValue = Mathf.Max(0f, this._owner.CurrentFireMeterValue - 1.0f * BraveTime.DeltaTime);
+        if (this._owner.CurrentFireMeterValue == 0f)
+            this._owner.IsOnFire = false;
     }
 
     protected override IEnumerator ContinueDodgeRoll()
@@ -175,17 +183,17 @@ public class GyroscopeRoll : CustomDodgeRoll
 
         #region Initialization
             DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
-            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this.owner.PlayerIDX);
+            BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(this._owner.PlayerIDX);
             this.tookDamageDuringDodgeRoll = false;
-            this.owner.OnReceivedDamage += this.OnReceivedDamage;
-            this.owner.OnRealPlayerDeath += this.OnReceivedDamage;
+            this._owner.OnReceivedDamage += this.OnReceivedDamage;
+            this._owner.OnRealPlayerDeath += this.OnReceivedDamage;
             this.stumbleClip = null;
 
             this.tornadoVFX = UnityEngine.Object.Instantiate(
-                Gyroscope._TornadoVFX, this.owner.specRigidbody.UnitBottomCenter, Quaternion.identity);
+                Gyroscope._TornadoVFX, this._owner.specRigidbody.UnitBottomCenter, Quaternion.identity);
             tk2dSpriteAnimator tornadoAnimator = this.tornadoVFX.GetComponent<tk2dSpriteAnimator>();
-                tornadoAnimator.sprite.transform.parent = this.owner.transform;
-                tornadoAnimator.sprite.transform.position = this.owner.SpriteBottomCenter;
+                tornadoAnimator.sprite.transform.parent = this._owner.transform;
+                tornadoAnimator.sprite.transform.position = this._owner.SpriteBottomCenter;
                 tornadoAnimator.sprite.usesOverrideMaterial = true;
                 tornadoAnimator.renderer.SetAlpha(0.0f);
         #endregion
@@ -194,30 +202,30 @@ public class GyroscopeRoll : CustomDodgeRoll
             float totalTime = 0.0f;
             float curSpinSpeed = 0.0f;
             float tornadoCurAlpha = 0.0f;
-            forcedDirection = this.owner.FacingDirection;
-            this.owner.m_overrideGunAngle = forcedDirection;
-            Vector3 chargeStartPosition = this.owner.transform.position;
+            forcedDirection = this._owner.FacingDirection;
+            this._owner.m_overrideGunAngle = forcedDirection;
+            Vector3 chargeStartPosition = this._owner.transform.position;
 
             this.rollDamageModifier = StatType.DodgeRollDamage.Mult(1f);
-                this.owner.ownerlessStatModifiers.Add(rollDamageModifier);
+                this._owner.ownerlessStatModifiers.Add(rollDamageModifier);
             this.speedModifier = StatType.MovementSpeed.Mult(1f);
-                this.owner.ownerlessStatModifiers.Add(speedModifier);
+                this._owner.ownerlessStatModifiers.Add(speedModifier);
             this.isSpeedModActive = true;
             this.isRollModActive = true;
-            this.owner.stats.RecalculateStats(this.owner);
+            this._owner.stats.RecalculateStats(this._owner);
 
             float chargePercent = 0.0f;
             while (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
             {
-                if (this.owner.IsFalling || this.tookDamageDuringDodgeRoll)
+                if (this._owner.IsFalling || this.tookDamageDuringDodgeRoll)
                     yield break;
                 totalTime += BraveTime.DeltaTime;
                 chargePercent = Mathf.Min(1.0f,totalTime / CHARGE_TIME);
                 curSpinSpeed = MIN_SPIN + SPIN_DELTA * (chargePercent*chargePercent);
                 UpdateForcedDirection(this.forcedDirection+curSpinSpeed*BraveTime.DeltaTime);
                 this.speedModifier.amount = 1.0f - (chargePercent*chargePercent);
-                this.owner.stats.RecalculateStats(this.owner,true);
-                this.owner.specRigidbody.Reinitialize();
+                this._owner.stats.RecalculateStats(this._owner,true);
+                this._owner.specRigidbody.Reinitialize();
 
                 if (UnityEngine.Random.Range(0.0f,100.0f) < 10)
                 {
@@ -226,37 +234,37 @@ public class GyroscopeRoll : CustomDodgeRoll
                     float mag = UnityEngine.Random.Range(0.3f,1.25f);
                     SpawnManager.SpawnVFX(
                         dusts.rollLandDustup,
-                        this.owner.CenterPosition - BraveMathCollege.DegreesToVector(dir, mag),
+                        this._owner.CenterPosition - BraveMathCollege.DegreesToVector(dir, mag),
                         Quaternion.Euler(0f, 0f, rot));
                 }
                 if (chargePercent >= DIZZY_THRES)
                 {
                     tornadoCurAlpha = TORNADO_ALPHA * (chargePercent - DIZZY_THRES) / (1.0f - DIZZY_THRES);
-                    tornadoAnimator.sprite.transform.position = this.owner.SpriteBottomCenter;
+                    tornadoAnimator.sprite.transform.position = this._owner.SpriteBottomCenter;
                     tornadoAnimator.renderer.SetAlpha(tornadoCurAlpha);
                 }
 
                 ExtinguishFire();
                 yield return null;
             }
-            this.owner.ownerlessStatModifiers.Remove(this.speedModifier);
+            this._owner.ownerlessStatModifiers.Remove(this.speedModifier);
             this.isSpeedModActive = false;
-            this.owner.stats.RecalculateStats(this.owner);
+            this._owner.stats.RecalculateStats(this._owner);
         #endregion
 
         #region The Dash
-            this.owner.SetIsFlying(true, "gyro", false, false);
+            this._owner.SetIsFlying(true, "gyro", false, false);
             this.reflectingProjectiles = chargePercent >= DIZZY_THRES;
-            this.owner.specRigidbody.OnPreRigidbodyCollision += BounceAwayEnemies;
-            this.owner.specRigidbody.OnCollision += BounceOffWalls;
-            this.owner.healthHaver.IsVulnerable = false;
+            this._owner.specRigidbody.OnPreRigidbodyCollision += BounceAwayEnemies;
+            this._owner.specRigidbody.OnCollision += BounceOffWalls;
+            this._owner.healthHaver.IsVulnerable = false;
 
             float dash_speed    = minDashSpeed  + chargePercent * (maxDashSpeed  - minDashSpeed);
             float dash_time     = MIN_DASH_TIME + chargePercent * (MAX_DASH_TIME - MIN_DASH_TIME);
             this.targetVelocity = dash_speed*instanceForPlayer.ActiveActions.Move.Value;
             for (float timer = 0.0f; timer < dash_time; timer += BraveTime.DeltaTime)
             {
-                if (this.owner.IsFalling || this.tookDamageDuringDodgeRoll)
+                if (this._owner.IsFalling || this.tookDamageDuringDodgeRoll)
                     yield break;
                 UpdateForcedDirection(this.forcedDirection+curSpinSpeed*BraveTime.DeltaTime);  //2.0 RPS
 
@@ -273,14 +281,14 @@ public class GyroscopeRoll : CustomDodgeRoll
                 {
                     float maxRot = MAX_ROT * BraveTime.DeltaTime;
                     float velangle = this.targetVelocity.ToAngle();
-                    float deltaToTarget = BraveMathCollege.ClampAngle180(this.owner.FacingDirection - velangle);
+                    float deltaToTarget = BraveMathCollege.ClampAngle180(this._owner.FacingDirection - velangle);
                     if (Mathf.Abs(deltaToTarget) <= maxRot)
-                        this.targetVelocity = BraveMathCollege.DegreesToVector(this.owner.FacingDirection,dash_speed);
+                        this.targetVelocity = BraveMathCollege.DegreesToVector(this._owner.FacingDirection,dash_speed);
                     else
                         this.targetVelocity = BraveMathCollege.DegreesToVector(velangle+Mathf.Sign(deltaToTarget)*maxRot,dash_speed);
                 }
                 this.targetVelocity *= GYRO_FRICTION;
-                this.owner.specRigidbody.Velocity = this.targetVelocity;
+                this._owner.specRigidbody.Velocity = this.targetVelocity;
 
                 if (UnityEngine.Random.Range(0.0f,100.0f) < 10)
                 {
@@ -289,57 +297,57 @@ public class GyroscopeRoll : CustomDodgeRoll
                     float mag = UnityEngine.Random.Range(0.3f,1.25f);
                     SpawnManager.SpawnVFX(
                         dusts.rollLandDustup,
-                        this.owner.CenterPosition - BraveMathCollege.DegreesToVector(dir, mag),
+                        this._owner.CenterPosition - BraveMathCollege.DegreesToVector(dir, mag),
                         Quaternion.Euler(0f, 0f, rot));
                 }
 
-                tornadoAnimator.sprite.transform.position = this.owner.SpriteBottomCenter;
+                tornadoAnimator.sprite.transform.position = this._owner.SpriteBottomCenter;
                 ExtinguishFire();
                 yield return null;
             }
-            this.owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
-            this.owner.specRigidbody.OnCollision -= BounceOffWalls;
-            this.owner.healthHaver.IsVulnerable = true;
+            this._owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
+            this._owner.specRigidbody.OnCollision -= BounceOffWalls;
+            this._owner.healthHaver.IsVulnerable = true;
             this.reflectingProjectiles = false;
 
-            this.owner.ownerlessStatModifiers.Remove(this.rollDamageModifier);
+            this._owner.ownerlessStatModifiers.Remove(this.rollDamageModifier);
             this.isRollModActive = false;
-            this.owner.stats.RecalculateStats(this.owner);
-            this.owner.SetIsFlying(false, "gyro", false, false);
+            this._owner.stats.RecalculateStats(this._owner);
+            this._owner.SetIsFlying(false, "gyro", false, false);
         #endregion
 
         #region The Stumble
             if (chargePercent >= DIZZY_THRES)
             {
-                this.owner.SetInputOverride("gyrostumble");
-                this.owner.ToggleGunRenderers(false,"gyrostumble");
-                this.owner.ToggleHandRenderers(false,"gyrostumble");
+                this._owner.SetInputOverride("gyrostumble");
+                this._owner.ToggleGunRenderers(false,"gyrostumble");
+                this._owner.ToggleHandRenderers(false,"gyrostumble");
 
-                this.owner.spriteAnimator.Stop();
-                this.owner.QueueSpecificAnimation(this.owner.spriteAnimator.GetClipByName("spinfall"/*"timefall"*/).name);
-                this.owner.spriteAnimator.SetFrame(0, false);
-                this.owner.gameObject.Play("Play_Fall");
+                this._owner.spriteAnimator.Stop();
+                this._owner.QueueSpecificAnimation(this._owner.spriteAnimator.GetClipByName("spinfall"/*"timefall"*/).name);
+                this._owner.spriteAnimator.SetFrame(0, false);
+                this._owner.gameObject.Play("Play_Fall");
                 float spinTimer = 0.65f;
                 for (float timer = spinTimer; timer > 0; timer -= BraveTime.DeltaTime)
                 {
                     if (this.tookDamageDuringDodgeRoll)
                         yield break;
                     tornadoAnimator.renderer.SetAlpha(tornadoCurAlpha * (timer / spinTimer));
-                    tornadoAnimator.sprite.transform.position = this.owner.sprite.WorldBottomCenter;
+                    tornadoAnimator.sprite.transform.position = this._owner.sprite.WorldBottomCenter;
                     this.targetVelocity *= STOP_FRICTION;
-                    this.owner.specRigidbody.Velocity = this.targetVelocity;
+                    this._owner.specRigidbody.Velocity = this.targetVelocity;
                     yield return null;
                 }
                 UnityEngine.Object.Destroy(this.tornadoVFX);
-                this.owner.spriteAnimator.Stop();
+                this._owner.spriteAnimator.Stop();
 
                 if (chargePercent >= STUMBLE_THRES)
                 {
-                    string stumbleAnim = Lazy.GetBaseDodgeAnimationName(this.owner, this.owner.specRigidbody.Velocity);
-                    this.stumbleClip = this.owner.spriteAnimator.GetClipByName(stumbleAnim);
-                    this.owner.QueueSpecificAnimation(stumbleClip.name);
-                    this.owner.spriteAnimator.SetFrame(0, false);
-                    this.owner.spriteAnimator.ClipFps = 24.0f;
+                    string stumbleAnim = Lazy.GetBaseDodgeAnimationName(this._owner, this._owner.specRigidbody.Velocity);
+                    this.stumbleClip = this._owner.spriteAnimator.GetClipByName(stumbleAnim);
+                    this._owner.QueueSpecificAnimation(stumbleClip.name);
+                    this._owner.spriteAnimator.SetFrame(0, false);
+                    this._owner.spriteAnimator.ClipFps = 24.0f;
                     this.wasFrameInvulnerable = new List<bool>();
                     foreach (var frame in this.stumbleClip.frames) // hack to make player vulnerable during roll animation frames
                     {
@@ -347,20 +355,20 @@ public class GyroscopeRoll : CustomDodgeRoll
                         frame.invulnerableFrame = false;
                     }
 
-                    this.owner.sprite.FlipX = (Mathf.Abs(this.owner.specRigidbody.Velocity.ToAngle()) > 90f);
-                    if (this.owner.sprite.FlipX)
-                        this.owner.sprite.gameObject.transform.localPosition = new Vector3(this.owner.sprite.GetUntrimmedBounds().size.x, 0f, 0f);
+                    this._owner.sprite.FlipX = (Mathf.Abs(this._owner.specRigidbody.Velocity.ToAngle()) > 90f);
+                    if (this._owner.sprite.FlipX)
+                        this._owner.sprite.gameObject.transform.localPosition = new Vector3(this._owner.sprite.GetUntrimmedBounds().size.x, 0f, 0f);
                     else
-                        this.owner.sprite.gameObject.transform.localPosition = Vector3.zero;
-                    this.owner.sprite.UpdateZDepth();
+                        this._owner.sprite.gameObject.transform.localPosition = Vector3.zero;
+                    this._owner.sprite.UpdateZDepth();
 
                     for (float timer = 0.0f; timer < STUMBLE_TIME; timer += BraveTime.DeltaTime)
                     {
                         if (this.tookDamageDuringDodgeRoll)
                             break;
-                        this.owner.specRigidbody.Velocity = Vector2.zero;
-                        if (this.owner.spriteAnimator.CurrentFrame > 3)
-                            this.owner.spriteAnimator.Stop();
+                        this._owner.specRigidbody.Velocity = Vector2.zero;
+                        if (this._owner.spriteAnimator.CurrentFrame > 3)
+                            this._owner.spriteAnimator.Stop();
                         yield return null;
                     }
                 }
@@ -379,30 +387,30 @@ public class GyroscopeRoll : CustomDodgeRoll
                     this.stumbleClip.frames[i].invulnerableFrame = this.wasFrameInvulnerable[i];
             }
 
-            this.owner.OnReceivedDamage -= this.OnReceivedDamage;
+            this._owner.OnReceivedDamage -= this.OnReceivedDamage;
             this.reflectingProjectiles = false;
-            this.owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
-            this.owner.specRigidbody.OnCollision -= BounceOffWalls;
-            this.owner.ClearInputOverride("gyro");
-            this.owner.SetIsFlying(false, "gyro", false, false);
-            this.owner.ToggleHandRenderers(true,"gyrostumble");
-            this.owner.ToggleGunRenderers(true,"gyrostumble");
-            this.owner.ClearInputOverride("gyrostumble");
-            this.owner.m_overrideGunAngle = null;
-            this.owner.forceAimPoint = null;
-            if (this.owner.CurrentGun is Gun gun) // fix upside down gun sprites when starting a dodge roll facing right and ending facing left
-                gun.HandleSpriteFlip(this.owner.SpriteFlipped);
-            this.owner.spriteAnimator.Stop();
-            this.owner.spriteAnimator.Play(this.owner.spriteAnimator.GetClipByName("idle_front"));
-            this.owner.healthHaver.IsVulnerable = true;
+            this._owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
+            this._owner.specRigidbody.OnCollision -= BounceOffWalls;
+            this._owner.ClearInputOverride("gyro");
+            this._owner.SetIsFlying(false, "gyro", false, false);
+            this._owner.ToggleHandRenderers(true,"gyrostumble");
+            this._owner.ToggleGunRenderers(true,"gyrostumble");
+            this._owner.ClearInputOverride("gyrostumble");
+            this._owner.m_overrideGunAngle = null;
+            this._owner.forceAimPoint = null;
+            if (this._owner.CurrentGun is Gun gun) // fix upside down gun sprites when starting a dodge roll facing right and ending facing left
+                gun.HandleSpriteFlip(this._owner.SpriteFlipped);
+            this._owner.spriteAnimator.Stop();
+            this._owner.spriteAnimator.Play(this._owner.spriteAnimator.GetClipByName("idle_front"));
+            this._owner.healthHaver.IsVulnerable = true;
 
             if (this.isSpeedModActive)
-                this.owner.ownerlessStatModifiers.Remove(this.speedModifier);
+                this._owner.ownerlessStatModifiers.Remove(this.speedModifier);
             if (this.isRollModActive)
-                this.owner.ownerlessStatModifiers.Remove(this.rollDamageModifier);
+                this._owner.ownerlessStatModifiers.Remove(this.rollDamageModifier);
             this.isSpeedModActive = false;
             this.isRollModActive = false;
-            this.owner.stats.RecalculateStats(this.owner);
+            this._owner.stats.RecalculateStats(this._owner);
 
             if (this.tornadoVFX)
                 UnityEngine.Object.Destroy(this.tornadoVFX);
@@ -415,7 +423,7 @@ public class GyroscopeRoll : CustomDodgeRoll
         float normangle = tileCollision.Normal.ToAngle();
         float newangle = BraveMathCollege.ClampAngle360(velangle + 2f * (normangle - velangle));
         this.targetVelocity = BraveMathCollege.DegreesToVector(newangle,this.targetVelocity.magnitude);
-        this.owner.specRigidbody.Velocity = this.targetVelocity;
+        this._owner.specRigidbody.Velocity = this.targetVelocity;
     }
 }
 

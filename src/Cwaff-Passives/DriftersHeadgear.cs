@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class DriftersHeadgear : CwaffPassive
+public class DriftersHeadgear : CwaffPassive, ICustomDodgeRollItem
 {
     public static string ItemName         = "Drifter's Headgear";
     public static string ShortDescription = "Hyper Light Dodger";
@@ -38,7 +38,7 @@ public class DriftersHeadgear : CwaffPassive
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
     {
-        if(!(this._dodgeRoller.isDodging && this._dodgeRoller.isHyped))  // reflect projectiles with hyped synergy
+        if(!(this._dodgeRoller._isDodging && this._dodgeRoller.isHyped))  // reflect projectiles with hyped synergy
             return;
         Projectile component = otherRigidbody.GetComponent<Projectile>();
         if (component != null && !(component.Owner is PlayerController))
@@ -52,7 +52,6 @@ public class DriftersHeadgear : CwaffPassive
     {
         base.Pickup(player);
         this._dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
-            this._dodgeRoller.owner = player;
         player.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
     }
 
@@ -65,6 +64,16 @@ public class DriftersHeadgear : CwaffPassive
         if (this._dodgeRoller)
             this._dodgeRoller.AbortDodgeRoll();
     }
+
+    // ICustomDodgeRollItem stuff
+    public int ExtraMidairDodgeRolls() => 2;
+    public CustomDodgeRoll CustomDodgeRoll() => null;
+    // public CustomDodgeRoll CustomDodgeRoll()
+    // {
+    //     if (!this._dodgeRoller)
+    //         this._dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
+    //     return this._dodgeRoller;
+    // }
 }
 
 public class HLDRoll : CustomDodgeRoll
@@ -76,18 +85,22 @@ public class HLDRoll : CustomDodgeRoll
 
     public bool isHyped = false;  // whether the hyped synergy is active
 
-    protected override void BeginDodgeRoll()
+    private Vector2 _dashDir;
+
+    protected override void BeginDodgeRoll(Vector2 direction)
     {
-        base.BeginDodgeRoll();
-        if (!(this.isHyped && this.owner))
+        base.BeginDodgeRoll(direction);
+        this._dashDir = (direction != Vector2.zero) ? direction : this._owner.m_lastNonzeroCommandedDirection.normalized;
+
+        if (!(this.isHyped && this._owner))
             return;
         Projectile p = SpawnManager.SpawnProjectile(
           DriftersHeadgear._LightningProjectile.gameObject,
-          this.owner.CenterPosition,
-          Quaternion.Euler(0f, 0f, this.owner.m_currentGunAngle),
+          this._owner.CenterPosition,
+          Quaternion.Euler(0f, 0f, this._owner.m_currentGunAngle),
           true).GetComponent<Projectile>();
-            p.Owner = this.owner;
-            p.Shooter = this.owner.specRigidbody;
+            p.Owner = this._owner;
+            p.Shooter = this._owner.specRigidbody;
 
             p.gameObject.AddComponent<FakeProjectileComponent>();
             p.gameObject.AddComponent<ProjectileExpiration>().expirationTimer = DISOWN_TIME+FADE_TIME;
@@ -104,11 +117,11 @@ public class HLDRoll : CustomDodgeRoll
         float dashspeed = DASH_SPEED * (this.isHyped ? 1.2f : 1.0f);
         float dashtime = DASH_TIME;
 
-        Vector2 vel = dashspeed * this.owner.m_lastNonzeroCommandedDirection.normalized;
+        Vector2 vel = dashspeed * this._dashDir;
 
-        this.owner.gameObject.Play("teledasher");
-        this.owner.SetInputOverride("hld");
-        this.owner.SetIsFlying(true, "hld");
+        this._owner.gameObject.Play("teledasher");
+        this._owner.SetInputOverride("hld");
+        this._owner.SetIsFlying(true, "hld");
 
         DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
         for (int i = 0; i < 16; ++i)
@@ -118,19 +131,19 @@ public class HLDRoll : CustomDodgeRoll
             float mag = UnityEngine.Random.Range(0.3f,1.25f);
             SpawnManager.SpawnVFX(
                 dusts.rollLandDustup,
-                this.owner.CenterPosition + BraveMathCollege.DegreesToVector(dir, mag),
+                this._owner.CenterPosition + BraveMathCollege.DegreesToVector(dir, mag),
                 Quaternion.Euler(0f, 0f, rot));
         }
 
         bool interrupted = false;
         for (float timer = 0.0f; timer < dashtime; )
         {
-            this.owner.PlayerAfterImage();
+            this._owner.PlayerAfterImage();
             timer += BraveTime.DeltaTime;
-            this.owner.specRigidbody.Velocity = vel;
-            GameManager.Instance.Dungeon.dungeonDustups.InstantiateLandDustup(this.owner.CenterPosition);
+            this._owner.specRigidbody.Velocity = vel;
+            GameManager.Instance.Dungeon.dungeonDustups.InstantiateLandDustup(this._owner.CenterPosition);
             yield return null;
-            if (this.owner.IsFalling)
+            if (this._owner.IsFalling)
             {
                 interrupted = true;
                 break;
@@ -138,7 +151,7 @@ public class HLDRoll : CustomDodgeRoll
         }
         if (!interrupted)
         {
-            this.owner.PlayerAfterImage();
+            this._owner.PlayerAfterImage();
             for (int i = 0; i < 8; ++i)
             {
                 float dir = UnityEngine.Random.Range(0.0f,360.0f);
@@ -146,12 +159,12 @@ public class HLDRoll : CustomDodgeRoll
                 float mag = UnityEngine.Random.Range(0.3f,1.0f);
                 SpawnManager.SpawnVFX(
                     dusts.rollLandDustup,
-                    this.owner.CenterPosition + BraveMathCollege.DegreesToVector(dir, mag),
+                    this._owner.CenterPosition + BraveMathCollege.DegreesToVector(dir, mag),
                     Quaternion.Euler(0f, 0f, rot));
             }
         }
-        this.owner.spriteAnimator.Stop();
-        this.owner.SetIsFlying(false, "hld");
-        this.owner.ClearInputOverride("hld");
+        this._owner.spriteAnimator.Stop();
+        this._owner.SetIsFlying(false, "hld");
+        this._owner.ClearInputOverride("hld");
     }
 }

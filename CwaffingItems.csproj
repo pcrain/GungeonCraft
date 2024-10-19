@@ -93,6 +93,9 @@
     <Compile Include="src\Cwaff-Passives\RingOfDefenestration.cs"/>
     <Compile Include="src\Lazy.cs"/>
     <Compile Include="src\Commands.cs"/>
+    <Compile Include="src\CustomDodgeRoll\ICustomDodgeRollItem.cs"/>
+    <Compile Include="src\CustomDodgeRoll\CustomDodgeRoll.cs"/>
+    <Compile Include="src\CustomDodgeRoll\CustomDodgeRollPatches.cs"/>
     <Compile Include="src\Cwaff-Enemies\BulletScriptHelper.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\BuildABoss.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansNPC.cs"/>
@@ -250,7 +253,6 @@
     <Compile Include="src\Cwaff-Misc\CwaffRaidenBeamController.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffCompanion.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedShrines.cs"/>
-    <Compile Include="src\Cwaff-Misc\CustomDodgeRoll.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffEvents.cs"/>
