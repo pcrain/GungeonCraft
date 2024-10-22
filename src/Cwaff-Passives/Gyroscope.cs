@@ -80,7 +80,7 @@ public class GyroscopeRoll : CustomDodgeRoll
     const float TORNADO_ALPHA  = 0.5f;     // Max alpha of tornado VFX
     const float SPIN_DELTA     = MAX_SPIN - MIN_SPIN;
 
-    public override bool putsOutFire => false; // We have custom fire extinguishing behavior
+    public override float fireReduction => 0.0f; // We have custom fire extinguishing behavior
 
     public bool reflectingProjectiles { get; private set; }
 
@@ -215,7 +215,7 @@ public class GyroscopeRoll : CustomDodgeRoll
             this._owner.stats.RecalculateStats(this._owner);
 
             float chargePercent = 0.0f;
-            while (instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
+            while (this._dodgeButtonHeld)
             {
                 if (this._owner.IsFalling || this.tookDamageDuringDodgeRoll)
                     yield break;

@@ -4,6 +4,7 @@ namespace CwaffingTheGungy;
 internal static class CustomDodgeRollPatches
 {
     private static List<CustomDodgeRoll>[] _Overrides = [new(), new()];
+    private static bool[] _BloodiedScarfActive = [false, false];
 
     private static readonly EventInfo OnPreDodgeRollEvent = typeof(PlayerController).GetEvent(
         nameof(PlayerController.OnPreDodgeRoll), BindingFlags.FlattenHierarchy | BindingFlags.Instance | BindingFlags.Public);
@@ -17,49 +18,62 @@ internal static class CustomDodgeRollPatches
         if (md == null)
             return;
         Delegate[] delegates = md.GetInvocationList();
-        if (delegates.Length == 0)
+        if (delegates == null || delegates.Length == 0)
             return;
         object[] args = new object[] { player };
         foreach (Delegate handler in delegates)
             handler.Method.Invoke(handler.Target, args);
     }
 
-    /// <summary>The magic that actually handles initiating custom dodge rolls.</summary>
-    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandleStartDodgeRoll))]
-    private static bool Prefix(ref PlayerController __instance, Vector2 direction)
+    /// <summary>Buffer dodge roll inputs even if we're not otherwise accepting inputs.</summary>
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.Update))]
+    [HarmonyPrefix]
+    private static void HandleDodgeRollBuffering(PlayerController __instance)
     {
-        PlayerController player = __instance;
-        // Make sure we can actually have all of our movements available (fixes not being able to dodge roll in the Aimless Void)
-        if (player.CurrentInputState != PlayerInputState.AllInput || !player.AcceptingNonMotionInput || player.IsDodgeRolling)
-            return true;
-
-        // Figure out all of our passives that give us a custom dodge roll
-        int pid = player.PlayerIDX;
-        if (pid < 0 || _Overrides[pid].Count == 0)  // fall back to default behavior if we don't have overrides
-            return true;
+        int pid = __instance.PlayerIDX;
+        if (pid < 0 || _Overrides[pid].Count == 0)
+            return;
 
         // Turn off dodgeButtonHeld state for all custom rolls if we aren't pushing the dodge button
-        BraveInput instanceForPlayer = BraveInput.GetInstanceForPlayer(pid);
-        if (!instanceForPlayer.ActiveActions.DodgeRollAction.IsPressed)
+        float now = BraveTime.ScaledTimeSinceStartup;
+        bool dodgeButtonPressed = BraveInput.GetInstanceForPlayer(pid).ActiveActions.DodgeRollAction.IsPressed;
+        foreach (CustomDodgeRoll customDodgeRoll in _Overrides[pid])
         {
-            foreach (CustomDodgeRoll customDodgeRoll in _Overrides[pid])
+            if (!dodgeButtonPressed)
                 customDodgeRoll._dodgeButtonHeld = false;
-            return false; // skip original method
+            else if (!customDodgeRoll._dodgeButtonHeld && customDodgeRoll._isDodging && customDodgeRoll.bufferWindow > 0.0f)
+            {
+                customDodgeRoll._dodgeButtonHeld = true;
+                customDodgeRoll._bufferTime = now; // keep track of the last time we buffered an input
+            }
         }
+    }
 
-        // Try initiating all available custom dodge rolls, starting from the end so newly-picked up items invoke first
-        bool anyDodgeRollSucceeded = false;
-        for (int i = _Overrides[pid].Count - 1; i >= 0; --i)
+    /// <summary>The magic that actually handles initiating custom dodge rolls.</summary>
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandleStartDodgeRoll))]
+    private static bool Prefix(PlayerController __instance, Vector2 direction)
+    {
+        // Make sure we actually have all of our movements available (fixes not being able to dodge roll in the Aimless Void)
+        PlayerController player = __instance;
+        if (player.CurrentInputState != PlayerInputState.AllInput || !player.AcceptingNonMotionInput || player.IsDodgeRolling)
+            return true;
+        int pid = player.PlayerIDX;
+        if (pid < 0 || _Overrides[pid].Count == 0 || _BloodiedScarfActive[pid])
+            return true; // fall back to default behavior if we don't have overrides
+
+        // Try initiating the most recently added dodge roll
+        CustomDodgeRoll customDodgeRoll = _Overrides[pid].Last();
+        bool dodgeButtonPressed = BraveInput.GetInstanceForPlayer(pid).ActiveActions.DodgeRollAction.IsPressed;
+        bool isBuffered = (BraveTime.ScaledTimeSinceStartup - customDodgeRoll._bufferTime) < customDodgeRoll.bufferWindow;
+        if (!isBuffered && (!dodgeButtonPressed || customDodgeRoll._dodgeButtonHeld))
+            return false; // skip original method
+
+        customDodgeRoll._dodgeButtonHeld = true;
+        if (customDodgeRoll.TryBeginDodgeRoll(direction, isBuffered))
         {
-            CustomDodgeRoll customDodgeRoll = _Overrides[pid][i];
-            if (customDodgeRoll._dodgeButtonHeld)
-                continue;
-            customDodgeRoll._dodgeButtonHeld = true;
-            if (customDodgeRoll.TryBeginDodgeRoll(direction))
-                anyDodgeRollSucceeded = true;
-        }
-        if (anyDodgeRollSucceeded)
             InvokeOnPreDodgeRollEvent(__instance); // call the player's OnPreDodgeRoll events
+            customDodgeRoll._bufferTime = 0.0f;
+        }
         return false; // skip original method
     }
 
@@ -81,12 +95,18 @@ internal static class CustomDodgeRollPatches
         if (pid < 0)
             return;
         _Overrides[pid].Clear();
+        _BloodiedScarfActive[pid] = false;
         foreach (PassiveItem p in owner.passiveItems)
-            if (p is ICustomDodgeRollItem dri && dri.CustomDodgeRoll() is CustomDodgeRoll overrideDodgeRoll)
+        {
+            if (p is BlinkPassiveItem) // bloodied scarf
+                _BloodiedScarfActive[pid] = true;
+            else if (p is ICustomDodgeRollItem dri && dri.CustomDodgeRoll() is CustomDodgeRoll overrideDodgeRoll)
             {
                 _Overrides[pid].Add(overrideDodgeRoll);
                 overrideDodgeRoll._owner = owner;
+                _BloodiedScarfActive[pid] = false; // bloodied scarf is active iff it's the last dodge roll modifier we picked up
             }
+        }
     }
 
     /// <summary>Allow dodge roll items to increase the number of midair dodge rolls a-la springheel boots</summary>
@@ -107,5 +127,17 @@ internal static class CustomDodgeRollPatches
         for (int i = 0, n = player.passiveItems.Count; i < n; ++i)
             if (player.passiveItems[i] is ICustomDodgeRollItem dri)
                 oldRolls += dri.ExtraMidairDodgeRolls();
+    }
+
+    /// <summary>Allow custom dodge rolls to override Bloodied Scarf.</summary>
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.DodgeRollIsBlink), MethodType.Getter)]
+    [HarmonyPrefix]
+    private static bool DisableBloodiedScarf(PlayerController __instance, ref bool __result)
+    {
+        int pid = __instance.PlayerIDX;
+        if (pid < 0 || _Overrides[pid].Count == 0 || _BloodiedScarfActive[pid])
+            return true; // call the original method
+        __result = false;
+        return false; // skip the original method
     }
 }

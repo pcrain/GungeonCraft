@@ -20,6 +20,7 @@ namespace CwaffingTheGungy;
     + no bullet that can kill the future
 
     - no default 2 blank restoration per floor (except for ammolets)
+    - gun fairies galore
 
     x no time slowing (too hard to implement)
 */

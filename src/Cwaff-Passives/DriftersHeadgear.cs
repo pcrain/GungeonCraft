@@ -66,14 +66,14 @@ public class DriftersHeadgear : CwaffPassive, ICustomDodgeRollItem
     }
 
     // ICustomDodgeRollItem stuff
-    public int ExtraMidairDodgeRolls() => 2;
-    public CustomDodgeRoll CustomDodgeRoll() => null;
-    // public CustomDodgeRoll CustomDodgeRoll()
-    // {
-    //     if (!this._dodgeRoller)
-    //         this._dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
-    //     return this._dodgeRoller;
-    // }
+    public int ExtraMidairDodgeRolls() => 0;
+    // public CustomDodgeRoll CustomDodgeRoll() => null;
+    public CustomDodgeRoll CustomDodgeRoll()
+    {
+        if (!this._dodgeRoller)
+            this._dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
+        return this._dodgeRoller;
+    }
 }
 
 public class HLDRoll : CustomDodgeRoll
@@ -87,13 +87,15 @@ public class HLDRoll : CustomDodgeRoll
 
     private Vector2 _dashDir;
 
-    protected override void BeginDodgeRoll(Vector2 direction)
+    public override float bufferWindow => 0.5f;
+
+    protected override void BeginDodgeRoll(Vector2 direction, bool buffered, bool wasAlreadyDodging)
     {
-        base.BeginDodgeRoll(direction);
         this._dashDir = (direction != Vector2.zero) ? direction : this._owner.m_lastNonzeroCommandedDirection.normalized;
 
-        if (!(this.isHyped && this._owner))
+        if (!this.isHyped)
             return;
+
         Projectile p = SpawnManager.SpawnProjectile(
           DriftersHeadgear._LightningProjectile.gameObject,
           this._owner.CenterPosition,
