@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class Gyroscope : CwaffPassive, ICustomDodgeRollItem
+public class Gyroscope : CwaffDodgeRollItem
 {
     public static string ItemName         = "Gyroscope";
     public static string ShortDescription = "Spin to Win";
@@ -53,9 +53,7 @@ public class Gyroscope : CwaffPassive, ICustomDodgeRollItem
             this._dodgeRoller.AbortDodgeRoll();
     }
 
-    // ICustomDodgeRollItem stuff
-    public int ExtraMidairDodgeRolls() => 0;
-    public CustomDodgeRoll CustomDodgeRoll()
+    public override CustomDodgeRoll CustomDodgeRoll()
     {
         if (!this._dodgeRoller)
             this._dodgeRoller = this.gameObject.GetComponent<GyroscopeRoll>();
@@ -80,7 +78,12 @@ public class GyroscopeRoll : CustomDodgeRoll
     const float TORNADO_ALPHA  = 0.5f;     // Max alpha of tornado VFX
     const float SPIN_DELTA     = MAX_SPIN - MIN_SPIN;
 
-    public override float fireReduction => 0.0f; // We have custom fire extinguishing behavior
+    public override float fireReduction     => 0.0f;       // we have custom fire extinguishing behavior
+    public override bool  isAirborne        => !_grounded; // we have custom flight logic
+    public override bool  dodgesProjectiles => false;      // we have custom projectile reflection logic
+    public override bool  lockedDirection   => false;      // we handle our own movement
+    public override bool  canDodgeInPlace   => true;
+    public override bool  canUseWeapon      => true;
 
     public bool reflectingProjectiles { get; private set; }
 
@@ -93,6 +96,7 @@ public class GyroscopeRoll : CustomDodgeRoll
     private StatModifier rollDamageModifier = null;
     private GameObject tornadoVFX           = null;
     private Vector2 targetVelocity          = Vector2.zero;
+    private bool _grounded                  = true;
 
     private tk2dSpriteAnimationClip stumbleClip = null; // animation to use for stumbling
     private List<bool> wasFrameInvulnerable = new List<bool>(); // cache for whether stumble frames were vulnerable
@@ -253,7 +257,7 @@ public class GyroscopeRoll : CustomDodgeRoll
         #endregion
 
         #region The Dash
-            this._owner.SetIsFlying(true, "gyro", false, false);
+            this._grounded = false;
             this.reflectingProjectiles = chargePercent >= DIZZY_THRES;
             this._owner.specRigidbody.OnPreRigidbodyCollision += BounceAwayEnemies;
             this._owner.specRigidbody.OnCollision += BounceOffWalls;
@@ -313,7 +317,7 @@ public class GyroscopeRoll : CustomDodgeRoll
             this._owner.ownerlessStatModifiers.Remove(this.rollDamageModifier);
             this.isRollModActive = false;
             this._owner.stats.RecalculateStats(this._owner);
-            this._owner.SetIsFlying(false, "gyro", false, false);
+            this._grounded = true;
         #endregion
 
         #region The Stumble
@@ -391,8 +395,6 @@ public class GyroscopeRoll : CustomDodgeRoll
             this.reflectingProjectiles = false;
             this._owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
             this._owner.specRigidbody.OnCollision -= BounceOffWalls;
-            this._owner.ClearInputOverride("gyro");
-            this._owner.SetIsFlying(false, "gyro", false, false);
             this._owner.ToggleHandRenderers(true,"gyrostumble");
             this._owner.ToggleGunRenderers(true,"gyrostumble");
             this._owner.ClearInputOverride("gyrostumble");

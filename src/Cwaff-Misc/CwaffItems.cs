@@ -428,6 +428,14 @@ public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffI
   }
 }
 
+public abstract class CwaffDodgeRollItem : CustomDodgeRollItem, ICwaffItem
+{
+  public virtual void OnFirstPickup(PlayerController player)
+  {
+
+  }
+}
+
 public abstract class CwaffCompanion : CompanionItem, ICwaffItem
 {
   public override void Pickup(PlayerController player)

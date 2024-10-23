@@ -1,6 +1,6 @@
 namespace CwaffingTheGungy;
 
-public class DriftersHeadgear : CwaffPassive, ICustomDodgeRollItem
+public class DriftersHeadgear : CwaffDodgeRollItem
 {
     public static string ItemName         = "Drifter's Headgear";
     public static string ShortDescription = "Hyper Light Dodger";
@@ -65,10 +65,7 @@ public class DriftersHeadgear : CwaffPassive, ICustomDodgeRollItem
             this._dodgeRoller.AbortDodgeRoll();
     }
 
-    // ICustomDodgeRollItem stuff
-    public int ExtraMidairDodgeRolls() => 0;
-    // public CustomDodgeRoll CustomDodgeRoll() => null;
-    public CustomDodgeRoll CustomDodgeRoll()
+    public override CustomDodgeRoll CustomDodgeRoll()
     {
         if (!this._dodgeRoller)
             this._dodgeRoller = this.gameObject.GetComponent<HLDRoll>();
@@ -87,7 +84,10 @@ public class HLDRoll : CustomDodgeRoll
 
     private Vector2 _dashDir;
 
-    public override float bufferWindow => 0.5f;
+    public override float bufferWindow       => 0.5f;
+    public override bool  canUseWeapon       => true;
+    public override bool  dodgesProjectiles  => false; // we have our own projectile collision handling
+    public override bool  takesContactDamage => false;
 
     protected override void BeginDodgeRoll(Vector2 direction, bool buffered, bool wasAlreadyDodging)
     {
@@ -117,13 +117,10 @@ public class HLDRoll : CustomDodgeRoll
     protected override IEnumerator ContinueDodgeRoll()
     {
         float dashspeed = DASH_SPEED * (this.isHyped ? 1.2f : 1.0f);
-        float dashtime = DASH_TIME;
 
         Vector2 vel = dashspeed * this._dashDir;
 
         this._owner.gameObject.Play("teledasher");
-        this._owner.SetInputOverride("hld");
-        this._owner.SetIsFlying(true, "hld");
 
         DustUpVFX dusts = GameManager.Instance.Dungeon.dungeonDustups;
         for (int i = 0; i < 16; ++i)
@@ -138,10 +135,9 @@ public class HLDRoll : CustomDodgeRoll
         }
 
         bool interrupted = false;
-        for (float timer = 0.0f; timer < dashtime; )
+        for (float timer = 0.0f; timer < DASH_TIME; timer += BraveTime.DeltaTime)
         {
             this._owner.PlayerAfterImage();
-            timer += BraveTime.DeltaTime;
             this._owner.specRigidbody.Velocity = vel;
             GameManager.Instance.Dungeon.dungeonDustups.InstantiateLandDustup(this._owner.CenterPosition);
             yield return null;
@@ -166,7 +162,5 @@ public class HLDRoll : CustomDodgeRoll
             }
         }
         this._owner.spriteAnimator.Stop();
-        this._owner.SetIsFlying(false, "hld");
-        this._owner.ClearInputOverride("hld");
     }
 }

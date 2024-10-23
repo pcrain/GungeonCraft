@@ -93,9 +93,10 @@
     <Compile Include="src\Cwaff-Passives\RingOfDefenestration.cs"/>
     <Compile Include="src\Lazy.cs"/>
     <Compile Include="src\Commands.cs"/>
-    <Compile Include="src\CustomDodgeRoll\ICustomDodgeRollItem.cs"/>
+    <Compile Include="src\CustomDodgeRoll\CustomDodgeRollPrivate.cs"/>
     <Compile Include="src\CustomDodgeRoll\CustomDodgeRoll.cs"/>
     <Compile Include="src\CustomDodgeRoll\CustomDodgeRollPatches.cs"/>
+    <Compile Include="src\CustomDodgeRoll\CustomDodgeRollItem.cs"/>
     <Compile Include="src\Cwaff-Enemies\BulletScriptHelper.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\BuildABoss.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansNPC.cs"/>

@@ -2,7 +2,10 @@
 
 ## 1.20.1 (TBD)
 
-
+- Tweaked Drifter's Headgear:
+	- Removed enemy contact damage during dash
+	- Allowed player to fire their weapon during dash
+	- Allowed player to buffer additinoal dash inputs during dash
 
 ## 1.20.0 (2024-10-15)
 
