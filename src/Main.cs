@@ -32,6 +32,7 @@
     global using Alexandria.Misc;
     global using Alexandria.NPCAPI;
     global using Alexandria.cAPI;
+    global using Alexandria.CustomDodgeRollAPI;
     global using Brave.BulletScript;
 
     global using SaveAPI; // only nonstandard api copied in from elsewhere, hopefully Alexandria standardizes this eventually
