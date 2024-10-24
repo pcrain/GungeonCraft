@@ -113,6 +113,8 @@ public class CreditCard : CwaffPassive
     {
         static void Postfix(GameUIRoot __instance, string reason)
         {
+            if (!GameManager.Instance.PrimaryPlayer)
+                return; // prevent null reference when selecting character in Breach
             if (!__instance.p_playerCoinLabel || !__instance.p_playerCoinLabel.Parent || !__instance.p_playerCoinLabel.Parent.Parent)
                 return; // prevent null reference when loading level
             __instance.UpdatePlayerConsumables(GameManager.Instance.PrimaryPlayer.carriedConsumables);
