@@ -246,3 +246,6 @@ overflow_shoot_sound,-5.0,1,sound,0
 detergent_cleanse_sound,-3.0,1,sound,0
 sound_of_opening_the_abyss,9.0,1,sound,0
 sound_of_the_abyss_calling,6.0,1,sound,0
+plasma_zap_sound,0.0,1,sound,0
+plasmarble_charge_sound,5.5,0,sound,0
+plasmarble_explode_sound,2.0,1,sound,0

@@ -2984,5 +2984,12 @@ public static class Extensions
       Array.Resize(ref item.passiveStatModifiers, item.passiveStatModifiers.Length + 1);
       item.passiveStatModifiers[item.passiveStatModifiers.Length - 1] = modifier;
   }
+
+  /// <summary>Set the speed for a gun's animation and return the Gun</summary>
+  public static Gun UpdateAnimationFPS(this Gun gun, string animation, int fps)
+  {
+    gun.SetAnimationFPS(animation, fps);
+    return gun;
+  }
 }
 

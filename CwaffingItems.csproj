@@ -175,6 +175,7 @@
     <Compile Include="src\Cwaff-Guns\Unfinished\SpinCycle.cs"/>
     <Compile Include="src\Cwaff-Guns\PlatinumStar.cs"/>
     <Compile Include="src\Cwaff-Guns\Crapshooter.cs"/>
+    <Compile Include="src\Cwaff-Guns\Plasmarble.cs"/>
     <Compile Include="src\Cwaff-Guns\Blamethrower.cs"/>
     <Compile Include="src\Cwaff-Guns\HandCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\Glockarina.cs"/>

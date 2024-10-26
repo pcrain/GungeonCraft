@@ -860,106 +860,94 @@ public class EmissiveTrail : MonoBehaviour // stolen from NN
 public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from NN
 {
     public GameObject linkPrefab;
-    public float DamagePerTick;
+    public float baseDamage = 1f;
     public float disownTimer = -1f;
     public float fadeTimer = -1f;
-    private GameActor owner;
+    public float hitCooldown = 0.1f;
+    public bool disowned = false;
+    public Color color = ExtendedColours.paleYellow;
+    public SpeculativeRigidbody targetBody;
+    public bool shrinkFade = false;
+    public float emissivePower = 100f;
+    public GameActor owner;
+
     private tk2dTiledSprite extantLink;
-    private Projectile self;
+    private Projectile proj;
     private bool makeGlowy = false;
     private bool fading = false;
-    public OwnerConnectLightningModifier()
-    {
-        // linkPrefab = St4ke.LinkVFXPrefab;
-        DamagePerTick = 2f;
-    }
+    private bool destroyWithProjectile = false;
+    private HashSet<AIActor> m_damagedEnemies = new HashSet<AIActor>();
+    private float shrinkLength = 1f;
+
+    public Vector2 originPos;
+    public Vector2 targetPos;
+
     private void OnDestroy()
     {
         if (extantLink)
-        {
-            SpawnManager.Despawn(extantLink.gameObject);
-        }
+            UnityEngine.Object.Destroy(extantLink.gameObject);
     }
     private void Start()
     {
-        self = base.GetComponent<Projectile>();
-        if (self)
-        {
-            if (self.Owner) owner = self.Owner;
-        }
+        proj = base.GetComponent<Projectile>();
+        if (!proj)
+            return;
+        owner = proj.Owner;
+        destroyWithProjectile = true;
     }
-    public void MakeGlowy()
-    {
-        this.makeGlowy = true;
-    }
+    public void MakeGlowy() => this.makeGlowy = true;
     private void Update()
     {
+        if (destroyWithProjectile && !proj)
+        {
+            DestroyExtantLink();
+            return;
+        }
         if (disownTimer > 0)
         {
             disownTimer -= BraveTime.DeltaTime;
             if (disownTimer <= 0)
-                owner = null;
-        }
-        if (self && owner)
-        {
-            if (this.extantLink == null)
             {
-                tk2dTiledSprite component = SpawnManager.SpawnVFX(linkPrefab, false).GetComponent<tk2dTiledSprite>();
-                this.extantLink = component;
-
-                if (makeGlowy)
-                {
-                    Shader glowshader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-                    // this.extantLink.usesOverrideMaterial = true;
-                    this.extantLink.renderer.material.shader = glowshader;
-                    this.extantLink.renderer.material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
-                    this.extantLink.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
-                    this.extantLink.renderer.material.SetFloat("_EmissivePower", 100.0f);
-                    this.extantLink.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
-                    this.extantLink.renderer.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
-                    this.extantLink.color = ExtendedColours.paleYellow;
-
-                    // foreach (tk2dSpriteDefinition frameDef in component.sprite.collection.spriteDefinitions)
-                    // {
-                    //     frameDef.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
-                    //     frameDef.material.SetFloat("_EmissivePower", 10.0f);
-                    //     frameDef.material.SetFloat("_EmissiveColorPower", 1.55f);
-                    //     frameDef.material.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
-                    //     frameDef.materialInst.EnableKeyword("BRIGHTNESS_CLAMP_ON");
-                    //     frameDef.materialInst.SetFloat("_EmissivePower", 10.0f);
-                    //     frameDef.materialInst.SetFloat("_EmissiveColorPower", 1.55f);
-                    //     frameDef.materialInst.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
-                    // }
-
-                    // this.extantLink.renderer.materialInst.EnableKeyword("BRIGHTNESS_CLAMP_ON");
-                    // this.extantLink.renderer.materialInst.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
-                    // this.extantLink.renderer.materialInst.SetFloat("_EmissivePower", 100.0f);
-                    // this.extantLink.renderer.materialInst.SetFloat("_EmissiveColorPower", 1.55f);
-                    // this.extantLink.renderer.materialInst.SetColor("_EmissiveColor", ExtendedColours.paleYellow);
-                }
+                owner = null;
+                disowned = true;
+                fading = true;
+                if (fadeTimer > 0)
+                    StartCoroutine(shrinkFade ? ShrinkOut() : FadeOut());
+                else
+                    DestroyExtantLink();
             }
-            else
-                UpdateLink(owner, this.extantLink);
         }
-        else if (!owner && !fading)
+        if (!this.extantLink)
         {
-            fading = true;
-            if (fadeTimer > 0)
-                StartCoroutine(FadeOut());
-            else
-                DestroyExtantLink();
+            this.extantLink = UnityEngine.Object.Instantiate(linkPrefab).GetComponent<tk2dTiledSprite>();
+            if (makeGlowy)
+            {
+                Shader glowshader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
+                this.extantLink.usesOverrideMaterial = true;
+                Material mat = this.extantLink.renderer.material;
+                mat.shader = glowshader;
+                mat.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+                mat.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+                mat.SetFloat("_EmissivePower", emissivePower);
+                mat.SetFloat("_EmissiveColorPower", 1.55f);
+                mat.SetColor("_EmissiveColor", color);
+                this.extantLink.color = color;
+            }
         }
-        else if (!self)
-        {
-            DestroyExtantLink();
-        }
+        UpdateLink();
     }
     private void DestroyExtantLink()
     {
-        if (extantLink != null)
-            SpawnManager.Despawn(extantLink.gameObject);
+        if (!extantLink)
+            return;
+        UnityEngine.Object.Destroy(extantLink.gameObject);
         extantLink = null;
+        if (proj)
+            UnityEngine.Object.Destroy(this);
+        else
+            UnityEngine.Object.Destroy(base.gameObject);
     }
+
     private IEnumerator FadeOut()
     {
         float halftimer = fadeTimer / 2.0f;
@@ -982,7 +970,7 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
                 this.extantLink.color = this.extantLink.color.WithAlpha(timer/halftimer);
             }
             else {
-                this.extantLink.renderer.material.SetFloat("_EmissivePower", 100.0f*(timer/halftimer));
+                this.extantLink.renderer.material.SetFloat("_EmissivePower", emissivePower*(timer/halftimer));
                 this.extantLink.renderer.material.SetFloat("_EmissiveColorPower", 1.55f*(timer/halftimer));
             }
             yield return null;
@@ -990,83 +978,86 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
         DestroyExtantLink();
         yield break;
     }
-    private void UpdateLink(GameActor target, tk2dTiledSprite m_extantLink)
+
+    private IEnumerator ShrinkOut()
     {
-        Vector2 unitCenter = self.specRigidbody.UnitCenter;
-        Vector2 unitCenter2 = target.specRigidbody.HitboxPixelCollider.UnitCenter;
-        m_extantLink.transform.position = unitCenter;
-        Vector2 vector = unitCenter2 - unitCenter;
-        float num = BraveMathCollege.Atan2Degrees(vector.normalized);
-        int num2 = Mathf.RoundToInt(vector.magnitude / 0.0625f);
-        m_extantLink.dimensions = new Vector2((float)num2, m_extantLink.dimensions.y);
-        m_extantLink.transform.rotation = Quaternion.Euler(0f, 0f, num);
-        m_extantLink.UpdateZDepth();
-        this.ApplyLinearDamage(unitCenter, unitCenter2);
+        for (float timer = fadeTimer; timer > 0; timer -= BraveTime.DeltaTime)
+        {
+            shrinkLength = timer / fadeTimer;
+            yield return null;
+        }
+        DestroyExtantLink();
+        yield break;
     }
+
+    private void UpdateLink()
+    {
+        if (proj)
+            originPos = proj.specRigidbody.UnitCenter;
+        if (targetBody)
+            targetPos = targetBody.HitboxPixelCollider.UnitCenter;
+        else if (!disowned && owner)
+            targetPos = owner.specRigidbody.HitboxPixelCollider.UnitCenter;
+        this.extantLink.transform.position = originPos;
+        Vector2 vector = targetPos - originPos;
+        float num = BraveMathCollege.Atan2Degrees(vector.normalized);
+        int pixelLength = Mathf.RoundToInt(shrinkLength * vector.magnitude * 16f);
+        this.extantLink.dimensions = new Vector2((float)pixelLength, this.extantLink.dimensions.y);
+        this.extantLink.transform.rotation = Quaternion.Euler(0f, 0f, num);
+        this.extantLink.UpdateZDepth();
+        this.ApplyLinearDamage(originPos, targetPos);
+    }
+
     private void ApplyLinearDamage(Vector2 p1, Vector2 p2)
     {
-        if (owner is PlayerController)
+        Vector2 delta = (p2 - p1).normalized;
+        if (owner is PlayerController playerOwner)
         {
-            float damage = DamagePerTick;
-            damage *= self.ProjectilePlayerOwner().DamageMult();
+            float damage = baseDamage * playerOwner.DamageMult();
+            float bossMult = playerOwner.stats.GetStatValue(StatType.DamageToBosses);
             for (int i = 0; i < StaticReferenceManager.AllEnemies.Count; i++)
             {
                 AIActor aiactor = StaticReferenceManager.AllEnemies[i];
-                if (!this.m_damagedEnemies.Contains(aiactor))
-                {
-                    if (aiactor && aiactor.HasBeenEngaged && aiactor.IsNormalEnemy && aiactor.specRigidbody && aiactor.healthHaver)
-                    {
-                        if (aiactor.healthHaver.IsBoss) damage *= self.ProjectilePlayerOwner().stats.GetStatValue(StatType.DamageToBosses);
-                        Vector2 zero = Vector2.zero;
-                        if (BraveUtility.LineIntersectsAABB(p1, p2, aiactor.specRigidbody.HitboxPixelCollider.UnitBottomLeft, aiactor.specRigidbody.HitboxPixelCollider.UnitDimensions, out zero))
-                        {
-                            aiactor.healthHaver.ApplyDamage(DamagePerTick, Vector2.zero, "Chain Lightning", CoreDamageTypes.Electric, DamageCategory.Normal, false, null, false);
-                            GameManager.Instance.StartCoroutine(this.HandleDamageCooldown(aiactor));
-                        }
-                    }
-                }
+                if (this.m_damagedEnemies.Contains(aiactor))
+                    continue;
+                if (!aiactor || !aiactor.HasBeenEngaged || !aiactor.IsNormalEnemy || !aiactor.specRigidbody || !aiactor.healthHaver)
+                    continue;
+                Vector2 ipos;
+                PixelCollider col = aiactor.specRigidbody.HitboxPixelCollider;
+                if (col == null || !BraveUtility.LineIntersectsAABB(p1, p2, col.UnitBottomLeft, col.UnitDimensions, out ipos))
+                    continue;
+                aiactor.healthHaver.ApplyDamage(damage * (aiactor.healthHaver.IsBoss ? bossMult : 1f), delta,
+                    "Chain Lightning", CoreDamageTypes.Electric, DamageCategory.Normal, false, null, false);
+                GameManager.Instance.StartCoroutine(this.HandleDamageCooldown(aiactor));
             }
         }
         else if (owner is AIActor)
         {
-            if (GameManager.Instance.PrimaryPlayer != null)
+            foreach (PlayerController player in GameManager.Instance.AllPlayers)
             {
-                PlayerController player1 = GameManager.Instance.PrimaryPlayer;
-                Vector2 zero = Vector2.zero;
-                if (BraveUtility.LineIntersectsAABB(p1, p2, player1.specRigidbody.HitboxPixelCollider.UnitBottomLeft, player1.specRigidbody.HitboxPixelCollider.UnitDimensions, out zero))
-                {
-                    if (player1.healthHaver && player1.healthHaver.IsVulnerable && !player1.IsEthereal && !player1.IsGhost)
-                    {
-                        string damageSource = "Electricity";
-                        if (owner.encounterTrackable) damageSource = owner.encounterTrackable.GetModifiedDisplayName();
-                        if (self.IsBlackBullet) player1.healthHaver.ApplyDamage(1f, Vector2.zero, damageSource, CoreDamageTypes.Electric, DamageCategory.BlackBullet, true);
-                        else player1.healthHaver.ApplyDamage(0.5f, Vector2.zero, damageSource, CoreDamageTypes.Electric, DamageCategory.Normal, false);
-                    }
-                }
-            }
-            if (GameManager.Instance.SecondaryPlayer != null)
-            {
-                PlayerController player2 = GameManager.Instance.SecondaryPlayer;
-                Vector2 zero = Vector2.zero;
-                if (BraveUtility.LineIntersectsAABB(p1, p2, player2.specRigidbody.HitboxPixelCollider.UnitBottomLeft, player2.specRigidbody.HitboxPixelCollider.UnitDimensions, out zero))
-                {
-                    if (player2.healthHaver && player2.healthHaver.IsVulnerable && !player2.IsEthereal && !player2.IsGhost)
-                    {
-                        string damageSource = "Electricity";
-                        if (owner.encounterTrackable) damageSource = owner.encounterTrackable.GetModifiedDisplayName();
-                        if (self.IsBlackBullet) player2.healthHaver.ApplyDamage(1f, Vector2.zero, damageSource, CoreDamageTypes.Electric, DamageCategory.BlackBullet, true);
-                        else player2.healthHaver.ApplyDamage(0.5f, Vector2.zero, damageSource, CoreDamageTypes.Electric, DamageCategory.Normal, false);
-                    }
-                }
+                if (!player)
+                    continue;
+                Vector2 ipos;
+                PixelCollider pcol = player.specRigidbody.HitboxPixelCollider;
+                if (!BraveUtility.LineIntersectsAABB(p1, p2, pcol.UnitBottomLeft, pcol.UnitDimensions, out ipos))
+                    continue;
+                if (!player.healthHaver || !player.healthHaver.IsVulnerable || player.IsEthereal || player.IsGhost)
+                    continue;
+                string damageSource = "Electricity";
+                if (owner.encounterTrackable)
+                    damageSource = owner.encounterTrackable.GetModifiedDisplayName();
+                if (proj && proj.IsBlackBullet)
+                    player.healthHaver.ApplyDamage(1f, delta, damageSource, CoreDamageTypes.Electric, DamageCategory.BlackBullet, false);
+                else
+                    player.healthHaver.ApplyDamage(0.5f, delta, damageSource, CoreDamageTypes.Electric, DamageCategory.Normal, false);
             }
         }
     }
-    private HashSet<AIActor> m_damagedEnemies = new HashSet<AIActor>();
 
     private IEnumerator HandleDamageCooldown(AIActor damagedTarget)
     {
         this.m_damagedEnemies.Add(damagedTarget);
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(hitCooldown);
         this.m_damagedEnemies.Remove(damagedTarget);
         yield break;
     }

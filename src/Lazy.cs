@@ -655,6 +655,25 @@ public static class Lazy
             useNearestAngleInsteadOfDistance: useNearestAngleInsteadOfDistance, ignoreWalls: ignoreWalls);
     }
 
+    /// <summary>Determine all enemies within a radius of a point.</summary>
+    public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = 100f, bool ignoreWalls = false)
+    {
+        float sqrRadius = radius * radius;
+        enemies.Clear();
+
+        center.SafeGetEnemiesInRoom(ref _TempEnemies);
+        foreach (AIActor enemy in _TempEnemies)
+        {
+            if (!enemy.IsHostile(canBeNeutral: true))
+                continue;
+            Vector2 tentativeTarget = enemy.CenterPosition;
+            if ((tentativeTarget - center).sqrMagnitude > sqrRadius)
+                continue;
+            if (ignoreWalls || center.HasLineOfSight(tentativeTarget))
+                enemies.Add(enemy);
+        }
+    }
+
     /// <summary>Spawn a chest with a single guaranteed item inside of it</summary>
     public static Chest SpawnChestWithSpecificItem(PickupObject pickup, IntVector2 position, ItemQuality? overrideChestQuality = null, bool overrideJunk = false)
     {

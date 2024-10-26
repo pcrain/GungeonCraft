@@ -2,6 +2,7 @@
 
 ## 1.20.1 (TBD)
 
+- Added Plasmarble
 - Tweaked Drifter's Headgear:
 	- Removed enemy contact damage during dash
 	- Allowed player to fire their weapon during dash
