@@ -110,7 +110,7 @@ if [ $updategfx -eq 1 ]; then
   mkdir -p "./Resources/Atlases"
   # WARNING: all sprites need to be on the same texture, particularly those that are part of the same animation, or graphical glitches occur
   # sort orders: 1 == width, 2 == height (fastest for our purposes), 3 == area, 4 == max(width, height)
-  cheetah-texture-packer --sort-order 2 -s 2048x2048 --square --border-size 3 -o "./Resources/Atlases/atlas" "./RawResources/"
+  ~/bin/cheetah-texture-packer --sort-order 2 -s 2048x2048 --square --border-size 3 -o "./Resources/Atlases/atlas" "./RawResources/"
   # cheetah-texture-packer -s 2048x2048 --square --border-size 3 -o "./Resources/Atlases/atlas" "./RawResources/"
   # cheetah-texture-packer -s 1024x1024 --square --border-size 3 -o "./Resources/Atlases/atlas" "./RawResources/"
   # cheetah-texture-packer -s 1024x1024 --square --disable-crop --border-size 2 -o "./Resources/Atlases/atlas" "./RawResources/"

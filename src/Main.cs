@@ -26,6 +26,7 @@
     global using Dungeonator;
     global using HutongGames.PlayMaker; //FSM___ stuff
     global using HutongGames.PlayMaker.Actions; //FSM___ stuff
+    global using Alexandria.BreakableAPI;
     global using Alexandria.CharacterAPI;
     global using Alexandria.ItemAPI;
     global using Alexandria.EnemyAPI;
@@ -275,6 +276,7 @@ public class Initialisation : BaseUnityPlugin
                 Oddjob.Init();
                 Overflow.Init();
                 Plasmarble.Init();
+                Sunderbuss.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

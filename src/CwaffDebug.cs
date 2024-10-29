@@ -5,7 +5,7 @@ namespace CwaffingTheGungy;
 internal static class CwaffDebug
 {
 
-    // private static int _DebugItemId => IDs.Pickups["racket_launcher"];
+    // private static int _DebugItemId => Lazy.PickupId<Sunderbuss>();
     // // private static int _DebugItemId => (int)Items.CoolantLeak;
     // // private static int _DebugItemId => (int)Items.Casey;
     // // private static int _DebugItemId => (int)Items.Ration;

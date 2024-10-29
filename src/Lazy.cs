@@ -1180,4 +1180,36 @@ public static class Lazy
         float newSpeed = Mathf.Sqrt(Mathf.Max(v1.sqrMagnitude, v2.sqrMagnitude/*, newv1.sqrMagnitude, newv2.sqrMagnitude*/));
         PhysicsEngine.PostSliceVelocity = newSpeed * newv1.normalized;
     }
+
+    /// <summary>Get the color from a palette corresponding to a red float scalar (calculations from decompiled shader)</summary>
+    public static Color GetPaletteColor(Texture2D palette, float red)
+    {
+        const double INV_TEXEL_SIZE = 0.5;
+        double x = red * 15.9375; // 255 / 16
+        double texX = Math.Floor(x) * 0.0625 + 0.4;
+        double texY = Math.Sign(x) * Math.Abs(x - Math.Truncate(x)) + 0.4;
+        int pixX = (int)Math.Round(INV_TEXEL_SIZE * texX * palette.width);
+        int pixY = (int)Math.Round(INV_TEXEL_SIZE * texY * palette.height);
+        return palette.GetPixel(pixX, pixY);
+    }
+
+    private static readonly Dictionary<Texture, Texture2D> _ReadableTexes = new();
+    /// <summary>Get the pixel colors for the best idle animation sprite for an enemy by GUID</summary>
+    public static Color[] GetPixelColorsForEnemy(string guid)
+    {
+        AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
+        // Lazy.DebugLog($"looking up pigment for {prefab.ActorName}");
+        tk2dSpriteDefinition def = prefab.GetComponent<tk2dSprite>().collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(prefab)];
+        // Lazy.DebugLog($"  got def {def.name}");
+
+        Texture mainTex = def.material.mainTexture;
+        if (!_ReadableTexes.TryGetValue(mainTex, out Texture2D tex))
+            tex = _ReadableTexes[mainTex] = (mainTex as Texture2D).GetRW();
+        return tex.GetPixels(
+            x           : Mathf.RoundToInt(def.uvs[0].x * tex.width),
+            y           : Mathf.RoundToInt(def.uvs[0].y * tex.height),
+            blockWidth  : Mathf.RoundToInt((def.uvs[3].x - def.uvs[0].x) * tex.width),
+            blockHeight : Mathf.RoundToInt((def.uvs[3].y - def.uvs[0].y) * tex.height)
+            );
+    }
 }

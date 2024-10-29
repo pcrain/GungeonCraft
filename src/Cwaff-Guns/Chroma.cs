@@ -358,39 +358,15 @@ public class Desaturator : MonoBehaviour
             this._lastKnownHealth = hh.currentHealth;
     }
 
-    private static readonly Dictionary<Texture, Texture2D> _ReadableTexes = new();
-
-    private static Color GetPaletteColor(Texture2D palette, float red)
-    {
-        const double INV_TEXEL_SIZE = 0.5;
-        double x = red * 15.9375; // 255 / 16
-        double texX = Math.Floor(x) * 0.0625 + 0.4;
-        double texY = Math.Sign(x) * Math.Abs(x - Math.Truncate(x)) + 0.4;
-        int pixX = (int)Math.Round(INV_TEXEL_SIZE * texX * palette.width);
-        int pixY = (int)Math.Round(INV_TEXEL_SIZE * texY * palette.height);
-        return palette.GetPixel(pixX, pixY);
-    }
-
     private static IntVector3 ComputePigmentForEnemy(string guid)
     {
-        AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
-        // Lazy.DebugLog($"looking up pigment for {prefab.ActorName}");
-        tk2dSpriteDefinition def = prefab.GetComponent<tk2dSprite>().collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(prefab)];
-        // Lazy.DebugLog($"  got def {def.name}");
-
         float r = 0;
         float g = 0;
         float b = 0;
-        Texture mainTex = def.material.mainTexture;
-        if (!_ReadableTexes.TryGetValue(mainTex, out Texture2D tex))
-            tex = _ReadableTexes[mainTex] = (mainTex as Texture2D).GetRW();
+
+        Color[] pixels = Lazy.GetPixelColorsForEnemy(guid);
+        AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
         Texture2D paletteTex = prefab.optionalPalette ? prefab.optionalPalette.GetRW() : null;
-        Color[] pixels = tex.GetPixels(
-            x           : Mathf.RoundToInt(def.uvs[0].x * tex.width),
-            y           : Mathf.RoundToInt(def.uvs[0].y * tex.height),
-            blockWidth  : Mathf.RoundToInt((def.uvs[3].x - def.uvs[0].x) * tex.width),
-            blockHeight : Mathf.RoundToInt((def.uvs[3].y - def.uvs[0].y) * tex.height)
-            );
         int npixels = pixels.Length;
         for (int i = 0; i < npixels; ++i)
         {
@@ -398,7 +374,7 @@ public class Desaturator : MonoBehaviour
             if (pixel.a < 0.5f)
                 continue; // mostly-transparent pixels don't count
             if (paletteTex)
-                pixel = GetPaletteColor(paletteTex, pixel.r);
+                pixel = Lazy.GetPaletteColor(paletteTex, pixel.r);
             Color.RGBToHSV(pixel, out float h, out float s, out float v);
             if (s < 0.25f)
                 continue; // mostly-gray pixels don't count

@@ -2675,7 +2675,7 @@ public static class Extensions
     return proj;
   }
 
-  /// <summary>Given a non-increasing array of numbers, returns the first index i for which val >= vals[i].</summary>
+  /// <summary>Given a non-increasing array of numbers, returns the first index i for which val is at least vals[i].</summary>
   public static int FirstGE<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
@@ -2684,7 +2684,7 @@ public static class Extensions
     return vals.Length;
   }
 
-  /// <summary>Given a non-increasing array of numbers, returns the first index i for which val > vals[i].</summary>
+  /// <summary>Given a non-increasing array of numbers, returns the first index i for which val is more than vals[i].</summary>
   public static int FirstGT<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
@@ -2693,7 +2693,7 @@ public static class Extensions
     return vals.Length;
   }
 
-  /// <summary>Given a non-decreasing array of numbers, returns the first index i for which val <= vals[i].</summary>
+  /// <summary>Given a non-decreasing array of numbers, returns the first index i for which val is no more than vals[i].</summary>
   public static int FirstLE<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)
@@ -2702,7 +2702,7 @@ public static class Extensions
     return vals.Length;
   }
 
-  /// <summary>Given a non-decreasing array of numbers, returns the first index i for which val < vals[i].</summary>
+  /// <summary>Given a non-decreasing array of numbers, returns the first index i for which val is less than vals[i].</summary>
   public static int FirstLT<T>(this T[] vals, T val) where T : IComparable<T>
   {
     for (int i = 0; i < vals.Length; ++i)

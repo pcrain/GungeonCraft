@@ -219,6 +219,7 @@
     <Compile Include="src\Cwaff-Guns\Jugglernaut.cs"/>
     <Compile Include="src\Cwaff-Guns\KALI.cs"/>
     <Compile Include="src\Cwaff-Guns\AlienNailgun.cs"/>
+    <Compile Include="src\Cwaff-Guns\Sunderbuss.cs"/>
     <Compile Include="src\Cwaff-Guns\English.cs"/>
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\SubMachineGun.cs"/>

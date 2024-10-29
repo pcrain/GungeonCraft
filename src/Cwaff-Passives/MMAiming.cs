@@ -9,11 +9,33 @@ public class MMAiming : CwaffPassive
 
     private const float _SPREAD_FACTOR = 0.5f;
 
+    [Serializable]
+    public class SomethingDumb
+    {
+        [SerializeField]
+        public string someString = "will this work?";
+    }
+
+    public class SomethingDumbBehavior : MonoBehaviour
+    {
+        [SerializeField]
+        public SomethingDumb dumbThing;
+    }
+
     public static void Init()
     {
         PassiveItem item  = Lazy.SetupPassive<MMAiming>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
+        SomethingDumbBehavior sdb = item.AddComponent<SomethingDumbBehavior>();
+        sdb.dumbThing = new();
+        sdb.dumbThing.someString = "this better work!";
+    }
+
+    public override void Pickup(PlayerController player)
+    {
+        ETGModConsole.Log($"my string is {base.gameObject.GetComponent<SomethingDumbBehavior>().dumbThing.someString}");
+        base.Pickup(player);
     }
 
     // NOTE: called by patch in CwaffPatches
