@@ -852,7 +852,7 @@ public static class Extensions
     float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, bool immobilizeWhileCharging = false,
-    bool onlyUsesIdleInWeaponBox = false)
+    bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -889,6 +889,8 @@ public static class Extensions
       gun.usesContinuousFireAnimation = true;
       gun.LoopAnimation(gun.shootAnimation);
     }
+    if (continuousFireAnimation)
+      cg.continuousFireAnimation = true;
 
     if (dynamicBarrelOffsets)
       CwaffGun.SetUpDynamicBarrelOffsets(gun);
@@ -2990,6 +2992,13 @@ public static class Extensions
   {
     gun.SetAnimationFPS(animation, fps);
     return gun;
+  }
+
+  /// <summary>Play an animation if it's not the current one</summary>
+  public static void PlayIfNotPlaying(this tk2dSpriteAnimator animator, string anim)
+  {
+    if (!animator.IsPlaying(anim))
+      animator.Play(anim);
   }
 }
 

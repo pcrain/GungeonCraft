@@ -46,10 +46,15 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   private Vector3                           _defaultBarrelOffset       = Vector3.zero; // the default barrel offset for guns with dynamic offsets
   private ModuleShootData                   _cachedShootData           = null; // cached firing data for getting info on extant beams, etc.
 
+  protected float                           _spinupRemaining           = 0.0f; // the remaining time a gun must spin up before firing
+
   public  bool                              hideAmmo                   = false;  // whether our ammo display is visible
   public  bool                              suppressReloadLabel        = false;  // whether to suppress reload label when out of ammo
   public  bool                              preventMovingWhenCharging  = false;  // whether holding the gun prevents the player from moving
   public  bool                              preventRollingWhenCharging = false;  // whether holding the gun prevents the player from dodge rolling
+  public  float                             spinupTime                 = 0.0f;   // the amount of time it takes an automatic weapon to start firing
+  public  string                            spinupSound                = null;   // the sound to play while an automatic gun is spinning up
+  public  bool                              continuousFireAnimation    = false;  // if true, don't restart shooting animation when firing bullet
 
   public static void SetUpDynamicBarrelOffsets(Gun gun)
   {
@@ -205,6 +210,12 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           return oldFireRate * ((gun.GetComponent<CwaffGun>() is CwaffGun cg) ? cg.GetDynamicFireRate() : 1f);
       }
   }
+
+  /// <summary>Query whether the gun is currently spinning up</summary>
+  protected bool IsSpinningUp() => _spinupRemaining < spinupTime && _spinupRemaining > 0;
+  /// <summary>Query whether the gun has been spun up</summary>
+
+  protected bool IsSpunUp() => _spinupRemaining <= 0;
 
   /// <summary>Determines an additional dynamic accuracy multiplier for the gun.</summary>
   public virtual float GetDynamicAccuracy() => 1.0f;
@@ -411,6 +422,120 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
         if (!gun.gameObject.GetComponent<CwaffGun>())
           return true; // don't affect vanilla guns
         return false;
+      }
+  }
+
+  /// <summary>Allow automatic guns to have a spin up time</summary>
+  [HarmonyPatch]
+  private class GunHandleInitialGunShootPatch
+  {
+      [HarmonyPatch(typeof(Gun), nameof(Gun.HandleInitialGunShoot), typeof(ProjectileModule), typeof(ProjectileData), typeof(GameObject))]
+      [HarmonyPatch(typeof(Gun), nameof(Gun.HandleInitialGunShoot), typeof(ProjectileVolleyData), typeof(ProjectileData), typeof(GameObject))]
+      [HarmonyILManipulator]
+      private static void GunHandleInitialGunShootIL(ILContext il)
+      {
+          ILCursor cursor = new ILCursor(il);
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<ModuleShootData>(nameof(ModuleShootData.onCooldown))))
+            return;
+          cursor.Emit(OpCodes.Ldarg_0);
+          cursor.CallPrivate(typeof(GunHandleInitialGunShootPatch), nameof(HandleAutomaticGunWindup));
+      }
+
+      private static bool HandleAutomaticGunWindup(bool wasOnCooldown, Gun gun)
+      {
+        if (wasOnCooldown)
+          return true;
+        if (gun.CurrentOwner is not PlayerController player)
+          return false;
+        if (gun.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg)
+          return false;
+        if (cg.spinupTime <= 0.0f)
+          return false; // don't have spin up
+        BraveInput currentBraveInput = BraveInput.GetInstanceForPlayer(player.PlayerIDX);
+        if (currentBraveInput.GetButtonDown(GungeonActions.GungeonActionType.Shoot))
+        {
+          // System.Console.WriteLine($"consuming fire");
+          currentBraveInput.ConsumeButtonDown(GungeonActions.GungeonActionType.Shoot);
+        }
+        cg._spinupRemaining = Mathf.Max(cg._spinupRemaining - BraveTime.DeltaTime, 0f);
+        if (!string.IsNullOrEmpty(cg.spinupSound))
+          cg.LoopSoundIf(cg._spinupRemaining > 0, cg.spinupSound);
+        // System.Console.WriteLine($"on cooldown? {cg._spinupRemaining > 0}");
+        return cg._spinupRemaining > 0;
+      }
+  }
+
+  /// <summary>Reset spinup for automatic guns</summary>
+  [HarmonyPatch]
+  private class PlayerControllerHandleGunFiringInternalPatch
+  {
+      [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandleGunFiringInternal))]
+      [HarmonyPrefix]
+      static void HandleGunFiringInternalPrefix(PlayerController __instance, Gun targetGun, BraveInput currentBraveInput, bool isSecondary)
+      {
+        if (!targetGun || targetGun.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg)
+          return;
+
+        if (currentBraveInput.GetButtonUp(GungeonActions.GungeonActionType.Shoot))
+        {
+          currentBraveInput.ConsumeButtonUp(GungeonActions.GungeonActionType.Shoot);
+          // System.Console.WriteLine($"resetting spinup");
+          cg._spinupRemaining = cg.spinupTime;
+        }
+      }
+
+      [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandleGunFiringInternal))]
+      [HarmonyILManipulator]
+      private static void PlayerControllerHandleGunFiringInternalIL(ILContext il)
+      {
+          ILCursor cursor = new ILCursor(il);
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<BraveInput>(nameof(BraveInput.GetButtonDown))))
+            return;
+          cursor.Emit(OpCodes.Ldarg_1); // Gun
+          cursor.CallPrivate(typeof(PlayerControllerHandleGunFiringInternalPatch), nameof(HandleAutomaticGunWindup));
+      }
+
+      private static bool HandleAutomaticGunWindup(bool wasFiring, Gun gun)
+      {
+        if (!gun || gun.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg || cg.spinupTime <= 0.0f)
+          return wasFiring; // no adjustment
+        if (gun.CurrentOwner is not PlayerController player)
+          return wasFiring; // no adjustment
+
+        BraveInput currentBraveInput = BraveInput.GetInstanceForPlayer(player.PlayerIDX);
+        if (currentBraveInput.GetButtonDown(GungeonActions.GungeonActionType.Shoot))
+        {
+          // System.Console.WriteLine($"consuming fire");
+          currentBraveInput.ConsumeButtonDown(GungeonActions.GungeonActionType.Shoot);
+        }
+
+        bool isFiring = wasFiring || currentBraveInput.GetButton(GungeonActions.GungeonActionType.Shoot);
+        if (!isFiring)
+          cg._spinupRemaining = cg.spinupTime;
+        return isFiring;
+      }
+  }
+
+  /// <summary>Allow guns to not reset their shooting animation with every bullet fired</summary>
+  [HarmonyPatch]
+  private class GunShootAnimationPatch
+  {
+      [HarmonyPatch(typeof(Gun), nameof(Gun.HandleShootAnimation))]
+      [HarmonyILManipulator]
+      private static void GunShootAnimationIL(ILContext il)
+      {
+          ILCursor cursor = new ILCursor(il);
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcI4(1)))
+            return;
+          cursor.Emit(OpCodes.Ldarg_0);
+          cursor.CallPrivate(typeof(GunShootAnimationPatch), nameof(CheckShouldRestartShootAnimation));
+      }
+
+      private static bool CheckShouldRestartShootAnimation(bool shouldRestart, Gun gun)
+      {
+          if (gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
+            return !cg.continuousFireAnimation;
+          return shouldRestart;
       }
   }
 }

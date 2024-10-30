@@ -1,6 +1,4 @@
-﻿
-
-namespace CwaffingTheGungy;
+﻿namespace CwaffingTheGungy;
 
 public class Vladimir : CwaffGun
 {
@@ -14,9 +12,6 @@ public class Vladimir : CwaffGun
     internal const float _CURSE_DAMAGE_SCALING         = 4.0f;
     internal const int   _ENEMIES_PER_CURSE            = 10;
 
-    internal static List<Vector3> _IdleBarrelOffsets   = new();
-    internal static List<Vector3> _ShootBarrelOffsets  = new();
-    internal static List<Vector3> _ChargeBarrelOffsets = new();
     internal static GameObject _AbsorbVFX              = null;
 
     internal int _enemiesKilled                        = 0;

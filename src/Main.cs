@@ -277,6 +277,7 @@ public class Initialisation : BaseUnityPlugin
                 Overflow.Init();
                 Plasmarble.Init();
                 Sunderbuss.Init();
+                Macheening.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

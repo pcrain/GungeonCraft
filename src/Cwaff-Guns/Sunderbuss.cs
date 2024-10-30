@@ -32,7 +32,7 @@ public class Sunderbuss : CwaffGun
                 AngularVelocity         : 0,
                 AngularVelocityVariance : 1080,
                 DebrisBounceCount       : 2).gameObject;
-        //TODO: add Blunderbuss projectiles
+
         _BlunderbussProjectile = Items.Blunderbuss.AsGun().rawVolley.projectiles[0].chargeProjectiles[0].Projectile.gameObject.ClonePrefab();
         UnityEngine.Object.Destroy(_BlunderbussProjectile.GetComponent<BounceProjModifier>());
         Projectile proj = _BlunderbussProjectile.GetComponent<Projectile>();
