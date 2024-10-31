@@ -3,8 +3,8 @@ namespace CwaffingTheGungy;
 public class Sunderbuss : CwaffGun
 {
     public static string ItemName         = "Sunderbuss";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Smashed to Oblivion";
+    public static string LongDescription  = "Smashes the ground with extreme force, releasing projectiles in all directions. Slows the user down immensely while charging. User receives double damage from all sources while this gun is equipped.";
     public static string Lore             = "TBD";
 
     internal static readonly string[] _ColorNames = ["red", "yellow", "green", "cyan", "blue", "magenta", "gray"];
@@ -17,7 +17,8 @@ public class Sunderbuss : CwaffGun
     {
         Lazy.SetupGun<Sunderbuss>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.0f, ammo: 100, shootFps: 60, idleFps: _IDLE_FPS,
-            chargeFps: 12, loopChargeAt: 18, fireAudio: "sunderbuss_fire", infiniteAmmo: true, attacksThroughWalls: true, autoPlay: false)
+            chargeFps: 12, loopChargeAt: 18, fireAudio: "sunderbuss_fire", infiniteAmmo: true, attacksThroughWalls: true, autoPlay: false,
+            percentSpeedWhileCharging: 0.35f, preventRollingWhenCharging: true)
           .InitSpecialProjectile<SunderbussProjectile>(GunData.New(clipSize: -1, cooldown: 1.0f, angleVariance: 0.0f,
             shootStyle: ShootStyle.Charged, damage: 50.0f, speed: 1.0f, range: 0.01f, sprite: "sunderbuss_projectile", fps: 30,
             anchor: Anchor.MiddleCenter, chargeTime: 1.5f, hideAmmo: true));
@@ -44,6 +45,7 @@ public class Sunderbuss : CwaffGun
         base.OnPlayerPickup(player);
         gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
         gun.spriteAnimator.Play();
+        player.healthHaver.ModifyDamage += this.OnTakeDamage;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -51,6 +53,20 @@ public class Sunderbuss : CwaffGun
         base.OnDroppedByPlayer(player);
         gun.SetAnimationFPS(gun.idleAnimation, 0);
         gun.spriteAnimator.StopAndResetFrameToDefault();
+        player.healthHaver.ModifyDamage -= this.OnTakeDamage;
+    }
+
+    private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
+    {
+        if (this.gun.CurrentOwner is PlayerController player && player.CurrentGun == this.gun)
+            data.ModifiedDamage *= 2f;
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            this.PlayerOwner.healthHaver.ModifyDamage -= this.OnTakeDamage;
+        base.OnDestroy();
     }
 }
 

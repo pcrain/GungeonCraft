@@ -851,8 +851,8 @@ public static class Extensions
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
     float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
-    GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, bool immobilizeWhileCharging = false,
-    bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false)
+    GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
+    bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -892,15 +892,13 @@ public static class Extensions
     if (continuousFireAnimation)
       cg.continuousFireAnimation = true;
 
+    cg.percentSpeedWhileCharging = percentSpeedWhileCharging;
     if (dynamicBarrelOffsets)
       CwaffGun.SetUpDynamicBarrelOffsets(gun);
     if (suppressReloadLabel)
       cg.suppressReloadLabel = true;
-    if (immobilizeWhileCharging)
-    {
-      cg.preventMovingWhenCharging = true;
+    if (preventRollingWhenCharging)
       cg.preventRollingWhenCharging = true;
-    }
 
     if (curse != 0f)
       gun.AddStatToGun(StatType.Curse.Add(curse));

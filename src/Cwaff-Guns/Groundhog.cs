@@ -17,7 +17,8 @@ public class Groundhog : CwaffGun
     {
         Lazy.SetupGun<Groundhog>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 0.0f, ammo: 50, shootFps: 14, reloadFps: 4,
-            chargeFps: (int)_BASE_FPS, attacksThroughWalls: true, immobilizeWhileCharging: true, loopChargeAt: 15)
+            chargeFps: (int)_BASE_FPS, attacksThroughWalls: true, percentSpeedWhileCharging: 0.0f, preventRollingWhenCharging: true,
+            loopChargeAt: 15)
           .SetChargeAudio("groundhog_burrow_sound", 11)
           .InitProjectile(GunData.New(sprite: null, clipSize: 1, cooldown: 0.75f, shootStyle: ShootStyle.Charged, chargeTime: 2f, hideAmmo: true,
             damage: 50.0f, speed: 25f, range: 100f, force: 30f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound"));
