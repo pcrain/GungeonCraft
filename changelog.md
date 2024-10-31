@@ -2,7 +2,7 @@
 
 ## 1.20.1 (TBD)
 
-- Added Plasmarble and Sunderbuss
+- Added Plasmarble, Sunderbuss, Macheening, and Lichguard
 - Tweaked Drifter's Headgear:
 	- Removed enemy contact damage during dash
 	- Allowed player to fire their weapon during dash

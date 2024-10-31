@@ -4,7 +4,7 @@ public class Sunderbuss : CwaffGun
 {
     public static string ItemName         = "Sunderbuss";
     public static string ShortDescription = "Smashed to Oblivion";
-    public static string LongDescription  = "Smashes the ground with extreme force, releasing projectiles in all directions. Slows the user down immensely while charging. User receives double damage from all sources while this gun is equipped.";
+    public static string LongDescription  = "Smashes the ground with extreme force, releasing projectiles in all directions. Slows the user down immensely while charging. User receives double damage from all sources while this weapon is equipped.";
     public static string Lore             = "TBD";
 
     internal static readonly string[] _ColorNames = ["red", "yellow", "green", "cyan", "blue", "magenta", "gray"];

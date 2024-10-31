@@ -5,7 +5,7 @@ public class Macheening : CwaffGun
 {
     public static string ItemName         = "Macheening";
     public static string ShortDescription = "Let the Daggers Fall";
-    public static string LongDescription  = "Fires magic blade projectiles conjured through sheer willpower. Requires unbroken concentration while firing, preventing movement or rolling. User receives double damage from all sources while this gun is equipped.";
+    public static string LongDescription  = "Fires magic blade projectiles conjured through sheer willpower. Requires unbroken concentration while firing, preventing movement or rolling. User receives double damage from all sources while this weapon is equipped.";
     public static string Lore             = "TBD";
 
     private static string _PrefireAnim;
