@@ -2998,5 +2998,52 @@ public static class Extensions
     if (!animator.IsPlaying(anim))
       animator.Play(anim);
   }
+
+  /// <summary>Make an item increase the chance of finding another item.</summary>
+  public static T IncreaseLootChance<T>(this T pickup, int pickupId, float multiplier) where T : PickupObject
+  {
+    pickup.associatedItemChanceMods ??= new LootModData[0];
+    int oldLength = pickup.associatedItemChanceMods.Length;
+    Array.Resize(ref pickup.associatedItemChanceMods, oldLength + 1);
+    pickup.associatedItemChanceMods[oldLength] = new(){
+      AssociatedPickupId = pickupId,
+      DropRateMultiplier = multiplier,
+    };
+    return pickup;
+  }
+
+  private class UnresolvedLootData
+  {
+    public PickupObject pickup;
+    public Type type;
+    public float multiplier;
+  }
+  private static readonly List<UnresolvedLootData> _UnresolvedLootChances = new();
+  /// <summary>Make an item increase the chance of finding another modded item.</summary>
+  public static T IncreaseLootChance<T>(this T pickup, Type pickupType, float multiplier) where T : PickupObject
+  {
+    _UnresolvedLootChances.Add(new(){
+      pickup = pickup,
+      type = pickupType,
+      multiplier = multiplier,
+    }); // resolved later with call to Lazy.ResolveModdedLootChances()
+    return pickup;
+  }
+
+  internal static void ResolveModdedLootChances(this GameManager gm)
+  {
+    foreach (UnresolvedLootData u in _UnresolvedLootChances)
+    {
+      PickupObject pickup = u.pickup;
+      pickup.associatedItemChanceMods ??= new LootModData[0];
+      int oldLength = pickup.associatedItemChanceMods.Length;
+      Array.Resize(ref pickup.associatedItemChanceMods, oldLength + 1);
+      pickup.associatedItemChanceMods[oldLength] = new(){
+        AssociatedPickupId = Lazy.PickupId(u.type),
+        DropRateMultiplier = u.multiplier,
+      };
+      // Lazy.DebugLog($"adding loot chance x{u.multiplier} for {Lazy.PickupId(u.type)} == {Lazy.Pickup(u.type).DisplayName} when possessing {pickup.DisplayName}");
+    }
+  }
 }
 

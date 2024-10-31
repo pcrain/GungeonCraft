@@ -225,8 +225,14 @@ public static class Lazy
     /// <summary>Retrieve the pickup object associated with a given type</summary>
     public static PickupObject Pickup<T>() => _CustomPickups[typeof(T)];
 
+    /// <summary>Retrieve the pickup object associated with a given type</summary>
+    public static PickupObject Pickup(Type t) => _CustomPickups[t];
+
     /// <summary>Retrieve the pickup object id associated with a given type</summary>
     public static int PickupId<T>() => _CustomPickupIds[typeof(T)];
+
+    /// <summary>Retrieve the pickup object id associated with a given type</summary>
+    public static int PickupId(Type t) => _CustomPickupIds[t];
 
     /// <summary>
     /// Post a custom item pickup notification to the bottom of the screen

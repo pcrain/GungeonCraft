@@ -11,17 +11,25 @@ public class Sunderbuss : CwaffGun
     internal static GameObject _ScorchMark = null;
     internal static GameObject _BlunderbussProjectile = null;
     internal static GameObject[] _ShatterDebris = new GameObject[7];
-    internal const int  _IDLE_FPS = 6;
+
+    private const int  _IDLE_FPS = 6;
+    private const float _RUN_SPEED_WHEN_CHARGING = 0.35f;
+    private const int _CHARGE_FPS = 12;
+    private const float _CHARGE_TIME = 1.5f;
+    private const float _COOLDOWN = 1.0f;
+
+    private bool _hasLichguard = false;
 
     public static void Init()
     {
         Lazy.SetupGun<Sunderbuss>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.0f, ammo: 100, shootFps: 60, idleFps: _IDLE_FPS,
-            chargeFps: 12, loopChargeAt: 18, fireAudio: "sunderbuss_fire", infiniteAmmo: true, attacksThroughWalls: true, autoPlay: false,
-            percentSpeedWhileCharging: 0.35f, preventRollingWhenCharging: true)
-          .InitSpecialProjectile<SunderbussProjectile>(GunData.New(clipSize: -1, cooldown: 1.0f, angleVariance: 0.0f,
+            chargeFps: _CHARGE_FPS, loopChargeAt: 18, fireAudio: "sunderbuss_fire", infiniteAmmo: true, attacksThroughWalls: true,
+            autoPlay: false, percentSpeedWhileCharging: _RUN_SPEED_WHEN_CHARGING, preventRollingWhenCharging: true)
+          .IncreaseLootChance(typeof(Lichguard), 20f)
+          .InitSpecialProjectile<SunderbussProjectile>(GunData.New(clipSize: -1, cooldown: _COOLDOWN, angleVariance: 0.0f,
             shootStyle: ShootStyle.Charged, damage: 50.0f, speed: 1.0f, range: 0.01f, sprite: "sunderbuss_projectile", fps: 30,
-            anchor: Anchor.MiddleCenter, chargeTime: 1.5f, hideAmmo: true));
+            anchor: Anchor.MiddleCenter, chargeTime: _CHARGE_TIME, hideAmmo: true));
 
         _ScorchMark = Explosions.EmergencyCrate.effect.transform.Find("scorch").gameObject;
         for (int i = 0; i < 7; ++i)
@@ -46,6 +54,8 @@ public class Sunderbuss : CwaffGun
         gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
         gun.spriteAnimator.Play();
         player.healthHaver.ModifyDamage += this.OnTakeDamage;
+        CwaffEvents.OnStatsRecalculated += this.CheckForLichguard;
+        CheckForLichguard(player);
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -54,19 +64,33 @@ public class Sunderbuss : CwaffGun
         gun.SetAnimationFPS(gun.idleAnimation, 0);
         gun.spriteAnimator.StopAndResetFrameToDefault();
         player.healthHaver.ModifyDamage -= this.OnTakeDamage;
+        CwaffEvents.OnStatsRecalculated += this.CheckForLichguard;
+        CheckForLichguard(player);
     }
 
     private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
     {
-        if (this.gun.CurrentOwner is PlayerController player && player.CurrentGun == this.gun)
+        if (!this._hasLichguard && this.gun.CurrentOwner is PlayerController player && player.CurrentGun == this.gun)
             data.ModifiedDamage *= 2f;
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
+        {
             this.PlayerOwner.healthHaver.ModifyDamage -= this.OnTakeDamage;
+            CwaffEvents.OnStatsRecalculated -= this.CheckForLichguard;
+        }
         base.OnDestroy();
+    }
+
+    private void CheckForLichguard(PlayerController player)
+    {
+        this._hasLichguard = player.HasPassive<Lichguard>();
+        this.percentSpeedWhileCharging = this._hasLichguard ? 1.0f : _RUN_SPEED_WHEN_CHARGING;
+        this.gun.SetAnimationFPS(this.gun.chargeAnimation, (this._hasLichguard ? 2 : 1) * _CHARGE_FPS);
+        this.gun.DefaultModule.chargeProjectiles[0].ChargeTime = (this._hasLichguard ? 0.5f : 1.0f) * _CHARGE_TIME;
+        this.gun.DefaultModule.cooldownTime = (this._hasLichguard ? 0.5f : 1.0f) * _COOLDOWN;
     }
 }
 

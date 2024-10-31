@@ -98,7 +98,10 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   /// <summary>Called the first time a gun is picked up by a player during a run</summary>
   public virtual void OnFirstPickup(PlayerController player)
   {
-
+    //NOTE: fix a vanilla issue where guns' associatedItemChanceMods data is ignored
+    if (this.gun.associatedItemChanceMods != null)
+      foreach(LootModData mod in this.gun.associatedItemChanceMods)
+        player.lootModData.Add(mod);
   }
 
   /// <summary>

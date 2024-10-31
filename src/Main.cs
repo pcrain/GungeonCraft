@@ -357,6 +357,9 @@ public class Initialisation : BaseUnityPlugin
                 BulletproofTablecloth.Init();
                 AmethystShard.Init();
                 PrismaticScope.Init();
+                Lichguard.Init();
+
+                GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 
                 setupPassivesWatch.Stop();
             #endregion
