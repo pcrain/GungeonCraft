@@ -10,6 +10,7 @@
 	- Allowed player to slide over tables during dash
 - Updated required Alexandria version to 0.4.15 for custom dodge roll API
 - Fixed null deref caused by Credit Card trying to update UI for non-existent player
+- Fixed infinitely looping audio issues on several guns wielded by enemies in Hecked Mode
 
 ## 1.20.0 (2024-10-15)
 

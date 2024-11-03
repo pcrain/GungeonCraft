@@ -1,7 +1,6 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - fix audio on all noisy weapons to stop playing when appropriate
     - fix charged weapons to actually respect charge
     - fix beam weapons to not persist when restarting
     - fix burst weapons to fire more than one shot
@@ -67,7 +66,6 @@ public static class HeckedMode
         (int)Items.MrAccretionJr,  // but hilarious
         (int)Items.MoonlightTiara,
         (int)Items.TheFatLine,
-        // (int)Items.TripleGunForm3,  // normal beam + audio issues (but it's hilariously threatening and makes for good content)
         (int)Items.Shell,
         (int)Items.Bullet,
         (int)Items.Gunzheng,
@@ -237,6 +235,8 @@ public static class HeckedMode
         (int)Items.Stinger,
         (int)Items.Shotbow,
         (int)Items.Mahoguny,
+        (int)Items.ReallySpecialLute,
+        (int)Items.FaceMelter,
 
         // Easy to Deal With
         (int)Items.SkullSpitter, // invariably homes in on other enemies
@@ -253,17 +253,14 @@ public static class HeckedMode
         (int)Items.CatClaw, // barely threatening and very goofy looking
         (int)Items.MolotovLauncher,
         (int)Items.AbyssalTentacle, // self destruct
+        (int)Items.ElTigre, // somewhat noisy and evidently can't damage the player
 
         // Semi-broken, projectile module related
         // (int)Items.GungeonAnt, // null deref looking up a projectile module
         // (int)Items.CombinedRifle, // null deref looking up a projectile module
         // (int)Items.StaffOfFirepower, // null deref looking up a projectile module
         // (int)Items.TripleCrossbow, // null deref looking up a projectile module
-
-        // Semi-broken, sound-related
-        // (int)Items.ReallySpecialLute,  // overlapping sounds
-        // (int)Items.FaceMelter, // works fine, but sounds never stop playing
-        // (int)Items.ElTigre, // very noisy and a little silly projectile orbiting behavior, but seems fine otherwise
+        // (int)Items.TripleGunForm3,  // normal beam issues + can't hurt the player (but it's hilariously threatening and makes for good content)
 
         // Semi-broken
         // (int)Items.Blasphemy, // no damage except from collision, null derefs on slash
@@ -433,7 +430,18 @@ public static class HeckedMode
                 replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(0, _FirstWeakGun)];
             else
                 replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(_FirstNonBeam, HeckedModeGunWhiteList.Count)];
+            replacementGunId = Items.TripleGunForm3;
             __instance.HeckedShootGunBehavior(replacementGunId.AsGun());
+        }
+    }
+
+    [HarmonyPatch(typeof(Gun), nameof(Gun.OnDestroy))]
+    private class GunOnDestroyPatch
+    {
+        static void Prefix(Gun __instance)
+        {
+            if (GameManager.AUDIO_ENABLED)
+                AkSoundEngine.PostEvent("Stop_WPN_gun_loop_01", __instance.gameObject);
         }
     }
 
