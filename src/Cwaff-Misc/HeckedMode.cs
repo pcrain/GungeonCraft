@@ -17,9 +17,9 @@ namespace CwaffingTheGungy;
     + 10x shop prices
     + all bosses are jammed
     + no bullet that can kill the future
+    + gun fairies galore
 
     - no default 2 blank restoration per floor (except for ammolets)
-    - gun fairies galore
 
     x no time slowing (too hard to implement)
 */
@@ -307,7 +307,7 @@ public static class HeckedMode
         _HeckedModeStatus = heckedConfig switch {
             "Disabled"  => Hecked.Disabled,
             "Hecked"    => Hecked.Classic,
-            // "Retrashed" => Hecked.Retrashed,  //NOTE: re-enable once Retrashed Mode is ready
+            "Retrashed" => Hecked.Retrashed,  //NOTE: re-enable once Retrashed Mode is ready
             _           => Hecked.Disabled,
         };
     }
@@ -430,7 +430,6 @@ public static class HeckedMode
                 replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(0, _FirstWeakGun)];
             else
                 replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(_FirstNonBeam, HeckedModeGunWhiteList.Count)];
-            replacementGunId = Items.TripleGunForm3;
             __instance.HeckedShootGunBehavior(replacementGunId.AsGun());
         }
     }
@@ -471,13 +470,6 @@ public static class HeckedMode
             gun.IsTrickGun = false; // fixes Trick Gun null deref in FinishReload()
         }
     }
-
-    // private static bool OnRandomShouldBecomeMimic(Func<SharedDungeonSettings, float, bool> orig, SharedDungeonSettings sds, float overrideChance)
-    // {
-    //     if (HeckedModeStatus == Hecked.Retrashed)
-    //         return orig(sds, 1.0f); // 100% of chests should be mimics in retrashed mode
-    //     return orig(sds, overrideChance);
-    // }
 
     [HarmonyPatch(typeof(Chest), nameof(Chest.RoomEntered))]
     private class HeckedFusedChestPatch
@@ -556,17 +548,49 @@ public static class HeckedMode
                 {
                     if (!__instance.m_moduleData.TryGetValue(mod, out ModuleShootData msd))
                     {
-                        ETGModConsole.Log($"shoot data wasn't set up for {__instance.gunName}");
+                        Lazy.DebugLog($"shoot data wasn't set up for {__instance.gunName}");
                         __instance.m_moduleData[mod] = new();
                     }
                 }
             }
             else if (!__instance.m_moduleData.TryGetValue(__instance.singleModule, out ModuleShootData msd))
             {
-                ETGModConsole.Log($"shoot data wasn't set up for {__instance.gunName}");
+                Lazy.DebugLog($"shoot data wasn't set up for {__instance.gunName}");
                 __instance.m_moduleData[__instance.singleModule] = new();
             }
         }
+    }
+
+    [HarmonyPatch(typeof(SharedDungeonSettings), nameof(SharedDungeonSettings.RandomShouldSpawnPotFairy))]
+    private class SharedDungeonSettingsRandomShouldSpawnPotFairyPatch
+    {
+        [HarmonyILManipulator]
+        private static void SharedDungeonSettingsRandomShouldSpawnPotFairyIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<SharedDungeonSettings>(nameof(SharedDungeonSettings.PotFairyChance))))
+              return;
+
+            cursor.CallPrivate(typeof(SharedDungeonSettingsRandomShouldSpawnPotFairyPatch), nameof(AlwaysAPotFairy));
+        }
+
+        private static float AlwaysAPotFairy(float origVal) => (_HeckedModeStatus == Hecked.Retrashed) ? 1.0f : origVal;
+    }
+
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.BraveOnLevelWasLoaded))]
+    private class PlayerControllerBraveOnLevelWasLoadedPatch
+    {
+        [HarmonyILManipulator]
+        private static void PlayerControllerBraveOnLevelWasLoadedIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<PlayerStats>(nameof(PlayerStats.NumBlanksPerFloor))))
+                cursor.CallPrivate(typeof(PlayerControllerBraveOnLevelWasLoadedPatch), nameof(NoFreeBlanks));
+            if (cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<PlayerStats>(nameof(PlayerStats.NumBlanksPerFloorCoop))))
+                cursor.CallPrivate(typeof(PlayerControllerBraveOnLevelWasLoadedPatch), nameof(NoFreeBlanks));
+        }
+
+        private static int NoFreeBlanks(int origVal) => (_HeckedModeStatus == Hecked.Retrashed) ? 0 : origVal;
     }
 
     private static bool ForceJammedBosses(bool original, AIActor actor)

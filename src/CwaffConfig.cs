@@ -36,12 +36,12 @@ public static class CwaffConfig
       options : new(){
         "Disabled",
         "Hecked".Yellow(),
-        // "Retrashed".Yellow(),
+        "Retrashed".Magenta(),
         },
       info    : new(){
         "Enemies spawn with their normal guns.\n\nTakes effect next run.".Green(),
         "Enemies spawn with completely random guns.\nNot for the faint of heart.\nTakes effect next run.".Green(),
-        // "All enemies have strong guns and ignore stealth.\nAll bosses are jammed. All chests are fused.\nShop prices x10. Takes effect next run.".Green(),
+        "All enemies armed, bosses jammed, & chests fused.\nFairy in each pot. Shop prices x10. No combat stealth.\nNo free blanks each floor. Takes effect next run.".Green(),
         }
       );
 
@@ -60,8 +60,6 @@ public static class CwaffConfig
 
     // Make sure our initial keybind preferences are set up for seconday reload button
     OnSecondaryReloadChange(_SECONDARY_RELOAD, _Gunfig.Value(_SECONDARY_RELOAD));
-
-    // "All enemies are armed to the teeth.\nNowhere is safe.\nTakes effect next run.".Green(),
   }
 
   private static void OnSecondaryReloadChange(string key, string value)
