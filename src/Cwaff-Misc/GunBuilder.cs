@@ -690,7 +690,7 @@ public static class GunBuilder
   }
 
   /// <summary>Set basic attributes for a gun's default projectile module and return it</summary>
-  public static ProjectileModule SetupDefaultModule(this Gun gun, GunData b = null)
+  private static ProjectileModule SetupDefaultModule(this Gun gun, GunData b = null)
   {
     b ??= GunData.Default;
     b.gun = gun;

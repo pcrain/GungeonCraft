@@ -44,15 +44,17 @@ public class Ticonderogun : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Ticonderogun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 150, shootFps: 1, reloadFps: 1, chargeFps: 24,
             curse: 2f, attacksThroughWalls: true)
-          .AddToShop(ItemBuilder.ShopType.Cursula);
-        gun.SetupDefaultModule(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, customClip: true));
-        gun.QuickUpdateGunAnimation("eraser_charge", returnToIdle : false);
-        gun.QuickUpdateGunAnimation("eraser_fire",   returnToIdle : false);
-        gun.QuickUpdateGunAnimation("eraser_idle",   returnToIdle : false);
-        gun.QuickUpdateGunAnimation("eraser_reload", returnToIdle : false);
+          .AddToShop(ItemBuilder.ShopType.Cursula)
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, customClip: true,
+            chargeTime: float.MaxValue));
+        gun.QuickUpdateGunAnimation("eraser_charge");
+        gun.QuickUpdateGunAnimation("eraser_fire");
+        gun.QuickUpdateGunAnimation("eraser_idle");
+        gun.QuickUpdateGunAnimation("eraser_reload");
 
         _SparklePrefab = VFX.Create("pencil_sparkles", fps: 12, loops: false);
         _RunePrefab = VFX.Create("pencil_runes", loops: false); // FPS must be nonzero or sprites don't update properly
