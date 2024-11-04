@@ -1,12 +1,11 @@
-﻿
-namespace CwaffingTheGungy;
+﻿namespace CwaffingTheGungy;
 
 public class Macheening : CwaffGun
 {
     public static string ItemName         = "Macheening";
     public static string ShortDescription = "Let the Daggers Fall";
     public static string LongDescription  = "Fires magic blade projectiles conjured through sheer willpower. Requires unbroken concentration while firing, preventing movement or rolling. User receives double damage from all sources while this weapon is equipped.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "An ancient artifact created by the first great gunsmith, Lord Kagreflak. The range of its blade is bounded only by the focus of its user, which was fantastic for warriors of yore and is awful for most scatterbrained Gungeoneers today. Despite not drawing the attention of the Jammed, you still feel uneasy holding this weapon.";
 
     private static string _PrefireAnim;
 

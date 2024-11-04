@@ -5,7 +5,7 @@ public class Sunderbuss : CwaffGun
     public static string ItemName         = "Sunderbuss";
     public static string ShortDescription = "Smashed to Oblivion";
     public static string LongDescription  = "Smashes the ground with extreme force, releasing projectiles in all directions. Slows the user down immensely while charging. User receives double damage from all sources while this weapon is equipped.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "An ancient artifact created by the first great gunsmith, Lord Kagreflak. It lacks the sleek form and versatility of a moddern blunderbuss, instead functioning more like a primitive war hammer. Though it doesn't seem to draw the ire of the Jammed, you curiously still feel vulnerable wielding it.";
 
     internal static readonly string[] _ColorNames = ["red", "yellow", "green", "cyan", "blue", "magenta", "gray"];
     internal static GameObject _ScorchMark = null;

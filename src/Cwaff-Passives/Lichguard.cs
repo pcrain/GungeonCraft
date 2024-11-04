@@ -5,7 +5,7 @@ public class Lichguard : CwaffPassive
     public static string ItemName         = "Lichguard";
     public static string ShortDescription = "Arena Ready";
     public static string LongDescription  = "Prevents most item-induced stat decreases. Empowers Sunderbuss and Macheening, and removes their negative side effects.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "An ancient artifact created by the first great gunsmith, Lord Kagreflak. Unlike most armor that protects the user from physical damage, this gauntlet was crafted to protect the user from the more ineffable magics and ailments that predominate the battlefield -- and as luck would have it, the Gungeon.";
 
     public static void Init()
     {
