@@ -59,7 +59,7 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
         }
         if (!found)
         {
-          ETGModConsole.Log($"failed to find hero shrine");
+          Lazy.DebugLog($"failed to find hero shrine");
           yield break;
         }
 

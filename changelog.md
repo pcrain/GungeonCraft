@@ -1,8 +1,9 @@
 # Changelog
 
-## 1.20.1 (TBD)
+## 1.21.0 (TBD)
 
 - Added Plasmarble, Sunderbuss, Macheening, and Lichguard
+- Added five new Hecked Mode variants: Light, Remixed, Grenade, Molotov, and Retrashed Mode
 - Tweaked Drifter's Headgear:
 	- Removed enemy contact damage during dash
 	- Allowed player to fire their weapon during dash

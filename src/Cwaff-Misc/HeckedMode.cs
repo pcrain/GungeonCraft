@@ -18,8 +18,7 @@ namespace CwaffingTheGungy;
     + all bosses are jammed
     + no bullet that can kill the future
     + gun fairies galore
-
-    - no default 2 blank restoration per floor (except for ammolets)
+    + no default 2 blank restoration per floor (except for ammolets)
 
     x no time slowing (too hard to implement)
 */
@@ -29,6 +28,10 @@ public static class HeckedMode
     public enum Hecked {
         Disabled,
         Classic,
+        Light,
+        Remixed,
+        Molotov,
+        Grenade,
         Retrashed,
     }
 
@@ -292,6 +295,7 @@ public static class HeckedMode
 
     public readonly static int _FirstWeakGun = HeckedModeGunWhiteList.IndexOf((int)Items.MakeshiftCannon);
     public readonly static int _FirstNonBeam = HeckedModeGunWhiteList.IndexOf((int)Items.PrototypeRailgun);
+    public readonly static int _FirstFairGun = HeckedModeGunWhiteList.IndexOf((int)Items.ZillaShotgun);
 
     internal const string _CONFIG_KEY = "Hecked Mode";
 
@@ -307,7 +311,11 @@ public static class HeckedMode
         _HeckedModeStatus = heckedConfig switch {
             "Disabled"  => Hecked.Disabled,
             "Hecked"    => Hecked.Classic,
-            "Retrashed" => Hecked.Retrashed,  //NOTE: re-enable once Retrashed Mode is ready
+            "Light"     => Hecked.Light,
+            "Remixed"   => Hecked.Remixed,
+            "Molotov"   => Hecked.Molotov,
+            "Grenade"   => Hecked.Grenade,
+            "Retrashed" => Hecked.Retrashed,
             _           => Hecked.Disabled,
         };
     }
@@ -428,7 +436,15 @@ public static class HeckedMode
             Items replacementGunId;
             if (_HeckedModeStatus == Hecked.Retrashed)
                 replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(0, _FirstWeakGun)];
-            else
+            else if (_HeckedModeStatus == Hecked.Light)
+                replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(_FirstWeakGun, HeckedModeGunWhiteList.Count)];
+            else if (_HeckedModeStatus == Hecked.Remixed)
+                replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(_FirstFairGun, HeckedModeGunWhiteList.Count)];
+            else if (_HeckedModeStatus == Hecked.Grenade)
+                replacementGunId = Items.GrenadeLauncher;
+            else if (_HeckedModeStatus == Hecked.Molotov)
+                replacementGunId = Items.MolotovLauncher;
+            else // Classic
                 replacementGunId = (Items)HeckedModeGunWhiteList[UnityEngine.Random.Range(_FirstNonBeam, HeckedModeGunWhiteList.Count)];
             __instance.HeckedShootGunBehavior(replacementGunId.AsGun());
         }
@@ -439,7 +455,7 @@ public static class HeckedMode
     {
         static void Prefix(Gun __instance)
         {
-            if (GameManager.AUDIO_ENABLED)
+            if (GameManager.AUDIO_ENABLED) // silence all gun sounds once the guns themselves are gone
                 AkSoundEngine.PostEvent("Stop_WPN_gun_loop_01", __instance.gameObject);
         }
     }
@@ -591,6 +607,26 @@ public static class HeckedMode
         }
 
         private static int NoFreeBlanks(int origVal) => (_HeckedModeStatus == Hecked.Retrashed) ? 0 : origVal;
+    }
+
+    [HarmonyPatch(typeof(AIShooter), nameof(AIShooter.OnPreDeath))]
+    private class AIShooterOnPreDeathPatch
+    {
+        static void Postfix(AIShooter __instance)
+        {
+            if (_HeckedModeStatus != Hecked.Remixed)
+                return;
+            if (__instance.CurrentGun is not Gun gun)
+                return;
+            if (GameManager.AUDIO_ENABLED) // silence all gun sounds once the guns themselves are gone
+                AkSoundEngine.PostEvent("Stop_WPN_gun_loop_01", gun.gameObject);
+            gun.ToggleRenderers(true);
+            if (gun.DropGun().gameObject.GetComponentInChildren<Gun>() is Gun droppedGun)
+            {
+                droppedGun.CurrentAmmo = Mathf.CeilToInt(0.05f * droppedGun.GetBaseMaxAmmo());
+                droppedGun.ToggleRenderers(true);
+            }
+        }
     }
 
     private static bool ForceJammedBosses(bool original, AIActor actor)
@@ -946,10 +982,10 @@ public static class HeckedMode
     {
         if (enemy.aiShooter is not AIShooter shooter)
         {
-            if (_HeckedModeStatus != Hecked.Retrashed)
-                return;  // disable extra guns outside the debug build for now
-            if (enemy.GetComponent<CompanionController>())
-                return; // companions should not get guns in retrashed mode
+            if (_HeckedModeStatus == Hecked.Classic || _HeckedModeStatus == Hecked.Light)
+                return; // no extra enemies armed in classic or light mode
+            if (_HeckedModeStatus != Hecked.Remixed && enemy.GetComponent<CompanionController>())
+                return; // companions should not get guns outside remixed mode
             shooter = enemy.EnableGunShooting(replacementGun);
         }
 

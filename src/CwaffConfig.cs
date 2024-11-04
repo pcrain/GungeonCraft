@@ -36,11 +36,19 @@ public static class CwaffConfig
       options : new(){
         "Disabled",
         "Hecked".Yellow(),
+        "Light".Yellow(),
+        "Remixed".Yellow(),
+        "Molotov".Yellow(),
+        "Grenade".Yellow(),
         "Retrashed".Magenta(),
         },
       info    : new(){
         "Enemies spawn with their normal guns.\n\nTakes effect next run.".Green(),
         "Enemies spawn with completely random guns.\nNot for the faint of heart.\nTakes effect next run.".Green(),
+        "Enemies spawn with a balanced variety of guns.\nA lighter hecked experience.\nTakes effect next run.".Green(),
+        "Enemies & companions spawn with mostly-fair guns.\nEnemies drop guns with 5% ammo when killed.\nTakes effect next run.".Green(),
+        "All enemies are armed with Molotov Launchers.\n\nTakes effect next run.".Green(),
+        "All enemies are armed with Grenade Launchers.\n\nTakes effect next run.".Green(),
         "All enemies armed, bosses jammed, & chests fused.\nFairy in each pot. Shop prices x10. No combat stealth.\nNo free blanks each floor. Takes effect next run.".Green(),
         }
       );
