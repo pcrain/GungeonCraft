@@ -56,33 +56,8 @@ public class Vladimir : CwaffGun
             enemy.sprite.PlaceAtPositionByAnchor((gunPos - (skewerCount * gunVec)).ToVector3ZisY(), Anchor.MiddleCenter);
             ++skewerCount;
 
-            if (!enemy.specRigidbody)
-                continue;
-
-            enemy.specRigidbody.Reinitialize();
-            PixelCollider collider = enemy.specRigidbody.PrimaryPixelCollider;
-            IntVector2 epos = enemy.sprite.WorldBottomLeft.ToIntVector2();
-            IntVector2 edim = (enemy.sprite.WorldTopRight - enemy.sprite.WorldBottomLeft).ToIntVector2();
-            for (int j = StaticReferenceManager.AllProjectiles.Count - 1; j >= 0; --j) //REFACTOR: make enemies collide with projectiles properly
-            {
-                Projectile proj = StaticReferenceManager.AllProjectiles[j];
-                if (!proj | !proj.isActiveAndEnabled)
-                    continue;
-                if (proj.specRigidbody is not SpeculativeRigidbody body)
-                    continue;
-                // if (!collider.AABBOverlaps(body.PrimaryPixelCollider))
-                if (!proj.sprite.Overlaps(enemy.sprite))
-                    continue;
-
-                // forces projectile to collide with enemies even if it normally wouldn't
-                LinearCastResult lcr   = LinearCastResult.Pool.Allocate();
-                lcr.Contact            = enemy.CenterPosition;
-                lcr.Normal             = Vector2.right;
-                lcr.OtherPixelCollider = body.PrimaryPixelCollider;
-                lcr.MyPixelCollider    = collider;
-                proj.ForceCollision(enemy.specRigidbody, lcr);
-                LinearCastResult.Pool.Free(ref lcr);
-            }
+            if (enemy.specRigidbody)
+                enemy.specRigidbody.Reinitialize();
         }
         bool gunLocked = (this._skeweredEnemies.Count > 0);
         pc.inventory.GunLocked.SetOverride(ItemName, gunLocked);
@@ -113,7 +88,7 @@ public class Vladimir : CwaffGun
     {
         if (this.PlayerOwner is not PlayerController pc)
             return;
-        if (!enemy || !enemy.IsHostileAndNotABoss() || !enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
+        if (!enemy || !enemy.IsHostileAndNotABoss() || !enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun || !enemy.specRigidbody)
             return;
         if (enemy.GetComponent<ImpaledOnGunBehaviour>())
             return;
@@ -121,12 +96,15 @@ public class Vladimir : CwaffGun
         this._skeweredEnemies.Add(enemy);
         enemy.gameObject.AddComponent<ImpaledOnGunBehaviour>();
         enemy.behaviorSpeculator.Stun(duration: 36000f, createVFX: true);
+        enemy.HitByEnemyBullets = true;
+        enemy.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile));
         pc.inventory.GunLocked.SetOverride(ItemName, true);
     }
 
     public void TossOff(AIActor enemy, Vector2 launchDir)
     {
         this._skeweredEnemies.Remove(enemy);
+        enemy.HitByEnemyBullets = false;
         enemy.GetComponent<ImpaledOnGunBehaviour>().SafeDestroy();
         if (enemy.behaviorSpeculator)
             enemy.behaviorSpeculator.ResetStun(duration: 1f, createVFX: true);
@@ -134,6 +112,8 @@ public class Vladimir : CwaffGun
         {
             enemy.specRigidbody.MoveTowardsTargetOrWall(start: this.PlayerOwner.CenterPosition, target: this.gun.barrelOffset.position.XY());
             enemy.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
+            enemy.specRigidbody.RemoveCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile));
+            enemy.specRigidbody.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile));
             enemy.specRigidbody.OnPreRigidbodyCollision += DealDamageWhenTossedAtEnemies;
         }
         if (enemy.knockbackDoer)
@@ -175,7 +155,7 @@ public class Vladimir : CwaffGun
             projectile.baseData.damage += _CURSE_DAMAGE_SCALING * Mathf.Max(0f, this.PlayerOwner.Curse());
     }
 
-    internal class ImpaledOnGunBehaviour : SkipAllCollisionsBehavior {}
+    internal class ImpaledOnGunBehaviour : SkipNonProjectileCollisionsBehavior {}
 
     [HarmonyPatch(typeof(Dungeon), nameof(Dungeon.SpawnCurseReaper))]
     private class PreventLotJSpawnWhenMasteredPatch

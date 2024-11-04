@@ -1425,7 +1425,7 @@ public class FancyGrenadeProjectile : Projectile
     }
 }
 
-public class SkipAllCollisionsBehavior : MonoBehaviour
+public class SkipNonProjectileCollisionsBehavior : MonoBehaviour
 {
     private void Start()
     {
@@ -1445,7 +1445,8 @@ public class SkipAllCollisionsBehavior : MonoBehaviour
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
     {
-        PhysicsEngine.SkipCollision = true;
+        if (!other.projectile)
+            PhysicsEngine.SkipCollision = true;
     }
 
     private void OnPreTileCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, PhysicsEngine.Tile other, PixelCollider otherPixelCollider)
