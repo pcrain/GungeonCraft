@@ -36,7 +36,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
 #### Original Sprites (please check out the authors' work! <3)
 
-  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Maestro, Missiletoe, Omnidirectional Laser, Starmageddon, Vladimir, Oddjob
+  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Maestro, Missiletoe, Oddjob, Omnidirectional Laser, Plasmarble, Starmageddon, Vladimir
 
   - [IdioticMuffin](https://www.reddit.com/r/EnterTheGungeon/comments/et316d/yet_even_more_gun_concepts_for_gungeon/): Grandmaster, [Paintball Cannon](https://www.reddit.com/r/EnterTheGungeon/comments/clkr07/splat_the_gungeon_weapon_concepts/)
 
@@ -52,7 +52,9 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - [Lynceus](https://thunderstore.io/c/enter-the-gungeon/p/Lynceus/): Alien Nailgun
 
-  - Misc. edits combined from several sources by me: Breegull, Ki Blast, Racket Launcher, Sub Machine Gun, Ticonderogun, Chroma
+  - Misc. edits combined from several sources by me: Breegull, Ki Blast, Racket Launcher, Sub Machine Gun, Ticonderogun
+  
+  - Original sprites by me: Chroma, Macheening, Sunderbuss
 
   - Most gun animations are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
 

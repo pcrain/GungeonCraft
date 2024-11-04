@@ -14,7 +14,7 @@ public class Macheening : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Macheening>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.1f, ammo: 100,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.1f, ammo: 100,
             infiniteAmmo: true, canReloadNoMatterAmmo: true, fireAudio: "macheening_fire_sound", shootFps: 45,
             muzzleFrom: Items.Origuni, dynamicBarrelOffsets: true, percentSpeedWhileCharging: 0.0f, continuousFire: true,
             continuousFireAnimation: true /* makes fire animation not reset with each projectile */)

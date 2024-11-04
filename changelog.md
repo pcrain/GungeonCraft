@@ -1,21 +1,30 @@
 # Changelog
 
-## 1.21.0 (TBD)
+## 1.21.0 (2024-11-04)
+
+#### Features:
 
 - Added Plasmarble, Sunderbuss, Macheening, and Lichguard
+	- Plasmarble sprite thanks to Dallan!
 - Added five new Hecked Mode variants: Light, Remixed, Grenade, Molotov, and Retrashed Mode
+
+#### Balance Changes and Polish:
+
 - Tweaked Drifter's Headgear:
 	- Removed enemy contact damage during dash
 	- Allowed player to fire their weapon during dash
 	- Allowed player to buffer additinoal dash inputs during dash
 	- Allowed player to slide over tables during dash
-- Updated required Alexandria version to 0.4.15 for custom dodge roll API
+- Added custom ammo clip sprites for all of Chroma's beams
+
+#### Bugfixes and Misc:
+
 - Fixed null deref caused by Credit Card trying to update UI for non-existent player
 - Fixed infinitely looping audio issues on several guns wielded by enemies in Hecked Mode
-- Fixed rare null deref caused by Drifter's Headgear when dying while dashing
+- Fixed rare null deref caused by dying during Drifter's Headgear's dash
 - Fixed Ticonderogun not actually having a valid projectile, causing a softlock while running SimpleStatsTweaked, whoops D:
-- Added custom ammo clip sprites for all of Chroma's beams
-- Mentioned in Tranquilizer's description that tranquilized enemies drop their guns and ammo (which has been true since 1.16.2).
+- Mentioned in Tranquilizer's description that tranquilized enemies drop their guns and ammo (added in 1.16.2).
+- Updated required Alexandria version to 0.4.15 for custom dodge roll API
 
 ## 1.20.0 (2024-10-15)
 
