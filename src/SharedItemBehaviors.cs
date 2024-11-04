@@ -1158,7 +1158,13 @@ public static class AfterImageHelpers
 
     public static void PlayerAfterImage(this PlayerController player)
     {
-        tk2dSpriteAnimationFrame frame = player.spriteAnimator.CurrentClip.frames[player.spriteAnimator.CurrentFrame];
+        if (player.spriteAnimator is not tk2dSpriteAnimator animator)
+            return;
+        if (animator.CurrentClip is not tk2dSpriteAnimationClip clip)
+            return;
+        if (clip.frames == null || clip.frames.Length == 0)
+            return;
+        tk2dSpriteAnimationFrame frame = clip.frames[animator.CurrentFrame % clip.frames.Length];
 
         tk2dSprite sprite = Lazy.SpriteObject(frame.spriteCollection, frame.spriteId);
         sprite.FlipX = player.sprite.FlipX;

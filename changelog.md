@@ -12,6 +12,7 @@
 - Updated required Alexandria version to 0.4.15 for custom dodge roll API
 - Fixed null deref caused by Credit Card trying to update UI for non-existent player
 - Fixed infinitely looping audio issues on several guns wielded by enemies in Hecked Mode
+- Fixed rare null deref caused by Drifter's Headgear when dying while dashing
 
 ## 1.20.0 (2024-10-15)
 
