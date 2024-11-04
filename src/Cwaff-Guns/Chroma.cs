@@ -34,10 +34,12 @@ public class Chroma : CwaffGun
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0f, beamEmission: 1500f))
           .Attach<ChromaProjectile>();
 
+        string[] ammoTypes = ["chroma_red", "chroma_green", "chroma_blue"];
         //NOTE: dispersal doesn't work with instant beams (since they have no bones)
         for (int i = 0; i < 3; ++i)
         {
             ProjectileModule mod = i > 0 ? gun.DuplicateDefaultModule() : gun.DefaultModule;
+            mod.SetupCustomAmmoClip(ammoTypes[i]);
             Projectile p = mod.projectiles[0];
             p.GetComponent<ChromaProjectile>()._pigment = (PigmentType)i;
             BasicBeamController beamComp = p.gameObject.GetComponent<BasicBeamController>();

@@ -14,6 +14,7 @@
 - Fixed infinitely looping audio issues on several guns wielded by enemies in Hecked Mode
 - Fixed rare null deref caused by Drifter's Headgear when dying while dashing
 - Fixed Ticonderogun not actually having a valid projectile, causing a softlock while running SimpleStatsTweaked, whoops D:
+- Added custom ammo clip sprites for all of Chroma's beams
 
 ## 1.20.0 (2024-10-15)
 
