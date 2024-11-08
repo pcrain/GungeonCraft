@@ -40,7 +40,7 @@ public class Telefragger : CwaffGun
     private void Start()
     {
         this.gun.sprite.SetGlowiness(10f, glowColor: new Color(0.0f, 0.625f, 0.664f, 1f));
-        gun.sprite.renderer.material.SetFloat("_EmissiveColorPower", 10f); // extra spicy colors
+        this.gun.sprite.renderer.material.SetFloat("_EmissiveColorPower", 10f); // extra spicy colors
     }
 
     private bool SynchronizeSpriteWithBeam()

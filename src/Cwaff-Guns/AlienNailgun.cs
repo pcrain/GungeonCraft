@@ -20,8 +20,7 @@ public class AlienNailgun : CwaffGun
     private const int _FRAGMENTS             = _FRAGMENT_EDGE * _FRAGMENT_EDGE;
     private const float _FRAGMENT_GAP        = _RECONSTRUCT_TIME / (float)_FRAGMENTS;
 
-    internal static GameActorCharmEffect _Charm = null;
-    internal static HashSet<AIActor> _Replicants   = new();
+    private static HashSet<AIActor> _Replicants   = new();
 
     private Coroutine _dnaReconstruct       = null;
     private int _spawnIndex                 = -1;
@@ -41,24 +40,8 @@ public class AlienNailgun : CwaffGun
             loopReloadAt: 0, muzzleFrom: Items.Mailbox, fireAudio: "alien_nailgun_shoot_sound", reloadAudio: "gorgun_eye_activate")
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .InitProjectile(GunData.New(clipSize: _RECONSTRUCT_COST, cooldown: 0.14f, shootStyle: ShootStyle.Charged, damage: 2.0f,
-            sprite: "alien_nailgun_projectile", customClip: true, chargeTime: 0.0f, useDummyChargeModule: true));
-
-        _Charm = new(){
-            AffectsPlayers   = false,
-            AffectsEnemies   = true,
-            effectIdentifier = "replicant",
-            resistanceType   = 0,
-            stackMode        = GameActorEffect.EffectStackingMode.Refresh,
-            duration         = 36000f,
-            };
-    }
-
-    public override void PostProcessProjectile(Projectile projectile)
-    {
-        base.PostProcessProjectile(projectile);
-        if (projectile.GetComponent<ExtractDNAOnKill>())
-            return;
-        projectile.AddComponent<ExtractDNAOnKill>().Setup(this);
+            sprite: "alien_nailgun_projectile", customClip: true, chargeTime: 0.0f, useDummyChargeModule: true))
+          .Attach<ExtractDNAOnKill>();
     }
 
     public override void OnFullClipReload(PlayerController player, Gun gun)
@@ -357,20 +340,21 @@ public class ExtractDNAOnKill : MonoBehaviour
     private PlayerController _owner;
     private AlienNailgun _gun;
 
-    public void Setup(AlienNailgun gun)
+    private void Start()
     {
-        this._gun = gun;
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
-
-        this._projectile.OnWillKillEnemy += OnWillKillEnemy;
+        if (!this._owner || !this._owner.CurrentGun)
+            return;
+        if (this._gun = this._owner.CurrentGun.gameObject.GetComponent<AlienNailgun>())
+            this._projectile.OnWillKillEnemy += OnWillKillEnemy;
     }
 
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemyBody)
     {
         if (enemyBody.GetComponent<AIActor>() is not AIActor enemy)
             return;
-        if (enemy.IsHostileAndNotABoss(canBeDead: true, canBeNeutral: false))
+        if (this._gun && enemy.IsHostileAndNotABoss(canBeDead: true, canBeNeutral: false))
             this._gun.RegisterEnemyDNA(enemy.EnemyGuid);
     }
 }

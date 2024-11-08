@@ -29,50 +29,32 @@ public class Overflow : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Overflow>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Overflow>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250, shootFps: 60, reloadFps: 4,
             fireAudio: "overflow_shoot_sound", rampUpFireRate: true, modulesAreTiers: true, muzzleVFX: "muzzle_overflow", muzzleFps: 120,
             muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 10f)
           .AddToShop(ItemBuilder.ShopType.Goopton)
-          .Attach<OverflowAmmoDisplay>();
-
-        Projectile baseProj = gun.InitProjectile(GunData.New(sprite: null, clipSize: -1, cooldown: 0.05f, shootStyle: ShootStyle.Automatic,
-            damage: 5.0f, speed: 50f, range: 18f, force: 12f));
+          .Attach<OverflowAmmoDisplay>()
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(sprite: null, clipSize: -1, cooldown: 0.05f, shootStyle: ShootStyle.Automatic,
+            damage: 5.0f, speed: 50f, range: 18f, force: 12f, glowAmount: 100f))
+          .Assign(out Projectile baseProj);
 
         Projectile[] projectiles = [
-            baseProj.Clone(GunData.New(gun: gun, sprite: "overflow_water_projectile",
-                damage: 6.5f)).AddOverflowGoop(EasyGoopDefinitions.WaterGoop),
-            baseProj.Clone(GunData.New(gun: gun, sprite: "overflow_fire_projectile",
-                fire: 0.25f)).AddOverflowGoop(EasyGoopDefinitions.FireDef),
-            baseProj.Clone(GunData.New(gun: gun, sprite: "overflow_poison_projectile",
-                poison: 0.25f)).AddOverflowGoop(EasyGoopDefinitions.PoisonDef),
-            baseProj.Clone(GunData.New(gun: gun, sprite: "overflow_oil_projectile",
-                slow: 0.25f)).AddOverflowGoop(EasyGoopDefinitions.OilDef),
-            baseProj.Clone(GunData.New(gun: gun, sprite: "overflow_ice_projectile",
-                freeze: 0.5f)).AddOverflowGoop(EasyGoopDefinitions.WaterGoop),
-            baseProj.Clone(GunData.New(gun: gun, sprite: "overflow_void_projectile",
-                damage: 8.0f))/*.AddGoop(EasyGoopDefinitions.PitGoop)*/, //TODO: implement pit goop
+            baseProj.Clone(GunData.New(sprite: "overflow_water_projectile",  damage: 6.5f) ).MakeGoop(EasyGoopDefinitions.WaterGoop),
+            baseProj.Clone(GunData.New(sprite: "overflow_fire_projectile",   fire: 0.25f)  ).MakeGoop(EasyGoopDefinitions.FireDef),
+            baseProj.Clone(GunData.New(sprite: "overflow_poison_projectile", poison: 0.25f)).MakeGoop(EasyGoopDefinitions.PoisonDef),
+            baseProj.Clone(GunData.New(sprite: "overflow_oil_projectile",    slow: 0.25f)  ).MakeGoop(EasyGoopDefinitions.OilDef),
+            baseProj.Clone(GunData.New(sprite: "overflow_ice_projectile",    freeze: 0.5f) ).MakeGoop(EasyGoopDefinitions.WaterGoop),
+            baseProj.Clone(GunData.New(sprite: "overflow_void_projectile",   damage: 8.0f) ), //TODO: implement pit goop
         ];
 
-        string[] clips = [
-            "overflow_water",
-            "overflow_fire",
-            "overflow_poison",
-            "overflow_oil",
-            "overflow_ice",
-            "overflow_void",
-        ];
-
-        gun.Volley.projectiles = new();
+        string[] clips = [ "overflow_water", "overflow_fire", "overflow_poison", "overflow_oil", "overflow_ice", "overflow_void" ];
+        gun.Volley.projectiles = new(projectiles.Length);
         for (int i = 0; i < projectiles.Length; ++i)
-        {
-            ProjectileModule mod = new ProjectileModule().SetAttributes(GunData.New(
-              gun: gun, clipSize: -1, cooldown: 0.05f, angleVariance: 4f, shootStyle: ShootStyle.Automatic));
-            projectiles[i].sprite.SetGlowiness(100f);
-            mod.SetupCustomAmmoClip(clips[i]);
-            mod.projectiles = new(){ projectiles[i] };
-            gun.Volley.projectiles.Add(mod);
-        }
+            gun.Volley.projectiles.Add(new ProjectileModule(){ projectiles = new(){ projectiles[i] } }
+              .SetAttributes(GunData.New(gun: gun, clipSize: -1, cooldown: 0.05f, angleVariance: 4f, shootStyle: ShootStyle.Automatic))
+              .SetupCustomAmmoClip(clips[i]));
 
         _Hoses = [
             VFX.Create("overflow_hose_water",  fps: 120).DefaultAnimation(),
@@ -316,7 +298,7 @@ public class OverflowAmmoDisplay : CustomAmmoDisplay
 
 public static class OverflowHelpers
 {
-    public static Projectile AddOverflowGoop(this Projectile p, GoopDefinition goop)
+    public static Projectile MakeGoop(this Projectile p, GoopDefinition goop)
     {
         return p.Attach<GoopModifier>(g => {
             g.goopDefinition         = goop;

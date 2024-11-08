@@ -20,46 +20,42 @@ public class KALI : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<KALI>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 200, fireAudio: "kali_shoot_sound");
-
-        _KaliProjectile = gun.InitProjectile(GunData.New(range: 9999f, force: 3f, cooldown: 0.1f, collidesWithProjectiles: true,
+        Lazy.SetupGun<KALI>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 200, fireAudio: "kali_shoot_sound")
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(range: 9999f, force: 3f, cooldown: 0.1f, collidesWithProjectiles: true,
             clipSize: 1, sprite: "kali_projectile", shootStyle: ShootStyle.Charged, customClip: true))
           .Attach<PierceProjModifier>(pierce => { pierce.penetration = 999; pierce.penetratesBreakables = true; })
           .AttachTrail("kali_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false,
-            dispersalPrefab: Items.FlashRay.AsGun().DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab);
+            dispersalPrefab: Items.FlashRay.AsGun().DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab)
+          .Assign(out _KaliProjectile);
 
         ProjectileModule mod = gun.DefaultModule;
         mod.projectiles.Clear();
-        mod.chargeProjectiles = new List<ProjectileModule.ChargeProjectile>(){
+        mod.chargeProjectiles = new(){
             new(){
-                Projectile = _KaliProjectile.Clone(GunData.New(damage: 25f, speed: 175f, recoil: 100f)
-                  ).Attach<KaliProjectile>(k => k.SetChargeLevel(1)
-                  ),
+                Projectile = _KaliProjectile.Clone(GunData.New(damage: 25f, speed: 175f, recoil: 100f))
+                  .Attach<KaliProjectile>(k => k.SetChargeLevel(1)),
                 ChargeTime = 1f,
             },
             new(){
-                Projectile = _KaliProjectile.Clone(GunData.New(damage: 50f, speed: 350f, recoil: 200f)
-                  ).Attach<KaliProjectile>(k => k.SetChargeLevel(2)
-                  ),
+                Projectile = _KaliProjectile.Clone(GunData.New(damage: 50f, speed: 350f, recoil: 200f))
+                  .Attach<KaliProjectile>(k => k.SetChargeLevel(2)),
                 ChargeTime = 2f,
             },
             new(){
-                Projectile = _KaliProjectile.Clone(GunData.New(damage: 100f, speed: 700f, recoil: 400f)
-                  ).Attach<KaliProjectile>(k => k.SetChargeLevel(3)
-                  ),
+                Projectile = _KaliProjectile.Clone(GunData.New(damage: 100f, speed: 700f, recoil: 400f))
+                  .Attach<KaliProjectile>(k => k.SetChargeLevel(3)),
                 ChargeTime = 3f,
             },
         };
 
-        string chargeAnim1 = gun.QuickUpdateGunAnimation("charge", returnToIdle: false);
-            gun.SetAnimationFPS(chargeAnim1, 20);
-        string chargeAnim2 = gun.QuickUpdateGunAnimation("charge_more", returnToIdle: false);
-            gun.SetAnimationFPS(chargeAnim2, 40);
-        string chargeAnim3 = gun.QuickUpdateGunAnimation("charge_most", returnToIdle: false);
-            gun.SetAnimationFPS(chargeAnim3, 60);
-            gun.SetGunAudio(chargeAnim3, "kali_charge_sound", 0);
-        _ChargeAnimations = new(){chargeAnim1, chargeAnim2, chargeAnim3};
+        _ChargeAnimations = new(){
+            gun.QuickUpdateGunAnimation("charge",      returnToIdle: false, fps: 20),
+            gun.QuickUpdateGunAnimation("charge_more", returnToIdle: false, fps: 40),
+            gun.QuickUpdateGunAnimation("charge_most", returnToIdle: false, fps: 60)
+        };
+        gun.SetGunAudio(_ChargeAnimations[2], "kali_charge_sound", 0);
 
         _IonizeVFX = VFX.Create("kali_ionize_particle", fps: 7, emissivePower: 100f);
     }

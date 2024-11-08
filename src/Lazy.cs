@@ -546,7 +546,9 @@ public static class Lazy
     {
         if (_NullProjectilePrefab == null)
         {
-            _NullProjectilePrefab                     = Items.Ak47.CloneProjectile(GunData.New(damage: 0.0f, speed: 0.00001f, range: 1.0f));
+            _NullProjectilePrefab = Items.Ak47.CloneProjectile(GunData.New(
+              damage: 0.0f, force: 0.0f, speed: 0.00001f, range: 1.0f, invisibleProjectile: true));
+            _NullProjectilePrefab.isFakeBullet        = true;
             _NullProjectilePrefab.damageTypes         = CoreDamageTypes.None;
             _NullProjectilePrefab.collidesWithEnemies = false;
             _NullProjectilePrefab.collidesWithPlayer  = false;

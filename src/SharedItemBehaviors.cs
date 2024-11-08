@@ -1685,6 +1685,15 @@ public class ManualMotionModule : ProjectileAndBeamMotionModule
 /// <summary>Class for creating replicant enemies that temporarily fight on your side</summary>
 public static class Replicant
 {
+    private static GameActorCharmEffect _CharmEffect = new(){
+        AffectsPlayers   = false,
+        AffectsEnemies   = true,
+        effectIdentifier = "replicant",
+        resistanceType   = 0,
+        stackMode        = GameActorEffect.EffectStackingMode.Refresh,
+        duration         = 36000f,
+        };
+
     public static AIActor Create(string guid, Vector2 position, Action<tk2dBaseSprite> shaderFunc, bool hasCollision)
     {
         AIActor replicant = AIActor.Spawn(
@@ -1718,7 +1727,7 @@ public static class Replicant
         replicant.HitByEnemyBullets = false;
         replicant.IgnoreForRoomClear = true;
         replicant.IsHarmlessEnemy = true;
-        replicant.ApplyEffect(AlienNailgun._Charm);
+        replicant.ApplyEffect(_CharmEffect);
         if (replicant.GetComponent<SpawnEnemyOnDeath>() is SpawnEnemyOnDeath seod)
             seod.chanceToSpawn = 0.0f; // prevent enemies such as Blobulons from replicating on death
         if (replicant.healthHaver is HealthHaver hh)

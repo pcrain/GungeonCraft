@@ -14,7 +14,7 @@ public class Wavefront : CwaffGun
             muzzleVFX: "muzzle_wavefront", muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 10f, fireAudio: "wavefront_fire_sound")
           .SetReloadAudio("wavefront_reload_sound", 0, 6, 12, 18)
           .InitProjectile(GunData.New(damage: 12f, clipSize: 8, cooldown: 0.125f, shootStyle: ShootStyle.Automatic, range: 999999f, speed: 60f, shouldRotate: true,
-            customClip: true, sprite: "wavefront_projectile_alt", scale: 0.25f, fps: 24, anchor: Anchor.MiddleCenter))
+            customClip: true, sprite: "wavefront_projectile_alt", scale: 0.25f, fps: 24, glowAmount: 1f, glowColor: Color.cyan))
           .SetEnemyImpactVFX(VFX.CreatePool("wavefront_impact_particles", fps: 24, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f, emissivePower: 2f))
           .Attach<TeslaProjectileBehavior>();
     }
@@ -52,8 +52,6 @@ public class TeslaProjectileBehavior : MonoBehaviour
             trail.BaseColor  = _TrailColor;
             trail.StartColor = _TrailColor;
             trail.EndColor   = _TrailColor;
-
-        this._projectile.sprite.SetGlowiness(glowAmount: 1f, glowColor: Color.cyan);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)

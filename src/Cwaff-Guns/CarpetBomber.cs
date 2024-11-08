@@ -22,30 +22,31 @@ public class CarpetBomber : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.EXPLOSIVE, reloadTime: 1.5f, ammo: 720, shootFps: 30, reloadFps: 20,
             chargeFps: (int)(1f / _CHARGE_PER_PROJECTILE), loopChargeAt: 10, muzzleVFX: "muzzle_carpet_bomber", muzzleFps: 30,
             muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound")
           .SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18)
           .SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-          .AddToShop(ModdedShopType.Boomhildr);
-
-        Projectile p = gun.InitSpecialProjectile<FancyGrenadeProjectile>(GunData.New(
-          clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: true,
-          sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "carpet_bomber_projectile", fps: 20, anchor: Anchor.MiddleCenter,
-          scale: 0.5f, barrageSize: _MAX_PROJECTILES, shouldRotate: true, shouldFlipHorizontally: true, surviveRigidbodyCollisions: true,
-          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(8, 8)))
-        .Attach<BounceProjModifier>(bounce => {
-          bounce.numberOfBounces = _MAX_WALL_BOUNCES;
-          bounce.onlyBounceOffTiles = false;
-          bounce.ExplodeOnEnemyBounce = false; })
-        .Attach<CarpetProjectile>();
+          .AddToShop(ModdedShopType.Boomhildr)
+          .AssignGun(out Gun gun)
+          .InitSpecialProjectile<FancyGrenadeProjectile>(GunData.New(
+            clipSize: 3, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, customClip: true,
+            sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "carpet_bomber_projectile", fps: 20, anchor: Anchor.MiddleCenter,
+            scale: 0.5f, barrageSize: _MAX_PROJECTILES, shouldRotate: true, shouldFlipHorizontally: true, surviveRigidbodyCollisions: true,
+            anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(8, 8)))
+          .Attach<BounceProjModifier>(bounce => {
+            bounce.numberOfBounces = _MAX_WALL_BOUNCES;
+            bounce.onlyBounceOffTiles = false;
+            bounce.ExplodeOnEnemyBounce = false; })
+          .Attach<CarpetProjectile>()
+          .Assign(out Projectile p);
 
         for (int i = 0; i < _MAX_PROJECTILES; i++)
         {
             ProjectileModule imod = gun.RawSourceVolley.projectiles[i];
             imod.projectiles.Clear();
-            imod.chargeProjectiles = new List<ProjectileModule.ChargeProjectile>();
+            imod.chargeProjectiles = new();
             imod.triggerCooldownForAnyChargeAmount = true;
             for (int j = 0; j <= i; ++j)
                 gun.RawSourceVolley.projectiles[j].chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
@@ -60,7 +61,7 @@ public class CarpetBomber : CwaffGun
                     }),
                     ChargeTime = _CHARGE_PER_PROJECTILE * (i + 1),
                 });
-        } //REFACTOR: charge level builder
+        }
 
         // Initialize our explosion data
         _CarpetExplosion = Explosions.ExplosiveRounds.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 1.5f, preventPlayerForce: true, shake: false);

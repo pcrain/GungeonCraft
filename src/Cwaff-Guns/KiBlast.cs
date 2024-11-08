@@ -24,30 +24,28 @@ public class KiBlast : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<KiBlast>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 20, canGainAmmo: false, idleFps: 10,
+        Lazy.SetupGun<KiBlast>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 20, canGainAmmo: false, idleFps: 10, shootFps: 24,
             fireAudio: "ki_blast_sound", muzzleVFX: "muzzle_ki_blast", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft)
           .Attach<KiBlastAmmoDisplay>()
-          .AddToShop(ModdedShopType.Boomhildr);
+          .AddToShop(ModdedShopType.Boomhildr)
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+            customClip: true, damage: 4.0f, range: 1000.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
+            anchor: Anchor.MiddleCenter, ignoreDamageCaps: true, hitSound: "ki_blast_explode_sound"))
+          .SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f))
+          .Attach<EasyTrailBullet>(trail => {
+            trail.TrailPos   = trail.transform.position;
+            trail.StartWidth = 0.2f;
+            trail.EndWidth   = 0f;
+            trail.LifeTime   = 0.1f;
+            trail.BaseColor  = Color.cyan;
+            trail.EndColor   = Color.cyan; })
+          .Attach<ArcTowardsTargetBehavior>()
+          .Attach<KiBlastBehavior>(); //NOTE: KiBlastBehavior must init before ArcTowardsTargetBehavior so we can call Setup() before Start()
 
         _FireLeftAnim  = gun.shootAnimation;
-        _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true);
-        gun.SetAnimationFPS(_FireLeftAnim, 24);
-        gun.SetAnimationFPS(_FireRightAnim, 24);
-
-        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-          customClip: true, damage: 4.0f, range: 1000.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
-          anchor: Anchor.MiddleCenter, ignoreDamageCaps: true, hitSound: "ki_blast_explode_sound"))
-        .SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f))
-        .Attach<EasyTrailBullet>(trail => {
-          trail.TrailPos   = trail.transform.position;
-          trail.StartWidth = 0.2f;
-          trail.EndWidth   = 0f;
-          trail.LifeTime   = 0.1f;
-          trail.BaseColor  = Color.cyan;
-          trail.EndColor   = Color.cyan; })
-        .Attach<ArcTowardsTargetBehavior>()
-        .Attach<KiBlastBehavior>(); //TODO: KiBlastBehavior must init before ArcTowardsTargetBehavior so we can call Setup() before Start()
+        _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true, fps: 24);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

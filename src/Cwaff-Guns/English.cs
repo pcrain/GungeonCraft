@@ -43,11 +43,8 @@ public class English : CwaffGun
             damage: 2.5f, speed: 81.0f, range: 9999f, sprite: "billiard_ball_projectile_small", fps: 12, scale: 1.5f, anchor: Anchor.MiddleCenter,
             collidesWithProjectiles: true, collidesOnlyWithPlayerProjectiles: true, customClip: true))
           .Attach<BilliardBall>()
+          .SetAirImpactVFX(Items.Winchester.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX, alwaysUseMidair: true)
           .Assign(out _BilliardBall);
-
-        _BilliardBall.hitEffects.alwaysUseMidair = true;
-        _BilliardBall.hitEffects.overrideMidairDeathVFX =
-            ((ItemHelper.Get(Items.Winchester) as Gun).DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
 
         _BilliardBallPhantom = VFX.Create("billiard_ball_small_vfx", scale: 1.5f, emissivePower: 10f);
         _BilliardBallPlaceholder = VFX.Create("billiard_ball_placeholder_vfx", fps: 10);

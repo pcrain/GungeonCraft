@@ -19,7 +19,7 @@ public class Jugglernaut : CwaffGun
     internal const int _IDLE_FPS = 16;
     internal const float _DEBRIS_GLOW = 500f;
 
-    internal static List<string> _JuggleAnimations;
+    internal static List<string> _JuggleAnimations = new(6);
     internal static List<float> _MinEmission = new(){10f, 50f, 100f, 200f, 300f, 400f};
     internal static string _TrueIdleAnimation;
     internal static IntVector2 _CarryOffset        = new IntVector2(-14, -8);
@@ -41,62 +41,33 @@ public class Jugglernaut : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Jugglernaut>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 240, shootFps: 30, reloadFps: 40, preventRotation: true);
-
-        _JuggleAnimations = new(){
-            gun.QuickUpdateGunAnimation("1_gun", returnToIdle: false),
-            gun.QuickUpdateGunAnimation("2_gun", returnToIdle: false),
-            gun.QuickUpdateGunAnimation("3_gun", returnToIdle: false),
-            gun.QuickUpdateGunAnimation("4_gun", returnToIdle: false),
-            gun.QuickUpdateGunAnimation("5_gun", returnToIdle: false),
-            gun.QuickUpdateGunAnimation("6_gun", returnToIdle: false),
-        };
+        Lazy.SetupGun<Jugglernaut>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 240, shootFps: 30, reloadFps: 40, preventRotation: true)
+          .AddFlippedCarryPixelOffsets(offset: _CarryOffset, flippedOffset: _FlippedCarryOffset)
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,
+            customClip: true, sprite: "jugglernaut_projectile", shouldRotate: false, spawnSound: "jugglernaut_throw_sound",
+            destroySound: "wall_thunk", glowAmount: _DEBRIS_GLOW));
 
         //NOTE: Manual adjustments to prevent wonky firing animations by effectively locking barrel offset in place
         gun.LockedHorizontalOnCharge = true;
         gun.LockedHorizontalCenterFireOffset = 0f;
         gun.barrelOffset.transform.position -= (C.PIXEL_SIZE * _CarryOffset.ToVector3());
-        gun.AddFlippedCarryPixelOffsets(offset: _CarryOffset, flippedOffset: _FlippedCarryOffset);
+        gun.reloadAnimation = null; // animation shouldn't change when reloading
+        gun.shootAnimation  = null; // animation shouldn't change when firing
+        _TrueIdleAnimation  = gun.idleAnimation;
 
-        string tossSound = "juggle_toss_sound";
-        for (int i = 0; i < _JuggleAnimations.Count; ++i)
+        const string tossSound = "juggle_toss_sound";
+        for (int i = 0; i < 6; ++i)
         {
-            gun.SetAnimationFPS(_JuggleAnimations[i], _IDLE_FPS);
-            gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 5);
-            gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 17);
-            if (i > 0)
-            {
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 9);
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 21);
-            }
-            if (i > 1)
-            {
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 1);
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 13);
-            }
-            if (i > 2)
-            {
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 7);
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 19);
-            }
-            if (i > 3)
-            {
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 11);
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 23);
-            }
-            if (i > 4)
-            {
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 3);
-                gun.SetGunAudio(_JuggleAnimations[i], tossSound, frame: 15);
-            }
+            _JuggleAnimations.Add(gun.QuickUpdateGunAnimation($"{i+1}_gun", fps: _IDLE_FPS));
+            gun.SetGunAudio(_JuggleAnimations[i], tossSound, 5, 17);
+            if (i > 0) gun.SetGunAudio(_JuggleAnimations[i], tossSound, 9, 21);
+            if (i > 1) gun.SetGunAudio(_JuggleAnimations[i], tossSound, 1, 13);
+            if (i > 2) gun.SetGunAudio(_JuggleAnimations[i], tossSound, 7, 19);
+            if (i > 3) gun.SetGunAudio(_JuggleAnimations[i], tossSound, 11, 23);
+            if (i > 4) gun.SetGunAudio(_JuggleAnimations[i], tossSound, 3, 15);
         }
-        _TrueIdleAnimation          = gun.idleAnimation;
-        gun.reloadAnimation         = null; // animation shouldn't change when reloading
-        gun.shootAnimation          = null; // animation shouldn't change when firing
-
-        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f, customClip: true,
-          sprite: "jugglernaut_projectile", fps: 2,  anchor: Anchor.MiddleCenter, shouldRotate: false, spawnSound: "jugglernaut_throw_sound", destroySound: "wall_thunk"));
     }
 
     /// <summary>Make sure Jugglernaut appears correctly in the weapons panel</summary>
@@ -368,7 +339,6 @@ public class JugglernautProjectile : MonoBehaviour
     {
         this._projectile.PickFrame(this._frame);
         this._rotation = 360f * UnityEngine.Random.value; // randomize the starting rotation
-        this._projectile.sprite.SetGlowiness(glowAmount: Jugglernaut._DEBRIS_GLOW);
     }
 
     private void Update()

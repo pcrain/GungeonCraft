@@ -12,30 +12,27 @@ public class BBGun : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<BBGun>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<BBGun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 3, canGainAmmo: false,
             shootFps: 10, chargeFps: 16, loopChargeAt: 32, muzzleVFX: "muzzle_b_b_gun", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
-            fireAudio: "Play_WPN_seriouscannon_shot_01", reloadAudio: "Play_ENM_flame_veil_01");
-
-        Projectile p = gun.InitProjectile(GunData.New(
-          clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
-          customClip: true, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter, hitSound: "bb_impact_sound",
-          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))) // prevent uneven colliders from glitching into walls
-        .Attach<PierceProjModifier>(pierce => {
-          pierce.penetration = Mathf.Max(pierce.penetration, 999);
-          pierce.penetratesBreakables = true; })
-        .Attach<BounceProjModifier>(bounce => {
-          bounce.numberOfBounces     = Mathf.Max(bounce.numberOfBounces, 999);
-          bounce.chanceToDieOnBounce = 0f;
-          bounce.onlyBounceOffTiles  = true; })
-        .CopyAllImpactVFX(Items.Crestfaller);
-
-        gun.DefaultModule.chargeProjectiles.Clear();
-        for (int i = 0; i < _CHARGE_LEVELS.Length; i++)
-            gun.DefaultModule.chargeProjectiles.Add(new ProjectileModule.ChargeProjectile {
-                Projectile = p.Clone(GunData.New(speed: 40f + 20f * i)).Attach<TheBB>(),
-                ChargeTime = _CHARGE_LEVELS[i],
-            }); //REFACTOR: charge level builder
+            fireAudio: "Play_WPN_seriouscannon_shot_01", reloadAudio: "Play_ENM_flame_veil_01")
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(
+            clipSize: 3, cooldown: 0.7f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, sequenceStyle: ProjectileSequenceStyle.Ordered,
+            customClip: true, speed: 20f, range: 999999f, sprite: "bball", fps: 20, anchor: Anchor.MiddleCenter, hitSound: "bb_impact_sound",
+            glowAmount: 1000f, glowColor: Color.magenta, anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2)))
+          .Attach<PierceProjModifier>(pierce => {
+            pierce.penetration = Mathf.Max(pierce.penetration, 999);
+            pierce.penetratesBreakables = true; })
+          .Attach<BounceProjModifier>(bounce => {
+            bounce.numberOfBounces     = Mathf.Max(bounce.numberOfBounces, 999);
+            bounce.chanceToDieOnBounce = 0f;
+            bounce.onlyBounceOffTiles  = true; })
+          .Attach<TheBB>()
+          .CopyAllImpactVFX(Items.Crestfaller)
+          .SetupChargeProjectiles(gun.DefaultModule, _CHARGE_LEVELS.Length, (i, p) => new() {
+            Projectile = p.Clone(GunData.New(speed: 40f + 20f * i)),
+            ChargeTime = _CHARGE_LEVELS[i] });
     }
 }
 
@@ -69,8 +66,6 @@ public class TheBB : MonoBehaviour
         if (!this._projectile.FiredForFree())
             this._projectile.OnDestruction += CreateInteractible;
         this._maxSpeed = this._projectile.baseData.speed;
-
-        this._projectile.sprite.SetGlowiness(glowAmount: 1000f, glowColor: Color.magenta);
 
         this.GetComponent<BounceProjModifier>().OnBounce += this.OnBounce;
     }

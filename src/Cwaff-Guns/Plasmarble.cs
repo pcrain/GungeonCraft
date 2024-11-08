@@ -24,7 +24,8 @@ public class Plasmarble : CwaffGun
           .InitSpecialProjectile<FancyGrenadeProjectile>(GunData.New(
             clipSize: 1, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, speed: 50f, damage: 3.5f,
             sequenceStyle: ProjectileSequenceStyle.Ordered, sprite: "plasmarble_projectile", fps: 20, anchor: Anchor.MiddleCenter,
-            shouldRotate: true, shouldFlipHorizontally: true, surviveRigidbodyCollisions: true, chargeTime: 0.5f, customClip: true))
+            shouldRotate: true, shouldFlipHorizontally: true, surviveRigidbodyCollisions: true, chargeTime: 0.5f, customClip: true,
+            glowAmount: 100f, glowColor: Color.magenta))
           .Attach<BounceProjModifier>(bounce => {
             bounce.numberOfBounces = 2;
             bounce.onlyBounceOffTiles = false;
@@ -139,7 +140,6 @@ public class PlasmarbleProjectile : MonoBehaviour
         this._projectile.specRigidbody.CollideWithOthers = false;
         this._projectile.collidesWithEnemies = false;
         this._projectile.UpdateCollisionMask();
-        this._projectile.sprite.SetGlowiness(100f, glowColor: Color.magenta);
 
         this._room = this._projectile.SafeCenter.GetAbsoluteRoom();
     }

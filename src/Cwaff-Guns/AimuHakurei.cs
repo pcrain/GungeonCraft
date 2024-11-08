@@ -16,9 +16,8 @@ public class AimuHakurei : CwaffGun
 
     internal static readonly int[] _GRAZE_TIER_THRESHOLDS  = {10, 30, 60, 100};
 
-    internal static tk2dSpriteAnimationClip _BulletSprite = null;
     internal static Projectile _ProjBase;
-    internal static GameObject _GrazeVFX      = null;
+    internal static GameObject _GrazeVFX;
 
     public int graze = 0;
 
@@ -28,18 +27,15 @@ public class AimuHakurei : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<AimuHakurei>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<AimuHakurei>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, infiniteAmmo: true,
             ammo: 200, canGainAmmo: false, canReloadNoMatterAmmo: true, modulesAreTiers: true, shootFps: 60, muzzleVFX: "muzzle_aimu",
             muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter)
-          .AddToShop(ModdedShopType.TimeTrader);
+          .Attach<AimuHakureiAmmoDisplay>()
+          .AddToShop(ModdedShopType.TimeTrader)
+          .AssignGun(out Gun gun);
 
-        _BulletSprite = AnimatedBullet.Create(name: "aimu_projectile", fps: 2, scale: 0.625f, anchor: Anchor.MiddleCenter);
-
-        _GrazeVFX = VFX.Create("graze_vfx", fps: 5, emissivePower: 5f);
-
-        _ProjBase = gun.InitFirstProjectile(GunData.New(damage: 8f, speed: 44f, range: 100f, force: 3f));
-
+        _ProjBase = gun.InitFirstProjectile(GunData.New(damage: 8f, speed: 44f, range: 100f, force: 3f, sprite: "aimu_projectile", scale: 0.625f));
         Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f, spawnSound: "aimu_beam_sound_2"))
           .SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false, scale: 1.0f, anchor: Anchor.MiddleCenter))
           .AttachTrail("aimu_beam_mid", fps: 60, startAnim: "aimu_beam_start", softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true,
@@ -78,7 +74,7 @@ public class AimuHakurei : CwaffGun
                 }),
         };
 
-        gun.gameObject.AddComponent<AimuHakureiAmmoDisplay>();
+        _GrazeVFX = VFX.Create("graze_vfx", fps: 5, emissivePower: 5f);
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -181,19 +177,18 @@ public class AimuHakurei : CwaffGun
 
     private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate, int level, Gun gun)
     {
-        ProjectileModule mod = new ProjectileModule().SetAttributes(GunData.New(
-            gun: gun, ammoCost: 0, clipSize: -1, cooldown: C.FRAME * fireRate, angleVariance: 15f - (2 * level),
+        return
+          new ProjectileModule() {
+            projectiles       = projectiles,
+            burstShotCount    = projectiles.Count,
+            burstCooldownTime = C.FRAME * fireRate }
+          .SetAttributes(GunData.New(gun: gun, ammoCost: 0, clipSize: -1, cooldown: C.FRAME * fireRate, angleVariance: 15f - (2 * level),
             shootStyle: ShootStyle.Burst, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
-        mod.projectiles         = projectiles;
-        mod.burstShotCount      = mod.projectiles.Count;
-        mod.burstCooldownTime   = C.FRAME * fireRate;
-        return mod;
     }
 
     private static Projectile AimuProj(bool invert, float amplitude, string sound, float trailWidth, Color? trailColor = null)
     {
         Projectile proj = _ProjBase.ClonePrefab<Projectile>();
-            proj.AddDefaultAnimation(_BulletSprite);
             proj.gameObject.AddComponent<AimuHakureiProjectileBehavior>()
                 .Setup(invert: invert, amplitude: amplitude, sound: sound);
             AddTrail(proj, trailWidth, trailColor);

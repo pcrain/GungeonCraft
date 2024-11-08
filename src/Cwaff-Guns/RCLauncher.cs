@@ -28,7 +28,6 @@ public class RCLauncher : CwaffGun
             igp.followTheLeader       = true; })
           .Attach<RCProjectileBehavior>();
 
-        // Initialize our explosion data
         _CarExplosion = Explosions.ExplosiveRounds.With(damage: 5f, force: 100f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false);
     }
 

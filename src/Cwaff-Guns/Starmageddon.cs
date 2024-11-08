@@ -22,11 +22,11 @@ public class Starmageddon : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Starmageddon>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Starmageddon>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FULLAUTO, reloadTime: 1.0f, ammo: 900, shootFps: 20, chargeFps: 20,
-            reloadFps: 30, loopReloadAt: 0, attacksThroughWalls: true);
-
-        gun.InitProjectile(GunData.New(clipSize: 30, cooldown: 0.125f, angleVariance: 15.0f,
+            reloadFps: 30, loopReloadAt: 0, attacksThroughWalls: true)
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(clipSize: 30, cooldown: 0.125f, angleVariance: 15.0f,
             shootStyle: ShootStyle.Automatic, damage: 8.0f, speed: 60.0f, range: 999999f, spawnSound: "starmageddon_fire_sound",
             sprite: "starmageddon_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, useDummyChargeModule: true, customClip: true,
             // overrideColliderPixelSizes: new IntVector2(128, 128), //WARNING: large hitboxes apparently lag the game????
@@ -41,7 +41,6 @@ public class Starmageddon : CwaffGun
             shootStyle: ShootStyle.Automatic, damage: 16.0f, speed: 60.0f, range: 999999f, spawnSound: "starmageddon_fire_sound",
             sprite: "meteor_projectile", fps: 12, anchor: Anchor.MiddleCenter, customClip: true, fire: 1.0f, shrapnelMinVelocity: 8f, shrapnelMaxVelocity: 16f,
             shrapnelVFX: VFX.Create("meteor_shrapnel"), shrapnelCount: 10, baseProjectile: Items._38Special.Projectile(), gun: gun));
-
         _MasteryModule.projectiles[0]
             .Attach<StarmageddonProjectile>()
             .Attach<GoopModifier>(g => {

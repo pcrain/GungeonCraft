@@ -47,20 +47,9 @@ public class IceCreamGun : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<IceCreamGun>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true);
-            gun.SetAttributes(quality: ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true);
-            gun.SetAnimationFPS(gun.chargeAnimation, 16);
-            gun.muzzleFlashEffects = null;
-            gun.preventRotation        = true; // make sure the ice cream is always standing up straight
-            gun.sprite.HeightOffGround = 0.2f; // render in front of the player
-
-        ProjectileModule mod = gun.DefaultModule;
-            mod.shootStyle             = ShootStyle.SemiAutomatic;
-            mod.sequenceStyle          = ProjectileSequenceStyle.Random;
-            mod.numberOfShotsInClip    = -1;
-            mod.ammoType               = GameUIAmmoType.AmmoType.BEAM;
-            mod.cooldownTime           = 0.0f;
-            mod.projectiles            = new(){ Lazy.NoProjectile() };
+        Lazy.SetupGun<IceCreamGun>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true)
+          .SetAttributes(quality: ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true, preventRotation: true)
+          .DefaultModule.projectiles = new(){ Lazy.NoProjectile() };
 
         // NOTE: sprites might need lots of padding for hands to render in right positions w.r.t. vanilla sprites, see bullet kin for example
         AIActor bulletKin = EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);

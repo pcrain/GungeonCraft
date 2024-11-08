@@ -258,10 +258,20 @@ public static class Extensions
   }
 
   /// <summary>Set a projectile's midair impact / death VFX</summary>
-  public static Projectile SetAirImpactVFX(this Projectile p, VFXPool vfx)
+  public static Projectile SetAirImpactVFX(this Projectile p, GameObject vfx, bool alwaysUseMidair = false)
+  {
+    p.hitEffects.suppressMidairDeathVfx = false;
+    p.hitEffects.overrideMidairDeathVFX = vfx;
+    p.hitEffects.alwaysUseMidair = alwaysUseMidair;
+    return p;
+  }
+
+  /// <summary>Set a projectile's midair impact / death VFX</summary>
+  public static Projectile SetAirImpactVFX(this Projectile p, VFXPool vfx, bool alwaysUseMidair = false)
   {
     p.hitEffects.suppressMidairDeathVfx = false;
     p.hitEffects.overrideMidairDeathVFX = vfx.effects[0].effects[0].effect;
+    p.hitEffects.alwaysUseMidair = alwaysUseMidair;
     return p;
   }
 
@@ -1036,17 +1046,19 @@ public static class Extensions
     self.RefreshBehaviors();
   }
 
-  /// <summary>Set up custom ammo types from default resource paths and adds it to a projectile module</summary>
-  public static void SetupCustomAmmoClip(this ProjectileModule mod, GunData b)
+  /// <summary>Set up custom ammo types from default resource paths and adds it to a projectile module and returns the module.</summary>
+  public static ProjectileModule SetupCustomAmmoClip(this ProjectileModule mod, GunData b)
   {
       mod.SetupCustomAmmoClip(b.gun.EncounterNameOrDisplayName.InternalName());
+      return mod;
   }
 
-  /// <summary>Set up custom ammo types from a specific resource path and adds it to a projectile module</summary>
-  public static void SetupCustomAmmoClip(this ProjectileModule mod, string clipname)
+  /// <summary>Set up custom ammo types from a specific resource path and adds it to a projectile module and returns the module.</summary>
+  public static ProjectileModule SetupCustomAmmoClip(this ProjectileModule mod, string clipname)
   {
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
       mod.customAmmoType = AtlasHelper.GetOrAddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
+      return mod;
   }
 
   /// <summary>Check if a player will die from next hit</summary>
@@ -1778,10 +1790,13 @@ public static class Extensions
   }
 
   /// <summary>Faster version of the MtG API equivalent using our ResMap()</summary>
-  public static string QuickUpdateGunAnimation(this Gun gun, string name, tk2dSpriteCollectionData collection = null, bool returnToIdle = false)
+  public static string QuickUpdateGunAnimation(this Gun gun, string name, tk2dSpriteCollectionData collection = null, bool returnToIdle = false, int fps = -1)
   {
       collection ??= ETGMod.Databases.Items.WeaponCollection;
-      return QuickUpdateAnimationAddClipsLater(gun, name, collection, returnToIdle);
+      string clipName = QuickUpdateAnimationAddClipsLater(gun, name, collection, returnToIdle);
+      if (fps >= 0)
+        gun.SetAnimationFPS(clipName, fps);
+      return clipName;
   }
 
   /// <summary>Fixed version fo Alexandria's ConstructOffsetsFromAnchor() to deal with atlas sprites correctly</summary>
@@ -1885,7 +1900,7 @@ public static class Extensions
   }
 
   /// <summary>Add a flipped carry offset to a gun</summary>
-  public static void AddFlippedCarryPixelOffsets(this Gun gun, IntVector2 offset, IntVector2 flippedOffset,
+  public static Gun AddFlippedCarryPixelOffsets(this Gun gun, IntVector2 offset, IntVector2 flippedOffset,
       IntVector2? offsetPilot       = null, IntVector2? flippedOffsetPilot       = null,
       IntVector2? offsetConvict     = null, IntVector2? flippedOffsetConvict     = null,
       IntVector2? offsetRobot       = null, IntVector2? flippedOffsetRobot       = null,
@@ -1912,6 +1927,7 @@ public static class Extensions
         offsetEevee:       offsetEevee,       flippedOffsetEevee:       flippedOffsetEevee,
         offsetGunslinger:  offsetGunslinger,  flippedOffsetGunslinger:  flippedOffsetGunslinger
       );
+    return gun;
   }
 
   private static bool _SuppressNextPassivePickupSound = false;

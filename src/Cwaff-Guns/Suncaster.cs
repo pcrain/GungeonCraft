@@ -28,15 +28,14 @@ public class Suncaster : CwaffGun
     public List<SuncasterPrism> extantPrisms = new();
     public int maxPrisms                     = _BASE_MAX_PRISMS;
 
-
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Suncaster>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Suncaster>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,
             canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false, shootFps: 30, reloadFps: 40)
-          .Attach<SuncasterAmmoDisplay>();
-
-        gun.InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, pierceBreakables: true, pierceInternalWalls: true,
+          .Attach<SuncasterAmmoDisplay>()
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, pierceBreakables: true, pierceInternalWalls: true,
             damage: 2f, speed: 100f, range: 999999f, fps: 12, anchor: Anchor.MiddleLeft, customClip: true, spawnSound: "suncaster_fire_sound", uniqueSounds: true))
           .Attach<PierceProjModifier>(pierce => pierce.penetration = 999)
           .Attach<SuncasterProjectile>()

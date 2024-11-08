@@ -19,19 +19,20 @@ public class Blackjack : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Blackjack>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Blackjack>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _AMMO, canGainAmmo: false,
-            shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound", fireAudio: "card_throw_sound");
-
-        Projectile p = gun.InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
-          customClip: true, damage: 6f, speed: 22f, range: 999f, hitSound: "blackjack_card_impact_sound"))
-        .AddAnimations(
-          AnimatedBullet.Create(refClip: ref _BulletSprite,  name: "playing_card",          fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
-          AnimatedBullet.Create(refClip: ref _BackSprite,    name: "playing_card_back",     fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
-          AnimatedBullet.Create(refClip: ref _RedSprite,     name: "playing_card_red",      fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
-          AnimatedBullet.Create(refClip: ref _RedBackSprite, name: "playing_card_back_red", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft))
-        .SetAllImpactVFX(VFX.CreatePool("blackjack_card_impact_vfx", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter))
-        .Attach<ThrownCard>();
+            shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound", fireAudio: "card_throw_sound")
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
+            customClip: true, damage: 6f, speed: 22f, range: 999f, hitSound: "blackjack_card_impact_sound"))
+          .AddAnimations(
+            AnimatedBullet.Create(refClip: ref _BulletSprite,  name: "playing_card",          fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _BackSprite,    name: "playing_card_back",     fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _RedSprite,     name: "playing_card_red",      fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft),
+            AnimatedBullet.Create(refClip: ref _RedBackSprite, name: "playing_card_back_red", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft))
+          .SetAllImpactVFX(VFX.CreatePool("blackjack_card_impact_vfx", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter))
+          .Attach<ThrownCard>()
+          .Assign(out Projectile p);
 
         gun.AddSynergyModules(Synergy.PIT_BOSS, new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, ammoCost: 0, clipSize: _CLIP_SIZE,
           cooldown: 0.16f, shootStyle: ShootStyle.Automatic, customClip: true, angleFromAim: 20f, angleVariance: 5f, ignoredForReloadPurposes: true,

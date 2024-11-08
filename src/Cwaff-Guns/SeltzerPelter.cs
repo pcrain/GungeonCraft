@@ -7,54 +7,51 @@ public class SeltzerPelter : CwaffGun
     public static string LongDescription  = "Launches soda cans that fly around wildly after initial impact, pushing enemies away with highly pressurized streams of seltzer water.";
     public static string Lore             = "The best designs are inspired by nature, but those inspired by fraternities come in at a close second. This weapon was first conceptualized when a frat bro stuffed a beer can in a spud launcher and fired it at the ceiling. Although the can burst immediately and ruined the launcher, another frat bro desperate for a cool term project to bring his engineering class grade up to a D- ran with the idea. After investing in sturdier titanium-alloy cans and substituting the beer for soda, the remodeled launcher created as big a mess as ever, but by virtue of externalizing that mess, was considered a resounding success. The frat bro got a D+ in his class, and an actually competent engineer bought the rights to the design and tweaked it to be a bit more marketable and combat-viable, resulting in win-wins all around.";
 
-    internal static BasicBeamController _BubbleBeam;
+    internal static Projectile _BubbleBeam;
     internal static List<string> _ReloadAnimations;
 
     private int _loadedCanIndex = 0;
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<SeltzerPelter>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<SeltzerPelter>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 150, shootFps: 36, muzzleFrom: Items.Mailbox)
-          .AddToShop(ItemBuilder.ShopType.Goopton);
+          .AddToShop(ItemBuilder.ShopType.Goopton)
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
+            damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1, anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
+            anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))) // prevent uneven colliders from glitching into walls
+          .Attach<BounceProjModifier>(bounce => {
+              bounce.numberOfBounces      = 9999;
+              bounce.chanceToDieOnBounce  = 0f;
+              bounce.onlyBounceOffTiles   = false;
+              bounce.ExplodeOnEnemyBounce = false;
+              bounce.bouncesTrackEnemies  = true;
+              bounce.bounceTrackRadius    = 3f; })
+          .Attach<SeltzerProjectile>();
 
         _ReloadAnimations = new(){
-            gun.QuickUpdateGunAnimation("reload",   returnToIdle: true), // coke can
-            gun.QuickUpdateGunAnimation("reload_b", returnToIdle: true), // pepsi can
-            gun.QuickUpdateGunAnimation("reload_c", returnToIdle: true), // sprite can
+            gun.QuickUpdateGunAnimation("reload",   returnToIdle: true, fps: 52), // coke can
+            gun.QuickUpdateGunAnimation("reload_b", returnToIdle: true, fps: 52), // pepsi can
+            gun.QuickUpdateGunAnimation("reload_c", returnToIdle: true, fps: 52), // sprite can
         };
         foreach(string animation in _ReloadAnimations)
         {
-            gun.SetAnimationFPS(animation, 52);
             gun.SetGunAudio(animation, "seltzer_shake_sound", 0, 10, 22, 29, 35);
             gun.SetGunAudio(animation, "seltzer_insert_sound", 42);
         }
-
-        gun.InitProjectile(GunData.New(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
-          damage: 16.0f, speed: 30.0f, force: 75.0f, range: 999.0f, sprite: "can_projectile", fps: 1, anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
-          anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))) // prevent uneven colliders from glitching into walls
-        .Attach<BounceProjModifier>(bounce => {
-            bounce.numberOfBounces      = 9999;
-            bounce.chanceToDieOnBounce  = 0f;
-            bounce.onlyBounceOffTiles   = false;
-            bounce.ExplodeOnEnemyBounce = false;
-            bounce.bouncesTrackEnemies  = true;
-            bounce.bounceTrackRadius    = 3f; })
-        .Attach<SeltzerProjectile>();
 
         //NOTE: the perfect seltzer stats, do not tweak without testing! (beam damage == DPS)
         _BubbleBeam = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f, preventOrbiting: true, doBeamSetup: true,
             beamSprite: "bubble_stream", beamFps: 8, beamEmission: 5f, beamChargeDelay: 0f, beamSeparation: true, beamIsRigid: false,
             beamInterpolate: false, beamKnockback: 100f, beamTiling: BasicBeamController.BeamTileType.Flowing, beamEndType: BasicBeamController.BeamEndType.Persist))
-          .GetComponent<BasicBeamController>();
-
-        GoopModifier gmod = _BubbleBeam.gameObject.GetOrAddComponent<GoopModifier>();
+          .Attach<GoopModifier>(gmod => {
             gmod.SpawnAtBeamEnd         = true;
             gmod.BeamEndRadius          = 0.5f;
             gmod.SpawnGoopInFlight      = true;
             gmod.InFlightSpawnRadius    = 0.5f;
             gmod.InFlightSpawnFrequency = 0.01f;
-            gmod.goopDefinition         = EasyGoopDefinitions.SeltzerGoop;
+            gmod.goopDefinition         = EasyGoopDefinitions.SeltzerGoop; });
     }
 
     public override void OnActualReload(PlayerController player, Gun gun, bool manual)

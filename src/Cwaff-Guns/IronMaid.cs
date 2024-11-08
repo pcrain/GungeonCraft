@@ -16,21 +16,22 @@ public class IronMaid : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<IronMaid>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<IronMaid>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.75f, ammo: 400, shootFps: 24, reloadFps: 24,
             muzzleVFX: "muzzle_iron_maid", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft, fireAudio: "knife_gun_launch",
             reloadAudio: "knife_gun_reload")
-          .AddToShop(ItemBuilder.ShopType.Trorc);
-
-        Projectile proj = gun.InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 5.0f, speed: 40.0f,
-            sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter, hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound"))
+          .AddReticle<CwaffReticle>(reticleVFX : VFX.BasicReticle, reticleAlpha : 0.4f, visibility : CwaffReticle.Visibility.ALWAYS, smoothLerp: true)
+          .AddToShop(ItemBuilder.ShopType.Trorc)
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 5.0f, speed: 40.0f,
+            sprite: "kunai", fps: 12, anchor: Anchor.MiddleCenter, hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound",
+            glowAmount: IronMaidBullets._BASE_GLOW, glowColor: Color.cyan))
           .CopyAllImpactVFX(Items.Thunderclap)
-          .Attach<IronMaidBullets>();
+          .Attach<IronMaidBullets>()
+          .Assign(out Projectile proj);
 
         gun.AddSynergyModules(Synergy.MASTERY_IRON_MAID, new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, ammoCost: 0, clipSize: 20, cooldown: 0.1f,
           shootStyle: ShootStyle.SemiAutomatic, angleFromAim: 20f, angleVariance: 8f, ignoredForReloadPurposes: true, mirror: true, baseProjectile: proj)));
-
-        gun.AddReticle<CwaffReticle>(reticleVFX : VFX.BasicReticle, reticleAlpha : 0.4f, visibility : CwaffReticle.Visibility.ALWAYS, smoothLerp: true);
     }
 
     private GameObject GetTargetEnemy(CwaffReticle reticle) => this._targetEnemy ? this._targetEnemy.gameObject : null;
@@ -151,7 +152,8 @@ public class IronMaidBullets : MonoBehaviour
     private const float _GLOW_MAX               = 10f;
     private const float _LAUNCH_DELAY           = 0.04f;
     private const float _LAUNCH_SPEED           = 50f;
-    private const float _BASE_GLOW              = 3f;
+
+    internal const float _BASE_GLOW              = 3f;
 
     private PlayerController _owner;
     private Projectile       _projectile;
@@ -175,7 +177,6 @@ public class IronMaidBullets : MonoBehaviour
         this._index                 = 0;
 
         // Phase 1 / 5 -- the initial fire
-        this._projectile.sprite.SetGlowiness(glowAmount: _BASE_GLOW, glowColor: Color.cyan);
         this._moveTimer = _TIME_BEFORE_STASIS;
         float decel = this._projectile.baseData.speed / (C.FPS * _TIME_BEFORE_STASIS);
         while (this._moveTimer > 0 && !this._launchSequenceStarted)

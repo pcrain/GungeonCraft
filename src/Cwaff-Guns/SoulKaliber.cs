@@ -15,7 +15,8 @@ public class SoulKaliber : CwaffGun
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.1f, ammo: 444, shootFps: 24, reloadFps: 12,
             muzzleFrom: Items.BundleOfWands, fireAudio: "soul_kaliber_fire", reloadAudio: "soul_kaliber_reload")
           .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, damage: 1.0f, speed: 30.0f,
-            sprite: "soul_kaliber_projectile", fps: 2, scale: 0.33f, anchor: Anchor.MiddleCenter, customClip: true))
+            sprite: "soul_kaliber_projectile", fps: 2, scale: 0.33f, anchor: Anchor.MiddleCenter, customClip: true,
+            glowAmount: 100f, glowColor: Color.magenta))
           .Attach<SoulLinkProjectile>();
     }
 
@@ -90,9 +91,7 @@ public class SoulLinkProjectile : MonoBehaviour
 {
     private void Start()
     {
-        Projectile proj = base.GetComponent<Projectile>();
-        proj.sprite.SetGlowiness(glowAmount: 100f, glowColor: Color.magenta);
-        proj.OnHitEnemy += this.OnHitEnemy;
+        base.GetComponent<Projectile>().OnHitEnemy += this.OnHitEnemy;
     }
 
     private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool _)

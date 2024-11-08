@@ -104,6 +104,8 @@ public sealed class GunData
   public bool hideAmmo;
   public float spinupTime;
   public string spinupSound;
+  public float glowAmount;
+  public Color? glowColor;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -196,6 +198,8 @@ public sealed class GunData
   /// <param name="hideAmmo">If true, no ammo is displayed for the module (uses Blasphemy's ammo).</param>
   /// <param name="spinupTime">The amount of time a (semi-)automatic gun must spin up before firing.</param>
   /// <param name="spinupSound">The sound to play while the gun is spinning up.</param>
+  /// <param name="glowAmount">The emissive power of the projectile.</param>
+  /// <param name="glowColor">The emissive color of the projectile.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -212,7 +216,7 @@ public sealed class GunData
     float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f, GoopDefinition beamGoop = null, bool? beamInterpolate = null,
     int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null, float beamKnockback = -1f,
     BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
-    bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null)
+    bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -304,6 +308,8 @@ public sealed class GunData
       _Instance.hideAmmo                          = hideAmmo;
       _Instance.spinupTime                        = spinupTime;
       _Instance.spinupSound                       = spinupSound;
+      _Instance.glowAmount                        = glowAmount;
+      _Instance.glowColor                         = glowColor;
       return _Instance;
   }
 }
@@ -325,6 +331,10 @@ public static class GunBuilder
 
     // Determine whether we have an invisible projectile
     proj.sprite.renderer.enabled = !b.invisibleProjectile;
+
+    // Determine the emissive properties of the projectile
+    if (b.glowAmount > 0f)
+      proj.sprite.SetGlowiness(glowAmount: b.glowAmount, glowColor: b.glowColor);
 
     // Need to set up charge projectiles after both module and base projectile have been set up
     if (b.shootStyle == ShootStyle.Charged)
@@ -768,6 +778,15 @@ public static class GunBuilder
         mod.projectiles[i] = mod.projectiles[i].Clone();
 
     return mod;
+  }
+
+  /// <summary>Set up charge levels for a single module of a gun</summary>
+  public static Projectile SetupChargeProjectiles(this Projectile p, ProjectileModule mod, int num, Func<int, Projectile, ProjectileModule.ChargeProjectile> setupFunc)
+  {
+    mod.chargeProjectiles.Clear();
+    for (int i = 0; i < num; i++)
+        mod.chargeProjectiles.Add(setupFunc(i, p));
+    return p;
   }
 
   /// <summary>Dummy class for suppressing reload animations on guns with reload times of 0</summary>

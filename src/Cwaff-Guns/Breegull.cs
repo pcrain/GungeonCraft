@@ -32,22 +32,20 @@ public class Breegull : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Breegull>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Breegull>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 480, shootFps: 20, reloadFps: 12,
             introFps: 8, fireAudio: "breegull_shoot_sound", introAudio: "breegull_intro_sound", carryOffset: new IntVector2(6, 0))
           .SetReloadAudio("breegull_reload_sound", 0, 4, 8)
-          .Attach<BreegullAmmoDisplay>();
+          .Attach<BreegullAmmoDisplay>()
+          .InitProjectile(GunData.New(sprite: "breegull_projectile_normal", clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.0f,
+            shrapnelVFX: VFX.Create("breegull_impact_normal"), shrapnelCount: 10, destroySound: "egg_hit_enemy_sound", customClip: true))
+          .Assign(out _EggNormal);
 
-        _EggNormal = gun.InitProjectile(GunData.New(sprite: "breegull_projectile_normal", clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.0f,
-            shrapnelVFX: VFX.Create("breegull_impact_normal"), shrapnelCount: 10, destroySound: "egg_hit_enemy_sound", customClip: true));
-
-        //WARNING: CloneProjectile from anything other than a vanilla gun causes weird issues on MacOS and Linux???
-        //         Can maybe be circumvented by setting up each sprite individually? (actually just has to do with missing DLL / patch for generic Instantiate())
-        _EggFire      = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_fire", shrapnelVFX: VFX.Create("breegull_impact_fire"), fire: 1.0f));
-        _EggGrenade   = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_grenade", shrapnelVFX: VFX.Create("breegull_impact_grenade")))
+        _EggFire      = _EggNormal.Clone(GunData.New(sprite: "breegull_projectile_fire", shrapnelVFX: VFX.Create("breegull_impact_fire"), fire: 1.0f));
+        _EggGrenade   = _EggNormal.Clone(GunData.New(sprite: "breegull_projectile_grenade", shrapnelVFX: VFX.Create("breegull_impact_grenade")))
           .Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultLarge);
-        _EggIce       = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_ice", shrapnelVFX: VFX.Create("breegull_impact_ice"), freeze: 0.75f));
-        _EggClockwork = gun.CloneProjectile(GunData.New(sprite: "breegull_projectile_clockwork", shrapnelVFX: VFX.Create("breegull_impact_clockwork")))
+        _EggIce       = _EggNormal.Clone(GunData.New(sprite: "breegull_projectile_ice", shrapnelVFX: VFX.Create("breegull_impact_ice"), freeze: 0.75f));
+        _EggClockwork = _EggNormal.Clone(GunData.New(sprite: "breegull_projectile_clockwork", shrapnelVFX: VFX.Create("breegull_impact_clockwork")))
           .Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultSmall.With(
             damage: 7f, force: 20f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false))
           .Attach<HomingModifier>(home => { home.HomingRadius = 10f; home.AngularVelocity = 720f; });

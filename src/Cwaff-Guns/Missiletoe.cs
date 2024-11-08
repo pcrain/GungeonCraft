@@ -49,10 +49,11 @@ public class Missiletoe : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Missiletoe>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<Missiletoe>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.0f, ammo: 300, canReloadNoMatterAmmo: true,
             shootFps: 45, reloadFps: 20, muzzleFrom: Items.Mailbox, fireAudio: "missiletoe_shoot_sound_1", reloadAudio: "missiletoe_reload_sound")
-          .AddToShop(ModdedShopType.Boomhildr);
+          .AddToShop(ModdedShopType.Boomhildr)
+          .AssignGun(out Gun gun);
 
         gun.DefaultModule.SetAttributes(GunData.New(gun: gun, clipSize: 1, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, customClip: true));
 
@@ -70,7 +71,7 @@ public class Missiletoe : CwaffGun
           .Attach<GlowyChristmasProjectileBehavior>();
         _ExplodingOrnamentProjectile = Items._38Special.CloneProjectile()
           .AddAnimations(ball, gingerbread, mistletoe, sock, star, wreath)
-          .Attach<GlowyChristmasProjectileBehavior>(glow => glow.Glow(40))
+          .Attach<GlowyChristmasProjectileBehavior>(glow => glow.glow = 40f)
           .Attach<ExplosiveModifier>(e => e.explosionData = splode);
         _GiftProjectileS = SetupProjectile(gun: gun, name: "gift_projectile_black", damage: 30f, speed: 30f, force: 30f)
           .Attach<ExplosiveModifier>(e => e.explosionData = splode)
@@ -326,11 +327,6 @@ public class GlowyChristmasProjectileBehavior : MonoBehaviour
         proj.sprite.spriteAnimator.Play(proj.sprite.spriteAnimator.Library.clips.ChooseRandom());
         if (this.glow > 0f)
             proj.sprite.SetGlowiness(glowAmount: this.glow, glowColor: Color.white);
-    }
-
-    public void Glow(float amount)
-    {
-        this.glow = amount;
     }
 }
 

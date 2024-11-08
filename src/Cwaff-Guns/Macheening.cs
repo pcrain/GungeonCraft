@@ -23,20 +23,16 @@ public class Macheening : CwaffGun
           .LoopAnimation(gun.shootAnimation, 4)
           .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.11f, shootStyle: ShootStyle.Automatic, scale: 0.75f,
             damage: 7.0f, speed: 50f, range: 1000f, sprite: "macheening_projectile", hideAmmo: true, spinupTime: 1.2f,
-            hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound"))
+            hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound", glowAmount: 20f, glowColor: Color.yellow))
           .SetAllImpactVFX(Items.Excaliber.AsGun().DefaultModule.projectiles[0].hitEffects.enemy)
           .Attach<CombineEvaporateEffect>(c => {
             CombineEvaporateEffect cvePrefab =
                 Items.CombinedRifle.AsGun().alternateVolley.projectiles[0].projectiles[0].GetComponent<CombineEvaporateEffect>();
             c.FallbackShader = cvePrefab.FallbackShader;
             c.ParticleSystemToSpawn = cvePrefab.ParticleSystemToSpawn;
-          })
-          .Assign(out Projectile proj);
+          });
 
-        proj.sprite.SetGlowiness(20f, glowColor: Color.yellow);
-
-        _PrefireAnim = gun.QuickUpdateGunAnimation("prefire", returnToIdle: true);
-        gun.SetAnimationFPS(_PrefireAnim, 20);
+        _PrefireAnim = gun.QuickUpdateGunAnimation("prefire", returnToIdle: true, fps: 20);
         gun.LoopAnimation(_PrefireAnim, 11);
         gun.SetGunAudio(_PrefireAnim, "macheening_brandish", frame: 6);
     }
