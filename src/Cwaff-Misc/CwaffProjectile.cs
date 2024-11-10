@@ -136,9 +136,11 @@ public class CwaffProjectile : MonoBehaviour
     {
         static bool Prefix(Projectile __instance, Vector2? overridePoint)
         {
-          if (__instance.GetComponent<CwaffProjectile>() is not CwaffProjectile cp)
-            return true;     // call the original method
-          return !cp.preventSparks; // skip original method if preventSparks is true
+          if (__instance.GetComponent<CwaffProjectile>() is CwaffProjectile cp)
+            return !cp.preventSparks; // skip original method if preventSparks is true
+          if (__instance.GetComponent<FakeProjectileComponent>())
+            return false; // skip original method if we're a fake projectile
+          return true;     // call the original method
         }
     }
 }

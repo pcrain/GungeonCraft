@@ -188,6 +188,8 @@ public static class CwaffSynergies
         // Maestro reflects projectiles twice as quickly and does not consume ammo unless a projectile is reflected.
         NewMastery<MasteryOfMaestro>(MASTERY_MAESTRO, Maestro.ItemName)
             .MultFireRate(2.0f);
+        // Ki Blast can be charged to fire a Kamehameha capable of breaking boss damage caps. Charging a Kamehameha slows the player down, and firing the Kamehameha prevents the player from moving entirely.
+        NewMastery<MasteryOfKiBlast>(MASTERY_KI_BLAST, KiBlast.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -423,6 +425,7 @@ internal class MasteryOfDerailGun       : MasteryDummyItem {}
 internal class MasteryOfAlienNailgun    : MasteryDummyItem {}
 internal class MasteryOfVladimir        : MasteryDummyItem {}
 internal class MasteryOfMaestro         : MasteryDummyItem {}
+internal class MasteryOfKiBlast         : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -501,4 +504,5 @@ public enum Synergy {
     MASTERY_ALIEN_NAILGUN,
     MASTERY_VLADIMIR,
     MASTERY_MAESTRO,
+    MASTERY_KI_BLAST
 };

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.21.1 (TBD)
+
+- Added mastery for Ki Blast
+- Ki Blast projectiles now behave like charge projectiles, firing when the fire button is released (for compatibility with mastery)
+
 ## 1.21.0 (2024-11-04)
 
 #### Features:
@@ -13,7 +18,7 @@
 - Tweaked Drifter's Headgear:
 	- Removed enemy contact damage during dash
 	- Allowed player to fire their weapon during dash
-	- Allowed player to buffer additinoal dash inputs during dash
+	- Allowed player to buffer additional dash inputs during dash
 	- Allowed player to slide over tables during dash
 - Added custom ammo clip sprites for all of Chroma's beams
 
@@ -23,7 +28,7 @@
 - Fixed infinitely looping audio issues on several guns wielded by enemies in Hecked Mode
 - Fixed rare null deref caused by dying during Drifter's Headgear's dash
 - Fixed Ticonderogun not actually having a valid projectile, causing a softlock while running SimpleStatsTweaked, whoops D:
-- Mentioned in Tranquilizer's description that tranquilized enemies drop their guns and ammo (added in 1.16.2).
+- Mentioned in Tranquilizer's description that tranquilized enemies drop their guns and ammo (added in 1.16.2)
 - Updated required Alexandria version to 0.4.15 for custom dodge roll API
 
 ## 1.20.0 (2024-10-15)
@@ -132,7 +137,7 @@
 - Fixed Soul Kaliber's soul link effect not working on bosses, Keybullet Kin, and Chance Kin
 - Fixed (again, for real hopefully) null deref in Ki Blast caused by trying to redirect projectiles to nonexistent enemies
 - Fixed Yggdrashell losing all built life force when dropped or when saving and reloading
-- Fixed rare null deref when [REDCATED] [REDACTED] for [REDACTED]
+- Fixed rare null deref when [REDACTED] [REDACTED] for [REDACTED]
 - Fixed Quarter Pounder's gold shaders not working properly on Shotgun Kin variants
 
 ## 1.18.5 (2024-09-09)
@@ -690,7 +695,7 @@
 - Seltzer water from Seltzer Pelter's projectiles can now be electrified like normal water 
 - Switched Bouncer from C to D quality since it's ridiculously hard to use effectively
 
-#### Misc.
+#### Misc:
 - Renamed Curator's Badge to Custodian's Badge, since I apparently forgot the difference between the two
 - Updated description of Custodian's Badge to mention removal from inventory after letting too many breakables break
 - Added directional sprites for a few hats
@@ -946,11 +951,11 @@
 
 #### Balance Changes:
 - Nerfed Itemfinder: 
-	+ reduced max items per floor from 6 (should have been 5 but I'm bad at programming) to 4
-	+ reduced chances of finding more than 1 item per floor
+	- Reduced max items per floor from 6 (should have been 5 but I'm bad at programming) to 4
+	- Reduced chances of finding more than 1 item per floor
 - Nerfed Plot Armor: 
-	+ reverted 1.2.1 changes so it once again gives at least 1 (not 2) armor and brings the player up to a minimum of 3 (not 4) armor
-	+ kept change to A quality so it should still be more common than pre-1.2.1 Plot Armor
+	- Reverted 1.2.1 changes so it once again gives at least 1 (not 2) armor and brings the player up to a minimum of 3 (not 4) armor
+	- Kept change to A quality so it should still be more common than pre-1.2.1 Plot Armor
 	
 #### Bugfixes:
 - Fixed barter shop not having items if first run was not started through quickstart

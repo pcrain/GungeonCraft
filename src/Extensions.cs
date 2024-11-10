@@ -1495,7 +1495,7 @@ public static class Extensions
   /// Perform basic initialization of beam sprites for a projectile, override the beam controller's existing sprites if they exist
   /// </summary>
   public static BasicBeamController SetupBeamSprites(this Projectile projectile, string spriteName, int fps, int impactFps = -1,
-    int endFps = -1, int startFps = -1, int chargeFps = -1, bool loopCharge = true)
+    int endFps = -1, int startFps = -1, int chargeFps = -1, int dissipateFps = -1, bool loopCharge = true)
   {
       // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody (no longer necessary with FixedGenerateBeamPrefab())
       // projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
@@ -1523,7 +1523,10 @@ public static class Extensions
           //Charge
           chargeVFXAnimationPaths     : ResMap.Get($"{spriteName}_charge", quietFailure: true),
           beamChargeFPS               : (chargeFps > 0) ? chargeFps : fps,
-          loopCharge                  : loopCharge
+          loopCharge                  : loopCharge,
+          //Dissipate
+          beamDissipateAnimationPaths : ResMap.Get($"{spriteName}_dissipate", quietFailure: true),
+          beamDissipateFPS            : (dissipateFps > 0) ? dissipateFps : fps
           );
 
       // fix some more animation glitches (don't consistently work, check and enable on a case by case basis)

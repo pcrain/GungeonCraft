@@ -437,6 +437,7 @@ public static class Lazy
         {
             public uint id;
             public float timer;
+            public bool finishNaturally;
         }
 
         private static List<LoopingSoundData> _LoopTimers = new(16);
@@ -446,18 +447,19 @@ public static class Lazy
             for (int i = _LoopTimers.Count - 1; i >= 0; --i)
             {
                 LoopingSoundData lsd = _LoopTimers[i];
-                if ((BraveTime.ScaledTimeSinceStartup - lsd.timer) < _TIMEOUT)
+                if (lsd.finishNaturally || (BraveTime.ScaledTimeSinceStartup - lsd.timer) < _TIMEOUT)
                     continue;
                 AkSoundEngine.StopPlayingID(lsd.id);
                 _LoopTimers.RemoveAt(i);
             }
         }
 
-        public void NewSound(uint soundId, GameObject gameObject)
+        public void NewSound(uint soundId, GameObject gameObject, bool finishNaturally)
         {
             _LoopTimers.Add(new(){
                 id = AkSoundEngine.PostEvent(soundId, gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition),
                 timer = BraveTime.ScaledTimeSinceStartup,
+                finishNaturally = finishNaturally,
             });
         }
 
@@ -474,7 +476,7 @@ public static class Lazy
 
     private static readonly uint[] _PlayingIds = new uint[16]; //NOTE: hopefully safe to assume no more than 16 sounds are playing on the same object
     /// <summary>Loops a sound between two loop points if condition `play` is true, stops it otherwise</summary>
-    public static void LoopSoundIf(this MonoBehaviour behav, bool play, string soundName, int loopPointMs = 0, int rewindAmountMs = 0)
+    public static void LoopSoundIf(this MonoBehaviour behav, bool play, string soundName, int loopPointMs = 0, int rewindAmountMs = 0, bool finishNaturally = false)
     {
         uint soundId = AkSoundEngine.GetIDFromString(soundName);
         uint count = (uint)_PlayingIds.Length;
@@ -487,7 +489,8 @@ public static class Lazy
                 continue;
             if (!play)
             {
-                AkSoundEngine.StopPlayingID(playingId); // sound shouldn't be playing but is, so stop it now
+                if (!finishNaturally)
+                    AkSoundEngine.StopPlayingID(playingId); // sound shouldn't be playing but is, so stop it now
                 return;
             }
             GameManager.Instance.GetOrAddComponent<LoopingSoundHandler>().RefreshSoundTimer(playingId);
@@ -497,7 +500,7 @@ public static class Lazy
             return;
         }
         if (play) // sound should be playing but isn't, so play it now
-            GameManager.Instance.GetOrAddComponent<LoopingSoundHandler>().NewSound(soundId, behav.gameObject);
+            GameManager.Instance.GetOrAddComponent<LoopingSoundHandler>().NewSound(soundId, behav.gameObject, finishNaturally);
     }
 
     /// <summary>Create some smoke VFX at the specified position</summary>
@@ -547,12 +550,13 @@ public static class Lazy
         if (_NullProjectilePrefab == null)
         {
             _NullProjectilePrefab = Items.Ak47.CloneProjectile(GunData.New(
-              damage: 0.0f, force: 0.0f, speed: 0.00001f, range: 1.0f, invisibleProjectile: true));
+              damage: 0.0f, force: 0.0f, speed: 1f, range: 1.0f, invisibleProjectile: true));
             _NullProjectilePrefab.isFakeBullet        = true;
             _NullProjectilePrefab.damageTypes         = CoreDamageTypes.None;
             _NullProjectilePrefab.collidesWithEnemies = false;
             _NullProjectilePrefab.collidesWithPlayer  = false;
             _NullProjectilePrefab.gameObject.AddComponent<ProjectileExpiration>().expirationTimer = 0f;
+            _NullProjectilePrefab.gameObject.AddComponent<FakeProjectileComponent>();
         }
         return _NullProjectilePrefab;
     }

@@ -77,7 +77,6 @@ public sealed class GunData
   public bool? pierceBreakables;
   public bool? collidesOnlyWithPlayerProjectiles;
   public bool? pierceInternalWalls;
-
   public bool? doBeamSetup;
   public string beamSprite;
   public int beamFps;
@@ -106,6 +105,7 @@ public sealed class GunData
   public string spinupSound;
   public float glowAmount;
   public Color? glowColor;
+  public int beamDissipateFps;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -200,6 +200,7 @@ public sealed class GunData
   /// <param name="spinupSound">The sound to play while the gun is spinning up.</param>
   /// <param name="glowAmount">The emissive power of the projectile.</param>
   /// <param name="glowColor">The emissive color of the projectile.</param>
+  /// <param name="beamDissipateFps">The framerate for the beam's dissipate animation.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -216,7 +217,7 @@ public sealed class GunData
     float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f, GoopDefinition beamGoop = null, bool? beamInterpolate = null,
     int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null, float beamKnockback = -1f,
     BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
-    bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null)
+    bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, int beamDissipateFps = -1)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -310,6 +311,7 @@ public sealed class GunData
       _Instance.spinupSound                       = spinupSound;
       _Instance.glowAmount                        = glowAmount;
       _Instance.glowColor                         = glowColor;
+      _Instance.beamDissipateFps                  = beamDissipateFps;
       return _Instance;
   }
 }
@@ -497,13 +499,15 @@ public static class GunBuilder
   private static void InternalSetupBeam(this Projectile p, GunData b)
   {
       BasicBeamController beamComp = p.SetupBeamSprites(
-          spriteName : b.beamSprite,
-          fps        : b.beamFps,
-          impactFps  : b.beamImpactFps,
-          endFps     : b.beamEndFps,
-          startFps   : b.beamStartFps,
-          chargeFps  : b.beamChargeFps,
-          loopCharge : b.beamLoopCharge);
+          spriteName   : b.beamSprite,
+          fps          : b.beamFps,
+          impactFps    : b.beamImpactFps,
+          endFps       : b.beamEndFps,
+          startFps     : b.beamStartFps,
+          chargeFps    : b.beamChargeFps,
+          loopCharge   : b.beamLoopCharge,
+          dissipateFps : b.beamDissipateFps);
+
       if (b.beamChargeDelay >= 0f)
       {
         beamComp.usesChargeDelay = b.beamChargeDelay > 0;
@@ -516,6 +520,31 @@ public static class GunBuilder
         // beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
         beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
         beamComp.sprite.renderer.material.SetFloat("_EmissivePower", b.beamEmission);
+        if (beamComp.UsesImpactSprite)
+        {
+          //NOTE: stolen from basegame BasicBeamController.Start()
+          if (beamComp.transform.Find("beam impact vfx") is not Transform impactTransform)
+          {
+            GameObject impactVfx = new GameObject("beam impact vfx");
+            impactTransform = impactVfx.transform;
+            impactTransform.parent = beamComp.transform;
+            impactTransform.localPosition = new Vector3(0f, 0f, 0.05f);
+            tk2dSprite m_impactSprite = impactVfx.AddComponent<tk2dSprite>();
+            tk2dTiledSprite m_beamSprite = beamComp.gameObject.GetComponent<tk2dTiledSprite>();
+            m_impactSprite.SetSprite(m_beamSprite.Collection, m_beamSprite.spriteId);
+            tk2dSpriteAnimator m_impactAnimator = impactVfx.AddComponent<tk2dSpriteAnimator>();
+            m_impactAnimator.SetSprite(m_beamSprite.Collection, m_beamSprite.spriteId);
+            m_impactAnimator.Library = beamComp.gameObject.GetComponent<tk2dSpriteAnimator>().Library;
+            m_beamSprite.AttachRenderer(m_impactSprite);
+            m_impactSprite.HeightOffGround = 0.05f;
+            m_impactSprite.IsPerpendicular = true;
+            m_impactSprite.usesOverrideMaterial = true;
+          }
+          tk2dSprite impactSprite = impactTransform.GetComponent<tk2dSprite>();
+          impactSprite.usesOverrideMaterial = true;
+          impactSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+          impactSprite.renderer.material.SetFloat("_EmissivePower", b.beamEmission);
+        }
       }
       if (b.beamReflections >= 0f)
         beamComp.reflections = b.beamReflections;

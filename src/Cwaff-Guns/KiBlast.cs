@@ -9,30 +9,37 @@ public class KiBlast : CwaffGun
 
     internal static string _FireLeftAnim;
     internal static string _FireRightAnim;
+    internal static string _KameAnim;
+    internal static string _HameAnim;
 
     private const float _KI_REFLECT_RANGE = 3.0f;
     private const float _KI_REFLECT_RANGE_SQR = _KI_REFLECT_RANGE * _KI_REFLECT_RANGE;
     private const float _MAX_RECHARGE_TIME = 0.5f;
     private const float _MIN_RECHARGE_TIME = 0.05f;
     private const float _RECHARGE_DECAY = 0.9f;
+    private const float _CHARGE_START_TIME = 0.5f;
+    private const float _CHARGE_FINISH_TIME = 4.5f;
+    private const float _CHARGE_TOTAL_TIME = _CHARGE_FINISH_TIME - _CHARGE_START_TIME;
 
     private Vector2 _currentTarget = Vector2.zero;
 
     public float nextKiBlastSign = 1;  //1 to deviate right, -1 to deviate left
     private float _rechargeTimer = 0.0f;
     private float _nextRecharge = 0.0f;
+    private int _nextChargeSound = 1;
 
     public static void Init()
     {
         Lazy.SetupGun<KiBlast>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 20, canGainAmmo: false, idleFps: 10, shootFps: 24,
-            fireAudio: "ki_blast_sound", muzzleVFX: "muzzle_ki_blast", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft)
+            muzzleVFX: "muzzle_ki_blast", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft)
           .Attach<KiBlastAmmoDisplay>()
+          .Attach<Unthrowable>()
           .AddToShop(ModdedShopType.Boomhildr)
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+          .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, chargeTime: 0.0f,
             customClip: true, damage: 4.0f, range: 1000.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
-            anchor: Anchor.MiddleCenter, ignoreDamageCaps: true, hitSound: "ki_blast_explode_sound"))
+            ignoreDamageCaps: true, hitSound: "ki_blast_explode_sound", spawnSound: "ki_blast_sound"))
           .SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f))
           .Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
@@ -44,8 +51,17 @@ public class KiBlast : CwaffGun
           .Attach<ArcTowardsTargetBehavior>()
           .Attach<KiBlastBehavior>(); //NOTE: KiBlastBehavior must init before ArcTowardsTargetBehavior so we can call Setup() before Start()
 
+        // Kamehameha projectile
+        gun.AddSynergyModules(Synergy.MASTERY_KI_BLAST, (new ProjectileModule().InitSingleProjectileModule(GunData.New(
+          gun: gun, baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
+          shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, customClip: true, ammoCost: 1, angleVariance: 0f,
+          beamSprite: "kamehameha", beamFps: 30, beamChargeFps: 20, beamImpactFps: 30, beamDissipateFps: 30,
+          beamLoopCharge: true, beamReflections: 0, beamChargeDelay: _CHARGE_FINISH_TIME, beamEmission: 160f, ignoreDamageCaps: true))));
+
         _FireLeftAnim  = gun.shootAnimation;
         _FireRightAnim = gun.QuickUpdateGunAnimation("fire_alt", returnToIdle: true, fps: 24);
+        _KameAnim = gun.QuickUpdateGunAnimation("kame");
+        _HameAnim = gun.QuickUpdateGunAnimation("hameha");
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)
@@ -113,11 +129,76 @@ public class KiBlast : CwaffGun
             closestBlast.ReturnFromPlayer(player);
     }
 
+    private void UpdateIdleAnimation(string idleAnimation = null, int frame = -1)
+    {
+        string curClipName = gun.spriteAnimator.CurrentClip.name;
+        if (curClipName != gun.idleAnimation && curClipName != _KameAnim && curClipName != _HameAnim)
+            return;
+        gun.spriteAnimator.PlayIfNotPlaying(idleAnimation ?? gun.idleAnimation);
+        if (frame >= 0)
+            gun.spriteAnimator.PlayFromFrame(frame);
+    }
+
+    private bool HandleKamehameha()
+    {
+        this.percentSpeedWhileCharging = 1f;
+        if (!this.gun.IsFiring)
+            _nextChargeSound = 1;
+        if (this.gun.Volley.projectiles.Count < 2 || !this.gun.m_moduleData.TryGetValue(this.gun.Volley.projectiles[1], out ModuleShootData msd))
+            return false;
+        if (msd == null || msd.beam is not BasicBeamController beam)
+            return false;
+
+        bool isChargingOrFiring = false;
+        if (beam.State == BeamState.Charging)
+        {
+            this.gun.LoopSoundIf(true, "kamehameha_charge_sound");
+             //NOTE: first frame of charge animation is blank to avoid 1-frame delay on making it invisible
+            bool preCharge = beam.m_chargeTimer < _CHARGE_START_TIME;
+            if (beam.m_beamMuzzleAnimator && beam.m_beamMuzzleAnimator.sprite)
+                beam.m_beamMuzzleAnimator.sprite.renderer.enabled = !preCharge;
+            if (preCharge)
+                _nextChargeSound = 1;
+            else
+            {
+                isChargingOrFiring = true;
+                // evenly space voice lines
+                int chargeSound = Mathf.FloorToInt(5f * (beam.m_chargeTimer - _CHARGE_START_TIME) / _CHARGE_TOTAL_TIME);
+                if (chargeSound >= _nextChargeSound && _nextChargeSound <= 5)
+                    base.gameObject.Play($"kamehameha_charge_{_nextChargeSound++}_sound");
+                UpdateIdleAnimation(_KameAnim, _nextChargeSound - 1);
+            }
+            this.percentSpeedWhileCharging = 1f - beam.m_chargeTimer / beam.chargeDelay;
+            if (beam.m_beamMuzzleAnimator && beam.m_beamMuzzleAnimator.sprite)
+            {
+                beam.m_beamMuzzleAnimator.sprite.SetGlowiness(500f * beam.m_chargeTimer / beam.chargeDelay);
+                beam.m_beamMuzzleAnimator.ClipFps = 20f + 8f * beam.m_chargeTimer;
+            }
+        }
+        else
+        {
+            bool isFiring = isChargingOrFiring = beam.State == BeamState.Firing;
+            if (isFiring && _nextChargeSound == 5)
+                base.gameObject.Play($"kamehameha_charge_{_nextChargeSound++}_sound");
+            this.gun.LoopSoundIf(isFiring, "kamehameha_fire_sound",
+              loopPointMs: 1050, rewindAmountMs: 300, finishNaturally: true);
+            this.percentSpeedWhileCharging = 0f;
+            _nextChargeSound = 1;
+            UpdateIdleAnimation(isFiring ? _HameAnim : gun.idleAnimation);
+        }
+
+        if (isChargingOrFiring && this.gun.m_moduleData.TryGetValue(this.gun.Volley.projectiles[0], out ModuleShootData kiBlastMsd))
+            kiBlastMsd.chargeFired = true; // disable the normal ki blast projectile now that the beam is active
+        return true;
+    }
+
     public override void Update()
     {
         base.Update();
         if (!this.PlayerOwner)
             return;
+        if (!HandleKamehameha())
+            UpdateIdleAnimation(); // reset idle animation to default if we're not actively charging or firing a kamehameha
         this.PlayerOwner.ToggleGunRenderers(!this.gun.isActiveAndEnabled, ItemName);
         if (this.gun.CurrentAmmo >= this.gun.AdjustedMaxAmmo)
             return;

@@ -125,7 +125,7 @@ def iconForGun(gun, nameOnly = False):
   return os.path.join(GUN_SPRITE_DIR, name)
 
 def computeUses(text):
-  if findPattern(text, r"""item\.consumable\s*=\s*(.*);""") != "true":
+  if findPattern(text, r"""item\.consumable\s*=\s*(.*);""") == "false":
     return "{{infinity}}"
   uses = findPattern(text, r"""item\.numberOfUses\s*=\s*(.*);""", default=None)
   if uses is None:

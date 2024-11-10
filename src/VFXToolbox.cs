@@ -594,11 +594,10 @@ public static class VFX
             //---------------Sets up the animaton for the VFX that plays over top of the end of the beam where it hits stuff
             if (impactVFXAnimationPaths != null)
             {
-                int impactSpriteId = collection.GetSpriteIdByName(impactVFXAnimationPaths[0]);
-                tk2dSpriteDefinition impactFrameDef = collection.spriteDefinitions[impactSpriteId];
+                tk2dSpriteDefinition impactFrameDef = collection.GetSpriteDefinition(impactVFXAnimationPaths[0]);
                 Vector3[] impactColliderVertices = new Vector3[]{
-                    0.5f * def.untrimmedBoundsDataExtents,
-                    def.untrimmedBoundsDataExtents
+                    0.5f * impactFrameDef.untrimmedBoundsDataExtents,
+                    impactFrameDef.untrimmedBoundsDataExtents
                 };
                 SetupBeamPart(animation, impactVFXAnimationPaths, "beam_impact", beamImpactFPS, null, null, impactColliderVertices, anchorOverride: Anchor.MiddleCenter);
                 beamController.impactAnimation = "beam_impact";
@@ -629,7 +628,7 @@ public static class VFX
             }
 
 
-            if (canTelegraph == true)
+            if (canTelegraph)
             {
                 beamController.usesTelegraph = true;
                 beamController.telegraphAnimations = new BasicBeamController.TelegraphAnims();
@@ -651,26 +650,31 @@ public static class VFX
                 }
                 beamController.telegraphTime = telegraphTime;
             }
-            if (canDissipate == true)
+
+            canDissipate = beamDissipateAnimationPaths != null;
+            if (canDissipate)
             {
                 beamController.endType = BasicBeamController.BeamEndType.Dissipate;
                 beamController.dissipateAnimations = new BasicBeamController.TelegraphAnims();
-                if (beamStartTelegraphAnimationPaths != null)
+                if (beamStartDissipateAnimationPaths != null)
                 {
-                    SetupBeamPart(animation, beamStartDissipateAnimationPaths, "beam_dissipate_start", beamStartDissipateFPS, new Vector2(0, 0), new Vector2(0, 0));
+                    SetupBeamPart(animation, beamStartDissipateAnimationPaths, "beam_dissipate_start", beamStartDissipateFPS, new Vector2(0, 0), new Vector2(0, 0),
+                      wrapMode: tk2dSpriteAnimationClip.WrapMode.Once);
                     beamController.dissipateAnimations.beamStartAnimation = "beam_dissipate_start";
                 }
-                if (beamTelegraphAnimationPaths != null)
+                if (beamDissipateAnimationPaths != null)
                 {
-                    SetupBeamPart(animation, beamDissipateAnimationPaths, "beam_dissipate_middle", beamDissipateFPS, new Vector2(0, 0), new Vector2(0, 0));
+                    SetupBeamPart(animation, beamDissipateAnimationPaths, "beam_dissipate_middle", beamDissipateFPS, new Vector2(0, 0), new Vector2(0, 0),
+                      wrapMode: tk2dSpriteAnimationClip.WrapMode.Once);
                     beamController.dissipateAnimations.beamAnimation = "beam_dissipate_middle";
                 }
-                if (beamEndTelegraphAnimationPaths != null)
+                if (beamEndDissipateAnimationPaths != null)
                 {
-                    SetupBeamPart(animation, beamEndDissipateAnimationPaths, "beam_dissipate_end", beamEndDissipateFPS, new Vector2(0, 0), new Vector2(0, 0));
+                    SetupBeamPart(animation, beamEndDissipateAnimationPaths, "beam_dissipate_end", beamEndDissipateFPS, new Vector2(0, 0), new Vector2(0, 0),
+                      wrapMode: tk2dSpriteAnimationClip.WrapMode.Once);
                     beamController.dissipateAnimations.beamEndAnimation = "beam_dissipate_end";
                 }
-                beamController.dissipateTime = dissipateTime;
+                beamController.dissipateTime = (float)beamDissipateAnimationPaths.Count / (float)beamDissipateFPS;
 
             }
 
