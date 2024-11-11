@@ -1224,4 +1224,22 @@ public static class Lazy
             blockHeight : Mathf.RoundToInt((def.uvs[3].y - def.uvs[0].y) * tex.height)
             );
     }
+
+    /// <summary>Make a piece of debris decay over time</summary>
+    public static IEnumerator DecayOverTime(DebrisObject debris, float time, bool shrink = false)
+    {
+        for (float lifeleft = time; lifeleft > 0; lifeleft -= BraveTime.DeltaTime)
+        {
+            if (shrink)
+            {
+                Vector2 oldCenter = debris.sprite.WorldCenter;
+                debris.sprite.scale = (lifeleft / time) * Vector3.one;
+                debris.sprite.PlaceAtScaledPositionByAnchor(oldCenter, Anchor.MiddleCenter);
+            }
+            else
+                debris.sprite.renderer.SetAlpha(lifeleft / time);
+            yield return null;
+        }
+        UnityEngine.Object.Destroy(debris.gameObject);
+    }
 }

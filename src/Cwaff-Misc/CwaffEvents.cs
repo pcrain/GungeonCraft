@@ -190,7 +190,7 @@ public static class CwaffEvents // global custom events we can listen for
     {
         static void Postfix(DebrisObject __instance)
         {
-            if (__instance.IsPickupObject && __instance.gameObject.GetComponent<PickupObject>() is PickupObject pickup)
+            if (__instance.IsPickupObject && __instance.gameObject.GetComponentInChildren<PickupObject>() is PickupObject pickup)
                 _DebrisPickups.Add(pickup);
         }
     }
@@ -200,7 +200,7 @@ public static class CwaffEvents // global custom events we can listen for
     {
         static void Prefix(DebrisObject __instance)
         {
-            if (__instance.IsPickupObject && __instance.gameObject.GetComponent<PickupObject>() is PickupObject pickup)
+            if (__instance.IsPickupObject && __instance.gameObject.GetComponentInChildren<PickupObject>() is PickupObject pickup)
                 _DebrisPickups.TryRemove(pickup);
         }
     }

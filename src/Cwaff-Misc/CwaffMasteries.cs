@@ -230,7 +230,7 @@ public class MasteryRitualComponent : MonoBehaviour
 
   public static void PrepareDroppedItemForMasteryRitual(DebrisObject pickup)
   {
-    if (pickup.GetComponentInChildren<Gun>() is not Gun gun)
+    if (!pickup || pickup.GetComponentInChildren<Gun>() is not Gun gun)
       return;
     if (pickup.onGround)
       PrepareForMasteryRitual(pickup);

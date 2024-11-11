@@ -610,7 +610,7 @@ public static class Extensions
       case ItemQuality.B: return 3;
       case ItemQuality.C: return 2;
       case ItemQuality.D: return 1;
-      default:                         return 0;
+      default:            return 0;
     }
   }
 

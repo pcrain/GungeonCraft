@@ -21,12 +21,15 @@ public class Hallaeribut : CwaffGun
         Hungry,   // + can't pick up ammo for other guns
         Starving, // + can't switch to a different gun
         Famished, // + feeds on the player every 30 seconds
+        Ravenous, // MASTERY: can be fed grounded items
     }
 
     internal static GameObject _BiteVFX;
 
     private State _state = Satiated;
     private float _famishTimer = 0.0f;
+    private int _cachedAmmo = -1;
+    private bool _mastered = false;
 
     public static void Init()
     {
@@ -46,7 +49,7 @@ public class Hallaeribut : CwaffGun
 
         ProjectileModule mod = gun.DefaultModule;
         gun.Volley.projectiles = new(_AmmoThresholds.Length - 1);
-        for (int i = 1; i < _AmmoThresholds.Length; ++i)
+        for (int i = 1; i <= _AmmoThresholds.Length; ++i)
         {
             ProjectileModule newMod = ProjectileModule.CreateClone(mod, inheritGuid: false);
             newMod.burstShotCount = i * _SWARM_SIZE;
@@ -62,6 +65,7 @@ public class Hallaeribut : CwaffGun
         base.Update();
         if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
             return;
+        this._mastered = this.PlayerOwner.HasSynergy(Synergy.MASTERY_HALLAERIBUT);
         UpdateAmmo();
         UpdateStarvation();
         this.gun.m_prepThrowTime = -999f; //HACK: prevent the gun from being thrown
@@ -69,9 +73,16 @@ public class Hallaeribut : CwaffGun
 
     private void UpdateStarvation()
     {
-        if (this._state != Famished)
+        if ((int)this._state < (int)Famished)
             return;
-        if ((BraveTime.ScaledTimeSinceStartup - this._famishTimer) < _STARVE_TIMER)
+        if (this._state == Ravenous)
+        {
+            if (this.gun.CurrentAmmo > 0 || this.gun.InfiniteAmmo || this.gun.LocalInfiniteAmmo)
+                return; // don't snack on player while ravenous unless we're out of ammo
+            if (AttemptRavenousItemConsume(checkInventory: true))
+                return;
+        }
+        else if (this._state == Famished && (BraveTime.ScaledTimeSinceStartup - this._famishTimer) < _STARVE_TIMER)
             return;
 
         this._famishTimer = BraveTime.ScaledTimeSinceStartup;
@@ -82,16 +93,146 @@ public class Hallaeribut : CwaffGun
             DamageCategory.Unstoppable, ignoreInvulnerabilityFrames: true);
         CwaffVFX.Spawn(prefab: Hallaeribut._BiteVFX, position: this.PlayerOwner.CenterPosition, lifetime: 0.3f, fadeOutTime: 0.1f);
         this.PlayerOwner.gameObject.Play("chomp_large_sound");
+        if (this._state == Ravenous)
+            this.gun.GainAmmo(Mathf.CeilToInt(0.2f * this.gun.AdjustedMaxAmmo)); // restore 20% when ravenous
     }
 
-    private int _cachedAmmo = -1;
+    public override void OnFullClipReload(PlayerController player, Gun gun)
+    {
+        if (!this._mastered)
+            return;
+        if (GameManager.Instance.IsLoadingLevel || GameManager.Instance.IsPaused || BraveTime.DeltaTime == 0.0f)
+            return;
+        if (player.IsDodgeRolling || !player.AcceptingNonMotionInput)
+            return;
+        AttemptRavenousItemConsume(false);
+    }
+
+    private bool AttemptRavenousItemConsume(bool checkInventory)
+    {
+        bool onGround = true;
+        PickupObject item = GetNearestEdibleDroppedItem();
+        if (!item && checkInventory)
+        {
+            item = GetWorstItemWeCanEat();
+            onGround = false;
+        }
+        if (!item)
+            return false; // we have no more items to scrap
+
+        DebrisObject debris = Lazy.MakeDebrisFromSprite(item.sprite, onGround ? item.sprite.WorldCenter : this.PlayerOwner.CenterPosition);
+            debris.doesDecay     = true;
+            debris.bounceCount   = 0;
+            debris.StartCoroutine(Lazy.DecayOverTime(debris, 0.5f, shrink: true));
+        CwaffVFX.Spawn(prefab: Hallaeribut._BiteVFX, position: debris.sprite.WorldCenter, lifetime: 0.3f, fadeOutTime: 0.1f);
+        debris.gameObject.Play("chomp_large_sound");
+
+        float percentAmmoToRestore = 0;
+        if (item.PickupObjectId == (int)Items.Junk)
+            percentAmmoToRestore = 0.1f;
+        else
+            percentAmmoToRestore = Mathf.Max(1, item.QualityGrade()) * 0.2f;
+        this.gun.GainAmmo(Mathf.CeilToInt(percentAmmoToRestore * this.gun.AdjustedMaxAmmo));
+
+        // drop and destroy the item so we properly call the Drop() / Destroy() events and can't pick it back up
+        if (onGround)
+            UnityEngine.Object.Destroy(item.gameObject);
+        else if (item is Gun g)
+        {
+            g.HasEverBeenAcquiredByPlayer = true;
+            this.PlayerOwner.inventory.RemoveGunFromInventory(g);
+            g.ToggleRenderers(true);
+            UnityEngine.Object.Destroy(g.DropGun().gameObject); //TODO: pop this code in utility vest code as well
+        }
+        else if (item is PassiveItem p)
+            UnityEngine.Object.Destroy(this.PlayerOwner.DropPassiveItem(p).gameObject);
+        else if (item is PlayerItem i)
+            UnityEngine.Object.Destroy(this.PlayerOwner.DropActiveItem(i).gameObject);
+
+        return true;
+    }
+
+    private PickupObject GetNearestEdibleDroppedItem()
+    {
+        PlayerController owner = this.PlayerOwner;
+        if (owner.CurrentRoom is not RoomHandler room)
+            return null;
+        PickupObject nearest = null;
+        float nearestDist = 999f;
+        Vector2 ownerPos = owner.CenterPosition;
+        foreach (PickupObject pickup in CwaffEvents._DebrisPickups)
+        {
+            if (!pickup || pickup.IsBeingSold || pickup.QualityGrade() == 0)
+                continue;
+            Vector3 pos = pickup.transform.position;
+            if (pos.GetAbsoluteRoom() != room)
+                continue;
+            float sqrDist = (pos.XY() - ownerPos).sqrMagnitude;
+            if (sqrDist >= nearestDist)
+                continue;
+            nearestDist = sqrDist;
+            nearest = pickup;
+        }
+        return nearest;
+    }
+
+    /* Item Priorities:
+        -1: [undroppable item]
+         0: Utility Vest
+         1: S tier (+0.5 for empty gun)
+         2: A tier (+0.5 for empty gun)
+         3: B tier (+0.5 for empty gun)
+         4: C tier (+0.5 for empty gun)
+         5: D tier (+0.5 for empty gun)
+         6: Junk
+    */
+    private static float GetItemFoodPriority(PickupObject item, PlayerController owner)
+    {
+        if (!item.CanActuallyBeDropped(owner))
+            return -1f;
+        if (item.PickupObjectId == Lazy.PickupId<Hallaeribut>())
+            return 0f;
+        if (item.PickupObjectId == (int)Items.Junk)
+            return 6f;
+        float priority;
+        switch(item.quality)
+        {
+            case ItemQuality.S: priority = 1f; break;
+            case ItemQuality.A: priority = 2f; break;
+            case ItemQuality.B: priority = 3f; break;
+            case ItemQuality.C: priority = 4f; break;
+            case ItemQuality.D: priority = 5f; break;
+            default:
+                return -1f; // unknown item quality
+        }
+        if (item is Gun g)
+            return priority + ((g.CurrentAmmo == 0) ? 0.5f: 0f);
+        return priority;
+    }
+
+    private PickupObject GetWorstItemWeCanEat()
+    {
+        float highestPriority  = -1;
+        PickupObject worstItem = null;
+        PlayerController owner = this.PlayerOwner;
+        foreach(PickupObject item in owner.AllItems())
+        {
+            float p = GetItemFoodPriority(item, owner);
+            if (p <= highestPriority)
+                continue;
+            worstItem       = item;
+            highestPriority = p;
+        }
+        return worstItem;
+    }
+
     private void UpdateAmmo()
     {
         if (this._cachedAmmo == this.gun.CurrentAmmo)
             return;
         this._cachedAmmo = this.gun.CurrentAmmo;
         float ammoPercent = (float)this._cachedAmmo / this.gun.AdjustedMaxAmmo;
-        int ti = _AmmoThresholds.FirstGE(ammoPercent);
+        int ti = this._mastered ? 5 : _AmmoThresholds.FirstGE(ammoPercent);
         UpdateState((State)ti);
         int newTier = Mathf.Max(ti - 1, 0);
         if (this.gun.CurrentStrengthTier != newTier)
@@ -106,7 +247,7 @@ public class Hallaeribut : CwaffGun
         this.gun.CanBeDropped = newState == Satiated;
         this.gun.CanBeSold = this.gun.CanBeDropped;
         this.PlayerOwner.inventory.GunLocked.SetOverride(ItemName, newState >= Starving);
-        if (this._state != Famished && newState == Famished)
+        if ((int)this._state < (int)Famished && (int)newState >= (int)Famished)
             this._famishTimer = BraveTime.ScaledTimeSinceStartup;
 
         this._state = newState;
@@ -135,6 +276,8 @@ public class Hallaeribut : CwaffGun
 
     private class HallaeributAmmoDisplay : CustomAmmoDisplay
     {
+        private const string _RAVENOUS_STRING = "[color #bb33bb]R[/color][color #bb33aa]a[/color][color #bb3399]v[/color][color #bb3388]e[/color][color #bb3377]n[/color][color #bb3366]o[/color][color #bb3355]u[/color][color #bb3344]s[/color]";
+
         private Gun _gun;
         private Hallaeribut _hal;
         private PlayerController _owner;
@@ -151,7 +294,9 @@ public class Hallaeribut : CwaffGun
             if (!this._owner)
                 return false;
 
-            if (this._hal._state == Famished)
+            if (this._hal._state == Ravenous)
+                uic.GunAmmoCountLabel.Text = $"{_RAVENOUS_STRING}\n{this._owner.VanillaAmmoDisplay()}";
+            else if (this._hal._state == Famished)
                 uic.GunAmmoCountLabel.Text = $"[color #bb33bb]{this._hal._state}[/color]\n{this._owner.VanillaAmmoDisplay()}";
             else
                 uic.GunAmmoCountLabel.Text = $"{this._hal._state}\n{this._owner.VanillaAmmoDisplay()}";

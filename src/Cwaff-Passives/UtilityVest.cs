@@ -41,16 +41,6 @@ public class UtilityVest : CwaffPassive
         data.ModifiedDamage = 0f;
     }
 
-    private IEnumerator DecayOverTime(DebrisObject debris, float time)
-    {
-        for (float lifeleft = time; lifeleft > 0; lifeleft -= BraveTime.DeltaTime)
-        {
-            debris.sprite.renderer.SetAlpha(lifeleft / time);
-            yield return null;
-        }
-        UnityEngine.Object.Destroy(debris.gameObject);
-    }
-
     private void UsedItemAsArmor(PickupObject item)
     {
         this.Owner.gameObject.Play("sentry_shoot");
@@ -63,7 +53,7 @@ public class UtilityVest : CwaffPassive
             debris.bounceCount   = 1;
             debris.breaksOnFall  = true;
             debris.canRotate     = true;
-            debris.StartCoroutine(DecayOverTime(debris, 2f));
+            debris.StartCoroutine(Lazy.DecayOverTime(debris, 2f));
 
         // drop and destroy the item so we properly call the Drop() / Destroy() events and can't pick it back up
         if (item is Gun g)
@@ -84,9 +74,9 @@ public class UtilityVest : CwaffPassive
          5: D tier (+0.5 for empty gun)
          6: Junk
     */
-    private float GetItemArmorPriority(PickupObject item)
+    private static float GetItemArmorPriority(PickupObject item, PlayerController owner)
     {
-        if (!item.CanActuallyBeDropped(this.Owner))
+        if (!item.CanActuallyBeDropped(owner))
             return -1f;
         if (item.PickupObjectId == IDs.Pickups["utility_vest"])
             return 0f;
@@ -114,7 +104,7 @@ public class UtilityVest : CwaffPassive
         PickupObject worstItem = null;
         foreach(PickupObject item in this.Owner.AllItems())
         {
-            float p = GetItemArmorPriority(item);
+            float p = GetItemArmorPriority(item, this.Owner);
             if (p <= highestPriority)
                 continue;
             worstItem       = item;
@@ -122,5 +112,4 @@ public class UtilityVest : CwaffPassive
         }
         return worstItem;
     }
-
 }
