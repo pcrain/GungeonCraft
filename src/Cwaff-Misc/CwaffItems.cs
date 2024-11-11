@@ -50,6 +50,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
   public  bool                              hideAmmo                   = false;  // whether our ammo display is visible
   public  bool                              suppressReloadLabel        = false;  // whether to suppress reload label when out of ammo
+  public  float                             percentSpeedWhileFiring    = 1.0f;   // max relative speed the player can move while firing the gun
   public  float                             percentSpeedWhileCharging  = 1.0f;   // max relative speed the player can move while charging the gun
   public  bool                              preventRollingWhenCharging = false;  // whether holding the gun prevents the player from dodge rolling
   public  float                             spinupTime                 = 0.0f;   // the amount of time it takes an automatic weapon to start firing
@@ -335,9 +336,10 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
             return;
           if (gun.GetComponent<CwaffGun>() is not CwaffGun cg)
             return;
-          if (!gun.IsCharging && cg._spinupRemaining == cg.spinupTime)
-            return;
-          __result = cg.percentSpeedWhileCharging * __result; // change the original result
+          if (gun.IsCharging || cg._spinupRemaining != cg.spinupTime)
+            __result = cg.percentSpeedWhileCharging * __result; // change the original result
+          else if (gun.IsFiring)
+            __result = cg.percentSpeedWhileFiring * __result; // change the original result
       }
   }
 

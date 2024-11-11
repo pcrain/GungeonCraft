@@ -141,7 +141,7 @@ public class KiBlast : CwaffGun
 
     private bool HandleKamehameha()
     {
-        this.percentSpeedWhileCharging = 1f;
+        this.percentSpeedWhileFiring = 1f;
         if (!this.gun.IsFiring)
             _nextChargeSound = 1;
         if (this.gun.Volley.projectiles.Count < 2 || !this.gun.m_moduleData.TryGetValue(this.gun.Volley.projectiles[1], out ModuleShootData msd))
@@ -168,7 +168,7 @@ public class KiBlast : CwaffGun
                     base.gameObject.Play($"kamehameha_charge_{_nextChargeSound++}_sound");
                 UpdateIdleAnimation(_KameAnim, _nextChargeSound - 1);
             }
-            this.percentSpeedWhileCharging = 1f - beam.m_chargeTimer / beam.chargeDelay;
+            this.percentSpeedWhileFiring = 1f - beam.m_chargeTimer / beam.chargeDelay;
             if (beam.m_beamMuzzleAnimator && beam.m_beamMuzzleAnimator.sprite)
             {
                 beam.m_beamMuzzleAnimator.sprite.SetGlowiness(500f * beam.m_chargeTimer / beam.chargeDelay);
@@ -182,7 +182,7 @@ public class KiBlast : CwaffGun
                 base.gameObject.Play($"kamehameha_charge_{_nextChargeSound++}_sound");
             this.gun.LoopSoundIf(isFiring, "kamehameha_fire_sound",
               loopPointMs: 1050, rewindAmountMs: 300, finishNaturally: true);
-            this.percentSpeedWhileCharging = 0f;
+            this.percentSpeedWhileFiring = 0f;
             _nextChargeSound = 1;
             UpdateIdleAnimation(isFiring ? _HameAnim : gun.idleAnimation);
         }

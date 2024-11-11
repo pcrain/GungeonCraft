@@ -862,7 +862,7 @@ public static class Extensions
     float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
-    bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false)
+    bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -903,6 +903,7 @@ public static class Extensions
       cg.continuousFireAnimation = true;
 
     cg.percentSpeedWhileCharging = percentSpeedWhileCharging;
+    cg.percentSpeedWhileFiring = percentSpeedWhileFiring;
     if (dynamicBarrelOffsets)
       CwaffGun.SetUpDynamicBarrelOffsets(gun);
     if (suppressReloadLabel)
