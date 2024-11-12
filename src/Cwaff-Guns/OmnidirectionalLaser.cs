@@ -18,11 +18,14 @@ public class OmnidirectionalLaser : CwaffGun
     private const float _FPS_RESET_TIME  = 1.0f; // how long after firing we start slowing the reticle down
     private const float _FPS_RESET_SPEED = 0.125f; // time increment between stepping down the reticle's speed
     private const float _LOCKON_FACTOR   = 2f; // if we fire a laser within this many (FPS * _LOCKON_FACTOR) degrees of an enemy, snap to the enemy
+    private const int _NUM_MASTERY_PROJ  = 4; // additional projectiles for mastery
+    private const float _MASTERY_GAP     = 360f / (1f + _NUM_MASTERY_PROJ);
 
     private static List<int> _BackSpriteIds = new();
     private static List<Vector3> _BarrelOffsets = new();
     private static GameObject _OmniReticle  = null;
     private static CwaffTrailController _OmniTrailPrefab  = null;
+    private static CwaffTrailController _OmniTrailMasteredPrefab  = null;
 
     private tk2dSprite _backside = null;
     private tk2dSprite _reticle = null;
@@ -50,7 +53,18 @@ public class OmnidirectionalLaser : CwaffGun
             offsetGunslinger:  new IntVector2(5, -4), flippedOffsetGunslinger:  new IntVector2(5, -4))  //TODO: verify
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(sprite: "omnilaser_projectile", clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-            angleVariance: 0.0f, speed: 200f, damage: 16f, spawnSound: "omnilaser_shoot_sound", uniqueSounds: true, customClip: true));
+            angleVariance: 0.0f, speed: 200f, damage: 16f, spawnSound: "omnilaser_shoot_sound", uniqueSounds: true, customClip: true))
+          .Attach<OmnidirectionalProjectile>(o => o.mastered = false)
+          .Assign(out Projectile proj);
+
+        ProjectileModule[] masteryModules = new ProjectileModule[_NUM_MASTERY_PROJ];
+        Projectile masteryProj = proj.Clone(GunData.New(sprite: "omnilaser_mastered_projectile"))
+          .Attach<OmnidirectionalProjectile>(o => o.mastered = true);
+        for (int i = 0; i < _NUM_MASTERY_PROJ; ++i)
+          masteryModules[i] = new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, ammoCost: 0, clipSize: -1, cooldown: 0.1f,
+            shootStyle: ShootStyle.SemiAutomatic, angleFromAim: _MASTERY_GAP * (i + 1), angleVariance: 0f, ignoredForReloadPurposes: true,
+            speed: 200f, damage: 8f, baseProjectile: masteryProj));
+        gun.AddSynergyModules(Synergy.MASTERY_OMNIDIRECTIONAL_LASER, masteryModules);
 
         gun.reloadAnimation = gun.idleAnimation; // animation shouldn't automatically change when reloading
         gun.shootAnimation  = null; // animation shouldn't automatically change when firing
@@ -64,8 +78,16 @@ public class OmnidirectionalLaser : CwaffGun
             _BackSpriteIds.Add(gun.sprite.Collection.GetSpriteIdByName($"omnidirectional_laser_fire_back_00{i}"));
         }
 
-        _OmniTrailPrefab = VFX.CreateSpriteTrailObject("omnilaser_projectile_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
+        _OmniTrailPrefab = VFX.CreateSpriteTrailObject(
+            "omnilaser_projectile_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
+        _OmniTrailMasteredPrefab = VFX.CreateSpriteTrailObject(
+            "omnilaser_mastered_projectile_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: true);
         _OmniReticle = VFX.Create("omnilaser_reticle");
+    }
+
+    public class OmnidirectionalProjectile : MonoBehaviour
+    {
+        public bool mastered;
     }
 
     private void CreateRenderersIfNecessary()
@@ -206,7 +228,8 @@ public class OmnidirectionalLaser : CwaffGun
             ignoreWalls                      : false);
         if (targetPos.HasValue)
             projectile.SendInDirection((targetPos.Value - this.gun.barrelOffset.position.XY()), true, true);
-        projectile.AddTrail(_OmniTrailPrefab).gameObject.SetGlowiness(10f);
+        if (projectile.gameObject.GetComponent<OmnidirectionalProjectile>() is OmnidirectionalProjectile o)
+            projectile.AddTrail(o.mastered ?  _OmniTrailMasteredPrefab : _OmniTrailPrefab).gameObject.SetGlowiness(10f);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)

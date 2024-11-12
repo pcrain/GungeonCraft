@@ -194,6 +194,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfHallaeribut>(MASTERY_HALLAERIBUT, Hallaeribut.ItemName);
         // Gunflower passively regenerates up to 10% of its max ammo while active and can gain ammo from all goops.
         NewMastery<MasteryOfGunflower>(MASTERY_GUNFLOWER, Gunflower.ItemName);
+        // Omnidirectional Laser fires lasers in 5 directions, with the laser aimed towards the reticle being 50% stronger.
+        NewMastery<MasteryOfOmnidirectionalLaser>(MASTERY_OMNIDIRECTIONAL_LASER, OmnidirectionalLaser.ItemName)
+            .MultDamage(1.5f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -386,52 +389,55 @@ public static class CwaffSynergies
         { e.statModifiers.Add(StatType.ChargeAmountMultiplier.Mult(a)); return e; }
     public static AdvancedSynergyEntry MultProjSpeed(this AdvancedSynergyEntry e, float a)
         { e.statModifiers.Add(StatType.ProjectileSpeed.Mult(a)); return e; }
+    public static AdvancedSynergyEntry MultDamage(this AdvancedSynergyEntry e, float a)
+        { e.statModifiers.Add(StatType.Damage.Mult(a)); return e; }
 
 }
 
 // Dummy classes for masteries
-public   class MasteryDummyItem         : FakeItem { }
-internal class MasteryOfGrandmaster     : MasteryDummyItem {}
-internal class MasteryOfChekhovsGun     : MasteryDummyItem {}
-internal class MasteryOfPincushion      : MasteryDummyItem {}
-internal class MasteryOfPlatinumStar    : MasteryDummyItem {}
-internal class MasteryOfNatascha        : MasteryDummyItem {}
-internal class MasteryOfHandCannon      : MasteryDummyItem {}
-internal class MasteryOfSchrodingersGat : MasteryDummyItem {}
-internal class MasteryOfHatchlingGun    : MasteryDummyItem {}
-internal class MasteryOfCrapshooter     : MasteryDummyItem {}
-internal class MasteryOfHolyWaterGun    : MasteryDummyItem {}
-internal class MasteryOfVacuumCleaner   : MasteryDummyItem {}
-internal class MasteryOfPaintballCannon : MasteryDummyItem {}
-internal class MasteryOfGunbrella       : MasteryDummyItem {}
-internal class MasteryOfAlyx            : MasteryDummyItem {}
-internal class MasteryOfPistolWhip      : MasteryDummyItem {}
-internal class MasteryOfFemtobyte       : MasteryDummyItem {}
-internal class MasteryOfUppskeruvel     : MasteryDummyItem {}
-internal class MasteryOfBlackjack       : MasteryDummyItem {}
-internal class MasteryOfEnglish         : MasteryDummyItem {}
-internal class MasteryOfIronMaid        : MasteryDummyItem {}
-internal class MasteryOfAlligator       : MasteryDummyItem {}
-internal class MasteryOfQuarterPounder  : MasteryDummyItem {}
-internal class MasteryOfTiconderogun    : MasteryDummyItem {}
-internal class MasteryOfKingsLaw        : MasteryDummyItem {}
-internal class MasteryOfBubblebeam      : MasteryDummyItem {}
-internal class MasteryOfDeadline        : MasteryDummyItem {}
-internal class MasteryOfStarmageddon    : MasteryDummyItem {}
-internal class MasteryOfSubtractorBeam  : MasteryDummyItem {}
-internal class MasteryOfKALI            : MasteryDummyItem {}
-internal class MasteryOfScotsman        : MasteryDummyItem {}
-internal class MasteryOfCarpetBomber    : MasteryDummyItem {}
-internal class MasteryOfSoulKaliber     : MasteryDummyItem {}
-internal class MasteryOfLightwing       : MasteryDummyItem {}
-internal class MasteryOfMagunet         : MasteryDummyItem {}
-internal class MasteryOfDerailGun       : MasteryDummyItem {}
-internal class MasteryOfAlienNailgun    : MasteryDummyItem {}
-internal class MasteryOfVladimir        : MasteryDummyItem {}
-internal class MasteryOfMaestro         : MasteryDummyItem {}
-internal class MasteryOfKiBlast         : MasteryDummyItem {}
-internal class MasteryOfHallaeribut     : MasteryDummyItem {}
-internal class MasteryOfGunflower       : MasteryDummyItem {}
+public   class MasteryDummyItem              : FakeItem { }
+internal class MasteryOfGrandmaster          : MasteryDummyItem {}
+internal class MasteryOfChekhovsGun          : MasteryDummyItem {}
+internal class MasteryOfPincushion           : MasteryDummyItem {}
+internal class MasteryOfPlatinumStar         : MasteryDummyItem {}
+internal class MasteryOfNatascha             : MasteryDummyItem {}
+internal class MasteryOfHandCannon           : MasteryDummyItem {}
+internal class MasteryOfSchrodingersGat      : MasteryDummyItem {}
+internal class MasteryOfHatchlingGun         : MasteryDummyItem {}
+internal class MasteryOfCrapshooter          : MasteryDummyItem {}
+internal class MasteryOfHolyWaterGun         : MasteryDummyItem {}
+internal class MasteryOfVacuumCleaner        : MasteryDummyItem {}
+internal class MasteryOfPaintballCannon      : MasteryDummyItem {}
+internal class MasteryOfGunbrella            : MasteryDummyItem {}
+internal class MasteryOfAlyx                 : MasteryDummyItem {}
+internal class MasteryOfPistolWhip           : MasteryDummyItem {}
+internal class MasteryOfFemtobyte            : MasteryDummyItem {}
+internal class MasteryOfUppskeruvel          : MasteryDummyItem {}
+internal class MasteryOfBlackjack            : MasteryDummyItem {}
+internal class MasteryOfEnglish              : MasteryDummyItem {}
+internal class MasteryOfIronMaid             : MasteryDummyItem {}
+internal class MasteryOfAlligator            : MasteryDummyItem {}
+internal class MasteryOfQuarterPounder       : MasteryDummyItem {}
+internal class MasteryOfTiconderogun         : MasteryDummyItem {}
+internal class MasteryOfKingsLaw             : MasteryDummyItem {}
+internal class MasteryOfBubblebeam           : MasteryDummyItem {}
+internal class MasteryOfDeadline             : MasteryDummyItem {}
+internal class MasteryOfStarmageddon         : MasteryDummyItem {}
+internal class MasteryOfSubtractorBeam       : MasteryDummyItem {}
+internal class MasteryOfKALI                 : MasteryDummyItem {}
+internal class MasteryOfScotsman             : MasteryDummyItem {}
+internal class MasteryOfCarpetBomber         : MasteryDummyItem {}
+internal class MasteryOfSoulKaliber          : MasteryDummyItem {}
+internal class MasteryOfLightwing            : MasteryDummyItem {}
+internal class MasteryOfMagunet              : MasteryDummyItem {}
+internal class MasteryOfDerailGun            : MasteryDummyItem {}
+internal class MasteryOfAlienNailgun         : MasteryDummyItem {}
+internal class MasteryOfVladimir             : MasteryDummyItem {}
+internal class MasteryOfMaestro              : MasteryDummyItem {}
+internal class MasteryOfKiBlast              : MasteryDummyItem {}
+internal class MasteryOfHallaeribut          : MasteryDummyItem {}
+internal class MasteryOfGunflower            : MasteryDummyItem {}
+internal class MasteryOfOmnidirectionalLaser : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -513,4 +519,5 @@ public enum Synergy {
     MASTERY_KI_BLAST,
     MASTERY_HALLAERIBUT,
     MASTERY_GUNFLOWER,
+    MASTERY_OMNIDIRECTIONAL_LASER,
 };
