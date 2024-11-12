@@ -2,7 +2,7 @@
 
 ## 1.21.1 (TBD)
 
-- Added masteries for Ki Blast and Hallaeribut
+- Added masteries for Ki Blast, Hallaeribut, and Gunflower
 - Ki Blast projectiles now behave like charge projectiles, firing when the fire button is released (for compatibility with mastery)
 
 ## 1.21.0 (2024-11-04)

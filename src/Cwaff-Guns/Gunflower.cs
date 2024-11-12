@@ -8,12 +8,15 @@ public class Gunflower : CwaffGun
     public static string Lore             = "A living sunflower that has been cybernetically enhanced with a generator and a refraction chamber. The botanist who invented it had originally been trying to produce a flower capable of growing itself, a million-dollar idea so it seemed. Several failed attempts and a refresher on the first law of thermodynamics later, they eventually tossed all of their prototypes into the wind, which carried some of them all the way into the Gungeon.";
 
     private const float _LIGHT_SPACING = 2f;
+    private const float _PASSIVE_AMMO_REGEN_TIME = 5f;
+    private const float _PASSIVE_AMMO_REGEN_PERCENT = 0.1f;
 
     internal static GameObject _GrowthSparkles;
     internal static GameObject _DecayVFX;
 
     private List<AdditionalBraveLight> _lights = new();
     private bool _revved = false;
+    private bool _mastered = false;
 
     public static void Init()
     {
@@ -32,6 +35,13 @@ public class Gunflower : CwaffGun
     public override void Update()
     {
         base.Update();
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+        if (this.gun.CurrentAmmo > 0 && this.gun.spriteAnimator.IsPlaying(this.gun.outOfAmmoAnimation))
+            this.gun.spriteAnimator.PlayFromFrame(this.gun.idleAnimation, 0);
+        this._mastered = player.HasSynergy(Synergy.MASTERY_GUNFLOWER);
+        if (this._mastered && !this.gun.IsFiring)
+            DoPassiveAmmoRegen();
         UpdateNutrients();
         bool shouldPlaySound = this.gun && this.gun.IsFiring;
         this.gun.LoopSoundIf(shouldPlaySound, "gunflower_fire_sound", loopPointMs: 1750, rewindAmountMs: 1750 - 1177);
@@ -56,6 +66,25 @@ public class Gunflower : CwaffGun
         }
     }
 
+    private float _lastRegenTime = 0;
+    private void DoPassiveAmmoRegen()
+    {
+        float ammoPercent = (float)this.gun.CurrentAmmo / this.gun.AdjustedMaxAmmo;
+        if (ammoPercent >= _PASSIVE_AMMO_REGEN_PERCENT)
+            return;
+
+        float now = BraveTime.ScaledTimeSinceStartup;
+        float timeToRestoreOneAmmo = _PASSIVE_AMMO_REGEN_TIME / (_PASSIVE_AMMO_REGEN_PERCENT * this.gun.AdjustedMaxAmmo);
+        float timeSinceLastRegen = now - _lastRegenTime;
+        if (timeSinceLastRegen < timeToRestoreOneAmmo)
+            return;
+
+        this._lastRegenTime = now;
+        this.gun.GainAmmo(1);
+        this.gun.gameObject.PlayOnce("starmageddon_bullet_impact_sound_2");
+        SpawnParticles(true);
+    }
+
     private void UpdateNutrients()
     {
         if (this.PlayerOwner is not PlayerController player)
@@ -68,7 +97,9 @@ public class Gunflower : CwaffGun
             return;
         int nutrition;
         bool consumesGoop;
-        if (currentGoop.DrainsAmmo)
+        if (this._mastered)
+            { consumesGoop = true; nutrition = 1; }   // all goop is nutritious if we're mastered
+        else if (currentGoop.DrainsAmmo)
             { consumesGoop = false; nutrition = 0; }  // no double jeopardy from ammo draining goop
         else if (player.m_currentGoopFrozen)
             { consumesGoop = false; nutrition = 0; }  // do nothing on ice
@@ -84,35 +115,39 @@ public class Gunflower : CwaffGun
             { consumesGoop = false; nutrition = 0; }  // do nothing on webs
         else
             { consumesGoop = true; nutrition = -1; }  // mystery goops are assumed toxic
-        bool nutritious = nutrition > 0;
         if (nutrition > 0)
         {
             this.gun.GainAmmo(nutrition);
             if (player.HasSynergy(Synergy.PHOTOSYNTHESIS) && player.GetGun((int)Items.Camera) is Gun camera)
                 camera.GainAmmo(nutrition);
             this.gun.gameObject.PlayOnce("starmageddon_bullet_impact_sound_2");
+            SpawnParticles(true);
         }
         else if (nutrition < 0)
         {
             this.gun.LoseAmmo(-nutrition);
             this.gun.gameObject.PlayOnce("lightwing_impact_sound");
+            SpawnParticles(false);
         }
-        if (nutrition != 0)
-            CwaffVFX.SpawnBurst(
-                prefab           : nutritious ? _GrowthSparkles : _DecayVFX,
-                numToSpawn       : nutritious ? 2 : 1,
-                basePosition     : this.gun.barrelOffset.position,
-                positionVariance : 1f,
-                velocityVariance : nutritious ? 3f : 5f,
-                velType          : CwaffVFX.Vel.Radial,
-                rotType          : CwaffVFX.Rot.None,
-                lifetime         : 0.5f,
-                fadeOutTime      : 0.5f,
-                emissivePower    : (nutrition > 0) ? 100f : 0f,
-                emissiveColor    : Color.yellow
-                );
         if (consumesGoop)
             DeadlyDeadlyGoopManager.DelayedClearGoopsInRadius(player.CenterPosition, 1f);
+    }
+
+    private void SpawnParticles(bool nutritious)
+    {
+        CwaffVFX.SpawnBurst(
+            prefab           : nutritious ? _GrowthSparkles : _DecayVFX,
+            numToSpawn       : nutritious ? 2 : 1,
+            basePosition     : this.gun.barrelOffset.position,
+            positionVariance : 1f,
+            velocityVariance : nutritious ? 3f : 5f,
+            velType          : CwaffVFX.Vel.Radial,
+            rotType          : CwaffVFX.Rot.None,
+            lifetime         : 0.5f,
+            fadeOutTime      : 0.5f,
+            emissivePower    : nutritious ? 100f : 0f,
+            emissiveColor    : Color.yellow
+            );
     }
 
     private void DismissLights(int startIndex = 0)

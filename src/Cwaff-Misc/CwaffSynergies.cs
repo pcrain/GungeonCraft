@@ -192,6 +192,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfKiBlast>(MASTERY_KI_BLAST, KiBlast.ItemName);
         // Hallaeribut becomes permanently ravenous and can be fed items on the ground by reloading with a full clip. Items grant ammo proportional to their quality. If Hallaeribut runs out of ammo, it will automatically consume the least valuable item in the player's inventory for ammo. Hallaeribut will not feed on the player until no more items are available.
         NewMastery<MasteryOfHallaeribut>(MASTERY_HALLAERIBUT, Hallaeribut.ItemName);
+        // Gunflower passively regenerates up to 10% of its max ammo while active and can gain ammo from all goops.
+        NewMastery<MasteryOfGunflower>(MASTERY_GUNFLOWER, Gunflower.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -429,6 +431,7 @@ internal class MasteryOfVladimir        : MasteryDummyItem {}
 internal class MasteryOfMaestro         : MasteryDummyItem {}
 internal class MasteryOfKiBlast         : MasteryDummyItem {}
 internal class MasteryOfHallaeribut     : MasteryDummyItem {}
+internal class MasteryOfGunflower       : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -509,4 +512,5 @@ public enum Synergy {
     MASTERY_MAESTRO,
     MASTERY_KI_BLAST,
     MASTERY_HALLAERIBUT,
+    MASTERY_GUNFLOWER,
 };
