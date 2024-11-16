@@ -201,6 +201,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfBlamethrower>(MASTERY_BLAMETHROWER, Blamethrower.ItemName);
         // Projectiles that hit walls now split into two projectiles that follow the wall in both directions.
         NewMastery<MasteryOfZag>(MASTERY_ZAG, Zag.ItemName);
+        // Projectiles move twice as fast and home onto enemies.
+        NewMastery<MasteryOfOutbreak>(MASTERY_OUTBREAK, Outbreak.ItemName)
+            .MultProjSpeed(2f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -444,6 +447,7 @@ internal class MasteryOfGunflower            : MasteryDummyItem {}
 internal class MasteryOfOmnidirectionalLaser : MasteryDummyItem {}
 internal class MasteryOfBlamethrower         : MasteryDummyItem {}
 internal class MasteryOfZag                  : MasteryDummyItem {}
+internal class MasteryOfOutbreak             : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -528,4 +532,5 @@ public enum Synergy {
     MASTERY_OMNIDIRECTIONAL_LASER,
     MASTERY_BLAMETHROWER,
     MASTERY_ZAG,
+    MASTERY_OUTBREAK,
 };

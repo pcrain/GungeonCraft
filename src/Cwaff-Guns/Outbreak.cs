@@ -56,6 +56,8 @@ public class Outbreak : CwaffGun
                     infectAngle = delta.ToAngle();
             }
             Projectile p = VolleyUtility.ShootSingleProjectile(_InfectionProjectile, enemy.CenterPosition, infectAngle, false, player);
+            if (player.HasSynergy(Synergy.MASTERY_OUTBREAK))
+                p.gameObject.GetOrAddComponent<OutbreakHomingModifier>();
             p.SetOwnerAndStats(player);
             p.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
         }
@@ -72,6 +74,8 @@ public class InfectionBehavior : MonoBehaviour
     {
         this._projectile = base.GetComponent<Projectile>();
         this._projectile.OnHitEnemy += this.OnHitEnemy;
+        if (this._projectile.Owner is PlayerController player && player.HasSynergy(Synergy.MASTERY_OUTBREAK))
+            this._projectile.gameObject.GetOrAddComponent<OutbreakHomingModifier>();
     }
 
     private void OnHitEnemy(Projectile proj, SpeculativeRigidbody enemy, bool killed)
@@ -110,5 +114,75 @@ public class InfectedBehavior : MonoBehaviour
 
         CwaffVFX.Spawn(Outbreak._OutbreakSmokeVFX, this._enemy.sprite.WorldTopCenter.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
             velocity: Lazy.RandomVector(0.5f), lifetime: 0.3f, fadeOutTime: 0.6f);
+    }
+}
+
+// modified from HomingModifier with slight optimizations + blacklisting our origin enemy
+public class OutbreakHomingModifier : BraveBehaviour
+{
+    public float HomingRadius         = 10f;
+    public float AngularVelocity      = 1080f;
+    public AIActor originEnemy        = null;
+    protected Projectile m_projectile = null;
+
+    private void Start()
+    {
+        if (!this.m_projectile)
+            this.m_projectile = GetComponent<Projectile>();
+        this.m_projectile.ModifyVelocity += this.ModifyVelocity;
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.m_projectile)
+            this.m_projectile.ModifyVelocity -= this.ModifyVelocity;
+        base.OnDestroy();
+    }
+
+    private Vector2 ModifyVelocity(Vector2 inVel)
+    {
+        Vector2 newVel = inVel;
+        RoomHandler absoluteRoomFromPosition = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(m_projectile.LastPosition.IntXY(VectorConversions.Floor));
+        List<AIActor> activeEnemies = absoluteRoomFromPosition.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+        if (activeEnemies == null || activeEnemies.Count == 0)
+            return inVel;
+
+        float nearestSqrDist = HomingRadius * HomingRadius;
+        Vector2 nearestDelta = Vector2.zero;
+        AIActor nearestActor = null;
+        Vector2 myPos = ((!base.sprite) ? base.transform.position.XY() : base.sprite.WorldCenter);
+        for (int i = 0; i < activeEnemies.Count; i++)
+        {
+            AIActor enemy = activeEnemies[i];
+            if (!enemy || !enemy.IsWorthShootingAt || enemy.IsGone || enemy == originEnemy)
+                continue;
+            Vector2 delta = enemy.CenterPosition - myPos;
+            float sqrMagnitude = delta.sqrMagnitude;
+            if (sqrMagnitude > nearestSqrDist)
+                continue;
+            nearestDelta   = delta;
+            nearestSqrDist = sqrMagnitude;
+            nearestActor   = enemy;
+        }
+        if (nearestActor == null)
+            return inVel;
+
+        float homeAmount = 1f - Mathf.Sqrt(nearestSqrDist) / HomingRadius;
+        float curAngle = inVel.ToAngle();
+        float maxDelta = AngularVelocity * homeAmount * m_projectile.LocalDeltaTime;
+        float newAngle = Mathf.MoveTowardsAngle(curAngle, nearestDelta.ToAngle(), maxDelta);
+        if (m_projectile.OverrideMotionModule != null)
+            m_projectile.OverrideMotionModule.AdjustRightVector(newAngle - curAngle);
+        if (m_projectile is HelixProjectile hp)
+        {
+            hp.AdjustRightVector(newAngle - curAngle);
+            return inVel;
+        }
+        if (m_projectile.shouldRotate)
+            base.transform.rotation = Quaternion.Euler(0f, 0f, newAngle);
+        newVel = BraveMathCollege.DegreesToVector(newAngle, inVel.magnitude);
+        if (newVel == Vector2.zero || float.IsNaN(newVel.x) || float.IsNaN(newVel.y))
+            return inVel;
+        return newVel;
     }
 }

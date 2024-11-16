@@ -649,8 +649,9 @@ public static class Lazy
     /// <summary>Determine position of the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
     public static Vector2? NearestEnemyPosWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
     {
-        return NearestEnemyWithinConeOfVision(start: start, coneAngle: coneAngle, maxDeviation: maxDeviation,
-            useNearestAngleInsteadOfDistance: useNearestAngleInsteadOfDistance, ignoreWalls: ignoreWalls)?.CenterPosition;
+        AIActor enemy = NearestEnemyWithinConeOfVision(start: start, coneAngle: coneAngle, maxDeviation: maxDeviation,
+            useNearestAngleInsteadOfDistance: useNearestAngleInsteadOfDistance, ignoreWalls: ignoreWalls);
+        return enemy ? enemy.CenterPosition : null;
     }
 
     /// <summary>Determine position of the nearest enemy to position start</summary>
