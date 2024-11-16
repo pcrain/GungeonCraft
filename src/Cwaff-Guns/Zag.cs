@@ -9,6 +9,7 @@ public class Zag : CwaffGun
 
     internal static CwaffTrailController _ZagTrailPrefab = null;
     internal static GameObject _ZagZigVFX = null;
+    internal static Projectile _ZagProjectile = null;
 
     public static void Init()
     {
@@ -18,10 +19,10 @@ public class Zag : CwaffGun
           .InitProjectile(GunData.New(clipSize: 9, cooldown: 0.125f, shootStyle: ShootStyle.SemiAutomatic, electric: true, preventOrbiting: true,
             damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter, hitEnemySound: "zag_hit_enemy_sound", customClip: true))
           .Attach<ZagProjectile>()
-          .CopyAllImpactVFX(Items.ShockRifle);
+          .CopyAllImpactVFX(Items.ShockRifle)
+          .Assign(out _ZagProjectile);
 
         _ZagTrailPrefab = VFX.CreateSpriteTrailObject("zag_trail_mid", fps: 30, cascadeTimer: C.FRAME, destroyOnEmpty: true);
-
         _ZagZigVFX = VFX.Create("zag_zig_vfx", fps: 15, loops: false);
     }
 }
@@ -32,13 +33,15 @@ public class ZagProjectile : MonoBehaviour
 
     private Projectile _projectile;
     private PlayerController _owner;
-    private bool _blockedByWall;
+    private bool _blockedByWall = false;
     private Vector2 _wallAngle;
     private int _tileCollisionsLeft;
     private SpeculativeRigidbody _body;
     private bool _hasTarget = false;
     private bool _straightened = false;
     private CwaffTrailController _trail = null;
+    private bool _mastered = false;
+    private bool _doNormalSetup = true;
 
     private static readonly Color _ZAG_GRAY = new Color(0.5f, 0.625f, 0.5f, 1f);
 
@@ -48,15 +51,18 @@ public class ZagProjectile : MonoBehaviour
         this._owner = this._projectile.Owner as PlayerController;
         if (!this._owner)
             return;
+        this._mastered = this._owner.HasSynergy(Synergy.MASTERY_ZAG);
 
         this._body = base.GetComponent<SpeculativeRigidbody>();
-        this._blockedByWall = false;
-        this._wallAngle = this._projectile.Direction;
+        if (this._doNormalSetup)
+        {
+            this._wallAngle = this._projectile.Direction;
+            this._tileCollisionsLeft = _MAX_TILE_COLLISIONS;
+        }
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
         this._projectile.specRigidbody.OnTileCollision += this.OnTileCollision;
         this._projectile.BulletScriptSettings.surviveTileCollisions = true;
         this._projectile.m_usesNormalMoveRegardless = true; // ignore Helix / Orbital bullets
-        this._tileCollisionsLeft = _MAX_TILE_COLLISIONS;
 
         this._trail = this._projectile.AddTrail(Zag._ZagTrailPrefab);
         this._trail.gameObject.SetGlowiness(10f);
@@ -85,6 +91,27 @@ public class ZagProjectile : MonoBehaviour
         this._blockedByWall = true;
         this._straightened = true;
         DoZigZag(newDir);
+        if (this._mastered)
+            SplitProjectile(-newDir);
+    }
+
+    private void SplitProjectile(Vector2 dir)
+    {
+        Projectile p = SpawnManager.SpawnProjectile(Zag._ZagProjectile.gameObject, this._projectile.SafeCenter, dir.EulerZ())
+          .GetComponent<Projectile>();
+        p.SpawnedFromOtherPlayerProjectile = true;
+        p.Owner                            = this._projectile.Owner;
+        p.Shooter                          = this._projectile.Shooter;
+        if (this._owner)
+            this._owner.DoPostProcessProjectile(p);
+
+        ZagProjectile zp       = p.gameObject.GetComponent<ZagProjectile>();
+        zp._doNormalSetup      = false;
+        zp._mastered           = true;
+        zp._straightened       = true;
+        zp._blockedByWall      = true;
+        zp._wallAngle          = this._wallAngle;
+        zp._tileCollisionsLeft = this._tileCollisionsLeft;
     }
 
     private void DoZigZag(Vector2 newDir)
@@ -145,8 +172,6 @@ public class ZagProjectile : MonoBehaviour
 
     private void StraightenOut()
     {
-        if (this._straightened)
-            return;
         float dir = this._projectile.Direction.ToAngle().Clamp360();
         float targetDir = dir.Quantize(90f, VectorConversions.Round);
         float deltaDir = (targetDir - dir).Clamp180();
@@ -164,7 +189,8 @@ public class ZagProjectile : MonoBehaviour
     {
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        StraightenOut();
+        if (!this._straightened)
+            StraightenOut();
         Reorient();
         if (this._hasTarget || !this._straightened)
             return;

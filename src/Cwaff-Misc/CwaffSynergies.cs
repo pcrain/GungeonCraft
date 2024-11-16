@@ -199,6 +199,8 @@ public static class CwaffSynergies
             .MultDamage(1.5f);
         // Blamethrower fires projectiles radially in all directions and permanently stuns scapegoats.
         NewMastery<MasteryOfBlamethrower>(MASTERY_BLAMETHROWER, Blamethrower.ItemName);
+        // Projectiles that hit walls now split into two projectiles that follow the wall in both directions.
+        NewMastery<MasteryOfZag>(MASTERY_ZAG, Zag.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -441,6 +443,7 @@ internal class MasteryOfHallaeribut          : MasteryDummyItem {}
 internal class MasteryOfGunflower            : MasteryDummyItem {}
 internal class MasteryOfOmnidirectionalLaser : MasteryDummyItem {}
 internal class MasteryOfBlamethrower         : MasteryDummyItem {}
+internal class MasteryOfZag                  : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -524,4 +527,5 @@ public enum Synergy {
     MASTERY_GUNFLOWER,
     MASTERY_OMNIDIRECTIONAL_LASER,
     MASTERY_BLAMETHROWER,
+    MASTERY_ZAG,
 };
