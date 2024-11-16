@@ -6,24 +6,16 @@ public class CwaffTrailController : BraveBehaviour
   private class Bone
   {
     public float posX;
-
     public Vector2 normal;
-
     public bool IsAnimating;
-
     public float AnimationTimer;
-
-    public float HeightOffset;
-
     public bool Hide;
-
-    public Vector2 pos { get; set; }
+    public Vector2 pos;
 
     private static int _BonesCreated = 0;
-
     private static readonly LinkedList<Bone> _BonePool = new();
 
-    internal static LinkedListNode<Bone> Rent(Vector2 pos, float posX, float heightOffset)
+    internal static LinkedListNode<Bone> Rent(Vector2 pos, float posX)
     {
       if (_BonePool.Count == 0)
         _BonePool.AddLast(new Bone());
@@ -34,7 +26,6 @@ public class CwaffTrailController : BraveBehaviour
       Bone bone = node.Value;
       bone.pos            = pos;
       bone.posX           = posX;
-      bone.HeightOffset   = heightOffset;
 
       bone.normal         = default;
       bone.IsAnimating    = default;
@@ -86,15 +77,6 @@ public class CwaffTrailController : BraveBehaviour
 
   public bool awaitAllTimers = false; // if true, await for both global and cascade timers
 
-  [HideInInspector]
-  public bool FlipUvsY;
-
-  public bool rampHeight;
-
-  public float rampStartHeight = 2f;
-
-  public float rampTime = 1f;
-
   public Vector2 boneSpawnOffset;
 
   public bool UsesDispersalParticles;
@@ -136,8 +118,6 @@ public class CwaffTrailController : BraveBehaviour
   private bool m_isDirty;
 
   private float m_globalTimer;
-
-  private float m_rampTimer;
 
   private float m_maxPosX;
 
@@ -183,9 +163,8 @@ public class CwaffTrailController : BraveBehaviour
     trail_sprite.OverrideSetTiledSpriteGeom = SetTiledSpriteGeom;
     tk2dSpriteDefinition currentSpriteDef = trail_sprite.GetCurrentSpriteDef();
     m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.untrimmedBoundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
-    float heightOffset = ((!rampHeight) ? 0f : rampStartHeight);
-    m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, 0f, heightOffset));
-    m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, 0f, heightOffset));
+    m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, 0f));
+    m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, 0f));
 
     if (usesStartAnimation)
       m_startAnimationClip = base.spriteAnimator.GetClipByName(startAnimation);
@@ -217,7 +196,6 @@ public class CwaffTrailController : BraveBehaviour
     int num = Mathf.RoundToInt(trail_sprite.GetCurrentSpriteDef().untrimmedBoundsDataExtents.x / trail_sprite.GetCurrentSpriteDef().texelSize.x);
     int num2 = num / 4;
     m_globalTimer += BraveTime.DeltaTime;
-    m_rampTimer += BraveTime.DeltaTime;
     if (usesAnimation)
     {
       LinkedListNode<Bone> linkedListNode = m_bones.First;
@@ -347,8 +325,8 @@ public class CwaffTrailController : BraveBehaviour
     Vector2 specRigidbodyPosition = this.body.Position.UnitPosition + PhysicsEngine.PixelToUnit(obj.NewPixelsToMove);
     HandleExtension(specRigidbodyPosition);
     m_bones.Last.Value.Hide = true;
-    m_bones.AddLast(Bone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX, m_bones.Last.Value.HeightOffset));
-    m_bones.AddLast(Bone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX, m_bones.Last.Value.HeightOffset));
+    m_bones.AddLast(Bone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX));
+    m_bones.AddLast(Bone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX));
   }
 
   private void PostRigidbodyMovement(SpeculativeRigidbody rigidbody, Vector2 unitDelta, IntVector2 pixelDelta)
@@ -362,14 +340,21 @@ public class CwaffTrailController : BraveBehaviour
     if (!m_isDirty)
       return;
 
-    m_minBonePosition = new Vector2(float.MaxValue, float.MaxValue);
-    m_maxBonePosition = new Vector2(float.MinValue, float.MinValue);
+    float minX = float.MaxValue;
+    float maxX = float.MinValue;
+    float minY = float.MaxValue;
+    float maxY = float.MinValue;
     for (LinkedListNode<Bone> linkedListNode = m_bones.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
     {
-      m_minBonePosition = Vector2.Min(m_minBonePosition, linkedListNode.Value.pos);
-      m_maxBonePosition = Vector2.Max(m_maxBonePosition, linkedListNode.Value.pos);
+      Vector2 pos = linkedListNode.Value.pos;
+      if (pos.x < minX) minX = pos.x;
+      if (pos.x > maxX) maxX = pos.x;
+      if (pos.y < minY) minY = pos.y;
+      if (pos.y > maxY) maxY = pos.y;
     }
-    base.transform.position = new Vector3(m_minBonePosition.x, m_minBonePosition.y, m_minBonePosition.y + -0.5f);
+    m_minBonePosition = new Vector2(minX, minY);
+    m_maxBonePosition = new Vector2(maxX, maxY);
+    base.transform.position = new Vector3(minX, minY, minY - 0.5f);
     trail_sprite.ForceBuild();
     trail_sprite.UpdateZDepth();
     m_isDirty = false;
@@ -382,9 +367,8 @@ public class CwaffTrailController : BraveBehaviour
 
     if (!destroyOnEmpty && m_bones.Count == 0)
     {
-      float heightOffset = ((!rampHeight) ? 0f : rampStartHeight);
-      m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX, heightOffset));
-      m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX, heightOffset));
+      m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX));
+      m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX));
     }
     if (this.body && this.body.projectile && this.body.projectile.OverrideTrailPoint.HasValue)
       toPosition = this.body.projectile.OverrideTrailPoint.Value;
@@ -430,17 +414,16 @@ public class CwaffTrailController : BraveBehaviour
       Vector2 pos = m_bones.Last.Value.pos;
       Vector2 vector3 = newPos - pos;
       float num7 = vector3.magnitude;
-      float heightOffset = ((!rampHeight) ? 0f : Mathf.Lerp(rampStartHeight, 0f, m_rampTimer / rampTime));
       vector3.Normalize();
       while (num7 > 0f)
       {
         if (num7 < 0.25f)
         {
-          m_bones.AddLast(Bone.Rent(newPos, m_bones.Last.Value.posX + num7, heightOffset));
+          m_bones.AddLast(Bone.Rent(newPos, m_bones.Last.Value.posX + num7));
           break;
         }
         pos += vector3 * 0.25f;
-        m_bones.AddLast(Bone.Rent(pos, m_bones.Last.Value.posX + 0.25f, heightOffset));
+        m_bones.AddLast(Bone.Rent(pos, m_bones.Last.Value.posX + 0.25f));
         num7 -= 0.25f;
         if (usesGlobalTimer && m_globalTimer > globalTimer)
         {
@@ -514,89 +497,51 @@ public class CwaffTrailController : BraveBehaviour
     boundsCenter = (m_minBonePosition + m_maxBonePosition) / 2f;
     boundsExtents = (m_maxBonePosition - m_minBonePosition) / 2f;
     LinkedListNode<Bone> linkedListNode = m_bones.First;
-    int uvIndex = 0;
+    int uvIndex = offset;
+    tk2dSpriteDefinition[] defs = trail_sprite.Collection.spriteDefinitions;
+    float invSubtile =  1f / (float)m_spriteSubtileWidth;
     for (int i = 0; i < num4; i++)
     {
       int num7 = num2 - 1;
       if (i == num4 - 1 && lastBoneIndex % num2 != 0)
-      {
         num7 = lastBoneIndex % num2 - 1;
-      }
       tk2dSpriteDefinition segmentSprite = spriteDef;
+      Bone bone = linkedListNode.Value;
       if (usesStartAnimation && i == 0)
       {
-        int startAnimationFrame = Mathf.Clamp(Mathf.FloorToInt(linkedListNode.Value.AnimationTimer * m_startAnimationClip.fps), 0, m_startAnimationClip.frames.Length - 1);
-        segmentSprite = trail_sprite.Collection.spriteDefinitions[m_startAnimationClip.frames[startAnimationFrame].spriteId];
+        int startAnimationFrame = Mathf.Clamp(Mathf.FloorToInt(bone.AnimationTimer * m_startAnimationClip.fps), 0, m_startAnimationClip.frames.Length - 1);
+        segmentSprite = defs[m_startAnimationClip.frames[startAnimationFrame].spriteId];
       }
-      else if (usesAnimation && linkedListNode.Value.IsAnimating)
+      else if (usesAnimation && bone.IsAnimating)
       {
-        int animationFrame = Mathf.Min((int)(linkedListNode.Value.AnimationTimer * m_animationClip.fps), m_animationClip.frames.Length - 1);
-        segmentSprite = trail_sprite.Collection.spriteDefinitions[m_animationClip.frames[animationFrame].spriteId];
+        int animationFrame = Mathf.Min((int)(bone.AnimationTimer * m_animationClip.fps), m_animationClip.frames.Length - 1);
+        segmentSprite = defs[m_animationClip.frames[animationFrame].spriteId];
       }
       float num10 = 0f;
+      float ymin = segmentSprite.position0.y * m_projectileScale;
+      float ymax = segmentSprite.position3.y * m_projectileScale;
       for (int j = 0; j <= num7; j++)
       {
+        Bone nextBone = linkedListNode.Next.Value;
         float num11 = 1f;
         if (i == num4 - 1 && j == num7)
-        {
-          num11 = Vector2.Distance(linkedListNode.Next.Value.pos, linkedListNode.Value.pos);
-        }
-        int uvCurrent = offset + uvIndex;
-        pos[uvCurrent++] = linkedListNode.Value.pos + (linkedListNode.Value.normal * segmentSprite.position0.y * m_projectileScale) - m_minBonePosition;
-        pos[uvCurrent++] = linkedListNode.Next.Value.pos + (linkedListNode.Next.Value.normal * segmentSprite.position1.y * m_projectileScale) - m_minBonePosition;
-        pos[uvCurrent++] = linkedListNode.Value.pos + (linkedListNode.Value.normal * segmentSprite.position2.y * m_projectileScale) - m_minBonePosition;
-        pos[uvCurrent++] = linkedListNode.Next.Value.pos + (linkedListNode.Next.Value.normal * segmentSprite.position3.y * m_projectileScale) - m_minBonePosition;
-        uvCurrent = offset + uvIndex;
-        pos[uvCurrent++] += new Vector3(0f, 0f, 0f - linkedListNode.Value.HeightOffset);
-        pos[uvCurrent++] += new Vector3(0f, 0f, 0f - linkedListNode.Next.Value.HeightOffset);
-        pos[uvCurrent++] += new Vector3(0f, 0f, 0f - linkedListNode.Value.HeightOffset);
-        pos[uvCurrent++] += new Vector3(0f, 0f, 0f - linkedListNode.Next.Value.HeightOffset);
+          num11 = Vector2.Distance(nextBone.pos, bone.pos);
+        //NOTE: we can safely reuse positional indices from previous bones if we know the sprite hasn't changed
+        pos[uvIndex]     = (j > 0) ? pos[uvIndex - 3] : bone.pos + (bone.normal * ymin) - m_minBonePosition;
+        pos[uvIndex + 1] = nextBone.pos + (nextBone.normal * ymin) - m_minBonePosition;
+        pos[uvIndex + 2] = (j > 0) ? pos[uvIndex - 1] : bone.pos + (bone.normal * ymax) - m_minBonePosition;
+        pos[uvIndex + 3] = nextBone.pos + (nextBone.normal * ymax) - m_minBonePosition;
         Vector2 vector = Vector2.Lerp(segmentSprite.uvs[0], segmentSprite.uvs[1], num10);
         Vector2 vector2 = Vector2.Lerp(segmentSprite.uvs[2], segmentSprite.uvs[3], num10 + num11 / (float)num2);
-        uvCurrent = offset + uvIndex;
-        if (segmentSprite.flipped == tk2dSpriteDefinition.FlipMode.Tk2d)
-        {
-          uv[uvCurrent++] = new Vector2(vector.x, vector.y);
-          uv[uvCurrent++] = new Vector2(vector.x, vector2.y);
-          uv[uvCurrent++] = new Vector2(vector2.x, vector.y);
-          uv[uvCurrent++] = new Vector2(vector2.x, vector2.y);
-        }
-        else if (segmentSprite.flipped == tk2dSpriteDefinition.FlipMode.TPackerCW)
-        {
-          uv[uvCurrent++] = new Vector2(vector.x, vector.y);
-          uv[uvCurrent++] = new Vector2(vector2.x, vector.y);
-          uv[uvCurrent++] = new Vector2(vector.x, vector2.y);
-          uv[uvCurrent++] = new Vector2(vector2.x, vector2.y);
-        }
-        else
-        {
-          uv[uvCurrent++] = new Vector2(vector.x, vector.y);
-          uv[uvCurrent++] = new Vector2(vector2.x, vector.y);
-          uv[uvCurrent++] = new Vector2(vector.x, vector2.y);
-          uv[uvCurrent++] = new Vector2(vector2.x, vector2.y);
-        }
-        if (linkedListNode.Value.Hide)
-        {
-          uv[uvCurrent - 4] = Vector2.zero;
-          uv[uvCurrent - 3] = Vector2.zero;
-          uv[uvCurrent - 2] = Vector2.zero;
-          uv[uvCurrent - 1] = Vector2.zero;
-        }
-        if (FlipUvsY)
-        {
-          Vector2 vector3 = uv[uvCurrent - 4];
-          uv[uvCurrent - 4] = uv[uvCurrent - 2];
-          uv[uvCurrent - 2] = vector3;
-          vector3 = uv[uvCurrent - 3];
-          uv[uvCurrent - 3] = uv[uvCurrent - 1];
-          uv[uvCurrent - 1] = vector3;
-        }
+        bool hide = bone.Hide;
+        uv[uvIndex    ] = hide ? Vector2.zero : new Vector2(vector.x, vector.y);
+        uv[uvIndex + 1] = hide ? Vector2.zero : new Vector2(vector2.x, vector.y);
+        uv[uvIndex + 2] = hide ? Vector2.zero : new Vector2(vector.x, vector2.y);
+        uv[uvIndex + 3] = hide ? Vector2.zero : new Vector2(vector2.x, vector2.y);
         uvIndex += 4;
-        num10 += num11 / (float)m_spriteSubtileWidth;
-        if (linkedListNode != null)
-        {
-          linkedListNode = linkedListNode.Next;
-        }
+        num10 += invSubtile;
+        linkedListNode = linkedListNode.Next;
+        bone = nextBone;
       }
     }
   }

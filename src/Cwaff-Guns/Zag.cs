@@ -88,6 +88,7 @@ public class ZagProjectile : MonoBehaviour
         bool clockwise  = (this._wallAngle.ToAngle().RelAngleTo(this._projectile.Direction.ToAngle()) > 0f);
         Vector2 newDir = tileCollision.Normal.Rotate(clockwise ? -90f : 90f);
         PhysicsEngine.PostSliceVelocity = newDir;
+        this._body.PushAgainstWalls(this._wallAngle.ToIntVector2());
         this._blockedByWall = true;
         this._straightened = true;
         DoZigZag(newDir);

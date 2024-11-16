@@ -6,6 +6,8 @@
 - Ki Blast projectiles now behave like charge projectiles, firing when the fire button is released (for compatibility with mastery)
 - Blamethrower projectile damage increased from 2 to 4
 - Blamethrower ammo increased from 300 to 800
+- Optimize sprite trail creation code to reduce lag when lots of projectile trails are on the screen
+- Optimize Zag projectile movement code to reduce lag when lots of Zag projectiles are on the screen
 
 ## 1.21.0 (2024-11-04)
 
