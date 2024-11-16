@@ -14,13 +14,21 @@ public class Blamethrower : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Blamethrower>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 300,
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 0.0f, ammo: 800,
             doesScreenShake: false, canReloadNoMatterAmmo: true, shootFps: 40, muzzleVFX: "muzzle_blamethrower", muzzleFps: 30)
+          .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic,
-            damage: 2f, angleVariance: 30f, speed: 17f, range: 17f, customClip: true,
+            damage: 4f, angleVariance: 30f, speed: 17f, range: 17f, customClip: true,
             sprite: "blamethrower_projectile", scale: 2.0f, fps: 10, anchor: Anchor.MiddleCenter, shouldRotate: false))
           .Attach<BlameDamage>()
-          .Attach<BlamethrowerProjectile>();
+          .Attach<BlamethrowerProjectile>()
+          .Assign(out Projectile proj);
+
+        ProjectileModule[] masteryModules = new ProjectileModule[3];
+        for (int i = 0; i < 3; ++i)
+          masteryModules[i] = new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, baseProjectile: proj, ammoCost: 0,
+            clipSize: -1, cooldown: 0.08f, shootStyle: ShootStyle.Automatic, angleFromAim: 90f * (i + 1), ignoredForReloadPurposes: true));
+        gun.AddSynergyModules(Synergy.MASTERY_BLAMETHROWER, masteryModules);
 
         _BlameImpact = VFX.Create("blamethrower_projectile_vfx", loops: false);
         _BlameTrail = VFX.Create("blamethrower_trail", fps: 16);
@@ -61,7 +69,7 @@ public class Blamethrower : CwaffGun
                 continue;
             if (enemy.GetComponent<EnemyBlamedBehavior>())
                 continue;  // can't scapegoat the same enemy twice
-            enemy.gameObject.GetOrAddComponent<ScapeGoat>();
+            enemy.gameObject.GetOrAddComponent<ScapeGoat>().Setup(player.HasSynergy(Synergy.MASTERY_BLAMETHROWER));
             break;
         }
     }
@@ -78,6 +86,12 @@ public class Blamethrower : CwaffGun
 internal class ScapeGoat : MonoBehaviour
 {
     private bool _active = true;
+    private bool _mastered = false;
+
+    public void Setup(bool mastered)
+    {
+        this._mastered = mastered;
+    }
 
     private IEnumerator Start()
     {
@@ -88,6 +102,9 @@ internal class ScapeGoat : MonoBehaviour
             yield break;
         if (base.GetComponent<EnemyBlamedBehavior>())
             yield break;  // can't scapegoat the same enemy twice
+
+        if (this._mastered && enemy.behaviorSpeculator is BehaviorSpeculator bs && !bs.ImmuneToStun)
+            bs.Stun(36000f);
 
         // spawn scapegoat VFX above their head
         GameObject vfx = SpawnManager.SpawnVFX(Blamethrower._ScapeGoatVFX, enemy.sprite.WorldTopCenter, Quaternion.identity);

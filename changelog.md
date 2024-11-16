@@ -2,8 +2,10 @@
 
 ## 1.21.1 (TBD)
 
-- Added masteries for Ki Blast, Hallaeribut, Gunflower, and Omnidirectional Laser
+- Added masteries for Ki Blast, Hallaeribut, Gunflower, Omnidirectional Laser, and Blamethrower
 - Ki Blast projectiles now behave like charge projectiles, firing when the fire button is released (for compatibility with mastery)
+- Blamethrower projectile damage increased from 2 to 4
+- Blamethrower ammo increased from 300 to 800
 
 ## 1.21.0 (2024-11-04)
 

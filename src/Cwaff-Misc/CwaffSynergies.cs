@@ -197,6 +197,8 @@ public static class CwaffSynergies
         // Omnidirectional Laser fires lasers in 5 directions, with the laser aimed towards the reticle being 50% stronger.
         NewMastery<MasteryOfOmnidirectionalLaser>(MASTERY_OMNIDIRECTIONAL_LASER, OmnidirectionalLaser.ItemName)
             .MultDamage(1.5f);
+        // Blamethrower fires projectiles radially in all directions and permanently stuns scapegoats.
+        NewMastery<MasteryOfBlamethrower>(MASTERY_BLAMETHROWER, Blamethrower.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -438,6 +440,7 @@ internal class MasteryOfKiBlast              : MasteryDummyItem {}
 internal class MasteryOfHallaeribut          : MasteryDummyItem {}
 internal class MasteryOfGunflower            : MasteryDummyItem {}
 internal class MasteryOfOmnidirectionalLaser : MasteryDummyItem {}
+internal class MasteryOfBlamethrower         : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -520,4 +523,5 @@ public enum Synergy {
     MASTERY_HALLAERIBUT,
     MASTERY_GUNFLOWER,
     MASTERY_OMNIDIRECTIONAL_LASER,
+    MASTERY_BLAMETHROWER,
 };
