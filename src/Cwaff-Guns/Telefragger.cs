@@ -15,12 +15,17 @@ public class Telefragger : CwaffGun
     private static VFXPool _TeleportVFX    = null;
     private static GameObject _FloorVFX    = null;
 
+    [SerializeField]
+    internal bool _teleportReady            = true;
+
     // lots of logic borrowed from RatBootsItem.cs
     private tk2dSprite m_extantFloor       = null;
     private bool m_frameWasPartialPit      = false;
     private bool m_wasAboutToFallLastFrame = false;
     private int m_lastFrameAboutToFall     = 0;
     private float _invulnTime              = 0.0f;
+    private bool _teleporting              = false;
+    private bool _mastered                 = false;
 
     public static void Init()
     {
@@ -28,6 +33,7 @@ public class Telefragger : CwaffGun
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 0.9f, ammo: 600, shootFps: 30,
             reloadFps: 4, handedness: GunHandedness.HiddenOneHanded, loopFireAt: 12)
           .SetFireAudio("telefragger_amp_up_sound", 0, 3, 6, 9)
+          .Attach<TelefraggerAmmoDisplay>()
           .InitProjectile(GunData.New(baseProjectile: Items.DemonHead.Projectile(), clipSize: -1, cooldown: 0.18f, shootStyle: ShootStyle.Beam,
             customClip: true, ammoCost: 5, angleVariance: 0f, beamSprite: "telefragger_beam", beamFps: 17,
             beamImpactFps: 14, beamLoopCharge: false, beamChargeDelay: 0.4f, beamEmission: 2f))
@@ -67,6 +73,8 @@ public class Telefragger : CwaffGun
     public override void Update()
     {
         base.Update();
+
+        this._mastered = this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_TELEFRAGGER);
         if (!SynchronizeSpriteWithBeam())
             gun.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
 
@@ -99,13 +107,40 @@ public class Telefragger : CwaffGun
 
     internal void TeleportPlayerToPosition(PlayerController player, Vector2 target)
     {
+        if (this._teleporting)
+            return;
+
+        if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
+        {
+            PlayerController otherPlayer = GameManager.Instance.GetOtherPlayer(player);
+            if (otherPlayer && !otherPlayer.IsGhost && !GameManager.Instance.MainCameraController.PointIsVisible(target))
+            {
+                player.DoEasyBlank(target, EasyBlankType.MINI);
+                return; // don't teleport around in co-op if we're offscreen
+            }
+        }
+
         Vector2 startPosition = player.transform.position;
         player.StartCoroutine(DoPlayerTeleport(player, startPosition, target, 0.125f));
+    }
+
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        base.OnReloadPressed(player, gun, manualReload);
+        if (player.IsDodgeRolling || !player.AcceptingNonMotionInput || !gun.IsFiring)
+            return;
+        if (!this._teleportReady || !player.HasSynergy(Synergy.MASTERY_TELEFRAGGER))
+            return;
+        if (GetExtantBeam() is not BasicBeamController beam || beam.State != BeamState.Firing)
+            return;
+        this._teleportReady = false;
+        TeleportPlayerToPosition(player, beam.Origin + beam.m_currentBeamDistance * beam.Direction.normalized);
     }
 
     // TODO: something in this method causes a _StencilVal warning in the debug log
     private IEnumerator DoPlayerTeleport(PlayerController player, Vector2 start, Vector2 end, float duration)
     {
+        this._teleporting = true;
         GameManager.Instance.MainCameraController.SetManualControl(true, true);
         Vector2 startCamPos = GameManager.Instance.MainCameraController.GetIdealCameraPosition();
         Vector2 endCamPos   = end;
@@ -140,6 +175,7 @@ public class Telefragger : CwaffGun
         player.specRigidbody.Reinitialize();
         player.specRigidbody.CorrectForWalls(andRigidBodies: true);
 
+        this._teleporting = false;
         yield break;
     }
 
@@ -211,6 +247,26 @@ public class Telefragger : CwaffGun
             m_extantFloor.renderer.enabled = true;
         return false;
     }
+
+    private class TelefraggerAmmoDisplay : CustomAmmoDisplay
+    {
+        private Telefragger _tele;
+        private PlayerController _owner;
+        private void Start()
+        {
+            this._tele = base.GetComponent<Telefragger>();
+            this._owner = base.GetComponent<Gun>().CurrentOwner as PlayerController;
+        }
+
+        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+        {
+            if (!this._owner || !this._tele || !this._tele._mastered || !this._tele._teleportReady)
+                return false;
+
+            uic.GunAmmoCountLabel.Text = $"[color #bb44dd]Teleport Ready[/color]\n{this._owner.VanillaAmmoDisplay()}";
+            return true;
+        }
+    }
 }
 
 public class TelefragJuice : MonoBehaviour
@@ -233,18 +289,16 @@ public class TelefragJuice : MonoBehaviour
             return;
         if (enemy.healthHaver is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
             return; // don't teleport to bosses since they tend to have cutscenes and we don't want to interfere with those
+
+        Telefragger telefragger = null;
+        if (owner.CurrentGun is Gun gun)
+            telefragger = gun.gameObject.GetComponent<Telefragger>();
+        if (telefragger)
+            telefragger._teleportReady = true;
+
         Vector2 targetPos = enemy.CenterPosition;
-        if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
-        {
-            PlayerController otherPlayer = GameManager.Instance.GetOtherPlayer(owner);
-            if (otherPlayer && !otherPlayer.IsGhost && !GameManager.Instance.MainCameraController.PointIsVisible(targetPos))
-            {
-                owner.DoEasyBlank(targetPos, EasyBlankType.MINI);
-                return; // don't teleport around in co-op if we're offscreen
-            }
-        }
         owner.specRigidbody.RegisterTemporaryCollisionException(other, 2.0f); // could possibly be a permanent collision exception
-        if (owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<Telefragger>() is Telefragger telefragger)
+        if (telefragger)
             telefragger.TeleportPlayerToPosition(owner, targetPos);
     }
 }

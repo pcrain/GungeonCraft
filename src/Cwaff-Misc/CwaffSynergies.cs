@@ -204,6 +204,8 @@ public static class CwaffSynergies
         // Projectiles move twice as fast and home onto enemies.
         NewMastery<MasteryOfOutbreak>(MASTERY_OUTBREAK, Outbreak.ItemName)
             .MultProjSpeed(2f);
+        // Telefragger can be reloaded while firing to instantly teleport the player to the end of the beam. This teleport cannot be triggered again until killing another enemy with Telefragger.
+        NewMastery<MasteryOfTelefragger>(MASTERY_TELEFRAGGER, Telefragger.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -448,6 +450,7 @@ internal class MasteryOfOmnidirectionalLaser : MasteryDummyItem {}
 internal class MasteryOfBlamethrower         : MasteryDummyItem {}
 internal class MasteryOfZag                  : MasteryDummyItem {}
 internal class MasteryOfOutbreak             : MasteryDummyItem {}
+internal class MasteryOfTelefragger          : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -533,4 +536,5 @@ public enum Synergy {
     MASTERY_BLAMETHROWER,
     MASTERY_ZAG,
     MASTERY_OUTBREAK,
+    MASTERY_TELEFRAGGER,
 };
