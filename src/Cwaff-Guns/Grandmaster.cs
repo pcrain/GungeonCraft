@@ -200,7 +200,9 @@ public abstract class ChessPiece : MonoBehaviour
 
     public void StopMoving()
     {
-        this.gameObject.Play("chess_move");
+        base.gameObject.Play("chess_move");
+        if (!this._projectile)
+            return;
         this._projectile.SetSpeed(0.001f);
         this._projectile.m_usesNormalMoveRegardless = true; // disable movement modifiers such as Helix Bullets and Orbital Bullets
     }

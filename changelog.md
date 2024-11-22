@@ -9,6 +9,12 @@
 - Optimize sprite trail creation code to reduce lag when lots of projectile trails are on the screen
 - Optimize Zag projectile movement code to reduce lag when lots of Zag projectiles are on the screen
 
+- Fixed debug log spam when reflecting projectiles using Ki Blast
+- Fixed (hopefully) null deref in Ki Blast's update logic
+- Fixed potential bug where Utility Vest can destroy the player's currently active gun in an unsafe way
+- Fixed null deref caused by Grandmaster's chess pieces trying to move destroyed projectiles
+- Enemies tranquilized by Tranquilizer now only have a 10% chance to drop their held gun (rather than 100%)
+
 ## 1.21.0 (2024-11-04)
 
 #### Features:

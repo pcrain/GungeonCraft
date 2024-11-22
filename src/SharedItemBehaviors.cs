@@ -765,7 +765,7 @@ public static class SlashDoer // stolen from NN
     }
 }
 
-public class SlashData : ScriptableObject // stolen from NN
+public class SlashData // stolen from NN
 {
     public bool doVFX = true;
     public VFXPool VFX = Items.Blasphemy.AsGun().muzzleFlashEffects;

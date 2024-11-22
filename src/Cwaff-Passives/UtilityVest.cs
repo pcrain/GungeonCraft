@@ -57,7 +57,12 @@ public class UtilityVest : CwaffPassive
 
         // drop and destroy the item so we properly call the Drop() / Destroy() events and can't pick it back up
         if (item is Gun g)
-            UnityEngine.Object.Destroy(this.Owner.ForceDropGun(g).gameObject);
+        {
+            g.HasEverBeenAcquiredByPlayer = true;
+            this.Owner.inventory.RemoveGunFromInventory(g);
+            g.ToggleRenderers(true);
+            UnityEngine.Object.Destroy(g.DropGun().gameObject);
+        }
         else if (item is PassiveItem p)
             UnityEngine.Object.Destroy(this.Owner.DropPassiveItem(p).gameObject);
         else if (item is PlayerItem i)

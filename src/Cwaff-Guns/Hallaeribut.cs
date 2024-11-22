@@ -142,7 +142,7 @@ public class Hallaeribut : CwaffGun
             g.HasEverBeenAcquiredByPlayer = true;
             this.PlayerOwner.inventory.RemoveGunFromInventory(g);
             g.ToggleRenderers(true);
-            UnityEngine.Object.Destroy(g.DropGun().gameObject); //TODO: pop this code in utility vest code as well
+            UnityEngine.Object.Destroy(g.DropGun().gameObject);
         }
         else if (item is PassiveItem p)
             UnityEngine.Object.Destroy(this.PlayerOwner.DropPassiveItem(p).gameObject);

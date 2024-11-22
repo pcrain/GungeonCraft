@@ -4,7 +4,7 @@ public class Tranquilizer : CwaffGun
 {
     public static string ItemName         = "Tranquilizer";
     public static string ShortDescription = "Zzzzzz";
-    public static string LongDescription  = "Fires darts that permastun enemies after a few seconds, scaling logarithmically with their current health. Each subsequent dart decreases an enemy's tranquilization timer by 3 seconds. Tranquilized enemies drop any held guns, and may also drop ammo";
+    public static string LongDescription  = "Fires darts that permastun enemies after a few seconds, scaling logarithmically with their current health. Each subsequent dart decreases an enemy's tranquilization timer by 3 seconds. Any enemy tranquilized while holding a gun has a 10% chance to drop their held gun and a 25% to drop a small amount of ammo.";
     public static string Lore             = "Most commonly used for sedating loudly-opinionated supermarket shoppers and other similarly aggressive wild animals, the tranquilizer gun is the pinnacle of non-lethal firearm technology. What it lacks in visual spectacle or firepower it more than makes up for with raw practicality, able to completely pacify all but the mightiest of the Gungeon's denizens with a single shot and a few seconds of your time. As long as you have a plan in place for not getting shot for those few precious seconds, it's hard to beat in terms of ammo-efficiency for dispatching the Gundead.";
 
     internal static GameObject _DrowsyVFX      = null;
@@ -63,7 +63,7 @@ public class TranquilizerBehavior : MonoBehaviour
 
     private class EnemyTranquilizedBehavior : MonoBehaviour
     {
-        private const float _DROP_GUN_CHANCE  = 1.0f;
+        private const float _DROP_GUN_CHANCE  = 0.1f;
         private const float _DROP_AMMO_CHANCE = 0.25f;
 
         private AIActor _enemy = null;
@@ -119,15 +119,18 @@ public class TranquilizerBehavior : MonoBehaviour
             if (this._enemy.aiShooter is not AIShooter shooter)
                 return;
 
-            if (UnityEngine.Random.value <= _DROP_GUN_CHANCE && shooter.CurrentGun is Gun gun)
+            if (shooter.CurrentGun is Gun gun)
             {
-                shooter.ToggleHandRenderers(false, "tranquilized");
-                if (shooter.m_cachedBraveBulletSource != null)
-                    shooter.m_cachedBraveBulletSource.enabled = false;
-                if (gun.DropGun().gameObject.GetComponentInChildren<Gun>() is Gun droppedGun)
-                    droppedGun.CurrentAmmo = Mathf.CeilToInt(0.05f * droppedGun.GetBaseMaxAmmo());
                 if (UnityEngine.Random.value <= _DROP_AMMO_CHANCE)
                     LootEngine.SpawnItem(ScavengingArms._SmallAmmoPickup, this._enemy.Position, Vector2.zero, 0f, false);
+                if (UnityEngine.Random.value <= _DROP_GUN_CHANCE)
+                {
+                    shooter.ToggleHandRenderers(false, "tranquilized");
+                    if (shooter.m_cachedBraveBulletSource != null)
+                        shooter.m_cachedBraveBulletSource.enabled = false;
+                    if (gun.DropGun().gameObject.GetComponentInChildren<Gun>() is Gun droppedGun)
+                        droppedGun.CurrentAmmo = Mathf.CeilToInt(0.05f * droppedGun.GetBaseMaxAmmo());
+                }
             }
             UnityEngine.Object.Destroy(shooter);
         }

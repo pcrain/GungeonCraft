@@ -131,12 +131,12 @@ public class KiBlast : CwaffGun
 
     private void UpdateIdleAnimation(string idleAnimation = null, int frame = -1)
     {
-        string curClipName = gun.spriteAnimator.CurrentClip.name;
-        if (curClipName != gun.idleAnimation && curClipName != _KameAnim && curClipName != _HameAnim)
+        string curClipName = this.gun.spriteAnimator.CurrentClip.name;
+        if (curClipName != this.gun.idleAnimation && curClipName != _KameAnim && curClipName != _HameAnim)
             return;
-        gun.spriteAnimator.PlayIfNotPlaying(idleAnimation ?? gun.idleAnimation);
+        this.gun.spriteAnimator.PlayIfNotPlaying(idleAnimation ?? this.gun.idleAnimation);
         if (frame >= 0)
-            gun.spriteAnimator.PlayFromFrame(frame);
+            this.gun.spriteAnimator.PlayFromFrame(frame);
     }
 
     private bool HandleKamehameha()
@@ -144,7 +144,9 @@ public class KiBlast : CwaffGun
         this.percentSpeedWhileFiring = 1f;
         if (!this.gun.IsFiring)
             _nextChargeSound = 1;
-        if (this.gun.Volley.projectiles.Count < 2 || !this.gun.m_moduleData.TryGetValue(this.gun.Volley.projectiles[1], out ModuleShootData msd))
+        if (this.gun.Volley.projectiles.Count < 2
+          || this.gun.m_moduleData == null
+          || !this.gun.m_moduleData.TryGetValue(this.gun.Volley.projectiles[1], out ModuleShootData msd))
             return false;
         if (msd == null || msd.beam is not BasicBeamController beam)
             return false;
@@ -195,7 +197,7 @@ public class KiBlast : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (!this.PlayerOwner)
+        if (!this.PlayerOwner || !this.gun)
             return;
         if (!HandleKamehameha())
             UpdateIdleAnimation(); // reset idle animation to default if we're not actively charging or firing a kamehameha
