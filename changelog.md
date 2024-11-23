@@ -13,6 +13,7 @@
 - Fixed potential bug where Utility Vest can destroy the player's currently active gun in an unsafe way
 - Fixed null deref caused by Grandmaster's chess pieces trying to move destroyed projectiles
 - Enemies tranquilized by Tranquilizer now only have a 10% chance to drop their held gun (rather than 100%)
+- Revamped Aimu Hakurei's graze detection to be more accurate and framerate independent (was easier to build graze at higher FPS before)
 
 ## 1.21.0 (2024-11-04)
 

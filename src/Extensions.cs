@@ -3050,6 +3050,7 @@ public static class Extensions
     return pickup;
   }
 
+  /// <summary>Finalize loot chance adjustments for modded items.</summary>
   internal static void ResolveModdedLootChances(this GameManager gm)
   {
     foreach (UnresolvedLootData u in _UnresolvedLootChances)
@@ -3064,6 +3065,12 @@ public static class Extensions
       };
       // Lazy.DebugLog($"adding loot chance x{u.multiplier} for {Lazy.PickupId(u.type)} == {Lazy.Pickup(u.type).DisplayName} when possessing {pickup.DisplayName}");
     }
+  }
+
+  /// <summary>Check whether a projectile is in front of the player or behind the player relative to its direction of travel.</summary>
+  public static bool HeadingTowardPlayer(this Projectile proj, PlayerController player)
+  {
+    return proj.Direction.ToAngle().IsNearAngle((player.CenterPosition - proj.SafeCenter).ToAngle(), 90f);
   }
 }
 

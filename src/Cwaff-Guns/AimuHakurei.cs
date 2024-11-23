@@ -11,7 +11,7 @@ public class AimuHakurei : CwaffGun
     internal const float _GRAZE_THRES_SQUARED      = _GRAZE_THRES * _GRAZE_THRES; // speed up distance calculations a bit
     internal const float _GRAZE_DECAY_RATE         = 0.75f; // seconds between our graze counter decreasing
     internal const float _GRAZE_COOLDOWN           = 1.0f;  // cooldown to prevent projectiles from being infinitely grazed
-    internal const int   _MAX_GRAZE_PER_PROJECTILE = 5;     // max amount of graze we can accumulate per projectile
+    internal const int   _GRAZE_PER_PROJECTILE     = 5;     // max amount of graze we can accumulate per projectile
     internal const int   _GRAZE_MAX                = 120;   // max amount of graze we can accumulate overall
 
     internal static readonly int[] _GRAZE_TIER_THRESHOLDS  = {10, 30, 60, 100};
@@ -233,8 +233,7 @@ public class AimuHakurei : CwaffGun
         }
     }
 
-    private static Dictionary<Projectile, int> _GrazeDict = new();
-    private static Dictionary<Projectile, float> _GrazeTimeDict = new();
+    private static LinkedList<Projectile> _GrazeCandidates = new();
     private void UpdateGraze()
     {
         if (!this || this.PlayerOwner is not PlayerController pc)
@@ -247,33 +246,37 @@ public class AimuHakurei : CwaffGun
             this._lastDecayTime = BraveTime.ScaledTimeSinceStartup;
         }
 
-        if (!pc.healthHaver || !pc.healthHaver.IsVulnerable)
+        bool playerVulnerable              = pc.healthHaver && pc.healthHaver.IsVulnerable;
+        Vector2 ppos                       = pc.CenterPosition;
+        Vector2 bottom                     = pc.SpriteBottomCenter;
+        int numCandidates                  = _GrazeCandidates.Count;
+        LinkedListNode<Projectile> curNode = _GrazeCandidates.First;
+        for (int i = 0; i < numCandidates; ++i)
+        {
+            LinkedListNode<Projectile> nextNode = curNode.Next;
+            Projectile p = curNode.Value;
+            if (!p || !p.isActiveAndEnabled || !p.sprite || !p.sprite.renderer || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner is PlayerController || !p.HeadingTowardPlayer(pc))
+            {
+                if (playerVulnerable)
+                {
+                    this.graze = Mathf.Min(this.graze + _GRAZE_PER_PROJECTILE, _GRAZE_MAX);
+                    CwaffVFX.Spawn(AimuHakurei._GrazeVFX, bottom, velocity: new Vector2(0f, 5f), lifetime: 0.2f, fadeOutTime: 0.4f);
+                    PowerUp();
+                }
+                _GrazeCandidates.Remove(curNode);
+            }
+            curNode = nextNode;
+        }
+
+        if (!playerVulnerable)
             return; // can't graze if we're invincible, that's cheating!!!
 
-        Vector2 ppos = pc.CenterPosition;
-        Vector2 bottom = pc.SpriteBottomCenter;
         foreach (Projectile p in StaticReferenceManager.AllProjectiles)
         {
-            if (!p.isActiveAndEnabled || !p.sprite || !p.sprite.renderer || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner is PlayerController)
+            if (!p || !p.isActiveAndEnabled || !p.sprite || !p.sprite.renderer || !p.sprite.renderer.enabled || !p.collidesWithPlayer || p.Owner is PlayerController)
                 continue; // if the projectile can't collide with us, we're not impressed
-            if ((p.SafeCenter - ppos).sqrMagnitude >= _GRAZE_THRES_SQUARED)
-                continue; // bullet's too far away, so doesn't need to be considered
-
-            //NOTE: Shenanigans to make sure pooled projectiles don't count as already-grazed when they respawn from the pool
-            if (!_GrazeTimeDict.ContainsKey(p))
-                _GrazeTimeDict[p] = 0;
-            if (_GrazeTimeDict[p] + _GRAZE_COOLDOWN < BraveTime.ScaledTimeSinceStartup)
-                _GrazeDict[p] = 0; // reset our grazedict timer if we haven't been near it for at least one second
-            _GrazeTimeDict[p] = BraveTime.ScaledTimeSinceStartup;
-            if (_GrazeDict[p] >= _MAX_GRAZE_PER_PROJECTILE)
-                continue; // we've already grazed the bullet a bunch, so put it on cooldown
-
-            ++_GrazeDict[p];
-            if (this.graze < _GRAZE_MAX)
-                ++this.graze;
-
-            CwaffVFX.Spawn(AimuHakurei._GrazeVFX, bottom, velocity: new Vector2(0f, 5f), lifetime: 0.2f, fadeOutTime: 0.4f);
-            PowerUp();
+            if (!_GrazeCandidates.Contains(p) && (p.SafeCenter - ppos).sqrMagnitude <= _GRAZE_THRES_SQUARED && p.HeadingTowardPlayer(pc))
+                _GrazeCandidates.AddLast(p);
         }
     }
 }
