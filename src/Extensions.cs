@@ -3067,10 +3067,10 @@ public static class Extensions
     }
   }
 
-  /// <summary>Check whether a projectile is in front of the player or behind the player relative to its direction of travel.</summary>
+  /// <summary>Check whether a projectile is in front of the player or behind the player relative to its direction of travel. Returns true if the projectile is not moving.</summary>
   public static bool HeadingTowardPlayer(this Projectile proj, PlayerController player)
   {
-    return proj.Direction.ToAngle().IsNearAngle((player.CenterPosition - proj.SafeCenter).ToAngle(), 90f);
+    return proj.Direction == Vector2.zero || proj.Direction.ToAngle().IsNearAngle((player.CenterPosition - proj.SafeCenter).ToAngle(), 90f);
   }
 }
 

@@ -209,6 +209,8 @@ public static class CwaffSynergies
         // Reload time is halved, and tranquilized enemies with guns are guaranteed to drop their guns and some ammo.
         NewMastery<MasteryOfTranquilizer>(MASTERY_TRANQUILIZER, Tranquilizer.ItemName)
             .MultReload(0.5f);
+        // Graze range is increased, focus mode slows down time even further, and projectiles grazed while not in focus mode are reflected back at enemies.
+        NewMastery<MasteryOfAimuHakurei>(MASTERY_AIMU_HAKUREI, AimuHakurei.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -457,6 +459,7 @@ internal class MasteryOfZag                  : MasteryDummyItem {}
 internal class MasteryOfOutbreak             : MasteryDummyItem {}
 internal class MasteryOfTelefragger          : MasteryDummyItem {}
 internal class MasteryOfTranquilizer         : MasteryDummyItem {}
+internal class MasteryOfAimuHakurei          : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -544,4 +547,5 @@ public enum Synergy {
     MASTERY_OUTBREAK,
     MASTERY_TELEFRAGGER,
     MASTERY_TRANQUILIZER,
+    MASTERY_AIMU_HAKUREI,
 };
