@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.21.1 (TBD)
+## 1.21.1 (2024-11-22)
 
 - Added masteries for Ki Blast, Hallaeribut, Gunflower, Omnidirectional Laser, Blamethrower, Zag, Outbreak, Telefragger, Tranquilizer, and Aimu Hakurei
 - Ki Blast projectiles now behave like charge projectiles, firing when the fire button is released (for compatibility with mastery)
