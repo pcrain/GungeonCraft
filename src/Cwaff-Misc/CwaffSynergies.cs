@@ -206,6 +206,9 @@ public static class CwaffSynergies
             .MultProjSpeed(2f);
         // Telefragger can be reloaded while firing to instantly teleport the player to the end of the beam. This teleport cannot be triggered again until killing another enemy with Telefragger.
         NewMastery<MasteryOfTelefragger>(MASTERY_TELEFRAGGER, Telefragger.ItemName);
+        // Reload time is halved, and tranquilized enemies with guns are guaranteed to drop their guns and some ammo.
+        NewMastery<MasteryOfTranquilizer>(MASTERY_TRANQUILIZER, Tranquilizer.ItemName)
+            .MultReload(0.5f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -400,6 +403,8 @@ public static class CwaffSynergies
         { e.statModifiers.Add(StatType.ProjectileSpeed.Mult(a)); return e; }
     public static AdvancedSynergyEntry MultDamage(this AdvancedSynergyEntry e, float a)
         { e.statModifiers.Add(StatType.Damage.Mult(a)); return e; }
+    public static AdvancedSynergyEntry MultReload(this AdvancedSynergyEntry e, float a)
+        { e.statModifiers.Add(StatType.ReloadSpeed.Mult(a)); return e; }
 
 }
 
@@ -451,6 +456,7 @@ internal class MasteryOfBlamethrower         : MasteryDummyItem {}
 internal class MasteryOfZag                  : MasteryDummyItem {}
 internal class MasteryOfOutbreak             : MasteryDummyItem {}
 internal class MasteryOfTelefragger          : MasteryDummyItem {}
+internal class MasteryOfTranquilizer         : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -537,4 +543,5 @@ public enum Synergy {
     MASTERY_ZAG,
     MASTERY_OUTBREAK,
     MASTERY_TELEFRAGGER,
+    MASTERY_TRANQUILIZER,
 };

@@ -121,9 +121,10 @@ public class TranquilizerBehavior : MonoBehaviour
 
             if (shooter.CurrentGun is Gun gun)
             {
-                if (UnityEngine.Random.value <= _DROP_AMMO_CHANCE)
+                bool mastered = Lazy.AnyoneHasSynergy(Synergy.MASTERY_TRANQUILIZER);
+                if (mastered || UnityEngine.Random.value <= _DROP_AMMO_CHANCE)
                     LootEngine.SpawnItem(ScavengingArms._SmallAmmoPickup, this._enemy.Position, Vector2.zero, 0f, false);
-                if (UnityEngine.Random.value <= _DROP_GUN_CHANCE)
+                if (mastered || UnityEngine.Random.value <= _DROP_GUN_CHANCE)
                 {
                     shooter.ToggleHandRenderers(false, "tranquilized");
                     if (shooter.m_cachedBraveBulletSource != null)

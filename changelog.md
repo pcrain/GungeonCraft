@@ -2,13 +2,12 @@
 
 ## 1.21.1 (TBD)
 
-- Added masteries for Ki Blast, Hallaeribut, Gunflower, Omnidirectional Laser, Blamethrower, Zag, Outbreak, and Telefragger
+- Added masteries for Ki Blast, Hallaeribut, Gunflower, Omnidirectional Laser, Blamethrower, Zag, Outbreak, Telefragger, and Tranquilizer
 - Ki Blast projectiles now behave like charge projectiles, firing when the fire button is released (for compatibility with mastery)
 - Blamethrower projectile damage increased from 2 to 4
 - Blamethrower ammo increased from 300 to 800
 - Optimize sprite trail creation code to reduce lag when lots of projectile trails are on the screen
 - Optimize Zag projectile movement code to reduce lag when lots of Zag projectiles are on the screen
-
 - Fixed debug log spam when reflecting projectiles using Ki Blast
 - Fixed (hopefully) null deref in Ki Blast's update logic
 - Fixed potential bug where Utility Vest can destroy the player's currently active gun in an unsafe way
