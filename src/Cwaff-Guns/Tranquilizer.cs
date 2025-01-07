@@ -4,7 +4,7 @@ public class Tranquilizer : CwaffGun
 {
     public static string ItemName         = "Tranquilizer";
     public static string ShortDescription = "Zzzzzz";
-    public static string LongDescription  = "Fires darts that permastun enemies after a few seconds, scaling logarithmically with their current health. Each subsequent dart decreases an enemy's tranquilization timer by 3 seconds. Any enemy tranquilized while holding a gun has a 10% chance to drop their held gun and a 25% to drop a small amount of ammo.";
+    public static string LongDescription  = "Fires darts that permastun enemies after a few seconds, scaling logarithmically with their current health. Each subsequent dart decreases an enemy's tranquilization timer by 3 seconds. Any enemy tranquilized while holding a gun has a 10% chance to drop their held gun and a 25% chance to drop a small amount of ammo.";
     public static string Lore             = "Most commonly used for sedating loudly-opinionated supermarket shoppers and other similarly aggressive wild animals, the tranquilizer gun is the pinnacle of non-lethal firearm technology. What it lacks in visual spectacle or firepower it more than makes up for with raw practicality, able to completely pacify all but the mightiest of the Gungeon's denizens with a single shot and a few seconds of your time. As long as you have a plan in place for not getting shot for those few precious seconds, it's hard to beat in terms of ammo-efficiency for dispatching the Gundead.";
 
     internal static GameObject _DrowsyVFX      = null;

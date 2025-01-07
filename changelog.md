@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.21.2 (TBD)
+- Fix a typo in Tranquilizer's description
+- Correct a few inaccuracies in some hat names
+
 ## 1.21.1 (2024-11-22)
 
 - Added masteries for Ki Blast, Hallaeribut, Gunflower, Omnidirectional Laser, Blamethrower, Zag, Outbreak, Telefragger, Tranquilizer, and Aimu Hakurei
