@@ -214,17 +214,18 @@ public class Femtobyte : CwaffGun
 
     private bool DigitizeChest(Chest chest, PrefabData data)
     {
+        if (data == null || data.prefab == null)
+            return false; // don't digitize modded chests, or bad things happen
         if (chest.IsOpen || chest.IsBroken || chest.IsMimic)
             return false;
-        if (data.prefab != null)
-            SetCurrentSlot(new(){
-                type      = CHEST,
-                data      = data,
-                locked    = chest.IsLocked && !this.PlayerOwner.HasSynergy(Synergy.KEYGEN),
-                glitched  = chest.IsGlitched,
-                rainbow   = chest.IsRainbowChest,
-                contents  = chest.contents != null ? chest.contents.Select(p => p ? p.PickupObjectId : -1).ToList() : null,
-            });
+        SetCurrentSlot(new(){
+            type      = CHEST,
+            data      = data,
+            locked    = chest.IsLocked && !this.PlayerOwner.HasSynergy(Synergy.KEYGEN),
+            glitched  = chest.IsGlitched,
+            rainbow   = chest.IsRainbowChest,
+            contents  = chest.contents != null ? chest.contents.Select(p => p ? p.PickupObjectId : -1).ToList() : null,
+        });
         CwaffShaders.Digitize(chest.sprite);
         if (chest.GetAbsoluteParentRoom() is RoomHandler room)
             room.DeregisterInteractable(chest);

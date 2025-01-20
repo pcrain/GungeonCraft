@@ -2,9 +2,10 @@
 
 ## 1.21.2 (TBD)
 
-- Fix a typo in Tranquilizer's description
-- Correct a few inaccuracies in some hat names
-- Potentially fix issue with Widowmaker turrets exploding shortly after deploying when playing at a high refresh rate
+- Fixed a typo in Tranquilizer's description
+- Corrected a few inaccuracies in some hat names
+- Potentially fixed issue with Widowmaker turrets exploding shortly after deploying when playing at a high refresh rate
+- Fixed null deref caused by trying to digitize modded chests with Femtobyte
 
 ## 1.21.1 (2024-11-22)
 
