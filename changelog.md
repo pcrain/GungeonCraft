@@ -7,6 +7,7 @@
 - Potentially fixed issue with Widowmaker turrets exploding shortly after deploying when playing at a high refresh rate
 - Fixed null deref caused by trying to digitize modded chests with Femtobyte
 - Fixed null deref caused by Alex trying to spawn poison goop without a valid goop manager
+- Fixed oil leak from Derail Gun mastery not working upon entering a new floor
 
 ## 1.21.1 (2024-11-22)
 

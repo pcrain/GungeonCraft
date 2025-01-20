@@ -49,8 +49,6 @@ public class DerailGun : CwaffGun
         player.OnReceivedDamage += this.OnReceivedDamage;
         gun.SetAnimationFPS(gun.idleAnimation, 11); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.Play();
-        if (!_OilGooper)
-            _OilGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.GreenOilGoop);
     }
 
     private void OnMightTakeDamage(HealthHaver haver, HealthHaver.ModifyDamageEventArgs args)
@@ -100,14 +98,18 @@ public class DerailGun : CwaffGun
             return;
         if (!this.gun.IsReloading && this.gun.ClipShotsRemaining < Mathf.Min(this.gun.ClipCapacity, this.gun.CurrentAmmo))
             this.gun.Reload(); // force reload immediately after firing to prevent single frame of idle animation looking funny
-        if (_OilGooper && this.PlayerOwner.HasSynergy(Synergy.MASTERY_DERAIL_GUN))
+        if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_DERAIL_GUN))
+        {
+            if (!_OilGooper)
+                _OilGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.GreenOilGoop);
             _OilGooper.AddGoopCircle(this.PlayerOwner.SpriteBottomCenter.XY() - this.PlayerOwner.m_currentGunAngle.ToVector(1f), 0.75f);
+        }
     }
 
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        if (_OilGooper && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_DERAIL_GUN))
+        if (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_DERAIL_GUN))
             projectile.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.GreenOilGoop;
     }
 
