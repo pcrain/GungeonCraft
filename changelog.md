@@ -1,23 +1,33 @@
 # Changelog
 
 ## 1.21.2 (TBD)
+
 - Fix a typo in Tranquilizer's description
 - Correct a few inaccuracies in some hat names
+- Potentially fix issue with Widowmaker turrets exploding shortly after deploying when playing at a high refresh rate
 
 ## 1.21.1 (2024-11-22)
 
+#### Features:
+
 - Added masteries for Ki Blast, Hallaeribut, Gunflower, Omnidirectional Laser, Blamethrower, Zag, Outbreak, Telefragger, Tranquilizer, and Aimu Hakurei
+
+#### Balance Changes and Polish:
+
 - Ki Blast projectiles now behave like charge projectiles, firing when the fire button is released (for compatibility with mastery)
 - Blamethrower projectile damage increased from 2 to 4
 - Blamethrower ammo increased from 300 to 800
-- Optimize sprite trail creation code to reduce lag when lots of projectile trails are on the screen
-- Optimize Zag projectile movement code to reduce lag when lots of Zag projectiles are on the screen
-- Fixed debug log spam when reflecting projectiles using Ki Blast
-- Fixed (hopefully) null deref in Ki Blast's update logic
-- Fixed potential bug where Utility Vest can destroy the player's currently active gun in an unsafe way
-- Fixed null deref caused by Grandmaster's chess pieces trying to move destroyed projectiles
 - Enemies tranquilized by Tranquilizer now only have a 10% chance to drop their held gun (rather than 100%)
 - Revamped Aimu Hakurei's graze detection to be more accurate and framerate independent (was easier to build graze at higher FPS before)
+
+#### Bugfixes and Misc:
+
+- Fixed null deref caused by Grandmaster's chess pieces trying to move destroyed projectiles
+- Fixed (hopefully) null deref in Ki Blast's update logic
+- Fixed potential bug where Utility Vest can destroy the player's currently active gun in an unsafe way
+- Fixed debug log spam when reflecting projectiles using Ki Blast
+- Optimized sprite trail creation code to reduce lag when lots of projectile trails are on the screen
+- Optimized Zag projectile movement code to reduce lag when lots of Zag projectiles are on the screen
 
 ## 1.21.0 (2024-11-04)
 

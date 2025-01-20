@@ -149,8 +149,12 @@ public class Crawlyboi : MonoBehaviour
             }
         }
         else
+        {
             this._stuckTime = 0f;
-        this._lastPosition = base.transform.position;
+            // NOTE: needs to be inside else due to Unity's approximate equality check for vectors causing issues:
+            // see: https://youtu.be/Ydg2ApPouOg?t=206
+            this._lastPosition = base.transform.position;
+        }
 
         if ((this._expireTimer += BraveTime.DeltaTime) >= _EXPIRE_TIMER)
         {
