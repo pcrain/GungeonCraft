@@ -14,6 +14,9 @@
 - Fixed null deref caused by trying to digitize modded chests with Femtobyte
 - Fixed null deref caused by Alex trying to spawn poison goop without a valid goop manager
 - Fixed oil leak from Derail Gun mastery not working upon entering a new floor
+- Updated required MtG version to 1.9.2
+- Updated required Alexandria version to 0.4.19
+- Updated required Gunfig version to 1.1.5
 
 ## 1.21.1 (2024-11-22)
 
