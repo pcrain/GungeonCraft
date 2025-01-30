@@ -14,7 +14,7 @@
 	+ 43 new passive items
 	+ 21 new active items
 - Lore for all new guns and items
-- 87 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
+- 90 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
 - Companion Shop: sells 3 random unlocked companions at a 30% discount
 - Bartering Shop: trades 3 random D-A tier items for any higher-tiered item
 - Insurance Shop: sells insurance policies that let you carry items over to the next run

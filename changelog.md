@@ -1,6 +1,12 @@
 # Changelog
 
-## 1.21.2 (TBD)
+## 1.21.2 (2025-01-30)
+
+#### Features:
+
+- Added 3 hats! (sprites thanks to Dallan)
+
+#### Bugfixes and Misc:
 
 - Fixed a typo in Tranquilizer's description
 - Corrected a few inaccuracies in some hat names
