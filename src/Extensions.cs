@@ -339,7 +339,7 @@ public static class Extensions
     if (!e)
       return false;
     HealthHaver h = e.healthHaver;
-    return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
+    return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && (canBeDead || h.IsAlive) && !h.isPlayerCharacter;
   }
 
   /// <summary>Check if an enemy is hostile and a non-boss</summary>
@@ -348,7 +348,7 @@ public static class Extensions
     if (!e)
       return false;
     HealthHaver h = e.healthHaver;
-    return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || (h.IsAlive && !h.IsDead)) && !h.isPlayerCharacter;
+    return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || h.IsAlive) && !h.isPlayerCharacter;
   }
 
   /// <summary>Check if an enemy is a boss</summary>
@@ -357,7 +357,7 @@ public static class Extensions
     if (!e)
       return false;
     HealthHaver h = e.healthHaver;
-    return e && !e.IsGone && e.IsWorthShootingAt && h && (h.IsBoss || h.IsSubboss) && (canBeDead || (h.IsAlive && !h.IsDead));
+    return e && !e.IsGone && e.IsWorthShootingAt && h && (h.IsBoss || h.IsSubboss) && (canBeDead || h.IsAlive);
   }
 
   /// <summary>Set the Alpha of a GameObject's sprite</summary>

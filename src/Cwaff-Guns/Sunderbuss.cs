@@ -168,7 +168,7 @@ public class SunderbussProjectile : Projectile
     // Element 7: total pixels counted
     private static readonly Dictionary<string, float[]> _HueLookupDict = new();
 
-    private static void ShatterViolentlyIntoAMillionPieces(AIActor enemy)
+    internal static void ShatterViolentlyIntoAMillionPieces(AIActor enemy)
     {
         string guid = enemy.EnemyGuid;
         if (!_HueLookupDict.TryGetValue(guid, out float[] hues))
