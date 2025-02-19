@@ -14,6 +14,7 @@ public class Stereoscope : CwaffGun
 
     internal static GameObject _ResonancePrefab          = null;
     private static Dictionary<string, int> _FrequencyMap = new();
+    private static List<uint> _EventIds = new();
 
     private int _frequency    = 0;
     private int _lastSoundPos = 0;
@@ -32,6 +33,13 @@ public class Stereoscope : CwaffGun
         gun.reloadAnimation = gun.idleAnimation; // animation shouldn't automatically change when reloading
 
         _ResonancePrefab = VFX.Create("resonance_vfx");
+
+        _EventIds.Add(AkSoundEngine.GetIDFromString("stereoscope_charge_sound_0"));
+        for (int i = 1; i <= 6; ++i)
+        {
+            _EventIds.Add(AkSoundEngine.GetIDFromString($"stereoscope_charge_sound_{i}_up"));
+            _EventIds.Add(AkSoundEngine.GetIDFromString($"stereoscope_charge_sound_{i}_down"));
+        }
     }
 
     private void Resonate(Vector2 pos)
@@ -68,6 +76,22 @@ public class Stereoscope : CwaffGun
         gun.spriteAnimator.StopAndResetFrameToDefault();
     }
 
+    private static uint[] _PlayingIds = new uint[16];
+
+    private bool IsGunResonating()
+    {
+        uint count = 16;
+        AKRESULT result = AkSoundEngine.GetPlayingIDsFromGameObject(this.gun.gameObject, ref count, _PlayingIds);
+        for (int i = 0; i < count; i++)
+            if (_PlayingIds[i] == this._soundId)
+            {
+                AKRESULT status = AkSoundEngine.GetSourcePlayPosition(this._soundId, out int pos);
+                this._lastSoundPos = (status == AKRESULT.AK_Success) ? pos : 0;
+                return true;
+            }
+        return false;
+    }
+
     public override void Update()
     {
         base.Update();
@@ -76,10 +100,11 @@ public class Stereoscope : CwaffGun
         if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
             return;
 
+        float now = BraveTime.ScaledTimeSinceStartup;
         this._frequency = Mathf.FloorToInt(this.PlayerOwner.m_currentGunAngle.Clamp360() / 30f) - 6;
-        bool soundIsPlaying = AkSoundEngine.GetSourcePlayPosition(this._soundId, out int pos) == AKRESULT.AK_Success;
+        bool soundIsPlaying = IsGunResonating();
         bool playedSoundThisFrame = false;
-        if (!soundIsPlaying || pos < this._lastSoundPos)
+        if (!soundIsPlaying && (now > this._lastVfx + _VFX_RATE))
         {
             string sound_name = "stereoscope_charge_sound_0";
             if (this._frequency > 0)
@@ -90,10 +115,7 @@ public class Stereoscope : CwaffGun
             playedSoundThisFrame = true;
             this._lastSoundPos = 0;
         }
-        if (soundIsPlaying)
-            this._lastSoundPos = pos;
 
-        float now = BraveTime.ScaledTimeSinceStartup;
         bool doVfx = false;
         if (playedSoundThisFrame && now > this._lastVfx + _VFX_RATE)
         {
