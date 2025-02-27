@@ -46,6 +46,7 @@
     <Reference Include="System"/>
     <Compile Include="src\Cwaff-Passives\VolcanicAmmolet.cs"/>
     <Compile Include="src\Cwaff-Passives\Calculator.cs"/>
+    <Compile Include="src\Cwaff-Passives\ScaldingJelly.cs"/>
     <Compile Include="src\Cwaff-Passives\StuntHelmet.cs"/>
     <Compile Include="src\Cwaff-Passives\CustodiansBadge.cs"/>
     <Compile Include="src\Cwaff-Passives\Unfinished\Superstitious.cs"/>

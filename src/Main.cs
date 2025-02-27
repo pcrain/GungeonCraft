@@ -359,6 +359,7 @@ public class Initialisation : BaseUnityPlugin
                 AmethystShard.Init();
                 PrismaticScope.Init();
                 Lichguard.Init();
+                ScaldingJelly.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

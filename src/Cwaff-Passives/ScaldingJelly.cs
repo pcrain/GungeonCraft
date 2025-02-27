@@ -1,0 +1,487 @@
+namespace CwaffingTheGungy;
+
+using System;
+using static IgnizolCompanion.IgnizolMovementBehavior.State;
+
+/* TODO:
+    - fix shadows
+    - set stuff on fire
+    - make him throwable
+*/
+
+public class ScaldingJelly : CwaffCompanion
+{
+    public static string ItemName         = "Scalding Jelly";
+    public static string ShortDescription = "TBD";
+    public static string LongDescription  = "TBD";
+    public static string Lore             = "TBD";
+
+    public static string CompanionName    = "Ignizol";
+
+    public static void Init()
+    {
+        PassiveItem item  = Lazy.SetupPassive<ScaldingJelly>(ItemName, ShortDescription, LongDescription, Lore);
+        item.quality      = ItemQuality.D;
+
+        IgnizolCompanion friend = item.InitCompanion<IgnizolCompanion>(friendName: CompanionName.ToID(), baseFps: 20,
+            extraAnims: ["charge", "jump"]);
+
+        BehaviorSpeculator bs = friend.gameObject.GetComponent<BehaviorSpeculator>();
+        bs.MovementBehaviors.Add(new IgnizolCompanion.IgnizolMovementBehavior());
+    }
+}
+
+public class IgnizolCompanion : CwaffCompanionController
+{
+    public class IgnizolMovementBehavior : MovementBehaviorBase
+    {
+        internal enum State {
+            IDLE,   // bouncing in place without a care in the world
+            WANDER, // moving towards a new random location
+            CHASE,  // moving towards a specific target's location
+            CHARGE, // charging up an attack for a specific target
+            JUMP,   // jumping at a target
+            CARRY,  // being carried by a player
+            THROW,  // being thrown by a player
+        }
+
+        private const float _WANDER_TIME_MIN = 1.5f;
+        private const float _WANDER_TIME_MAX = 4.0f;
+        private const float _IDLE_TIME_MIN = 1.0f;
+        private const float _IDLE_TIME_MAX = 3.0f;
+        private const float _CHARGE_TIME = 1.0f;
+        private const float _CHASE_RETARGET_TIME = 1.0f;
+        private const float _LAUNCH_HEIGHT = 1f;
+        private const float _LAUNCH_TIME = 0.4f;
+        private const float _LAUNCH_DIST_MIN = 2.0f;
+        private const float _LAUNCH_DIST_MIN_SQR = _LAUNCH_DIST_MIN * _LAUNCH_DIST_MIN;
+        private const float _LAUNCH_DIST_MAX = 5.0f;
+        private const float _LAUNCH_DIST_MAX_SQR = _LAUNCH_DIST_MAX * _LAUNCH_DIST_MAX;
+        private const float _AIM_DEVIANCE = 0.5f;
+
+        public float PathInterval = 0.25f;
+        public float LaunchRadius = 4.5f;
+
+        private int m_sequentialPathFails;
+        private float m_stateTimer;
+        private float m_repathTimer;
+        private CompanionController m_companionController;
+
+        private GameActor _targetActor = null;
+        private Vector2 _targetPos = default;
+        private Vector2 _launchStart = default;
+        private Vector2 _launchTarget = default;
+        private Vector2 _launchVelocity = default;
+        private State _state = WANDER;
+        private Vector2 _lastVel = default;
+        private bool _airborne = false;
+        private float _height = 0.0f;
+        private bool _allowPathing = true;
+
+        private tk2dSprite _jumpSprite = null;
+        private Nametag _debugNameTag = null;
+
+        public override void Start()
+        {
+            base.Start();
+            m_companionController = m_gameObject.GetComponent<CompanionController>();
+            m_aiActor.MovementModifiers += AdjustMovement;
+            m_aiActor.spriteAnimator.OnPlayAnimationCalled += this.EnsureSmoothIdleAnimationTransition;
+
+            this._jumpSprite = new GameObject("ignizol_jump_renderer").AddComponent<tk2dSprite>();
+            this._jumpSprite.transform.parent = m_aiActor.sprite.transform;
+            this._jumpSprite.RegenerateCache();
+            this._jumpSprite.renderer.enabled = false;
+
+            #if DEBUG
+                _debugNameTag = m_aiActor.gameObject.AddComponent<Nametag>();
+                _debugNameTag.Setup();
+            #endif
+        }
+
+        private static bool _RecursivePlay = false;
+        private void EnsureSmoothIdleAnimationTransition(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
+        {
+            if (_RecursivePlay)
+                return;
+
+            tk2dSpriteAnimationClip curClip = animator.CurrentClip;
+            if (curClip == null || !curClip.name.Contains("idle") || !clip.name.Contains("idle"))
+                return;
+
+            _RecursivePlay = true;
+            animator.PlayFromFrame(clip, (m_aiActor.spriteAnimator.CurrentFrame + 1) % curClip.frames.Length);
+            _RecursivePlay = false;
+        }
+
+        public override void Destroy()
+        {
+            if (m_aiActor)
+                m_aiActor.MovementModifiers -= AdjustMovement;
+            if (this._jumpSprite)
+                UnityEngine.Object.Destroy(this._jumpSprite);
+            base.Destroy();
+        }
+
+        public override void Upkeep()
+        {
+            base.Upkeep();
+            DecrementTimer(ref m_repathTimer);
+
+            #if DEBUG
+                _debugNameTag.SetName($"{this._state.ToString()}\n can path: {this._allowPathing}\nstate timer: {m_stateTimer}");
+                _debugNameTag.UpdateWhileParentAlive();
+            #endif
+        }
+
+        private void OnTileCollision(CollisionData tileCollision)
+        {
+            if (tileCollision.CollidedX)
+                this._lastVel = this._lastVel.WithX(0);
+            if (tileCollision.CollidedY)
+                this._lastVel = this._lastVel.WithY(0);
+        }
+
+        private AIActor FindTargetableEnemy()
+        {
+            PlayerController owner = m_companionController.m_owner;
+            if (owner.CurrentRoom is not RoomHandler room)
+                return null;
+            if (m_aiActor.CenterPosition.GetAbsoluteRoom() != room)
+                return null;
+
+            Vector2 myPos = m_aiActor.specRigidbody.UnitCenter;
+            AIActor nearest = null;
+            float nearestDist = 999f;
+
+            foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
+            {
+                if (!enemy || !enemy.isActiveAndEnabled || !enemy.IsWorthShootingAt)
+                    continue;
+                if (enemy.healthHaver is not HealthHaver hh || hh.IsDead)
+                    continue;
+
+                float sqrDist = (enemy.CenterPosition - myPos).sqrMagnitude;
+                if (sqrDist > nearestDist)
+                    continue;
+
+                nearest = enemy;
+                nearestDist = sqrDist;
+            }
+            return nearest;
+        }
+
+        private void DetermineNewTarget()
+        {
+            PlayerController owner = m_companionController.m_owner;
+
+            this._allowPathing = true;
+
+            if (!base.m_aiAnimator.IsPlaying("idle"))
+                base.m_aiAnimator.PlayUntilCancelled("idle");
+            if (owner.IsInCombat && FindTargetableEnemy() is AIActor target)
+            {
+                this._targetActor = target;
+                this._state = CHASE;
+                this.m_stateTimer = _CHASE_RETARGET_TIME;
+                return;
+            }
+
+            this._targetActor = null;
+            RoomHandler targetRoom;
+            if (owner && owner.healthHaver && owner.healthHaver.IsAlive && owner.CurrentRoom is RoomHandler ownerRoom)
+                targetRoom = ownerRoom;
+            else
+                targetRoom = m_aiActor.CenterPosition.GetAbsoluteRoom();
+
+            if (targetRoom == null || this._state == WANDER)
+            {
+                this._targetPos = this.m_aiActor.CenterPosition;
+                this._state = IDLE;
+                this._allowPathing = false;
+                BecomeIdle();
+                this.m_stateTimer = UnityEngine.Random.Range(_IDLE_TIME_MIN, _IDLE_TIME_MAX);
+                return;
+            }
+
+            this._targetPos = targetRoom.GetRandomVisibleClearSpot(2, 2).ToVector2();
+            this._state = WANDER;
+            this.m_stateTimer = UnityEngine.Random.Range(_WANDER_TIME_MIN, _WANDER_TIME_MAX);
+        }
+
+        private bool IsTargetValid()
+        {
+            if (this._state == CHASE)
+                return this.m_stateTimer > 0f && this._targetActor && this._targetActor.healthHaver && this._targetActor.healthHaver.IsAlive;
+            return true;
+        }
+
+        private void UpdateStateAndTargetPosition()
+        {
+            if (!IsTargetValid())
+                DetermineNewTarget();
+            if (this._state == CHASE && this._targetActor)
+                this._targetPos = this._targetActor.CenterPosition;
+        }
+
+        private bool ReachedTarget()
+        {
+            // if (m_aiActor.spriteAnimator.CurrentFrame > 0)
+            //     return false;
+
+            switch(this._state)
+            {
+                case CHASE:
+                    return (Vector2.Distance(this._targetPos, m_aiActor.CenterPosition) <= LaunchRadius) && m_aiActor.CenterPosition.InBounds();
+                case IDLE:
+                case WANDER:
+                case CHARGE:
+                    return this.m_stateTimer <= 0f;
+                case CARRY:
+                    return false; //TODO: add a real check for this
+                case JUMP:
+                case THROW:
+                    return !this._airborne;
+            }
+            return false;
+        }
+
+        private void OnReachedTarget()
+        {
+            switch(this._state)
+            {
+                case IDLE:
+                case WANDER:
+                    DetermineNewTarget();
+                    return;
+                case CHASE:
+                    // ETGModConsole.Log($"transitioning to charge state");
+                    this._state = CHARGE;
+                    this.m_stateTimer = _CHARGE_TIME;
+                    base.m_aiAnimator.PlayUntilCancelled("charge");
+                    // base.m_aiAnimator.EndAnimationIf("charge");
+                    this._launchTarget = this._targetPos + Lazy.RandomVector(_AIM_DEVIANCE);
+                    this._targetPos = this.m_aiActor.CenterPosition;
+                    return;
+                case CHARGE:
+                    // ETGModConsole.Log($"transitioning to jump state");
+                    this._state = JUMP;
+                    LaunchTowardsTarget(this._launchTarget, wasThrown: false);
+                    return;
+                case JUMP:
+                case THROW:
+                    // ETGModConsole.Log($"transitioning to idle / wander state");
+                    this._allowPathing = false;
+                    BecomeIdle();
+                    this._targetActor = null;
+                    this._state = IDLE;
+                    this.m_stateTimer = _IDLE_TIME_MAX;
+                    this._targetPos = this.m_aiActor.CenterPosition;
+                    if (!base.m_aiAnimator.IsPlaying("idle"))
+                        base.m_aiAnimator.PlayUntilCancelled("idle");
+                    return;
+                case CARRY:
+                    return;
+            }
+        }
+
+        private void LaunchTowardsTarget(Vector2 targetPos, bool wasThrown)
+        {
+            base.m_aiAnimator.PlayUntilCancelled("jump");
+            //TODO: clamp maximum jump distance
+            this._launchStart = this.m_aiActor.CenterPosition;
+            this._launchTarget = targetPos;
+            Vector2 delta = this._launchTarget - this._launchStart;
+            float sqrMag = delta.sqrMagnitude;
+            if (sqrMag > _LAUNCH_DIST_MAX_SQR)
+            {
+                delta = _LAUNCH_DIST_MAX * delta.normalized;
+                this._launchTarget = this._launchStart + delta;
+            }
+            else if (sqrMag < _LAUNCH_DIST_MIN_SQR)
+            {
+                delta = _LAUNCH_DIST_MIN * delta.normalized;
+                this._launchTarget = this._launchStart + delta;
+            }
+            this._launchVelocity = delta / _LAUNCH_TIME;
+            this._airborne = true;
+            this._allowPathing = false;
+        }
+
+        private void BecomeIdle()
+        {
+            m_aiActor.ClearPath();
+        }
+
+        private bool CorrectForInaccessibleCell()
+        {
+            IntVector2 pos = m_aiActor.specRigidbody.UnitCenter.ToIntVector2(VectorConversions.Floor);
+            CellData currentCell = GameManager.Instance.Dungeon.data[pos];
+            if (currentCell == null || !currentCell.IsPlayerInaccessible)
+                return false;
+
+            if (m_repathTimer > 0f)
+                return true;
+
+            m_repathTimer = PathInterval;
+            RoomHandler currentRoom = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(pos);
+            if (currentRoom == null)
+                return true;
+
+            IntVector2? nearestAvailableCell = currentRoom.GetNearestAvailableCell(
+                pos.ToCenterVector2(), m_aiActor.Clearance, m_aiActor.PathableTiles, false,
+                (IntVector2 pos) => !GameManager.Instance.Dungeon.data[pos].IsPlayerInaccessible);
+            if (nearestAvailableCell.HasValue)
+                m_aiActor.PathfindToPosition(nearestAvailableCell.Value.ToCenterVector2());
+            return true;
+        }
+
+        private void RepathToTarget()
+        {
+            // adjust relative to the center of our sprite
+            Vector2 bottomLeft = m_aiActor.transform.position.XY();
+            Vector2 center = m_aiActor.sprite.WorldCenter;
+            Vector2 adjustedTarget = this._targetPos + (bottomLeft - center);
+
+            if (m_repathTimer > 0f)
+                return;
+
+            m_repathTimer = PathInterval;
+            m_aiActor.PathfindToPosition(adjustedTarget);
+
+            if (m_aiActor.Path == null)
+            {
+                m_sequentialPathFails = 0;
+                return;
+            }
+
+            if (m_aiActor.Path.InaccurateLength > 50f)
+            {
+                m_aiActor.ClearPath();
+                m_sequentialPathFails = 0;
+                m_aiActor.CompanionWarp(adjustedTarget);
+                DetermineNewTarget();
+            }
+            else if (!m_aiActor.Path.WillReachFinalGoal && (++m_sequentialPathFails) > 3)
+            {
+                CellData cellData2 = GameManager.Instance.Dungeon.data[adjustedTarget.ToIntVector2(VectorConversions.Floor)];
+                if (cellData2 != null && cellData2.IsPassable)
+                {
+                    m_sequentialPathFails = 0;
+                    m_aiActor.CompanionWarp(adjustedTarget);
+                    DetermineNewTarget();
+                }
+            }
+            else
+                m_sequentialPathFails = 0;
+        }
+
+        private Vector2 DeltaToTarget()
+        {
+            // adjust relative to the center of our sprite
+            Vector2 bottomLeft = m_aiActor.transform.position.XY();
+            Vector2 adjustedTarget = this._targetPos - m_aiActor.sprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter);
+            return adjustedTarget - bottomLeft;
+        }
+
+        private void UpdateMovementSpeed()
+        {
+            const float BURST_SPEED = 3.5f;
+
+            float newSpeed = BURST_SPEED;
+            tk2dSpriteAnimationClip clip = m_aiActor.spriteAnimator.currentClip;
+            if (clip.name.Contains("idle"))
+            {
+                int frame = m_aiActor.spriteAnimator.CurrentFrame;
+                newSpeed = (frame >= 3 && frame <= 6) ? BURST_SPEED : 0f;  // only move during airborne frames of animation
+            }
+            m_aiActor.MovementSpeed = newSpeed;
+        }
+
+        private void ToggleRendererAndOutlines(tk2dBaseSprite sprite, bool enabled)
+        {
+            if (sprite.renderer.enabled == enabled)
+                return;
+            sprite.renderer.enabled = enabled;
+            if (enabled)
+                SpriteOutlineManager.AddOutlineToSprite(sprite, Color.black, 0.2f, 0.05f);
+            else
+                SpriteOutlineManager.RemoveOutlineFromSprite(sprite);
+        }
+
+        private void AdjustMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
+        {
+            Vector2 curPos = m_aiActor.specRigidbody.UnitCenter;
+
+            if (this._state == CHARGE)
+            {
+                voluntaryVel = Vector2.zero;
+                involuntaryVel = Vector2.zero;
+                m_aiActor.aiAnimator.FacingDirection = (this._launchTarget - curPos).ToAngle();
+                return;
+            }
+
+            if (this._state != JUMP && this._state != THROW)
+            {
+                involuntaryVel = Vector2.zero;
+                UpdateMovementSpeed();
+                this._lastVel = voluntaryVel;
+                return;
+            }
+
+            voluntaryVel = Vector2.zero;
+            involuntaryVel = this._launchVelocity;
+            float percentDone = curPos.LazyInverseLerp(this._launchStart, this._launchTarget);
+            // ETGModConsole.Log($"  percent done: {percentDone}");
+            if (percentDone < 1f)
+            {
+                ToggleRendererAndOutlines(this._jumpSprite, true); //BUG: doesn't work first time
+                this._jumpSprite.SetSprite(this.m_aiActor.sprite.collection, this.m_aiActor.sprite.spriteId);
+                this._jumpSprite.transform.localPosition = new Vector3(0, _LAUNCH_HEIGHT * Mathf.Sin(Mathf.PI * percentDone), 0);
+                ToggleRendererAndOutlines(this.m_aiActor.sprite, false);
+                return;
+            }
+
+            involuntaryVel = Vector2.zero;
+            this._airborne = false; // triggers the next state
+            this._height = 0f;
+            ToggleRendererAndOutlines(this._jumpSprite, false);
+            ToggleRendererAndOutlines(this.m_aiActor.sprite, true);
+        }
+
+        private bool InDifferentRoom()
+        {
+            Vector2 pos = m_aiActor.CenterPosition;
+            if (m_companionController.m_owner is PlayerController pc && pc.CurrentRoom is RoomHandler ownerRoom)
+                return ownerRoom != pos.GetAbsoluteRoom();
+            return !GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.4f);
+        }
+
+        public override BehaviorResult Update()
+        {
+            if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel || !m_companionController || !m_aiActor.CompanionOwner)
+                return BehaviorResult.SkipAllRemainingBehaviors;
+
+            if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.END_TIMES)
+            {
+                m_aiActor.ClearPath();
+                return BehaviorResult.SkipAllRemainingBehaviors;
+            }
+
+            DecrementTimer(ref m_stateTimer);
+
+            UpdateStateAndTargetPosition();
+            if (InDifferentRoom())
+            {
+                m_aiActor.CompanionWarp(m_companionController.m_owner.CenterPosition);
+                DetermineNewTarget();
+            }
+            else if (ReachedTarget())
+                OnReachedTarget();
+            else if (this._allowPathing)
+                RepathToTarget();
+
+            return BehaviorResult.SkipRemainingClassBehaviors;
+        }
+    }
+}

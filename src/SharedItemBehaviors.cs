@@ -1314,7 +1314,7 @@ public class Nametag : MonoBehaviour
         RectTransform rectTransform;
         rectTransform = this._nametag.GetComponent<RectTransform>();
         rectTransform.localPosition = new Vector3(0, 0, 0);
-        rectTransform.sizeDelta = new Vector2(500, 100); // make this big enough to fit a pretty big name
+        rectTransform.sizeDelta = new Vector2(500, 300); // make this big enough to fit a pretty big name
 
         this._actor.healthHaver.OnPreDeath += HandleEnemyDied;
 

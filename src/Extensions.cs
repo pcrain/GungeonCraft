@@ -3072,5 +3072,11 @@ public static class Extensions
   {
     return proj.Direction == Vector2.zero || proj.Direction.ToAngle().IsNearAngle((player.CenterPosition - proj.SafeCenter).ToAngle(), 90f);
   }
+
+  /// <summary>Get the percent of the way a given vector c is between two endpoints a and b (assumes all 3 points are roughly colinear)</summary>
+  public static float LazyInverseLerp(this Vector2 c, Vector2 a, Vector2 b)
+  {
+    return Mathf.Sqrt((c-a).sqrMagnitude / (b-a).sqrMagnitude);
+  }
 }
 
