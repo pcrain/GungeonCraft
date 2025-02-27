@@ -174,9 +174,9 @@ public class AllayCompanion : CwaffCompanionController
             DropItem();
             DropEnemy(droppedEarly: true);
             if (m_aiActor)
-                m_aiActor.MovementModifiers += AdjustMovement;
+                m_aiActor.MovementModifiers -= AdjustMovement;
             if (m_companionController && m_companionController.m_owner)
-                m_companionController.m_owner.OnRoomClearEvent += PossiblyFindCopyOfHeldItem;
+                m_companionController.m_owner.OnRoomClearEvent -= PossiblyFindCopyOfHeldItem;
             #if DEBUG
                 Commands._OnDebugKeyPressed -= ShowState;
             #endif
