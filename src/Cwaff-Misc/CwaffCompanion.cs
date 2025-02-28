@@ -22,7 +22,8 @@ public static class CwaffCompanionBuilder
         Friend friend = CompanionBuilder.BuildPrefab(name, $"{C.MOD_PREFIX}:{name}_companion", $"{name}_idle_001", IntVector2.Zero, IntVector2.One)
           .AddComponent<Friend>();
         friend.SetupAnimations(baseFps: baseFps, extraAnims: extraAnims);
-        friend.aiActor.ActorShadowOffset = new Vector3(friend.aiActor.sprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter).x, 0f, 0f);
+        //NOTE: should use LowerLeft anchor if we have a SpeculativeRigidBody and MiddleCenter otherwise, but we can't know ahead of time
+        friend.aiActor.ActorShadowOffset = new Vector3(friend.aiActor.sprite.GetRelativePositionFromAnchor(Anchor.LowerLeft).x, 0f, 0f);
         friend.companionID = CompanionController.CompanionIdentifier.NONE;
 
         cc.CompanionGuid = friend.aiActor.EnemyGuid;
@@ -53,12 +54,15 @@ public static class CwaffCompanionBuilder
         if (coll.AutoAnimation(ref clips, $"{name}_fidget", fps: baseFps) is DirectionalAnimation fidgetAnim)
             aiAnimator.IdleFidgetAnimations = [fidgetAnim];
         foreach (string anim in extraAnims.EmptyIfNull())
-            aiAnimator.OtherAnimations.Add(new(){name = anim, anim = coll.AutoAnimation(ref clips, $"{name}_{anim}", fps: baseFps)});
+        {
+            bool loop = (anim != "pitfall");
+            aiAnimator.OtherAnimations.Add(new(){name = anim, anim = coll.AutoAnimation(ref clips, $"{name}_{anim}", fps: baseFps, loop: loop)});
+        }
         spriteAnimator.library.clips = clips.ToArray();
     }
 
     /// <summary>Sets up the appropriate directional animation from the available sprites with the given prefix</summary>
-    private static DirectionalAnimation AutoAnimation(this tk2dSpriteCollectionData coll, ref List<tk2dSpriteAnimationClip> clips, string name, int fps)
+    private static DirectionalAnimation AutoAnimation(this tk2dSpriteCollectionData coll, ref List<tk2dSpriteAnimationClip> clips, string name, int fps, bool loop = true)
     {
         DirectionalAnimation.DirectionType dType = AutoDetectDirectionFromSpriteName(name);
         if (dType == None)
@@ -73,7 +77,7 @@ public static class CwaffCompanionBuilder
         for (int i = 0; i < nanims; ++i)
         {
             string aname = string.IsNullOrEmpty(sa[i].suffix) ? name : $"{name}_{sa[i].suffix}";
-            tk2dSpriteAnimationClip clip = coll.AddAnimation(aname, fps: fps);
+            tk2dSpriteAnimationClip clip = coll.AddAnimation(aname, fps: fps, loopStart: loop ? 0 : -1);
             if (clip == null)
             {
                 Lazy.RuntimeWarn($"  FAILED TO ADD CLIP {aname}");
@@ -84,6 +88,7 @@ public static class CwaffCompanionBuilder
             clips.Add(clip);
         }
 
+        ETGModConsole.Log($"found {animNames.Length} frames for {dType.ToString()} animation {name}");
         return new(){
             Type      = dType,
             Prefix    = name,

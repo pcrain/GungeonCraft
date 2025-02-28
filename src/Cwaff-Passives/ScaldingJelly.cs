@@ -2,11 +2,6 @@ namespace CwaffingTheGungy;
 
 using static IgnizolCompanion.IgnizolMovementBehavior.State;
 
-/* TODO:
-    - better throw animations
-    - sounds
-*/
-
 public class ScaldingJelly : CwaffCompanion
 {
     public static string ItemName         = "Scalding Jelly";
@@ -22,9 +17,17 @@ public class ScaldingJelly : CwaffCompanion
         item.quality      = ItemQuality.D;
 
         IgnizolCompanion friend = item.InitCompanion<IgnizolCompanion>(friendName: CompanionName.ToID(), baseFps: 20,
-            extraAnims: ["charge", "jump"]);
+            extraAnims: ["charge", "jump", "carry", "pitfall"]);
 
-        friend.gameObject.AutoRigidBody(Anchor.LowerCenter, CollisionLayer.EnemyCollider);
+        tk2dSpriteAnimation library = friend.gameObject.GetComponent<tk2dSpriteAnimation>();
+        foreach (string clipName in new List<string>{"ignizol_pitfall_right", "ignizol_pitfall_left"})
+        {
+            tk2dSpriteAnimationClip clip = library.GetClipByName(clipName);
+            clip.fps = 5;
+            clip.frames[0].AddSound("ignizol_fall_sound");
+        }
+
+        friend.gameObject.AutoRigidBody(Anchor.LowerLeft, CollisionLayer.EnemyCollider);
 
         BehaviorSpeculator bs = friend.gameObject.GetComponent<BehaviorSpeculator>();
         bs.MovementBehaviors.Add(new IgnizolCompanion.IgnizolMovementBehavior());
@@ -45,6 +48,13 @@ public class IgnizolCompanion : CwaffCompanionController
             THROW,  // being thrown by a player
         }
 
+        private const string _LAUNCH_REASON = "launched";
+        private const string _CARRY_REASON  = "carried";
+
+        private const float _MOVE_SPEED           = 3.5f;
+        private const float _PATH_INTERVAL        = 0.25f;
+        private const float _LAUNCH_RADIUS        = 4.5f;
+        private const float _COLLSION_DAMAGE      = 10.0f;
         private const float _WANDER_TIME_MIN      = 1.5f;
         private const float _WANDER_TIME_MAX      = 4.0f;
         private const float _IDLE_TIME_MIN        = 1.0f;
@@ -63,12 +73,10 @@ public class IgnizolCompanion : CwaffCompanionController
         private const float _LIGHT_FLICKER_RATE   = 10.0f;
         private const float _LIGHT_BRIGHTNESS_MIN = 10.0f;
         private const float _LIGHT_BRIGHTNESS_DLT = 5.0f;
+        private const float _LAUNCH_RADIUS_SQR    = _LAUNCH_RADIUS * _LAUNCH_RADIUS;
         private const float _LAUNCH_DIST_MIN_SQR  = _LAUNCH_DIST_MIN * _LAUNCH_DIST_MIN;
         private const float _LAUNCH_DIST_MAX_SQR  = _LAUNCH_DIST_MAX * _LAUNCH_DIST_MAX;
         private const float _PICKUP_DIST_SQR      = _PICKUP_DIST * _PICKUP_DIST;
-
-        public float PathInterval = 0.25f;
-        public float LaunchRadius = 4.5f;
 
         private int m_sequentialPathFails;
         private float m_stateTimer;
@@ -80,14 +88,19 @@ public class IgnizolCompanion : CwaffCompanionController
         private Vector2 _launchStart = default;
         private Vector2 _launchTarget = default;
         private Vector2 _launchVelocity = default;
+        private float _launchBeginTime = 0.0f;
         private State _state = WANDER;
         private bool _airborne = false;
         private bool _allowPathing = true;
         private PlayerController _carrier = null;
         private tk2dSprite _jumpSprite = null;
         private EasyLight _light = null;
+        private bool _launchSpriteFlipped = false;
+        private int _lastIdleFrame = -1;
 
+    #if DEBUG
         private Nametag _debugNameTag = null;
+    #endif
 
         public override void Start()
         {
@@ -97,6 +110,7 @@ public class IgnizolCompanion : CwaffCompanionController
             m_aiActor.spriteAnimator.OnPlayAnimationCalled += this.EnsureSmoothIdleAnimationTransition;
             m_aiActor.CustomPitDeathHandling += this.CustomPitDeathHandling;
             m_aiActor.specRigidbody.CollideWithOthers = true; //NOTE: this doesn't work in CwaffCompanion.InitCompanion for some reason...investigate later
+            m_aiActor.PreventFallingInPitsEver = false; //NOTE: neither does this...
             m_aiActor.specRigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
             m_aiActor.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
 
@@ -104,6 +118,7 @@ public class IgnizolCompanion : CwaffCompanionController
             this._jumpSprite.transform.parent = m_aiActor.sprite.transform;
             this._jumpSprite.SetSprite(m_aiActor.sprite.collection, m_aiActor.sprite.spriteId);
             this._jumpSprite.renderer.enabled = false;
+            // ResetShadow();
 
             this._light = EasyLight.Create(parent: m_aiActor.transform, color: ExtendedColours.vibrantOrange,
                 radius: _LIGHT_RADIUS_MIN, brightness: _LIGHT_BRIGHTNESS_MIN);
@@ -125,7 +140,8 @@ public class IgnizolCompanion : CwaffCompanionController
             if (otherRigidbody.healthHaver is not HealthHaver hh)
                 return;
             myRigidbody.RegisterTemporaryCollisionException(otherRigidbody, maxTime: 2.0f);
-            hh.ApplyDamage(10f, myRigidbody.Velocity.normalized, "IGNIZOOOOOL", CoreDamageTypes.Fire);
+            hh.ApplyDamage(_COLLSION_DAMAGE, myRigidbody.Velocity.normalized, ScaldingJelly.CompanionName, CoreDamageTypes.Fire);
+            this.m_aiActor.gameObject.Play("ignizol_hit_sound");
         }
 
         private void CustomPitDeathHandling(AIActor actor, ref bool suppressDamage)
@@ -156,7 +172,10 @@ public class IgnizolCompanion : CwaffCompanionController
             this.m_stateTimer = _PICKUP_TIME;
             this._allowPathing = false;
             base.m_aiAnimator.PlayUntilCancelled("carry");
+            this.m_aiActor.gameObject.Play("ignizol_lift_sound");
             base.m_aiActor.specRigidbody.CollideWithTileMap = false;
+            base.m_aiActor.SetIsFlying(true, _CARRY_REASON, adjustShadow: false);
+            this.m_aiActor.ToggleShadowVisiblity(false);
             ClearPaths();
         }
 
@@ -304,37 +323,48 @@ public class IgnizolCompanion : CwaffCompanionController
 
         private bool ReachedTarget()
         {
-            // if (m_aiActor.spriteAnimator.CurrentFrame > 0)
-            //     return false;
-
             switch(this._state)
             {
                 case CHASE:
-                    return (Vector2.Distance(this._targetPos, m_aiActor.CenterPosition) <= LaunchRadius) && m_aiActor.CenterPosition.InBounds();
+                    return ((this._targetPos - m_aiActor.CenterPosition).sqrMagnitude <= _LAUNCH_RADIUS_SQR) && m_aiActor.CenterPosition.HasLineOfSight(this._targetPos);
                 case IDLE:
                 case WANDER:
                 case CHARGE:
                     return this.m_stateTimer <= 0f;
-                case CARRY:
-                    return false;
                 case JUMP:
                 case THROW:
                     return !this._airborne;
+                case CARRY:
+                    return false;
             }
             return false;
         }
 
         private void ResetState()
         {
-            // ETGModConsole.Log($"transitioning to idle / wander state");
             ClearPaths();
             this._allowPathing = false;
+            this._airborne = false;
             this._targetActor = null;
             this._state = IDLE;
             this.m_stateTimer = UnityEngine.Random.Range(_IDLE_TIME_MIN, _IDLE_TIME_MAX);
             this._targetPos = this.m_aiActor.CenterPosition;
+            this.m_aiActor.SetIsFlying(false, _LAUNCH_REASON, adjustShadow: false);
+            this.m_aiActor.SetIsFlying(false, _CARRY_REASON, adjustShadow: false);
+            ResetShadow();
+            DisableSecondaryRenderer();
             if (!base.m_aiAnimator.IsPlaying("idle"))
                 base.m_aiAnimator.PlayUntilCancelled("idle");
+        }
+
+        private void ResetShadow()
+        {
+            this.m_aiActor.ToggleShadowVisiblity(true);
+            GameObject shadowObject = this.m_aiActor.ShadowObject;
+            shadowObject.transform.localPosition =
+                (this.m_aiActor.specRigidbody.UnitBottomCenter - this.m_aiActor.transform.position.XY()).ToVector3ZUp(0.1f);
+            shadowObject.transform.position = shadowObject.transform.position.Quantize(0.0625f);
+            shadowObject.transform.localPosition += this.m_aiActor.ActorShadowOffset;
         }
 
         private void OnReachedTarget()
@@ -375,6 +405,7 @@ public class IgnizolCompanion : CwaffCompanionController
         private void LaunchTowardsTarget(Vector2 targetPos, bool wasThrown)
         {
             base.m_aiAnimator.PlayUntilCancelled("jump");
+            this.m_aiActor.gameObject.Play("ignizol_launch_sound");
             this._launchStart = this.m_aiActor.CenterPosition;
             this._launchTarget = targetPos + Lazy.RandomVector(_AIM_DEVIANCE);
             Vector2 delta = this._launchTarget - this._launchStart;
@@ -390,6 +421,9 @@ public class IgnizolCompanion : CwaffCompanionController
                 this._launchTarget = this._launchStart + delta;
             }
             this._launchVelocity = delta / _LAUNCH_TIME;
+            this._launchBeginTime = BraveTime.ScaledTimeSinceStartup;
+            this.m_aiActor.SetIsFlying(true, _LAUNCH_REASON, adjustShadow: false);
+            this.m_aiActor.ToggleShadowVisiblity(false);
             this._airborne = true;
             this._allowPathing = false;
         }
@@ -409,7 +443,7 @@ public class IgnizolCompanion : CwaffCompanionController
             if (m_repathTimer > 0f)
                 return true;
 
-            m_repathTimer = PathInterval;
+            m_repathTimer = _PATH_INTERVAL;
             RoomHandler currentRoom = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(pos);
             if (currentRoom == null)
                 return true;
@@ -432,7 +466,7 @@ public class IgnizolCompanion : CwaffCompanionController
             if (m_repathTimer > 0f)
                 return;
 
-            m_repathTimer = PathInterval;
+            m_repathTimer = _PATH_INTERVAL;
             m_aiActor.PathfindToPosition(adjustedTarget);
 
             if (m_aiActor.Path == null)
@@ -472,14 +506,15 @@ public class IgnizolCompanion : CwaffCompanionController
 
         private void UpdateMovementSpeed()
         {
-            const float BURST_SPEED = 3.5f;
-
-            float newSpeed = BURST_SPEED;
+            float newSpeed = _MOVE_SPEED;
             tk2dSpriteAnimationClip clip = m_aiActor.spriteAnimator.currentClip;
             if (clip.name.Contains("idle"))
             {
                 int frame = m_aiActor.spriteAnimator.CurrentFrame;
-                newSpeed = (frame >= 3 && frame <= 6) ? BURST_SPEED : 0f;  // only move during airborne frames of animation
+                if (this._state != IDLE && frame == 7 && this._lastIdleFrame != 7 && m_aiActor.MovementSpeed > 0)
+                    this.m_aiActor.gameObject.Play("ignizol_hop_sound");
+                this._lastIdleFrame = frame;
+                newSpeed = (frame >= 3 && frame <= 6) ? _MOVE_SPEED : 0f;  // only move during airborne frames of animation
             }
             m_aiActor.MovementSpeed = newSpeed;
         }
@@ -490,9 +525,7 @@ public class IgnizolCompanion : CwaffCompanionController
                 return;
             sprite.renderer.enabled = enabled;
             if (enabled)
-            {
                 SpriteOutlineManager.AddOutlineToSprite(sprite, Color.black, 0.2f, 0.05f);
-            }
             else
                 SpriteOutlineManager.RemoveOutlineFromSprite(sprite);
         }
@@ -502,7 +535,7 @@ public class IgnizolCompanion : CwaffCompanionController
             #if DEBUG
                 if (_debugNameTag)
                 {
-                    _debugNameTag.SetName($"{this._state.ToString()}\n can path: {this._allowPathing}\nstate timer: {m_stateTimer}");
+                    _debugNameTag.SetName($"{this._state.ToString()}\n clip: {base.m_aiAnimator.spriteAnimator.CurrentClip.name}");
                     _debugNameTag.UpdateWhileParentAlive();
                 }
             #endif
@@ -528,10 +561,23 @@ public class IgnizolCompanion : CwaffCompanionController
                 if (this._carrier)
                 {
                     m_aiActor.aiAnimator.FacingDirection = this._carrier.FacingDirection;
-                    Vector2 offset = m_aiActor.sprite.WorldBottomCenter - m_aiActor.transform.position.XY();
-                    Vector3 carryPos = (this._carrier.sprite.WorldTopCenter - offset).Quantize(0.0625f);
+                    // Vector2 offset = m_aiActor.sprite.WorldBottomCenter - m_aiActor.transform.position.XY();
+                    // ETGModConsole.Log($"offset is {offset.x},{offset.y}");
+                    // Vector3 carryPos = (this._carrier.sprite.WorldBottomCenter/* - offset*/ + new Vector2(-0.5f, 1f)).Quantize(0.0625f);
+                    Vector3 carryPos = (this._carrier.sprite.WorldTopCenter/* - offset*/ + new Vector2(-0.5f, 0f)).Quantize(0.0625f);
                     if (this.m_stateTimer <= 0.0f)
+                    {
                         m_aiActor.transform.position = carryPos; // snap to player
+                        bool flipped = this._carrier.sprite.FlipX;
+                        if (UpdateSecondaryRenderer() || this._launchSpriteFlipped != flipped)
+                        {
+                            this._jumpSprite.transform.position = carryPos;
+                            this._jumpSprite.transform.parent = this._carrier.sprite.transform;
+                            this._launchSpriteFlipped = flipped;
+                        }
+                        this._jumpSprite.transform.position = this._jumpSprite.transform.position.WithY(this._carrier.sprite.WorldTopCenter.y);
+                        this._jumpSprite.UpdateZDepth();
+                    }
                     else
                     {
                         Vector3 carryDelta = carryPos - m_aiActor.transform.position;
@@ -553,18 +599,33 @@ public class IgnizolCompanion : CwaffCompanionController
 
             voluntaryVel = Vector2.zero;
             involuntaryVel = this._launchVelocity;
-            float percentDone = curPos.LazyInverseLerp(this._launchStart, this._launchTarget);
+            float percentDone = (BraveTime.ScaledTimeSinceStartup - this._launchBeginTime) / _LAUNCH_TIME;
             if (percentDone < 1f)
             {
-                ToggleRendererAndOutlines(this._jumpSprite, true);
-                this._jumpSprite.SetSprite(this.m_aiActor.sprite.collection, this.m_aiActor.sprite.spriteId);
+                UpdateSecondaryRenderer();
+                this._jumpSprite.transform.parent = m_aiActor.sprite.transform;
                 this._jumpSprite.transform.localPosition = new Vector3(0, _LAUNCH_HEIGHT * Mathf.Sin(Mathf.PI * percentDone), 0);
-                ToggleRendererAndOutlines(this.m_aiActor.sprite, false);
                 return;
             }
 
             involuntaryVel = Vector2.zero;
             this._airborne = false; // triggers the next state
+            this.m_aiActor.SetIsFlying(false, "launched");
+            ResetShadow();
+            DisableSecondaryRenderer();
+        }
+
+        private bool UpdateSecondaryRenderer()
+        {
+            bool enabledThisFrame = !this._jumpSprite.renderer.enabled;
+            ToggleRendererAndOutlines(this._jumpSprite, true);
+            this._jumpSprite.SetSprite(this.m_aiActor.sprite.collection, this.m_aiActor.sprite.spriteId);
+            ToggleRendererAndOutlines(this.m_aiActor.sprite, false);
+            return enabledThisFrame;
+        }
+
+        private void DisableSecondaryRenderer()
+        {
             ToggleRendererAndOutlines(this._jumpSprite, false);
             ToggleRendererAndOutlines(this.m_aiActor.sprite, true);
         }

@@ -266,3 +266,8 @@ stereoscope_charge_sound_3_up,-4.5,1,sound,0
 stereoscope_charge_sound_4_up,-4.5,1,sound,0
 stereoscope_charge_sound_5_up,-4.5,1,sound,0
 stereoscope_charge_sound_6_up,-4.5,1,sound,0
+ignizol_fall_sound,-2.5,1,sound,0
+ignizol_hit_sound,3.0,1,sound,0
+ignizol_hop_sound,-5.0,1,sound,0
+ignizol_launch_sound,-2.0,1,sound,0
+ignizol_lift_sound,-1.0,1,sound,0

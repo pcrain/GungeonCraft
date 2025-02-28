@@ -2051,10 +2051,18 @@ public static class Extensions
         Lazy.DebugWarn("Trying to play animation event on nonexistent animator");
         return;
       }
-      anim.AnimationEventTriggered += action;
+      if (action != null)
+        anim.AnimationEventTriggered += action;
       tk2dSpriteAnimationFrame f = anim.DefaultClip.frames[frame];
         f.triggerEvent = true;
         f.eventAudio   = sound;
+  }
+
+  /// <summary>Add a sound effect to a frame of animation</summary>
+  public static void AddSound(this tk2dSpriteAnimationFrame f, string sound)
+  {
+      f.triggerEvent = true;
+      f.eventAudio   = sound;
   }
 
   /// <summary>Increases a player's curse</summary>
