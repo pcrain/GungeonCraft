@@ -93,9 +93,10 @@ public class Commands
         });
     }
 
-    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
+    [HarmonyPatch]
     private class DebugInputPatch // handle debug input
     {
+        [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
         static bool Prefix(PlayerController __instance)
         {
             if (!C.DEBUG_BUILD)

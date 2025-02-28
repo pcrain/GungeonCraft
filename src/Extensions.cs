@@ -1688,7 +1688,7 @@ public static class Extensions
   /// <summary>Set up a SpeculativeRigidBody for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
   public static SpeculativeRigidbody AutoRigidBody(this GameObject g, Anchor anchor, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false)
   {
-    SpeculativeRigidbody body = g.AddComponent<SpeculativeRigidbody>();
+    SpeculativeRigidbody body = g.GetOrAddComponent<SpeculativeRigidbody>();
 
     tk2dBaseSprite sprite     = g.GetComponent<tk2dBaseSprite>();
     IntVector2 spriteSize     = (C.PIXELS_PER_TILE * sprite.GetBounds().size.XY()).ToIntVector2();

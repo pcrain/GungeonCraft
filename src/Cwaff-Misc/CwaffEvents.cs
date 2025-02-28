@@ -28,6 +28,8 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action<DebrisObject, AIActor> OnCorpseCreated;
     // Runs whenever stats and/or synergies are recalculated
     public static Action<PlayerController> OnStatsRecalculated;
+    // Run whenever a player interacts without a valid interaction target
+    public static Action<PlayerController> OnEmptyInteract;
 
     internal static bool _OnFirstFloor = false;
     internal static bool _RunJustStarted = false;
@@ -219,6 +221,20 @@ public static class CwaffEvents // global custom events we can listen for
             if (OnStatsRecalculated != null)
                 OnStatsRecalculated(owner);
             _CurrentlyRecalculatingStats = false;
+        }
+    }
+
+    [HarmonyPatch]
+    private static class ExtraInteractPatch
+    {
+        [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
+        static void Postfix(PlayerController __instance)
+        {
+            IPlayerInteractable playerInteractable = __instance.m_currentRoom.GetNearestInteractable(__instance.CenterPosition, 1f, __instance);
+            if (playerInteractable != null || !__instance.m_activeActions.InteractAction.WasPressed || __instance.IsPetting || __instance.IsDodgeRolling || __instance.m_handlingQueuedAnimation)
+                return;
+            if (OnEmptyInteract != null)
+                OnEmptyInteract(__instance);
         }
     }
 }

@@ -22,6 +22,7 @@ public static class CwaffCompanionBuilder
         Friend friend = CompanionBuilder.BuildPrefab(name, $"{C.MOD_PREFIX}:{name}_companion", $"{name}_idle_001", IntVector2.Zero, IntVector2.One)
           .AddComponent<Friend>();
         friend.SetupAnimations(baseFps: baseFps, extraAnims: extraAnims);
+        friend.aiActor.ActorShadowOffset = new Vector3(friend.aiActor.sprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter).x, 0f, 0f);
         friend.companionID = CompanionController.CompanionIdentifier.NONE;
 
         cc.CompanionGuid = friend.aiActor.EnemyGuid;
