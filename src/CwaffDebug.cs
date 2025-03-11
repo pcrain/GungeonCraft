@@ -252,3 +252,88 @@ public static class ConstructorProfiler
         }
     }
 }
+
+internal static class DebugDraw
+{
+    internal static void DrawDebugCircle(this GameObject go, Vector2? pos = null, float? radius = null, Color? color = null)
+    {
+        go.GetOrAddComponent<DebugCircle>().Setup(pos, radius, color);
+    }
+
+    public class DebugCircle : MonoBehaviour
+    {
+        public Color color = default;
+        public Vector2 pos = default;
+        public float radius = 1f;
+
+        private const int _CIRCLE_SEGMENTS = 12;
+
+        private bool _didSetup = false;
+        private GameObject _meshObject = null;
+        private Mesh _mesh = null;
+        private MeshRenderer _meshRenderer = null;
+        private Vector3[] _vertices;
+
+        private void CreateMesh()
+        {
+            this._meshObject = new GameObject("debug_circle");
+            this._meshObject.SetLayerRecursively(LayerMask.NameToLayer("FG_Critical"));
+
+            this._mesh = new Mesh();
+
+            this._vertices  = new Vector3[_CIRCLE_SEGMENTS + 2];
+            int[] triangles = new int[3 * _CIRCLE_SEGMENTS];
+            for (int i = 0; i < _CIRCLE_SEGMENTS; i++) //NOTE: triangle fan
+            {
+                triangles[i * 3]     = 0;
+                triangles[i * 3 + 1] = i + 1;
+                triangles[i * 3 + 2] = i + 2;
+            }
+            this._mesh.vertices  = this._vertices;
+            this._mesh.triangles = triangles;
+            this._mesh.uv        = new Vector2[_CIRCLE_SEGMENTS + 2];
+
+            this._meshObject.AddComponent<MeshFilter>().mesh = this._mesh;
+
+            this._meshRenderer = this._meshObject.AddComponent<MeshRenderer>();
+            Material mat = this._meshRenderer.material = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
+            mat.shader = ShaderCache.Acquire("tk2d/BlendVertexColorAlphaTintableTilted");
+            mat.SetColor("_OverrideColor", this.color);
+        }
+
+        private void RebuildMeshes()
+        {
+            Vector3 basePos = this._vertices[0] = this.pos;
+            for (int i = 0; i <= _CIRCLE_SEGMENTS; ++i)
+                this._vertices[i + 1] = basePos + (i * (360f / _CIRCLE_SEGMENTS)).ToVector3(this.radius);
+            this._mesh.vertices = this._vertices; // necessary to actually trigger an update for some reason
+            this._mesh.RecalculateBounds();
+            this._mesh.RecalculateNormals();
+        }
+
+        public void Setup(Vector2? pos = null, float? radius = null, Color? color = null)
+        {
+            if (!this._didSetup)
+                CreateMesh();
+            this.color  = color ?? this.color;
+            this.pos    = pos ?? this.pos;
+            this.radius = radius ?? this.radius;
+            if (color.HasValue)
+                this._meshRenderer.material.SetColor("_OverrideColor", this.color);
+            if (!this._didSetup || pos.HasValue || radius.HasValue)
+                RebuildMeshes();
+            this._didSetup = true;
+        }
+
+        private void Update()
+        {
+          // enter update code here
+        }
+
+        private void OnDestroy()
+        {
+            if (this._meshObject)
+                UnityEngine.Object.Destroy(this._meshObject);
+        }
+    }
+}

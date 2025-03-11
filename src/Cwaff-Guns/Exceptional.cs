@@ -21,6 +21,7 @@ public class Exceptional : CwaffGun
         Lazy.SetupGun<Exceptional>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true)
           .SetAttributes(quality: ItemQuality.SPECIAL, gunClass: CwaffGunClass.UTILITY, reloadTime: 0f, ammo: 80, shootFps: 30, reloadFps: 40,
             muzzleFrom: Items.Mailbox, fireAudio: "corruption_sound", banFromBlessedRuns: true, infiniteAmmo: true, modulesAreTiers: true)
+          .Attach<ExceptionalAmmoDisplay>()
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(sprite: "exceptional_projectile", clipSize: 32, cooldown: 0.33f, shootStyle: ShootStyle.Burst,
             angleVariance: 10f, damage: 4.0f, speed: 75f, range: 1000f, force: 12f, burstCooldown: 0.04f, hideAmmo: true))
@@ -41,8 +42,6 @@ public class Exceptional : CwaffGun
             newMod.projectiles = Enumerable.Repeat<Projectile>(proj, i).ToList();
             gun.Volley.projectiles.Add(newMod);
         } //REFACTOR: burst builder
-
-        gun.gameObject.AddComponent<ExceptionalAmmoDisplay>();
 
         _PickupId = gun.PickupObjectId;
 

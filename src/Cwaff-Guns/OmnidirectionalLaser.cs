@@ -66,7 +66,6 @@ public class OmnidirectionalLaser : CwaffGun
             speed: 200f, damage: 8f, baseProjectile: masteryProj));
         gun.AddSynergyModules(Synergy.MASTERY_OMNIDIRECTIONAL_LASER, masteryModules);
 
-        gun.reloadAnimation = gun.idleAnimation; // animation shouldn't automatically change when reloading
         gun.shootAnimation  = null; // animation shouldn't automatically change when firing
         gun.PreventOutlines = true; // messes up with two-part rendering
         for (int i = 1; i <= 8; ++i)

@@ -22,7 +22,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
     - [Spirit Mod](https://spiritmod.wiki.gg/wiki/Weapons): Holy Water Gun (Holy Hellstorm), Nycterian (Bat Blaster), Scotsman (edited Iron Bomber), Wavefront (Tesla Cannon)
 
-    - [Thorium Mod](https://thoriummod.wiki.gg/wiki/Weapons): BlasTech F-4 (Valadium Foe Blaster), Deadline (Hit Scanner), Pincushion (Omni-Cannon)
+    - [Thorium Mod](https://thoriummod.wiki.gg/wiki/Weapons): BlasTech F-4 (Valadium Foe Blaster), Deadline (Hit Scanner), Flakseed (recolored Energy Storm Bolter), Pincushion (Omni-Cannon)
 
     - [Elements Awoken Mod](https://elementsawoken.fandom.com/wiki/Weapons): K.A.L.I. (Particle Accelerator), R.C. Launcher (Dubstep Gun), Soul Kaliber (Sapphire Blaster)
 
@@ -36,7 +36,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
 #### Original Sprites (please check out the authors' work! <3)
 
-  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Maestro, Missiletoe, Oddjob, Omnidirectional Laser, Plasmarble, Starmageddon, Vladimir
+  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Maestro, Missiletoe, Oddjob, Omnidirectional Laser, Plasmarble, Starmageddon, Stereoscope, Vladimir
 
   - [IdioticMuffin](https://www.reddit.com/r/EnterTheGungeon/comments/et316d/yet_even_more_gun_concepts_for_gungeon/): Grandmaster, [Paintball Cannon](https://www.reddit.com/r/EnterTheGungeon/comments/clkr07/splat_the_gungeon_weapon_concepts/)
 
@@ -61,7 +61,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 ### Other Sprites
 
 * Several custom shopkeeper, item, clip, projectile, and miscellaneous sprites by [Lynceus](https://thunderstore.io/c/enter-the-gungeon/p/Lynceus/)
-* Most hat sprites plus various item, and NPC sprites by [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)
+* Most hat sprites plus various item and NPC sprites by [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)
 * More item sprites from various games including Knights in the Nightmare, Blaze Union, Pokemon, Dragonball Z: Buu's Fury, and Minecraft
 * [SPOILERS] boss sprites [by askywalker from Spriter's Resource](https://www.spriters-resource.com/custom_edited/undertalecustoms/sheet/126792/)
 * [SPOILERS] boss card art [by synistersyrup from DeviantArt](https://www.deviantart.com/synistersyrup/art/Sans-Uses-Flirt-665517108)

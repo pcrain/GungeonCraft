@@ -14,7 +14,6 @@ public class Stereoscope : CwaffGun
 
     internal static GameObject _ResonancePrefab          = null;
     private static Dictionary<string, int> _FrequencyMap = new();
-    private static List<uint> _EventIds = new();
 
     private int _frequency    = 0;
     private int _lastSoundPos = 0;
@@ -23,43 +22,20 @@ public class Stereoscope : CwaffGun
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Stereoscope>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 261, idleFps: _IDLE_FPS, shootFps: _IDLE_FPS,
-                fireAudio: "stereoscope_fire_sound", attacksThroughWalls: true, suppressReloadAnim: true, autoPlay: false);
-
-        gun.InitSpecialProjectile<ResonantProjectile>(GunData.New(sprite: null, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
+        Lazy.SetupGun<Stereoscope>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 261, idleFps: _IDLE_FPS, shootFps: _IDLE_FPS,
+            fireAudio: "stereoscope_fire_sound", attacksThroughWalls: true, suppressReloadAnim: true, autoPlay: false)
+          .InitSpecialProjectile<ResonantProjectile>(GunData.New(sprite: null, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 17.0f, speed: 25f, range: 18f, force: 12f, invisibleProjectile: true));
 
-        gun.reloadAnimation = gun.idleAnimation; // animation shouldn't automatically change when reloading
-
         _ResonancePrefab = VFX.Create("resonance_vfx");
-
-        _EventIds.Add(AkSoundEngine.GetIDFromString("stereoscope_charge_sound_0"));
-        for (int i = 1; i <= 6; ++i)
-        {
-            _EventIds.Add(AkSoundEngine.GetIDFromString($"stereoscope_charge_sound_{i}_up"));
-            _EventIds.Add(AkSoundEngine.GetIDFromString($"stereoscope_charge_sound_{i}_down"));
-        }
     }
 
     private void Resonate(Vector2 pos)
     {
-        CwaffVFX.SpawnBurst(
-            prefab           : _ResonancePrefab,
-            numToSpawn       : 6,
-            basePosition     : pos,
-            positionVariance : 0.4f,
-            velocityVariance : 10f,
-            velType          : CwaffVFX.Vel.AwayRadial,
-            rotType          : CwaffVFX.Rot.Position,
-            lifetime         : 0.25f,
-            fadeOutTime      : 0.25f,
-            uniform          : true,
-            startScale       : 1.0f,
-            endScale         : 0.1f,
-            specificFrame    : this._frequency + 6,
-            height           : 3f
-          );
+        CwaffVFX.SpawnBurst(prefab: _ResonancePrefab, numToSpawn: 6, basePosition: pos, positionVariance: 0.4f, velocityVariance: 10f,
+            velType: CwaffVFX.Vel.AwayRadial, rotType: CwaffVFX.Rot.Position, lifetime: 0.25f, fadeOutTime: 0.25f, uniform: true,
+            startScale: 1.0f, endScale: 0.1f, specificFrame: this._frequency + 6, height: 3f);
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -80,9 +56,9 @@ public class Stereoscope : CwaffGun
 
     private bool IsGunResonating()
     {
-        uint count = 16;
-        AKRESULT result = AkSoundEngine.GetPlayingIDsFromGameObject(this.gun.gameObject, ref count, _PlayingIds);
-        for (int i = 0; i < count; i++)
+        uint maxSounds = 16;
+        AKRESULT result = AkSoundEngine.GetPlayingIDsFromGameObject(this.gun.gameObject, ref maxSounds, _PlayingIds);
+        for (int i = 0; i < maxSounds; i++)
             if (_PlayingIds[i] == this._soundId)
             {
                 AKRESULT status = AkSoundEngine.GetSourcePlayPosition(this._soundId, out int pos);
@@ -159,28 +135,15 @@ public class Stereoscope : CwaffGun
 
     private class ResonantProjectile : Projectile
     {
-        public int frequency = 99; // guaranteed unused
+        public int frequency = 99; // guaranteed unused initial value
         public int power = 4;
         public Gun gun = null;
 
         private void Reverberate(Vector2 pos)
         {
-            CwaffVFX.SpawnBurst(
-                prefab           : _ResonancePrefab,
-                numToSpawn       : power,
-                basePosition     : pos,
-                positionVariance : 1.75f,
-                velocityVariance : 1f,
-                velType          : CwaffVFX.Vel.AwayRadial,
-                rotType          : CwaffVFX.Rot.Position,
-                lifetime         : 0.25f,
-                fadeOutTime      : 0.25f,
-                uniform          : true,
-                startScale       : 1.0f,
-                endScale         : 0.1f,
-                specificFrame    : this.frequency + 6,
-                height           : 3f
-              );
+            CwaffVFX.SpawnBurst(prefab: _ResonancePrefab, numToSpawn: power, basePosition: pos, positionVariance: 1.75f, velocityVariance: 1f,
+              velType: CwaffVFX.Vel.AwayRadial, rotType: CwaffVFX.Rot.Position, lifetime: 0.25f, fadeOutTime: 0.25f, uniform: true,
+              startScale: 1.0f, endScale: 0.1f, specificFrame: this.frequency + 6, height: 3f);
             Exploder.DoDistortionWave(center: pos, distortionIntensity: 1.5f, distortionRadius: 0.05f, maxRadius: 1.75f, duration: 0.25f);
         }
 

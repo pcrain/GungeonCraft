@@ -823,7 +823,10 @@ public static class GunBuilder
 
   /// <summary>Prevent a gun from ever playing reload animations when it's reload time is 0</summary>
   public static void SuppressReloadAnimations(this Gun gun)
-    => gun.gameObject.GetOrAddComponent<ReloadAnimationSuppressor>();
+  {
+    gun.reloadAnimation = gun.idleAnimation; // animation shouldn't automatically change when reloading
+    gun.gameObject.GetOrAddComponent<ReloadAnimationSuppressor>();
+  }
 
   /// <summary>Helper patch for enabling ReloadAnimationSuppressor's functionality</summary>
   [HarmonyPatch(typeof(Gun), nameof(Gun.FinishReload))]

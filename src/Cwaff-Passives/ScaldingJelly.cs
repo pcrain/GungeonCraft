@@ -5,7 +5,7 @@ using static IgnizolCompanion.IgnizolMovementBehavior.State;
 public class ScaldingJelly : CwaffCompanion
 {
     public static string ItemName         = "Scalding Jelly";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Fiery Friend";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 

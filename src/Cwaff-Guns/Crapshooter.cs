@@ -34,6 +34,7 @@ public class Crapshooter : CwaffGun
           .Attach<BounceProjModifier>(bounce => {
             bounce.percentVelocityToLoseOnBounce = 0.5f;
             bounce.numberOfBounces = Mathf.Max(bounce.numberOfBounces, 0) + 3;
+            // TODO: i don't think this event is serialized...
             bounce.OnBounce += () => { bounce.gameObject.Play(_DiceSounds.ChooseRandom()); }; })
           .Attach<DiceProjectile>()
           .Assign(out _BaseCrapshooterProjectile);

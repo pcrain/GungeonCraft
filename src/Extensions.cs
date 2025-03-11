@@ -2640,6 +2640,19 @@ public static class Extensions
     return data;
   }
 
+  /// <summary>Get the current goop data for a position in the world, as well as the goop definition.</summary>
+  public static GoopPositionData GoopData(this Vector2 pos, out GoopDefinition goopDef)
+  {
+    goopDef = null;
+    IntVector2 key = (pos / DeadlyDeadlyGoopManager.GOOP_GRID_SIZE).ToIntVector2(VectorConversions.Floor);
+    if (!DeadlyDeadlyGoopManager.allGoopPositionMap.TryGetValue(key, out DeadlyDeadlyGoopManager goopManager))
+      return null;
+    if (!goopManager.m_goopedCells.TryGetValue(key, out GoopPositionData data))
+      return null;
+    goopDef = goopManager.goopDefinition;
+    return data;
+  }
+
   private static readonly List<SpeculativeRigidbody> _NoIgnores = Enumerable.Empty<SpeculativeRigidbody>().ToList();
   /// <summary>Creates a new explosion</summary>
   public static ExplosionData With(this ExplosionData effect, float force = 100f, float debrisForce = 10f, float damage = 10f, float radius = 0.5f,

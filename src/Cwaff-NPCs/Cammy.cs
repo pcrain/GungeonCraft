@@ -65,6 +65,7 @@ public class Cammy
             "ski:baby_good_dodogama",
             // GungeonCraft
             "cg:amethyst_shard",
+            "cg:scalding_jelly",
         };
 
         // if (C.DEBUG_BUILD)  // test some wonky offsets

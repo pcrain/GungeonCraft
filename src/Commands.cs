@@ -20,7 +20,7 @@ public class Commands
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             DebrisObject debris = LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(Lazy.PickupId<ScaldingJelly>()).gameObject,
+                PickupObjectDatabase.GetById(Lazy.PickupId<Flakseed>()).gameObject,
                 // PickupObjectDatabase.GetById(IDs.Pickups["bubblebeam"]).gameObject,
                 GameManager.Instance.PrimaryPlayer.CenterPosition,
                 Vector2.zero,
