@@ -275,3 +275,5 @@ flakseed_pollinate_sound,-6.0,1,sound,1
 flak_flower_shoot_sound,4.0,1,sound,1
 flakseed_shoot_sound,-7.0,1,sound,0
 flak_plant_sound,-4.5,1,sound,0
+flakseed_reload_sound,4.0,1,sound,0
+flakseed_deposit_sound,4.0,1,sound,0

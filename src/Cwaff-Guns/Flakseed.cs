@@ -2,7 +2,7 @@
 
 /* Behavior sketch:
     - fires flak seeds that deal no damage, but plant flak sprouts on the ground beneath them when dying
-    - flak sprouts grow into flak flowers after 7 seconds
+    - flak sprouts grow into flak flowers after 6 seconds
         - sprout growth can be sped up by "pollinating" them via firing enemy or player bullets over them
         - each player bullet accelerates growth by (0.1 seconds * damage)
         - each enemy bullet accelerates growth by a flat 1 second
@@ -10,26 +10,28 @@
     - fully grown flak flowers wither after 15 seconds
         - nearby flowers compete for nutrients, causing each other to wither faster
         - watering flowers resets wither timer
-        - flowers wither immediately when exposed to fire, poison, oil, or ice
-        - electrified water interactions?
+        - flowers wither immediately when exposed to fire, poison, oil, ice, or electricity
+        - flowers wither immediately when trampled by enemies
 */
 
 public class Flakseed : CwaffGun
 {
     public static string ItemName         = "Flakseed";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Orgunic Gardening";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    internal static GameObject _FlakFlowerPrefab = null;
+    internal static GameObject _FlakFlowerPrefab     = null;
     internal static Projectile _FlakFlowerProjectile = null;
-    internal static GameObject _PetalVFX = null;
+    internal static GameObject _PetalVFX             = null;
 
     public static void Init()
     {
         Lazy.SetupGun<Flakseed>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300, idleFps: 6, shootFps: 24,
-            reloadFps: 24, muzzleFrom: Items.Mailbox, fireAudio: "flakseed_shoot_sound")
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300, idleFps: 6, shootFps: 30,
+            reloadFps: 18, muzzleFrom: Items.Mailbox, fireAudio: "flakseed_shoot_sound")
+          .SetReloadAudio("flakseed_reload_sound", 3, 22)
+          .SetReloadAudio("flakseed_deposit_sound", 13, 14, 16, 17)
           .InitSpecialProjectile<GrenadeProjectile>(GunData.New(clipSize: 12, cooldown: 0.16f,
             shootStyle: ShootStyle.Automatic, damage: 0f, speed: 24f, force: 10f, range: 30f,/* customClip: true,*/
             sprite: "flakseed_bullet", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false))
@@ -42,7 +44,7 @@ public class Flakseed : CwaffGun
         _FlakFlowerPrefab = VFX.Create("flakseed_sprout", anchor: Anchor.LowerCenter, emissivePower: 1f);
         _FlakFlowerPrefab.AddAnimation("bloom", "flakseed_flower", fps: 4, anchor: Anchor.LowerCenter, emissivePower: 1f);
         _FlakFlowerPrefab.AddComponent<FlakseedFlower>();
-        _FlakFlowerPrefab.AutoRigidBody(Anchor.LowerCenter, CollisionLayer.BulletBlocker);
+        _FlakFlowerPrefab.AutoRigidBody(Anchor.LowerCenter, CollisionLayer.PlayerHitBox);
 
         Color lightGreen = new Color(0.7f, 0.85f, 0.65f);
         _FlakFlowerProjectile = Items.Ak47.CloneProjectile(GunData.New(
@@ -78,9 +80,12 @@ public class FlakseedProjectile : MonoBehaviour
 
     private void CreateSprout(Projectile projectile)
     {
-        FlakseedFlower ff = Flakseed._FlakFlowerPrefab.Instantiate(projectile.SafeCenter).GetComponent<FlakseedFlower>();
+        Vector2 finalPos = projectile.SafeCenter;
+        if (GameManager.Instance.Dungeon.CellIsPit(finalPos))
+            return;
+        FlakseedFlower ff = Flakseed._FlakFlowerPrefab.Instantiate(finalPos).GetComponent<FlakseedFlower>();
         ff._owner = this._owner;
-        SpawnManager.SpawnVFX(VFX.MiniPickup, projectile.SafeCenter, Lazy.RandomEulerZ());
+        SpawnManager.SpawnVFX(VFX.MiniPickup, finalPos, Lazy.RandomEulerZ());
     }
 
     private void Update()
@@ -88,7 +93,6 @@ public class FlakseedProjectile : MonoBehaviour
         if (!this._projectile)
             return;
 
-        // float newHeight = this._projectile.m_currentHeight + (this._projectile.m_current3DVelocity.z + this._projectile.LocalDeltaTime * -10f) * this._projectile.LocalDeltaTime;
         if (this._projectile.m_current3DVelocity.z < 0)
         {
             this._projectile.ApplyFriction(_AIR_FRICTION);
@@ -103,7 +107,7 @@ public class FlakseedProjectile : MonoBehaviour
 
 public class FlakseedFlower : MonoBehaviour
 {
-    const float _GROWTH_TIME = 7.0f;
+    const float _GROWTH_TIME = 6.0f;
     const float _MIN_FIRE_RATE = 0.5f;
     const float _FIRE_RATE_VARIANCE = 0.25f;
     const float _WILT_TIME = 15.0f;
@@ -134,10 +138,26 @@ public class FlakseedFlower : MonoBehaviour
         this._nextFireRate = _MIN_FIRE_RATE + _FIRE_RATE_VARIANCE * UnityEngine.Random.value;
     }
 
+    private static bool CanTrample(AIActor enemy)
+    {
+        if (!enemy || enemy.IsFlying || enemy.IsGone || enemy.IsHarmlessEnemy || !enemy.isActiveAndEnabled)
+            return false;
+        if (enemy.healthHaver is HealthHaver hh && hh.IsDead)
+            return false;
+        return true;
+    }
+
     private void PollinatedByBullets(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
         PhysicsEngine.SkipCollision = true;
-        if (this._grown || !otherRigidbody)
+        if (!otherRigidbody)
+            return;
+        if (otherRigidbody.gameObject.GetComponent<AIActor>() is AIActor enemy && CanTrample(enemy))
+        {
+            Wilt();
+            return;
+        }
+        if (this._grown)
             return;
         if (otherRigidbody.gameObject.GetComponent<Projectile>() is not Projectile proj)
             return;

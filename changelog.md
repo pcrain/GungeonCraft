@@ -2,7 +2,7 @@
 
 ## 1.22.0 (TBD)
 
-- Added Stereoscope and Scalding Jelly
+- Added Stereoscope, Scalding Jelly, and Flakseed
 - Fixed potential null deref caused by event handler for destroyed Allay companion
 
 ## 1.21.2 (2025-01-30)
