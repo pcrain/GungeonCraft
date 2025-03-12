@@ -215,6 +215,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfRacketLauncher>(MASTERY_RACKET_LAUNCHER, RacketLauncher.ItemName);
         // Each juggled gun automatically fires an additional ball projectile when tossed.
         NewMastery<MasteryOfJugglernaut>(MASTERY_JUGGLERNAUT, Jugglernaut.ItemName);
+        // [REDACTED]
+        NewMastery<MasteryOfBlasTechF4>(MASTERY_BLASTECH_F4, BlasTechF4.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -466,6 +468,7 @@ internal class MasteryOfTranquilizer         : MasteryDummyItem {}
 internal class MasteryOfAimuHakurei          : MasteryDummyItem {}
 internal class MasteryOfRacketLauncher       : MasteryDummyItem {}
 internal class MasteryOfJugglernaut          : MasteryDummyItem {}
+internal class MasteryOfBlasTechF4           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -556,4 +559,5 @@ public enum Synergy {
     MASTERY_AIMU_HAKUREI,
     MASTERY_RACKET_LAUNCHER,
     MASTERY_JUGGLERNAUT,
+    MASTERY_BLASTECH_F4,
 };

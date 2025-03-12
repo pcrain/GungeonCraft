@@ -2321,8 +2321,8 @@ public static class Extensions
   /// <summary>Returns whether a projectile is on a collision path with an enemy, optionally including walls, pixel perfect collision, and outsetting our hitbox</summary>
   public static bool WouldCollideWithEnemy(this Projectile projectile, float angle, bool accountForWalls = true, bool pixelPerfect = false, int outset = 0)
   {
-      Vector2 ppos                     = projectile.transform.position.XY();
-      IntVector2 pixelDelta            = accountForWalls
+      Vector2 ppos = projectile.transform.position.XY();
+      IntVector2 pixelDelta = accountForWalls
         ? PhysicsEngine.UnitToPixel(ppos.ToNearestWall(out Vector2 normal, angle, minDistance: 1) - ppos)
         : PhysicsEngine.UnitToPixel(angle.ToVector(20f));
       PixelCollider projectileCollider = projectile.specRigidbody.PrimaryPixelCollider;
@@ -2331,6 +2331,27 @@ public static class Extensions
           if (!enemy.IsHostile(canBeNeutral: true) || !enemy.specRigidbody)
               continue;
           PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
+          if (accountForWalls && !ppos.HasLineOfSight(collider.UnitCenter))
+              continue; // avoid more expensive linear cast if possible
+          if (projectileCollider.FastLinearCast(collider, pixelDelta, pixelPerfect: pixelPerfect, outset: outset))
+            return true;
+      }
+      return false;
+  }
+
+  /// <summary>Returns whether a projectile is on a collision path with a player, optionally including walls, pixel perfect collision, and outsetting our hitbox</summary>
+  public static bool WouldCollideWithPlayer(this Projectile projectile, float angle, bool accountForWalls = true, bool pixelPerfect = false, int outset = 0)
+  {
+      Vector2 ppos = projectile.transform.position.XY();
+      IntVector2 pixelDelta = accountForWalls
+        ? PhysicsEngine.UnitToPixel(ppos.ToNearestWall(out Vector2 normal, angle, minDistance: 1) - ppos)
+        : PhysicsEngine.UnitToPixel(angle.ToVector(20f));
+      PixelCollider projectileCollider = projectile.specRigidbody.PrimaryPixelCollider;
+      foreach (PlayerController player in GameManager.Instance.AllPlayers)
+      {
+          if (!player || player.IsGhost)
+            continue;
+          PixelCollider collider = player.specRigidbody.HitboxPixelCollider;
           if (accountForWalls && !ppos.HasLineOfSight(collider.UnitCenter))
               continue; // avoid more expensive linear cast if possible
           if (projectileCollider.FastLinearCast(collider, pixelDelta, pixelPerfect: pixelPerfect, outset: outset))

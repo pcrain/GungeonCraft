@@ -1,3 +1,4 @@
+
 namespace CwaffingTheGungy;
 
 // Class for harmony patches that need to be shared by multiple classes (e.g., functions that are patched multiple times)
@@ -207,5 +208,49 @@ static class PlayerItemApplyCooldownPatch
     {
         if (__instance is GrapplingHookItem && user.HasSynergy(Synergy.BIONIC_COMMANDO))
             __instance.ClearCooldowns();
+    }
+}
+
+// NOTE: used by BubbbleWand and BlasTech F-4 mastery
+[HarmonyPatch(typeof(AIActor), nameof(AIActor.Start))]
+static class ReplaceEnemyGunsPatch
+{
+    private static Items _BlasTechID = (Items)(-1);
+
+    private static void Prefix(AIActor __instance)
+    {
+        if (DoBlastechReplacement(__instance))
+            return;
+        if (DoBubbleWandReplacement(__instance))
+            return;
+    }
+
+    private static bool DoBlastechReplacement(AIActor enemy)
+    {
+        if (!enemy.aiShooter)
+            return false;
+        if (!Lazy.AnyoneHasSynergy(Synergy.MASTERY_BLASTECH_F4))
+            return false;
+        if ((int)_BlasTechID < 0)
+            _BlasTechID = (Items)Lazy.PickupId<BlasTechF4>();
+        enemy.ReplaceGun(_BlasTechID);
+        return true;
+    }
+
+    private static bool DoBubbleWandReplacement(AIActor enemy)
+    {
+        if (!Lazy.AnyoneHas<BubbleWand>())
+            return false;
+        if (enemy.healthHaver is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
+            return false;
+        if (Lazy.CoinFlip())
+            enemy.ReplaceGun(Items.BubbleBlaster);
+        else if (GameManager.Instance.PrimaryPlayer.HasSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
+            enemy.ReplaceGun(Items.BubbleBlaster);
+        else if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER && GameManager.Instance.SecondaryPlayer.HasSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
+            enemy.ReplaceGun(Items.BubbleBlaster);
+        else
+            return false;
+        return true;
     }
 }

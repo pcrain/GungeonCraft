@@ -16,6 +16,7 @@ public class BlasTechF4 : CwaffGun
           .SetReloadAudio("blastech_jam_sound", 0, 2, 4, 5, 6)
           .InitProjectile(GunData.New(sprite: "blastech_projectile", clipSize: 20, cooldown: 0.11f, shootStyle: ShootStyle.Automatic, customClip: true,
             damage: 20.0f, speed: 100f, range: 9999f, force: 12f, ignoreDamageCaps: true, scale: 0.5f, hitSound: "generic_bullet_impact"))
+          .Attach<BlasTechProjectile>()
           .Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.3f;
@@ -27,38 +28,43 @@ public class BlasTechF4 : CwaffGun
           .SetAllImpactVFX((ItemHelper.Get(Items.WitchPistol) as Gun).DefaultModule.projectiles[0].hitEffects.enemy);
     }
 
-    public override void PostProcessProjectile(Projectile projectile)
+    public class BlasTechProjectile : MonoBehaviour
     {
-        base.PostProcessProjectile(projectile);
-        if (this.PlayerOwner is not PlayerController pc)
-            return;
-        if (pc.HasSynergy(Synergy.BLASTECH_A1))
+        //NOTE: mastery logic in ReplaceEnemyGunsPatch()
+        private void Start()
         {
-            projectile.gameObject.PlayUnique("blastech_fire_sound");
-            return;
-        }
+            Projectile projectile = base.GetComponent<Projectile>();
+            PlayerController playerOwner = projectile.Owner as PlayerController;
+            if (playerOwner && playerOwner.HasSynergy(Synergy.BLASTECH_A1))
+            {
+                projectile.gameObject.PlayUnique("blastech_fire_sound");
+                return;
+            }
 
-        const float MAX_DEVIATION = 30f;
-        projectile.Start(); // NOTE: need to make sure projectile has a valid specrigidbody
-        float oldAngle = projectile.transform.rotation.eulerAngles.z;
-        bool flipped = Lazy.CoinFlip();
-        for (float f = 0f; f < MAX_DEVIATION; f += UnityEngine.Random.Range(1f, 10f))
-        {
-            float newAngle = oldAngle + (flipped ? f : -f);
-            if (projectile.WouldCollideWithEnemy(newAngle, accountForWalls: false, pixelPerfect: false, outset: 2))
-                continue;
-            if (newAngle != oldAngle)
-                projectile.SendInDirection(newAngle.ToVector(), true, true);
-            projectile.gameObject.PlayUnique("blastech_fire_sound");
-            return;
-        }
+            const float MAX_DEVIATION = 30f;
+            projectile.Start(); // NOTE: need to make sure projectile has a valid specrigidbody
+            float oldAngle = projectile.transform.rotation.eulerAngles.z;
+            bool flipped = Lazy.CoinFlip();
+            for (float f = 0f; f < MAX_DEVIATION; f += UnityEngine.Random.Range(1f, 10f))
+            {
+                float newAngle = oldAngle + (flipped ? f : -f);
+                if (playerOwner && projectile.WouldCollideWithEnemy(newAngle, accountForWalls: false, pixelPerfect: false, outset: 2))
+                    continue;
+                if (!playerOwner && projectile.WouldCollideWithPlayer(newAngle, accountForWalls: false, pixelPerfect: false, outset: 2))
+                    continue;
+                if (newAngle != oldAngle)
+                    projectile.SendInDirection(newAngle.ToVector(), true, true);
+                projectile.gameObject.PlayUnique("blastech_fire_sound");
+                return;
+            }
 
-        if (this.gun == pc.CurrentGun && !projectile.FiredForFree())
-        {
-            this.gun.GainAmmo(1);
-            this.gun.MoveBulletsIntoClip(1);
+            if (playerOwner && (projectile.PossibleSourceGun is Gun gun) && gun == playerOwner.CurrentGun && !projectile.FiredForFree())
+            {
+                gun.GainAmmo(1);
+                gun.MoveBulletsIntoClip(1);
+            }
+            projectile.gameObject.PlayUnique("blastech_jam_sound");
+            projectile.DieInAir(suppressInAirEffects: true);
         }
-        projectile.gameObject.PlayUnique("blastech_jam_sound");
-        projectile.DieInAir(suppressInAirEffects: true);
     }
 }

@@ -3,7 +3,7 @@
 ## 1.22.0 (TBD)
 
 - Added Stereoscope, Scalding Jelly, and Flakseed
-- Added masteries for Racket Launcher and Jugglernaut
+- Added masteries for Racket Launcher, Jugglernaut, and BlasTech F-4
 - Fixed potential null deref caused by event handler for destroyed Allay companion
 - Racket Launcher now onlys reflect the nearest valid projectile rather than all projectiles in range
 
