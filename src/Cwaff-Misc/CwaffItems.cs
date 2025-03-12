@@ -78,6 +78,17 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       d[anim] = gun.GetBarrelOffsetsForAnimation(anim);
   }
 
+  private void Start()
+  {
+    // Load dynamic barrel offsets if we have any registered
+    if (_BarrelOffsetCache.TryGetValue(this.gun.GetUnmodifiedDisplayName(), out var barrelOffsets))
+    {
+      this._usesDynamicBarrelPosition = true;
+      this._barrelOffsets             = barrelOffsets;
+      this._defaultBarrelOffset       = barrelOffsets[_DEFAULT_BARREL_OFFSET][0];
+    }
+  }
+
   public override void OnPlayerPickup(PlayerController player)
   {
     if (!this.EverPickedUp)
@@ -86,14 +97,6 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
     player.GunChanged -= OnGunsChanged;
     player.GunChanged += OnGunsChanged;
-
-    // Load dynamic barrel offsets if we have any registered
-    if (_BarrelOffsetCache.TryGetValue(this.gun.GetUnmodifiedDisplayName(), out var barrelOffsets))
-    {
-      this._usesDynamicBarrelPosition = true;
-      this._barrelOffsets             = barrelOffsets;
-      this._defaultBarrelOffset       = barrelOffsets[_DEFAULT_BARREL_OFFSET][0];
-    }
   }
 
   /// <summary>Called the first time a gun is picked up by a player during a run</summary>
