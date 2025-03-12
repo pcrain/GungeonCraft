@@ -217,6 +217,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfJugglernaut>(MASTERY_JUGGLERNAUT, Jugglernaut.ItemName);
         // [REDACTED]
         NewMastery<MasteryOfBlasTechF4>(MASTERY_BLASTECH_F4, BlasTechF4.ItemName);
+        // Yggdrashell can target up to 3 enemies simultaneously.
+        NewMastery<MasteryOfYggdrashell>(MASTERY_YGGDRASHELL, Yggdrashell.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -469,6 +471,7 @@ internal class MasteryOfAimuHakurei          : MasteryDummyItem {}
 internal class MasteryOfRacketLauncher       : MasteryDummyItem {}
 internal class MasteryOfJugglernaut          : MasteryDummyItem {}
 internal class MasteryOfBlasTechF4           : MasteryDummyItem {}
+internal class MasteryOfYggdrashell          : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -560,4 +563,5 @@ public enum Synergy {
     MASTERY_RACKET_LAUNCHER,
     MASTERY_JUGGLERNAUT,
     MASTERY_BLASTECH_F4,
+    MASTERY_YGGDRASHELL,
 };

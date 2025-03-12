@@ -11,14 +11,11 @@ public class CwaffRaidenBeamController : BeamController
   private class Bone
   {
     private static int _Counter = 0;
+    private static int _BonesCreated = 0;
+    private static readonly LinkedList<Bone> _BonePool = new();
 
     public Vector2 pos;
-
     public Vector2 normal;
-
-    private static int _BonesCreated = 0;
-
-    private static readonly LinkedList<Bone> _BonePool = new();
 
     internal static LinkedListNode<Bone> Rent(Vector2 pos)
     {
@@ -28,7 +25,7 @@ public class CwaffRaidenBeamController : BeamController
       LinkedListNode<Bone> node = _BonePool.Last;
       _BonePool.RemoveLast();
 
-      Bone bone = node.Value;
+      Bone bone   = node.Value;
       bone.pos    = pos;
       bone.normal = default;
 
@@ -323,6 +320,8 @@ public class CwaffRaidenBeamController : BeamController
       for (int j = 0; j < s_enemiesInRoom.Count; j++)
       {
         AIActor aIActor2 = s_enemiesInRoom[j];
+        if (m_targets.Contains(aIActor2))
+          continue;
         if (aIActor2.IsNormalEnemy && aIActor2.renderer.isVisible && aIActor2.healthHaver.IsAlive && !aIActor2.IsGone)
           m_targets.Add(aIActor2);
         if (maxTargets > 0 && m_targets.Count >= maxTargets)
@@ -351,22 +350,6 @@ public class CwaffRaidenBeamController : BeamController
       }
       else
       {
-        this._lockedOn = true;
-        this.lastImpactPosition = curTarget;
-        DrawMainBezierCurve(prevTarget, startAnchor, endAnchor, curTarget);
-        for (int k = 0; k < m_targets.Count - 1; k++)
-        {
-          prevTarget = m_targets[k].specRigidbody.HitboxPixelCollider.UnitCenter;
-          startAnchor = prevTarget + nextBoneDir;
-          nextBoneDir = Quaternion.Euler(0f, 0f, 90f) * nextBoneDir;
-
-          curTarget = m_targets[k + 1].specRigidbody.HitboxPixelCollider.UnitCenter;
-          endAnchor = curTarget + nextBoneDir;
-          nextBoneDir = -nextBoneDir;
-
-          DrawBezierCurve(prevTarget, startAnchor, endAnchor, curTarget);
-        }
-        nextBoneDir = nextBoneDir.normalized * _WRAP_TIGHTNESS;
         while (_vineAngles.Count < _EXTRA_WRAPS) // randomize some parameters for nice tangly vine effects
         {
           _vineAngles.Add(UnityEngine.Random.Range(10f, 90f));
@@ -374,23 +357,47 @@ public class CwaffRaidenBeamController : BeamController
           _vineLengths.Add(UnityEngine.Random.Range(1.5f, 3f));
           _vineLengthDevs.Add(UnityEngine.Random.Range(1f, 3f));
         }
-        _firstWrapBoneIndex = m_bones.Count;
-        float time = BraveTime.ScaledTimeSinceStartup;
-        for (int i = 0; i < _EXTRA_WRAPS; ++i)
+
+        this._lockedOn = true;
+        this.lastImpactPosition = curTarget;
+        DrawMainBezierCurve(prevTarget, startAnchor, endAnchor, curTarget);
+        for (int k = 0; k < m_targets.Count; k++)
         {
-          float angleDelta = this._growthTime * Mathf.Sin(_vineAngleDevs[i] * time);
-          float lengthDelta = this._growthTime * Mathf.Abs(Mathf.Sin(_vineLengthDevs[i] * time));
-          nextBoneDir = lengthDelta * _vineLengths[i] * nextBoneDir.normalized;
-          startAnchor = curTarget + nextBoneDir;
-          Vector3 midVec = Quaternion.Euler(0f, 0f, _vineAngles[i] / 2f) * nextBoneDir;
-          Vector3 midTarget = curTarget + midVec;
-          nextBoneDir = Quaternion.Euler(0f, 0f, _vineAngles[i]) * nextBoneDir;
+          nextBoneDir = nextBoneDir.normalized * _WRAP_TIGHTNESS;
+          _firstWrapBoneIndex = m_bones.Count;
+          float time = BraveTime.ScaledTimeSinceStartup;
 
-          endAnchor = curTarget + nextBoneDir;
-          nextBoneDir = -nextBoneDir;
+          // draw wrapping VFX around target
+          for (int i = 0; i < _EXTRA_WRAPS; ++i)
+          {
+            float angleDelta = this._growthTime * Mathf.Sin(_vineAngleDevs[i] * time);
+            float lengthDelta = this._growthTime * Mathf.Abs(Mathf.Sin(_vineLengthDevs[i] * time));
+            nextBoneDir = lengthDelta * _vineLengths[i] * nextBoneDir.normalized;
+            startAnchor = curTarget + nextBoneDir;
+            Vector3 midVec = Quaternion.Euler(0f, 0f, _vineAngles[i] / 2f) * nextBoneDir;
+            Vector3 midTarget = curTarget + midVec;
+            nextBoneDir = Quaternion.Euler(0f, 0f, _vineAngles[i]) * nextBoneDir;
 
-          DrawBezierCurve(curTarget, curTarget + (Quaternion.Euler(0f, 0f, -_WRAP_SPREAD * angleDelta) * midVec), startAnchor, midTarget);
-          DrawBezierCurve(midTarget, endAnchor, curTarget + (Quaternion.Euler(0f, 0f, _WRAP_SPREAD * angleDelta) * midVec), curTarget);
+            endAnchor = curTarget + nextBoneDir;
+            nextBoneDir = -nextBoneDir;
+
+            DrawBezierCurve(curTarget, curTarget + (Quaternion.Euler(0f, 0f, -_WRAP_SPREAD * angleDelta) * midVec), startAnchor, midTarget);
+            DrawBezierCurve(midTarget, endAnchor, curTarget + (Quaternion.Euler(0f, 0f, _WRAP_SPREAD * angleDelta) * midVec), curTarget);
+          }
+
+          // draw bezier to next target
+          if (k < m_targets.Count - 1)
+          {
+            prevTarget = m_targets[k].specRigidbody.HitboxPixelCollider.UnitCenter;
+            startAnchor = prevTarget + nextBoneDir;
+            nextBoneDir = Quaternion.Euler(0f, 0f, 90f) * nextBoneDir;
+
+            curTarget = m_targets[k + 1].specRigidbody.HitboxPixelCollider.UnitCenter;
+            endAnchor = curTarget + nextBoneDir;
+            nextBoneDir = -nextBoneDir;
+
+            DrawBezierCurve(prevTarget, startAnchor, endAnchor, curTarget);
+          }
         }
       }
       if (ImpactRenderer)

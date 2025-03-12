@@ -88,7 +88,7 @@ public static class CwaffCompanionBuilder
             clips.Add(clip);
         }
 
-        ETGModConsole.Log($"found {animNames.Length} frames for {dType.ToString()} animation {name}");
+        // ETGModConsole.Log($"found {animNames.Length} frames for {dType.ToString()} animation {name}");
         return new(){
             Type      = dType,
             Prefix    = name,

@@ -17,10 +17,11 @@ public class Yggdrashell : CwaffGun
     internal static tk2dBaseSprite _ArmorVFXSprite = null;
     internal static GameObject _LeafVFX            = null;
 
-    public float lifeForce                 = 0f;
+    private bool _protectionActive  = false;
+    private float _lastParticleTime = 0f;
+    private bool _mastered          = false;
 
-    private bool _protectionActive           = false;
-    private float _lastParticleTime          = 0f;
+    public float lifeForce          = 0f;
 
     public static void Init()
     {
@@ -112,27 +113,27 @@ public class Yggdrashell : CwaffGun
         base.Update();
         bool shouldPlaySound = this.gun && this.gun.IsFiring;
         this.gun.LoopSoundIf(shouldPlaySound, "entangle_loop", loopPointMs: 1500, rewindAmountMs: 1500 - 1000);
-        if (this.gun.IsFiring && (BraveTime.ScaledTimeSinceStartup - this._lastParticleTime) > _PARTICLE_RATE)
-        {
-            this._lastParticleTime = BraveTime.ScaledTimeSinceStartup;
-            if (this.GetExtantBeam() is not CwaffRaidenBeamController beam)
-                return;
-            Vector2 gunAngle = this.gun.CurrentAngle.ToVector();
-            CwaffVFX.SpawnBurst(
-                prefab           : _LeafVFX,
-                numToSpawn       : 2 + 2 * this.gun.CurrentStrengthTier,
-                basePosition     : beam.GetPointOnMainBezier(UnityEngine.Random.value),
-                positionVariance : 1f,
-                baseVelocity     : 4f * gunAngle,
-                velocityVariance : 4f,
-                velType          : CwaffVFX.Vel.Random,
-                rotType          : CwaffVFX.Rot.Random,
-                lifetime         : 0.5f,
-                startScale       : 1.0f,
-                endScale         : 0.1f,
-                randomFrame      : true
-              );
-        }
+        if (!this.gun.IsFiring || (BraveTime.ScaledTimeSinceStartup - this._lastParticleTime) <= _PARTICLE_RATE)
+            return;
+        this._lastParticleTime = BraveTime.ScaledTimeSinceStartup;
+        if (this.GetExtantBeam() is not CwaffRaidenBeamController beam)
+            return;
+        beam.maxTargets = this._mastered ? 3 : 1;
+        Vector2 gunAngle = this.gun.CurrentAngle.ToVector();
+        CwaffVFX.SpawnBurst(
+            prefab: _LeafVFX,
+            numToSpawn: 2 + 2 * this.gun.CurrentStrengthTier,
+            basePosition: beam.GetPointOnMainBezier(UnityEngine.Random.value),
+            positionVariance: 1f,
+            baseVelocity: 4f * gunAngle,
+            velocityVariance: 4f,
+            velType: CwaffVFX.Vel.Random,
+            rotType: CwaffVFX.Rot.Random,
+            lifetime: 0.5f,
+            startScale: 1.0f,
+            endScale: 0.1f,
+            randomFrame: true
+          );
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -141,6 +142,7 @@ public class Yggdrashell : CwaffGun
         this.gun.CurrentStrengthTier = 0;
         player.OnReceivedDamage += this.OnReceivedDamage;
         player.healthHaver.ModifyDamage += this.OnMightTakeDamage;
+        this._mastered = player.HasSynergy(Synergy.MASTERY_YGGDRASHELL);
     }
 
     private void OnReceivedDamage(PlayerController player)
