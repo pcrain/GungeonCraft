@@ -4,7 +4,7 @@ public class RacketLauncher : CwaffGun
 {
     public static string ItemName         = "Racket Launcher";
     public static string ShortDescription = "Paddle to the Metal";
-    public static string LongDescription  = "Launches a tennis ball that bounces off of walls, enemies, projectiles, and other obstructions. The ball can be volleyed repeatedly and increases in power, speed, and knockback with each successive volley.";
+    public static string LongDescription  = "Serves a tennis ball that bounces off of walls, enemies, projectiles, and other obstructions. The ball can be volleyed repeatedly and increases in power, speed, and knockback with each successive volley.";
     public static string Lore             = "The amount of speed, dexterity, and awareness required to play table tennis at the highest level is staggering to some when they first learn about it. The Racket takes patience and practice to wield to its full potential, but those willing to invest time honing their skills with it will be able to fearlessly return the most lethal of volleys with a Smile on their face.";
 
     internal const float _MAX_REFLECT_DISTANCE          = 5f;

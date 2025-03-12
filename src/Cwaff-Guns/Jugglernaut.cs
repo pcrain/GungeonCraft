@@ -1,4 +1,5 @@
-﻿namespace CwaffingTheGungy;
+﻿
+namespace CwaffingTheGungy;
 
 /*
    TODO:
@@ -19,6 +20,7 @@ public class Jugglernaut : CwaffGun
     internal const int _IDLE_FPS = 16;
     internal const float _DEBRIS_GLOW = 500f;
 
+    internal static Projectile _JugglingBallProjectile = null;
     internal static List<string> _JuggleAnimations = new(6);
     internal static List<float> _MinEmission = new(){10f, 50f, 100f, 200f, 300f, 400f};
     internal static string _TrueIdleAnimation;
@@ -29,8 +31,14 @@ public class Jugglernaut : CwaffGun
         Color.blue,
         Color.yellow,
         Color.green,
-        new Color(1.0f, 0.647f, 0.0f, 1.0f),
         new Color(0.627f, 0.125f, 0.941f),
+        new Color(1.0f, 0.647f, 0.0f, 1.0f),
+    };
+    internal static List<int> _ColorIndices = new(){
+        0, 2, 0, 5, 0, 0,
+        0, 3, 0, 1, 0, 4,
+        0, 2, 0, 5, 0, 0,
+        0, 3, 0, 1, 0, 4,
     };
 
     private int _juggleLevel = 0;
@@ -68,6 +76,9 @@ public class Jugglernaut : CwaffGun
             if (i > 3) gun.SetGunAudio(_JuggleAnimations[i], tossSound, 11, 23);
             if (i > 4) gun.SetGunAudio(_JuggleAnimations[i], tossSound, 3, 15);
         }
+
+        _JugglingBallProjectile = Items.Ak47.CloneProjectile(GunData.New(
+            sprite: "jugglernaut_ball_gray_projectile", damage: 2.0f, speed: 50.0f, force: 2.0f, range: 80.0f, glowAmount: _DEBRIS_GLOW));
     }
 
     /// <summary>Make sure Jugglernaut appears correctly in the weapons panel</summary>
@@ -172,7 +183,33 @@ public class Jugglernaut : CwaffGun
     {
         base.OnSwitchedToThisGun();
         gun.spriteAnimator.StopAndResetFrameToDefault();
+        gun.spriteAnimator.AnimationEventTriggered -= ShootAndJuggle;
+        if (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_JUGGLERNAUT))
+            gun.spriteAnimator.AnimationEventTriggered += ShootAndJuggle;
         ResetJuggle(); //WARNING: possibly need to delete one of these due to bug where jugglernaut drops combo seemingly out of nowhere, but might be fixed already
+    }
+
+    private void ShootAndJuggle(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
+    {
+        Projectile proj = SpawnManager.SpawnProjectile(
+            prefab   : _JugglingBallProjectile.gameObject,
+            position : this.gun.barrelOffset.position,
+            rotation : this.PlayerOwner.m_currentGunAngle.EulerZ()).GetComponent<Projectile>();
+        proj.collidesWithPlayer  = false;
+        proj.collidesWithEnemies = true;
+        proj.baseData.damage     = 2f;
+        proj.SetOwnerAndStats(this.PlayerOwner);
+        Color tint = _Colors[_ColorIndices[frame]];
+        proj.Attach<EasyTrailBullet>(trail => {
+          trail.StartWidth = 0.2f;
+          trail.EndWidth   = 0.05f;
+          trail.LifeTime   = 0.05f;
+          trail.BaseColor  = tint;
+          trail.StartColor = tint;
+          trail.EndColor   = Color.Lerp(tint, Color.white, 0.25f);
+        });
+        proj.sprite.SetGlowiness(glowAmount: 250f, glowColor: tint, overrideColor: Color.Lerp(tint, Color.white, 0.75f));
+        base.gameObject.PlayUnique("jugglernaut_ball_throw_sound");
     }
 
     public override void OnSwitchedAwayFromThisGun()
