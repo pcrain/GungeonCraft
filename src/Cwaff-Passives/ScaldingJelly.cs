@@ -6,7 +6,7 @@ public class ScaldingJelly : CwaffCompanion
 {
     public static string ItemName         = "Scalding Jelly";
     public static string ShortDescription = "Fiery Friend";
-    public static string LongDescription  = "TBD";
+    public static string LongDescription  = "Spawns a friendly Ignizol that sets nearby ground ablaze as it jumps around. The Ignizol will launch itself at nearby enemies, and can be manually picked up and thrown using the interact key.";
     public static string Lore             = "TBD";
 
     public static string CompanionName    = "Ignizol";

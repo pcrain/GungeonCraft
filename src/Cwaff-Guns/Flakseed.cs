@@ -1,24 +1,10 @@
 ﻿namespace CwaffingTheGungy;
 
-/* Behavior sketch:
-    - fires flak seeds that deal no damage, but plant flak sprouts on the ground beneath them when dying
-    - flak sprouts grow into flak flowers after 6 seconds
-        - sprout growth can be sped up by "pollinating" them via firing enemy or player bullets over them
-        - each player bullet accelerates growth by (0.1 seconds * damage)
-        - each enemy bullet accelerates growth by a flat 1 second
-    - fully grown flak flowers fire a weak bullet towards the nearest enemy every 0.5 seconds
-    - fully grown flak flowers wither after 15 seconds
-        - nearby flowers compete for nutrients, causing each other to wither faster
-        - watering flowers resets wither timer
-        - flowers wither immediately when exposed to fire, poison, oil, ice, or electricity
-        - flowers wither immediately when trampled by enemies
-*/
-
 public class Flakseed : CwaffGun
 {
     public static string ItemName         = "Flakseed";
     public static string ShortDescription = "Orgunic Gardening";
-    public static string LongDescription  = "TBD";
+    public static string LongDescription  = "Fires flak seeds that grow into flak flowers 6 seconds after landing. Bullets accelerate growth by pollinating flak sprouts they pass over, with stronger bullets causing faster growth. Grown flowers fire flak for 15 seconds before withering. Nearby flak flowers compete for nutrients and accelerate withering. Flak flowers will not wither while planted in water, and wither instantly when exposed to hostile terrain or when trampled by enemies.";
     public static string Lore             = "TBD";
 
     internal static GameObject _FlakFlowerPrefab     = null;

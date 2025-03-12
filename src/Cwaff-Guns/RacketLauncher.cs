@@ -7,9 +7,10 @@ public class RacketLauncher : CwaffGun
     public static string LongDescription  = "Launches a tennis ball that bounces off of walls, enemies, projectiles, and other obstructions. The ball can be volleyed repeatedly and increases in power, speed, and knockback with each successive volley.";
     public static string Lore             = "The amount of speed, dexterity, and awareness required to play table tennis at the highest level is staggering to some when they first learn about it. The Racket takes patience and practice to wield to its full potential, but those willing to invest time honing their skills with it will be able to fearlessly return the most lethal of volleys with a Smile on their face.";
 
-    internal const float _MAX_REFLECT_DISTANCE = 5f;
-    internal const int   _IDLE_FPS             = 24;
-    internal const int   _AMMO                 = 100;
+    internal const float _MAX_REFLECT_DISTANCE          = 5f;
+    internal const float _MAX_REFLECT_DISTANCE_MASTERED = 7f;
+    internal const int   _IDLE_FPS                      = 24;
+    internal const int   _AMMO                          = 100;
 
     private List<TennisBall> _extantTennisBalls = new();
 
@@ -45,13 +46,20 @@ public class RacketLauncher : CwaffGun
 
     public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
     {
+        if (gun.GunPlayerOwner() is not PlayerController player)
+            return projectile;
+
+        bool mastered = player.HasSynergy(Synergy.MASTERY_RACKET_LAUNCHER);
         if (this._extantTennisBalls.Count == 0 && gun.CurrentAmmo > 0)
         {
             mod.ammoCost = 1;
             gun.ClipShotsRemaining = gun.CurrentAmmo;
             return projectile;
         }
-        Vector2 racketpos = gun.GunPlayerOwner().CenterPosition;
+        Vector2 racketpos = player.CenterPosition;
+        float reflectRange = mastered ? _MAX_REFLECT_DISTANCE_MASTERED : _MAX_REFLECT_DISTANCE;
+        TennisBall closest = null;
+        float closestDist = reflectRange;
         foreach (TennisBall ball in this._extantTennisBalls)
         {
             if (!ball.Whackable())
@@ -60,8 +68,19 @@ public class RacketLauncher : CwaffGun
             float dist = delta.magnitude;
             float angle = delta.ToAngle();
             // make sure it's within range and not behind us
-            if (dist < _MAX_REFLECT_DISTANCE && Mathf.Abs(angle - gun.CurrentAngle) < 90f)
-                ball.GotWhacked(gun.CurrentAngle.ToVector());
+            if (dist < closestDist && Mathf.Abs(angle - gun.CurrentAngle) < 90f)
+            {
+                closestDist = dist;
+                closest = ball;
+            }
+        }
+        if (closest)
+            closest.GotWhacked(gun.CurrentAngle.ToVector());
+        else if (mastered)
+        {
+            mod.ammoCost = 1;
+            gun.ClipShotsRemaining = gun.CurrentAmmo;
+            return projectile;
         }
         mod.ammoCost = 0;
         gun.ClipShotsRemaining = gun.CurrentAmmo + 1;

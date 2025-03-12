@@ -211,6 +211,8 @@ public static class CwaffSynergies
             .MultReload(0.5f);
         // Graze range is increased, focus mode slows down time even further, and projectiles grazed while not in focus mode are reflected back at enemies.
         NewMastery<MasteryOfAimuHakurei>(MASTERY_AIMU_HAKUREI, AimuHakurei.ItemName);
+        // Racket Launcher can fire multiple projectiles and has increased reflect range
+        NewMastery<MasteryOfRacketLauncher>(MASTERY_RACKET_LAUNCHER, RacketLauncher.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -460,6 +462,7 @@ internal class MasteryOfOutbreak             : MasteryDummyItem {}
 internal class MasteryOfTelefragger          : MasteryDummyItem {}
 internal class MasteryOfTranquilizer         : MasteryDummyItem {}
 internal class MasteryOfAimuHakurei          : MasteryDummyItem {}
+internal class MasteryOfRacketLauncher       : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -548,4 +551,5 @@ public enum Synergy {
     MASTERY_TELEFRAGGER,
     MASTERY_TRANQUILIZER,
     MASTERY_AIMU_HAKUREI,
+    MASTERY_RACKET_LAUNCHER,
 };
