@@ -578,7 +578,7 @@ public static class Extensions
       return player.GetAbsoluteParentRoom().area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS;
   }
 
-  /// <summary>https://forum.unity.com/threads/clever-way-to-shuffle-a-list-t-in-one-line-of-c-code.241052/</summary>
+  /// <summary>Fisher-Yates Shuffle: https://forum.unity.com/threads/clever-way-to-shuffle-a-list-t-in-one-line-of-c-code.241052/</summary>
   public static void Shuffle<T>(this IList<T> ts) {
       var count = ts.Count;
       var last = count - 1;
@@ -3119,6 +3119,16 @@ public static class Extensions
   public static float LazyInverseLerp(this Vector2 c, Vector2 a, Vector2 b)
   {
     return Mathf.Sqrt((c-a).sqrMagnitude / (b-a).sqrMagnitude);
+  }
+
+  /// <summary>Creates chain lighting VFX from a normal VFX object</summary>
+  public static GameObject MakeChainLightingVFX(this GameObject vfx)
+  {
+      GameObject prefab = Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX.ClonePrefab(deactivate: false);
+      prefab.GetComponent<tk2dSpriteAnimator>().Library = vfx.GetComponent<tk2dSpriteAnimator>().Library;
+      prefab.GetComponent<tk2dSpriteAnimator>().DefaultClipId = vfx.GetComponent<tk2dSpriteAnimator>().DefaultClipId;
+      prefab.GetComponent<tk2dTiledSprite>().SetSprite(vfx.DefaultAnimation().frames[0].spriteCollection, vfx.DefaultAnimation().frames[0].spriteId);
+      return prefab;
   }
 }
 

@@ -7,7 +7,6 @@ public class Plasmarble : CwaffGun
     public static string LongDescription  = "Launches an orb of plasma that periodically discharges electric bolts towards nearby enemies, shattering after a few seconds. Orbs discharge twice as quickly when soaked in water.";
     public static string Lore             = "An artificat emblematic of funkier times when peace and love were rad and war was totally uncool. Much like other household decor of its era, it is eccentric, flashy, and unreasonably dangerous when considering its intended purpose.";
 
-    internal static GameObject _PlasmaLighting = null;
     internal static GameObject _LinkVFXPrefab = null;
     internal static Projectile _FlakProjectile = null;
 
@@ -42,12 +41,7 @@ public class Plasmarble : CwaffGun
           sprite: "plasmarble_flak", fps: 1, damage: 3.5f, shouldRotate: true, speed: 50f))
         .Attach<PlasmarbleFlak>();
 
-      _PlasmaLighting = VFX.Create("plasmarble_lightning", fps: 30, loops: true, anchor: Anchor.MiddleLeft);
-      _LinkVFXPrefab = Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX.ClonePrefab(deactivate: false);
-      _LinkVFXPrefab.GetComponent<tk2dSpriteAnimator>().Library = _PlasmaLighting.GetComponent<tk2dSpriteAnimator>().Library;
-      _LinkVFXPrefab.GetComponent<tk2dSpriteAnimator>().DefaultClipId = _PlasmaLighting.GetComponent<tk2dSpriteAnimator>().DefaultClipId;
-      _LinkVFXPrefab.GetComponent<tk2dTiledSprite>().SetSprite(
-        _PlasmaLighting.DefaultAnimation().frames[0].spriteCollection, _PlasmaLighting.DefaultAnimation().frames[0].spriteId);
+      _LinkVFXPrefab = VFX.Create("plasmarble_lightning", fps: 30, loops: true, anchor: Anchor.MiddleLeft).MakeChainLightingVFX();
     }
 
     public override void Update()

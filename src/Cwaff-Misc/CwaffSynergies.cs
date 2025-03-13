@@ -225,6 +225,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfOddjob>(MASTERY_ODDJOB, Oddjob.ItemName);
         // Sunderbuss produces a shockwave that travels along the ground in the direction of aim, heavily damaging all enemies in its path.
         NewMastery<MasteryOfSunderbuss>(MASTERY_SUNDERBUSS, Sunderbuss.ItemName);
+        // Wavefront's projectiles become ionized, intermittently zapping nearby enemies and each other.
+        NewMastery<MasteryOfWavefront>(MASTERY_WAVEFRONT, Wavefront.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -481,6 +483,7 @@ internal class MasteryOfYggdrashell          : MasteryDummyItem {}
 internal class MasteryOfWidowmaker           : MasteryDummyItem {}
 internal class MasteryOfOddjob               : MasteryDummyItem {}
 internal class MasteryOfSunderbuss           : MasteryDummyItem {}
+internal class MasteryOfWavefront            : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -576,4 +579,5 @@ public enum Synergy {
     MASTERY_WIDOWMAKER,
     MASTERY_ODDJOB,
     MASTERY_SUNDERBUSS,
+    MASTERY_WAVEFRONT,
 };

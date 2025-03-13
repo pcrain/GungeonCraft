@@ -4,12 +4,17 @@
 
 - Added Stereoscope, Scalding Jelly, and Flakseed
 	- Stereoscope sprite thanks to Dallan!
-- Added masteries for Racket Launcher, Jugglernaut, BlasTech F-4, Yggdrashell, Widowmaker, Oddjob, and Sunderbuss
+- Added masteries for Racket Launcher, Jugglernaut, BlasTech F-4, Yggdrashell, Widowmaker, Oddjob, Sunderbuss, and Wavefront
 - Fixed potential null deref caused by event handler for destroyed Allay companion
 - Racket Launcher now onlys reflect the nearest valid projectile rather than all projectiles in range
 - Nerfed Widowmaker:
 	- Reduced spider turret damage from 15 to 10
 	- Reduced max ammo from 320 to 160
+- Buffed Wavefront:
+	- Increased clip size from 8 to 12
+	- Increased projectiles' lingering time from 10 to 15 seconds
+	- Allowed Wavefront to fire when facing walls (since projectiles phase through them anyway)
+- Corrected misinformation in Wavefront description incorrectly stating projectiles lasted up to 30 seconds
 
 ## 1.21.2 (2025-01-30)
 

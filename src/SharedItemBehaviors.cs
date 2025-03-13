@@ -874,7 +874,6 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
     private tk2dTiledSprite extantLink;
     private Projectile proj;
     private bool makeGlowy = false;
-    private bool fading = false;
     private bool destroyWithProjectile = false;
     private HashSet<AIActor> m_damagedEnemies = new HashSet<AIActor>();
     private float shrinkLength = 1f;
@@ -903,20 +902,6 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
             DestroyExtantLink();
             return;
         }
-        if (disownTimer > 0)
-        {
-            disownTimer -= BraveTime.DeltaTime;
-            if (disownTimer <= 0)
-            {
-                owner = null;
-                disowned = true;
-                fading = true;
-                if (fadeTimer > 0)
-                    StartCoroutine(shrinkFade ? ShrinkOut() : FadeOut());
-                else
-                    DestroyExtantLink();
-            }
-        }
         if (!this.extantLink)
         {
             this.extantLink = UnityEngine.Object.Instantiate(linkPrefab).GetComponent<tk2dTiledSprite>();
@@ -932,6 +917,21 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
                 mat.SetFloat("_EmissiveColorPower", 1.55f);
                 mat.SetColor("_EmissiveColor", color);
                 this.extantLink.color = color;
+            }
+            if (disownTimer <= 0 && fadeTimer > 0)  // if we immediately have a fadeTimer > 0 and no disownTimer, start fading out immediately
+                StartCoroutine(shrinkFade ? ShrinkOut() : FadeOut());
+        }
+        if (disownTimer > 0)
+        {
+            disownTimer -= BraveTime.DeltaTime;
+            if (disownTimer <= 0)
+            {
+                owner = null;
+                disowned = true;
+                if (fadeTimer > 0)
+                    StartCoroutine(shrinkFade ? ShrinkOut() : FadeOut());
+                else
+                    DestroyExtantLink();
             }
         }
         UpdateLink();
@@ -1000,10 +1000,10 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
             targetPos = owner.specRigidbody.HitboxPixelCollider.UnitCenter;
         this.extantLink.transform.position = originPos;
         Vector2 vector = targetPos - originPos;
-        float num = BraveMathCollege.Atan2Degrees(vector.normalized);
+        float angle = BraveMathCollege.Atan2Degrees(vector.normalized);
         int pixelLength = Mathf.RoundToInt(shrinkLength * vector.magnitude * 16f);
         this.extantLink.dimensions = new Vector2((float)pixelLength, this.extantLink.dimensions.y);
-        this.extantLink.transform.rotation = Quaternion.Euler(0f, 0f, num);
+        this.extantLink.transform.rotation = Quaternion.Euler(0f, 0f, angle);
         this.extantLink.UpdateZDepth();
         this.ApplyLinearDamage(originPos, targetPos);
     }
