@@ -21,11 +21,12 @@ public class OmnidirectionalLaser : CwaffGun
     private const int _NUM_MASTERY_PROJ  = 4; // additional projectiles for mastery
     private const float _MASTERY_GAP     = 360f / (1f + _NUM_MASTERY_PROJ);
 
+    internal static CwaffTrailController _OmniTrailPrefab  = null;
+    internal static CwaffTrailController _OmniTrailMasteredPrefab  = null;
+
     private static List<int> _BackSpriteIds = new();
     private static List<Vector3> _BarrelOffsets = new();
     private static GameObject _OmniReticle  = null;
-    private static CwaffTrailController _OmniTrailPrefab  = null;
-    private static CwaffTrailController _OmniTrailMasteredPrefab  = null;
 
     private tk2dSprite _backside = null;
     private tk2dSprite _reticle = null;
@@ -56,6 +57,8 @@ public class OmnidirectionalLaser : CwaffGun
             angleVariance: 0.0f, speed: 200f, damage: 16f, spawnSound: "omnilaser_shoot_sound", uniqueSounds: true, customClip: true))
           .Attach<OmnidirectionalProjectile>(o => o.mastered = false)
           .Assign(out Projectile proj);
+
+        Widowmaker._WidowTurretLaser = proj;
 
         ProjectileModule[] masteryModules = new ProjectileModule[_NUM_MASTERY_PROJ];
         Projectile masteryProj = proj.Clone(GunData.New(sprite: "omnilaser_mastered_projectile"))

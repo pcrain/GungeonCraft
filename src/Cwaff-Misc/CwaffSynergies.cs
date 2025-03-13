@@ -219,6 +219,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfBlasTechF4>(MASTERY_BLASTECH_F4, BlasTechF4.ItemName);
         // Yggdrashell can target up to 3 enemies simultaneously.
         NewMastery<MasteryOfYggdrashell>(MASTERY_YGGDRASHELL, Yggdrashell.ItemName);
+        // Spider drones fire lasers that pierce small obstacles and have increased speed, damage, and fire rate.
+        NewMastery<MasteryOfWidowmaker>(MASTERY_WIDOWMAKER, Widowmaker.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -472,6 +474,7 @@ internal class MasteryOfRacketLauncher       : MasteryDummyItem {}
 internal class MasteryOfJugglernaut          : MasteryDummyItem {}
 internal class MasteryOfBlasTechF4           : MasteryDummyItem {}
 internal class MasteryOfYggdrashell          : MasteryDummyItem {}
+internal class MasteryOfWidowmaker           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -564,4 +567,5 @@ public enum Synergy {
     MASTERY_JUGGLERNAUT,
     MASTERY_BLASTECH_F4,
     MASTERY_YGGDRASHELL,
+    MASTERY_WIDOWMAKER,
 };

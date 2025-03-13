@@ -3,9 +3,12 @@
 ## 1.22.0 (TBD)
 
 - Added Stereoscope, Scalding Jelly, and Flakseed
-- Added masteries for Racket Launcher, Jugglernaut, BlasTech F-4, and Yggdrashell
+- Added masteries for Racket Launcher, Jugglernaut, BlasTech F-4, Yggdrashell, and Widowmaker
 - Fixed potential null deref caused by event handler for destroyed Allay companion
 - Racket Launcher now onlys reflect the nearest valid projectile rather than all projectiles in range
+- Nerfed Widowmaker:
+	- Reduced spider turret damage from 15 to 10
+	- Reduced max ammo from 320 to 160
 
 ## 1.21.2 (2025-01-30)
 

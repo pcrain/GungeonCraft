@@ -11,11 +11,12 @@ public class Widowmaker : CwaffGun
 
     internal static GameObject _WidowmakerPrefab = null;
     internal static Projectile _WidowTurretProjectile = null;
+    internal static Projectile _WidowTurretLaser = null;
 
     public static void Init()
     {
         Lazy.SetupGun<Widowmaker>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.4f, ammo: 320, shootFps: 20, reloadFps: 12, fireAudio: "widowmaker_fire_sound")
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.4f, ammo: 160, shootFps: 20, reloadFps: 12, fireAudio: "widowmaker_fire_sound")
           .SetReloadAudio("widowmaker_reload_sound", 0, 4, 8, 10, 12, 14)
           .InitProjectile(GunData.New(clipSize: 5, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 3.5f, pierceBreakables: true,
             sprite: "widowmaker_projectile", fps: 12, scale: _SCALE, anchor: Anchor.MiddleLeft, preventOrbiting: true, customClip: true))
@@ -26,7 +27,8 @@ public class Widowmaker : CwaffGun
         _WidowmakerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
         _WidowmakerPrefab.AddComponent<Crawlyboi>();
 
-        _WidowTurretProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 15.0f, speed: 80.0f, force: 10.0f, range: 80.0f))
+        _WidowTurretProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 10.0f, speed: 50.0f, force: 10.0f, range: 80.0f,
+            spawnSound: "widowmaker_turret_shoot_sound", uniqueSounds: true))
           .Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.3f;
@@ -35,6 +37,10 @@ public class Widowmaker : CwaffGun
             trail.BaseColor  = ExtendedColours.paleYellow;
             trail.EndColor   = Color.Lerp(ExtendedColours.paleYellow, Color.white, 0.25f);
           });
+
+        _WidowTurretLaser = Items.Ak47.CloneProjectile(GunData.New(sprite: "widowmaker_laser_projectile", angleVariance: 0.0f,
+            speed: 200f, damage: 12f, spawnSound: "widowmaker_laser_sound", customClip: true, shouldRotate: true,
+            pierceBreakables: true));
     }
 }
 
@@ -69,13 +75,14 @@ public class WidowmakerProjectile : MonoBehaviour
 
 public class Crawlyboi : MonoBehaviour
 {
-    private const float _CRAWL_SPEED  = 10f;
-    private const float _SHOOT_TIMER  = 0.4f;
-    private const float _SOUND_TIMER  = 0.18f;
-    private const float _EXPIRE_TIMER = 8f;
-    private const float _SIGHT_CONE   = 90f; // 180-degree cone
-    private const float _SIGHT_DIST   = 12f;
-    private const float _STUCK_TIME   = 0.15f; // amount of time we can go without moving until we're considered stuck
+    private const float _CRAWL_SPEED          = 10f;
+    private const float _SHOOT_TIMER          = 0.4f;
+    private const float _SHOOT_TIMER_MASTERED = 0.25f;
+    private const float _SOUND_TIMER          = 0.18f;
+    private const float _EXPIRE_TIMER         = 8f;
+    private const float _SIGHT_CONE           = 90f; // 180-degree cone
+    private const float _SIGHT_DIST           = 12f;
+    private const float _STUCK_TIME           = 0.15f; // amount of time we can go without moving until we're considered stuck
 
     private SpeculativeRigidbody _body;
     private tk2dSprite _sprite;
@@ -91,6 +98,8 @@ public class Crawlyboi : MonoBehaviour
     private bool _oddStep;
     private Vector3 _lastPosition;
     private float _stuckTime = 0f;
+    private bool _mastered = false;
+    private float _shootRate;
 
     public void Setup(PlayerController owner, Vector2 wallNormal, Vector2 projVelocity, float damage)
     {
@@ -98,7 +107,9 @@ public class Crawlyboi : MonoBehaviour
         this._rotateDir = clockwise ? -90f : 90f;
 
         this._owner      = owner;
+        this._mastered   = owner && owner.HasSynergy(Synergy.MASTERY_WIDOWMAKER);
         this._damage     = damage;
+        this._shootRate  = this._mastered ? _SHOOT_TIMER_MASTERED : _SHOOT_TIMER;
         this._wallNormal = wallNormal;
         this._velocity   = wallNormal.Rotate(this._rotateDir);
 
@@ -167,7 +178,7 @@ public class Crawlyboi : MonoBehaviour
             base.gameObject.PlayUnique(_oddStep ? "widowmaker_turret_crawl_sound_2" : "widowmaker_turret_crawl_sound");
             this._oddStep = !this._oddStep;
         }
-        if ((this._shootTimer += BraveTime.DeltaTime) < _SHOOT_TIMER)
+        if ((this._shootTimer += BraveTime.DeltaTime) < this._shootRate)
             return;
 
         Vector2 shootPoint = base.transform.position.XY() + this._wallNormal;
@@ -181,16 +192,16 @@ public class Crawlyboi : MonoBehaviour
             return;
 
         Projectile proj = SpawnManager.SpawnProjectile(
-            prefab   : Widowmaker._WidowTurretProjectile.gameObject,
+            prefab   : (this._mastered ? Widowmaker._WidowTurretLaser : Widowmaker._WidowTurretProjectile).gameObject,
             position : shootPoint,
             rotation : (enemyPos.Value - shootPoint).EulerZ()).GetComponent<Projectile>();
         proj.collidesWithPlayer  = false;
         proj.collidesWithEnemies = true;
         proj.baseData.damage     = this._damage;
         proj.SetOwnerAndStats(this._owner);
+        if (this._mastered)
+            proj.AddTrail(OmnidirectionalLaser._OmniTrailMasteredPrefab).gameObject.SetGlowiness(10f);
 
-        proj.SetSpeed(50f);
-        base.gameObject.PlayUnique("widowmaker_turret_shoot_sound");
         this._shootTimer = 0f;
     }
 
