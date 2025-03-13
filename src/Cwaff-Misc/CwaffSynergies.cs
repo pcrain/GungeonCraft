@@ -221,6 +221,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfYggdrashell>(MASTERY_YGGDRASHELL, Yggdrashell.ItemName);
         // Spider drones fire lasers that pierce small obstacles and have increased speed, damage, and fire rate.
         NewMastery<MasteryOfWidowmaker>(MASTERY_WIDOWMAKER, Widowmaker.ItemName);
+        // Oddjob fires additional sawblade projectiles outward radially while in flight.
+        NewMastery<MasteryOfOddjob>(MASTERY_ODDJOB, Oddjob.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -475,6 +477,7 @@ internal class MasteryOfJugglernaut          : MasteryDummyItem {}
 internal class MasteryOfBlasTechF4           : MasteryDummyItem {}
 internal class MasteryOfYggdrashell          : MasteryDummyItem {}
 internal class MasteryOfWidowmaker           : MasteryDummyItem {}
+internal class MasteryOfOddjob               : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -568,4 +571,5 @@ public enum Synergy {
     MASTERY_BLASTECH_F4,
     MASTERY_YGGDRASHELL,
     MASTERY_WIDOWMAKER,
+    MASTERY_ODDJOB,
 };

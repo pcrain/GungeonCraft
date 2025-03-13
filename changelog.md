@@ -3,7 +3,8 @@
 ## 1.22.0 (TBD)
 
 - Added Stereoscope, Scalding Jelly, and Flakseed
-- Added masteries for Racket Launcher, Jugglernaut, BlasTech F-4, Yggdrashell, and Widowmaker
+	- Stereoscope sprite thanks to Dallan!
+- Added masteries for Racket Launcher, Jugglernaut, BlasTech F-4, Yggdrashell, Widowmaker, and Oddjob
 - Fixed potential null deref caused by event handler for destroyed Allay companion
 - Racket Launcher now onlys reflect the nearest valid projectile rather than all projectiles in range
 - Nerfed Widowmaker:

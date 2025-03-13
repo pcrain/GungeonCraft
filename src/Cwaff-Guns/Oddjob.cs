@@ -9,6 +9,7 @@ public class Oddjob : CwaffGun
 
     internal static GameObject _Sparks = null;
     internal static Hat _OddjobHat = null;
+    internal static Projectile _OddjobFlakProjectile = null;
 
     private Projectile _extantOddjobProj = null;
     private string _capiHatName = null;
@@ -28,6 +29,10 @@ public class Oddjob : CwaffGun
 
       _Sparks = VFX.Create("oddjob_sparks");
       _OddjobHat = CwaffHats.EasyHat(name: "oddjob_hat", offset: new IntVector2(0, -3), excluded: true);
+
+      _OddjobFlakProjectile = Items.Ak47.CloneProjectile(GunData.New(sprite: "oddjob_flak_projectile", angleVariance: 0.0f,
+          speed: 20f, damage: 6f, shouldRotate: false, spinRate: 2160f, glowAmount: 10f))
+        .SetAllImpactVFX(VFX.CreatePool("oddjob_flak_impact", fps: 20, loops: false));
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -154,12 +159,18 @@ public class Oddjob : CwaffGun
 public class OddjobProjectile : MonoBehaviour
 {
     private const float _SPARK_RATE = 0.05f;
+    private const float _FLAK_TIMER = 0.15f;
+    private const int _FLAK_COUNT = 5;
+    private const float _FLAK_SPACING = 360f / _FLAK_COUNT;
 
     internal bool _collidedLastFrame = false;
     internal bool _returning = false;
 
     private Projectile _proj;
+    private PlayerController _owner = null;
     private float _lastSparkTime = 0;
+    private bool _mastered = false;
+    private float _nextFlakTime = 0;
     private List<HealthHaver> _hitThisFrame = new();
     private List<HealthHaver> _hitLastFrame = new();
 
@@ -171,7 +182,12 @@ public class OddjobProjectile : MonoBehaviour
         OddjobProjectileMotionModule motionModule = new OddjobProjectileMotionModule();
         this._proj.OverrideMotionModule = motionModule;
         if (this._proj.Owner is PlayerController player)
+        {
+            this._owner = player;
             motionModule.ForceInvert = player.SpriteFlipped;
+            this._mastered = player.HasSynergy(Synergy.MASTERY_ODDJOB);
+            this._nextFlakTime = BraveTime.ScaledTimeSinceStartup + _FLAK_TIMER;
+        }
         else
             motionModule.ForceInvert = Lazy.CoinFlip();
 
@@ -182,6 +198,9 @@ public class OddjobProjectile : MonoBehaviour
             trail.BaseColor  = new Color(0.5f, 0.5f, 0.5f);
             trail.StartColor = Color.Lerp(trail.BaseColor, Color.white, 0.5f);
             trail.EndColor   = trail.BaseColor;
+
+        this._proj.sprite.HeightOffGround = 4f;
+        this._proj.sprite.UpdateZDepth();
     }
 
     private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -205,7 +224,7 @@ public class OddjobProjectile : MonoBehaviour
         if ((now - this._lastSparkTime) >= _SPARK_RATE)
         {
             this._lastSparkTime = now;
-            CwaffVFX.SpawnBurst(prefab: Oddjob._Sparks, numToSpawn: 10, basePosition: myRigidbody.UnitBottomCenter,
+            CwaffVFX.SpawnBurst(prefab: Oddjob._Sparks, numToSpawn: 10, basePosition: myRigidbody.UnitBottomCenter, height: 4f,
               minVelocity: 10f, velocityVariance: 5f, rotType: CwaffVFX.Rot.Random, lifetime: 0.2f, fadeOutTime: 0.05f);
         }
     }
@@ -239,6 +258,32 @@ public class OddjobProjectile : MonoBehaviour
         this.LoopSoundIf(this._collidedLastFrame, "oddjob_saw_sound");
         this.LoopSoundIf(!this._collidedLastFrame, "oddjob_spin_sound");
         UpdateCollisionData();
+
+        if (!this._mastered)
+            return;
+
+        float now = BraveTime.ScaledTimeSinceStartup;
+        if (now < this._nextFlakTime)
+            return;
+
+        this._nextFlakTime = now + _FLAK_TIMER;
+        float offset = 360f * UnityEngine.Random.value;
+        for (int i = 0; i < _FLAK_COUNT; ++i)
+        {
+            Projectile proj = SpawnManager.SpawnProjectile(
+                prefab   : Oddjob._OddjobFlakProjectile.gameObject,
+                position : this._proj.SafeCenter,
+                rotation : (offset + i * _FLAK_SPACING).EulerZ()).GetComponent<Projectile>();
+            //REFACTOR: combine the next few lines into the base function throughout the code base
+            proj.collidesWithPlayer  = false;
+            proj.collidesWithEnemies = true;
+            proj.SetOwnerAndStats(this._owner);
+            //REFACTOR: end of refactor
+            foreach (HealthHaver hh in this._hitLastFrame)
+                if (hh.specRigidbody is SpeculativeRigidbody body)
+                    proj.specRigidbody.RegisterSpecificCollisionException(body);
+        }
+        base.gameObject.Play("oddjob_flak_sound");
     }
 }
 

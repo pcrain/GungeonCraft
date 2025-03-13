@@ -106,6 +106,7 @@ public sealed class GunData
   public float glowAmount;
   public Color? glowColor;
   public int beamDissipateFps;
+  public float? spinRate;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -201,6 +202,7 @@ public sealed class GunData
   /// <param name="glowAmount">The emissive power of the projectile.</param>
   /// <param name="glowColor">The emissive color of the projectile.</param>
   /// <param name="beamDissipateFps">The framerate for the beam's dissipate animation.</param>
+  /// <param name="spinRate">The speed at which the projectile spins while moving in degrees per second (requires shouldRotate == false).</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -217,7 +219,7 @@ public sealed class GunData
     float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f, GoopDefinition beamGoop = null, bool? beamInterpolate = null,
     int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null, float beamKnockback = -1f,
     BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
-    bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, int beamDissipateFps = -1)
+    bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, int beamDissipateFps = -1, float? spinRate = null)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -312,6 +314,7 @@ public sealed class GunData
       _Instance.glowAmount                        = glowAmount;
       _Instance.glowColor                         = glowColor;
       _Instance.beamDissipateFps                  = beamDissipateFps;
+      _Instance.spinRate                          = spinRate;
       return _Instance;
   }
 }
@@ -330,13 +333,6 @@ public static class GunBuilder
     // Set up the gun's default module, default projectile, and default projectile animation
     ProjectileModule mod = gun.SetupDefaultModule(b);
     ProjectileType proj = gun.InitFirstProjectileOfType<ProjectileType>(b);
-
-    // Determine whether we have an invisible projectile
-    proj.sprite.renderer.enabled = !b.invisibleProjectile;
-
-    // Determine the emissive properties of the projectile
-    if (b.glowAmount > 0f)
-      proj.sprite.SetGlowiness(glowAmount: b.glowAmount, glowColor: b.glowColor);
 
     // Need to set up charge projectiles after both module and base projectile have been set up
     if (b.shootStyle == ShootStyle.Charged)
@@ -461,6 +457,7 @@ public static class GunBuilder
       c.preventOrbiting     = b.preventOrbiting     ?? c.preventOrbiting;
       c.becomeDebris        = b.becomeDebris        ?? c.becomeDebris;
       c.preventSparks       = b.preventSparks       ?? c.preventSparks;
+      c.spinRate            = b.spinRate            ?? c.spinRate;
 
     // Non-defaulted
     p.BossDamageMultiplier         = b.bossDamageMult;
@@ -491,6 +488,13 @@ public static class GunBuilder
 
     if (b.doBeamSetup ?? (b.shootStyle == ShootStyle.Beam))
       p.InternalSetupBeam(b);
+
+    // Determine whether we have an invisible projectile
+    p.sprite.renderer.enabled = !b.invisibleProjectile;
+
+    // Determine the emissive properties of the projectile
+    if (b.glowAmount > 0f)
+      p.sprite.SetGlowiness(glowAmount: b.glowAmount, glowColor: b.glowColor);
 
     return p;
   }

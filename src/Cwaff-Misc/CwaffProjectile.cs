@@ -16,6 +16,7 @@ public class CwaffProjectile : MonoBehaviour
     public bool firedForFree         = true;
     public bool becomeDebris         = false;
     public bool preventSparks        = false;
+    public float spinRate            = 0f;
 
     private Projectile _projectile;
     private PlayerController _owner;
@@ -42,7 +43,8 @@ public class CwaffProjectile : MonoBehaviour
 
     private void Update()
     {
-      // enter update code here
+      if (this.spinRate != 0f && this._projectile.m_transform)
+        this._projectile.m_transform.rotation *= Quaternion.Euler(0f, 0f, BraveTime.DeltaTime * this.spinRate);
     }
 
     private void OnProjectileDestroy(Projectile p)
