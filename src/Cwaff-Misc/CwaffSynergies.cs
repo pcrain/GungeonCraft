@@ -227,6 +227,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfSunderbuss>(MASTERY_SUNDERBUSS, Sunderbuss.ItemName);
         // Wavefront's projectiles become ionized, intermittently zapping nearby enemies and each other.
         NewMastery<MasteryOfWavefront>(MASTERY_WAVEFRONT, Wavefront.ItemName);
+        // Breegull transforms into its dragon form, granting infinite fire eggs that never need reloading.
+        NewMastery<MasteryOfBreegull>(MASTERY_BREEGULL, Breegull.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -484,6 +486,7 @@ internal class MasteryOfWidowmaker           : MasteryDummyItem {}
 internal class MasteryOfOddjob               : MasteryDummyItem {}
 internal class MasteryOfSunderbuss           : MasteryDummyItem {}
 internal class MasteryOfWavefront            : MasteryDummyItem {}
+internal class MasteryOfBreegull             : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -580,4 +583,5 @@ public enum Synergy {
     MASTERY_ODDJOB,
     MASTERY_SUNDERBUSS,
     MASTERY_WAVEFRONT,
+    MASTERY_BREEGULL,
 };

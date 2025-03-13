@@ -21,6 +21,8 @@ public class Breegull : CwaffGun
     internal int _currentEggType = 0;
     private float _noiseTimer = 0.0f;
     private bool _altNoise = false;
+    private bool _mastered = false;
+    private int _trueAmmo = 0;
 
     internal class EggData
     {
@@ -37,9 +39,15 @@ public class Breegull : CwaffGun
             introFps: 8, fireAudio: "breegull_shoot_sound", introAudio: "breegull_intro_sound", carryOffset: new IntVector2(6, 0))
           .SetReloadAudio("breegull_reload_sound", 0, 4, 8)
           .Attach<BreegullAmmoDisplay>()
+          .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(sprite: "breegull_projectile_normal", clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.0f,
             shrapnelVFX: VFX.Create("breegull_impact_normal"), shrapnelCount: 10, destroySound: "egg_hit_enemy_sound", customClip: true))
           .Assign(out _EggNormal);
+
+        gun.QuickUpdateGunAnimation($"dragon_idle", fps: 1);
+        gun.SetGunAudio(gun.QuickUpdateGunAnimation($"dragon_reload", fps: 12, returnToIdle: true), "breegull_dragon_reload_sound", 0, 4, 8);
+        gun.SetGunAudio(gun.QuickUpdateGunAnimation($"dragon_fire", fps: 20, returnToIdle: true), "breegull_dragon_shoot_sound");
+        gun.SetGunAudio(gun.QuickUpdateGunAnimation($"dragon_intro", fps: 8, returnToIdle: true), "breegull_dragon_intro_sound");
 
         _EggFire      = _EggNormal.Clone(GunData.New(sprite: "breegull_projectile_fire", shrapnelVFX: VFX.Create("breegull_impact_fire"), fire: 1.0f));
         _EggGrenade   = _EggNormal.Clone(GunData.New(sprite: "breegull_projectile_grenade", shrapnelVFX: VFX.Create("breegull_impact_grenade")))
@@ -64,7 +72,11 @@ public class Breegull : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (!this.PlayerOwner || !this.PlayerOwner.HasSynergy(Synergy.TALON_TROT))
+        if (!this.PlayerOwner)
+            return;
+        if (this._mastered && this._currentEggType == 1 && this.gun.ClipShotsRemaining < this.gun.DefaultModule.numberOfShotsInClip)
+            this.gun.ClipShotsRemaining = this.gun.DefaultModule.numberOfShotsInClip;
+        if (!this.PlayerOwner.HasSynergy(Synergy.TALON_TROT))
             return;
         if (!this.gun.spriteAnimator.CurrentClip.name.Contains("idle"))
             return;
@@ -94,10 +106,27 @@ public class Breegull : CwaffGun
         UpdateEggs(playSound: true);
     }
 
+    internal void CheckDragonForm(bool force = false)
+    {
+        PlayerController pc = this.PlayerOwner;
+        this._mastered = pc && pc.HasSynergy(Synergy.MASTERY_BREEGULL);
+        if (!this._mastered && !force)
+            return;
+
+        this.gun.idleAnimation = "breegull_dragon_idle";
+        this.gun.shootAnimation = "breegull_dragon_fire";
+        this.gun.reloadAnimation = "breegull_dragon_reload";
+        this.gun.introAnimation = "breegull_dragon_intro";
+        this.gun.spriteAnimator.playAutomatically = false;
+        this.gun.spriteAnimator.StopAndResetFrameToDefault();
+        this.gun.spriteAnimator.Play(pc ? this.gun.introAnimation : this.gun.idleAnimation);
+    }
+
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
         UpdateEggs(playSound: false);
+        CheckDragonForm();
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -105,12 +134,18 @@ public class Breegull : CwaffGun
         base.OnPlayerPickup(player);
         player.OnRollStarted += this.OnDodgeRoll;
         UpdateEggs(playSound: false);
+        CheckDragonForm();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
         player.OnRollStarted -= this.OnDodgeRoll;
+        if (this._trueAmmo > 0)
+        {
+            this.gun.CurrentAmmo = this._trueAmmo;
+            this._trueAmmo = 0;
+        }
     }
 
     public override void OnDestroy()
@@ -130,13 +165,34 @@ public class Breegull : CwaffGun
     {
         EggData e = _Eggs[this._currentEggType];
         this.gun.DefaultModule.ammoCost = e.ammo;  //BUG: with certain items, the ammo cost here seems to be ignored...can't replicate though
+        bool hadInfiniteAmmo = this.gun.LocalInfiniteAmmo;
         if (this._currentEggType == 0 && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.CHEATO_PAGE))
+        {
+            this.gun.LocalInfiniteAmmo = true;
+            this.gun.DefaultModule.ammoCost = 0;
+        }
+        else if (this._currentEggType == 1 && this.PlayerOwner && this._mastered)  // free fire eggs in dragon form
         {
             this.gun.LocalInfiniteAmmo = true;
             this.gun.DefaultModule.ammoCost = 0;
         }
         else
             this.gun.LocalInfiniteAmmo = false;
+        if (hadInfiniteAmmo != this.gun.LocalInfiniteAmmo)
+        {
+            //NOTE: possibly a vanilla bug: LocalInfiniteAmmo isn't respected when the gun has 0 ammo
+            if (this.gun.LocalInfiniteAmmo)
+            {
+                this._trueAmmo = this.gun.CurrentAmmo;
+                this.gun.CurrentAmmo = Mathf.Max(this._trueAmmo, this.gun.DefaultModule.numberOfShotsInClip);
+                this.gun.MoveBulletsIntoClip(this.gun.DefaultModule.numberOfShotsInClip);
+            }
+            else
+            {
+                this.gun.CurrentAmmo = this._trueAmmo;
+                this._trueAmmo = -1;
+            }
+        }
         if (playSound)
             base.gameObject.Play(e.sound);
     }

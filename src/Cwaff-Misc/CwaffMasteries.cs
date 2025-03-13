@@ -195,7 +195,11 @@ public class MasteryRitualComponent : MonoBehaviour
         }
         ritComp.DisableEffects();
         if (ritComp == ritualTarget)
+        {
           blankUser.AcquireMastery(ritComp.GetComponent<Gun>());
+          if (ritComp.GetComponent<Breegull>() is Breegull breegull)
+            breegull.CheckDragonForm(force: true); //REFACTOR: add a post-mastery ritual method for CwaffGuns
+        }
         else
           ritComp.BurnAway();
       }

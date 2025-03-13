@@ -280,3 +280,6 @@ flakseed_deposit_sound,4.0,1,sound,0
 widowmaker_laser_sound,-8.0,1,sound,2
 oddjob_flak_sound,3.0,1,sound,2
 wavefront_zap_sound,-2.0,1,sound,2
+breegull_dragon_shoot_sound,-8.5,1,sound,0
+breegull_dragon_reload_sound,-5.0,1,sound,0
+breegull_dragon_intro_sound,0.0,1,sound,0

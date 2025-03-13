@@ -20,7 +20,7 @@ public class Commands
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             DebrisObject debris = LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(Lazy.PickupId<Wavefront>()).gameObject,
+                PickupObjectDatabase.GetById(Lazy.PickupId<Breegull>()).gameObject,
                 // PickupObjectDatabase.GetById(IDs.Pickups["bubblebeam"]).gameObject,
                 GameManager.Instance.PrimaryPlayer.CenterPosition,
                 Vector2.zero,
@@ -120,6 +120,8 @@ public class Commands
             if (Input.GetKeyDown(KeyCode.M)) // acquire mastery token for current gun
             {
                 __instance.AcquireMastery(__instance.CurrentGun);
+                if (__instance.CurrentGun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
+                    cg.OnSwitchedToThisGun(); //NOTE: remove this if this causes problems
             }
 
             if (Input.GetKeyDown(KeyCode.B)) // toggle constructor profiler
