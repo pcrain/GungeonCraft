@@ -11,6 +11,9 @@ public class Sunderbuss : CwaffGun
     internal static GameObject _ScorchMark = null;
     internal static GameObject _BlunderbussProjectile = null;
     internal static GameObject[] _ShatterDebris = new GameObject[7];
+    internal static SunderbussShockwave _ShockwavePrefab = null;
+
+    internal const float _SHOCKWAVE_DAMAGE = 50f;
 
     private const int  _IDLE_FPS = 6;
     private const float _RUN_SPEED_WHEN_CHARGING = 0.35f;
@@ -46,6 +49,8 @@ public class Sunderbuss : CwaffGun
         UnityEngine.Object.Destroy(_BlunderbussProjectile.GetComponent<BounceProjModifier>());
         Projectile proj = _BlunderbussProjectile.GetComponent<Projectile>();
             proj.baseData.speed = 20f;
+
+        _ShockwavePrefab = new GameObject().RegisterPrefab().AddComponent<SunderbussShockwave>();
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -88,9 +93,10 @@ public class Sunderbuss : CwaffGun
     {
         this._hasLichguard = player.HasPassive<Lichguard>();
         this.percentSpeedWhileCharging = this._hasLichguard ? 1.0f : _RUN_SPEED_WHEN_CHARGING;
-        this.gun.SetAnimationFPS(this.gun.chargeAnimation, (this._hasLichguard ? 2 : 1) * _CHARGE_FPS);
-        this.gun.DefaultModule.chargeProjectiles[0].ChargeTime = (this._hasLichguard ? 0.5f : 1.0f) * _CHARGE_TIME;
-        this.gun.DefaultModule.cooldownTime = (this._hasLichguard ? 0.5f : 1.0f) * _COOLDOWN;
+        float chargeFactor = (this._hasLichguard ? 2f : 1f);
+        this.gun.SetAnimationFPS(this.gun.chargeAnimation, Mathf.RoundToInt(chargeFactor * _CHARGE_FPS));
+        this.gun.DefaultModule.chargeProjectiles[0].ChargeTime = _CHARGE_TIME / chargeFactor;
+        this.gun.DefaultModule.cooldownTime = _COOLDOWN / chargeFactor;
     }
 }
 
@@ -136,6 +142,10 @@ public class SunderbussProjectile : Projectile
             p.Owner = base.Owner;
             p.Shooter = base.Shooter;
         }
+
+        if (proj.Owner is PlayerController pc && pc.HasSynergy(Synergy.MASTERY_SUNDERBUSS))
+            Sunderbuss._ShockwavePrefab.gameObject.Instantiate(proj.SafeCenter).GetComponent<SunderbussShockwave>()
+              .Setup(Sunderbuss._SHOCKWAVE_DAMAGE, proj.transform.right.XY().ToAngle(), 25f, 20f, 2f);
 
         DieInAir();
     }
@@ -211,5 +221,83 @@ public class SunderbussProjectile : Projectile
         hues[7] = validPixels;
 
         return hues;
+    }
+}
+
+public class SunderbussShockwave : MonoBehaviour
+{
+    private const float _SHOCKWAVE_KB = 150f;
+
+    private Vector2 _velocity;
+    private float _damage;
+    private float _speed;
+    private float _timeBetweenShockwaves;
+    private float _sqrRadius;
+    private Vector2 _start;
+    private float _nextShockwaveTime;
+    private float _lifetime;
+    private RoomHandler _room;
+    private List<AIActor> _hitEnemies = new();
+
+    public void Setup(float damage, float angle, float speed, float spacing, float radius)
+    {
+        this._lifetime              = 0f;
+        this._damage                = damage;
+        this._speed                 = speed;
+        this._velocity              = angle.ToVector(this._speed);
+        this._timeBetweenShockwaves = spacing / (16f * speed);
+        this._sqrRadius             = radius * radius;
+        this._nextShockwaveTime     = this._timeBetweenShockwaves;
+
+        this._start = base.transform.position;
+        this._room = this._start.GetAbsoluteRoom();
+        if (this._room == null)
+            UnityEngine.Object.Destroy(base.gameObject);
+    }
+
+    private void Update()
+    {
+        if ((this._lifetime += BraveTime.DeltaTime) < this._nextShockwaveTime)
+            return;
+
+        Vector2 pos = this._start + this._lifetime * this._velocity;
+        if (!pos.InBounds(wallsOk: true) || pos.GetAbsoluteRoom() != this._room)
+        {
+            UnityEngine.Object.Destroy(base.gameObject);
+            return;
+        }
+
+        this._nextShockwaveTime += this._timeBetweenShockwaves;
+        base.gameObject.Play("earthquake_sound");
+        CwaffVFX.SpawnBurst(
+          prefab           : Groundhog._EarthClod,
+          numToSpawn       : 10,
+          basePosition     : pos,
+          positionVariance : 1f,
+          velType          : CwaffVFX.Vel.AwayRadial,
+          velocityVariance : 5f,
+          rotType          : CwaffVFX.Rot.None,
+          lifetime         : 0.25f,
+          fadeOutTime      : 0.25f,
+          startScale       : 1.0f,
+          endScale         : 0.1f,
+          uniform          : true,
+          randomFrame      : true);
+
+        foreach (AIActor enemy in this._room.SafeGetEnemiesInRoom())
+        {
+          if (!enemy || this._hitEnemies.Contains(enemy))
+            continue;
+          if (enemy.healthHaver is not HealthHaver hh || !hh.IsVulnerable || hh.IsDead || hh.PreventAllDamage || !enemy.specRigidbody)
+            continue;
+          Vector2 delta = enemy.CenterPosition - pos;
+          if (delta.sqrMagnitude > this._sqrRadius)
+            continue;
+          Vector2 deltaNorm = delta.normalized;
+          enemy.healthHaver.ApplyDamage(this._damage, deltaNorm, "Sunderwave", CoreDamageTypes.None, DamageCategory.Environment);
+          if (enemy.knockbackDoer)
+            enemy.knockbackDoer.ApplyKnockback(deltaNorm, _SHOCKWAVE_KB, immutable: false);
+          this._hitEnemies.Add(enemy);
+        }
     }
 }

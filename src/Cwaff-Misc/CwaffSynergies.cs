@@ -223,6 +223,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfWidowmaker>(MASTERY_WIDOWMAKER, Widowmaker.ItemName);
         // Oddjob fires additional sawblade projectiles outward radially while in flight.
         NewMastery<MasteryOfOddjob>(MASTERY_ODDJOB, Oddjob.ItemName);
+        // Sunderbuss produces a shockwave that travels along the ground in the direction of aim, heavily damaging all enemies in its path.
+        NewMastery<MasteryOfSunderbuss>(MASTERY_SUNDERBUSS, Sunderbuss.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -478,6 +480,7 @@ internal class MasteryOfBlasTechF4           : MasteryDummyItem {}
 internal class MasteryOfYggdrashell          : MasteryDummyItem {}
 internal class MasteryOfWidowmaker           : MasteryDummyItem {}
 internal class MasteryOfOddjob               : MasteryDummyItem {}
+internal class MasteryOfSunderbuss           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -572,4 +575,5 @@ public enum Synergy {
     MASTERY_YGGDRASHELL,
     MASTERY_WIDOWMAKER,
     MASTERY_ODDJOB,
+    MASTERY_SUNDERBUSS,
 };

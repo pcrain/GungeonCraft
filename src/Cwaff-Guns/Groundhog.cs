@@ -84,6 +84,7 @@ public class Groundhog : CwaffGun
       Vector2 shockwaveCenter = this.PlayerOwner.CenterPosition;
       for (int i = 1; i < intRange; ++i)
       {
+        this.PlayerOwner.gameObject.Play("earthquake_sound");
         LaunchAllEnemiesInRoom(this.PlayerOwner, damage, force, shockwaveCenter, i - 1.5f, i + 0.5f);
         Exploder.DoRadialMinorBreakableBreak(shockwaveCenter, i);
         Exploder.DoRadialPush(shockwaveCenter, force, i);
@@ -109,7 +110,6 @@ public class Groundhog : CwaffGun
 
     private static void LaunchAllEnemiesInRoom(PlayerController player, float damage, float force, Vector2 shockwaveCenter, float minRange, float maxRange)
     {
-      player.gameObject.Play("earthquake_sound");
       RoomHandler room = player.CurrentRoom;
       foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
       {
