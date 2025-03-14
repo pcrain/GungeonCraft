@@ -5,7 +5,7 @@ public class Flakseed : CwaffGun
     public static string ItemName         = "Flakseed";
     public static string ShortDescription = "Orgunic Gardening";
     public static string LongDescription  = "Fires flak seeds that grow into flak flowers 6 seconds after landing. Bullets accelerate growth by pollinating flak sprouts they pass over, with stronger bullets causing faster growth. Grown flowers fire flak for 15 seconds before withering. Nearby flak flowers compete for nutrients and accelerate withering. Flak flowers will not wither while planted in water, and wither instantly when exposed to hostile terrain or when trampled by enemies.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "The quintessential tool for both practitioners of warfare-based gardening and practitioners of gardening-based warfare. Disregarding the fact that the combined demographic for both of these hobbies was 0 at the time of this tool's invention, a successful decade-long marketing campaign has since brought that number up to 2. With just a tiny bit of practice, you could be the one to let them technically, legally claim that number is 3!";
 
     internal static GameObject _FlakFlowerPrefab     = null;
     internal static Projectile _FlakFlowerProjectile = null;

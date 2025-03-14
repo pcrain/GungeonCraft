@@ -7,7 +7,7 @@ public class ScaldingJelly : CwaffCompanion
     public static string ItemName         = "Scalding Jelly";
     public static string ShortDescription = "Fiery Friend";
     public static string LongDescription  = "Spawns a friendly Ignizol that sets nearby ground ablaze as it jumps around. The Ignizol will launch itself at nearby enemies, and can be manually picked up and thrown using the interact key.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "These small blobs were first spotted falling from the clouds, as if carelessly dropped from a kingdom in the heavens. While no such land of high rule actually exists, the origins of these fiery creatures is still a subject of hot debate among Gungeon scholars and meteorologists alike. At the very least, all known specimens have been docile towards Gungeoneers, passive combustion notwithstanding.";
 
     public static string CompanionName    = "Ignizol";
 
