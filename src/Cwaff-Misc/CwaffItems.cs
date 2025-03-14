@@ -45,6 +45,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   private Dictionary<string, List<Vector3>> _barrelOffsets             = null;  // list of dynamic barrel offsets for each of a gun's animations
   private Vector3                           _defaultBarrelOffset       = Vector3.zero; // the default barrel offset for guns with dynamic offsets
   private ModuleShootData                   _cachedShootData           = null; // cached firing data for getting info on extant beams, etc.
+  private int                               _cachedMasteryTokenId      = -2;   // cached mastery token id
 
   protected float                           _spinupRemaining           = 0.0f; // the remaining time a gun must spin up before firing
 
@@ -56,6 +57,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public  float                             spinupTime                 = 0.0f;   // the amount of time it takes an automatic weapon to start firing
   public  string                            spinupSound                = null;   // the sound to play while an automatic gun is spinning up
   public  bool                              continuousFireAnimation    = false;  // if true, don't restart shooting animation when firing bullet
+
+  public  bool                              Mastered {get; private set;}         // whether the gun has been mastered
 
   public static void SetUpDynamicBarrelOffsets(Gun gun)
   {
@@ -89,6 +92,16 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     }
   }
 
+  private void DoMasteryChecks(PlayerController player)
+  {
+    if (this._cachedMasteryTokenId < -1)
+      this._cachedMasteryTokenId = this.gun.MasteryTokenId();
+    this.Mastered = (player && player.HasPassive(this._cachedMasteryTokenId));
+    // #if DEBUG
+    // ETGModConsole.Log($"is {this.gun.GetUnmodifiedDisplayName()} mastered: {this.mastered}");
+    // #endif
+  }
+
   public override void OnPlayerPickup(PlayerController player)
   {
     if (!this.EverPickedUp)
@@ -97,6 +110,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
     player.GunChanged -= OnGunsChanged;
     player.GunChanged += OnGunsChanged;
+
+    DoMasteryChecks(player);
   }
 
   /// <summary>Called the first time a gun is picked up by a player during a run</summary>
@@ -120,6 +135,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
         this.OnSwitchedToThisGun();
     if (previous == this.gun && current != this.gun)
         this.OnSwitchedAwayFromThisGun();
+    DoMasteryChecks(this.PlayerOwner);
   }
 
   /// <summary>
@@ -146,6 +162,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       base.OnDroppedByPlayer(player);
       foreach (CwaffReticle ret in base.gameObject.GetComponents<CwaffReticle>())
         ret.HideImmediately();
+      player.GunChanged -= OnGunsChanged;
   }
 
   public override void Update()

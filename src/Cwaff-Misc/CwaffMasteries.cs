@@ -70,9 +70,10 @@ public static class CwaffMasteries
               return;
             if (gun.CurrentOwner is not PlayerController player)
               return;
-            if (!gun.IsMasterable())
+            int masteryId = gun.MasteryTokenId();
+            if (masteryId < 0)
               return;
-            if (player.GetPassive(gun.MasteryTokenId()))
+            if (player.GetPassive(masteryId))
               __result = $"{MASTERED_STRING}{__result}";
             else
               __result = $"{NORMAL_STRING}{__result}";
@@ -144,14 +145,16 @@ public class MasteryRitualComponent : MonoBehaviour
     // Requirement #4: the middle gun must have a mastery
     if (centerGun.GetComponentInChildren<Gun>() is not Gun gun)
       return false; // should never happen, error state
-    if (!gun.IsMasterable())
+
+    int masteryId = gun.MasteryTokenId();
+    if (masteryId < 0)
     {
       // Lazy.DebugLog($"Failed req #4: center gun {gun.EncounterNameOrDisplayName} does not have a mastery available");
       return false;
     }
 
     // Requirement #5: the player must not already have the mastery for that gun
-    if (Lazy.AnyoneHas(gun.MasteryTokenId()))
+    if (Lazy.AnyoneHas(masteryId))
     {
       // Lazy.DebugLog($"Failed req #5: player already has mastery for {gun.EncounterNameOrDisplayName}");
       return false;

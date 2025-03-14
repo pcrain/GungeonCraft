@@ -327,22 +327,17 @@ public static class CwaffSynergies
         return ase;
     }
 
-    public static bool IsMasterable(this Gun gun)
-    {
-        return _MasteryGuns.ContainsKey(gun.PickupObjectId);
-    }
-
     public static int MasteryTokenId(this Gun gun)
     {
-        return _MasteryGuns[gun.PickupObjectId];
+        return _MasteryGuns.TryGetValue(gun.PickupObjectId, out int id) ? id : -1;
     }
 
     public static void AcquireMastery(this PlayerController player, Gun gun)
     {
-        if (gun && gun.IsMasterable())
+        if (gun && gun.MasteryTokenId() is int id && id >= 0)
         {
             //WARNING: if the mastery changes our clip size, the ui doesn't update for some reason (e.g., with Blackjack)...can't track down
-            player.AcquireFakeItem(_MasteryGuns[gun.PickupObjectId]);
+            player.AcquireFakeItem(id);
             player.gameObject.Play("mastery_ritual_complete_sound");
         }
         else if (gun)
