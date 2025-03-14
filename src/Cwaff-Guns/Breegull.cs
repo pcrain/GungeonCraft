@@ -106,6 +106,12 @@ public class Breegull : CwaffGun
         UpdateEggs(playSound: true);
     }
 
+    public override void OnMasteryStatusChanged()
+    {
+        base.OnMasteryStatusChanged();
+        CheckDragonForm(force: true);
+    }
+
     internal void CheckDragonForm(bool force = false)
     {
         PlayerController pc = this.PlayerOwner;

@@ -92,16 +92,25 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     }
   }
 
-  private void DoMasteryChecks(PlayerController player)
+  internal void DoMasteryChecks(PlayerController player)
   {
+    bool wasMastered = this.Mastered;
     if (this._cachedMasteryTokenId < -1)
       this._cachedMasteryTokenId = this.gun.MasteryTokenId();
     this.Mastered = (player && player.HasPassive(this._cachedMasteryTokenId));
+    if (wasMastered != this.Mastered)
+      OnMasteryStatusChanged();
     // #if DEBUG
     // ETGModConsole.Log($"is {this.gun.GetUnmodifiedDisplayName()} mastered: {this.mastered}");
     // #endif
   }
 
+  /// <summary>Called when the player obtains or loses a mastery for the gun</summary>
+  public virtual void OnMasteryStatusChanged()
+  {
+  }
+
+  /// <summary>Called any time a gun is picked up by a player during a run</summary>
   public override void OnPlayerPickup(PlayerController player)
   {
     if (!this.EverPickedUp)
