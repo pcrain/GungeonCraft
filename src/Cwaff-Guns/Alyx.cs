@@ -46,17 +46,19 @@ public class Alyx : CwaffGun
         Material m = gun.sprite.renderer.material;
         m.SetFloat("_EmissivePower", 50f + 100f * Mathf.Abs(Mathf.Sin(BraveTime.ScaledTimeSinceStartup)));
         RecalculateAmmo();
-        if (this.PlayerOwner && this.Mastered)
+        if (this.Mastered && this._poisonImmunity == null && this.PlayerOwner)
+        {
+            this._poisonImmunity = new DamageTypeModifier {
+                damageType = CoreDamageTypes.Poison,
+                damageMultiplier = 0f,
+            };
             this.PlayerOwner.healthHaver.damageTypeModifiers.AddUnique(this._poisonImmunity);
+        }
     }
 
     public override void OnFirstPickup(PlayerController player)
     {
         base.OnFirstPickup(player);
-        this._poisonImmunity = new DamageTypeModifier {
-            damageType = CoreDamageTypes.Poison,
-            damageMultiplier = 0f,
-        };
         this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
         this.gun.CurrentAmmo = _BASE_MAX_AMMO;
         this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
@@ -88,7 +90,8 @@ public class Alyx : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
-        player.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
+        if (this._poisonImmunity != null)
+            player.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
     }
 
     public override void OnDestroy()
@@ -98,7 +101,7 @@ public class Alyx : CwaffGun
             StopCoroutine(this._decayCoroutine);
             this._decayCoroutine = null;
         }
-        if (this.PlayerOwner)
+        if (this.PlayerOwner && this._poisonImmunity != null)
             this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
         base.OnDestroy();
     }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.22.1 (TBD)
+
+- Fix null deref and softlock caused by picking up a Alyx's mastered form while standing in poison goop
+
 ## 1.22.0 (2025-03-13)
 
 #### Features:
