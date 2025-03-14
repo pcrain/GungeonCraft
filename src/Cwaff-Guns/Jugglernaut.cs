@@ -184,7 +184,7 @@ public class Jugglernaut : CwaffGun
         base.OnSwitchedToThisGun();
         gun.spriteAnimator.StopAndResetFrameToDefault();
         gun.spriteAnimator.AnimationEventTriggered -= ShootAndJuggle;
-        if (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_JUGGLERNAUT))
+        if (this.PlayerOwner && this.Mastered)
             gun.spriteAnimator.AnimationEventTriggered += ShootAndJuggle;
         ResetJuggle(); //WARNING: possibly need to delete one of these due to bug where jugglernaut drops combo seemingly out of nowhere, but might be fixed already
     }

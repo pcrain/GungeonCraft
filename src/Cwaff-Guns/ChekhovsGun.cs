@@ -68,7 +68,7 @@ public class ChekhovsGun : CwaffGun
                 ++ammoToRestore;
         }
         this._extantBullets.Clear();
-        if (!player.HasSynergy(Synergy.MASTERY_CHEKHOVS_GUN))
+        if (!this.Mastered)
             ammoToRestore /= 2;
         this.gun.GainAmmo(ammoToRestore);
     }

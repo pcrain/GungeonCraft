@@ -21,7 +21,6 @@ public class Breegull : CwaffGun
     internal int _currentEggType = 0;
     private float _noiseTimer = 0.0f;
     private bool _altNoise = false;
-    private bool _mastered = false;
     private int _trueAmmo = 0;
 
     internal class EggData
@@ -74,7 +73,7 @@ public class Breegull : CwaffGun
         base.Update();
         if (!this.PlayerOwner)
             return;
-        if (this._mastered && this._currentEggType == 1 && this.gun.ClipShotsRemaining < this.gun.DefaultModule.numberOfShotsInClip)
+        if (this.Mastered && this._currentEggType == 1 && this.gun.ClipShotsRemaining < this.gun.DefaultModule.numberOfShotsInClip)
             this.gun.ClipShotsRemaining = this.gun.DefaultModule.numberOfShotsInClip;
         if (!this.PlayerOwner.HasSynergy(Synergy.TALON_TROT))
             return;
@@ -114,9 +113,7 @@ public class Breegull : CwaffGun
 
     internal void CheckDragonForm(bool force = false)
     {
-        PlayerController pc = this.PlayerOwner;
-        this._mastered = pc && pc.HasSynergy(Synergy.MASTERY_BREEGULL);
-        if (!this._mastered && !force)
+        if (!this.Mastered && !force)
             return;
 
         this.gun.idleAnimation = "breegull_dragon_idle";
@@ -125,7 +122,7 @@ public class Breegull : CwaffGun
         this.gun.introAnimation = "breegull_dragon_intro";
         this.gun.spriteAnimator.playAutomatically = false;
         this.gun.spriteAnimator.StopAndResetFrameToDefault();
-        this.gun.spriteAnimator.Play(pc ? this.gun.introAnimation : this.gun.idleAnimation);
+        this.gun.spriteAnimator.Play(this.PlayerOwner ? this.gun.introAnimation : this.gun.idleAnimation);
     }
 
     public override void OnSwitchedToThisGun()
@@ -177,7 +174,7 @@ public class Breegull : CwaffGun
             this.gun.LocalInfiniteAmmo = true;
             this.gun.DefaultModule.ammoCost = 0;
         }
-        else if (this._currentEggType == 1 && this.PlayerOwner && this._mastered)  // free fire eggs in dragon form
+        else if (this._currentEggType == 1 && this.PlayerOwner && this.Mastered)  // free fire eggs in dragon form
         {
             this.gun.LocalInfiniteAmmo = true;
             this.gun.DefaultModule.ammoCost = 0;

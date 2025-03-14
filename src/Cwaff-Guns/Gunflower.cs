@@ -16,7 +16,6 @@ public class Gunflower : CwaffGun
 
     private List<AdditionalBraveLight> _lights = new();
     private bool _revved = false;
-    private bool _mastered = false;
 
     public static void Init()
     {
@@ -39,8 +38,7 @@ public class Gunflower : CwaffGun
             return;
         if (this.gun.CurrentAmmo > 0 && this.gun.spriteAnimator.IsPlaying(this.gun.outOfAmmoAnimation))
             this.gun.spriteAnimator.PlayFromFrame(this.gun.idleAnimation, 0);
-        this._mastered = player.HasSynergy(Synergy.MASTERY_GUNFLOWER);
-        if (this._mastered && !this.gun.IsFiring)
+        if (this.Mastered && !this.gun.IsFiring)
             DoPassiveAmmoRegen();
         UpdateNutrients();
         bool shouldPlaySound = this.gun && this.gun.IsFiring;
@@ -97,7 +95,7 @@ public class Gunflower : CwaffGun
             return;
         int nutrition;
         bool consumesGoop;
-        if (this._mastered)
+        if (this.Mastered)
             { consumesGoop = true; nutrition = 1; }   // all goop is nutritious if we're mastered
         else if (currentGoop.DrainsAmmo)
             { consumesGoop = false; nutrition = 0; }  // no double jeopardy from ammo draining goop

@@ -44,7 +44,7 @@ public class Pincushion : CwaffGun
             return;
 
         float spread = _MIN_SPREAD;
-        if (pc.HasSynergy(Synergy.MASTERY_PINCUSHION))
+        if (this.Mastered)
         {
             if (projectile.GetComponent<VeryFragileProjectile>() is VeryFragileProjectile vfp)
                 vfp.phasesThroughBreakables = true;

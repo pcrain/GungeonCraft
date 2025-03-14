@@ -93,7 +93,7 @@ public class Uppskeruvel : CwaffGun
     {
         if (this.PlayerOwner is not PlayerController player)
             return;
-        if (!player.HasSynergy(Synergy.MASTERY_UPPSKERUVEL))
+        if (!this.Mastered)
             return;
         if (!enemy || enemy.aiActor is not AIActor actor)
             return;

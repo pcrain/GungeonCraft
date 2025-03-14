@@ -18,8 +18,6 @@ public class CarpetBomber : CwaffGun
 
     internal static ExplosionData _CarpetExplosion = null;
 
-    private bool _mastered = false;
-
     public static void Init()
     {
         Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore)
@@ -70,16 +68,14 @@ public class CarpetBomber : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (!this.PlayerOwner)
-            return;
+        if (this.PlayerOwner)
+            this.gun.SynchronizeReloadAcrossAllModules(); // Synchronize ammo clips between projectile modules as necessary
+    }
 
-        this.gun.SynchronizeReloadAcrossAllModules(); // Synchronize ammo clips between projectile modules as necessary
-        bool mastered = this.PlayerOwner.HasSynergy(Synergy.MASTERY_CARPET_BOMBER);
-        if (mastered != this._mastered)
-        {
-            this.gun.SetAnimationFPS(this.gun.chargeAnimation, (int)((mastered ? 4f : 1f) / _CHARGE_PER_PROJECTILE));
-            this._mastered = mastered;
-        }
+    public override void OnMasteryStatusChanged()
+    {
+        base.OnMasteryStatusChanged();
+        this.gun.SetAnimationFPS(this.gun.chargeAnimation, (int)((this.Mastered ? 4f : 1f) / _CHARGE_PER_PROJECTILE));
     }
 }
 

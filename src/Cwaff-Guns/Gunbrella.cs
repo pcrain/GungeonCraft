@@ -23,7 +23,6 @@ public class Gunbrella : CwaffGun
     private bool _wasCharging            = false;
     private Vector2 _chargeStartPos      = Vector2.zero;
     private int _nextProjectileNumber    = 0;
-    private bool _mastered               = false;
     private bool _masteryVolleyReplaced  = false;
 
     public static void Init()
@@ -56,8 +55,7 @@ public class Gunbrella : CwaffGun
             return;
         if (BraveTime.DeltaTime == 0.0f)
             return;
-        this._mastered = player.HasSynergy(Synergy.MASTERY_GUNBRELLA);
-        if (this._mastered && !this._masteryVolleyReplaced)
+        if (this.Mastered && !this._masteryVolleyReplaced)
         {
             ProjectileVolleyData projectileVolleyData = ScriptableObject.CreateInstance<ProjectileVolleyData>();
             projectileVolleyData.projectiles = new(){ ProjectileModule.CreateClone(_MasteryModule) };
@@ -91,7 +89,7 @@ public class Gunbrella : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        projectile.GetComponent<GunbrellaProjectile>().Setup(gunbrella: this, index: this._nextProjectileNumber++, target: this._chargeStartPos, mastered: this._mastered);
+        projectile.GetComponent<GunbrellaProjectile>().Setup(gunbrella: this, index: this._nextProjectileNumber++, target: this._chargeStartPos, mastered: this.Mastered);
     }
 
     public Vector2 CurrentTarget() => this._chargeStartPos;

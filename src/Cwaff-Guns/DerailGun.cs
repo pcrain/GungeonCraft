@@ -98,7 +98,7 @@ public class DerailGun : CwaffGun
             return;
         if (!this.gun.IsReloading && this.gun.ClipShotsRemaining < Mathf.Min(this.gun.ClipCapacity, this.gun.CurrentAmmo))
             this.gun.Reload(); // force reload immediately after firing to prevent single frame of idle animation looking funny
-        if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_DERAIL_GUN))
+        if (this.Mastered)
         {
             if (!_OilGooper)
                 _OilGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.GreenOilGoop);
@@ -109,7 +109,7 @@ public class DerailGun : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        if (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_DERAIL_GUN))
+        if (this.Mastered)
             projectile.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.GreenOilGoop;
     }
 

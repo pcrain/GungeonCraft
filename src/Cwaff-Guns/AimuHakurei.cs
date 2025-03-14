@@ -24,7 +24,6 @@ public class AimuHakurei : CwaffGun
     private float _lastDecayTime = 0f;
     private Coroutine _decayCoroutine = null;
     private bool _focused = false;
-    private bool _mastered = false;
 
     public static void Init()
     {
@@ -92,7 +91,6 @@ public class AimuHakurei : CwaffGun
         SetFocus(false);
         player.OnRollStarted += this.OnDodgeRoll;
         player.OnReceivedDamage += this.OnReceivedDamage;
-        this._mastered = player && player.HasSynergy(Synergy.MASTERY_AIMU_HAKUREI);
     }
 
     private void OnReceivedDamage(PlayerController player)
@@ -134,7 +132,6 @@ public class AimuHakurei : CwaffGun
     {
         base.OnSwitchedToThisGun();
         SetFocus(false);
-        this._mastered = this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_AIMU_HAKUREI);
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -157,13 +154,13 @@ public class AimuHakurei : CwaffGun
             return;
         this._focused = focus;
         this.gun.CanBeDropped = !focus;
-        BraveTime.SetTimeScaleMultiplier(focus ? (this._mastered ? 0.4f : 0.65f) : 1.0f, base.gameObject);
+        BraveTime.SetTimeScaleMultiplier(focus ? (this.Mastered ? 0.4f : 0.65f) : 1.0f, base.gameObject);
         if (this._focused)
             this.PlayerOwner.gameObject.Play("aimu_focus_sound");
 
         this.gun.RemoveStatFromGun(StatType.MovementSpeed);
         // NOTE: since time is slowed down, the player's effective speed is 0.65 * 0.65. This is intentional
-        this.gun.AddStatToGun(StatType.MovementSpeed.Mult((focus && !this._mastered) ? 0.65f : 1.0f));
+        this.gun.AddStatToGun(StatType.MovementSpeed.Mult((focus && !this.Mastered) ? 0.65f : 1.0f));
         this.PlayerOwner.stats.RecalculateStats(this.PlayerOwner);
     }
 
@@ -249,7 +246,7 @@ public class AimuHakurei : CwaffGun
             this._lastDecayTime = BraveTime.ScaledTimeSinceStartup;
         }
 
-        float maxGrazeDist                 = (_GRAZE_THRES_SQUARED * (this._mastered ? 2f : 1f));
+        float maxGrazeDist                 = (_GRAZE_THRES_SQUARED * (this.Mastered ? 2f : 1f));
         bool playerVulnerable              = pc.healthHaver && pc.healthHaver.IsVulnerable;
         Vector2 ppos                       = pc.CenterPosition;
         Vector2 bottom                     = pc.SpriteBottomCenter;
@@ -271,7 +268,7 @@ public class AimuHakurei : CwaffGun
                 curNode = nextNode;
                 continue;
             }
-            if (this._mastered && !this._focused && p && p.Owner is not PlayerController)
+            if (this.Mastered && !this._focused && p && p.Owner is not PlayerController)
             {
                 PassiveReflectItem.ReflectBullet(p: p, retargetReflectedBullet: true, newOwner: this.PlayerOwner,
                     minReflectedBulletSpeed: 30f, scaleModifier: 1f, damageModifier: 1f, spread: 0f);

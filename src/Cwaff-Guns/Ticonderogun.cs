@@ -91,7 +91,7 @@ public class Ticonderogun : CwaffGun
         base.OnReloadPressed(player, gun, manualReload);
         if (player.IsDodgeRolling || !player.AcceptingNonMotionInput)
             return;
-        if (!player.HasSynergy(Synergy.MASTERY_TICONDEROGUN))
+        if (!this.Mastered)
             return;
         this._eraserMode = !this._eraserMode;
         base.gameObject.PlayOnce(this._eraserMode ? "pencil_erase" : "pencil_write");

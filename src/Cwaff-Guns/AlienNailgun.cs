@@ -195,7 +195,7 @@ public class AlienNailgun : CwaffGun
             return;
         if (this.PlayerOwner is not PlayerController player)
             return;
-        if (!player.IsInCombat || !player.HasSynergy(Synergy.MASTERY_ALIEN_NAILGUN))
+        if (!player.IsInCombat || !this.Mastered)
             return;
         if (enemy.aiActor is not AIActor actor)
             return;

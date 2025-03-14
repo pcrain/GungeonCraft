@@ -13,7 +13,6 @@ public class SubtractorBeam : CwaffGun
     internal static CwaffTrailController _RedTrailPrefab;
     internal static GameObject _HitEffects;
 
-    internal bool _mastered = false;
     internal HealthHaver _lastHitEnemy = null;
 
     public static void Init()
@@ -47,12 +46,6 @@ public class SubtractorBeam : CwaffGun
     {
         WhoAreTheyAgain();
         base.OnDestroy();
-    }
-
-    public override void OnSwitchedToThisGun()
-    {
-        base.OnSwitchedToThisGun();
-        this._mastered = this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_SUBTRACTOR_BEAM);
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -111,7 +104,7 @@ public class SubtractorBeam : CwaffGun
 
     internal void SetLastEnemy(HealthHaver enemy)
     {
-        if (this._mastered)
+        if (this.Mastered)
             this._lastHitEnemy = enemy;
     }
 
@@ -137,7 +130,7 @@ public class SubtractorBeamAmmoDisplay : CustomAmmoDisplay
 
     public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
     {
-        if (!this._sub || !this._sub._mastered)
+        if (!this._sub || !this._sub.Mastered)
             return false;
 
         float damage = this._sub._lastHitEnemy ? this._sub._lastHitEnemy.currentHealth : 0f;

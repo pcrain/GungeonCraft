@@ -231,7 +231,7 @@ public class Maestro : CwaffGun
         if (this._targetProjectile)
             RedirectProjectile(this._targetProjectile, this._targetEnemy, projectile);
         if (this.gun.CanGainAmmo && !projectile.FiredForFree())
-            if (!this._targetProjectile && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_MAESTRO))
+            if (!this._targetProjectile && this.Mastered)
             {
                 this.gun.GainAmmo(1);
                 this.gun.MoveBulletsIntoClip(1);

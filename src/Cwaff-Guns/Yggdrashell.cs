@@ -19,7 +19,6 @@ public class Yggdrashell : CwaffGun
 
     private bool _protectionActive  = false;
     private float _lastParticleTime = 0f;
-    private bool _mastered          = false;
 
     public float lifeForce          = 0f;
 
@@ -118,7 +117,7 @@ public class Yggdrashell : CwaffGun
         this._lastParticleTime = BraveTime.ScaledTimeSinceStartup;
         if (this.GetExtantBeam() is not CwaffRaidenBeamController beam)
             return;
-        beam.maxTargets = this._mastered ? 3 : 1;
+        beam.maxTargets = this.Mastered ? 3 : 1;
         Vector2 gunAngle = this.gun.CurrentAngle.ToVector();
         CwaffVFX.SpawnBurst(
             prefab: _LeafVFX,
@@ -142,7 +141,6 @@ public class Yggdrashell : CwaffGun
         this.gun.CurrentStrengthTier = 0;
         player.OnReceivedDamage += this.OnReceivedDamage;
         player.healthHaver.ModifyDamage += this.OnMightTakeDamage;
-        this._mastered = player.HasSynergy(Synergy.MASTERY_YGGDRASHELL);
     }
 
     private void OnReceivedDamage(PlayerController player)

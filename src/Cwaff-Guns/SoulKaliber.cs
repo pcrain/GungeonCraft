@@ -48,7 +48,7 @@ public class SoulKaliber : CwaffGun
             return; // if we weren't going to take damage anyway, nothing to do
         if (!this.PlayerOwner || this.PlayerOwner.CurrentRoom is not RoomHandler room)
             return; // no valid room to check for enemies
-        if (!this.PlayerOwner.HasSynergy(Synergy.MASTERY_SOUL_KALIBER))
+        if (!this.Mastered)
             return; // no mastery to trigger effect
 
         //NOTE: base chance for triggering == 1 - (1 - (0.25 + 0.05 * Curse))^(# of soul linked enemies)

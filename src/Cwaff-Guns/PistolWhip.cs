@@ -85,7 +85,7 @@ public class PistolWhip : CwaffGun
 
         public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
         {
-            if (!this._owner || !this._owner.HasSynergy(Synergy.MASTERY_PISTOL_WHIP))
+            if (!this.whip.Mastered)
                 return false;
 
             uic.GunAmmoCountLabel.Text = $"[sprite \"mini_blank_ui\"]x{this.whip.miniBlanks}\n[sprite \"infinite-big\"]";

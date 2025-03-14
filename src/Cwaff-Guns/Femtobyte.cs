@@ -177,7 +177,7 @@ public class Femtobyte : CwaffGun
         this._lastEnemyKilled = enemy.EnemyGuid;
         this._lastEnemyName = this._lastEnemyKilled.AmmonomiconName();
         this._displayNameDirty = true;
-        if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_FEMTOBYTE))
+        if (this.Mastered)
             if (DigitizedObject.FromEnemyGuid(enemy.EnemyGuid) is DigitizedObject d)
                 SetCurrentSlot(d);
         CwaffShaders.Digitize(enemy.sprite);

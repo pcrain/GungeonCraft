@@ -49,7 +49,6 @@ public class RacketLauncher : CwaffGun
         if (gun.GunPlayerOwner() is not PlayerController player)
             return projectile;
 
-        bool mastered = player.HasSynergy(Synergy.MASTERY_RACKET_LAUNCHER);
         if (this._extantTennisBalls.Count == 0 && gun.CurrentAmmo > 0)
         {
             mod.ammoCost = 1;
@@ -57,7 +56,7 @@ public class RacketLauncher : CwaffGun
             return projectile;
         }
         Vector2 racketpos = player.CenterPosition;
-        float reflectRange = mastered ? _MAX_REFLECT_DISTANCE_MASTERED : _MAX_REFLECT_DISTANCE;
+        float reflectRange = this.Mastered ? _MAX_REFLECT_DISTANCE_MASTERED : _MAX_REFLECT_DISTANCE;
         TennisBall closest = null;
         float closestDist = reflectRange;
         foreach (TennisBall ball in this._extantTennisBalls)
@@ -76,7 +75,7 @@ public class RacketLauncher : CwaffGun
         }
         if (closest)
             closest.GotWhacked(gun.CurrentAngle.ToVector());
-        else if (mastered)
+        else if (this.Mastered)
         {
             mod.ammoCost = 1;
             gun.ClipShotsRemaining = gun.CurrentAmmo;

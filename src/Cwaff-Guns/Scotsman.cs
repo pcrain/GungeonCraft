@@ -17,7 +17,6 @@ public class Scotsman : CwaffGun
     private Vector2 _aimPoint                = Vector2.zero;
     private int _nextIndex                   = 0;
     private Vector2 _whereIsThePlayerLooking = Vector2.zero;
-    private bool _mastered                   = false;
 
     public static void Init()
     {
@@ -129,9 +128,7 @@ public class Scotsman : CwaffGun
     {
         if (!this.PlayerOwner)
             return;
-        if (!this._mastered)
-            this._mastered = this.PlayerOwner.HasSynergy(Synergy.MASTERY_SCOTSMAN);
-        if (this._mastered)
+        if (this.Mastered)
             UpdateExplosiveDecor();
     }
 
@@ -167,7 +164,7 @@ public class Scotsman : CwaffGun
     private List<AIActor> _activeEnemiesInRoom = new();
     private bool DetonateTheWorld(PlayerController pc)
     {
-        if (!this._mastered || !this.gun || !this.gun.barrelOffset || pc.CurrentRoom is not RoomHandler room)
+        if (!this.Mastered || !this.gun || !this.gun.barrelOffset || pc.CurrentRoom is not RoomHandler room)
             return false;
 
         bool anythingDetonated = false;

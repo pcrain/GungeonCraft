@@ -25,7 +25,6 @@ public class Telefragger : CwaffGun
     private int m_lastFrameAboutToFall     = 0;
     private float _invulnTime              = 0.0f;
     private bool _teleporting              = false;
-    private bool _mastered                 = false;
 
     public static void Init()
     {
@@ -74,7 +73,6 @@ public class Telefragger : CwaffGun
     {
         base.Update();
 
-        this._mastered = this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_TELEFRAGGER);
         if (!SynchronizeSpriteWithBeam())
             gun.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
 
@@ -129,7 +127,7 @@ public class Telefragger : CwaffGun
         base.OnReloadPressed(player, gun, manualReload);
         if (player.IsDodgeRolling || !player.AcceptingNonMotionInput || !gun.IsFiring)
             return;
-        if (!this._teleportReady || !player.HasSynergy(Synergy.MASTERY_TELEFRAGGER))
+        if (!this._teleportReady || !this.Mastered)
             return;
         if (GetExtantBeam() is not BasicBeamController beam || beam.State != BeamState.Firing)
             return;
@@ -260,7 +258,7 @@ public class Telefragger : CwaffGun
 
         public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
         {
-            if (!this._owner || !this._tele || !this._tele._mastered || !this._tele._teleportReady)
+            if (!this._owner || !this._tele || !this._tele.Mastered || !this._tele._teleportReady)
                 return false;
 
             uic.GunAmmoCountLabel.Text = $"[color #bb44dd]Teleport Ready[/color]\n{this._owner.VanillaAmmoDisplay()}";

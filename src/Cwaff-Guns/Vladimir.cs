@@ -122,7 +122,7 @@ public class Vladimir : CwaffGun
             enemy.knockbackDoer.ClearContinuousKnockbacks();
             enemy.knockbackDoer.ApplyKnockback(direction: launchDir, force: _LAUNCH_FORCE);
         }
-        if (!this.PlayerOwner || !this.PlayerOwner.HasSynergy(Synergy.MASTERY_VLADIMIR))
+        if (!this.PlayerOwner || !this.Mastered)
             return;
         if (++this._enemiesKilled < _ENEMIES_PER_CURSE)
             return;
@@ -151,7 +151,7 @@ public class Vladimir : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        if (this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_VLADIMIR))
+        if (this.PlayerOwner && this.Mastered)
             projectile.baseData.damage += _CURSE_DAMAGE_SCALING * Mathf.Max(0f, this.PlayerOwner.Curse());
     }
 
@@ -233,7 +233,7 @@ public class VladimirProjectile : MonoBehaviour
 
         if (!this._gun || this._gun.PlayerOwner is not PlayerController player)
             return;
-        if (!player.HasSynergy(Synergy.MASTERY_VLADIMIR))
+        if (!this._gun.Mastered)
             return;
         if (++this._gun._enemiesKilled < Vladimir._ENEMIES_PER_CURSE)
             return;

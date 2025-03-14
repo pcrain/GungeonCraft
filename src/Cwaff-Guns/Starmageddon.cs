@@ -62,9 +62,7 @@ public class Starmageddon : CwaffGun
         if (this.PlayerOwner is not PlayerController player)
             return;
 
-        if (!this._mastered)
-            this._mastered = player.HasSynergy(Synergy.MASTERY_STARMAGEDDON);
-        if (this._mastered && !this._masteryVolleyReplaced)
+        if (this.Mastered && !this._masteryVolleyReplaced)
         {
             player.healthHaver.damageTypeModifiers.AddUnique(this._fireImmunity);
             // NOTE: only replace first module, don't replace dummy charge module

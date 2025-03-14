@@ -154,8 +154,7 @@ public class English : CwaffGun
             if (!this._wasCharging)
             {
                 EnsurePhantoms();
-                this._currentMaxCharge = player.HasSynergy(Synergy.MASTERY_ENGLISH)
-                    ? _MAX_CHARGE_LEVEL : _NORM_CHARGE_LEVEL;
+                this._currentMaxCharge = this.Mastered ? _MAX_CHARGE_LEVEL : _NORM_CHARGE_LEVEL;
             }
             if ((this._chargeTime += BraveTime.DeltaTime * player.ChargeMult()) > _CHARGE_PER_LEVEL)
             {

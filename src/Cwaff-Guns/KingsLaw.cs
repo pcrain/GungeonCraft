@@ -169,7 +169,7 @@ public class KingsLaw : CwaffGun
         if (!this.PlayerOwner)
             return;
         if (projectile.gameObject.GetComponent<KingsLawBullets>() is KingsLawBullets klb)
-            klb.Setup(this, this.PlayerOwner.HasSynergy(Synergy.MASTERY_KINGS_LAW));
+            klb.Setup(this, this.Mastered);
     }
 }
 

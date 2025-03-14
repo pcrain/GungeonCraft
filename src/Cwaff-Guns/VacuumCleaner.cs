@@ -103,7 +103,6 @@ public class VacuumCleaner : CwaffGun
         Lazy.PlaySoundUntilDeathOrTimeout(soundName: "suction_loop", source: this.gun.gameObject, timer: 0.05f);
 
         Vector2 gunpos = this.gun.barrelOffset.position;
-        bool mastered = player.HasSynergy(Synergy.MASTERY_VACUUM_CLEANER);
 
         // Particle effect creation logic should not be tied to framerate
         if (UnityEngine.Random.value < 0.66f * (BraveTime.DeltaTime * C.FPS))
@@ -115,7 +114,7 @@ public class VacuumCleaner : CwaffGun
 
         float minAngle = this.gun.CurrentAngle - _SPREAD;
         float maxAngle = this.gun.CurrentAngle + _SPREAD;
-        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100, allowJunk: mastered))
+        foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100, allowJunk: this.Mastered))
         {
             if (debris.gameObject.GetComponent<VacuumParticle>())
                 continue; // already added a vacuum particle component
@@ -147,7 +146,7 @@ public class VacuumCleaner : CwaffGun
             LootEngine.SpawnCurrency(player.CenterPosition, 1);
         }
 
-        if (!player.HasSynergy(Synergy.MASTERY_VACUUM_CLEANER))
+        if (!this.Mastered)
             return;
 
         if (debris.IsCorpse && ((++corpsesSucked) >= _CORPSE_PER_ARMOR))
@@ -192,7 +191,7 @@ public class VacuumCleaner : CwaffGun
             if (!this._owner)
                 return false;
 
-            if (this._owner.HasSynergy(Synergy.MASTERY_VACUUM_CLEANER))
+            if (this._vac.Mastered)
                 uic.GunAmmoCountLabel.Text = $"[sprite \"corpse_ui\"]x{this._vac.corpsesSucked}\n[sprite \"vacuum_debris_ui\"]x{this._vac.debrisSucked}";
             else
                 uic.GunAmmoCountLabel.Text = $"[sprite \"vacuum_debris_ui\"]x{this._vac.debrisSucked}";

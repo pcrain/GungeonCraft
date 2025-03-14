@@ -135,7 +135,7 @@ public class KALI : CwaffGun
         if (projectile.GetComponent<KaliProjectile>() is not KaliProjectile kp)
             return;
 
-        kp.Mastered = this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.MASTERY_KALI);
+        kp.Mastered = this.Mastered;
         if (kp.GetChargeLevel() == 3)
             this._timeShifter.GetComponent<KaliTimeshifter>().Reset();
         projectile.transform.DoMovingDistortionWave(distortionIntensity: 2.5f, distortionRadius: 0.25f, maxRadius: 0.25f, duration: 0.75f);

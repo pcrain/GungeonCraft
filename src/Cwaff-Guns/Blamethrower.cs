@@ -69,7 +69,7 @@ public class Blamethrower : CwaffGun
                 continue;
             if (enemy.GetComponent<EnemyBlamedBehavior>())
                 continue;  // can't scapegoat the same enemy twice
-            enemy.gameObject.GetOrAddComponent<ScapeGoat>().Setup(player.HasSynergy(Synergy.MASTERY_BLAMETHROWER));
+            enemy.gameObject.GetOrAddComponent<ScapeGoat>().Setup(this.Mastered);
             break;
         }
     }

@@ -126,7 +126,7 @@ public class Alligator : CwaffGun
         else
         {
             float decay = _ELECTRIC_DECAY_FACTOR;
-            if (this.PlayerOwner.HasSynergy(Synergy.MASTERY_ALLIGATOR))
+            if (this.Mastered)
                 decay *= 0.1f;
             this.energyProduction = Mathf.Max(newProduction, Lazy.SmoothestLerp(this.energyProduction, 0, decay));
         }

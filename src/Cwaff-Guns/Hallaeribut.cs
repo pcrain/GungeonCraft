@@ -29,7 +29,6 @@ public class Hallaeribut : CwaffGun
     private State _state = Satiated;
     private float _famishTimer = 0.0f;
     private int _cachedAmmo = -1;
-    private bool _mastered = false;
 
     public static void Init()
     {
@@ -65,7 +64,6 @@ public class Hallaeribut : CwaffGun
         base.Update();
         if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
             return;
-        this._mastered = this.PlayerOwner.HasSynergy(Synergy.MASTERY_HALLAERIBUT);
         UpdateAmmo();
         UpdateStarvation();
         this.gun.m_prepThrowTime = -999f; //HACK: prevent the gun from being thrown
@@ -99,7 +97,7 @@ public class Hallaeribut : CwaffGun
 
     public override void OnFullClipReload(PlayerController player, Gun gun)
     {
-        if (!this._mastered)
+        if (!this.Mastered)
             return;
         if (GameManager.Instance.IsLoadingLevel || GameManager.Instance.IsPaused || BraveTime.DeltaTime == 0.0f)
             return;
@@ -232,7 +230,7 @@ public class Hallaeribut : CwaffGun
             return;
         this._cachedAmmo = this.gun.CurrentAmmo;
         float ammoPercent = (float)this._cachedAmmo / this.gun.AdjustedMaxAmmo;
-        int ti = this._mastered ? 5 : _AmmoThresholds.FirstGE(ammoPercent);
+        int ti = this.Mastered ? 5 : _AmmoThresholds.FirstGE(ammoPercent);
         UpdateState((State)ti);
         int newTier = Mathf.Max(ti - 1, 0);
         if (this.gun.CurrentStrengthTier != newTier)
