@@ -2,6 +2,7 @@
 
 ## 1.22.1 (TBD)
 
+- Added missing outlines and backgrounds to several ammo clip sprites 
 - Fix null deref and softlock caused by picking up a Alyx's mastered form while standing in poison goop
 
 ## 1.22.0 (2025-03-13)
