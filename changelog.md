@@ -8,6 +8,8 @@
 - Fixed Femtobyte digitizing stone tables as wooden tables
 - Fixed auxiliary Gunflower beams (e.g., from Scattershot or Bouncy Bullets) not emitting light
 - Animated the Propellor Cap C:
+- Tightened max orbit speed of Wavefront projectiles to prevent them from drifting too far away from the player
+- Made player's facing direction visually match whip's direction while firing Pistol Whip
 
 ## 1.22.0 (2025-03-13)
 

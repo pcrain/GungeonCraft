@@ -18,6 +18,8 @@ public class PistolWhip : CwaffGun
 
     public int miniBlanks = 0;
 
+    private float _unlockAngleTime = 0f;
+
     public static void Init()
     {
         Lazy.SetupGun<PistolWhip>(ItemName, ShortDescription, LongDescription, Lore)
@@ -57,6 +59,25 @@ public class PistolWhip : CwaffGun
             return;
         --this.miniBlanks;
         Lazy.DoMicroBlankAt(pos, this.PlayerOwner);
+    }
+
+    public override void PostProcessProjectile(Projectile projectile)
+    {
+        base.PostProcessProjectile(projectile);
+        this._unlockAngleTime = BraveTime.ScaledTimeSinceStartup + WhipChainStart.TIMES.Last();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        if (this.PlayerOwner is not PlayerController pc)
+            return;
+        bool isGunAngleLocked = pc.m_overrideGunAngle.HasValue;
+        bool shouldLockGunAngle = BraveTime.ScaledTimeSinceStartup < this._unlockAngleTime;
+        if (!isGunAngleLocked && shouldLockGunAngle)
+            pc.m_overrideGunAngle = pc.m_currentGunAngle;
+        else if (isGunAngleLocked && !shouldLockGunAngle)
+            pc.m_overrideGunAngle = null;
     }
 
     public override void MidGameSerialize(List<object> data, int i)

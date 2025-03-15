@@ -29,8 +29,8 @@ public class TeslaProjectileBehavior : MonoBehaviour
 {
     private const float _LIFESPAN   =  15.0f;
     private const float _ACCEL      = 350.0f;
-    private const float _MIN_SPEED  =  60.0f;
-    private const float _MAX_SPEED  =  90.0f;
+    private const float _MIN_SPEED  =  50.0f;
+    private const float _MAX_SPEED  =  70.0f;
     private const float _PRECESSION =   1.0f; // speed at which projectiles change their angle of orbit around the player
     private const float _MIN_ION_TIME = 0.5f;
     private const float _ION_VARIANCE = 0.5f;
