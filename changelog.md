@@ -6,6 +6,7 @@
 - Added missing outlines and backgrounds to several ammo clip sprites 
 - Added custom ammo clip sprites for Stereoscope and Flakseed
 - Fixed Femtobyte digitizing stone tables as wooden tables
+- Fixed auxiliary Gunflower beams (e.g., from Scattershot or Bouncy Bullets) not emitting light
 
 ## 1.22.0 (2025-03-13)
 

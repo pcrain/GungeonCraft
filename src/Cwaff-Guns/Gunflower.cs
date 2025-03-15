@@ -51,7 +51,7 @@ public class Gunflower : CwaffGun
                 this.gun.spriteAnimator.PlayFromFrame(this.gun.shootAnimation, 4);
                 this._revved = true;
             }
-            UpdateLights(beam);
+            UpdateLights();
         }
         else
         {
@@ -155,15 +155,16 @@ public class Gunflower : CwaffGun
                 this._lights[i].LightIntensity = 0f;
     }
 
-    private void UpdateLights(BasicBeamController beam)
+    private void UpdateLightsForBeam(BasicBeamController beam, ref int i)
     {
-        Vector2 barrelPos = this.gun.barrelOffset.position;
+        Vector2 origin = beam.Origin;
         Vector2 deltaNorm = beam.Direction.normalized;
         Vector2 gap = _LIGHT_SPACING * deltaNorm;
         float mag = beam.m_currentBeamDistance;
         int steps = Mathf.CeilToInt(mag / _LIGHT_SPACING);
-        for (int i = 0; i <= steps; ++i)
+        for (int s = 0; s <= steps; ++s)
         {
+            ++i;
             if (this._lights.Count < i + 1)
                 this._lights.Add(null);
             if (!this._lights[i])
@@ -173,18 +174,26 @@ public class Gunflower : CwaffGun
                 this._lights[i].LightRadius = 2f;
                 this._lights[i].Initialize();
             }
-            if (i == steps)
+            if (s == steps)
             {
-                this._lights[i].gameObject.transform.position = barrelPos + mag * deltaNorm;
+                this._lights[i].gameObject.transform.position = origin + mag * deltaNorm;
                 this._lights[i].LightIntensity = 100f;
             }
             else
             {
-                this._lights[i].gameObject.transform.position = barrelPos + i * gap;
+                this._lights[i].gameObject.transform.position = origin + s * gap;
                 this._lights[i].LightIntensity = 10f;
             }
         }
-        for (int i = steps + 1; i < this._lights.Count; ++i)
+    }
+
+    private void UpdateLights()
+    {
+        int i = -1;
+        for (int ibeam = this.gun.m_activeBeams.Count - 1; ibeam >= 0; --ibeam)
+            for (BasicBeamController beam = this.gun.m_activeBeams[ibeam].beam as BasicBeamController; beam; beam = beam.m_reflectedBeam)
+                UpdateLightsForBeam(beam, ref i);
+        while (++i < this._lights.Count)
             if (this._lights[i])
                 this._lights[i].LightIntensity = 0f;
     }
