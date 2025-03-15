@@ -7,6 +7,7 @@
 - Added custom ammo clip sprites for Stereoscope and Flakseed
 - Fixed Femtobyte digitizing stone tables as wooden tables
 - Fixed auxiliary Gunflower beams (e.g., from Scattershot or Bouncy Bullets) not emitting light
+- Animated the Propellor Cap C:
 
 ## 1.22.0 (2025-03-13)
 

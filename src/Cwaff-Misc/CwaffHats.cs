@@ -91,7 +91,7 @@ public static class CwaffHats
       EasyHat(name: "fish",                  offset: new IntVector2( 0, -3));
       EasyHat(name: "gameboy",               offset: new IntVector2( 0, -1));
       EasyHat(name: "nurse_hat",             offset: new IntVector2( 0, -2));
-      EasyHat(name: "propeller_cap",         offset: new IntVector2( 0, -2));
+      EasyHat(name: "propeller_cap",         offset: new IntVector2( 0, -2), fps: 10);
       EasyHat(name: "saucepan",              offset: new IntVector2(-4, -1));
       EasyHat(name: "shellmet",              offset: new IntVector2( 0, -3));
       EasyHat(name: "siren",                 offset: new IntVector2( 0, -1), fps: 6);

@@ -2227,7 +2227,7 @@ public static class Extensions
   /// <summary>Adds a targeting reticle to the gun</summary>
   public static Gun AddReticle<T>(this Gun gun, GameObject reticleVFX, float reticleAlpha = 1f, float fadeInTime = 0f, float fadeOutTime = 0f, bool smoothLerp = false,
     float maxDistance = -1f, float controllerScale = 1f, float rotateSpeed = 0f, CwaffReticle.Visibility visibility = CwaffReticle.Visibility.DEFAULT,
-    Func<CwaffReticle, GameObject> targetObjFunc = null, Func<CwaffReticle, Vector2> targetPosFunc = null, bool aimFromPlayerCenter = false, bool background = false) where T : CwaffReticle
+    bool aimFromPlayerCenter = false, bool background = false) where T : CwaffReticle
   {
     T reticle                   = gun.gameObject.AddComponent<T>();
     reticle.reticleVFX          = reticleVFX;
@@ -2240,8 +2240,8 @@ public static class Extensions
     reticle.controllerScale     = controllerScale;
     reticle.rotateSpeed         = rotateSpeed;
     reticle.visibility          = visibility;
-    reticle.targetObjFunc       = targetObjFunc;
-    reticle.targetPosFunc       = targetPosFunc;
+    // reticle.targetObjFunc       = targetObjFunc; //NOTE: can't meaningfully be set / serialized in initialization
+    // reticle.targetPosFunc       = targetPosFunc; //NOTE: can't meaningfully be set / serialized in initialization
     reticle.background          = background;
     return gun;
   }

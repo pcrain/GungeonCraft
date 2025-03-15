@@ -166,9 +166,8 @@ public class KingsLaw : CwaffGun
 
     public override void PostProcessProjectile(Projectile projectile)
     {
-        if (!this.PlayerOwner)
-            return;
-        if (projectile.gameObject.GetComponent<KingsLawBullets>() is KingsLawBullets klb)
+        base.PostProcessProjectile(projectile);
+        if (this.PlayerOwner && projectile.gameObject.GetComponent<KingsLawBullets>() is KingsLawBullets klb)
             klb.Setup(this, this.Mastered);
     }
 }
