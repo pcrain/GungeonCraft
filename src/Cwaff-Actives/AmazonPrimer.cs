@@ -67,7 +67,7 @@ public class PrimerSubscription : FakeItem
             GameManager.Instance.OnNewLevelFullyLoaded -= Inflation;
             this._primer.gameObject.Play("prime_ran_out");
             Lazy.CustomNotification("Primer Expired", "Thanks for Trying Amazon Primer", ItemHelper.Get((Items)IDs.Pickups["amazon_primer"]).sprite);
-            UnityEngine.Object.Destroy(this);
+            UnityEngine.Object.Destroy(this._primer.DropPassiveItem(this).gameObject);
             return;
         }
 
