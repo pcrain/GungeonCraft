@@ -43,6 +43,7 @@ public class Missiletoe : CwaffGun
     private ItemQuality _lastQualityFired;
 
     internal List<ItemQuality> _shuffledQualities = new();
+    internal bool _currentlyWrapping = false;
 
     public List<PickupObject> wrappedGifts = new();
     public List<ItemQuality> wrappedQualities = new();
@@ -180,7 +181,7 @@ public class Missiletoe : CwaffGun
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
-        if (manualReload && gun.DefaultModule.numberOfShotsInClip == Mathf.Min(gun.ClipShotsRemaining, gun.AdjustedMaxAmmo))
+        if (manualReload && !this._currentlyWrapping && gun.DefaultModule.numberOfShotsInClip == Mathf.Min(gun.ClipShotsRemaining, gun.AdjustedMaxAmmo))
             WrapPresent();
         else
             RecalculateClip();
@@ -394,6 +395,7 @@ public class WrappableGift : MonoBehaviour
         this._sprite   = this._vfx.GetComponent<tk2dBaseSprite>();
         this._animator = this._vfx.GetComponent<tk2dSpriteAnimator>();
 
+        this._gun._currentlyWrapping = true;
         StartCoroutine(WrapItUp(unwrapping));
     }
 
@@ -470,6 +472,8 @@ public class WrappableGift : MonoBehaviour
         if (wrapping)
         {
             pickupvfx.ArcTowards(animLength: animLength, targetSprite: this._sprite, useBottom: true, minScale: _MIN_SCALE, vanishPercent: _VANISH_PERCENT);
+            yield return new WaitForSeconds(animLength);
+            this._gun._currentlyWrapping = false;
             yield break;
         }
 
@@ -490,5 +494,6 @@ public class WrappableGift : MonoBehaviour
             passive2.m_pickedUp = false;
         }
         this._pickup.m_isBeingEyedByRat = this._wasEyedByRat;
+        this._gun._currentlyWrapping = false;
     }
 }
