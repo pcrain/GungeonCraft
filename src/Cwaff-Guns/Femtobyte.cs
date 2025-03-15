@@ -165,6 +165,8 @@ public class Femtobyte : CwaffGun
 
     internal static bool IsWhiteListedPrefab(GameObject bodyObject, out PrefabData trapPrefab)
     {
+        if (bodyObject.transform.parent is Transform tp && tp.gameObject.GetComponent<FlippableCover>())
+            bodyObject = tp.gameObject;  //NOTE: table prefabs are actually associated with the parent of FlippableCover
         string name = bodyObject.name.Replace("(Clone)","").TrimEnd().ToLowerInvariant();
         // ETGModConsole.Log($"looking up {name} in prefab whitelist");
         return _NameToPrefabMap.TryGetValue(name, out trapPrefab);

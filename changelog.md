@@ -2,9 +2,10 @@
 
 ## 1.22.1 (TBD)
 
-- Fix null deref and softlock caused by picking up a Alyx's mastered form while standing in poison goop
+- Fixed null deref and softlock caused by picking up a Alyx's mastered form while standing in poison goop
 - Added missing outlines and backgrounds to several ammo clip sprites 
 - Added custom ammo clip sprites for Stereoscope and Flakseed
+- Fixed Femtobyte digitizing stone tables as wooden tables
 
 ## 1.22.0 (2025-03-13)
 
