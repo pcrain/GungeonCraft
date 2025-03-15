@@ -11,6 +11,7 @@
 - Tightened max orbit speed of Wavefront projectiles to prevent them from drifting too far away from the player
 - Made player's facing direction visually match whip's direction while firing Pistol Whip
 - Prevented Missiletoe from being able to visually wrap / unwrap multiple presents at once
+- Fixed null deref and softlock caused by Scalding Jelly checking for Ignizol interactions in non-existent rooms
 
 ## 1.22.0 (2025-03-13)
 
