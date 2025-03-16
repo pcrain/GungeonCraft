@@ -90,7 +90,7 @@ public class WeightedRobes : CwaffActive, ILabelItem
     private void OnEnteredCombat()
     {
         if (this._active && this._owner)
-            this._owner.FlashVFXAbovePlayer(_TrainingVFX, sound: "the_sound_of_doing_some_training", glowAndFade: true);
+            this._owner.StartCoroutine(DoTraining_CR(this._owner, true));
     }
 
     private void MaybeKilledBoss(PlayerController player, HealthHaver enemy)
@@ -125,7 +125,7 @@ public class WeightedRobes : CwaffActive, ILabelItem
             return;
         int pid = player.PlayerIDX;
         this._trainingDone[pid] = Mathf.Min(this._trainingDone[pid] + trainingDone, _MAX_TRAINING);
-        player.FlashVFXAbovePlayer(_TrainedVFX, sound: "the_sound_of_training_finished", glowAndFade: true);
+        player.StartCoroutine(DoTraining_CR(player, false));
         UpdateTrainingStats(player);
     }
 
@@ -165,12 +165,33 @@ public class WeightedRobes : CwaffActive, ILabelItem
         this.passiveStatModifiers = this._active ? this.weightedStats : null;
         base.sprite.SetSprite(this._active ? _ActiveId : _InactiveId);
 
-        if (this._active)
-            player.FlashVFXAbovePlayer(_TrainingVFX, sound: "the_sound_of_doing_some_training", glowAndFade: true);
-        else
-            player.FlashVFXAbovePlayer(_TrainedVFX, sound: "the_sound_of_training_finished", glowAndFade: true);
-
+        player.StartCoroutine(DoTraining_CR(player, this._active));
 
         player.stats.RecalculateStats(player);
+    }
+
+    private static readonly Color _TrainingGreen = new Color(30f / 255f, 255f / 255f, 30f / 255f);
+    private static readonly Color _TrainingRed = new Color(255f / 255f, 30f / 255f, 30f / 255f);
+    public static IEnumerator DoTraining_CR(PlayerController player, bool active)
+    {
+        if (active)
+            player.FlashVFXAbovePlayer(_TrainingVFX, sound: "statdown", glowAndFade: true);
+        else
+            player.FlashVFXAbovePlayer(_TrainedVFX, sound: "statup", glowAndFade: true);
+
+        SpriteOutlineManager.RemoveOutlineFromSprite(player.sprite);
+        Material[] mats = player.SetOverrideShader(CwaffShaders.UnlitDigitizeShader);
+        foreach (Material mat in mats)
+        {
+            mat.SetTexture("_BinaryTex", active ? CwaffShaders.PowerdownTexture : CwaffShaders.PowerupTexture);
+            mat.SetColor("_Color", active ? _TrainingRed : _TrainingGreen);
+            mat.SetFloat("_BinarizeProgress", 0.5f);
+            mat.SetFloat("_ColorizeProgress", 1.0f);
+            mat.SetFloat("_FadeProgress", 0.0f);
+            mat.SetFloat("_ScrollSpeed", active ? 3.0f : -3.0f);
+        }
+        yield return new WaitForSeconds(1.0f);
+        player.ClearOverrideShader();
+        SpriteOutlineManager.AddOutlineToSprite(player.sprite, Color.black);
     }
 }

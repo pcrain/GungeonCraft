@@ -18,6 +18,7 @@
 - Blamethrower now grants the scapegoat status to the enemy that actually damaged the player when possible (rather than a random enemy)
 - Cleaned up petting sprites for Wolf a bit
 - Fixed wrong shaders being used on petting sprites for Wolf, ice cream sprites for Bullet Kin, and tiny ammo box sprites from Scavenging Arms
+- Added better sounds and VFX for triggering training effects with Weighted Robes
 
 ## 1.22.0 (2025-03-13)
 

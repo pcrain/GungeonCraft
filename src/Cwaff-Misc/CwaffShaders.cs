@@ -14,6 +14,8 @@ public static class CwaffShaders
     public static Texture2D DigitizeTexture = null;
     public static Texture2D StarsTexture = null;
     public static Texture2D NoiseTexture = null;
+    public static Texture2D PowerdownTexture = null;
+    public static Texture2D PowerupTexture = null;
 
     private static string GetShaderBundleNameForPlatform()
     {
@@ -51,6 +53,8 @@ public static class CwaffShaders
             CorruptShader = shaderBundle.LoadAsset<Shader>("assets/corruptshader.shader");
             ChromaShader = shaderBundle.LoadAsset<Shader>("assets/chromashiftshader.shader");
             DesatShader = shaderBundle.LoadAsset<Shader>("assets/desaturateshader.shader");
+            PowerdownTexture = shaderBundle.LoadAsset<Texture2D>("assets/powerdown.png");
+            PowerupTexture = shaderBundle.LoadAsset<Texture2D>("assets/powerup.png");
         }
     }
 
