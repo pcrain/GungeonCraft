@@ -55,6 +55,11 @@ public class IronMaid : CwaffGun
     {
         base.OnSwitchedToThisGun();
         LaunchAllBullets(this.PlayerOwner);
+        //NOTE: this might be a vanilla bug where automatically reloads while guns are switched out don't reload secondary modules
+        if (this.Mastered && this.gun.ClipShotsRemaining == this.gun.DefaultModule.numberOfShotsInClip)
+            foreach (ProjectileModule mod in this.gun.Volley.projectiles)
+                if (this.gun.m_moduleData.TryGetValue(mod, out ModuleShootData msd))
+                    msd.numberShotsFired = 0;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)

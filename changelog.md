@@ -3,6 +3,7 @@
 ## 1.22.2 (TBD)
 
 - Fixed janky sprite offsets when using Vacuum Cleaner or Magunet to attract large objects
+- Fixed mastered Iron Maid sometimes only firing a single projectile when switching to another gun and back
 
 ## 1.22.1 (2025-03-16)
 
