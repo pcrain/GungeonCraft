@@ -127,7 +127,8 @@ public class Magunet : CwaffGun
             debris.enabled = false;
 
             // Actually add the MagnetParticle component to it
-            debris.gameObject.AddComponent<MagnetParticle>().Setup(this.gun, (debris.gameObject.transform.position.XY() - gunpos).magnitude);
+            Vector2 debrisCenter = debris.sprite ? debris.sprite.WorldCenter : debris.gameObject.transform.position.XY();
+            debris.gameObject.AddComponent<MagnetParticle>().Setup(this.gun, (debrisCenter - gunpos).magnitude);
         }
     }
 }
@@ -159,6 +160,7 @@ public class MagnetParticle : MonoBehaviour
 {
     private const float _MAX_LIFE           = 0.5f;
     private const float _MIN_DIST_TO_VACUUM = 1.25f;
+    private const float _MIN_VAC_DIST_SQR   = _MIN_DIST_TO_VACUUM * _MIN_DIST_TO_VACUUM;
     private const float _MIN_ALPHA          = 0.3f;
     private const float _MAX_ALPHA          = 1.0f;
     private const float _DLT_ALPHA          = _MAX_ALPHA - _MIN_ALPHA;
@@ -182,6 +184,7 @@ public class MagnetParticle : MonoBehaviour
     private float _statisMag       = 0.0f;
     private float _trueAngle       = 0.0f;
     private float _timeInStasis    = 0.0f;
+    private Vector2 _spriteCenter  = Vector2.zero;
 
     public void Setup(Gun g, float startDistance = 0.0f, float offsetAngle = 0f)
     {
@@ -193,6 +196,7 @@ public class MagnetParticle : MonoBehaviour
         this._startScaleX   = this._sprite.scale.x;
         this._startScaleY   = this._sprite.scale.y;
         this._startAngle    = offsetAngle;
+        this._spriteCenter  = this._sprite.WorldCenter;
 
         // get rid of any previously-cached speculativerigidbody information so that enemies we've previously
         //   collided with don't detect us as the same projectile and ignore us
@@ -202,6 +206,16 @@ public class MagnetParticle : MonoBehaviour
             this._debris.specRigidbody = null;
             this._debris.RegenerateCache();
         }
+
+        #if DEBUG
+        if (this._debris)
+        {
+            // this._debris.m_transform;
+            // Lazy.DebugLog($"sprite transform same as object transform? {this._sprite.transform == base.gameObject.transform}");
+            // Lazy.DebugLog($"sprite transform's parent is object transform? {this._sprite.transform.parent == base.gameObject.transform}");
+            // Lazy.DebugLog($"got debris with sprite {this._debris.sprite.CurrentSprite.name} at base pos {base.transform.position.XY()} with sprite center at {this._debris.sprite.WorldCenter} (offset = {this._debris.sprite.WorldCenter - base.transform.position.XY()}) and body at {this._debris.specRigidbody.UnitCenter}  (offset = {this._debris.specRigidbody.UnitCenter - base.transform.position.XY()})");
+        }
+        #endif
     }
 
     private void LaunchDebrisInStasis(Vector2 velocity)
@@ -304,21 +318,20 @@ public class MagnetParticle : MonoBehaviour
         }
 
         // handle particles in stasis
-        Vector2 fromVacuum = (this._sprite.transform.position - this._gun.barrelOffset.position);
+        Vector2 fromVacuum = (this._sprite.WorldCenter - this._gun.barrelOffset.position.XY());
         this.gameObject.transform.rotation = fromVacuum.ToAngle().EulerZ();
         if (this._inStasis)
         {
             this._timeInStasis += BraveTime.DeltaTime;
             Vector2 yOff = new Vector2(0f, 0.2f * Mathf.Sin(24f * this._timeInStasis));
             this._trueAngle = (this._gun.CurrentAngle + this._statisAngle);
-            this.gameObject.transform.position = this._gun.barrelOffset.position.XY() + yOff +
-                this._trueAngle.ToVector(this._statisMag);
+            this._spriteCenter = this._gun.barrelOffset.position.XY() + yOff + this._trueAngle.ToVector(this._statisMag);
             this.gameObject.transform.rotation = this._gun.CurrentAngle.EulerZ();
+            this._sprite.PlaceAtRotatedPositionByAnchor(this._spriteCenter, Anchor.MiddleCenter);
             return;
         }
 
-        float mag = fromVacuum.magnitude;
-        if (mag < _MIN_DIST_TO_VACUUM)
+        if (fromVacuum.sqrMagnitude < _MIN_VAC_DIST_SQR)
         {
             this._inStasis    = true;
             this._statisAngle = (fromVacuum.ToAngle() - this._gun.CurrentAngle).Clamp180();
@@ -327,11 +340,12 @@ public class MagnetParticle : MonoBehaviour
         }
 
         // Home towards the magnet
-        this._velocity = this._sprite.transform.position.XY().LerpDirectAndNaturalVelocity(
+        this._velocity = this._sprite.WorldCenter.LerpDirectAndNaturalVelocity(
             target          : this._gun.barrelOffset.position,
             naturalVelocity : this._velocity,
             accel           : VacuumCleaner._ACCEL_SEC * BraveTime.DeltaTime,
             lerpFactor      : 1f);
-        this.gameObject.transform.position += (this._velocity * C.FPS * BraveTime.DeltaTime).ToVector3ZUp(0f);
+        this._spriteCenter += (this._velocity * C.FPS * BraveTime.DeltaTime);
+        this._sprite.PlaceAtRotatedPositionByAnchor(this._spriteCenter, Anchor.MiddleCenter);
     }
 }

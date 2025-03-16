@@ -129,7 +129,8 @@ public class VacuumCleaner : CwaffGun
             debris.enabled = false;
 
             // Actually add the VacuumParticle component to it
-            debris.gameObject.AddComponent<VacuumParticle>().Setup(this, (debris.gameObject.transform.position.XY() - gunpos).magnitude);
+            Vector2 debrisCenter = debris.sprite ? debris.sprite.WorldCenter : debris.gameObject.transform.position.XY();
+            debris.gameObject.AddComponent<VacuumParticle>().Setup(this, (debrisCenter - gunpos).magnitude);
         }
     }
 
@@ -205,6 +206,7 @@ public class VacuumParticle : MonoBehaviour
 {
     private const float _MAX_LIFE           = 1.0f;
     private const float _MIN_DIST_TO_VACUUM = 0.5f;
+    private const float _MIN_VAC_DIST_SQR   = _MIN_DIST_TO_VACUUM * _MIN_DIST_TO_VACUUM;
     private const float _MIN_ALPHA          = 0.01f;
     private const float _MAX_ALPHA          = 0.5f;
     private const float _DLT_ALPHA          = 0.01f;
@@ -221,6 +223,7 @@ public class VacuumParticle : MonoBehaviour
     private float _startDistance   = 0.0f;
     private float _startScaleX     = 1.0f;
     private float _startScaleY     = 1.0f;
+    private Vector2 _spriteCenter  = Vector2.zero;
 
     public void Setup(VacuumCleaner vac, float startDistance = 0.0f)
     {
@@ -232,6 +235,7 @@ public class VacuumParticle : MonoBehaviour
         this._sprite        = this._isDebris ? this._debris.sprite : base.gameObject.GetComponent<tk2dSprite>();
         this._startScaleX   = this._isDebris ? this._sprite.scale.x : 1.0f;
         this._startScaleY   = this._isDebris ? this._sprite.scale.y : 1.0f;
+        this._spriteCenter  = this._sprite.WorldCenter;
     }
 
     // Using LateUpdate() here so alpha is updated correctly
@@ -258,9 +262,8 @@ public class VacuumParticle : MonoBehaviour
             }
         }
 
-        Vector2 towardsVacuum = (this._gun.barrelOffset.position - this._sprite.transform.position);
-        float mag = towardsVacuum.magnitude;
-        if (mag < _MIN_DIST_TO_VACUUM)
+        Vector2 towardsVacuum = (this._gun.barrelOffset.position.XY() - this._sprite.WorldCenter);
+        if (towardsVacuum.sqrMagnitude < _MIN_VAC_DIST_SQR)
         {
             if (this._isDebris)
                 this._vac.ProcessDebris(this._debris);
@@ -269,13 +272,14 @@ public class VacuumParticle : MonoBehaviour
         }
 
         // Shrink on our way to the vacuum
-        float scale = mag / this._startDistance;
+        float scale = towardsVacuum.magnitude / this._startDistance;
         this._sprite.scale = new Vector3(this._startScaleX * scale, this._startScaleY * scale, 1f);
-        this._velocity = this._sprite.transform.position.XY().LerpDirectAndNaturalVelocity(
+        this._velocity = this._sprite.WorldCenter.LerpDirectAndNaturalVelocity(
             target          : this._gun.barrelOffset.position,
             naturalVelocity : this._velocity,
             accel           : VacuumCleaner._ACCEL_SEC * BraveTime.DeltaTime,
             lerpFactor      : 1f);
-        this.gameObject.transform.position += (this._velocity * C.FPS * BraveTime.DeltaTime).ToVector3ZUp(0f);
+        this._spriteCenter += (this._velocity * C.FPS * BraveTime.DeltaTime);
+        this._sprite.PlaceAtRotatedPositionByAnchor(this._spriteCenter, Anchor.MiddleCenter);
     }
 }

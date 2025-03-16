@@ -1314,7 +1314,8 @@ public static class Extensions
           if (debris.IsPickupObject || debris.Priority == EphemeralObject.EphemeralPriority.Critical)
             if (!allowJunk || !debris.IsPickupObject || (debris.GetComponent<PickupObject>().PickupObjectId != (int)Items.Junk))
               continue; // don't vacuum up important objects
-          Vector2 deltaVec = (debris.gameObject.transform.position.XY() - start);
+          Vector2 debrisPos = debris.sprite ? debris.sprite.WorldCenter : debris.gameObject.transform.position.XY();
+          Vector2 deltaVec = (debrisPos - start);
           if (deltaVec.sqrMagnitude > squareReach || !deltaVec.ToAngle().IsNearAngle(angle, spread))
               continue; // out of range
           yield return debris;

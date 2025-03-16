@@ -1,35 +1,39 @@
 # Changelog
 
+## 1.22.2 (TBD)
+
+- Fixed janky sprite offsets when using Vacuum Cleaner or Magunet to attract large objects
+
 ## 1.22.1 (2025-03-16)
 
 #### Balance Changes:
 
-	- Tightened max orbit speed of Wavefront projectiles to prevent them from drifting too far away from the player
-	- Blamethrower now grants the scapegoat status to the enemy that actually damaged the player when possible (rather than a random enemy)
-	- Sub Machine Gun can now be eaten when out of ammo to restore 1.5 hearts
+- Tightened max orbit speed of Wavefront projectiles to prevent them from drifting too far away from the player
+- Blamethrower now grants the scapegoat status to the enemy that actually damaged the player when possible (rather than a random enemy)
+- Sub Machine Gun can now be eaten when out of ammo to restore 1.5 hearts
 
 #### Polish:
 
-	- Added custom ammo clip sprites for Stereoscope and Flakseed
-	- Added missing outlines and backgrounds to several ammo clip sprites 
-	- Added impact VFX to Platinum Star's projectiles
-	- Added VFX for spawning in decoys via Glockarina
-	- Added VFX for slowing bullets via Glockarina
-	- Added better sounds and VFX for triggering training effects with Weighted Robes
-	- Made Alligator's cables scatter on the floor when detaching from enemies instead of just vanishing into thin air
-	- Made player's facing direction visually match whip's direction while firing Pistol Whip
-	- Prevented Missiletoe from being able to visually wrap / unwrap multiple presents at once
-	- Fixed bad lighting on petting sprites for Wolf, ice cream sprites for Bullet Kin, and tiny ammo box sprites from Scavenging Arms
-	- Cleaned up petting sprites for Wolf a bit
-	- Animated the Propellor Cap C:
+- Added custom ammo clip sprites for Stereoscope and Flakseed
+- Added missing outlines and backgrounds to several ammo clip sprites 
+- Added impact VFX to Platinum Star's projectiles
+- Added VFX for spawning in decoys via Glockarina
+- Added VFX for slowing bullets via Glockarina
+- Added better sounds and VFX for triggering training effects with Weighted Robes
+- Made Alligator's cables scatter on the floor when detaching from enemies instead of just vanishing into thin air
+- Made player's facing direction visually match whip's direction while firing Pistol Whip
+- Prevented Missiletoe from being able to visually wrap / unwrap multiple presents at once
+- Fixed bad lighting on petting sprites for Wolf, ice cream sprites for Bullet Kin, and tiny ammo box sprites from Scavenging Arms
+- Cleaned up petting sprites for Wolf a bit
+- Animated the Propellor Cap C:
 
 #### Bugfixes and Misc:
 
-	- Fixed null deref and softlock caused by picking up Alyx's mastered form while standing in poison goop
-	- Fixed null deref and softlock caused by Scalding Jelly checking for Ignizol interactions in non-existent rooms
-	- Fixed null deref and softlock caused when loading a new floor after an Amazon Primer subscription expires
-	- Fixed Femtobyte digitizing stone tables as wooden tables
-	- Fixed auxiliary Gunflower beams (e.g., from Scattershot or Bouncy Bullets) not emitting light
+- Fixed null deref and softlock caused by picking up Alyx's mastered form while standing in poison goop
+- Fixed null deref and softlock caused by Scalding Jelly checking for Ignizol interactions in non-existent rooms
+- Fixed null deref and softlock caused when loading a new floor after an Amazon Primer subscription expires
+- Fixed Femtobyte digitizing stone tables as wooden tables
+- Fixed auxiliary Gunflower beams (e.g., from Scattershot or Bouncy Bullets) not emitting light
 
 ## 1.22.0 (2025-03-13)
 
