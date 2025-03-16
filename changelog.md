@@ -13,6 +13,9 @@
 - Prevented Missiletoe from being able to visually wrap / unwrap multiple presents at once
 - Fixed null deref and softlock caused by Scalding Jelly checking for Ignizol interactions in non-existent rooms
 - Fixed null deref and softlock caused when loading a new floor after an Amazon Primer subscription expires
+- Added impact VFX to Platinum Star's projectiles
+- Added VFX for spawning in decoys via Glockarina
+- Blamethrower now grants the scapegoat status to the enemy that actually damaged the player when possible (rather than a random enemy)
 
 ## 1.22.0 (2025-03-13)
 

@@ -8,6 +8,7 @@ public class PlatinumStar : CwaffGun
     public static string Lore             = "This gun had a large golden arrow pierced through its barrel and grip when it was originally discovered by Ox and Cadence lying in a patch of flowers behind the Gungeon. The arrow had mysteriously vanished by the time they had gotten back to the Breach to test out the gun's capabilities, which by all accounts seemed to be nothing more than rapid-firing some harmless phantom projectiles. Having deemed the gun worthless in combat, Cadence tossed it back outside where she found it, only for it to vanish before hitting the ground. Somehow, it has found its way into the Gungeon on its own.";
 
     internal static Projectile _OraBullet;
+    internal static GameObject _MenacingVFX = null;
 
     public static void Init()
     {
@@ -24,6 +25,8 @@ public class PlatinumStar : CwaffGun
           .AddAnimations(AnimatedBullet.Create(name: "ora_fist_fast", fps: 12, scale: 0.33f, anchor: Anchor.MiddleRight))
           .Attach<PierceProjModifier>(pierce => pierce.penetration = 999)
           .Attach<ImmuneToTimestop>();
+
+        _MenacingVFX = VFX.Create("menacing_vfx", emissivePower: 3f);
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manual)
@@ -230,6 +233,35 @@ public class OraOra : MonoBehaviour
         StartCoroutine(OraOraOraOra(pc));
     }
 
+    private void DoMenacingVFX(Projectile p)
+    {
+        const float VFX_SPEED = 15f;
+        CwaffVFX.Spawn(
+            prefab        : PlatinumStar._MenacingVFX,
+            position      : p.SafeCenter,
+            rotation      : Quaternion.identity,
+            velocity      : VFX_SPEED * p.specRigidbody.Velocity.Rotate(UnityEngine.Random.Range(-30f, 30f)).normalized,
+            lifetime      : 0.35f,
+            fadeOutTime   : 0.05f,
+            emissivePower : 3f,
+            fadeIn        : false,
+            startScale    : 0.5f,
+            endScale      : 1.0f
+          );
+    }
+
+    private void DoHit(Projectile p)
+    {
+        p.gameObject.PlayUnique("ora_hit_sound");
+        DoMenacingVFX(p);
+    }
+
+    private void DoFinalHit(Projectile p)
+    {
+        p.gameObject.Play("ora_final_hit_sound");
+        DoMenacingVFX(p);
+    }
+
     private IEnumerator OraOraOraOra(PlayerController pc)
     {
         bool doTimeFreeze = pc.HasSynergy(Synergy.MASTERY_PLATINUM_STAR);
@@ -307,15 +339,11 @@ public class OraOra : MonoBehaviour
                     if (lastHit)
                     {
                         proj.baseData.force = numBursts * _BURST_SIZE;
-                        proj.OnDestruction += (Projectile p) => {
-                            p.gameObject.Play("ora_final_hit_sound");
-                        };
+                        proj.OnDestruction += this.DoFinalHit;
                     }
                     else
                     {
-                        proj.OnDestruction += (Projectile p) => {
-                            p.gameObject.PlayUnique("ora_hit_sound");
-                        };
+                        proj.OnDestruction += this.DoHit;
                     }
                     proj.SendInDirection(angleVec, false);
                     proj.gameObject.PlayUnique("ora_fist_fire");

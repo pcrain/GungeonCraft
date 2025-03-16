@@ -403,8 +403,10 @@ public class CreateDecoyOnKill : MonoBehaviour
 
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
     {
-        GameObject decoy = Glockarina._DecoyPrefab.Instantiate(position: enemy.UnitCenter.ToVector3ZUp(), anchor: Anchor.LowerCenter);
+        Vector3 pos = enemy.UnitCenter.ToVector3ZUp();
+        GameObject decoy = Glockarina._DecoyPrefab.Instantiate(position: pos, anchor: Anchor.LowerCenter);
         if (decoy.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
             body.RegisterGhostCollisionException(this._owner.specRigidbody);
+        Lazy.DoSmokeAt(pos);
     }
 }

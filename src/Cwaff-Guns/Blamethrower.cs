@@ -1,15 +1,19 @@
-﻿namespace CwaffingTheGungy;
+﻿
+namespace CwaffingTheGungy;
 
 public class Blamethrower : CwaffGun
 {
     public static string ItemName         = "Blamethrower";
     public static string ShortDescription = "Take It Up with HR";
-    public static string LongDescription  = "Fires harsh words that deal emotional damage and may inflict blame, making enemies run away and take 4x emotional damage. Taking damage from an enemy projectile assigns a random scapegoat, who becomes 100% susceptible to blame and drops an appropriate health / armor pickup when killed with the Blamethrower.";
+    public static string LongDescription  = "Fires harsh words that deal emotional damage and may inflict blame, making enemies run away and take 4x emotional damage. Taking damage from an enemy or enemy projectile gives that enemy the scapegoat status, making it 100% susceptible to blame and causing it to drop an appropriate health / armor pickup when killed with the Blamethrower.";
     public static string Lore             = "Whoever claimed that actions speak louder than words has clearly never stared down the barrel of a military-grade bullhorn. As the saying goes, sticks and stones may break your bones, but words can get you grounded, expelled, fired, ostracized, defenestrated, imprisoned, executed, or flipped off depending on your specific life circumstances.";
 
     internal static GameObject _BlameImpact = null;
     internal static GameObject _BlameTrail = null;
     internal static GameObject _ScapeGoatVFX = null;
+
+    private AIActor _candidateScapegoat = null;
+    private float _candidateValidUntil = 0;
 
     public static void Init()
     {
@@ -39,23 +43,47 @@ public class Blamethrower : CwaffGun
     {
         base.OnPlayerPickup(player);
         player.OnReceivedDamage += this.OnReceivedDamage;
+        player.specRigidbody.OnPreRigidbodyCollision += this.DeterminePotentialScapegoat;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         player.OnReceivedDamage -= this.OnReceivedDamage;
+        player.specRigidbody.OnPreRigidbodyCollision -= this.DeterminePotentialScapegoat;
         base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
+        {
             this.PlayerOwner.OnReceivedDamage -= this.OnReceivedDamage;
+            this.PlayerOwner.specRigidbody.OnPreRigidbodyCollision -= this.DeterminePotentialScapegoat;
+        }
         base.OnDestroy();
+    }
+
+    private void DeterminePotentialScapegoat(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        AIActor scapeGoat = null;
+        if (otherRigidbody.gameObject.GetComponent<AIActor>() is AIActor enemy)
+            scapeGoat = enemy;
+        else if (otherRigidbody.gameObject.GetComponent<Projectile>() is Projectile proj && proj.Owner is AIActor enemy2)
+            scapeGoat = enemy2;
+        if (!scapeGoat)
+            return;
+        this._candidateScapegoat = scapeGoat;
+        this._candidateValidUntil = BraveTime.ScaledTimeSinceStartup + 0.1f;
     }
 
     private void OnReceivedDamage(PlayerController player)
     {
+        if (this._candidateScapegoat && this._candidateValidUntil >= BraveTime.ScaledTimeSinceStartup)
+        {
+            if (!this._candidateScapegoat.gameObject.GetComponent<EnemyBlamedBehavior>())
+                this._candidateScapegoat.gameObject.GetOrAddComponent<ScapeGoat>().Setup(this.Mastered);
+            return;
+        }
         if (player.CurrentRoom.SafeGetEnemiesInRoom() is not List<AIActor> enemies)
             return;
         if (enemies.Count == 0)
