@@ -197,7 +197,7 @@ public class AlligatorProjectile : MonoBehaviour
             return;
         if (!aiActor.IsHostile(canBeNeutral: true) || aiActor.gameObject.GetComponents<AlligatorCableHandler>().Length >= _MAX_CLIPS_PER_ENEMY)
             return;
-        aiActor.gameObject.AddComponent<AlligatorCableHandler>()
+        new GameObject().AddComponent<AlligatorCableHandler>()
             .Initialize(projectile.Owner as PlayerController, aiActor, aiActor.transform, aiActor.CenterPosition - aiActor.transform.position.XY());
     }
 }
@@ -207,6 +207,9 @@ public class AlligatorCableHandler : MonoBehaviour
 {
     private const int _SEGMENTS            = 10;
     private const float _SPARK_TRAVEL_TIME = 0.3f;
+    private const float _MIN_DROP_SPEED    = 5f;
+    private const float _MAX_DROP_SPEED    = 20f;
+    private const float _DROP_FRICTION     = 0.9f;
 
     private MeshFilter _stringFilter;
     private Transform _startTransform;
@@ -222,6 +225,11 @@ public class AlligatorCableHandler : MonoBehaviour
     private Vector2 _endTransformOffset = Vector2.zero;
     private float _energyProduced       = 0f;
     private Alligator _alligator        = null;
+    private bool _fallen                = false;
+    private bool _settled               = false;
+    private Vector3 _dropVelocity       = Vector3.zero;
+    private Vector3 _dropOffsetVector   = Vector3.zero;
+    private Vector3 _lastGoodEndPos     = Vector3.zero;
 
     internal List<GameObject> _extantSparks = new();
     internal List<float> _extantSpawnTimes  = new();
@@ -287,11 +295,72 @@ public class AlligatorCableHandler : MonoBehaviour
         }
     }
 
+    private void FallOnFloor()
+    {
+        if (this._alligator)
+        {
+            this._alligator._cables.Remove(this);
+            this._alligator = null;
+        }
+
+        for (int i = 0; i < this._extantSparks.Count; ++i)
+            UnityEngine.Object.Destroy(this._extantSparks[i]);
+
+        base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("BG_Critical")); // render below most objects
+        base.transform.position = this._startTransform.position.WithZ(10f);
+        this._startTransform = base.transform;
+
+        this._endTransform = new GameObject().transform;
+        this._endTransform.position = this._lastGoodEndPos;
+        if (this._clippyboi)
+        {
+            this._clippyboi.transform.parent = this._endTransform;
+            this._clippyboi.transform.localRotation = Lazy.RandomEulerZ();
+        }
+
+        this._dropVelocity     = Lazy.RandomVector(UnityEngine.Random.Range(_MIN_DROP_SPEED, _MAX_DROP_SPEED)).ToVector3ZUp();
+        this._dropOffsetVector = Lazy.RandomVector(0.5f + 1.5f * UnityEngine.Random.value).ToVector3ZUp();
+        this._enemy            = null;
+        this._targetingEnemy   = false;
+        this._fallen           = true;
+        this._settled          = false;
+    }
+
+    private void HandleFallenOnFloor()
+    {
+        if (this._settled)
+            return;
+
+        float dtime = BraveTime.DeltaTime;
+        this._endTransform.position += dtime * this._dropVelocity;
+        this._startTransform.position = Lazy.SmoothestLerp(this._startTransform.position, this._endTransform.position, 10f);
+        this._dropVelocity *= Mathf.Pow(_DROP_FRICTION, dtime * C.FPS);
+        if (this._dropVelocity.sqrMagnitude < 1f)
+            this._settled = true;
+
+        Vector3 vector = this._startTransform.position;
+        Vector3 vector2 = this._endTransform.position + this._endTransformOffset.ToVector3ZisY();
+        BuildMeshAlongCurveAndUpdateSparks(vector, vector, vector2 + this._dropOffsetVector, vector2);
+        this._mesh.vertices = this._vertices;
+        this._mesh.RecalculateBounds();
+        this._mesh.RecalculateNormals();
+    }
+
     private void LateUpdate()
     {
-        if (!this._owner || !this._owner.CurrentGun || (this._targetingEnemy && !(this._enemy && this._enemy.healthHaver && this._enemy.healthHaver.IsAlive)))
+        if (this._fallen)
         {
-            UnityEngine.Object.Destroy(this);
+            HandleFallenOnFloor();
+            return;
+        }
+        if (this._targetingEnemy && !(this._enemy && this._enemy.healthHaver && this._enemy.healthHaver.IsAlive))
+        {
+            FallOnFloor();
+            return;
+        }
+        if (!this._owner || !this._owner.CurrentGun)
+        {
+            UnityEngine.Object.Destroy(base.gameObject);
             return;
         }
 
@@ -308,7 +377,8 @@ public class AlligatorCableHandler : MonoBehaviour
         else
             vector = this._startTransform.position.XY().ToVector3ZisY(-3f);
 
-        Vector3 vector2 = this._endTransform.position.XY().ToVector3ZisY(-3f) + this._endTransformOffset.ToVector3ZisY();
+        this._lastGoodEndPos = this._endTransform.position;
+        Vector3 vector2 = this._lastGoodEndPos.XY().ToVector3ZisY(-3f) + this._endTransformOffset.ToVector3ZisY();
         BuildMeshAlongCurveAndUpdateSparks(vector, vector, vector2 + new Vector3(0f, -2f, -2f), vector2);
         this._mesh.vertices = this._vertices;
         this._mesh.RecalculateBounds();
@@ -322,8 +392,10 @@ public class AlligatorCableHandler : MonoBehaviour
         this._clippyboi.SafeDestroy();
         if (this._stringFilter)
             UnityEngine.Object.Destroy(this._stringFilter.gameObject);
-        for (int i = 0; i < _extantSparks.Count; ++i)
+        for (int i = 0; i < this._extantSparks.Count; ++i)
             UnityEngine.Object.Destroy(this._extantSparks[i]);
+        if (this._fallen)
+            UnityEngine.Object.Destroy(this._endTransform.gameObject);
     }
 
     private void BuildMeshAlongCurveAndUpdateSparks(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float meshWidth = 1f / 32f)
@@ -342,8 +414,8 @@ public class AlligatorCableHandler : MonoBehaviour
             if (vector3.HasValue)
                 offset += (euler90 * (vector3.Value - vector2)).XY().normalized;
             offset = offset.normalized;
-            vertices[i * 2] = (vector2 + offset * meshWidth).ToVector3ZisY(-10f);
-            vertices[i * 2 + 1] = (vector2 + -offset * meshWidth).ToVector3ZisY(-10f);
+            vertices[i * 2] = (vector2 + offset * meshWidth).ToVector3ZisY(this._fallen ? 10f : -10f);
+            vertices[i * 2 + 1] = (vector2 + -offset * meshWidth).ToVector3ZisY(this._fallen ? 10f : -10f);
             vector = vector2;
         }
 

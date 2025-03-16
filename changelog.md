@@ -19,6 +19,7 @@
 - Cleaned up petting sprites for Wolf a bit
 - Fixed wrong shaders being used on petting sprites for Wolf, ice cream sprites for Bullet Kin, and tiny ammo box sprites from Scavenging Arms
 - Added better sounds and VFX for triggering training effects with Weighted Robes
+- Made Alligator's clips scatter on the floor when detaching from enemies instead of just vanishing
 
 ## 1.22.0 (2025-03-13)
 
