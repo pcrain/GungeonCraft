@@ -110,6 +110,12 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   {
   }
 
+  /// <summary>Called whenever the player attempts to attack with the gun while it's out of ammo. Returns true if throwing the gun should be allowed.</summary>
+  public virtual bool OnZeroAmmoAttack()
+  {
+    return true;
+  }
+
   /// <summary>Called any time a gun is picked up by a player during a run</summary>
   public override void OnPlayerPickup(PlayerController player)
   {
@@ -372,12 +378,15 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       }
   }
 
-  /// <summary>Patch to prevent guns from being thrown</summary>
+  /// <summary>Patch to prevent guns from being thrown and handle attack events when out of ammo</summary>
   [HarmonyPatch(typeof(Gun), nameof(Gun.PrepGunForThrow))]
   private class GunPrepGunForThrowPatch
   {
       static bool Prefix(Gun __instance)
       {
+          if (__instance.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
+            if (!cg.OnZeroAmmoAttack())
+              return false;
           return !__instance.gameObject.GetComponent<Unthrowable>();
       }
   }

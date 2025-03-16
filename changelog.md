@@ -20,6 +20,8 @@
 - Fixed wrong shaders being used on petting sprites for Wolf, ice cream sprites for Bullet Kin, and tiny ammo box sprites from Scavenging Arms
 - Added better sounds and VFX for triggering training effects with Weighted Robes
 - Made Alligator's clips scatter on the floor when detaching from enemies instead of just vanishing
+- Added VFX for slowing bullets via Glockarina
+- Sub Machine Gun can now be eaten when out of ammo to restore 1.5 hearts
 
 ## 1.22.0 (2025-03-13)
 

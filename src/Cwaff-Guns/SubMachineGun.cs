@@ -4,10 +4,13 @@ public class SubMachineGun : CwaffGun
 {
     public static string ItemName         = "Sub Machine Gun";
     public static string ShortDescription = "The Hero You Deserve";
-    public static string LongDescription  = "Fires harmless sandwiches that have a chance to permacharm enemies equal to twice the percent of health they have lost, with enemies at 50% health or less being 100% susceptible to charm. Enemies are fully healed upon being charmed.";
+    public static string LongDescription  = "Fires harmless sandwiches that have a chance to permacharm enemies equal to twice the percent of health they have lost, with enemies at 50% health or less being 100% susceptible to charm. Enemies are fully healed upon being charmed. Can be eaten when out of ammo to restore 1.5 hearts.";
     public static string Lore             = "Calling this object a gun stretches the definition of the word to its absolute limits, but it evidently scrapes by just enough to get a pass from both the legal system and the Breach's marketing division. Even so, this 'gun' doesn't seem to be particularly useful as a conventional firearm.";
 
+    private const float _HEAL_AMOUNT = 1.5f;
+
     internal static GameObject _NourishVFX;
+    internal static GameObject _NourishSelfVFX;
 
     public static void Init()
     {
@@ -20,6 +23,21 @@ public class SubMachineGun : CwaffGun
           .Attach<NourishingProjectile>();
 
         _NourishVFX = VFX.Create("nourish_vfx", fps: 18, emissivePower: 1, emissiveColour: Color.Lerp(Color.green, Color.white, 0.5f));
+        _NourishSelfVFX = Items.Ration.AsActive().gameObject.GetComponent<RationItem>().healVFX;
+    }
+
+    public override bool OnZeroAmmoAttack()
+    {
+        base.OnZeroAmmoAttack();
+        if (this.PlayerOwner is not PlayerController pc)
+            return true;
+
+        pc.gameObject.Play("sub_machine_gun_reload_sound");
+        pc.gameObject.Play("nourished_sound");
+        pc.healthHaver.ApplyHealing(_HEAL_AMOUNT);
+        pc.PlayEffectOnActor(_NourishSelfVFX, Vector3.zero);
+        UnityEngine.Object.Destroy(pc.ForceDropGun(this.gun).gameObject);
+        return false;
     }
 }
 

@@ -384,6 +384,7 @@ public class SlowNearbyBullets : MonoBehaviour
             else
                 p.MultiplySpeed(_BULLET_TIME_SCALE);
             p.AddComponent<SlowedByGlockarina>();
+            p.transform.DoMovingDistortionWave(distortionIntensity: 1.5f, distortionRadius: 0.25f, maxRadius: 0.25f, duration: 0.15f);
         }
     }
 }
