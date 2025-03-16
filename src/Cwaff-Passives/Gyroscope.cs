@@ -228,8 +228,7 @@ public class GyroscopeRoll : CustomDodgeRoll
                 curSpinSpeed = MIN_SPIN + SPIN_DELTA * (chargePercent*chargePercent);
                 UpdateForcedDirection(this.forcedDirection+curSpinSpeed*BraveTime.DeltaTime);
                 this.speedModifier.amount = 1.0f - (chargePercent*chargePercent);
-                this._owner.stats.RecalculateStats(this._owner,true);
-                this._owner.specRigidbody.Reinitialize();
+                this._owner.stats.RecalculateStats(this._owner);
 
                 if (UnityEngine.Random.Range(0.0f,100.0f) < 10)
                 {
