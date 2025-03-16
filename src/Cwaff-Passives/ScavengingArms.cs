@@ -25,11 +25,20 @@ public class ScavengingArms : CwaffPassive
             ap.SpreadAmmoOtherGunsPercent        = 0.0f;
 
             // shenanigans for adding a new clip
-            int oldLength = ap.spriteAnimator.library.clips.Length;
-            Array.Resize(ref ap.spriteAnimator.library.clips, oldLength + 1);
-            ap.spriteAnimator.library.clips[oldLength] = VFX.Create("blue_ammobox_pickup", fps: 8).GetComponent<tk2dSpriteAnimator>().library.clips[0];
-            ap.spriteAnimator.defaultClipId      = oldLength;
-            ap.spriteAnimator.deferNextStartClip = false;
+            tk2dSpriteAnimation library              = ap.spriteAnimator.library;
+            int oldLength                            = library.clips.Length;
+            Array.Resize(ref library.clips, oldLength + 1);
+            tk2dSpriteAnimationFrame referenceFrame  = library.clips[ap.spriteAnimator.defaultClipId].frames[0];
+            tk2dSpriteAnimationClip boxClip          = VFX.Create("blue_ammobox_pickup", fps: 8).GetComponent<tk2dSpriteAnimator>().library.clips[0];
+            library.clips[oldLength]                 = boxClip;
+            ap.spriteAnimator.defaultClipId          = oldLength;
+            ap.spriteAnimator.deferNextStartClip     = false;
+
+            // fix the shaders and material properties to match those of the vanilla ammo boxes
+            Material oldMat = referenceFrame.spriteCollection.spriteDefinitions[referenceFrame.spriteId].material;
+            tk2dSpriteDefinition[] defs = boxClip.frames[0].spriteCollection.spriteDefinitions;
+            foreach (tk2dSpriteAnimationFrame frame in boxClip.frames)
+                defs[frame.spriteId].CopyMaterialProps(oldMat);
 
         // ap.minimapIcon.GetComponent<tk2dSprite>().SetSprite(VFX.Collection, clip.frames[0].spriteId);
         ap.minimapIcon = null; //TODO: nuking the minimap icon since i can't find the base game reference...put back later if i can make a good-looking new one

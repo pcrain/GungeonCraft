@@ -211,10 +211,19 @@ internal static class AtlasHelper
   }
 
   /// <summary>Helper method for adding multiple sprites to a collection at once. Returns the id of the first sprite added and the number of sprites added.</summary>
-  private static IntVector2 AddSpritesToCollection(List<tk2dSpriteDefinition> newDefs, tk2dSpriteCollectionData collection, List<tk2dSpriteDefinition.AttachPoint[]> attachPoints = null)
+  private static IntVector2 AddSpritesToCollection(List<tk2dSpriteDefinition> newDefs, tk2dSpriteCollectionData collection,
+    List<tk2dSpriteDefinition.AttachPoint[]> attachPoints = null, bool copyMaterialSettings = false)
   {
       if (collection.spriteNameLookupDict == null)
           collection.InitDictionary();
+
+      Material baseMat  = null;
+      Shader baseShader = null;
+      if (copyMaterialSettings && collection.spriteDefinitions.Length > 0)
+      {
+        baseMat = collection.spriteDefinitions[0].material;
+        baseShader = baseMat.shader;
+      }
 
       //Add definition to collection
       int oldLength = collection.spriteDefinitions.Length;
@@ -223,6 +232,8 @@ internal static class AtlasHelper
       for (int i = 0; i < n; ++i)
       {
         tk2dSpriteDefinition def = newDefs[i];
+        if (baseMat)
+          def.CopyMaterialProps(baseMat);
         int newPos = oldLength + i;
         collection.spriteDefinitions[newPos] = def;
         collection.spriteNameLookupDict[def.name] = newPos;
@@ -246,13 +257,13 @@ internal static class AtlasHelper
   }
 
   /// <summary>Helper method for adding multiple sprites to a collection at once (public path-based version). Returns the id of the first sprite added and the number of sprites added.</summary>
-  public static IntVector2 AddSpritesToCollection(List<string> paths, tk2dSpriteCollectionData collection)
+  public static IntVector2 AddSpritesToCollection(List<string> paths, tk2dSpriteCollectionData collection, bool copyMaterialSettings = false)
   {
     int n = paths.Count;
     List<tk2dSpriteDefinition> defs = new(n);
     for (int i = 0; i < n; ++i)
       defs.Add(_PackedTextures[paths[i]]);
-    return AddSpritesToCollection(defs, collection);
+    return AddSpritesToCollection(defs, collection, copyMaterialSettings: copyMaterialSettings);
   }
 
   public static Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> ReadAttachPointsFromTSV(Assembly asmb, string tsvPath)

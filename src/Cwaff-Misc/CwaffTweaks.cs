@@ -31,13 +31,15 @@ public static class CwaffTweaks
         // Give it a petting animation
         if (pettingAnimation != null)
         {
-            List<int> animIndicesRight = AtlasHelper.AddSpritesToCollection(pettingAnimation, cc.sprite.Collection).AsRange();
-            tk2dSpriteAnimationClip anim_right = SpriteBuilder.AddAnimation(cc.sprite.spriteAnimator, cc.sprite.Collection, animIndicesRight,
+            tk2dSpriteCollectionData col = cc.sprite.Collection;
+
+            List<int> animIndicesRight = AtlasHelper.AddSpritesToCollection(pettingAnimation, col, copyMaterialSettings: true).AsRange();
+            tk2dSpriteAnimationClip anim_right = SpriteBuilder.AddAnimation(cc.sprite.spriteAnimator, col, animIndicesRight,
                 "pet_right", tk2dSpriteAnimationClip.WrapMode.Loop);
             anim_right.fps = 8f;
 
-            List<int> animIndicesLeft = AtlasHelper.AddSpritesToCollection(pettingAnimationLeft, cc.sprite.Collection).AsRange();
-            tk2dSpriteAnimationClip anim_left = SpriteBuilder.AddAnimation(cc.sprite.spriteAnimator, cc.sprite.Collection, animIndicesLeft,
+            List<int> animIndicesLeft = AtlasHelper.AddSpritesToCollection(pettingAnimationLeft, col, copyMaterialSettings: true).AsRange();
+            tk2dSpriteAnimationClip anim_left = SpriteBuilder.AddAnimation(cc.sprite.spriteAnimator, col, animIndicesLeft,
                 "pet_left", tk2dSpriteAnimationClip.WrapMode.Loop);
             anim_left.fps = 8f;
 

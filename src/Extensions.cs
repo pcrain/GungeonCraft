@@ -995,19 +995,19 @@ public static class Extensions
   }
 
   /// <summary>Add a new animation to the same collection as a reference sprite</summary>
-  public static string SetUpAnimation(this tk2dBaseSprite sprite, string animationName, float fps, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Once, bool copyShaders = false)
+  public static string SetUpAnimation(this tk2dBaseSprite sprite, string animationName, float fps,
+    tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Once, bool copyMaterialSettings = false)
   {
     tk2dSpriteCollectionData collection = sprite.collection;
     tk2dSpriteDefinition referenceFrameDef = collection.spriteDefinitions[sprite.spriteId];
     tk2dSpriteAnimator anim = sprite.spriteAnimator;
     List<int> spriteIds = AtlasHelper.AddSpritesToCollection(ResMap.Get(animationName), collection).AsRange();
-    if (copyShaders)
+    if (copyMaterialSettings)
+    {
+      Material baseMat = referenceFrameDef.material;
       foreach (int fid in spriteIds)
-      {
-          tk2dSpriteDefinition frameDef = collection.spriteDefinitions[fid];
-          frameDef.material.shader = referenceFrameDef.material.shader;
-          // frameDef.materialInst.shader = referenceFrameDef.materialInst.shader;
-      }
+        collection.spriteDefinitions[fid].CopyMaterialProps(baseMat);
+    }
     tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(anim, collection, spriteIds, animationName, wrapMode, fps);
     return animationName;
   }
@@ -3129,6 +3129,16 @@ public static class Extensions
       prefab.GetComponent<tk2dSpriteAnimator>().DefaultClipId = vfx.GetComponent<tk2dSpriteAnimator>().DefaultClipId;
       prefab.GetComponent<tk2dTiledSprite>().SetSprite(vfx.DefaultAnimation().frames[0].spriteCollection, vfx.DefaultAnimation().frames[0].spriteId);
       return prefab;
+  }
+
+  /// <summary>Copy material properties and shader from another material (everything except the texture itself)</summary>
+  public static tk2dSpriteDefinition CopyMaterialProps(this tk2dSpriteDefinition def, Material mat)
+  {
+    Texture oldTex = def.material.mainTexture;
+    def.material.CopyPropertiesFromMaterial(mat);
+    def.material.mainTexture = oldTex;
+    def.material.shader = mat.shader;
+    return def;
   }
 }
 

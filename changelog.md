@@ -16,6 +16,8 @@
 - Added impact VFX to Platinum Star's projectiles
 - Added VFX for spawning in decoys via Glockarina
 - Blamethrower now grants the scapegoat status to the enemy that actually damaged the player when possible (rather than a random enemy)
+- Cleaned up petting sprites for Wolf a bit
+- Fixed wrong shaders being used on petting sprites for Wolf, ice cream sprites for Bullet Kin, and tiny ammo box sprites from Scavenging Arms
 
 ## 1.22.0 (2025-03-13)
 
