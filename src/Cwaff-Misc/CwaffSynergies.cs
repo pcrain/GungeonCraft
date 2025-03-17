@@ -229,6 +229,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfWavefront>(MASTERY_WAVEFRONT, Wavefront.ItemName);
         // Breegull transforms into its dragon form, granting infinite fire eggs that never need reloading.
         NewMastery<MasteryOfBreegull>(MASTERY_BREEGULL, Breegull.ItemName);
+        // Overflow siphons goop from barrels faster and can be overfilled far past its max ammo, causing it to constantly autofire extra goop until it is no longer overfilled.
+        NewMastery<MasteryOfOverflow>(MASTERY_OVERFLOW, Overflow.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -422,6 +424,8 @@ public static class CwaffSynergies
         { e.statModifiers.Add(StatType.Damage.Mult(a)); return e; }
     public static AdvancedSynergyEntry MultReload(this AdvancedSynergyEntry e, float a)
         { e.statModifiers.Add(StatType.ReloadSpeed.Mult(a)); return e; }
+    public static AdvancedSynergyEntry MultAmmo(this AdvancedSynergyEntry e, float a)
+        { e.statModifiers.Add(StatType.AmmoCapacityMultiplier.Mult(a)); return e; }
 
 }
 
@@ -484,6 +488,7 @@ internal class MasteryOfOddjob               : MasteryDummyItem {}
 internal class MasteryOfSunderbuss           : MasteryDummyItem {}
 internal class MasteryOfWavefront            : MasteryDummyItem {}
 internal class MasteryOfBreegull             : MasteryDummyItem {}
+internal class MasteryOfOverflow             : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -581,4 +586,5 @@ public enum Synergy {
     MASTERY_SUNDERBUSS,
     MASTERY_WAVEFRONT,
     MASTERY_BREEGULL,
+    MASTERY_OVERFLOW,
 };
