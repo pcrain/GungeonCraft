@@ -1,4 +1,5 @@
-﻿namespace CwaffingTheGungy;
+﻿
+namespace CwaffingTheGungy;
 
 public class Missiletoe : CwaffGun
 {
@@ -33,12 +34,17 @@ public class Missiletoe : CwaffGun
 
     private const int _WRAP_FPS = 16;
     private const float _MAX_DIST = 5f;
+    private const int _MIN_EXCHANGE_KILLS = 5;
+    private const int _MAX_EXCHANGE_KILLS = 15;
 
-    private static readonly List<ItemQuality> _BannedQualities = new(){
-        ItemQuality.COMMON,
-        ItemQuality.EXCLUDED,
-        ItemQuality.SPECIAL,
+    private static readonly List<ItemQuality> _AllowedQualities = new(){
+        ItemQuality.S,
+        ItemQuality.A,
+        ItemQuality.B,
+        ItemQuality.C,
+        ItemQuality.D,
     };
+    private static GameObject _SecretSantaVFX = null;
 
     private ItemQuality _lastQualityFired;
 
@@ -47,6 +53,7 @@ public class Missiletoe : CwaffGun
 
     public List<PickupObject> wrappedGifts = new();
     public List<ItemQuality> wrappedQualities = new();
+    public int exchangeKillsRemaining = -1;
 
     public static void Init()
     {
@@ -122,6 +129,7 @@ public class Missiletoe : CwaffGun
         _UnwrapVFXD     = SetupVFX("brown_gift_unwrap");
         _WrapAnimLength = _WrapVFXB.GetComponent<tk2dSpriteAnimator>().DefaultClip.BaseClipLength;
         _SparklePrefab  = VFX.Create("missiletoe_sparkles", fps: 8, scale: 0.75f, loops: false);
+        _SecretSantaVFX = VFX.Create("present_vfx", anchor: Anchor.LowerCenter, emissivePower: 10f);
     }
 
     private static GameObject SetupVFX(string name)
@@ -173,6 +181,28 @@ public class Missiletoe : CwaffGun
         }
     }
 
+    public override void PostProcessProjectile(Projectile projectile)
+    {
+        base.PostProcessProjectile(projectile);
+        if (this.Mastered)
+            projectile.OnWillKillEnemy += this.GiftExchange;
+    }
+
+    private void GiftExchange(Projectile projectile, SpeculativeRigidbody rigidbody)
+    {
+        if (rigidbody.healthHaver is not HealthHaver hh || hh.IsDead)
+            return;
+        if (--this.exchangeKillsRemaining > 0)
+            return;
+        SecretSanta();
+        ResetSecretSanta();
+    }
+
+    private void ResetSecretSanta()
+    {
+        this.exchangeKillsRemaining = UnityEngine.Random.Range(_MIN_EXCHANGE_KILLS, _MAX_EXCHANGE_KILLS + 1);
+    }
+
     public override void OnPlayerPickup(PlayerController player)
     {
         RecalculateClip();
@@ -198,6 +228,8 @@ public class Missiletoe : CwaffGun
     {
         base.OnSwitchedToThisGun();
         RecalculateClip();
+        if (this.exchangeKillsRemaining < 0)
+            ResetSecretSanta();
     }
 
     private void WrapPresent()
@@ -212,7 +244,7 @@ public class Missiletoe : CwaffGun
                 continue;
             if (pickup.IsBeingSold)
                 continue;
-            if (_BannedQualities.Contains(pickup.quality))
+            if (!_AllowedQualities.Contains(pickup.quality))
                 continue;
 
             float pickupDist = (debris.sprite.WorldCenter - this.PlayerOwner.CenterPosition).magnitude;
@@ -239,6 +271,34 @@ public class Missiletoe : CwaffGun
         this.gun.DefaultModule.numberOfShotsInClip = _shuffledQualities.Count;
     }
 
+    private void SecretSanta(int index = -1)
+    {
+        if (wrappedGifts.Count == 0 || !this.PlayerOwner)
+            return;
+        if (index < 0)
+            index = UnityEngine.Random.Range(0, wrappedGifts.Count);
+
+        GameObject newGiftPrefab = this.PlayerOwner.GetRandomChestRewardOfQuality(wrappedGifts[index].quality);
+        UnityEngine.Object.Destroy(wrappedGifts[index].gameObject);
+
+        PickupObject newGift = UnityEngine.Object.Instantiate(newGiftPrefab).GetComponent<PickupObject>();
+        if (newGift.gameObject.GetComponent<PlayerItem>() is PlayerItem active)
+            active.m_pickedUp = true;
+        else if (newGift.gameObject.GetComponent<PassiveItem>() is PassiveItem passive)
+            passive.m_pickedUp = true;
+        SpriteOutlineManager.RemoveOutlineFromSprite(newGift.sprite, true);
+        newGift.renderer.enabled = false;
+        DontDestroyOnLoad(newGift.gameObject); // needed for persisting between floors
+
+        wrappedGifts[index] = newGift;
+
+        for (int i = 0; i <= 8; ++i)
+            CwaffVFX.Spawn(prefab: _SecretSantaVFX, position: this.PlayerOwner.sprite.WorldCenter, velocity: (22.5f + 45f * i).ToVector(4f),
+                lifetime: 0.6f, fadeOutTime: 0.125f, startScale: 0.75f, endScale: 0.4f, anchorTransform: this.PlayerOwner.transform);
+        this.PlayerOwner.gameObject.Play("secret_santa_sound");
+        // this.PlayerOwner.FlashVFXAbovePlayer(_SecretSantaVFX, sound: "secret_santa_sound", glowAndFade: true, time: 0.5f, glowAmount: 3f);
+    }
+
     private void UnwrapPresent()
     {
         if (wrappedGifts.Count == 0)
@@ -252,6 +312,7 @@ public class Missiletoe : CwaffGun
     public override void MidGameSerialize(List<object> data, int i)
     {
         base.MidGameSerialize(data, i);
+        data.Add(exchangeKillsRemaining);
         data.Add(wrappedGifts.Count);
         foreach(PickupObject pickup in wrappedGifts)
         {
@@ -271,6 +332,8 @@ public class Missiletoe : CwaffGun
     {
         base.MidGameDeserialize(data, ref i);
         wrappedGifts.Clear();
+
+        this.exchangeKillsRemaining = (int)data[i++];
         int numGifts = (int)data[i++];
         for (int n = 0; n < numGifts; ++n)
         {
@@ -487,11 +550,13 @@ public class WrappableGift : MonoBehaviour
         {
             active2.RegisterMinimapIcon();
             active2.m_pickedUp = false;
+            RoomHandler.unassignedInteractableObjects.AddUnique(active2);
         }
         else if (this._pickup.GetComponent<PassiveItem>() is PassiveItem passive2)
         {
             passive2.RegisterMinimapIcon();
             passive2.m_pickedUp = false;
+            RoomHandler.unassignedInteractableObjects.AddUnique(passive2);
         }
         this._pickup.m_isBeingEyedByRat = this._wasEyedByRat;
         this._gun._currentlyWrapping = false;

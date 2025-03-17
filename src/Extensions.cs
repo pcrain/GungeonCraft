@@ -2478,14 +2478,14 @@ public static class Extensions
   public static bool OnScreen(this Vector3 pos, float leeway) => pos.XY().OnScreen(leeway);
 
   /// <summary>Helper for flashing VFX briefly above the player's head</summary>
-  public static void FlashVFXAbovePlayer(this PlayerController player, GameObject vfx, string sound = null, float time = 1.0f, bool glowAndFade = false)
+  public static void FlashVFXAbovePlayer(this PlayerController player, GameObject vfx, string sound = null, float time = 1.0f, bool glowAndFade = false, float glowAmount = 5f)
   {
       GameObject v = SpawnManager.SpawnVFX(vfx, player.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Quaternion.identity);
       v.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
       v.transform.parent = player.transform;
       if (glowAndFade)
         v.AddComponent<GlowAndFadeOut>().Setup(
-          fadeInTime: 0.15f, glowInTime: 0.20f, glowOutTime: 0.20f, fadeOutTime: 0.15f, maxEmit: 5f, destroy: true);
+          fadeInTime: 0.15f, glowInTime: 0.20f, holdTime: time, glowOutTime: 0.20f, fadeOutTime: 0.15f, maxEmit: glowAmount, destroy: true);
       else
         v.ExpireIn(time);
       if (sound != null)
@@ -3140,6 +3140,13 @@ public static class Extensions
     def.material.mainTexture = oldTex;
     def.material.shader = mat.shader;
     return def;
+  }
+
+  /// <summary>Get a random reward of the specified quality for a player, accounting for items the player already has.</summary>
+  public static GameObject GetRandomChestRewardOfQuality(this PlayerController player, ItemQuality quality)
+  {
+      RewardManager rm = GameManager.Instance.RewardManager;
+      return rm.GetItemForPlayer(player, Lazy.CoinFlip() ? rm.ItemsLootTable : rm.GunsLootTable, quality, null);
   }
 }
 

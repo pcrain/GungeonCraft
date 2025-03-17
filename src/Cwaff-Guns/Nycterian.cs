@@ -106,7 +106,7 @@ public class DecoyEcho : MonoBehaviour
                     sprite.HeightOffGround = 1f;
                 vfx.transform.parent = enemy.sprite.transform;
                 vfx.AddComponent<GlowAndFadeOut>().Setup(
-                    fadeInTime: 0.15f, glowInTime: 0.10f, glowOutTime: 0.10f, fadeOutTime: 0.15f, maxEmit: 50f, destroy: true);
+                    fadeInTime: 0.15f, glowInTime: 0.10f, holdTime: 0.0f, glowOutTime: 0.10f, fadeOutTime: 0.15f, maxEmit: 50f, destroy: true);
             enemy.gameObject.PlayUnique("distracted_sound");
         }
     }

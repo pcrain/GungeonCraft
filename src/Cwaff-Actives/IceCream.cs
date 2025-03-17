@@ -193,7 +193,7 @@ public class HappyIceCreamHaver : MonoBehaviour
                 sprite.HeightOffGround = 1f;
             vfx.transform.parent = enemy.sprite.transform;
             vfx.AddComponent<GlowAndFadeOut>().Setup(
-                fadeInTime: 0.25f, glowInTime: 0.50f, glowOutTime: 0.50f, fadeOutTime: 0.25f, maxEmit: 200f, destroy: true);
+                fadeInTime: 0.25f, glowInTime: 0.50f, holdTime: 0.0f, glowOutTime: 0.50f, fadeOutTime: 0.25f, maxEmit: 200f, destroy: true);
     }
 }
 

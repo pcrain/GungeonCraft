@@ -72,7 +72,7 @@ public class NourishingProjectile : MonoBehaviour
         vfx.GetComponent<tk2dSprite>().HeightOffGround = 1f;
         vfx.transform.parent = enemy.sprite.transform;
         vfx.AddComponent<GlowAndFadeOut>().Setup(
-            fadeInTime: 0.15f, glowInTime: 0.20f, glowOutTime: 0.20f, fadeOutTime: 0.15f, maxEmit: 5f, destroy: true);
+            fadeInTime: 0.15f, glowInTime: 0.20f, holdTime: 0.0f, glowOutTime: 0.20f, fadeOutTime: 0.15f, maxEmit: 5f, destroy: true);
         enemy.gameObject.Play("nourished_sound");
     }
 }

@@ -231,6 +231,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfBreegull>(MASTERY_BREEGULL, Breegull.ItemName);
         // Overflow siphons goop from barrels faster and can be overfilled far past its max ammo, causing it to constantly autofire extra goop until it is no longer overfilled.
         NewMastery<MasteryOfOverflow>(MASTERY_OVERFLOW, Overflow.ItemName);
+        // Every 5-15 enemies killed with Missiletoe triggers a gift exchange, which randomly replaces a wrapped gift with another item of equal quality.
+        NewMastery<MasteryOfMissiletoe>(MASTERY_MISSILETOE, Missiletoe.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -489,6 +491,7 @@ internal class MasteryOfSunderbuss           : MasteryDummyItem {}
 internal class MasteryOfWavefront            : MasteryDummyItem {}
 internal class MasteryOfBreegull             : MasteryDummyItem {}
 internal class MasteryOfOverflow             : MasteryDummyItem {}
+internal class MasteryOfMissiletoe           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -587,4 +590,5 @@ public enum Synergy {
     MASTERY_WAVEFRONT,
     MASTERY_BREEGULL,
     MASTERY_OVERFLOW,
+    MASTERY_MISSILETOE,
 };

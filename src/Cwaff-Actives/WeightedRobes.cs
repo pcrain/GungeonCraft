@@ -175,9 +175,9 @@ public class WeightedRobes : CwaffActive, ILabelItem
     public static IEnumerator DoTraining_CR(PlayerController player, bool active)
     {
         if (active)
-            player.FlashVFXAbovePlayer(_TrainingVFX, sound: "statdown", glowAndFade: true);
+            player.FlashVFXAbovePlayer(_TrainingVFX, sound: "statdown", glowAndFade: true, time: 0.0f);
         else
-            player.FlashVFXAbovePlayer(_TrainedVFX, sound: "statup", glowAndFade: true);
+            player.FlashVFXAbovePlayer(_TrainedVFX, sound: "statup", glowAndFade: true, time: 0.0f);
 
         SpriteOutlineManager.RemoveOutlineFromSprite(player.sprite);
         Material[] mats = player.SetOverrideShader(CwaffShaders.UnlitDigitizeShader);

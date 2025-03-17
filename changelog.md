@@ -2,10 +2,10 @@
 
 ## 1.22.2 (TBD)
 
+- Added masteries for Overflow and Missiletoe
 - Fixed janky sprite offsets when using Vacuum Cleaner or Magunet to attract large objects
 - Fixed mastered Iron Maid sometimes only firing a single projectile when switching to another gun and back
 - Made player smoothly decelerate while charging Gyroscope's dodge roll
-- Added mastery for Overflow
 - Removed a bunch of debug code from M.M.: Aiming causing a null deref when picked up
 
 ## 1.22.1 (2025-03-16)

@@ -1308,12 +1308,12 @@ public class GlowAndFadeOut : MonoBehaviour //NOTE: can't be used with pooled VF
 {
     private const float _MAX_EMIT = 200f;
 
-    public void Setup(float fadeInTime, float glowInTime, float glowOutTime, float fadeOutTime, float maxEmit = _MAX_EMIT, bool destroy = true)
+    public void Setup(float fadeInTime, float glowInTime, float holdTime, float glowOutTime, float fadeOutTime, float maxEmit = _MAX_EMIT, bool destroy = true)
     {
-        StartCoroutine(Top(fadeInTime, glowInTime, glowOutTime, fadeOutTime, maxEmit, destroy));
+        StartCoroutine(Top(fadeInTime, glowInTime, holdTime, glowOutTime, fadeOutTime, maxEmit, destroy));
     }
 
-    private IEnumerator Top(float fadeInTime, float glowInTime, float glowOutTime, float fadeOutTime, float maxEmit = _MAX_EMIT, bool destroy = true)
+    private IEnumerator Top(float fadeInTime, float glowInTime, float holdTime, float glowOutTime, float fadeOutTime, float maxEmit = _MAX_EMIT, bool destroy = true)
     {
         tk2dSprite sprite = base.GetComponent<tk2dSprite>();
         sprite.usesOverrideMaterial = true;
@@ -1334,6 +1334,9 @@ public class GlowAndFadeOut : MonoBehaviour //NOTE: can't be used with pooled VF
             sprite.renderer.material.SetFloat("_EmissivePower", maxEmit * quadraticEase);
             yield return null;
         }
+
+        for (float elapsed = 0f; elapsed < holdTime; elapsed += BraveTime.DeltaTime)
+            yield return null;
 
         for (float elapsed = 0f; elapsed < glowOutTime; elapsed += BraveTime.DeltaTime)
         {
