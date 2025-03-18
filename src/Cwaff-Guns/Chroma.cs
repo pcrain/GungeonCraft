@@ -213,6 +213,7 @@ public class Chroma : CwaffGun
     {
         const float _BOOST_PER_LEVEL = 0.2f;
 
+        base.PostProcessBeam(beam);
         if (beam.projectile is not Projectile projectile)
             return;
         if (this.PlayerOwner is not PlayerController pc)

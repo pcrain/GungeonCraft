@@ -34,6 +34,14 @@ public class MacchiAuto : CwaffGun
             };
     }
 
+    public override void PostProcessBeam(BeamController beam)
+    {
+        base.PostProcessBeam(beam);
+        if (!this.Mastered)
+            return;
+        beam.gameObject.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.SuperCoffeeGoop;
+    }
+
     /// <summary>Allow beams to apply arbitrary status effects</summary>
     [HarmonyPatch(typeof(BasicBeamController), nameof(BasicBeamController.FrameUpdate))]
     private class BeamApplyArbitraryStatusEffectPatch
@@ -100,9 +108,9 @@ public class OverdoseEffect : GameActorEffect
 
 public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
 {
-    private static StatModifier[] _CaffeineGoopBuffs = null;
-
     private static GameObject _DummyCaffeineTimeScaleObject = null;
+
+    private StatModifier[] _caffeineGoopBuffs = null;
 
     public override void OnEffectApplied(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f)
     {
@@ -113,12 +121,12 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
             _DummyCaffeineTimeScaleObject = new();
         float inverseSpeed = 1f / SpeedMultiplier;
         BraveTime.SetTimeScaleMultiplier(inverseSpeed, _DummyCaffeineTimeScaleObject);
-        _CaffeineGoopBuffs ??= new[] {  //NOTE: speed handled by base GameActorSpeedEffect
+        this._caffeineGoopBuffs ??= new[] {  //NOTE: speed handled by base GameActorSpeedEffect
             StatType.RateOfFire.Mult(SpeedMultiplier),
             StatType.DodgeRollSpeedMultiplier.Mult(SpeedMultiplier),
             StatType.ReloadSpeed.Mult(inverseSpeed),
         };
-        foreach (StatModifier stat in _CaffeineGoopBuffs)
+        foreach (StatModifier stat in this._caffeineGoopBuffs)
             player.ownerlessStatModifiers.AddUnique(stat);
         player.stats.RecalculateStats(player);
     }
@@ -128,7 +136,7 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
         base.OnEffectRemoved(actor, effectData);
         if (actor is not PlayerController player)
             return;
-        foreach (StatModifier stat in _CaffeineGoopBuffs)
+        foreach (StatModifier stat in this._caffeineGoopBuffs)
             player.ownerlessStatModifiers.TryRemove(stat);
         player.stats.RecalculateStats(player);
         if (!_DummyCaffeineTimeScaleObject)

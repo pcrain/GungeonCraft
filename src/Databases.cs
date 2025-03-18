@@ -1097,6 +1097,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
     //Cwaff Goops
     public static GoopDefinition SeltzerGoop;
     public static GoopDefinition CoffeeGoop;
+    public static GoopDefinition SuperCoffeeGoop;
     public static GoopDefinition HolyGoop;
     public static GoopDefinition GreenOilGoop;
 
@@ -1189,6 +1190,20 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
                 duration                     = 0.05f,
                 maxStackedDuration           = 0.05f,
                 SpeedMultiplier              = 2.0f,
+                CooldownMultiplier           = 1f,
+                OnlyAffectPlayerWhenGrounded = true,
+            };
+
+        //Set up mastered Macchi Auto goop
+        SuperCoffeeGoop = UnityEngine.Object.Instantiate<GoopDefinition>(CoffeeGoop);
+            SuperCoffeeGoop.SpeedModifierEffect = new GameActorCaffeineGoopEffect(){
+                AffectsPlayers               = true,
+                AffectsEnemies               = false,
+                effectIdentifier             = "super coffee goop",
+                stackMode                    = GameActorEffect.EffectStackingMode.Refresh,
+                duration                     = 0.05f,
+                maxStackedDuration           = 0.05f,
+                SpeedMultiplier              = 4.0f,
                 CooldownMultiplier           = 1f,
                 OnlyAffectPlayerWhenGrounded = true,
             };

@@ -2,7 +2,7 @@
 
 ## 1.22.2 (TBD)
 
-- Added masteries for Overflow and Missiletoe
+- Added masteries for Overflow, Missiletoe, and Macchi Auto
 - Fixed janky sprite offsets when using Vacuum Cleaner or Magunet to attract large objects
 - Fixed mastered Iron Maid sometimes only firing a single projectile when switching to another gun and back
 - Made player smoothly decelerate while charging Gyroscope's dodge roll
