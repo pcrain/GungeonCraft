@@ -235,6 +235,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfMissiletoe>(MASTERY_MISSILETOE, Missiletoe.ItemName);
         // Flow of time is further slowed down when standing in coffee goop.
         NewMastery<MasteryOfMacchiAuto>(MASTERY_MACCHI_AUTO, MacchiAuto.ItemName);
+        // Chroma gains a tribeam mode that uses additional ammo, but deals vastly increased damage. The tribeam's damage scales even further based on the lowest of extracted red, green, and blue pigment levels.
+        NewMastery<MasteryOfChroma>(MASTERY_CHROMA, Chroma.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -495,6 +497,7 @@ internal class MasteryOfBreegull             : MasteryDummyItem {}
 internal class MasteryOfOverflow             : MasteryDummyItem {}
 internal class MasteryOfMissiletoe           : MasteryDummyItem {}
 internal class MasteryOfMacchiAuto           : MasteryDummyItem {}
+internal class MasteryOfChroma               : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -595,4 +598,5 @@ public enum Synergy {
     MASTERY_OVERFLOW,
     MASTERY_MISSILETOE,
     MASTERY_MACCHI_AUTO,
+    MASTERY_CHROMA,
 };

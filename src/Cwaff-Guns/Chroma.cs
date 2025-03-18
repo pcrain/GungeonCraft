@@ -11,6 +11,7 @@ public class Chroma : CwaffGun
 
     private const float _BASE_PARTICLE_RATE = 0.5f;
     private const float _PER_LEVEL_PARTICLE_RATE = 0.05f;
+    private const float _TRIBEAM_COLOR_CYCLE_SPEED = 10f;
 
     internal static GameObject _PigmentPrefab = null;
 
@@ -18,8 +19,11 @@ public class Chroma : CwaffGun
     public int greenPigment = 0;
     public int bluePigment  = 0;
 
-    private readonly int[] _pigmentPowers = [0, 0, 0];
+    internal Color _cachedTribeamColor = default;
+
+    private readonly int[] _pigmentPowers = [0, 0, 0, 0];
     private bool _ammoDisplayDirty = true;
+    private Material _cachedTribeamMat = null;
 
     public static void Init()
     {
@@ -29,17 +33,19 @@ public class Chroma : CwaffGun
           .Attach<ChromaAmmoDisplay>()
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
-            shootStyle: ShootStyle.Beam, damage: 7f, speed: -1f, /*customClip: true, */ammoCost: 5, angleVariance: 0f,
+            shootStyle: ShootStyle.Beam, damage: 7f, speed: -1f, ammoCost: 5, angleVariance: 0f,
             beamSprite: "chroma_beam", beamFps: 60, beamChargeFps: 8, beamImpactFps: 30,
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0f, beamEmission: 1500f))
           .Attach<ChromaProjectile>();
 
-        string[] ammoTypes = ["chroma_red", "chroma_green", "chroma_blue"];
+        string[] ammoTypes = ["chroma_red", "chroma_green", "chroma_blue", "chroma_tri"];
         //NOTE: dispersal doesn't work with instant beams (since they have no bones)
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < 4; ++i)
         {
             ProjectileModule mod = i > 0 ? gun.DuplicateDefaultModule() : gun.DefaultModule;
             mod.SetupCustomAmmoClip(ammoTypes[i]);
+            if (i == 3)  // tribeam drains ammo twice as quickly
+                mod.ammoCost *= 2;
             Projectile p = mod.projectiles[0];
             p.GetComponent<ChromaProjectile>()._pigment = (PigmentType)i;
             BasicBeamController beamComp = p.gameObject.GetComponent<BasicBeamController>();
@@ -61,7 +67,7 @@ public class Chroma : CwaffGun
         if (!manualReload || !player.AcceptingNonMotionInput)
             return;
         bool wasFiring = gun.IsFiring;
-        this.gun.CurrentStrengthTier = (this.gun.CurrentStrengthTier + 1) % 3;
+        this.gun.CurrentStrengthTier = (this.gun.CurrentStrengthTier + 1) % (this.Mastered ? 4 : 3);
         if (wasFiring)
             gun.CeaseAttack();
         this._ammoDisplayDirty = true;
@@ -143,7 +149,21 @@ public class Chroma : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
+        if (!this.PlayerOwner)
+            return;
+
+        if (this.gun.CurrentStrengthTier == 3)
+        {
+            float now = _TRIBEAM_COLOR_CYCLE_SPEED * BraveTime.ScaledTimeSinceStartup;
+            if (this._cachedTribeamMat == null)
+                this._cachedTribeamMat = this.gun.DefaultModule.projectiles[0].GetComponent<BasicBeamController>().sprite.renderer.material;
+            Color c = this._cachedTribeamColor = Color.HSVToRGB(now - Mathf.Floor(now), 0.75f, 1.0f);
+            this._cachedTribeamMat.SetColor("_EmissiveColor", c);
+            this._cachedTribeamMat.SetColor("_OverrideColor", Color.Lerp(c, Color.white, 0.5f));
+            this._ammoDisplayDirty = true;
+        }
+
+        if (!this.PlayerOwner.AcceptingNonMotionInput)
             return;
 
         this.gun.LoopSoundIf(this.gun.IsFiring, "chroma_fire_sound");
@@ -165,6 +185,7 @@ public class Chroma : CwaffGun
         Vector2 deltaNorm = beam.Direction.normalized;
         float mag = beam.m_currentBeamDistance;
 
+        int level = this.gun.CurrentStrengthTier;
         for (int i = 0; i < (int)mag; ++i)
             CwaffVFX.Spawn(
                 prefab         : VFX.SinglePixel,
@@ -172,7 +193,7 @@ public class Chroma : CwaffGun
                 velocity       : Lazy.RandomVector(4f),
                 lifetime       : 0.4f,
                 emissivePower  : 2000f,
-                overrideColor  : PigmentDrop._Primaries[this.gun.CurrentStrengthTier],
+                overrideColor  : PigmentDrop._Primaries[(level < 3) ? level : UnityEngine.Random.Range(0, 3)],
                 emitColorPower : 8f
               );
     }
@@ -250,6 +271,7 @@ public class Chroma : CwaffGun
         this._pigmentPowers[0] = PigmentPower(this.redPigment);
         this._pigmentPowers[1] = PigmentPower(this.greenPigment);
         this._pigmentPowers[2] = PigmentPower(this.bluePigment);
+        this._pigmentPowers[3] = Mathf.Min(this._pigmentPowers[0], this._pigmentPowers[1], this._pigmentPowers[2]);
         this._ammoDisplayDirty = true;
     }
 
@@ -292,8 +314,10 @@ public class Chroma : CwaffGun
             if (this._chroma._ammoDisplayDirty)
             {
                 int[] pp = this._chroma._pigmentPowers;
-                this._ammoText = $"[sprite \"pigment_red_ui{1+pp[0]}\"] [sprite \"pigment_green_ui{1+pp[1]}\"] [sprite \"pigment_blue_ui{1+pp[2]}\"] \n[color {PigmentDrop._HexPrimaries[this._gun.CurrentStrengthTier]}]";
-                this._chroma._ammoDisplayDirty = false;
+                string colorString = (this._gun.CurrentStrengthTier < 3)
+                    ? PigmentDrop._HexPrimaries[this._gun.CurrentStrengthTier]
+                    : ColorUtility.ToHtmlStringRGB(this._chroma._cachedTribeamColor);
+                this._ammoText = $"[sprite \"pigment_red_ui{1+pp[0]}\"] [sprite \"pigment_green_ui{1+pp[1]}\"] [sprite \"pigment_blue_ui{1+pp[2]}\"] \n[color #{colorString}]";
             }
             uic.GunAmmoCountLabel.Text = $"{this._ammoText}{this._owner.VanillaAmmoDisplay()}[/color]";
             return true;
@@ -305,7 +329,8 @@ public enum PigmentType
 {
     RED,
     GREEN,
-    BLUE
+    BLUE,
+    TRI, // unused
 }
 
 public class Desaturator : MonoBehaviour
@@ -328,7 +353,7 @@ public class Desaturator : MonoBehaviour
     private float _gFrac = 0.0f;
     private float _bFrac = 0.0f;
 
-    private float[] damageScales = [1.0f, 1.0f, 1.0f];
+    private float[] damageScales = [1.0f, 1.0f, 1.0f, 1.0f];
 
     private void Start()
     {
@@ -443,6 +468,7 @@ public class Desaturator : MonoBehaviour
                 this.damageScales[0] = (gNorm < 0.16f) ? RESIST : (gNorm > 0.45f) ? WEAK : 1f; // red pigment damage based on green pigment in enemy
                 this.damageScales[1] = (bNorm < 0.16f) ? RESIST : (bNorm > 0.45f) ? WEAK : 1f; // green pigment damage based on blue pigment in enemy
             }
+            this.damageScales[3] = 3f * WEAK;
 
             this._gotPigment = true;
         }
@@ -465,7 +491,7 @@ public class Desaturator : MonoBehaviour
             }
         }
 
-        if (willKill)
+        if (willKill && hitPigment != PigmentType.TRI)
         {
             PigmentType bonusPigment = (PigmentType)(((int)hitPigment + 2) % 3); // red gives bonus blue, blue gives bonus green, and green gives bonus red
             int bonusAmount = (int)(Mathf.Log(Mathf.Max(1f, hh.AdjustedMaxHealth), 2));
@@ -517,7 +543,7 @@ public class ChromaProjectile : MonoBehaviour
         Desaturator desat = enemy.gameObject.GetOrAddComponent<Desaturator>();
         desat.DoPigmentChecks(this._pigment, willKill);
         float mult = desat.GetPigmentMult(this._pigment);
-        //NOTE: sets damage on a one frame delay since setting it before hit would require patches beam controller logic before it applies damage
+        //NOTE: sets damage on a one frame delay since setting it before hit would require patching beam controller logic before it applies damage
         this._projectile.baseData.damage = this._baseDamage * mult;
         if (mult > 1f)
             this._owner.LoopSoundIf(true, "chroma_drain_sound");
@@ -541,12 +567,14 @@ public class PigmentDrop : MonoBehaviour
         new(230f / 255f, 87f  / 255f, 149f / 255f), //red
         new(149f / 255f, 230f / 255f, 87f  / 255f), //green
         new( 90f / 255f, 180f / 255f, 230f / 255f), //blue
+        new(255f / 255f, 255f / 255f, 255f / 255f), //white
     ];
 
     internal static readonly List<string> _HexPrimaries = [
-        "#E65795", //red
-        "#95E657", //green
-        "#5795E6", //blue
+        "E65795", //red
+        "95E657", //green
+        "5795E6", //blue
+        "FFFFFF", //white
     ];
 
     internal static int _ChromaId = -1;

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.22.3 (TBD)
+
+- Added mastery for Chroma
+
 ## 1.22.2 (2025-03-17)
 
 #### Features and Polish:
