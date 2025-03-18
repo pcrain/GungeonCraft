@@ -7,6 +7,7 @@
 - Fixed mastered Iron Maid sometimes only firing a single projectile when switching to another gun and back
 - Made player smoothly decelerate while charging Gyroscope's dodge roll
 - Removed a bunch of debug code from M.M.: Aiming causing a null deref when picked up
+- Changed player's animation speed to match their movement speed while under the effects of Macchi Auto's coffee goop
 
 ## 1.22.1 (2025-03-16)
 

@@ -1,3 +1,4 @@
+
 namespace CwaffingTheGungy;
 
 public class MacchiAuto : CwaffGun
@@ -121,14 +122,17 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
             _DummyCaffeineTimeScaleObject = new();
         float inverseSpeed = 1f / SpeedMultiplier;
         BraveTime.SetTimeScaleMultiplier(inverseSpeed, _DummyCaffeineTimeScaleObject);
-        this._caffeineGoopBuffs ??= new[] {  //NOTE: speed handled by base GameActorSpeedEffect
+        this._caffeineGoopBuffs ??= new[] {  //NOTE: movement speed handled by base GameActorSpeedEffect
             StatType.RateOfFire.Mult(SpeedMultiplier),
             StatType.DodgeRollSpeedMultiplier.Mult(SpeedMultiplier),
+            // StatType.DodgeRollDistanceMultiplier.Mult(inverseSpeed), //HACK: gets rid of weird acceleration but also shortens dodge roll too much
             StatType.ReloadSpeed.Mult(inverseSpeed),
         };
         foreach (StatModifier stat in this._caffeineGoopBuffs)
             player.ownerlessStatModifiers.AddUnique(stat);
         player.stats.RecalculateStats(player);
+        player.spriteAnimator.OverrideTimeScale = SpeedMultiplier;
+        player.gameObject.GetOrAddComponent<CaffeineAnimationSpeedCorrector>().Setup(SpeedMultiplier);
     }
 
     public override void OnEffectRemoved(GameActor actor, RuntimeGameActorEffectData effectData)
@@ -142,5 +146,42 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
         if (!_DummyCaffeineTimeScaleObject)
             _DummyCaffeineTimeScaleObject = new();
         BraveTime.SetTimeScaleMultiplier(1.0f, _DummyCaffeineTimeScaleObject);
+        if (player.gameObject.GetComponent<CaffeineAnimationSpeedCorrector>() is CaffeineAnimationSpeedCorrector corrector)
+            UnityEngine.Object.Destroy(corrector);
+        player.spriteAnimator.OverrideTimeScale = 0f;
+    }
+
+
+    public class CaffeineAnimationSpeedCorrector : MonoBehaviour
+    {
+        private PlayerController   _player = null;
+        private tk2dSpriteAnimator _animator = null;
+        private float              _speed    = -1f;
+
+        public void Setup(float speed)
+        {
+            this._player   = base.gameObject.GetComponent<PlayerController>();
+            this._player.OnPreDodgeRoll += ClearTimeScale;
+            this._animator = this._player.spriteAnimator;
+            this._speed    = speed;
+        }
+
+        private void OnDestroy()
+        {
+            this._player.OnPreDodgeRoll -= ClearTimeScale;
+        }
+
+        private void ClearTimeScale(PlayerController controller)
+        {
+            this._animator.OverrideTimeScale = 0f;
+        }
+
+        private void Update()
+        {
+            if (this._player.IsDodgeRolling)
+                this._animator.OverrideTimeScale = 0f;
+            else
+                this._animator.OverrideTimeScale = this._speed;
+        }
     }
 }
