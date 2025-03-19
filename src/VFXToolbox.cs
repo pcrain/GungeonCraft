@@ -1079,6 +1079,7 @@ public partial class CwaffVFX // private
         this._sprite.FlipY = flipY;
         this._sprite.renderer.SetAlpha(1.0f);
         this._library.clips = prefabLibrary.clips;
+        this._animator.playAutomatically = true;
         this._animator.defaultClipId = prefabAnim.defaultClipId;
         this._animator.currentClip = this._animator.DefaultClip;
 
@@ -1121,7 +1122,10 @@ public partial class CwaffVFX // private
         else if (randomFrame)
             this._animator.PickFrame();
         else
+        {
+            this._animator.Resume();
             this._animator.PlayFromFrame(0);
+        }
 
         this._setup = true;
     }

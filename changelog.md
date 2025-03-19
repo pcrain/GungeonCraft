@@ -3,6 +3,7 @@
 ## 1.22.3 (TBD)
 
 - Added mastery for Chroma
+- Fixed issue with certain non-looping VFX animations preventing other unrelated animations from playing properly
 
 ## 1.22.2 (2025-03-17)
 
