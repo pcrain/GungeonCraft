@@ -1,4 +1,5 @@
-﻿namespace CwaffingTheGungy;
+﻿
+namespace CwaffingTheGungy;
 
 public class Flakseed : CwaffGun
 {
@@ -8,8 +9,10 @@ public class Flakseed : CwaffGun
     public static string Lore             = "The quintessential tool for both practitioners of warfare-based gardening and practitioners of gardening-based warfare. Disregarding the fact that the combined demographic for both of these hobbies was 0 at the time of this tool's invention, a successful decade-long marketing campaign has since brought that number up to 2. With just a tiny bit of practice, you could be the one to let them technically, legally claim that number is 3!";
 
     internal static GameObject _FlakFlowerPrefab     = null;
+    internal static GameObject _MegaFlakFlowerPrefab = null;
     internal static Projectile _FlakFlowerProjectile = null;
     internal static GameObject _PetalVFX             = null;
+    internal static GameObject _VineVFX              = null;
 
     public static void Init()
     {
@@ -32,6 +35,13 @@ public class Flakseed : CwaffGun
         _FlakFlowerPrefab.AddComponent<FlakseedFlower>();
         _FlakFlowerPrefab.AutoRigidBody(Anchor.LowerCenter, CollisionLayer.PlayerHitBox);
 
+        _MegaFlakFlowerPrefab = VFX.Create("mega_flak_flower_sprout", anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _MegaFlakFlowerPrefab.AddAnimation("wait", "mega_flak_flower_wait", fps: 10, anchor: Anchor.MiddleCenter, emissivePower: 1f);
+        _MegaFlakFlowerPrefab.AddAnimation("attack", "mega_flak_flower_attack", fps: 10 , anchor: Anchor.MiddleCenter, emissivePower: 1f, loops: false);
+        _MegaFlakFlowerPrefab.AddAnimation("vanish", "mega_flak_flower_vanish", fps: 10, anchor: Anchor.MiddleCenter, emissivePower: 1f, loops: false);
+        _MegaFlakFlowerPrefab.AddComponent<FlakseedFlower>().mega = true;
+        _MegaFlakFlowerPrefab.AutoRigidBody(Anchor.MiddleCenter, CollisionLayer.PlayerHitBox);
+
         Color lightGreen = new Color(0.7f, 0.85f, 0.65f);
         _FlakFlowerProjectile = Items.Ak47.CloneProjectile(GunData.New(
             sprite: "flakseed_flower_bullet", damage: 1.0f, speed: 50.0f, force: 1.0f, range: 80.0f))
@@ -46,6 +56,7 @@ public class Flakseed : CwaffGun
           });
 
         _PetalVFX = VFX.Create("flakseed_petal", emissivePower: 2f);
+        _VineVFX = VFX.Create("vine_attack_vfx", fps: 60, loops: false, emissivePower: 2f);
     }
 }
 
@@ -55,11 +66,14 @@ public class FlakseedProjectile : MonoBehaviour
 
     private GrenadeProjectile _projectile = null;
     private PlayerController  _owner      = null;
+    private bool              _mastered   = false;
 
     private void Start()
     {
         this._projectile = base.GetComponent<GrenadeProjectile>();
         this._owner = this._projectile.Owner as PlayerController;
+        if (this._owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<Flakseed>() is Flakseed fs)
+            this._mastered = fs.Mastered;
         this._projectile.baseData.speed *= 0.95f + 0.1f * UnityEngine.Random.value; // randomize the velocity slightly
         this._projectile.OnDestruction += CreateSprout;
     }
@@ -69,7 +83,9 @@ public class FlakseedProjectile : MonoBehaviour
         Vector2 finalPos = projectile.SafeCenter;
         if (GameManager.Instance.Dungeon.CellIsPit(finalPos))
             return;
-        FlakseedFlower ff = Flakseed._FlakFlowerPrefab.Instantiate(finalPos).GetComponent<FlakseedFlower>();
+
+        FlakseedFlower ff = (this._mastered ? Flakseed._MegaFlakFlowerPrefab : Flakseed._FlakFlowerPrefab)
+          .Instantiate(finalPos).GetComponent<FlakseedFlower>();
         ff._owner = this._owner;
         SpawnManager.SpawnVFX(VFX.MiniPickup, finalPos, Lazy.RandomEulerZ());
     }
@@ -90,7 +106,6 @@ public class FlakseedProjectile : MonoBehaviour
     }
 }
 
-
 public class FlakseedFlower : MonoBehaviour
 {
     const float _GROWTH_TIME = 6.0f;
@@ -98,8 +113,11 @@ public class FlakseedFlower : MonoBehaviour
     const float _FIRE_RATE_VARIANCE = 0.25f;
     const float _WILT_TIME = 15.0f;
     const float _WILT_CHECK_RATE = 0.1f;
-
-    internal PlayerController _owner = null;
+    const float _ATTACK_RATE = 2.0f;
+    const float _ATTACK_CHECK_RATE = 0.5f;
+    const float _ATTACK_DAMAGE = 25f;
+    const float _ATTACK_RADIUS = 5.0f;
+    const float _ATTACK_RADIUS_SQR = _ATTACK_RADIUS * _ATTACK_RADIUS;
 
     private static List<FlakseedFlower> _ExtantFlowers = new();
 
@@ -113,19 +131,40 @@ public class FlakseedFlower : MonoBehaviour
     private tk2dSprite _sprite = null;
     private SpeculativeRigidbody _body = null;
     private Vector2 _firePos = default;
+    private bool _wilting = false;
+    private float _nextAttackCheck = 0;
+    private tk2dSpriteAnimator _animator = null;
+
+    internal PlayerController _owner = null;
+
+    public bool mega = false;
 
     private void Start()
     {
         _ExtantFlowers.Add(this);
         this._sprite = base.GetComponent<tk2dSprite>();
+        this._sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
+        this._sprite.usesOverrideMaterial = true;
         this._body = base.gameObject.GetComponent<SpeculativeRigidbody>();
+        this._animator = base.gameObject.GetComponent<tk2dSpriteAnimator>();
         this._body.OnPreRigidbodyCollision += this.PollinatedByBullets;
         this._firePos = this._sprite.WorldTopCenter + new Vector2(0f, -0.125f);
         this._nextFireRate = _MIN_FIRE_RATE + _FIRE_RATE_VARIANCE * UnityEngine.Random.value;
+        this._animator.AnimationCompleted += OnAnimationCompleted;
     }
 
-    private static bool CanTrample(AIActor enemy)
+    private void OnAnimationCompleted(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
     {
+        if (this._wilting)
+            Wilt(vanish: true);
+        else if (clip.name.Contains("attack"))
+            animator.Play("wait");
+    }
+
+    private bool CanTrample(AIActor enemy)
+    {
+        if (this.mega)
+            return false;
         if (!enemy || enemy.IsFlying || enemy.IsGone || enemy.IsHarmlessEnemy || !enemy.isActiveAndEnabled)
             return false;
         if (enemy.healthHaver is HealthHaver hh && hh.IsDead)
@@ -159,6 +198,24 @@ public class FlakseedFlower : MonoBehaviour
         DoPetalVFX(true);
     }
 
+    private void DoMegaPetalVFX()
+    {
+        CwaffVFX.SpawnBurst(
+            prefab: Yggdrashell._LeafVFX,
+            numToSpawn: 60,
+            basePosition: this._firePos,
+            positionVariance: 1f,
+            minVelocity: 4f,
+            velocityVariance: 4f,
+            velType: CwaffVFX.Vel.Random,
+            rotType: CwaffVFX.Rot.Random,
+            lifetime: 0.5f,
+            startScale: 1.0f,
+            endScale: 0.1f,
+            randomFrame: true
+          );
+    }
+
     private void DoPetalVFX(bool pollination = false)
     {
         CwaffVFX.SpawnBurst(
@@ -177,14 +234,51 @@ public class FlakseedFlower : MonoBehaviour
           );
     }
 
+    private void AttackNearbyEnemies()
+    {
+        float now = BraveTime.ScaledTimeSinceStartup;
+        if (now < this._nextAttackCheck)
+            return;
+        this._nextAttackCheck = now + _ATTACK_CHECK_RATE;
+
+        AIActor nearestEnemy = Lazy.NearestEnemy(this._firePos);
+        if (!nearestEnemy)
+            return;
+
+        Vector2 delta = (nearestEnemy.CenterPosition - this._firePos);
+        if (delta.sqrMagnitude > _ATTACK_RADIUS_SQR)
+            return;
+
+        this._animator.Play("attack");
+        this._sprite.FlipX = nearestEnemy.sprite.WorldCenter.x < this._sprite.WorldCenter.x;
+        base.gameObject.Play("vine_attack_sound");
+        CwaffVFX.Spawn(prefab: Flakseed._VineVFX, position: nearestEnemy.CenterPosition, lifetime: 0.25f, fadeOutTime: 0.05f, height: 10f);
+        if (!nearestEnemy.IsGone && nearestEnemy.healthHaver is HealthHaver hh && hh.IsAlive && hh.IsVulnerable)
+        {
+            hh.ApplyDamage(_ATTACK_DAMAGE, delta, Flakseed.ItemName, CoreDamageTypes.None, DamageCategory.Normal);
+            if (hh.behaviorSpeculator is BehaviorSpeculator bs && !bs.ImmuneToStun)
+                bs.Stun(_ATTACK_RATE + 0.1f);
+        }
+        this._nextAttackCheck = now + _ATTACK_RATE;
+    }
+
     private void Update()
     {
+        // #if DEBUG
+        //     base.gameObject.DrawDebugCircle(this._firePos, _ATTACK_RADIUS, Color.green.WithAlpha(0.15f));
+        // #endif
+
+        if (this._wilting)
+            return;
+
         GoopPositionData goopData = this._body.UnitBottomCenter.GoopData(out GoopDefinition goopDef);
-        if (InHostileSoil(goopData, goopDef))
+        if (!this.mega && InHostileSoil(goopData, goopDef))
         {
             Wilt();
             return;
         }
+        if (this.mega && this._grown)
+            AttackNearbyEnemies();
 
         float dtime = BraveTime.DeltaTime;
         if (!this._grown)
@@ -194,8 +288,11 @@ public class FlakseedFlower : MonoBehaviour
             {
                 this._sprite.scale = Vector3.one;
                 this._grown = true;
-                base.gameObject.GetComponent<tk2dSpriteAnimator>().Play("bloom");
-                DoPetalVFX();
+                this._animator.Play(this.mega ? "wait" : "bloom");
+                if (this.mega)
+                    DoMegaPetalVFX();
+                else
+                    DoPetalVFX();
                 base.gameObject.Play("flak_bloom_sound");
                 // base.gameObject.Play("flak_growth_sound");
             }
@@ -287,12 +384,27 @@ public class FlakseedFlower : MonoBehaviour
         _ExtantFlowers.Remove(this);
     }
 
-    private void Wilt()
+    private void Wilt(bool vanish = false)
     {
-        if (this._grown)
+        if (this._wilting && !vanish)
+            return;
+        if (!this._grown)
+        {
+            UnityEngine.Object.Destroy(base.gameObject);
+            return;
+        }
+        base.gameObject.Play("flak_wilt_sound");
+        if (!this.mega)
         {
             DoPetalVFX();
-            base.gameObject.Play("flak_wilt_sound");
+            UnityEngine.Object.Destroy(base.gameObject);
+            return;
+        }
+        if (!vanish)
+        {
+            this._animator.Play("vanish");
+            this._wilting = true;
+            return;
         }
         UnityEngine.Object.Destroy(base.gameObject);
     }

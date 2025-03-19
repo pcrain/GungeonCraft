@@ -256,6 +256,7 @@ public static class ConstructorProfiler
 
 internal static class DebugDraw
 {
+    [System.Diagnostics.Conditional("DEBUG")]
     internal static void DrawDebugCircle(this GameObject go, Vector2? pos = null, float? radius = null, Color? color = null)
     {
         go.GetOrAddComponent<DebugCircle>().Setup(pos, radius, color);

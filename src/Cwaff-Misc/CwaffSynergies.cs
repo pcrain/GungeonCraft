@@ -237,6 +237,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfMacchiAuto>(MASTERY_MACCHI_AUTO, MacchiAuto.ItemName);
         // Chroma gains a tribeam mode that uses additional ammo, but deals vastly increased damage. The tribeam's damage scales even further based on the lowest of extracted red, green, and blue pigment levels.
         NewMastery<MasteryOfChroma>(MASTERY_CHROMA, Chroma.ItemName);
+        // Flakseed's sprouts can grow in hostile terrain and can no longer be trampled. Fully grown sprouts become larger flak flowers that attack and stun nearby enemies with their roots.
+        NewMastery<MasteryOfFlakseed>(MASTERY_FLAKSEED, Flakseed.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -498,6 +500,7 @@ internal class MasteryOfOverflow             : MasteryDummyItem {}
 internal class MasteryOfMissiletoe           : MasteryDummyItem {}
 internal class MasteryOfMacchiAuto           : MasteryDummyItem {}
 internal class MasteryOfChroma               : MasteryDummyItem {}
+internal class MasteryOfFlakseed             : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -599,4 +602,5 @@ public enum Synergy {
     MASTERY_MISSILETOE,
     MASTERY_MACCHI_AUTO,
     MASTERY_CHROMA,
+    MASTERY_FLAKSEED,
 };

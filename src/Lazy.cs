@@ -687,6 +687,13 @@ public static class Lazy
         }
     }
 
+    /// <summary>Returns a list of all enemies within a radius of a point.</summary>
+    public static List<AIActor> GetAllNearbyEnemies(Vector2 center, float radius = 100f, bool ignoreWalls = false)
+    {
+        GetAllNearbyEnemies(ref _TempEnemies, center, radius, ignoreWalls);
+        return _TempEnemies;
+    }
+
     /// <summary>Spawn a chest with a single guaranteed item inside of it</summary>
     public static Chest SpawnChestWithSpecificItem(PickupObject pickup, IntVector2 position, ItemQuality? overrideChestQuality = null, bool overrideJunk = false)
     {
