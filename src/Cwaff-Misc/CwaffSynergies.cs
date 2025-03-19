@@ -239,6 +239,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfChroma>(MASTERY_CHROMA, Chroma.ItemName);
         // Flakseed's sprouts can grow in hostile terrain and can no longer be trampled. Fully grown sprouts become larger flak flowers that attack and stun nearby enemies with their roots.
         NewMastery<MasteryOfFlakseed>(MASTERY_FLAKSEED, Flakseed.ItemName);
+        // Cars have much better handling, deal 25% more damage, and can crash into walls up to 3 times before disappearing.
+        NewMastery<MasteryOfRCLauncher>(MASTERY_R_C_LAUNCHER, RCLauncher.ItemName)
+            .MultDamage(1.25f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -501,6 +504,7 @@ internal class MasteryOfMissiletoe           : MasteryDummyItem {}
 internal class MasteryOfMacchiAuto           : MasteryDummyItem {}
 internal class MasteryOfChroma               : MasteryDummyItem {}
 internal class MasteryOfFlakseed             : MasteryDummyItem {}
+internal class MasteryOfRCLauncher           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -603,4 +607,5 @@ public enum Synergy {
     MASTERY_MACCHI_AUTO,
     MASTERY_CHROMA,
     MASTERY_FLAKSEED,
+    MASTERY_R_C_LAUNCHER,
 };

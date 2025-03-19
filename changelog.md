@@ -2,9 +2,10 @@
 
 ## 1.22.3 (TBD)
 
-- Added masteries for Chroma and Flakseed
+- Added masteries for Chroma, Flakseed, and R.C. Launcher
 - Fixed issue with certain non-looping VFX animations preventing other unrelated animations from playing properly
 - Adjusted shader lighting on Flakseed's flowers
+- Clarified in R.C. Launcher's description that reload time scales with number of shots fired from clip (this was always true, but never mentioned)
 
 ## 1.22.2 (2025-03-17)
 

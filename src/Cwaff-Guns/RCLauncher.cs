@@ -1,10 +1,11 @@
-﻿namespace CwaffingTheGungy;
+﻿
+namespace CwaffingTheGungy;
 
 public class RCLauncher : CwaffGun
 {
     public static string ItemName         = "R.C. Launcher";
     public static string ShortDescription = "Pedal to the Metal";
-    public static string LongDescription  = "Launches R.C. cars that explode on impact. Each car follows the car fired before it, or the mouse cursor / controller aim direction if they are the lead car.";
+    public static string LongDescription  = "Launches R.C. cars that explode on impact. Each car follows the car fired before it, or the mouse cursor / controller aim direction if they are the lead car. Reload time scales with number of shots fired from clip.";
     public static string Lore             = "A case study of the unreasonable effectiveness of retrofitting children's toys with AI and explosives, this launcher's steerable projectiles ensure swift and accurate destruction in the hands of a competent pilot. The projectiles also still make a surprisingly fun and entertaining diversion for children ages 4-14, provided they never crash into anything.";
 
     private const float _FULL_RELOAD_TIME = 2.0f;
@@ -40,16 +41,29 @@ public class RCLauncher : CwaffGun
 
 public class RCProjectileBehavior : MonoBehaviour
 {
+    private const float _WIPE_OUT_TIME     = 0.5f;
+    private const float _WIPE_OUT_SPEED    = 10f;
+    private const float _MASTERY_TURN_MULT = 2f;   // increased turning speed for mastered projectiles
+    private const int   _MAX_CRASHES       = 3;    // max number of times mastered projectiles can crash before disappearing
+
+
     private Projectile _projectile;
+    private RCGuidedProjectile _rc;
     private PlayerController _owner;
     private tk2dSpriteAnimationClip _clip;
     private int _numFrames;
     private EasyTrailBullet _trail;
+    private float _wipeoutAngle;
+    private float _wipeoutTime;
+    private bool _mastered;
+    private int _crashesLeft;
 
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
+        this._rc = base.GetComponent<RCGuidedProjectile>();
         this._owner = this._projectile.Owner as PlayerController;
+        this._mastered = this._owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<RCLauncher>() is RCLauncher rc && rc.Mastered;
 
         this._projectile.spriteAnimator.Stop(); // stop animating immediately after creation so we can stick with our initial sprite
         this._clip = this._projectile.spriteAnimator.CurrentClip;
@@ -71,17 +85,54 @@ public class RCProjectileBehavior : MonoBehaviour
             this._trail.BaseColor  = lightc;
             this._trail.StartColor = lightc;
             this._trail.EndColor   = lightc;
+
+        if (this._mastered)
+        {
+            this._crashesLeft = _MAX_CRASHES;
+            this._rc.trackingSpeed *= _MASTERY_TURN_MULT;
+            BounceProjModifier bounce = base.gameObject.GetOrAddComponent<BounceProjModifier>();
+            bounce.numberOfBounces = this._crashesLeft;
+            bounce.OnBounce += this.OnBounce;
+        }
+    }
+
+    private void OnBounce()
+    {
+        if ((this._crashesLeft--) <= 0)
+            return;
+
+        base.gameObject.Play("wipe_out_sound");
+        this._wipeoutAngle = this._projectile.Direction.ToAngle() + 180f;
+        this._wipeoutTime = _WIPE_OUT_TIME;
+        this._rc.ResetDumbFireTimer(this._wipeoutTime);
+        this._projectile.SetSpeed(_WIPE_OUT_SPEED);
+        DoSmallExplosion();
     }
 
     private void Update()
     {
-      int frameForRotation = Mathf.RoundToInt((float)this._numFrames * (1f + this._projectile.LastVelocity.ToAngle() / 360.0f)) % this._numFrames;
+      float facingAngle;
+      if (this._wipeoutTime > 0)
+      {
+        float dtime = BraveTime.DeltaTime;
+        this._wipeoutTime -= dtime;
+        this._wipeoutAngle += 1800f * dtime;
+        facingAngle = this._wipeoutAngle;
+      }
+      else
+        facingAngle = this._projectile.LastVelocity.ToAngle();
+      int frameForRotation = Mathf.RoundToInt((float)this._numFrames * (1f + facingAngle / 360.0f)) % this._numFrames;
       this._projectile.sprite.SetSprite(this._clip.frames[frameForRotation].spriteId);
+    }
+
+    private void DoSmallExplosion()
+    {
+      Exploder.Explode(this._projectile.transform.position, RCLauncher._CarExplosion, this._projectile.Direction, ignoreQueues: true);
     }
 
     private void OnDestroy()
     {
-      Exploder.Explode(this._projectile.transform.position, RCLauncher._CarExplosion, this._projectile.Direction, ignoreQueues: true);
+      DoSmallExplosion();
     }
 }
 
@@ -114,6 +165,12 @@ public class RCGuidedProjectile : Projectile
     {
         _ExtantCars.Remove(this);
         base.OnDestroy();
+    }
+
+    public void ResetDumbFireTimer(float newTime)
+    {
+        this._dumbfireTimer = 0f;
+        this.dumbfireTime = newTime;
     }
 
     public override void Move()
