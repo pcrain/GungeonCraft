@@ -424,7 +424,6 @@ public static class GunBuilder
     p.shouldFlipVertically                            = b.shouldFlipVertically       ?? p.shouldFlipVertically;
     p.collidesWithEnemies                             = b.collidesWithEnemies        ?? p.collidesWithEnemies;
     p.ignoreDamageCaps                                = b.ignoreDamageCaps           ?? p.ignoreDamageCaps;
-    p.collidesWithProjectiles                         = b.collidesWithProjectiles    ?? p.collidesWithProjectiles;
     p.BulletScriptSettings.surviveRigidbodyCollisions = b.surviveRigidbodyCollisions ?? p.BulletScriptSettings.surviveRigidbodyCollisions;
     p.pierceMinorBreakables                           = b.pierceBreakables           ?? p.pierceMinorBreakables;
     p.collidesWithProjectiles                         = b.collidesWithProjectiles    ?? p.collidesWithProjectiles;

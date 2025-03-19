@@ -242,6 +242,8 @@ public static class CwaffSynergies
         // Cars have much better handling, deal 25% more damage, and can crash into walls up to 3 times before disappearing.
         NewMastery<MasteryOfRCLauncher>(MASTERY_R_C_LAUNCHER, RCLauncher.ItemName)
             .MultDamage(1.25f);
+        // B. B. Gun projectiles deflect all enemy projectiles in their path, transforming them to pins in the process.
+        NewMastery<MasteryOfBBGun>(MASTERY_B_B_GUN, BBGun.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -505,6 +507,7 @@ internal class MasteryOfMacchiAuto           : MasteryDummyItem {}
 internal class MasteryOfChroma               : MasteryDummyItem {}
 internal class MasteryOfFlakseed             : MasteryDummyItem {}
 internal class MasteryOfRCLauncher           : MasteryDummyItem {}
+internal class MasteryOfBBGun                : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -608,4 +611,5 @@ public enum Synergy {
     MASTERY_CHROMA,
     MASTERY_FLAKSEED,
     MASTERY_R_C_LAUNCHER,
+    MASTERY_B_B_GUN,
 };
