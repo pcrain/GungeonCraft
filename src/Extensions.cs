@@ -357,7 +357,7 @@ public static class Extensions
     if (!e)
       return false;
     HealthHaver h = e.healthHaver;
-    return e && !e.IsGone && e.IsWorthShootingAt && h && (h.IsBoss || h.IsSubboss) && (canBeDead || h.IsAlive);
+    return h && (h.IsBoss || h.IsSubboss) && (canBeDead || h.IsAlive);
   }
 
   /// <summary>Set the Alpha of a GameObject's sprite</summary>
@@ -3147,6 +3147,21 @@ public static class Extensions
   {
       RewardManager rm = GameManager.Instance.RewardManager;
       return rm.GetItemForPlayer(player, Lazy.CoinFlip() ? rm.ItemsLootTable : rm.GunsLootTable, quality, null);
+  }
+
+  // TODO: in the future, might need to account for dual wields
+  /// <summary>Determine whether a projectile is mastered.</summary>
+  public static bool Mastered<T>(this Projectile proj) where T : CwaffGun
+  {
+    if (!proj)
+      return false;
+    if (proj.Owner is not PlayerController player)
+      return false;
+    if (player.CurrentGun is not Gun gun)
+      return false;
+    if (gun.gameObject.GetComponent<T>() is not T t)
+      return false;
+    return t.Mastered;
   }
 }
 

@@ -72,8 +72,7 @@ public class FlakseedProjectile : MonoBehaviour
     {
         this._projectile = base.GetComponent<GrenadeProjectile>();
         this._owner = this._projectile.Owner as PlayerController;
-        if (this._owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<Flakseed>() is Flakseed fs)
-            this._mastered = fs.Mastered;
+        this._mastered = this._projectile.Mastered<Flakseed>();
         this._projectile.baseData.speed *= 0.95f + 0.1f * UnityEngine.Random.value; // randomize the velocity slightly
         this._projectile.OnDestruction += CreateSprout;
     }

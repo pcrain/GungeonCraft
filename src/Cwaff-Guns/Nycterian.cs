@@ -12,11 +12,15 @@ public class Nycterian : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Nycterian>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.1f, ammo: 425, shootFps: 20, reloadFps: 20,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.1f, ammo: 325, shootFps: 20, reloadFps: 20,
             muzzleFrom: Items.Mailbox, fireAudio: "nycterian_shoot_sound", reloadAudio: "nycterian_reload_sound")
-          .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.19f, shootStyle: ShootStyle.SemiAutomatic, scale: 1.5f, customClip: true,
-            damage: 7.0f, speed: 27.0f, range: 100.0f, sprite: "bat_projectile", fps: 12))
-          .Attach<PierceProjModifier>(pierce => { pierce.penetration = 1; })
+          .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic, scale: 1.5f, customClip: true,
+            damage: 7.0f, speed: 18.0f, range: 100.0f, sprite: "bat_projectile", fps: 12))
+          .Attach<BounceProjModifier>(bounce => { bounce.numberOfBounces = 1; })
+          .Attach<PierceProjModifier>(pierce => {
+              pierce.penetration = 99;
+              pierce.penetratesBreakables = true;
+            })
           .Attach<BatProjectile>();
 
         _DistractedVFX = VFX.Create("distracted_vfx", fps: 18, emissivePower: 1, emissiveColour: Color.magenta);
@@ -32,6 +36,7 @@ public class BatProjectile : MonoBehaviour
 
     private float _timer = _ECHO_INIT_DELAY;
     private Projectile _proj = null;
+    private bool _mastered = false;
 
     private void Start()
     {
@@ -51,6 +56,7 @@ public class BatProjectile : MonoBehaviour
             trail.StartColor = _BatGray;
             trail.EndColor   = Color.clear;
 
+        this._mastered = this._proj.Mastered<Nycterian>();
         this._timer = _ECHO_INIT_DELAY + UnityEngine.Random.value * (_ECHO_DELAY - _ECHO_INIT_DELAY);
     }
 
@@ -66,10 +72,10 @@ public class BatProjectile : MonoBehaviour
 
     private void DoEcho()
     {
-        Lazy.CreateDecoy(this._proj.SafeCenter).AddComponent<DecoyEcho>();
+        Lazy.CreateDecoy(this._proj.SafeCenter).AddComponent<DecoyEcho>().mastered = this._mastered;
         base.gameObject.Play("bat_screech_sound");
         Exploder.DoDistortionWave(center: this._proj.SafeCenter,
-            distortionIntensity: 1.5f, distortionRadius: 0.05f, maxRadius: 2.75f, duration: 0.25f);
+            distortionIntensity: (this._mastered ? 3.0f : 1.5f), distortionRadius: 0.05f, maxRadius: (this._mastered ? 5.0f : 2.75f), duration: 0.25f);
     }
 }
 
@@ -81,6 +87,8 @@ public class DecoyEcho : MonoBehaviour
 
     private RoomHandler _room = null;
 
+    public bool mastered = false;
+
     private void Start()
     {
         base.gameObject.ExpireIn(_DECOY_TIME);
@@ -91,14 +99,18 @@ public class DecoyEcho : MonoBehaviour
         SpeculativeRigidbody body = base.gameObject.GetComponent<SpeculativeRigidbody>();
         foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
         {
-            if (!enemy || !enemy.IsHostileAndNotABoss(canBeNeutral: true))
+            if (!enemy || !enemy.IsHostile(canBeNeutral: true) || (!this.mastered && enemy.IsABoss()))
                 continue;
-            float dist = (base.transform.position.XY() - enemy.CenterPosition).magnitude;
-            if (dist > _DECOY_MAX_DIST)
-                continue;
-            float decoyChance = Mathf.InverseLerp(_DECOY_MAX_DIST, _DECOY_MIN_DIST, dist);
-            if (decoyChance < UnityEngine.Random.value)
-                continue;
+
+            if (!this.mastered)
+            {
+                float dist = (base.transform.position.XY() - enemy.CenterPosition).magnitude;
+                if (dist > _DECOY_MAX_DIST)
+                    continue;
+                float decoyChance = Mathf.InverseLerp(_DECOY_MAX_DIST, _DECOY_MIN_DIST, dist);
+                if (decoyChance < UnityEngine.Random.value)
+                    continue;
+            }
 
             enemy.OverrideTarget = body;
             GameObject vfx = SpawnManager.SpawnVFX(Nycterian._DistractedVFX, enemy.sprite.WorldTopCenter + new Vector2(0f, 1f), Quaternion.identity, ignoresPools: true);

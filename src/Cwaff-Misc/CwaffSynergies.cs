@@ -244,6 +244,8 @@ public static class CwaffSynergies
             .MultDamage(1.25f);
         // B. B. Gun projectiles deflect all enemy projectiles in their path, transforming them to pins in the process.
         NewMastery<MasteryOfBBGun>(MASTERY_B_B_GUN, BBGun.ItemName);
+        // Bat echoes have a 100% chance of distracting enemies at any range, and gain the ability to distract bosses.
+        NewMastery<MasteryOfNycterian>(MASTERY_NYCTERIAN, Nycterian.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -508,6 +510,7 @@ internal class MasteryOfChroma               : MasteryDummyItem {}
 internal class MasteryOfFlakseed             : MasteryDummyItem {}
 internal class MasteryOfRCLauncher           : MasteryDummyItem {}
 internal class MasteryOfBBGun                : MasteryDummyItem {}
+internal class MasteryOfNycterian            : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -612,4 +615,5 @@ public enum Synergy {
     MASTERY_FLAKSEED,
     MASTERY_R_C_LAUNCHER,
     MASTERY_B_B_GUN,
+    MASTERY_NYCTERIAN,
 };

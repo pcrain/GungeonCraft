@@ -63,7 +63,7 @@ public class RCProjectileBehavior : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._rc = base.GetComponent<RCGuidedProjectile>();
         this._owner = this._projectile.Owner as PlayerController;
-        this._mastered = this._owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<RCLauncher>() is RCLauncher rc && rc.Mastered;
+        this._mastered = this._projectile.Mastered<RCLauncher>();
 
         this._projectile.spriteAnimator.Stop(); // stop animating immediately after creation so we can stick with our initial sprite
         this._clip = this._projectile.spriteAnimator.CurrentClip;

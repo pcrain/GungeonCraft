@@ -2,10 +2,16 @@
 
 ## 1.22.3 (TBD)
 
-- Added masteries for Chroma, Flakseed, R.C. Launcher, and B. B. Gun
+- Added masteries for Chroma, Flakseed, R.C. Launcher, B. B. Gun, and Nycterian
 - Fixed issue with certain non-looping VFX animations preventing other unrelated animations from playing properly
 - Adjusted shader lighting on Flakseed's flowers
 - Clarified in R.C. Launcher's description that reload time scales with number of shots fired from clip (this was always true, but never mentioned)
+- Rebalanced Nycterian to accentuate distraction mechanics:
+	- Reduced fire rate from 0.19 seconds to 0.3 seconds
+	- Reduced speed from 27 to 18
+	- Reduced ammo from 425 to 325
+	- Bats now have unlimited piercing
+	- Bats now bounce off walls once
 
 ## 1.22.2 (2025-03-17)
 

@@ -154,8 +154,7 @@ public class TheBB : MonoBehaviour
         {
             this._damageMult = _BB_DAMAGE_SCALE * this._owner.DamageMult();
             this._knockbackMult = _BB_FORCE_SCALE * this._owner.KnockbackMult();
-            if (this._owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<BBGun>() is BBGun bb && bb.Mastered)
-                this._mastered = true;
+            this._mastered = this._projectile.Mastered<BBGun>();
         }
 
         if (!this._projectile.FiredForFree())
