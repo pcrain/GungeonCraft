@@ -15,7 +15,7 @@ public class SeltzerPelter : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<SeltzerPelter>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 150, shootFps: 36, muzzleFrom: Items.Mailbox)
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 150, shootFps: 36, muzzleFrom: Items.Mailbox, smoothReload: 0.1f)
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
@@ -54,19 +54,12 @@ public class SeltzerPelter : CwaffGun
             gmod.goopDefinition         = EasyGoopDefinitions.SeltzerGoop; });
     }
 
-    public override void OnActualReload(PlayerController player, Gun gun, bool manual)
-    {
-        base.OnActualReload(player, gun, manual);
-
-        this._loadedCanIndex = UnityEngine.Random.Range(0, _ReloadAnimations.Count);
-        gun.spriteAnimator.Stop();
-        gun.spriteAnimator.Play(_ReloadAnimations[this._loadedCanIndex]);
-    }
-
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
         projectile.spriteAnimator.PlayFromFrame(this._loadedCanIndex);
+        this._loadedCanIndex = UnityEngine.Random.Range(0, _ReloadAnimations.Count);
+        gun.reloadAnimation = _ReloadAnimations[this._loadedCanIndex];
     }
 }
 
@@ -78,11 +71,13 @@ public class SeltzerProjectile : MonoBehaviour
     private BasicBeamController _beam = null;
     private float _rotationRate = 0f;
     private bool _startedSpraying = false;
+    private bool _mastered = false;
 
     private void Start()
     {
         this._canProjectile = base.GetComponent<Projectile>();
         this._owner = this._canProjectile.Owner as PlayerController;
+        this._mastered = this._canProjectile.Mastered<SeltzerPelter>();
         this._canProjectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
         this._canProjectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
         this._canProjectile.shouldRotate = false; // prevent automatic rotation after creation
@@ -101,6 +96,9 @@ public class SeltzerProjectile : MonoBehaviour
         if (!this || !this._canProjectile)
             return;
         this._canProjectile.SendInDirection(rigidbodyCollision.Normal, false);
+
+        if (this._mastered && rigidbodyCollision.OtherRigidbody.gameObject.GetComponent<AIActor>() is AIActor enemy)
+            enemy.ApplyEffect(EasyGoopDefinitions.SuperSeltzerGoop.SpeedModifierEffect);
 
         if (!this._startedSpraying)
         {
@@ -138,6 +136,8 @@ public class SeltzerProjectile : MonoBehaviour
             this._beam.HitsEnemies = true;
             this._beam.Origin      = this._canProjectile.SafeCenter;
             this._beam.Direction   = -this._canProjectile.sprite.transform.rotation.z.ToVector();
+        if (this._mastered)
+            theBeamObject.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.SuperSeltzerGoop;
     }
 
     private void RestartBeamOnBounce()
@@ -252,5 +252,91 @@ public class SeltzerProjectile : MonoBehaviour
         #endregion
 
         yield break;
+    }
+}
+
+public class HiccupVFXDoer : MonoBehaviour
+{
+    private const float _VFX_RATE = 0.4f;
+
+    private AIActor _enemy = null;
+    private float _nextVfxTime = 0;
+
+    private void Start()
+    {
+        this._enemy = base.gameObject.GetComponent<AIActor>();
+    }
+
+    private void Update()
+    {
+        float now = BraveTime.ScaledTimeSinceStartup;
+        if (now < this._nextVfxTime)
+            return;
+        this._nextVfxTime = now + _VFX_RATE;
+        if (!this._enemy || !this._enemy.sprite)
+            return;
+        CwaffVFX.SpawnBurst(
+            prefab           : Bubblebeam._BurstBubbleVFX,
+            numToSpawn       : 4,
+            basePosition     : this._enemy.sprite.WorldTopCenter,
+            positionVariance : 1f,
+            baseVelocity     : new Vector2(0.0f, 2.5f),
+            velocityVariance : 2.5f,
+            velType          : CwaffVFX.Vel.Random,
+            rotType          : CwaffVFX.Rot.Random,
+            lifetime         : 0.5f,
+            fadeOutTime      : 0.1f
+          );
+    }
+}
+
+public class GameActorHiccupEffect : GameActorSpeedEffect
+{
+    internal const float _HICCUP_PERSIST_TIME    = 3f;
+
+    private const float _HICCUP_STUN_TIME        = 0.5f;
+    private const float _HICCUP_CHANCE_PER_SEC   = 0.4f;
+    private const int _HICCUP_NUM_PROJECTILES    = 12;
+    private const float _HICCUP_PROJ_GAP         = 360f / _HICCUP_NUM_PROJECTILES;
+
+    internal static GameObject _HiccupProjectile = null;
+
+    public override void OnEffectApplied(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f)
+    {
+        actor.gameObject.GetOrAddComponent<HiccupVFXDoer>();
+    }
+
+    public override void OnEffectRemoved(GameActor actor, RuntimeGameActorEffectData effectData)
+    {
+        if (actor.gameObject.GetComponent<HiccupVFXDoer>() is HiccupVFXDoer h)
+            UnityEngine.Object.Destroy(h);
+    }
+
+    public override void EffectTick(GameActor actor, RuntimeGameActorEffectData effectData)
+    {
+        if (!_HiccupProjectile)
+            _HiccupProjectile = Items.Ak47.AsGun().DefaultModule.projectiles[0].projectile.gameObject;
+
+        if (actor is not AIActor enemy || enemy.IsGone || enemy.healthHaver is not HealthHaver hh || hh.IsDead || !hh.IsVulnerable)
+            return;
+
+        if (UnityEngine.Random.value > BraveMathCollege.SliceProbability(_HICCUP_CHANCE_PER_SEC, BraveTime.DeltaTime))
+            return;
+        if (enemy.behaviorSpeculator is not BehaviorSpeculator bs || bs.ImmuneToStun || bs.IsStunned)
+            return;
+
+        bs.Stun(_HICCUP_STUN_TIME);
+        enemy.gameObject.Play("hiccup_sound");
+        float offset = _HICCUP_PROJ_GAP * UnityEngine.Random.value;
+        for (int i = 0; i < _HICCUP_NUM_PROJECTILES; ++i)
+        {
+            GameObject po = SpawnManager.SpawnProjectile(_HiccupProjectile, enemy.CenterPosition, (offset + _HICCUP_PROJ_GAP * i).EulerZ());
+            Projectile proj = po.GetComponent<Projectile>();
+            proj.SetOwnerAndStats(enemy);
+            proj.collidesWithEnemies = true;
+            proj.collidesWithPlayer = false;
+            proj.SetSpeed(15f);
+            proj.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
+        }
     }
 }

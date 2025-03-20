@@ -57,6 +57,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public  float                             spinupTime                 = 0.0f;   // the amount of time it takes an automatic weapon to start firing
   public  string                            spinupSound                = null;   // the sound to play while an automatic gun is spinning up
   public  bool                              continuousFireAnimation    = false;  // if true, don't restart shooting animation when firing bullet
+  public  bool                              useSmoothReload            = false;  // if true, synchronize reload animation with reload speed
+  public  float                             smoothReloadOffset         = 0f;     // time between reloading finishing visually and functionally
 
   public  bool                              Mastered {get; private set;}         // whether the gun has been mastered
 
@@ -578,6 +580,28 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           return shouldRestart;
       }
   }
+
+  /// <summary>Allow guns to have smooth reload animations tied to the actual reload rate.</summary>
+  [HarmonyPatch]
+  private static class SmoothReloadAnimationPatch
+  {
+      [HarmonyPatch(typeof(Gun), nameof(Gun.HandleReload))]
+      [HarmonyPostfix]
+      private static void UpdateReloadSpeed(Gun __instance)
+      {
+        if (__instance.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg || !cg.useSmoothReload)
+          return;
+        if (__instance.spriteAnimator.GetClipByName(__instance.reloadAnimation) is not tk2dSpriteAnimationClip reloadClip)
+          return;
+        reloadClip.fps = (float)reloadClip.frames.Length / Mathf.Max(0.1f, __instance.AdjustedReloadTime - cg.smoothReloadOffset);
+        // Lazy.DebugLog($"set reload fps to {reloadClip.fps}");
+      }
+  }
+
+  // HACK: harmony doesn't recognize the above prefix patch for HandleReload if we don't patch Reload() as well due to a bug with Harmony leaving an older version of the call
+  // see discussion in MTG discord: https://discord.com/channels/998556124250898523/1011409820617810011/1308804511770345534
+  [HarmonyPatch(typeof(Gun), nameof(Gun.Reload))]
+  private static class GunReloadPostfixToAppeaseTheHarmonyOverlords { public static void Postfix() { } }
 }
 
 public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffItem

@@ -246,6 +246,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfBBGun>(MASTERY_B_B_GUN, BBGun.ItemName);
         // Bat echoes have a 100% chance of distracting enemies at any range, and gain the ability to distract bosses.
         NewMastery<MasteryOfNycterian>(MASTERY_NYCTERIAN, Nycterian.ItemName);
+        // Reload time is decreased by 35%, and seltzer water now inflicts hiccups on enemies. Hiccups have a chance to erratically stun enemies for a brief period and cause them to emit a ring of bullets that damage other nearby enemies.
+        NewMastery<MasteryOfSeltzerPelter>(MASTERY_SELTZER_PELTER, SeltzerPelter.ItemName)
+            .MultReload(0.65f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -511,6 +514,7 @@ internal class MasteryOfFlakseed             : MasteryDummyItem {}
 internal class MasteryOfRCLauncher           : MasteryDummyItem {}
 internal class MasteryOfBBGun                : MasteryDummyItem {}
 internal class MasteryOfNycterian            : MasteryDummyItem {}
+internal class MasteryOfSeltzerPelter        : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -616,4 +620,5 @@ public enum Synergy {
     MASTERY_R_C_LAUNCHER,
     MASTERY_B_B_GUN,
     MASTERY_NYCTERIAN,
+    MASTERY_SELTZER_PELTER,
 };

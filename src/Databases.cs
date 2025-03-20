@@ -1096,6 +1096,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
 
     //Cwaff Goops
     public static GoopDefinition SeltzerGoop;
+    public static GoopDefinition SuperSeltzerGoop;
     public static GoopDefinition CoffeeGoop;
     public static GoopDefinition SuperCoffeeGoop;
     public static GoopDefinition HolyGoop;
@@ -1173,6 +1174,21 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
             SeltzerGoop.usesAmbientGoopFX = true;
             SeltzerGoop.ambientGoopFXChance = 0.004f;
             SeltzerGoop.ambientGoopFX = VFX.CreatePool("seltzer_sparkles", fps: 10, loops: false, scale: 0.5f, anchor: Anchor.MiddleCenter);
+
+        //Set up mastered Seltzer Pelter goop
+        SuperSeltzerGoop = UnityEngine.Object.Instantiate<GoopDefinition>(SeltzerGoop);
+            SuperSeltzerGoop.CanBeElectrified = false; //TODO; temp
+            SuperSeltzerGoop.AppliesSpeedModifierContinuously = true;
+            SuperSeltzerGoop.SpeedModifierEffect = new GameActorHiccupEffect(){
+                AffectsPlayers               = false,
+                AffectsEnemies               = true,
+                effectIdentifier             = "hiccup goop",
+                stackMode                    = GameActorEffect.EffectStackingMode.Refresh,
+                duration                     = GameActorHiccupEffect._HICCUP_PERSIST_TIME,
+                maxStackedDuration           = GameActorHiccupEffect._HICCUP_PERSIST_TIME,
+                SpeedMultiplier              = 1.0f,
+                CooldownMultiplier           = 1f,
+            };
 
         //Set up Macchi Auto goop
         CoffeeGoop = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
