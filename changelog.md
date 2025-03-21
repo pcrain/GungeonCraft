@@ -2,7 +2,7 @@
 
 ## 1.22.3 (TBD)
 
-- Added masteries for Chroma, Flakseed, R.C. Launcher, B. B. Gun, Nycterian, Seltzer Pelter, Suncaster, Bouncer, Sub Machine Gun, and Stereoscope
+- Added masteries for Chroma, Flakseed, R.C. Launcher, B. B. Gun, Nycterian, Seltzer Pelter, Suncaster, Bouncer, Sub Machine Gun, Stereoscope, and Groundhog
 - Fixed issue with certain non-looping VFX animations preventing other unrelated animations from playing properly
 - Adjusted shader lighting on Flakseed's flowers
 - Clarified in R.C. Launcher's description that reload time scales with number of shots fired from clip (this was always true, but never mentioned)

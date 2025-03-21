@@ -1,3 +1,4 @@
+
 namespace CwaffingTheGungy;
 
 public class Groundhog : CwaffGun
@@ -12,6 +13,7 @@ public class Groundhog : CwaffGun
     internal static GameObject _EarthClod = null;
 
     private bool _wasCharging = false;
+    private bool _setupAnimator = false;
 
     public static void Init()
     {
@@ -30,6 +32,11 @@ public class Groundhog : CwaffGun
     public override void Update()
     {
         base.Update();
+        if (!this._setupAnimator)
+        {
+          base.gameObject.GetComponent<tk2dSpriteAnimator>().AnimationEventTriggered += this.AnimationEventTriggered;
+          this._setupAnimator = true;
+        }
         this.gun.OverrideAngleSnap = (this.gun.IsCharging || this.gun.IsReloading) ? 180f : null;
         if (!this.PlayerOwner)
           return;
@@ -47,6 +54,19 @@ public class Groundhog : CwaffGun
           this.PlayerOwner.forceAimPoint = this.PlayerOwner.CenterPosition
             + new Vector2(this.PlayerOwner.sprite.FlipX ? -4f : 4f, 0f); // lock aim point while charging
         }
+    }
+
+    private void AnimationEventTriggered(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
+    {
+        if (!this.Mastered || frame != 11 || !this.PlayerOwner || clip.name != "groundhog_charge")
+            return;
+        Vector2 blankPos = this.gun.sprite.FlipY ? this.gun.sprite.WorldTopCenter : this.gun.sprite.WorldBottomCenter;
+        Lazy.DoMicroBlankAt(blankPos, this.PlayerOwner);
+        GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.2f, 6f, 0.2f, 0f), blankPos);
+        for (int i = 1; i <= 3; ++i)
+          CwaffVFX.SpawnBurst(prefab: _EarthClod, numToSpawn: 10 * i, basePosition: blankPos, positionVariance: i,
+            velType: CwaffVFX.Vel.AwayRadial, velocityVariance: 5f, lifetime: 0.25f, fadeOutTime: 0.25f,
+            startScale: 1.0f,  endScale: 0.1f, uniform: true, randomFrame: true);
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -88,7 +108,7 @@ public class Groundhog : CwaffGun
         LaunchAllEnemiesInRoom(this.PlayerOwner, damage, force, shockwaveCenter, i - 1.5f, i + 0.5f);
         Exploder.DoRadialMinorBreakableBreak(shockwaveCenter, i);
         Exploder.DoRadialPush(shockwaveCenter, force, i);
-        GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f,6f,0.5f,0f), shockwaveCenter);
+        GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f, 6f, 0.5f, 0f), shockwaveCenter);
         CwaffVFX.SpawnBurst(
           prefab           : _EarthClod,
           numToSpawn       : i * 10,
@@ -96,7 +116,6 @@ public class Groundhog : CwaffGun
           positionVariance : i,
           velType          : CwaffVFX.Vel.AwayRadial,
           velocityVariance : 5f,
-          rotType          : CwaffVFX.Rot.None,
           lifetime         : 0.25f,
           fadeOutTime      : 0.25f,
           startScale       : 1.0f,
@@ -110,13 +129,14 @@ public class Groundhog : CwaffGun
 
     private static void LaunchAllEnemiesInRoom(PlayerController player, float damage, float force, Vector2 shockwaveCenter, float minRange, float maxRange)
     {
-      RoomHandler room = player.CurrentRoom;
-      foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
+      float minRangeSqr = minRange * minRange;
+      float maxRangeSqr = maxRange * maxRange;
+      foreach (AIActor enemy in player.CurrentRoom.SafeGetEnemiesInRoom())
       {
         if (enemy.healthHaver is not HealthHaver hh || !hh.IsVulnerable || hh.IsDead || hh.PreventAllDamage || !enemy.specRigidbody/* || enemy.IsFlying*/)
           continue;
-        float dist = (enemy.CenterPosition - shockwaveCenter).magnitude;
-        if (dist < minRange || dist > maxRange)
+        float sqrDist = (enemy.CenterPosition - shockwaveCenter).sqrMagnitude;
+        if (sqrDist < minRangeSqr || sqrDist > maxRangeSqr)
           continue;
         if (enemy.behaviorSpeculator is not BehaviorSpeculator bs || bs.ImmuneToStun || hh.IsBoss || hh.IsSubboss)
           enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.None, DamageCategory.Collision);

@@ -257,6 +257,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfSubMachineGun>(MASTERY_SUB_MACHINE_GUN, SubMachineGun.ItemName);
         // Reloading now deploys a stereo that continuously emits sound matching Stereoscope's pitch at time of deployment, acting as a secondary source of stun and damage.
         NewMastery<MasteryOfStereoscope>(MASTERY_STEREOSCOPE, Stereoscope.ItemName);
+        // Groundhog charges twice as quickly and creates a mini-tremor when plunged into the ground, triggering a mini-blank effect.
+        NewMastery<MasteryOfGroundhog>(MASTERY_GROUNDHOG, Groundhog.ItemName)
+            .MultChargeRate(2f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -527,6 +530,7 @@ internal class MasteryOfSuncaster            : MasteryDummyItem {}
 internal class MasteryOfBouncer              : MasteryDummyItem {}
 internal class MasteryOfSubMachineGun        : MasteryDummyItem {}
 internal class MasteryOfStereoscope          : MasteryDummyItem {}
+internal class MasteryOfGroundhog            : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -637,4 +641,5 @@ public enum Synergy {
     MASTERY_BOUNCER,
     MASTERY_SUB_MACHINE_GUN,
     MASTERY_STEREOSCOPE,
+    MASTERY_GROUNDHOG,
 };

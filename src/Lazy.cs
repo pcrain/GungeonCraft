@@ -1115,7 +1115,7 @@ public static class Lazy
         GameObject gameObject = new GameObject("silencer");
         SilencerInstance silencerInstance = gameObject.AddComponent<SilencerInstance>();
         silencerInstance.TriggerSilencer(pos, 20f, radius, _BlankVFXPrefab, 0f, 3f, 3f, 3f, 30f, 3f, additionalTimeAtMaxRadius, user, false);
-        AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", gameObject);
+        gameObject.Play("Play_OBJ_silenceblank_small_01");
     }
 
     //TODO: this doesn't actually seem to work on the player, which is all we ever use it on..unsure why though
