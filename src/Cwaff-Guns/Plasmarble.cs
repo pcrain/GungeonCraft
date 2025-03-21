@@ -5,7 +5,7 @@ public class Plasmarble : CwaffGun
     public static string ItemName         = "Plasmarble";
     public static string ShortDescription = "Stunning in the 80's";
     public static string LongDescription  = "Launches an orb of plasma that periodically discharges electric bolts towards nearby enemies, shattering after a few seconds. Orbs discharge twice as quickly when soaked in water.";
-    public static string Lore             = "An artificat emblematic of funkier times when peace and love were rad and war was totally uncool. Much like other household decor of its era, it is eccentric, flashy, and unreasonably dangerous when considering its intended purpose.";
+    public static string Lore             = "An artifact emblematic of funkier times when peace and love were rad and war was totally uncool. Much like other household decor of its era, it is eccentric, flashy, and unreasonably dangerous when considering its intended purpose.";
 
     internal static GameObject _LinkVFXPrefab = null;
     internal static Projectile _FlakProjectile = null;

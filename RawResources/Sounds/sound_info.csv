@@ -287,3 +287,4 @@ statdown,-3.0,1,sound,1
 statup,-3.0,1,sound,1
 secret_santa_sound,0.0,1,sound,0
 wipe_out_sound,-2.0,1,sound,2
+place_stereo_sound,-6.5,1,sound,1

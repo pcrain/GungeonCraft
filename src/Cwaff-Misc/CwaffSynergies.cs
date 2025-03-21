@@ -105,12 +105,6 @@ public static class CwaffSynergies
         NewSynergy(PHOTOSYNTHESIS, "Photosynthesis", new[]{IName(Gunflower.ItemName), "camera"});
         // Grants immunity to contact damage while holding Alien Engine and immunity to most other forms of damage while firing Alien Engine.
         NewSynergy(TANK_ENGINE, "Tank Engine", new[]{IName(DerailGun.ItemName), "alien_engine"});
-        // Firing uncharged shots no longer consumes ammo, and every active prism fires a parallel beam of light in unison with Suncaster.
-        NewMastery<MasteryOfSuncaster>(MASTERY_SUNCASTER, Suncaster.ItemName);
-        // Projectiles home towards nearby enemies on each bounce and gain unlimited piercing with no damage loss.
-        NewMastery<MasteryOfBouncer>(MASTERY_BOUNCER, Bouncer.ItemName);
-        // Sub Machine Gun restores all hearts when consumed, and is automatically consumed upon taking otherwise fatal damage.
-        NewMastery<MasteryOfSubMachineGun>(MASTERY_SUB_MACHINE_GUN, SubMachineGun.ItemName);
       #endregion
 
       #region Masteries
@@ -255,6 +249,14 @@ public static class CwaffSynergies
         // Reload time is decreased by 35%, and seltzer water now inflicts hiccups on enemies. Hiccups have a chance to erratically stun enemies for a brief period and cause them to emit a ring of bullets that damage other nearby enemies.
         NewMastery<MasteryOfSeltzerPelter>(MASTERY_SELTZER_PELTER, SeltzerPelter.ItemName)
             .MultReload(0.65f);
+        // Firing uncharged shots no longer consumes ammo, and every active prism fires a parallel beam of light in unison with Suncaster.
+        NewMastery<MasteryOfSuncaster>(MASTERY_SUNCASTER, Suncaster.ItemName);
+        // Projectiles home towards nearby enemies on each bounce and gain unlimited piercing with no damage loss.
+        NewMastery<MasteryOfBouncer>(MASTERY_BOUNCER, Bouncer.ItemName);
+        // Sub Machine Gun restores all hearts when consumed, and is automatically consumed upon taking otherwise fatal damage.
+        NewMastery<MasteryOfSubMachineGun>(MASTERY_SUB_MACHINE_GUN, SubMachineGun.ItemName);
+        // Reloading now deploys a stereo that continuously emits sound matching Stereoscope's pitch at time of deployment, acting as a secondary source of stun and damage.
+        NewMastery<MasteryOfStereoscope>(MASTERY_STEREOSCOPE, Stereoscope.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -524,6 +526,7 @@ internal class MasteryOfSeltzerPelter        : MasteryDummyItem {}
 internal class MasteryOfSuncaster            : MasteryDummyItem {}
 internal class MasteryOfBouncer              : MasteryDummyItem {}
 internal class MasteryOfSubMachineGun        : MasteryDummyItem {}
+internal class MasteryOfStereoscope          : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -633,4 +636,5 @@ public enum Synergy {
     MASTERY_SUNCASTER,
     MASTERY_BOUNCER,
     MASTERY_SUB_MACHINE_GUN,
+    MASTERY_STEREOSCOPE,
 };

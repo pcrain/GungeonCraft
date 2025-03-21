@@ -1,3 +1,5 @@
+
+
 namespace CwaffingTheGungy;
 
 public class Stereoscope : CwaffGun
@@ -11,14 +13,19 @@ public class Stereoscope : CwaffGun
     private const int _SOUND_MS           = 469;
     private const float _VFX_RATE         = 0.1f;
     private const float _STUN_LINGER_TIME = 0.25f;
+    private const int _MAX_SOUNDS         = 16;
 
-    internal static GameObject _ResonancePrefab          = null;
-    private static Dictionary<string, int> _FrequencyMap = new();
+    internal static GameObject _ResonancePrefab               = null;
+    internal static GameObject _StereoPrefab                  = null;
+    private static ResonantProjectile _StereoscopeProjectile  = null;
+    private static Dictionary<string, int> _FrequencyMap      = new();
+    private static uint[] _PlayingIds                         = new uint[_MAX_SOUNDS];
 
-    private int _frequency    = 0;
-    private int _lastSoundPos = 0;
-    private uint _soundId     = 0;
-    private float _lastVfx    = 0.0f;
+    private int _frequency                  = 0;
+    private int _lastSoundPos               = 0;
+    private uint _soundId                   = 0;
+    private float _lastVfx                  = 0.0f;
+    private StereoscopeStereo _extantStereo = null;
 
     public static void Init()
     {
@@ -26,16 +33,18 @@ public class Stereoscope : CwaffGun
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 261, idleFps: _IDLE_FPS, shootFps: _IDLE_FPS,
             fireAudio: "stereoscope_fire_sound", attacksThroughWalls: true, suppressReloadAnim: true, autoPlay: false)
           .InitSpecialProjectile<ResonantProjectile>(GunData.New(sprite: null, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 17.0f, speed: 25f, range: 18f, force: 12f, invisibleProjectile: true, customClip: true));
+            damage: 17.0f, speed: 25f, range: 18f, force: 12f, invisibleProjectile: true, customClip: true))
+          .Assign(out _StereoscopeProjectile);
 
         _ResonancePrefab = VFX.Create("resonance_vfx");
+        _StereoPrefab = VFX.Create("stereoscope_stereo", fps: 19).Attach<StereoscopeStereo>();
     }
 
-    private void Resonate(Vector2 pos)
+    private void Resonate(Vector2 pos, int freq)
     {
         CwaffVFX.SpawnBurst(prefab: _ResonancePrefab, numToSpawn: 6, basePosition: pos, positionVariance: 0.4f, velocityVariance: 10f,
             velType: CwaffVFX.Vel.AwayRadial, rotType: CwaffVFX.Rot.Position, lifetime: 0.25f, fadeOutTime: 0.25f, uniform: true,
-            startScale: 1.0f, endScale: 0.1f, specificFrame: this._frequency + 6, height: 3f);
+            startScale: 1.0f, endScale: 0.1f, specificFrame: freq + 6, height: 3f);
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -43,21 +52,72 @@ public class Stereoscope : CwaffGun
         base.OnPlayerPickup(player);
         gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.Play();
+        CwaffEvents.OnChangedRooms -= OnChangedRooms;
+        CwaffEvents.OnChangedRooms += OnChangedRooms;
+    }
+
+    private void OnChangedRooms(PlayerController player, RoomHandler oldRoom, RoomHandler newRoom)
+    {
+        if (player == this.PlayerOwner)
+            CleanUpStereos();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
+        CleanUpStereos();
         gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.StopAndResetFrameToDefault();
+        CwaffEvents.OnChangedRooms -= OnChangedRooms;
     }
 
-    private static uint[] _PlayingIds = new uint[16];
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        base.OnReloadPressed(player, gun, manualReload);
+        if (player.IsDodgeRolling || !player.AcceptingNonMotionInput || !this.Mastered)
+            return;
+
+        CleanUpStereos();
+        this._extantStereo = _StereoPrefab.Instantiate(position: player.CenterPosition).AddComponent<StereoscopeStereo>();
+        this._extantStereo.Setup(this);
+        base.gameObject.Play("place_stereo_sound");
+        Lazy.DoSmokeAt(player.CenterPosition);
+    }
+
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        base.OnSwitchedAwayFromThisGun();
+        if (this._extantStereo)
+            this._extantStereo.linked = false;
+    }
+
+    public override void OnSwitchedToThisGun()
+    {
+        base.OnSwitchedToThisGun();
+        if (this._extantStereo)
+            this._extantStereo.linked = true;
+    }
+
+    public override void OnDestroy()
+    {
+        CleanUpStereos();
+        CwaffEvents.OnChangedRooms -= OnChangedRooms;
+        base.OnDestroy();
+    }
+
+    private void CleanUpStereos()
+    {
+        if (!this._extantStereo)
+            return;
+        Lazy.DoPickupAt(this._extantStereo.pos);
+        UnityEngine.Object.Destroy(this._extantStereo.gameObject);
+        this._extantStereo = null;
+    }
 
     private bool IsGunResonating()
     {
-        uint maxSounds = 16;
-        AKRESULT result = AkSoundEngine.GetPlayingIDsFromGameObject(this.gun.gameObject, ref maxSounds, _PlayingIds);
+        uint maxSounds = _MAX_SOUNDS;
+        AKRESULT result = AkSoundEngine.GetPlayingIDsFromGameObject(this.PlayerOwner.gameObject, ref maxSounds, _PlayingIds);
         for (int i = 0; i < maxSounds; i++)
             if (_PlayingIds[i] == this._soundId)
             {
@@ -68,36 +128,43 @@ public class Stereoscope : CwaffGun
         return false;
     }
 
-    public override void Update()
+    private static string GetSoundForFrequency(int freq)
     {
-        base.Update();
-        if (GameManager.Instance.IsLoadingLevel || GameManager.Instance.IsPaused || BraveTime.DeltaTime == 0.0f)
-            return;
-        if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
+        if (freq > 0)
+            return $"stereoscope_charge_sound_{freq}_up";
+        if (freq < 0)
+            return $"stereoscope_charge_sound_{-freq}_down";
+        return "stereoscope_charge_sound_0";
+    }
+
+    public void HandleAudioChecks()
+    {
+        if (!this.PlayerOwner)
             return;
 
+        bool isCurrentGun = this.gun == this.PlayerOwner.CurrentGun;
+        if (isCurrentGun)
+            this._frequency = Mathf.FloorToInt(this.PlayerOwner.m_currentGunAngle.Clamp360() / 30f) - 6;
+        else if (this._extantStereo)
+            this._frequency = this._extantStereo.freq;
         float now = BraveTime.ScaledTimeSinceStartup;
-        this._frequency = Mathf.FloorToInt(this.PlayerOwner.m_currentGunAngle.Clamp360() / 30f) - 6;
-        bool soundIsPlaying = IsGunResonating();
-        bool playedSoundThisFrame = false;
-        if (!soundIsPlaying && (now > this._lastVfx + _VFX_RATE))
+        bool playedSoundThisFrame = (now > this._lastVfx + _VFX_RATE) && !IsGunResonating();
+        if (playedSoundThisFrame)
         {
-            string sound_name = "stereoscope_charge_sound_0";
-            if (this._frequency > 0)
-                sound_name = $"stereoscope_charge_sound_{this._frequency}_up";
-            else if (this._frequency < 0)
-                sound_name = $"stereoscope_charge_sound_{-this._frequency}_down";
-            this._soundId = AkSoundEngine.PostEvent(sound_name, this.gun.gameObject, in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
             playedSoundThisFrame = true;
             this._lastSoundPos = 0;
-        }
-
-        bool doVfx = false;
-        if (playedSoundThisFrame && now > this._lastVfx + _VFX_RATE)
-        {
             this._lastVfx = now;
-            doVfx = true;
-            Resonate(this.gun.sprite.WorldCenter);
+            this._soundId = AkSoundEngine.PostEvent(GetSoundForFrequency(this._frequency),
+                in_gameObjectID: this.PlayerOwner.gameObject,
+                in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
+            if (isCurrentGun)
+                Resonate(this.gun.sprite.WorldCenter, this._frequency);
+            if (this._extantStereo)
+            {
+                Resonate(this._extantStereo.pos, this._extantStereo.freq);
+                if (isCurrentGun && (this._frequency != this._extantStereo.freq))
+                    this._extantStereo.gameObject.Play(GetSoundForFrequency(this._extantStereo.freq));
+            }
         }
 
         RoomHandler room = this.PlayerOwner.CurrentRoom;
@@ -112,13 +179,24 @@ public class Stereoscope : CwaffGun
                 continue;
             if (!_FrequencyMap.TryGetValue(guid, out int resonantFrequency))
                 _FrequencyMap[guid] = resonantFrequency = UnityEngine.Random.Range(-6, 6);
-            if (resonantFrequency != this._frequency)
+            if (resonantFrequency != this._frequency && (!this._extantStereo || resonantFrequency != this._extantStereo.freq))
                 continue;
             if (!bs.ImmuneToStun)
                 bs.Stun(_STUN_LINGER_TIME, createVFX: true);
-            if (doVfx)
-                Resonate(enemy.CenterPosition);
+            if (playedSoundThisFrame)
+                Resonate(enemy.CenterPosition, resonantFrequency);
         }
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        if (GameManager.Instance.IsLoadingLevel || GameManager.Instance.IsPaused || BraveTime.DeltaTime == 0.0f)
+            return;
+        if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
+            return;
+
+        HandleAudioChecks();
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -126,11 +204,26 @@ public class Stereoscope : CwaffGun
         base.PostProcessProjectile(projectile);
         if (projectile is not ResonantProjectile res)
             return;
-        res.frequency = this._frequency;
         // get distance from sound loop point as timing accuracy
         float accuracy = 1f - (2f * (Mathf.Min(this._lastSoundPos, _SOUND_MS - this._lastSoundPos) / (float)_SOUND_MS));
-        res.power = Mathf.RoundToInt(8f * accuracy * accuracy); // square power falloff
-        res.gun = this.gun;
+        int damage = Mathf.RoundToInt(8f * accuracy * accuracy); // square power falloff
+
+        res.frequency = this._frequency;
+        res.power     = damage;
+        res.gun       = this.gun;
+
+        if (!this._extantStereo)
+            return;
+
+        Projectile p = SpawnManager.SpawnProjectile(
+            prefab   : _StereoscopeProjectile.gameObject,
+            position : this._extantStereo.pos,
+            rotation : Quaternion.identity).GetComponent<Projectile>();
+        p.SetOwnerAndStats(this.PlayerOwner);
+        ResonantProjectile res2 = p.gameObject.GetComponent<ResonantProjectile>();
+        res2.frequency = this._extantStereo.freq;
+        res2.power     = damage;
+        res2.gun       = this.gun;
     }
 
     private class ResonantProjectile : Projectile
@@ -149,9 +242,8 @@ public class Stereoscope : CwaffGun
 
         public override void Move()
         {
-            if (gun)
-                Reverberate(gun.sprite.WorldCenter);
             Vector3 pos = base.transform.position;
+            Reverberate(pos);
             RoomHandler absoluteRoom = pos.GetAbsoluteRoom();
             absoluteRoom.ApplyActionToNearbyEnemies(pos.XY(), 100f, ProcessEnemy);
             DieInAir(true, false, false, false);
@@ -176,6 +268,29 @@ public class Stereoscope : CwaffGun
                 SunderbussProjectile.ShatterViolentlyIntoAMillionPieces(enemy);
                 enemy.EraseFromExistenceWithRewards(suppressDeathSounds: true);
             }
+        }
+    }
+
+    public class StereoscopeStereo : MonoBehaviour
+    {
+        public Vector2 pos;
+        public int freq;
+        public bool linked;
+
+        private Stereoscope _gun;
+
+        public void Setup(Stereoscope gun)
+        {
+            this.pos    = base.transform.position;
+            this._gun   = gun;
+            this.freq   = gun._frequency;
+            this.linked = true;
+        }
+
+        private void Update()
+        {
+            if (!this.linked && this._gun)
+                this._gun.HandleAudioChecks();
         }
     }
 }
