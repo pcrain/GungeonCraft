@@ -332,7 +332,7 @@ public class GameActorHiccupEffect : GameActorSpeedEffect
         {
             GameObject po = SpawnManager.SpawnProjectile(_HiccupProjectile, enemy.CenterPosition, (offset + _HICCUP_PROJ_GAP * i).EulerZ());
             Projectile proj = po.GetComponent<Projectile>();
-            proj.SetOwnerAndStats(enemy);
+            proj.SetOwnerAndStats(enemy, updateCollisions: false);
             proj.collidesWithEnemies = true;
             proj.collidesWithPlayer = false;
             proj.SetSpeed(15f);

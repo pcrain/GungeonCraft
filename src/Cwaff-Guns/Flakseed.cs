@@ -318,8 +318,6 @@ public class FlakseedFlower : MonoBehaviour
                 prefab   : Flakseed._FlakFlowerProjectile.gameObject,
                 position : this._firePos,
                 rotation : (targetPos - this._firePos).EulerZ()).GetComponent<Projectile>();
-            proj.collidesWithPlayer  = false;
-            proj.collidesWithEnemies = true;
             proj.SetOwnerAndStats(this._owner);
             proj.gameObject.Play("flak_flower_shoot_sound");
         }

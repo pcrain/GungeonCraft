@@ -242,7 +242,6 @@ public class MagnetParticle : MonoBehaviour
         p.baseData.force      = 50f;
         p.SetOwnerAndStats(this._gun.CurrentOwner);
         p.DestroyMode         = Projectile.ProjectileDestroyMode.BecomeDebris;
-        p.collidesWithPlayer  = false;
         p.ManualControl       = true; // let debris velocity take care of movement
         p.OnHitEnemy         += this.OnHitEnemy;
         p.shouldRotate        = true;

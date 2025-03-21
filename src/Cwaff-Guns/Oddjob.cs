@@ -274,11 +274,7 @@ public class OddjobProjectile : MonoBehaviour
                 prefab   : Oddjob._OddjobFlakProjectile.gameObject,
                 position : this._proj.SafeCenter,
                 rotation : (offset + i * _FLAK_SPACING).EulerZ()).GetComponent<Projectile>();
-            //REFACTOR: combine the next few lines into the base function throughout the code base
-            proj.collidesWithPlayer  = false;
-            proj.collidesWithEnemies = true;
             proj.SetOwnerAndStats(this._owner);
-            //REFACTOR: end of refactor
             foreach (HealthHaver hh in this._hitLastFrame)
                 if (hh.specRigidbody is SpeculativeRigidbody body)
                     proj.specRigidbody.RegisterSpecificCollisionException(body);

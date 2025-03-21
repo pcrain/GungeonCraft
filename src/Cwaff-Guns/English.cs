@@ -259,8 +259,6 @@ public class English : CwaffGun
             GameObject projObj = SpawnManager.SpawnProjectile(_BilliardBall.gameObject, pos, Quaternion.identity, true);
             Projectile proj = projObj.GetComponent<Projectile>();
                 proj.SetOwnerAndStats(this.PlayerOwner);
-                proj.collidesWithEnemies = true;
-                proj.collidesWithPlayer = false;
                 proj.SetFrame(_BALL_ORDER[i % 15]);
             projObj.GetComponent<BilliardBall>().Setup(fired: false, failsafeLaunchAngle: i == 0 ? this.gun.CurrentAngle : null);
         }

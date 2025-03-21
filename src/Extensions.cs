@@ -2780,16 +2780,22 @@ public static class Extensions
   }
 
   /// <summary>Sets the owner of a projectile and, if it's a player, copy over projectile baseData from their stats</summary>
-  public static void SetOwnerAndStats(this Projectile p, GameActor owner)
+  public static void SetOwnerAndStats(this Projectile p, GameActor owner, bool updateCollisions = true)
   {
     p.Owner = owner;
     p.SetNewShooter(owner.specRigidbody);
-    if (owner is not PlayerController pc)
+    PlayerController playerOwner = owner as PlayerController;
+    if (updateCollisions)
+    {
+      p.collidesWithPlayer = !playerOwner;
+      p.collidesWithEnemies = playerOwner;
+    }
+    if (!playerOwner)
       return;
-    p.baseData.damage *= pc.DamageMult();
-    p.baseData.range *= pc.RangeMult();
-    p.baseData.force *= pc.KnockbackMult();
-    p.baseData.speed *= pc.ProjSpeedMult();
+    p.baseData.damage *= playerOwner.DamageMult();
+    p.baseData.range *= playerOwner.RangeMult();
+    p.baseData.force *= playerOwner.KnockbackMult();
+    p.baseData.speed *= playerOwner.ProjSpeedMult();
   }
 
   /// <summary>Check if a body has a collision layer override</summary>

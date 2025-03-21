@@ -208,10 +208,11 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       OnActualReload(player, gun, manual);
       this._hasReloaded = false;
     }
-    if (player.AcceptingNonMotionInput && !gun.IsReloading && manual && (gun.ClipShotsRemaining >= Mathf.Min(gun.ClipCapacity, gun.CurrentAmmo)))
-    {
+    if (!player.AcceptingNonMotionInput || gun.IsReloading)
+      return;
+
+    if (manual && (gun.ClipShotsRemaining >= Mathf.Min(gun.ClipCapacity, gun.CurrentAmmo)))
       OnFullClipReload(player, gun);
-    }
   }
 
   /// <summary>Called when the player actually initiates an ammo-repleneshing reload</summary>

@@ -260,6 +260,8 @@ public static class CwaffSynergies
         // Groundhog charges twice as quickly and creates a mini-tremor when plunged into the ground, triggering a mini-blank effect.
         NewMastery<MasteryOfGroundhog>(MASTERY_GROUNDHOG, Groundhog.ItemName)
             .MultChargeRate(2f);
+        // Glockarina gains infinite ammo and fires 3 rings of notes when reloading an empty clip.
+        NewMastery<MasteryOfGlockarina>(MASTERY_GLOCKARINA, Glockarina.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -531,6 +533,7 @@ internal class MasteryOfBouncer              : MasteryDummyItem {}
 internal class MasteryOfSubMachineGun        : MasteryDummyItem {}
 internal class MasteryOfStereoscope          : MasteryDummyItem {}
 internal class MasteryOfGroundhog            : MasteryDummyItem {}
+internal class MasteryOfGlockarina           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -642,4 +645,5 @@ public enum Synergy {
     MASTERY_SUB_MACHINE_GUN,
     MASTERY_STEREOSCOPE,
     MASTERY_GROUNDHOG,
+    MASTERY_GLOCKARINA,
 };

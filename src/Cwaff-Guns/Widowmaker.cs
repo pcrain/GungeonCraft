@@ -195,8 +195,6 @@ public class Crawlyboi : MonoBehaviour
             prefab   : (this._mastered ? Widowmaker._WidowTurretLaser : Widowmaker._WidowTurretProjectile).gameObject,
             position : shootPoint,
             rotation : (enemyPos.Value - shootPoint).EulerZ()).GetComponent<Projectile>();
-        proj.collidesWithPlayer  = false;
-        proj.collidesWithEnemies = true;
         proj.baseData.damage     = this._damage;
         proj.SetOwnerAndStats(this._owner);
         if (this._mastered)

@@ -70,8 +70,6 @@ public class Maestro : CwaffGun
         p.baseData.range = launcher.baseData.range;
         p.SetOwnerAndStats(pc);
         p.allowSelfShooting = false;
-        p.collidesWithPlayer = false;
-        p.collidesWithEnemies = true;
         p.specRigidbody.CollideWithTileMap = false;
         p.UpdateCollisionMask();
         p.ResetDistance();

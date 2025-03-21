@@ -204,8 +204,6 @@ public class TheBB : MonoBehaviour
                 prefab   : BBGun._PinProjectile.gameObject,
                 position : ppos,
                 rotation : delta.EulerZ()).GetComponent<Projectile>();
-            pin.collidesWithPlayer  = false;
-            pin.collidesWithEnemies = true;
             pin.SetOwnerAndStats(this._owner);
             pin.SetSpeed(mySpeed + 10f);
             didReflect = true;

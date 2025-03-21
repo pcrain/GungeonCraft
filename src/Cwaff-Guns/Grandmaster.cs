@@ -45,30 +45,6 @@ public class Grandmaster : CwaffGun
           .Attach<PlayChessBehavior>()
           .Assign(out _Projectile);
     }
-
-    public override void OnDestroy()
-    {
-        if (this.PlayerOwner)
-            this.PlayerOwner.OnReloadedGun -= OnGrandmasterReloaded;
-    }
-
-    public override void OnPlayerPickup(PlayerController player)
-    {
-        base.OnPlayerPickup(player);
-        player.OnReloadedGun += OnGrandmasterReloaded;
-    }
-
-    public override void OnDroppedByPlayer(PlayerController player)
-    {
-        player.OnReloadedGun -= OnGrandmasterReloaded;
-        base.OnDroppedByPlayer(player);
-    }
-
-    private static void OnGrandmasterReloaded(PlayerController usingPlayer, Gun usedGun)
-    {
-        if (usedGun.GetComponent<Grandmaster>() is not Grandmaster gm)
-            return;
-    }
 }
 
 public enum ChessPieces {

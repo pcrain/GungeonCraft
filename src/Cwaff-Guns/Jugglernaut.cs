@@ -195,8 +195,6 @@ public class Jugglernaut : CwaffGun
             prefab   : _JugglingBallProjectile.gameObject,
             position : this.gun.barrelOffset.position,
             rotation : this.PlayerOwner.m_currentGunAngle.EulerZ()).GetComponent<Projectile>();
-        proj.collidesWithPlayer  = false;
-        proj.collidesWithEnemies = true;
         proj.baseData.damage     = 2f;
         proj.SetOwnerAndStats(this.PlayerOwner);
         Color tint = _Colors[_ColorIndices[frame]];

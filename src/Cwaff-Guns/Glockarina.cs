@@ -38,6 +38,7 @@ public class Glockarina : CwaffGun
 
     internal static GameObject _DecoyPrefab   = null;
     internal static GameObject _NoteVFXPrefab = null;
+    private static Projectile _Projectile = null;
     private static int _GlockarinaPickupID    = -1;
     private static List<List<Note>> _Songs = new(){
         /* DEFAULT */ null,
@@ -61,7 +62,8 @@ public class Glockarina : CwaffGun
             shootFps: 24, reloadFps: 20, muzzleFrom: Items.Mailbox, fireAudio: "glockarina_shoot_sound", reloadAudio: "glockarina_reload_sound")
           .Attach<GlockarinaAmmoDisplay>()
           .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic, speed: 35f, damage: 7.5f, customClip: true,
-            sprite: "glockarina_projectile", fps: 12, anchor: Anchor.MiddleLeft, shouldRotate: false));
+            sprite: "glockarina_projectile", fps: 12, anchor: Anchor.MiddleLeft, shouldRotate: false))
+          .Assign(out _Projectile);
 
         _DecoyPrefab = ItemHelper.Get(Items.Decoy).GetComponent<SpawnObjectPlayerItem>().objectToSpawn.ClonePrefab();
         _DecoyPrefab.GetComponent<Decoy>().DeathExplosionTimer = _DECOY_LIFE;
@@ -109,6 +111,7 @@ public class Glockarina : CwaffGun
         };
         base.OnPlayerPickup(player);
         UpdateMode();
+        UpdateAmmo();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -122,6 +125,23 @@ public class Glockarina : CwaffGun
         if (this.PlayerOwner)
             this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
         base.OnDestroy();
+    }
+
+    private void UpdateAmmo()
+    {
+        this.gun.LocalInfiniteAmmo = this.Mastered;
+        this.gun.DefaultModule.ammoCost = this.Mastered ? 0 : 1;
+    }
+
+    public override void OnMasteryStatusChanged()
+    {
+        UpdateAmmo();
+    }
+
+    public override void OnSwitchedToThisGun()
+    {
+        base.OnSwitchedToThisGun();
+        UpdateAmmo();
     }
 
     // Returns true if we handled a special song, false if we pass it along
@@ -173,6 +193,40 @@ public class Glockarina : CwaffGun
 
         }
         return false;
+    }
+
+    public override void OnActualReload(PlayerController player, Gun gun, bool manual)
+    {
+        base.OnActualReload(player, gun, manual);
+        if (gun.ClipShotsRemaining > 0 || !this.Mastered)
+            return;
+        this.gun.StartCoroutine(DoRadialMusic());
+    }
+
+    private IEnumerator DoRadialMusic()
+    {
+        const int _NUM_RINGS             = 3;
+        const int _RING_SIZE             = 8;
+        const float _GAP                 = 360f / _RING_SIZE;
+        const float _DELAY_BETWEEN_RINGS = 0.3f;
+
+        for (int i = 0; i < _NUM_RINGS; ++i)
+        {
+            if (!this || !this.gun || !this.PlayerOwner)
+                yield break;
+            float offset = UnityEngine.Random.value * _GAP;
+            for (int j = 0; j < _RING_SIZE; ++j)
+            {
+                Projectile proj = SpawnManager.SpawnProjectile(
+                    prefab   : _Projectile.gameObject,
+                    position : this.gun.barrelOffset.position,
+                    rotation : (j * _GAP + offset).EulerZ()).GetComponent<Projectile>();
+                proj.SetOwnerAndStats(this.PlayerOwner);
+                this.PostProcessProjectile(proj);
+                proj.SetSpeed(proj.baseData.speed / 2f);
+            }
+            yield return new WaitForSeconds(_DELAY_BETWEEN_RINGS);
+        }
     }
 
     public override void OnFullClipReload(PlayerController player, Gun gun)
