@@ -107,6 +107,8 @@ public static class CwaffSynergies
         NewSynergy(TANK_ENGINE, "Tank Engine", new[]{IName(DerailGun.ItemName), "alien_engine"});
         // Firing uncharged shots no longer consumes ammo, and every active prism fires a parallel beam of light in unison with Suncaster.
         NewMastery<MasteryOfSuncaster>(MASTERY_SUNCASTER, Suncaster.ItemName);
+        // Projectiles home towards nearby enemies on each bounce and gain unlimited piercing with no damage loss.
+        NewMastery<MasteryOfBouncer>(MASTERY_BOUNCER, Bouncer.ItemName);
       #endregion
 
       #region Masteries
@@ -518,6 +520,7 @@ internal class MasteryOfBBGun                : MasteryDummyItem {}
 internal class MasteryOfNycterian            : MasteryDummyItem {}
 internal class MasteryOfSeltzerPelter        : MasteryDummyItem {}
 internal class MasteryOfSuncaster            : MasteryDummyItem {}
+internal class MasteryOfBouncer              : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -625,4 +628,5 @@ public enum Synergy {
     MASTERY_NYCTERIAN,
     MASTERY_SELTZER_PELTER,
     MASTERY_SUNCASTER,
+    MASTERY_BOUNCER,
 };

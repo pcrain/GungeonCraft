@@ -36,6 +36,12 @@ public class Bouncer : CwaffGun
 
 public class HarmlessUntilBounce : MonoBehaviour
 {
+    private const float _MIN_SOUND_GAP     = 0.25f;
+    private const float _MAX_HOMING_SPREAD = 60f;
+    private const float _BOUNCE_TIME       = 0.1f; // frames for half a bounce
+
+    private static float _LastBouncePlayed = 0;
+
     private Projectile _projectile;
     private PlayerController _owner;
     private bool _bounceStarted  = false;
@@ -43,6 +49,7 @@ public class HarmlessUntilBounce : MonoBehaviour
     private int _currentBounces  = 0;
     private int _maxBounces      = 0;
     private float _damageMult    = 1.0f;
+    private bool _mastered       = false;
 
     private void Start()
     {
@@ -55,6 +62,14 @@ public class HarmlessUntilBounce : MonoBehaviour
         BounceProjModifier bounce = base.gameObject.GetComponent<BounceProjModifier>();
         this._maxBounces = bounce.numberOfBounces;
         bounce.OnBounce += this.OnBounce;
+
+        this._mastered = this._projectile.Mastered<Bouncer>();
+        if (this._mastered)
+        {
+            PierceProjModifier ppm   = this._projectile.gameObject.AddComponent<PierceProjModifier>();
+            ppm.penetration          = 99;
+            ppm.penetratesBreakables = true;
+        }
 
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         this._projectile.OnDestruction += this.OnDestruction;
@@ -87,8 +102,6 @@ public class HarmlessUntilBounce : MonoBehaviour
             PhysicsEngine.SkipCollision = true;
     }
 
-    private static float _LastBouncePlayed = 0;
-    private const  float _MIN_SOUND_GAP = 0.25f;
     private void HandleBounceSounds()
     {
         float now = BraveTime.ScaledTimeSinceStartup;
@@ -106,9 +119,9 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._projectile.m_usesNormalMoveRegardless = true; // temporarily disable Helix Projectile shenanigans
         this._bounceStarted = true;
         this._projectile.StartCoroutine(DoElasticBounce());
+        this._projectile.ResetPiercing();
     }
 
-    private const float _BOUNCE_TIME = 0.1f; // frames for half a bounce
     private IEnumerator DoElasticBounce()
     {
         float oldSpeed = this._projectile.baseData.speed;
@@ -147,6 +160,9 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._projectile.spriteAnimator.transform.localScale = oldScale;
 
         this._projectile.SetSpeed(oldSpeed);
+        if (this._mastered)
+            if (Lazy.NearestEnemyPosWithinConeOfVision(this._projectile.SafeCenter, this._projectile.Direction.ToAngle(), _MAX_HOMING_SPREAD) is Vector2 target)
+                this._projectile.SendInDirection(target - this._projectile.SafeCenter, true);
         this._projectile.specRigidbody.Reinitialize();
 
         this._bounceFinished = true;

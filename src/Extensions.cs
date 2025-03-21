@@ -3168,5 +3168,13 @@ public static class Extensions
       return false;
     return t.Mastered;
   }
+
+  /// <summary>Reset piercing stastics for a projectile (to reset damage falloff)</summary>
+  public static void ResetPiercing(this Projectile p, bool resetHitCount = true)
+  {
+    p.m_hasPierced = false;
+    if (resetHitCount)
+      p.m_healthHaverHitCount = 0;
+  }
 }
 

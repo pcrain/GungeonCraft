@@ -192,7 +192,7 @@ public class SubtractorProjectile : MonoBehaviour
         if (!this._hitFirstEnemy)
             return;
 
-        this._projectile.m_hasPierced = false; // reset pierce damange penalty from 0.5 to 1.0
+        this._projectile.ResetPiercing();
         this._postHitDamage = this._damage - enemy.healthHaver.GetCurrentHealth();
     }
 
