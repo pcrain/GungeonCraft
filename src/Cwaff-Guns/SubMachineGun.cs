@@ -26,18 +26,60 @@ public class SubMachineGun : CwaffGun
         _NourishSelfVFX = Items.Ration.AsActive().gameObject.GetComponent<RationItem>().healVFX;
     }
 
-    public override bool OnZeroAmmoAttack()
+    public override bool OnAttemptedGunThrow()
     {
-        base.OnZeroAmmoAttack();
+        base.OnAttemptedGunThrow();
         if (this.PlayerOwner is not PlayerController pc)
             return true;
 
+        Consume(pc);
+        return false;
+    }
+
+    private void Consume(PlayerController pc, bool preventedDeath = false)
+    {
+        if (preventedDeath)
+            NourishingProjectile.DoActorNourishVFX(pc);
+        else
+            pc.gameObject.Play("nourished_sound");
         pc.gameObject.Play("sub_machine_gun_reload_sound");
-        pc.gameObject.Play("nourished_sound");
-        pc.healthHaver.ApplyHealing(_HEAL_AMOUNT);
+        pc.healthHaver.ApplyHealing(this.Mastered ? 999f :  _HEAL_AMOUNT);
         pc.PlayEffectOnActor(_NourishSelfVFX, Vector3.zero);
         UnityEngine.Object.Destroy(pc.ForceDropGun(this.gun).gameObject);
-        return false;
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        if (!player.ForceZeroHealthState)
+            player.healthHaver.ModifyDamage += this.ModifyDamage;
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        player.healthHaver.ModifyDamage -= this.ModifyDamage;
+        base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            this.PlayerOwner.healthHaver.ModifyDamage -= this.ModifyDamage;
+        base.OnDestroy();
+    }
+
+    private void ModifyDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
+    {
+        if (!this.Mastered)
+            return;
+        if (!hh.PlayerWillDieFromHit(data))
+            return; // if we're not going to die, we don't need to activate
+
+        data.ModifiedDamage = 0f;
+        hh.ModifyDamage -= this.ModifyDamage;
+        hh.TriggerInvulnerabilityPeriod();
+        Lazy.DoDamagedFlash(hh);
+        Consume(this.PlayerOwner, preventedDeath: true);
     }
 }
 
@@ -68,11 +110,16 @@ public class NourishingProjectile : MonoBehaviour
             enemy.ReplaceGun(Items.Heroine);
 
         hh.FullHeal();
-        GameObject vfx = SpawnManager.SpawnVFX(SubMachineGun._NourishVFX, enemy.sprite.WorldTopCenter + new Vector2(0f, 1f), Quaternion.identity, ignoresPools: true);
+        DoActorNourishVFX(enemy);
+    }
+
+    internal static void DoActorNourishVFX(GameActor actor)
+    {
+        GameObject vfx = SpawnManager.SpawnVFX(SubMachineGun._NourishVFX, actor.sprite.WorldTopCenter + new Vector2(0f, 1f), Quaternion.identity, ignoresPools: true);
         vfx.GetComponent<tk2dSprite>().HeightOffGround = 1f;
-        vfx.transform.parent = enemy.sprite.transform;
+        vfx.transform.parent = actor.sprite.transform;
         vfx.AddComponent<GlowAndFadeOut>().Setup(
             fadeInTime: 0.15f, glowInTime: 0.20f, holdTime: 0.0f, glowOutTime: 0.20f, fadeOutTime: 0.15f, maxEmit: 5f, destroy: true);
-        enemy.gameObject.Play("nourished_sound");
+        actor.gameObject.Play("nourished_sound");
     }
 }

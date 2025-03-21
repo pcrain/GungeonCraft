@@ -109,6 +109,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfSuncaster>(MASTERY_SUNCASTER, Suncaster.ItemName);
         // Projectiles home towards nearby enemies on each bounce and gain unlimited piercing with no damage loss.
         NewMastery<MasteryOfBouncer>(MASTERY_BOUNCER, Bouncer.ItemName);
+        // Sub Machine Gun restores all hearts when consumed, and is automatically consumed upon taking otherwise fatal damage.
+        NewMastery<MasteryOfSubMachineGun>(MASTERY_SUB_MACHINE_GUN, SubMachineGun.ItemName);
       #endregion
 
       #region Masteries
@@ -521,6 +523,7 @@ internal class MasteryOfNycterian            : MasteryDummyItem {}
 internal class MasteryOfSeltzerPelter        : MasteryDummyItem {}
 internal class MasteryOfSuncaster            : MasteryDummyItem {}
 internal class MasteryOfBouncer              : MasteryDummyItem {}
+internal class MasteryOfSubMachineGun        : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -629,4 +632,5 @@ public enum Synergy {
     MASTERY_SELTZER_PELTER,
     MASTERY_SUNCASTER,
     MASTERY_BOUNCER,
+    MASTERY_SUB_MACHINE_GUN,
 };

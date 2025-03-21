@@ -112,8 +112,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   {
   }
 
-  /// <summary>Called whenever the player attempts to attack with the gun while it's out of ammo. Returns true if throwing the gun should be allowed.</summary>
-  public virtual bool OnZeroAmmoAttack()
+  /// <summary>Called whenever the player attempts to throw the gun. Returns true if throwing the gun should be allowed.</summary>
+  public virtual bool OnAttemptedGunThrow()
   {
     return true;
   }
@@ -387,7 +387,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       static bool Prefix(Gun __instance)
       {
           if (__instance.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
-            if (!cg.OnZeroAmmoAttack())
+            if (!cg.OnAttemptedGunThrow())
               return false;
           return !__instance.gameObject.GetComponent<Unthrowable>();
       }
