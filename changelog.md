@@ -13,6 +13,7 @@
 	- Bats now have unlimited piercing
 	- Bats now bounce off walls once
 - Fixed a typo in Plasmarble's description
+- Fixed Groundhog's charge animation not matching it's charge rate after the player's stats are changed
 
 ## 1.22.2 (2025-03-17)
 

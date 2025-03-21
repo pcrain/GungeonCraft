@@ -1,4 +1,5 @@
 
+
 namespace CwaffingTheGungy;
 
 public class Groundhog : CwaffGun
@@ -38,22 +39,13 @@ public class Groundhog : CwaffGun
           this._setupAnimator = true;
         }
         this.gun.OverrideAngleSnap = (this.gun.IsCharging || this.gun.IsReloading) ? 180f : null;
-        if (!this.PlayerOwner)
+        if (this.PlayerOwner is not PlayerController pc)
           return;
         if (!this.gun.IsCharging)
-        {
-          this._wasCharging = false;
-          this.PlayerOwner.forceAimPoint = null;
-          return;
-        }
-        if (!this._wasCharging)
-        {
-          this._wasCharging = true;
-          //TODO: this is delayed and takes effect next time the gun is charged; refactor later to use OnStatsChanged listener
-          this.gun.SetAnimationFPS(this.gun.chargeAnimation, Mathf.RoundToInt(_BASE_FPS * this.PlayerOwner.ChargeMult()));
-          this.PlayerOwner.forceAimPoint = this.PlayerOwner.CenterPosition
-            + new Vector2(this.PlayerOwner.sprite.FlipX ? -4f : 4f, 0f); // lock aim point while charging
-        }
+          pc.forceAimPoint = null;
+        else if (!this._wasCharging)
+          pc.forceAimPoint = pc.CenterPosition + new Vector2(pc.sprite.FlipX ? -4f : 4f, 0f); // lock aim point while charging
+        this._wasCharging = this.gun.IsCharging;
     }
 
     private void AnimationEventTriggered(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
@@ -69,10 +61,28 @@ public class Groundhog : CwaffGun
             startScale: 1.0f,  endScale: 0.1f, uniform: true, randomFrame: true);
     }
 
+    private void UpdateChargeAnimation(PlayerController controller)
+    {
+        if (controller == this.PlayerOwner)
+          this.gun.SetAnimationFPS(this.gun.chargeAnimation, Mathf.RoundToInt(_BASE_FPS * this.PlayerOwner.ChargeMult()));
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        CwaffEvents.OnStatsRecalculated += this.UpdateChargeAnimation;
+    }
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
         player.forceAimPoint = null;
+        CwaffEvents.OnStatsRecalculated -= this.UpdateChargeAnimation;
+    }
+
+    public override void OnDestroy()
+    {
+        CwaffEvents.OnStatsRecalculated -= this.UpdateChargeAnimation;
+        base.OnDestroy();
     }
 
     public override void OnSwitchedAwayFromThisGun()
