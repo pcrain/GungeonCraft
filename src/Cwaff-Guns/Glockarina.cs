@@ -315,6 +315,7 @@ public class Glockarina : CwaffGun
 
     public override void PostProcessProjectile(Projectile projectile)
     {
+        base.PostProcessProjectile(projectile);
         switch(this._mode)
         {
             case Mode.STORM:

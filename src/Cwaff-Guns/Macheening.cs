@@ -7,6 +7,8 @@ public class Macheening : CwaffGun
     public static string LongDescription  = "Fires magic blade projectiles conjured through sheer willpower. Requires unbroken concentration while firing, preventing movement or rolling. User receives double damage from all sources while this weapon is equipped.";
     public static string Lore             = "An ancient artifact created by the first great gunsmith, Lord Kagreflak. The range of its blade is bounded only by the focus of its user, which was fantastic for warriors of yore and is awful for most scatterbrained Gungeoneers today. Despite not drawing the attention of the Jammed, you still feel uneasy holding this weapon.";
 
+    private const float _BASE_SPINUP_TIME = 1.2f;
+
     private static string _PrefireAnim;
 
     private bool _hasLichguard = false;
@@ -22,7 +24,7 @@ public class Macheening : CwaffGun
           .AssignGun(out Gun gun)
           .LoopAnimation(gun.shootAnimation, 4)
           .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.11f, shootStyle: ShootStyle.Automatic, scale: 0.75f,
-            damage: 7.0f, speed: 50f, range: 1000f, sprite: "macheening_projectile", hideAmmo: true, spinupTime: 1.2f,
+            damage: 7.0f, speed: 50f, range: 1000f, sprite: "macheening_projectile", hideAmmo: true, spinupTime: _BASE_SPINUP_TIME,
             hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound", glowAmount: 20f, glowColor: Color.yellow))
           .SetAllImpactVFX(Items.Excaliber.AsGun().DefaultModule.projectiles[0].hitEffects.enemy)
           .Attach<CombineEvaporateEffect>(c => {
@@ -85,9 +87,40 @@ public class Macheening : CwaffGun
         base.OnDestroy();
     }
 
+    public override void OnMasteryStatusChanged()
+    {
+        base.OnMasteryStatusChanged();
+        this.spinupTime = _BASE_SPINUP_TIME * (this.Mastered ? 0.5f : 1.0f);
+    }
+
     private void CheckForLichguard(PlayerController player)
     {
         this._hasLichguard = player.HasPassive<Lichguard>();
         this.percentSpeedWhileCharging = this._hasLichguard ? 1.0f : 0.0f;
+    }
+
+    public override void PostProcessProjectile(Projectile projectile)
+    {
+        base.PostProcessProjectile(projectile);
+        if (!this.Mastered)
+            return;
+
+        projectile.collidesWithProjectiles           = true;
+        projectile.collidesOnlyWithPlayerProjectiles = false;
+        projectile.UpdateCollisionMask();
+        projectile.specRigidbody.OnCollision += this.OnProjectileCollision;
+    }
+
+    private void OnProjectileCollision(CollisionData data)
+    {
+        if (!data.OtherRigidbody || data.OtherRigidbody.gameObject.GetComponent<Projectile>() is not Projectile other)
+            return;
+        if (other.Owner is PlayerController)
+            return;
+        if (!data.MyRigidbody || data.MyRigidbody.gameObject.GetComponent<Projectile>() is not Projectile me)
+            return;
+        me.DieInAir();
+        other.DieInAir();
+        this.gun.gameObject.Play("aimu_reflect_sound");
     }
 }
