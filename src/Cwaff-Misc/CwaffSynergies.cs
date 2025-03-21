@@ -105,6 +105,8 @@ public static class CwaffSynergies
         NewSynergy(PHOTOSYNTHESIS, "Photosynthesis", new[]{IName(Gunflower.ItemName), "camera"});
         // Grants immunity to contact damage while holding Alien Engine and immunity to most other forms of damage while firing Alien Engine.
         NewSynergy(TANK_ENGINE, "Tank Engine", new[]{IName(DerailGun.ItemName), "alien_engine"});
+        // Firing uncharged shots no longer consumes ammo, and every active prism fires a parallel beam of light in unison with Suncaster.
+        NewMastery<MasteryOfSuncaster>(MASTERY_SUNCASTER, Suncaster.ItemName);
       #endregion
 
       #region Masteries
@@ -515,6 +517,7 @@ internal class MasteryOfRCLauncher           : MasteryDummyItem {}
 internal class MasteryOfBBGun                : MasteryDummyItem {}
 internal class MasteryOfNycterian            : MasteryDummyItem {}
 internal class MasteryOfSeltzerPelter        : MasteryDummyItem {}
+internal class MasteryOfSuncaster            : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -621,4 +624,5 @@ public enum Synergy {
     MASTERY_B_B_GUN,
     MASTERY_NYCTERIAN,
     MASTERY_SELTZER_PELTER,
+    MASTERY_SUNCASTER,
 };

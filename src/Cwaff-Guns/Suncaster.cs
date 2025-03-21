@@ -43,13 +43,15 @@ public class Suncaster : CwaffGun
 
         gun.DefaultModule.chargeProjectiles = new(){
           new ProjectileModule.ChargeProjectile {
-            Projectile = _SuncasterProjectile.Clone().Attach<SuncasterProjectile>(s => s.charged = false),
-            ChargeTime = 0.0f,
+            Projectile     = _SuncasterProjectile.Clone().Attach<SuncasterProjectile>(s => s.charged = false),
+            ChargeTime     = 0.0f,
+            AmmoCost       = 1,
+            UsedProperties = ChargeProjectileProperties.ammo,
           },
           new ProjectileModule.ChargeProjectile {
-            Projectile = _SuncasterProjectile.Clone().Attach<SuncasterProjectile>(s => s.charged = true),
-            ChargeTime = _CHARGE_TIME,
-            AmmoCost   = _CHARGE_AMMO_COST,
+            Projectile     = _SuncasterProjectile.Clone().Attach<SuncasterProjectile>(s => s.charged = true),
+            ChargeTime     = _CHARGE_TIME,
+            AmmoCost       = _CHARGE_AMMO_COST,
             UsedProperties = ChargeProjectileProperties.ammo,
           },
         };
@@ -90,8 +92,13 @@ public class Suncaster : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        projectile.GetComponent<SuncasterProjectile>().FiredFromGun(this);
+        SuncasterProjectile sp = projectile.GetComponent<SuncasterProjectile>();
+        sp.FiredFromGun(this);
         this._lastChargeTime = BraveTime.ScaledTimeSinceStartup; // reset charge timer after firing
+        if (!this.Mastered)
+          return;
+        foreach (SuncasterPrism prism in this.extantPrisms)
+          sp.Refract(prism, projectile.transform.right);
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -108,6 +115,12 @@ public class Suncaster : CwaffGun
           prism.Selfdestruct();
         this.extantPrisms.Clear();
         base.OnDestroy();
+    }
+
+    public override void OnMasteryStatusChanged()
+    {
+        base.OnMasteryStatusChanged();
+        this.gun.DefaultModule.chargeProjectiles[0].AmmoCost = 0;
     }
 
     public override void Update()
@@ -202,6 +215,7 @@ public class SuncasterProjectile : MonoBehaviour
     private CwaffTrailController  _trail          = null;
     private Suncaster              _gun            = null;
     private int                    _prismsLeft     = 0;
+    private bool                   _setup          = false;
 
     protected List<SuncasterPrism> _hitPrisms      = new();
     protected SuncasterPrism       _lastPrism      = null;
@@ -211,18 +225,26 @@ public class SuncasterProjectile : MonoBehaviour
 
     private void Start()
     {
-        this._proj  = base.GetComponent<Projectile>();
-        this._owner = this._proj.ProjectilePlayerOwner();
-        this._trail = this._proj.AddTrail(
-          this.charged        ? Suncaster._SunTrailRefractedPrefab :
-          (this._gun != null) ? Suncaster._SunTrailPrefab :
-                                Suncaster._SunTrailFinalPrefab);
-        this._trail.gameObject.SetGlowiness(100f);
+      if (!this._setup)
+        Setup();
+    }
 
-        if (this._gun)
-          this._prismsLeft = this._gun.extantPrisms.Count * (this.charged ? _MAX_LOOPS : 1);
+    private void Setup()
+    {
+      this._proj  = base.GetComponent<Projectile>();
+      this._owner = this._proj.ProjectilePlayerOwner();
+      this._trail = this._proj.AddTrail(
+        this.charged        ? Suncaster._SunTrailRefractedPrefab :
+        (this._gun != null) ? Suncaster._SunTrailPrefab :
+                              Suncaster._SunTrailFinalPrefab);
+      this._trail.gameObject.SetGlowiness(100f);
 
-        this._proj.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
+      if (this._gun)
+        this._prismsLeft = this._gun.extantPrisms.Count * (this.charged ? _MAX_LOOPS : 1);
+
+      this._proj.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
+
+      this._setup = true;
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -241,8 +263,13 @@ public class SuncasterProjectile : MonoBehaviour
         this._trail.gameObject.SafeDestroy();
     }
 
-    private Projectile Refract(SuncasterPrism prism, Vector2 newDirection)
+    public void Refract(SuncasterPrism prism, Vector2 newDirection)
     {
+      if (!prism)
+        return;
+      if (!this._setup)
+        Setup();
+
       Projectile p = SpawnManager.SpawnProjectile(
           prefab   : Suncaster._SuncasterProjectile.gameObject,
           position : prism.transform.position,
@@ -255,7 +282,6 @@ public class SuncasterProjectile : MonoBehaviour
       SuncasterProjectile s = p.GetComponent<SuncasterProjectile>();
       s._lastPrism = prism;
       s._canRefract = false;
-      return p;
     }
 
     private const float _REFRACT_SOUND_RATE = 0.16f;
