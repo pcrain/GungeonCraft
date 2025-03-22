@@ -1,6 +1,13 @@
 namespace CwaffingTheGungy;
 
 /*
+    Vanilla shops:
+        bello / blacksmith        // everything
+        trorc                     // military and realistic equipment
+        goopton                   // goop, slime, and alien items
+        cursula                   // magic, cursed, and evil items
+        old red                   // blank-themed items
+        flynt                     // key, look, and chest items
     Currently known modded shop IDs:
         psog:tabletechshop        // table and mimic related items
         psog:timedshop            // "rare" items (we add time and space related items)
@@ -12,6 +19,8 @@ namespace CwaffingTheGungy;
         omitb:Boomhildr           // explosive themed items
 
         ski:Arms_Dealer           // body implants and transplants that can physically replace organs
+
+        cg:cammy                  // companions and companion-adjacent items
 */
 
 public enum ModdedShopType {

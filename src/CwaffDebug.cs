@@ -339,3 +339,20 @@ internal static class DebugDraw
         }
     }
 }
+
+/// <summary>Class for testing tk2dMeshSprite shaders</summary>
+public class Distortyboi : MonoBehaviour
+{
+    private Material _mat = null;
+
+    public void Setup(Material mat)
+    {
+        this._mat = mat;
+    }
+
+    private void Update()
+    {
+      if (this._mat)
+        this._mat.SetFloat("_Amplitude", Mathf.Sin(3f * BraveTime.ScaledTimeSinceStartup));
+    }
+}
