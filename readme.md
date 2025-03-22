@@ -20,6 +20,7 @@
 - Insurance Shop: sells insurance policies that let you carry items over to the next run
 - Hecked Mode: randomize enemies' guns for a truly hecked playing experience (enabled via the Mod Config menu)
 - A new secret boss
+- Gun mastery system
 - Vanilla bugfixes
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
@@ -30,9 +31,6 @@
 - **Balance and Diversity**: all items and guns should be fun, engaging, and useful in a variety of situations
 - **Fun New Mechanics**: most items and guns should offer their own distinct ways of interacting with the Gungeon
 - **Playstyle Variety**: defensive and strategic play should feel as rewarding as aggressive and proactive play
-
-### Known Bugs
-* None at the moment! If you find any, please let me know!
 
 ### Vanilla Bugs Fixed
 * In co-op Turbo Mode, the 2nd player now has the same speed as the first player without having to die first
