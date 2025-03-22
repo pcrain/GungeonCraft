@@ -16,7 +16,7 @@ public class Tranquilizer : CwaffGun
     {
         Lazy.SetupGun<Tranquilizer>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.D, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 80, shootFps: 30, reloadFps: 40,
-            muzzleFrom: Items.Mailbox, fireAudio: "blowgun_fire_sound", reloadAudio: "blowgun_reload_sound", banFromBlessedRuns: true)
+            muzzleFrom: Items.Mailbox, fireAudio: "blowgun_fire_sound", reloadAudio: "blowgun_reload_sound", banFromBlessedRuns: true, smoothReload: 0.1f)
           .InitProjectile(GunData.New(clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, damage: 0f,
             sprite: "tranquilizer_projectile", fps: 12, anchor: Anchor.MiddleLeft))
           .Attach<TranquilizerBehavior>();

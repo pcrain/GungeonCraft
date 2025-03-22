@@ -18,7 +18,7 @@ public class Flakseed : CwaffGun
     {
         Lazy.SetupGun<Flakseed>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 1.5f, ammo: 300, idleFps: 6, shootFps: 30,
-            reloadFps: 18, muzzleFrom: Items.Mailbox, fireAudio: "flakseed_shoot_sound")
+            reloadFps: 18, muzzleFrom: Items.Mailbox, fireAudio: "flakseed_shoot_sound", smoothReload: 0.1f)
           .SetReloadAudio("flakseed_reload_sound", 3, 22)
           .SetReloadAudio("flakseed_deposit_sound", 13, 14, 16, 17)
           .InitSpecialProjectile<GrenadeProjectile>(GunData.New(clipSize: 12, cooldown: 0.16f,

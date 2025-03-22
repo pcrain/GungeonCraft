@@ -19,7 +19,7 @@ public class SubtractorBeam : CwaffGun
     {
         Lazy.SetupGun<SubtractorBeam>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 1.25f, ammo: 300, idleFps: 10, shootFps: 24, reloadFps: 30,
-            muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter,
+            muzzleVFX: "muzzle_subtractor_beam", muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, smoothReload: 0.1f,
             reloadAudio: "subtractor_beam_reload_sound", banFromBlessedRuns: true)
           .Attach<SubtractorBeamAmmoDisplay>()
           .InitProjectile(GunData.New(clipSize: 4, cooldown: 0.25f, angleVariance: 5.0f, shootStyle: ShootStyle.SemiAutomatic,

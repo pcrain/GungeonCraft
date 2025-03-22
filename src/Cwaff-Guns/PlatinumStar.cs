@@ -13,7 +13,7 @@ public class PlatinumStar : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<PlatinumStar>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480, shootFps: 20, reloadFps: 40,
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480, shootFps: 20, reloadFps: 40, smoothReload: 0.1f,
             muzzleVFX: "muzzle_platinum_star", muzzleFps: 60, muzzleScale: 0.25f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "platinum_fire_sound")
           .SetReloadAudio("platinum_reload_sound", frame: 5)
           .AddToShop(ModdedShopType.TimeTrader)

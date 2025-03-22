@@ -23,7 +23,7 @@ public class CarpetBomber : CwaffGun
         Lazy.SetupGun<CarpetBomber>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.EXPLOSIVE, reloadTime: 1.5f, ammo: 720, shootFps: 30, reloadFps: 20,
             chargeFps: (int)(1f / _CHARGE_PER_PROJECTILE), loopChargeAt: 10, muzzleVFX: "muzzle_carpet_bomber", muzzleFps: 30,
-            muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound")
+            muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound", smoothReload: 0.1f)
           .SetReloadAudio("carpet_bomber_reload_sound", 2, 10, 18)
           .SetChargeAudio("carpet_bomber_charge_stage", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
           .AddToShop(ModdedShopType.Boomhildr)

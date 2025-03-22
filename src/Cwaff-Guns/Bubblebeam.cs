@@ -14,7 +14,7 @@ public class Bubblebeam : CwaffGun
     {
         Lazy.SetupGun<Bubblebeam>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.25f, ammo: 2400, shootFps: 60, reloadFps: 24,
-            fireAudio: "bubble_pop_sound", carryOffset: new IntVector2(14, 4))
+            fireAudio: "bubble_pop_sound", carryOffset: new IntVector2(14, 4), smoothReload: 0.1f)
           .SetReloadAudio("bubblebeam_close_sound", 1)
           .SetReloadAudio("seltzer_insert_sound", 9)
           .SetReloadAudio("seltzer_shake_sound", 17, 19, 21, 23, 25, 27)

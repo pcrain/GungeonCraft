@@ -16,7 +16,7 @@ public class SubMachineGun : CwaffGun
     {
         Lazy.SetupGun<SubMachineGun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARM, reloadTime: 1.5f, ammo: 200, shootFps: 20, reloadFps: 10,
-            muzzleVFX: "muzzle_sub_machine_gun", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
+            muzzleVFX: "muzzle_sub_machine_gun", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, smoothReload: 0.1f,
             fireAudio: "sub_machine_gun_fire_sound", reloadAudio: "sub_machine_gun_reload_sound", banFromBlessedRuns: true)
           .InitProjectile(GunData.New(sprite: "sandwich_projectile", clipSize: 5, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 0.0f, shouldRotate: false, customClip: true))

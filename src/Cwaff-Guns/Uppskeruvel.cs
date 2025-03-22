@@ -36,7 +36,7 @@ public class Uppskeruvel : CwaffGun
         Lazy.SetupGun<Uppskeruvel>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARM, reloadTime: 1.25f, ammo: 400, shootFps: 24, reloadFps: 30,
             muzzleVFX: "muzzle_uppskeruvel", muzzleFps: 60, muzzleScale: 0.2f, muzzleAnchor: Anchor.MiddleCenter,
-            fireAudio: "uppskeruvel_fire_sound")
+            fireAudio: "uppskeruvel_fire_sound", smoothReload: 0.1f)
           .SetReloadAudio("uppskeruvel_reload_sound", 4, 22)
           .Attach<UppskeruvelAmmoDisplay>()
           .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.Automatic, damage: 4f, customClip: true,

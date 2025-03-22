@@ -17,7 +17,7 @@ public class Lightwing : CwaffGun
         Lazy.SetupGun<Lightwing>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 120, shootFps: 32, reloadFps: 30,
             muzzleVFX: "muzzle_lightwing", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
-            fireAudio: "lightwing_fire_sound", reloadAudio: "lightwing_reload_sound")
+            fireAudio: "lightwing_fire_sound", reloadAudio: "lightwing_reload_sound", smoothReload: 0.1f)
           .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f, customClip: true,
             speed: 20.0f, collidesWithProjectiles: true)) // collidesWithProjectiles needs to be set up front because...Unity
           .AddAnimations(

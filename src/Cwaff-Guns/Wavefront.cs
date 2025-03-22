@@ -14,7 +14,7 @@ public class Wavefront : CwaffGun
         Lazy.SetupGun<Wavefront>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 1.0f, ammo: 320, idleFps: 12, shootFps: 50, reloadFps: 16,
             muzzleVFX: "muzzle_wavefront", muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 10f, fireAudio: "wavefront_fire_sound",
-            attacksThroughWalls: true)
+            attacksThroughWalls: true, smoothReload: 0.1f)
           .SetReloadAudio("wavefront_reload_sound", 0, 6, 12, 18)
           .InitProjectile(GunData.New(damage: 12f, clipSize: 12, cooldown: 0.125f, shootStyle: ShootStyle.Automatic, range: 999999f, speed: 60f, shouldRotate: true,
             customClip: true, sprite: "wavefront_projectile_alt", scale: 0.25f, fps: 24, glowAmount: 1f, glowColor: Color.cyan))

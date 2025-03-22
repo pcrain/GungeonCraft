@@ -14,7 +14,7 @@ public class DerailGun : CwaffGun
     {
         Lazy.SetupGun<DerailGun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 2.2f, ammo: 66, idleFps: 11, reloadFps: 11, shootFps: 2,
-            fireAudio: "train_bell_sound", autoPlay: false)
+            fireAudio: "train_bell_sound", autoPlay: false, smoothReload: 0.1f)
           .SetIdleAudio("steam_engine_a", 1)
           .SetIdleAudio("steam_engine_b", 3, 5, 7)
           .SetReloadAudio("steam_engine_a", 7, 15)
