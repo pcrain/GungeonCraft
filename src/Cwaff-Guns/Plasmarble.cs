@@ -106,7 +106,8 @@ public class PlasmarbleFlak : MonoBehaviour
 
 public class PlasmarbleProjectile : MonoBehaviour
 {
-    private const int _MAX_BOUNCES          = 4;
+    private const int _MAX_BOUNCES          = 6;
+    private const int _MAX_MASTER_BOUNCES   = 8;
     private const float _AIR_FRICTION       = 0.90f;
     private const float _BOUNCE_FRICTION    = 0.75f;
     private const float _ZAP_FREQUENCY      = 0.25f;
@@ -120,10 +121,13 @@ public class PlasmarbleProjectile : MonoBehaviour
     private float _lastZap                  = 0;
     private RoomHandler _room               = null;
     private bool _inWater                   = false;
+    private bool _mastered                  = false;
 
     private void Start()
     {
         this._projectile        = base.GetComponent<Projectile>();
+        this._mastered          = this._projectile.Mastered<Plasmarble>();
+        this._bounces           = this._mastered ? _MAX_MASTER_BOUNCES : _MAX_BOUNCES;
         this._owner             = this._projectile.Owner as PlayerController;
         this._grenade           = base.GetComponent<FancyGrenadeProjectile>();
         this._grenade.OnBounce += OnGroundBounce;
@@ -178,19 +182,13 @@ public class PlasmarbleProjectile : MonoBehaviour
         if (!this._projectile)
             return;
 
-        if (this._bounces >= _MAX_BOUNCES)
-        {
-            this._projectile.DieInAir(suppressInAirEffects: true);
-            return;
-        }
-
         this._projectile.ApplyFriction(_AIR_FRICTION);
         float now = BraveTime.ScaledTimeSinceStartup;
         if ((now - this._lastZap) < _ZAP_FREQUENCY * (this._inWater ? 0.5f : 1f))
             return;
 
         this._lastZap = now;
-        ZapRandomEnemies(this._projectile, 2);
+        ZapRandomEnemies(this._projectile, this._mastered ? 4 : 1);
         this._projectile.gameObject.PlayUnique("plasma_zap_sound");
 
         this._inWater = false;
@@ -208,7 +206,8 @@ public class PlasmarbleProjectile : MonoBehaviour
     {
         this._projectile.m_usesNormalMoveRegardless = true; // disable Helix projectile shenanigans after first bounce
         this._projectile.baseData.speed *= _BOUNCE_FRICTION;
-        ++this._bounces;
+        if (--this._bounces <= 0)
+            this._projectile.DieInAir(suppressInAirEffects: true);
     }
 
     private void ExplodeIntoFlak(int numFlak)

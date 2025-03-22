@@ -2,7 +2,7 @@
 
 ## 1.22.3 (TBD)
 
-- Added masteries for Chroma, Flakseed, R.C. Launcher, B. B. Gun, Nycterian, Seltzer Pelter, Suncaster, Bouncer, Sub Machine Gun, Stereoscope, Groundhog, Glockarina, and Macheening
+- Added masteries for Chroma, Flakseed, R.C. Launcher, B. B. Gun, Nycterian, Seltzer Pelter, Suncaster, Bouncer, Sub Machine Gun, Stereoscope, Groundhog, Glockarina, Macheening, and Plasmarble
 - Fixed issue with certain non-looping VFX animations preventing other unrelated animations from playing properly
 - Adjusted shader lighting on Flakseed's flowers
 - Clarified in R.C. Launcher's description that reload time scales with number of shots fired from clip (this was always true, but never mentioned)
@@ -14,6 +14,8 @@
 	- Bats now bounce off walls once
 - Fixed a typo in Plasmarble's description
 - Fixed Groundhog's charge animation not matching it's charge rate after the player's stats are changed
+- Reduced number of bolts dischared by Plasmarble's orb projectile from 2 to 1
+- Increased number of times Plasmarble's orb can bounce before breaking from 4 to 6 
 
 ## 1.22.2 (2025-03-17)
 

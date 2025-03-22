@@ -264,6 +264,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfGlockarina>(MASTERY_GLOCKARINA, Glockarina.ItemName);
         // Macheening's charge-up time is halved, and its projectiles destroy enemy projectile upon collision.
         NewMastery<MasteryOfMacheening>(MASTERY_MACHEENING, Macheening.ItemName);
+        // Plasmarble projectiles bounce two additional times before shattering and emit 4 electric bolts per bounce.
+        NewMastery<MasteryOfPlasmarble>(MASTERY_PLASMARBLE, Plasmarble.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -537,6 +539,7 @@ internal class MasteryOfStereoscope          : MasteryDummyItem {}
 internal class MasteryOfGroundhog            : MasteryDummyItem {}
 internal class MasteryOfGlockarina           : MasteryDummyItem {}
 internal class MasteryOfMacheening           : MasteryDummyItem {}
+internal class MasteryOfPlasmarble           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -650,4 +653,5 @@ public enum Synergy {
     MASTERY_GROUNDHOG,
     MASTERY_GLOCKARINA,
     MASTERY_MACHEENING,
+    MASTERY_PLASMARBLE,
 };
