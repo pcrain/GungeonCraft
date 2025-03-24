@@ -21,6 +21,7 @@ public class tk2dMeshSprite : tk2dBaseSprite
   private int meshY = 2;
   private int numVertices = 4;
   private bool setup = false;
+  private bool isPointMesh = false;
 
   public bool ApplyEmissivePropertyBlock;
 
@@ -75,7 +76,17 @@ public class tk2dMeshSprite : tk2dBaseSprite
     return triangles;
   }
 
-  public void ResizeMesh(int xSize = -1, int ySize = -1)
+  // built left to right, bottom to top
+  private static int[] PointsForMeshOfSize(int x, int y)
+  {
+    int nPoints = x * y;
+    int[] triangles = new int[nPoints];
+    for (int i = 0; i < nPoints; ++i)
+      triangles[i] = i;
+    return triangles;
+  }
+
+  public void ResizeMesh(int xSize = -1, int ySize = -1, bool usePointMesh = false, bool build = true)
   {
     if (xSize < 2)
       xSize = 2;
@@ -84,14 +95,20 @@ public class tk2dMeshSprite : tk2dBaseSprite
 
     meshX         = xSize;
     meshY         = ySize;
+    isPointMesh   = usePointMesh;
     numVertices   = xSize * ySize;
     meshTangents  = TangentsForMeshOfSize(meshX, meshY);
     meshNormals   = NormalsForMeshOfSize(meshX, meshY);
-    meshTriangles = TrianglesForMeshOfSize(meshX, meshY);
+    if (usePointMesh)
+      meshTriangles = PointsForMeshOfSize(meshX, meshY);
+    else
+      meshTriangles = TrianglesForMeshOfSize(meshX, meshY);
     meshVertices  = new Vector3[numVertices];
     meshColors    = new Color32[numVertices];
     meshUVs       = new Vector2[numVertices];
     setup         = true;
+    if (build)
+      ForceBuild();
   }
 
   private new void Awake()
@@ -249,7 +266,10 @@ public class tk2dMeshSprite : tk2dBaseSprite
     mesh.vertices = meshVertices;
     mesh.normals = meshNormals;
     mesh.tangents = meshTangents;
-    mesh.triangles = meshTriangles;
+    if (isPointMesh)
+      mesh.SetIndices(meshTriangles, MeshTopology.Points, 0);
+    else
+      mesh.triangles = meshTriangles;
     mesh.uv = meshUVs;
     mesh.bounds = tk2dBaseSprite.AdjustedMeshBounds(GetBounds(), renderLayer);
 

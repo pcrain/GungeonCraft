@@ -1250,4 +1250,26 @@ public static class Lazy
         }
         UnityEngine.Object.Destroy(debris.gameObject);
     }
+
+    /// <summary>Create a mesh sprite object at the given position.</summary>
+    public static tk2dMeshSprite CreateMeshSpriteObject(tk2dSpriteCollectionData collection, int spriteId, Vector2 pos, bool pointMesh = false)
+    {
+        GameObject g = new GameObject("testMeshSprite");
+        g.transform.position = pos.Quantize(0.0625f);
+
+        tk2dMeshSprite ss = g.AddComponent<tk2dMeshSprite>();
+        ss.SetSprite(collection, spriteId);
+        ss.usesOverrideMaterial = true; // we'll virtually always want an override material for use with shaders
+        tk2dSpriteDefinition def = collection.spriteDefinitions[spriteId];
+        int w = Mathf.RoundToInt(C.PIXELS_PER_TILE * def.boundsDataExtents.x);
+        int h = Mathf.RoundToInt(C.PIXELS_PER_TILE * def.boundsDataExtents.y);
+        ss.ResizeMesh(w, h, usePointMesh: pointMesh);
+        return ss;
+    }
+
+    /// <summary>Create a mesh sprite object at the given position using the given sprite as a reference.</summary>
+    public static tk2dMeshSprite CreateMeshSpriteObject(tk2dBaseSprite s, Vector2 pos, bool pointMesh = false)
+    {
+        return CreateMeshSpriteObject(s.collection, s.spriteId, pos, pointMesh: pointMesh);
+    }
 }

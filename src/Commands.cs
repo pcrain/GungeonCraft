@@ -38,20 +38,12 @@ public class Commands
         });
         ETGModConsole.Commands.AddGroup("zz", delegate (string[] args)
         {
-            GameObject g = new GameObject("testMeshSprite");
             PlayerController pc = GameManager.Instance.PrimaryPlayer;
-            tk2dBaseSprite s = pc.sprite;
-            g.transform.position = s.WorldTopCenter.Quantize(0.0625f);
-            tk2dMeshSprite ss = g.AddComponent<tk2dMeshSprite>();
-            ss.SetSprite(s.collection, s.spriteId);
-            tk2dSpriteDefinition def = s.collection.spriteDefinitions[s.spriteId];
-            int w = Mathf.RoundToInt(C.PIXELS_PER_TILE * def.boundsDataExtents.x);
-            int h = Mathf.RoundToInt(C.PIXELS_PER_TILE * def.boundsDataExtents.y);
-            ss.usesOverrideMaterial = true;
-            ss.renderer.material.shader = CwaffShaders.WiggleShader;
-            ss.ResizeMesh(w, h);
-            ss.ForceBuild();
-            g.AddComponent<Distortyboi>().Setup(ss.renderer.material);
+            tk2dMeshSprite ms = Lazy.CreateMeshSpriteObject(pc.sprite, pc.sprite.WorldTopCenter, pointMesh: true);
+            ms.renderer.material.shader = CwaffShaders.ShatterShader;  // CwaffShaders.WiggleShader;
+            ms.renderer.material.SetFloat("_Progressive", 1f);
+            ms.renderer.material.SetFloat("_Amplitude", 10f);
+            ms.gameObject.AddComponent<Distortyboi>().Setup(ms.renderer.material);
         });
         ETGModConsole.Commands.AddGroup("ww", delegate (string[] args)
         {//

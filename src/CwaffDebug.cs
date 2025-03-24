@@ -353,6 +353,9 @@ public class Distortyboi : MonoBehaviour
     private void Update()
     {
       if (this._mat)
-        this._mat.SetFloat("_Amplitude", Mathf.Sin(3f * BraveTime.ScaledTimeSinceStartup));
+      {
+        // this._mat.SetFloat("_Amplitude", Mathf.Sin(3f * BraveTime.ScaledTimeSinceStartup));
+        this._mat.SetFloat("_Fade", Mathf.Max(0f, Mathf.Sin(0.9f * BraveTime.ScaledTimeSinceStartup)));
+      }
     }
 }
