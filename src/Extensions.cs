@@ -3182,5 +3182,12 @@ public static class Extensions
     if (resetHitCount)
       p.m_healthHaverHitCount = 0;
   }
+
+  //WARNING: this doesn't actually work ):
+  /// <summary>Force a sprite to use an unlit shader</summary>
+  public static void ForceUnlit(this tk2dBaseSprite s)
+  {
+    s.renderer.material.shader = ShaderCache.Acquire("Brave/UnlitTintableCutoutColorEmissive") ;
+  }
 }
 

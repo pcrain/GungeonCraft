@@ -280,6 +280,7 @@ public class Initialisation : BaseUnityPlugin
                 Macheening.Init();
                 Stereoscope.Init();
                 Flakseed.Init();
+                Xelsior.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

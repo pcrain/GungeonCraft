@@ -18,7 +18,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
     - [Antiaris Mod](https://antiaris.fandom.com/wiki/Weapons): Bubblebeam (recolored Boiling Point), Carpet Bomber (Royal Cannon), Seltzer Pelter (Cannon of Nightmares), Uppskeruvel (Devil Dragon), Yggdrashell (Terra Blunderbuss)
 
-    - [Calamity Mod](https://calamitymod.wiki.gg/wiki/Weapons): Groundhog (Karasawa), Hallaeribut (Leviatitan), King's Law (Soma Prime), Outbreak (Cursed Capper), Widowmaker (Svantechnical)
+    - [Calamity Mod](https://calamitymod.wiki.gg/wiki/Weapons): Groundhog (Karasawa), Hallaeribut (Leviatitan), King's Law (Soma Prime), Outbreak (Cursed Capper), Widowmaker (Svantechnical), X-elsior (Astral Blaster)
 
     - [Spirit Mod](https://spiritmod.wiki.gg/wiki/Weapons): Holy Water Gun (Holy Hellstorm), Nycterian (Bat Blaster), Scotsman (edited Iron Bomber), Wavefront (Tesla Cannon)
 

@@ -74,7 +74,7 @@ seltzer_shoot_sound,-5.0,1,sound,0
 missiletoe_shoot_sound_1,-4.0,1,sound,0
 missiletoe_reload_sound,-1.0,1,sound,0
 ice_cream_shared,-5.0,1,sound,0
-platinum_fire_sound,-11.0,1,sound,0
+platinum_fire_sound,-11.0,1,sound,2
 platinum_reload_sound,-4.0,1,sound,0
 ora_hit_sound,-2.0,1,sound,0
 ora_final_hit_sound,-2.0,1,sound,0
@@ -288,3 +288,4 @@ statup,-3.0,1,sound,1
 secret_santa_sound,0.0,1,sound,0
 wipe_out_sound,-2.0,1,sound,2
 place_stereo_sound,-6.5,1,sound,1
+xelsior_fire_sound,-4.0,1,sound,2

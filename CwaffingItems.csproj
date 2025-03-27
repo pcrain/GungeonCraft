@@ -208,6 +208,7 @@
     <Compile Include="src\Cwaff-Guns\Flakseed.cs"/>
     <Compile Include="src\Cwaff-Guns\Bubblebeam.cs"/>
     <Compile Include="src\Cwaff-Guns\Wavefront.cs"/>
+    <Compile Include="src\Cwaff-Guns\Xelsior.cs"/>
     <Compile Include="src\Cwaff-Guns\Pincushion.cs"/>
     <Compile Include="src\Cwaff-Guns\Suncaster.cs"/>
     <Compile Include="src\Cwaff-Guns\CarpetBomber.cs"/>

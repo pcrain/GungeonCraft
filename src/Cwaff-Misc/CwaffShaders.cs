@@ -63,6 +63,7 @@ public static class CwaffShaders
             ScreenWiggleShader = shaderBundle.LoadAsset<Shader>("assets/screenwiggleshader.shader");
             ScreenBasicShader = shaderBundle.LoadAsset<Shader>("assets/screenbasicshader.shader");
             ShatterShader = shaderBundle.LoadAsset<Shader>("assets/scattershader.shader");
+            // ShatterShader = shaderBundle.LoadAsset<Shader>("assets/scattershaderunlit.shader");
         }
     }
 

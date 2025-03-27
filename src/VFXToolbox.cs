@@ -77,7 +77,10 @@ public static class VFX
     /// <summary>
     /// Generically register a VFX as a GameObject (animated sprite), VFXComplex, or VFXPool
     /// </summary>
-    public static void RegisterVFX(string name, List<string> spritePaths, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static void RegisterVFX(string name, List<string> spritePaths, float fps = 2, bool loops = true, int loopStart = -1,
+        float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0,
+        bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null,
+        bool orphaned = false, bool attached = true, bool unlit = false)
     {
         if (animations.ContainsKey(name))
         {
@@ -106,7 +109,8 @@ public static class VFX
 
         tk2dSpriteAnimationClip clip = vfxEffect.NewAnimation(animName: "start", spritePaths: spritePaths, fps: fps, loops: loops, loopStart: loopStart,
             anchor: anchor, emissivePower: emissivePower, emissiveColour: emissiveColour);
-        Shader shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+        Shader shader = ShaderCache.Acquire(unlit ?
+            "Brave/UnlitTintableCutoutColorEmissive" : "Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
         if (emissivePower > 0) {
             sprite.renderer.material.shader = shader;
             sprite.renderer.material.SetFloat("_EmissivePower", emissivePower);
