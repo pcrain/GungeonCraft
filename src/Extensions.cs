@@ -3189,5 +3189,27 @@ public static class Extensions
   {
     s.renderer.material.shader = ShaderCache.Acquire("Brave/UnlitTintableCutoutColorEmissive") ;
   }
+
+  /// <summary>Get the radius of an enemy's sprite in game units.</summary>
+  public static float SpriteRadius(this AIActor enemy)
+  {
+    if (!enemy || !enemy.sprite)
+      return -1f;
+    return 0.5f * enemy.sprite.GetCurrentSpriteDef().boundsDataExtents.MaxComponent();
+  }
+
+  /// <summary>Get the radius of an enemy's sprite in pixels.</summary>
+  public static float SpritePixelRadius(this AIActor enemy)
+  {
+    if (!enemy || !enemy.sprite)
+      return -1f;
+    return 0.5f * C.PIXELS_PER_TILE * enemy.sprite.GetCurrentSpriteDef().boundsDataExtents.MaxComponent();
+  }
+
+  /// <summary>Get maximum component of a Vector2.</summary>
+  public static float MaxComponent(this Vector2 v) => Mathf.Max(v.x, v.y);
+
+  /// <summary>Get maximum component of a Vector3.</summary>
+  public static float MaxComponent(this Vector3 v) => Mathf.Max(v.x, v.y, v.z);
 }
 
