@@ -436,6 +436,8 @@ public class MasteryRitualComponent : MonoBehaviour
       RoomHandler room = base.gameObject.transform.position.GetAbsoluteRoom();
       if (room != null && room.IsRegistered(gun))
         room.DeregisterInteractable(gun);
+      else
+        RoomHandler.unassignedInteractableObjects.TryRemove(gun);
 
       tk2dBaseSprite burnSprite = gun.sprite.DuplicateInWorld();
       burnSprite.StartCoroutine(BurnAway_CR(burnSprite));
