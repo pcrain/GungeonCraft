@@ -143,6 +143,8 @@ public class BulletThatCanKillTheFuture : CwaffActive
             otherPlayer.specRigidbody.CollideWithTileMap = false;
             otherPlayer.specRigidbody.CollideWithOthers = false;
         }
+
+        NoDamageBlankPatch.ForceNextBlankToDoNoDamage = true;
         interactor.ForceBlank(silent: true, breaksWalls: false, breaksObjects: false);
 
         // Figure out which enemies we should freeze in place
@@ -422,3 +424,23 @@ public class BulletThatCanKillTheFuture : CwaffActive
         }
     }
 }
+
+/// <summary>Prevent invisible blank triggered by BTCKTF from damaging enemies.</summary>
+[HarmonyPatch]
+static class NoDamageBlankPatch
+{
+    internal static bool ForceNextBlankToDoNoDamage = false;
+
+    [HarmonyPatch(typeof(SilencerInstance), nameof(SilencerInstance.TriggerSilencer))]
+    [HarmonyPrefix]
+    static void MaybeForceNoDamageBlank(SilencerInstance __instance)
+    {
+        if (ForceNextBlankToDoNoDamage)
+        {
+            __instance.ForceNoDamage = true;
+            ForceNextBlankToDoNoDamage = false;
+            Lazy.DebugLog($"fixed!");
+        }
+    }
+}
+
