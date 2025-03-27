@@ -11,7 +11,6 @@ public class Xelsior : CwaffGun
     internal static GameObject _HoverGunPrefab  = null;
     internal static GameObject _ShootVFXPrefab  = null;
     internal static GameObject _HoverProjectile = null;
-    internal static float      _ReticleRadius   = 1.75f;
 
     private const float _TARGET_COOLDOWN = 0.5f;
 
@@ -21,14 +20,15 @@ public class Xelsior : CwaffGun
     private GameObject _reticle = null;
 
     public int maxGuns = 0;
+    public bool autotarget = false;
 
     public static void Init()
     {
-        Gun gun = Lazy.SetupGun<Xelsior>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
-                fireAudio: null, reloadAudio: null);
-
-        gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
+        Lazy.SetupGun<Xelsior>(ItemName, ShortDescription, LongDescription, Lore)
+          .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
+            fireAudio: null, reloadAudio: null)
+          .Attach<XelsiorAmmoDisplay>()
+          .InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
             shootStyle: ShootStyle.Beam, damage: 2f, force: 0f, speed: -1f, ammoCost: 3, angleVariance: 0f,
             beamSprite: "xelsior_beam", beamFps: 60, beamChargeFps: 8, beamImpactFps: 30,
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0f, beamEmission: 50f));
@@ -39,7 +39,7 @@ public class Xelsior : CwaffGun
         _HoverGunPrefab.AddComponent<XelsiorHoveringGun>();
 
         _HoverProjectile = Items.Ak47.CloneProjectile(GunData.New(/*sprite: "widowmaker_laser_projectile", */angleVariance: 0.0f,
-            speed: 100f, damage: 2f, range: 4f, force: 0f, shouldRotate: true, pierceBreakables: true, ignoreDamageCaps: true,
+            speed: 100f, damage: 3f, range: 4f, force: 0f, shouldRotate: true, pierceBreakables: true, ignoreDamageCaps: true,
             collidesWithTilemap: false)).gameObject;
     }
 
@@ -47,6 +47,21 @@ public class Xelsior : CwaffGun
     {
         base.PostProcessBeam(beam);
         beam.projectile.OnHitEnemy += this.SetTargets;
+    }
+
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        base.OnReloadPressed(player, gun, manualReload);
+        if (!this.Mastered || this.gun.IsFiring)
+            return;
+        this.autotarget = !this.autotarget;
+        base.gameObject.PlayOnce("xelsior_autofire_toggle");
+        if (this.autotarget)
+            return;
+
+        int numGuns = this._extantGuns.Count;
+        for (int i = 0; i < numGuns; ++i)
+            this._extantGuns[i].SetTarget(null);
     }
 
     private void SetTargets(Projectile projectile, SpeculativeRigidbody rigidbody, bool arg3)
@@ -69,7 +84,18 @@ public class Xelsior : CwaffGun
         int numGuns = this._extantGuns.Count;
         for (int i = 0; i < numGuns; ++i)
             this._extantGuns[i].SetTarget(enemy);
-        this._cooldown = _TARGET_COOLDOWN;
+        if (this._target)
+            this._cooldown = _TARGET_COOLDOWN;
+    }
+
+    public override void OnMasteryStatusChanged()
+    {
+        base.OnMasteryStatusChanged();
+
+        bool mastered = this.Mastered;
+        int numGuns = this._extantGuns.Count;
+        for (int i = 0; i < numGuns; ++i)
+            this._extantGuns[i]._mastered = mastered;
     }
 
     private void UpdateReticle()
@@ -96,6 +122,7 @@ public class Xelsior : CwaffGun
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
+        DestroyExtantGuns();
         StartCoroutine(SpawnGunsOnceWeCanMove());
 
         #if DEBUG
@@ -142,7 +169,7 @@ public class Xelsior : CwaffGun
         UnityEngine.Object.Destroy(targetGun.gameObject);
         for (int i = 0; i < quality; ++i)
             AddNewGun();
-        base.gameObject.Play("assimilate_sound");
+        base.gameObject.Play("materialize_sound");
         base.gameObject.Play("vaporized_sound");
     }
 
@@ -212,8 +239,10 @@ public class Xelsior : CwaffGun
 
     private void DestroyExtantGuns(bool doVFX = true)
     {
-        if (this._extantGuns.Count > 0)
-            base.gameObject.Play("vaporized_sound");
+        if (this._extantGuns.Count <= 0)
+            return;
+
+        base.gameObject.Play("vaporized_sound");
         for (int i = 0; i < this._extantGuns.Count; ++i)
             if (this._extantGuns[i])
             {
@@ -252,7 +281,7 @@ public class Xelsior : CwaffGun
         if (!this.PlayerOwner)
             yield break;
 
-        base.gameObject.Play("assimilate_sound");
+        base.gameObject.Play("materialize_sound");
         for (int i = 0; i < this.maxGuns; ++i)
             SpawnNewGun();
         UpdateGunOffsets();
@@ -269,6 +298,33 @@ public class Xelsior : CwaffGun
         base.MidGameDeserialize(data, ref i);
         this.maxGuns = (int)data[i++];
     }
+
+    private class XelsiorAmmoDisplay : CustomAmmoDisplay
+    {
+        private Gun _gun;
+        private Xelsior _xelsior;
+        private PlayerController _owner;
+
+        private void Start()
+        {
+            this._gun = base.GetComponent<Gun>();
+            this._xelsior = this._gun.GetComponent<Xelsior>();
+            this._owner = this._gun.CurrentOwner as PlayerController;
+        }
+
+        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+        {
+            if (!this._owner || !this._xelsior || !this._xelsior.Mastered)
+                return false;
+
+            if (this._xelsior.autotarget)
+                uic.GunAmmoCountLabel.Text = $"[color #ff44ff]Autotarget On[/color]\n{this._owner.VanillaAmmoDisplay()}";
+            else
+                uic.GunAmmoCountLabel.Text = $"[color #444444]Autotarget Off[/color]\n{this._owner.VanillaAmmoDisplay()}";
+            return true;
+        }
+    }
+
 }
 
 public class XelsiorHoveringGun : MonoBehaviour
@@ -281,7 +337,9 @@ public class XelsiorHoveringGun : MonoBehaviour
     private const float _BASE_DELAY = 0.1f;
     private const float _MAX_DELAY = 0.5f;
     private const float _GUN_DIST = 3.5f;
+    private const float _AUTOFIRE_REDUCTION = 2.5f;
 
+    private static List<AIActor> _TargetableEnemies = new();
     private static VFXPool _MuzzleVFX = null;
 
     public float curAngle    = 90f;
@@ -291,6 +349,8 @@ public class XelsiorHoveringGun : MonoBehaviour
     public Vector2 curPos    = default;
     public tk2dSprite sprite = null;
     public bool doVFX        = true;
+
+    internal bool _mastered = false;
 
     private Xelsior _parentGun = null;
     private PlayerController _owner = null;
@@ -304,11 +364,13 @@ public class XelsiorHoveringGun : MonoBehaviour
     private float _nextShot = 0f;
     private float _targetHoverDist = 0f;
     private tk2dMeshSprite _mesh = null;
+    private bool _autoTarget = false;
 
     public XelsiorHoveringGun Setup(Xelsior parentGun)
     {
         this._parentGun = parentGun;
         this._owner = parentGun.PlayerOwner;
+        this._mastered = parentGun && parentGun.Mastered;
 
         this.sprite = base.gameObject.GetComponent<tk2dSprite>();
 
@@ -330,18 +392,21 @@ public class XelsiorHoveringGun : MonoBehaviour
         return this;
     }
 
-    public void SetTarget(AIActor enemy)
+    public void SetTarget(AIActor enemy, bool autoTarget = false)
     {
-        if (enemy == this._target)
+        if (enemy == this._target && autoTarget == this._autoTarget)
             return;
 
-        if (!this._target) // reset shot timer if we didn't already have a target
+        // reset shot timer if we didn't already have a target or if we're transitioning between autotarget states
+        if (!this._target || (autoTarget != this._autoTarget))
         {
             float myDelay = this.offset >= 0 ? this.offset : (this.numGuns + this.offset);
             float delay = _BASE_DELAY + (_MAX_DELAY - _BASE_DELAY) * (myDelay / this.numGuns);
-            this._nextShot = BraveTime.ScaledTimeSinceStartup + delay;
+            this._nextShot = BraveTime.ScaledTimeSinceStartup + delay * (autoTarget ? _AUTOFIRE_REDUCTION : 1f);
+            // System.Console.WriteLine($"  will fire from offset {this.offset} at time {this._nextShot}, autotarget {autoTarget}");
         }
 
+        this._autoTarget = autoTarget;
         this._target = enemy;
         this._targetHH = enemy ? enemy.healthHaver : null;
         this._targetHoverDist = Mathf.Max(_GUN_DIST, enemy.SpriteRadius() + 2.5f);
@@ -352,7 +417,7 @@ public class XelsiorHoveringGun : MonoBehaviour
         if (this._nextShot >= BraveTime.ScaledTimeSinceStartup)
             return;
 
-        this._nextShot = BraveTime.ScaledTimeSinceStartup + _MAX_DELAY;
+        this._nextShot = BraveTime.ScaledTimeSinceStartup + _MAX_DELAY * (this._autoTarget ? _AUTOFIRE_REDUCTION : 1f);
         if (!targetIsAlive)
             return;
 
@@ -376,6 +441,13 @@ public class XelsiorHoveringGun : MonoBehaviour
         _MuzzleVFX.SpawnAtPosition(pos, zRotation: delta.ToAngle());
     }
 
+    private void DoAutoTarget()
+    {
+        Lazy.GetAllNearbyEnemies(ref _TargetableEnemies, this._owner.CenterPosition, ignoreWalls: true);
+        if (_TargetableEnemies.Count > 0 && _TargetableEnemies.ChooseRandom() is AIActor newTarget)
+            SetTarget(newTarget, autoTarget: true);
+    }
+
     private void Update()
     {
         const float SQR_SNAP_THRES     = 0.01f;
@@ -386,7 +458,7 @@ public class XelsiorHoveringGun : MonoBehaviour
         const float LERP_RATE          = 7.5f;
         const float ANGULAR_LERP_RATE  = 9f;
         const float KICKBACK_STRENGTH  = 1.25f;
-        const float RETARGET_DELAY      = 0.5f;
+        const float RETARGET_DELAY     = 0.5f;
 
         if (!this._owner || !this._parentGun)
             return;
@@ -398,6 +470,12 @@ public class XelsiorHoveringGun : MonoBehaviour
 
         float now = BraveTime.ScaledTimeSinceStartup;
         bool targetIsAlive = this._target && this._targetHH && this._targetHH.IsAlive;
+        if (!targetIsAlive && this._mastered && this._owner && this._owner.IsInCombat && this._parentGun && this._parentGun.autotarget)
+        {
+            DoAutoTarget();
+            targetIsAlive = this._target && this._targetHH && this._targetHH.IsAlive;
+        }
+
         if (targetIsAlive || (this._retargetTime > now))
         {
             if (targetIsAlive)
@@ -423,8 +501,6 @@ public class XelsiorHoveringGun : MonoBehaviour
             this._target = null;
             this._targetHH = null;
         }
-
-        // HandleLaser(targetIsAlive, this._lastTargetPos);
 
         Vector2 targetDelta = (this.curPos - targetPos);
         float dMag = targetDelta.sqrMagnitude;
@@ -474,53 +550,8 @@ public class XelsiorHoveringGun : MonoBehaviour
         this.sprite.FlipY = this.curAngle < 90f || this.curAngle > 270f;
     }
 
-    // private tk2dTiledSprite _laserSight = null;
-    // private void HandleLaser(bool draw, Vector2 target)
-    // {
-    //     const float _SIGHT_WIDTH = 1.0f;
-
-    //     if (this._laserSight)
-    //         this._laserSight.renderer.enabled = draw;
-    //     if (!draw)
-    //         return;
-
-    //     Vector2 start = this.sprite.WorldCenter;
-    //     Vector2 delta = target - start;
-    //     float angle = delta.ToAngle();
-    //     float mag   = C.PIXELS_PER_TILE * (delta.magnitude - Xelsior._ReticleRadius);
-    //     bool hadLaserSight = this._laserSight;
-    //     if (!hadLaserSight)
-    //     {
-    //         this._laserSight = VFX.CreateLaserSight(start, 1f, _SIGHT_WIDTH, angle, colour: Color.red/*, power: 50f*/)
-    //             .GetComponent<tk2dTiledSprite>();
-    //         this._laserSight.gameObject.transform.parent = this.sprite.transform;
-    //         this._laserSight.usesOverrideMaterial = true;
-    //         this._laserSight.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
-    //         this._laserSight.renderer.material.SetFloat("_Fade", 0.25f);
-    //     }
-
-    //     if (mag < 1f)
-    //     {
-    //         this._laserSight.renderer.enabled = false;
-    //         return;
-    //     }
-    //     this._laserSight.dimensions = new Vector2(mag, _SIGHT_WIDTH);
-    //     this._laserSight.gameObject.transform.localPosition = Vector2.zero;
-    //     this._laserSight.gameObject.transform.rotation = angle.EulerZ();
-    //     if (hadLaserSight)
-    //     {
-    //         this._laserSight.ForceRotationRebuild();
-    //         this._laserSight.UpdateZDepth();
-    //     }
-    // }
-
     private void OnDestroy()
     {
-        // if (this._laserSight)
-        // {
-        //     UnityEngine.Object.Destroy(this._laserSight);
-        //     this._laserSight = null;
-        // }
         if (this._mesh)
         {
             UnityEngine.Object.Destroy(this._mesh.gameObject);

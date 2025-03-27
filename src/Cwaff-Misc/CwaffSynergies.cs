@@ -266,6 +266,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfMacheening>(MASTERY_MACHEENING, Macheening.ItemName);
         // Plasmarble projectiles bounce two additional times before shattering and emit 4 electric bolts per bounce.
         NewMastery<MasteryOfPlasmarble>(MASTERY_PLASMARBLE, Plasmarble.ItemName);
+        // Reloading toggles autotarget mode, allowing Xelsior's secondary guns to autotarget enemies at a reduced fire rate.
+        NewMastery<MasteryOfXelsior>(MASTERY_XELSIOR, Xelsior.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -540,6 +542,7 @@ internal class MasteryOfGroundhog            : MasteryDummyItem {}
 internal class MasteryOfGlockarina           : MasteryDummyItem {}
 internal class MasteryOfMacheening           : MasteryDummyItem {}
 internal class MasteryOfPlasmarble           : MasteryDummyItem {}
+internal class MasteryOfXelsior              : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -654,4 +657,5 @@ public enum Synergy {
     MASTERY_GLOCKARINA,
     MASTERY_MACHEENING,
     MASTERY_PLASMARBLE,
+    MASTERY_XELSIOR,
 };

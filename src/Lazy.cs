@@ -669,7 +669,7 @@ public static class Lazy
     }
 
     /// <summary>Determine all enemies within a radius of a point.</summary>
-    public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = 100f, bool ignoreWalls = false)
+    public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = -1f, bool ignoreWalls = false)
     {
         float sqrRadius = radius * radius;
         enemies.Clear();
@@ -680,7 +680,7 @@ public static class Lazy
             if (!enemy.IsHostile(canBeNeutral: true))
                 continue;
             Vector2 tentativeTarget = enemy.CenterPosition;
-            if ((tentativeTarget - center).sqrMagnitude > sqrRadius)
+            if ((radius > 0) && ((tentativeTarget - center).sqrMagnitude > sqrRadius))
                 continue;
             if (ignoreWalls || center.HasLineOfSight(tentativeTarget))
                 enemies.Add(enemy);
