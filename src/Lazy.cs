@@ -854,12 +854,18 @@ public static class Lazy
     }
 
     /// <summary>Create a new GameObject with a specific sprite</summary>
-    public static tk2dSprite SpriteObject(tk2dSpriteCollectionData spriteColl, int spriteId)
+    public static T SpriteObject<T>(tk2dSpriteCollectionData spriteColl, int spriteId) where T : tk2dBaseSprite
     {
         GameObject g = new();
-        tk2dSprite sprite = g.AddComponent<tk2dSprite>();
+        T sprite = g.AddComponent<T>();
         sprite.SetSprite(spriteColl, spriteId);
         return sprite;
+    }
+
+    /// <summary>Create a new GameObject with a specific sprite</summary>
+    public static tk2dSprite SpriteObject(tk2dSpriteCollectionData spriteColl, int spriteId)
+    {
+        return SpriteObject<tk2dSprite>(spriteColl, spriteId);
     }
 
     /// <summary>Create a hovering gun from the player's current active gun</summary>
@@ -1270,5 +1276,30 @@ public static class Lazy
     public static tk2dMeshSprite CreateMeshSpriteObject(tk2dBaseSprite s, Vector2 pos, bool pointMesh = false)
     {
         return CreateMeshSpriteObject(s.collection, s.spriteId, pos, pointMesh: pointMesh);
+    }
+
+    /// <summary>Coroutine for dissipating a mesh sprite object over a period of time.</summary>
+    public static IEnumerator Dissipate_CR(tk2dMeshSprite ms, float time, float amplitude = 10f, bool progressive = false)
+    {
+        ms.renderer.material.shader = CwaffShaders.ShatterShader;
+        ms.renderer.material.SetFloat("_Progressive", progressive ? 1f : 0f);
+        ms.renderer.material.SetFloat("_Amplitude", amplitude);
+        ms.renderer.material.SetFloat("_RandomSeed", UnityEngine.Random.value);
+
+        Material mat = ms.renderer.material;
+        for (float elapsed = 0f; elapsed < time; elapsed += BraveTime.DeltaTime)
+        {
+            float percentLeft = 1f - elapsed / time;
+            mat.SetFloat("_Fade", 1f - percentLeft * percentLeft);
+            yield return null;
+        }
+        UnityEngine.Object.Destroy(ms.gameObject);
+        yield break;
+    }
+
+    /// <summary>Dissipate a mesh sprite object over a period of time.</summary>
+    public static void Dissipate(this tk2dMeshSprite ms, float time, float amplitude = 10f, bool progressive = false)
+    {
+        ms.StartCoroutine(Dissipate_CR(ms: ms, time: time, amplitude: amplitude, progressive: progressive));
     }
 }

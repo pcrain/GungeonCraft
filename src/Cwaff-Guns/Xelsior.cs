@@ -163,9 +163,7 @@ public class Xelsior : CwaffGun
 
         RoomHandler.unassignedInteractableObjects.Remove(targetGun);
         int quality = Mathf.Max(targetGun.QualityGrade(), 1);
-        tk2dMeshSprite ms = Lazy.CreateMeshSpriteObject(targetGun.sprite, targetGun.sprite.WorldCenter, pointMesh: true);
-        ms.PlaceAtPositionByAnchor(targetGun.sprite.WorldCenter, Anchor.MiddleCenter);
-        ms.StartCoroutine(XelsiorHoveringGun.DoDissipate(ms, 0.5f));
+        targetGun.sprite.DuplicateInWorldAsMesh().Dissipate(time: 3.5f, amplitude: 5f, progressive: true);
         UnityEngine.Object.Destroy(targetGun.gameObject);
         for (int i = 0; i < quality; ++i)
             AddNewGun();
@@ -563,10 +561,10 @@ public class XelsiorHoveringGun : MonoBehaviour
 
         tk2dMeshSprite ms = Lazy.CreateMeshSpriteObject(this.sprite, this.sprite.WorldCenter, pointMesh: true);
         ms.gameObject.transform.rotation = base.transform.rotation;
-        ms.StartCoroutine(DoDissipate(ms, 0.5f));
+        ms.Dissipate(time: 0.5f, amplitude: 10f, progressive: false);
     }
 
-    private static IEnumerator DoMaterialize(XelsiorHoveringGun xg, tk2dMeshSprite ms, float v)
+    public static IEnumerator DoMaterialize(XelsiorHoveringGun xg, tk2dMeshSprite ms, float v)
     {
         Material mat = ms.renderer.material;
         for (float elapsed = 0f; elapsed < v; elapsed += BraveTime.DeltaTime)
@@ -581,24 +579,6 @@ public class XelsiorHoveringGun : MonoBehaviour
         UnityEngine.Object.Destroy(xg._mesh.gameObject);
         xg._mesh = null;
         xg.sprite.renderer.enabled = true;
-        yield break;
-    }
-
-    internal static IEnumerator DoDissipate(tk2dMeshSprite ms, float v)
-    {
-        ms.renderer.material.shader = CwaffShaders.ShatterShader;
-        ms.renderer.material.SetFloat("_Progressive", 0f);
-        ms.renderer.material.SetFloat("_Amplitude", 10f);
-        ms.renderer.material.SetFloat("_RandomSeed", UnityEngine.Random.value);
-
-        Material mat = ms.renderer.material;
-        for (float elapsed = 0f; elapsed < v; elapsed += BraveTime.DeltaTime)
-        {
-            float percentLeft = 1f - elapsed / v;
-            mat.SetFloat("_Fade", 1f - percentLeft * percentLeft);
-            yield return null;
-        }
-        UnityEngine.Object.Destroy(ms.gameObject);
         yield break;
     }
 }

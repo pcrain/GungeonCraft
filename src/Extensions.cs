@@ -2104,6 +2104,19 @@ public static class Extensions
     return sprite;
   }
 
+  /// <summary>Creates a GameObject with a sprite in the exact same location as an original sprite, as a point mesh.</summary>
+  public static tk2dMeshSprite DuplicateInWorldAsMesh(this tk2dBaseSprite osprite, bool pointMesh = true)
+  {
+    tk2dMeshSprite sprite = Lazy.CreateMeshSpriteObject(osprite, osprite.WorldCenter, pointMesh: pointMesh);
+    sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
+    sprite.HeightOffGround        = osprite.HeightOffGround;
+    sprite.depthUsesTrimmedBounds = osprite.depthUsesTrimmedBounds;
+    sprite.SortingOrder           = osprite.SortingOrder;
+    sprite.renderLayer            = osprite.renderLayer;
+    sprite.UpdateZDepth();
+    return sprite;
+  }
+
   /// <summary>Freezes a projectile and launches it with a short delay</summary>
   public static void FreezeAndLaunchWithDelay(this Projectile p, float delay, float speed, string sound = null)
   {

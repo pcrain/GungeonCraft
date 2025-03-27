@@ -439,8 +439,7 @@ public class MasteryRitualComponent : MonoBehaviour
       else
         RoomHandler.unassignedInteractableObjects.TryRemove(gun);
 
-      tk2dBaseSprite burnSprite = gun.sprite.DuplicateInWorld();
-      burnSprite.StartCoroutine(BurnAway_CR(burnSprite));
+      gun.sprite.DuplicateInWorldAsMesh().Dissipate(time: 2.5f, amplitude: 5f, progressive: true);
     }
 
     // Destroy our gun component

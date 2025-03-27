@@ -7,6 +7,7 @@
 - Added dynamic reload animation speeds to several guns (i.e., their animations reflect changes to the player's reload speed stat)
 	- (Bouncer, Bubblebeam, Carpet Bomber, Derail Gun, Flakseed, Hand Cannon, Hatchling Gun, Lightwing, Nycterian, Platinum Star, Sub Machine Gun, Subtractor Beam, Tranquilizer, Uppskeruvel, Wavefront, and Widowmaker)
 - Fixed null deref caused by looking for non-existent guns on the ground after completing mastery ritual
+- Improved Gun destruction VFX for mastery ritual
 
 ## 1.22.3 (2025-03-21)
 
