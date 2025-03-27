@@ -9,6 +9,12 @@ public class tk2dMeshSprite : tk2dBaseSprite
   private static int m_shaderEmissiveColorID = -1;
   private static int m_shaderThresholdID = -1;
 
+  private static readonly Vector4                    _TangentVec    = new Vector4(1f, 0f, 0f, 1f);
+  private static readonly Dictionary<int, Vector4[]> _TangentCache  = new();
+  private static readonly Dictionary<int, Vector3[]> _NormalCache   = new();
+  private static readonly Dictionary<int, int[]>     _TriangleCache = new();
+  private static readonly Dictionary<int, int[]>     _PointCache    = new();
+
   private Mesh mesh;
   private Vector3[] meshVertices;
   private Vector3[] meshNormals;
@@ -27,12 +33,19 @@ public class tk2dMeshSprite : tk2dBaseSprite
 
   private static Vector4[] TangentsForMeshOfSize(int x, int y)
   {
-    return Enumerable.Repeat<Vector4>(new Vector4(1f, 0f, 0f, 1f), x * y).ToArray();
+    int index = (x << 16) + y;
+    if (_TangentCache.TryGetValue(index, out Vector4[] cached))
+      return cached;
+    return _TangentCache[index] = Enumerable.Repeat<Vector4>(_TangentVec, x * y).ToArray();
   }
 
   // built left to right, bottom to top
   private static Vector3[] NormalsForMeshOfSize(int x, int y)
   {
+    int index = (x << 16) + y;
+    if (_NormalCache.TryGetValue(index, out Vector3[] cached))
+      return cached;
+
     Vector3[] normals = new Vector3[x * y];
     int n = 0;
     for (int j = 1; j <= y; ++j)
@@ -44,12 +57,16 @@ public class tk2dMeshSprite : tk2dBaseSprite
         normals[n++] = new Vector3(xcomp, ycomp, -1f);
       }
     }
-    return normals;
+    return _NormalCache[index] = normals;
   }
 
   // built left to right, bottom to top
   private static int[] TrianglesForMeshOfSize(int x, int y)
   {
+    int index = (x << 16) + y;
+    if (_TriangleCache.TryGetValue(index, out int[] cached))
+      return cached;
+
     int xQuads = x - 1;
     int yQuads = y - 1;
     int nPoints = xQuads * yQuads * 6;
@@ -73,17 +90,22 @@ public class tk2dMeshSprite : tk2dBaseSprite
       }
     }
 
-    return triangles;
+    return _TriangleCache[index] = triangles;
   }
 
   // built left to right, bottom to top
   private static int[] PointsForMeshOfSize(int x, int y)
   {
+    int index = (x << 16) + y;
+    if (_PointCache.TryGetValue(index, out int[] cached))
+      return cached;
+
     int nPoints = x * y;
-    int[] triangles = new int[nPoints];
+    int[] points = new int[nPoints];
     for (int i = 0; i < nPoints; ++i)
-      triangles[i] = i;
-    return triangles;
+      points[i] = i;
+
+    return _PointCache[index] = points;
   }
 
   public void ResizeMesh(int xSize = -1, int ySize = -1, bool usePointMesh = false, bool build = true)

@@ -288,4 +288,7 @@ statup,-3.0,1,sound,1
 secret_santa_sound,0.0,1,sound,0
 wipe_out_sound,-2.0,1,sound,2
 place_stereo_sound,-6.5,1,sound,1
-xelsior_fire_sound,-4.0,1,sound,2
+xelsior_fire_sound,-3.0,1,sound,2
+xelsior_hover_fire_sound,-3.0,1,sound,2
+xelsior_beam_fire_sound,-7.0,1,sound,1
+xelsior_shoot_sound_3,-8.0,1,sound,1

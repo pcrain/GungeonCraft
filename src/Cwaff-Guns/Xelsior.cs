@@ -1,5 +1,11 @@
 namespace CwaffingTheGungy;
 
+/* TODO:
+    - add sounds / more vfx for assimilating guns
+    - animate main gun
+    - find better gun sprites (and add to credits)
+*/
+
 public class Xelsior : CwaffGun
 {
     public static string ItemName         = "X-elsior";
@@ -10,47 +16,71 @@ public class Xelsior : CwaffGun
     internal static GameObject _HoverGunPrefab = null;
     internal static GameObject _HoverProjectile = null;
 
+    private const float _TARGET_COOLDOWN = 0.5f;
+
     private List<XelsiorHoveringGun> _extantGuns = new();
     private AIActor _target = null;
+    private float _cooldown = 0.0f;
 
     public int maxGuns = 0;
 
     public static void Init()
     {
         Gun gun = Lazy.SetupGun<Xelsior>(ItemName, ShortDescription, LongDescription, Lore);
-            gun.SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
-                muzzleFrom: Items.Mailbox, fireAudio: "platinum_fire_sound", reloadAudio: null);
+            gun.SetAttributes(quality: ItemQuality.S, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
+                fireAudio: null, reloadAudio: null);
 
-        gun.InitProjectile(GunData.New(sprite: null, clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 3.0f, speed: 25f, range: 18f, force: 12f, hitEnemySound: null, hitWallSound: null))
-          // .Attach<XelsiorProjectile>()
-          ;
+        gun.InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
+            shootStyle: ShootStyle.Beam, damage: 2f, force: 0f, speed: -1f, ammoCost: 3, angleVariance: 0f,
+            beamSprite: "xelsior_beam", beamFps: 60, beamChargeFps: 8, beamImpactFps: 30,
+            beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0f, beamEmission: 50f));
 
-        // _HoverGunPrefab = new GameObject("xelsior hovergun", typeof(tk2dSprite), typeof(XelsiorHoveringGun)).RegisterPrefab();
         _HoverGunPrefab = VFX.Create("xelsior_hover_gun");
         _HoverGunPrefab.AddComponent<XelsiorHoveringGun>();
 
-        _HoverProjectile = Items.Ak47.AsGun().DefaultModule.projectiles[0].projectile.gameObject.ClonePrefab();
+        _HoverProjectile = Items.Ak47.CloneProjectile(GunData.New(/*sprite: "widowmaker_laser_projectile", */angleVariance: 0.0f,
+            speed: 100f, damage: 3f, range: 4f, force: 0f, shouldRotate: true, pierceBreakables: true, ignoreDamageCaps: true,
+            collidesWithTilemap: false)).gameObject;
     }
 
-    public override void PostProcessProjectile(Projectile projectile)
+    private void ZapPickups(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-        base.PostProcessProjectile(projectile);
-        projectile.OnHitEnemy += this.SetTargets;
+        System.Console.WriteLine($"collided with {otherRigidbody.gameObject.name}");
+        if (!otherRigidbody || otherRigidbody.gameObject.GetComponent<Gun>() is not Gun gun)
+        {
+            PhysicsEngine.SkipCollision = true;
+            return;
+        }
+        // Lazy.DebugLog($"found a gun!");
+    }
+
+    public override void PostProcessBeam(BeamController beam)
+    {
+        base.PostProcessBeam(beam);
+        beam.projectile.OnHitEnemy += this.SetTargets;
     }
 
     private void SetTargets(Projectile projectile, SpeculativeRigidbody rigidbody, bool arg3)
     {
-        if (rigidbody.aiActor is not AIActor enemy)
-            return;
-        if (enemy.healthHaver is not HealthHaver hh)
-            return;
-        if (hh.IsDead)
-            return;
+        SetTargets(rigidbody.aiActor);
+    }
+
+    private void SetTargets(AIActor enemy, bool allowNull = false)
+    {
+        if (!allowNull)
+        {
+            if (!enemy)
+                return;
+            if (enemy.healthHaver is not HealthHaver hh)
+                return;
+            if (hh.IsDead)
+                return;
+        }
         this._target = enemy;
         int numGuns = this._extantGuns.Count;
         for (int i = 0; i < numGuns; ++i)
             this._extantGuns[i].SetTarget(enemy);
+        this._cooldown = _TARGET_COOLDOWN;
     }
 
     public override void OnSwitchedToThisGun()
@@ -68,13 +98,56 @@ public class Xelsior : CwaffGun
     {
         base.OnSwitchedAwayFromThisGun();
         DestroyExtantGuns();
+        this._target = null;
+    }
+
+    private void CheckForDroppedGuns()
+    {
+        if (this.GetExtantBeam() is not BasicBeamController beam)
+            return;
+
+        Vector2 start = beam.Origin;
+        if (start.GetAbsoluteRoom() is not RoomHandler room)
+            return;
+        Vector2 end = start + beam.Direction.normalized * beam.m_currentBeamDistance;
+        Gun targetGun = null;
+        foreach (var ix in RoomHandler.unassignedInteractableObjects)
+        {
+            if (ix is not Gun gun || !gun.isActiveAndEnabled ||  !gun.sprite)
+                continue;
+            Vector2 v = default;
+            if (!BraveMathCollege.LineSegmentRectangleIntersection(start, end, gun.sprite.WorldBottomLeft, gun.sprite.WorldTopRight, ref v))
+                continue;
+            targetGun = gun;
+            break;
+        }
+        if (!targetGun)
+            return;
+
+        RoomHandler.unassignedInteractableObjects.Remove(targetGun);
+        int quality = Mathf.Max(targetGun.QualityGrade(), 1);
+        tk2dMeshSprite ms = Lazy.CreateMeshSpriteObject(targetGun.sprite, targetGun.sprite.WorldCenter, pointMesh: true);
+        ms.PlaceAtPositionByAnchor(targetGun.sprite.WorldCenter, Anchor.MiddleCenter);
+        ms.StartCoroutine(XelsiorHoveringGun.DoDissipate(ms, 0.5f));
+        UnityEngine.Object.Destroy(targetGun.gameObject);
+        for (int i = 0; i < quality; ++i)
+            AddNewGun();
+        //TODO: need sfx
     }
 
     public override void Update()
     {
         base.Update();
-        if (!this.PlayerOwner)
+
+        CheckForDroppedGuns();
+        this.gun.LoopSoundIf(this.gun.IsFiring, "xelsior_beam_fire_sound");
+        if (this._cooldown <= 0.0f)
             return;
+        this._cooldown -= BraveTime.DeltaTime;
+        if (this._cooldown > 0.0f)
+            return;
+        this._cooldown = 0.0f;
+        SetTargets(null, allowNull: true);
     }
 
     private void AddNewGun()
@@ -122,6 +195,7 @@ public class Xelsior : CwaffGun
         base.OnDroppedByPlayer(player);
         StopAllCoroutines();
         DestroyExtantGuns();
+        this._target = null;
     }
 
     private void DestroyExtantGuns(bool doVFX = true)
@@ -173,6 +247,8 @@ public class XelsiorHoveringGun : MonoBehaviour
     private const float _KICKBACK_TIME = 0.5f;
     private const float _MATERIALIZE_TIME = 0.5f;
     private const float _MAX_TRANSITION_TIME = 1.0f;
+    private const float _BASE_DELAY = 0.1f;
+    private const float _MAX_DELAY = 0.5f;
 
     public float curAngle    = 90f;
     public float curOffset   = 0f;
@@ -188,12 +264,13 @@ public class XelsiorHoveringGun : MonoBehaviour
     private Vector2 _lastTargetPos = default;
     private HealthHaver _targetHH = null;
     private bool _transitionToPlayer = false;
-    private float _extraDist = 0f;
     private float _kickback = 0f;
     private float _transitionTimer = 0f;
+    private float _retargetTime = 0f;
+    private float _nextShot = 0f;
     private tk2dMeshSprite _mesh = null;
 
-    private LinkedList<float> _queuedShots = new();
+    // private LinkedList<float> _queuedShots = new();
 
     public XelsiorHoveringGun Setup(Xelsior parentGun)
     {
@@ -201,28 +278,20 @@ public class XelsiorHoveringGun : MonoBehaviour
         this._owner = parentGun.PlayerOwner;
 
         this.sprite = base.gameObject.GetComponent<tk2dSprite>();
-        // this.sprite.SetSprite(parentGun.sprite.collection, parentGun.sprite.spriteId);
 
         this._mesh = Lazy.CreateMeshSpriteObject(this.sprite, this.sprite.WorldCenter, pointMesh: true);
-        // this._mesh.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unfaded"));
         this._mesh.gameObject.transform.position = this.sprite.WorldCenter;
         this._mesh.gameObject.transform.rotation = base.transform.rotation;
         this._mesh.renderer.material.shader = CwaffShaders.ShatterShader;
         this._mesh.renderer.material.SetFloat("_Progressive", 1f);
         this._mesh.renderer.material.SetFloat("_Fade", 1f);
         this._mesh.renderer.material.SetFloat("_Amplitude", 4f);
-        this._mesh.renderer.material.SetFloat("_RandomSeed", UnityEngine.Random.value + BraveTime.ScaledTimeSinceStartup);
+        this._mesh.renderer.material.SetFloat("_RandomSeed", UnityEngine.Random.value);
         this.StartCoroutine(DoMaterialize(this, this._mesh, _MATERIALIZE_TIME));
 
-        // Lazy.DebugLog($"have {this._mesh.renderer.materials.Length} materials");
-        // foreach (Material m in this._mesh.renderer.materials)
-        //     Lazy.DebugLog($"  {m.shader.name}");
-
-        // Lazy.DebugLog($"have {this._mesh.renderer.sharedMaterials.Length} materials");
-        // foreach (Material m in this._mesh.renderer.sharedMaterials)
-        //     Lazy.DebugLog($"  {m.shader.name}");
-
-        this.sprite.ForceUnlit();
+        // this.sprite.ForceUnlit();
+        this.sprite.usesOverrideMaterial = true;
+        this.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
         this.sprite.renderer.enabled = false;
 
         return this;
@@ -230,47 +299,37 @@ public class XelsiorHoveringGun : MonoBehaviour
 
     public void SetTarget(AIActor enemy)
     {
-        if (enemy != this._target)
+        if (enemy == this._target)
+            return;
+
+        if (!this._target) // reset shot timer if we didn't already have a target
         {
-            this._target = enemy;
-            this._targetHH = enemy ? enemy.healthHaver : null;
-            // this._extraDist = UnityEngine.Random.Range(-1f, 1f);
+            float myDelay = this.offset >= 0 ? this.offset : (this.numGuns + this.offset);
+            float delay = _BASE_DELAY + (_MAX_DELAY - _BASE_DELAY) * (myDelay / this.numGuns);
+            this._nextShot = BraveTime.ScaledTimeSinceStartup + delay;
         }
-        if (this._targetHH && this._targetHH.IsAlive)
-            QueueShotAgainstTarget();
+
+        this._target = enemy;
+        this._targetHH = enemy ? enemy.healthHaver : null;
     }
 
-    private void QueueShotAgainstTarget()
+    private void HandleQueuedShots(bool targetIsAlive)
     {
-        const float BASE_DELAY = 0.125f;
-        const float MAX_DELAY = 0.4f;
-
-        float myDelay = this.offset >= 0 ? this.offset : (this.numGuns + this.offset);
-        float delay = BASE_DELAY + MAX_DELAY * (myDelay / this.numGuns);
-        this._queuedShots.AddLast(BraveTime.ScaledTimeSinceStartup + delay);
-    }
-
-    private void HandleQueuedShots()
-    {
-        if (this._queuedShots.Count == 0)
-            return;
-        if (this._queuedShots.First.Value >= BraveTime.ScaledTimeSinceStartup)
+        if (this._nextShot >= BraveTime.ScaledTimeSinceStartup)
             return;
 
-        this._queuedShots.RemoveFirst();
+        this._nextShot = BraveTime.ScaledTimeSinceStartup + _MAX_DELAY;
+        if (!targetIsAlive)
+            return;
+
+        base.gameObject.PlayOnce("xelsior_shoot_sound_3");
+        // base.gameObject.PlayOnce("xelsior_fire_sound");
         this._kickback = _KICKBACK_TIME;
 
         Vector2 pos = this.sprite.WorldCenter;
         GameObject po = SpawnManager.SpawnProjectile(Xelsior._HoverProjectile, pos, (this._target.CenterPosition - pos).EulerZ());
-        po.PlayOnce("xelsior_fire_sound");
-
         Projectile proj = po.GetComponent<Projectile>();
         proj.SetOwnerAndStats(this._owner);
-        proj.SetSpeed(60f);
-        proj.ignoreDamageCaps = true;
-        proj.baseData.damage = 2f;
-        proj.baseData.range = 4f;
-        proj.specRigidbody.CollideWithTileMap = false;
         proj.AddTrail(ChekhovsGun._ChekhovTrailPrefab).gameObject.SetGlowiness(10.0f);
     }
 
@@ -286,6 +345,7 @@ public class XelsiorHoveringGun : MonoBehaviour
         const float LERP_RATE          = 7.5f;
         const float ANGULAR_LERP_RATE  = 9f;
         const float KICKBACK_STRENGTH  = 1.25f;
+        const float RETARGET_DELAY      = 0.5f;
 
         if (!this._owner || !this._parentGun)
             return;
@@ -295,16 +355,22 @@ public class XelsiorHoveringGun : MonoBehaviour
         Vector2 basePos, backVec, tangent, targetPos;
         float targetAngle;
 
-        if (this._target && this._targetHH && this._targetHH.IsAlive)
+        float now = BraveTime.ScaledTimeSinceStartup;
+        bool targetIsAlive = this._target && this._targetHH && this._targetHH.IsAlive;
+        if (targetIsAlive || (this._retargetTime > now))
         {
-            basePos = this._target.CenterPosition;
-            this._lastTargetPos = basePos;
+            if (targetIsAlive)
+            {
+                this._lastTargetPos = this._target.CenterPosition;
+                this._retargetTime = now + RETARGET_DELAY;
+            }
+            basePos = this._lastTargetPos;
             float offAngle = 360f * CIRCLE_SPEED * BraveTime.ScaledTimeSinceStartup;
             targetAngle = (offAngle + 360f * this.offset / this.numGuns).Clamp360();
-            targetPos = basePos + targetAngle.ToVector(GUN_DIST + this._extraDist);
+            targetPos = basePos + targetAngle.ToVector(GUN_DIST);
             this._transitionToPlayer = true;
             this._transitionTimer = 0f;
-            HandleQueuedShots();
+            HandleQueuedShots(targetIsAlive); // tick timer down even if we don't have a valid target
         }
         else
         {
@@ -315,7 +381,6 @@ public class XelsiorHoveringGun : MonoBehaviour
             targetPos = backVec + this.offset * tangent;
             this._target = null;
             this._targetHH = null;
-            this._queuedShots.Clear();
         }
 
         Vector2 targetDelta = (this.curPos - targetPos);
@@ -344,35 +409,6 @@ public class XelsiorHoveringGun : MonoBehaviour
             float relAngle = this.curAngle.RelAngleTo(targetAngle);
             this.curAngle = (this.curAngle + Lazy.SmoothestLerp(0, relAngle, LERP_RATE)).Clamp360();
         }
-        // else if (this._transitionToPlayer) // lerp magnitude and angle to target
-        // {
-        //     float curAngle = this.curAngle;
-        //     float relAngle = this.curAngle.RelAngleTo(targetAngle);
-
-        //     float curMag = (this.curPos - this._lastTargetPos).magnitude;
-        //     float targetMag = GUN_DIST;
-
-        //     Vector2 curCenter = this._lastTargetPos;
-        //     Vector2 targetCenter = basePos;
-
-        //     float newAngle = (curAngle + Lazy.SmoothestLerp(0, relAngle, LERP_RATE)).Clamp360();
-        //     float newMag = Lazy.SmoothestLerp(curMag, targetMag, LERP_RATE);
-        //     Vector2 newCenter = Lazy.SmoothestLerp(curCenter, targetCenter, LERP_RATE);
-        //     this.curOffset = Lazy.SmoothestLerp(this.curOffset, this.offset, LERP_RATE);
-
-        //     this._lastTargetPos = newCenter;
-        //     this.curAngle = newAngle;
-        //     Vector2 localTangent = (targetAngle + 90f).ToVector(GUN_SPACING);
-        //     this.curPos = newCenter + newAngle.ToVector(newMag) + this.curOffset * localTangent;
-
-        //     // Vector2 deltaToPlayer = this.curPos - basePos;
-        //     // float magToPlayer = deltaToPlayer.magnitude;
-        //     // float newMag = Lazy.SmoothestLerp(magToPlayer, GUN_DIST - 0.5f, LERP_RATE);
-        //     // this.curPos = basePos + newMag * deltaToPlayer.normalized;
-        //     // this.curAngle = deltaToPlayer.ToAngle();
-        //     // if (newMag <= GUN_DIST)
-        //     //     this._transitionToPlayer = false;
-        // }
         else // snap to magnitude from target and lerp angle
         {
             this.curOffset = Lazy.SmoothestLerp(this.curOffset, this.offset, 5f);
@@ -408,10 +444,6 @@ public class XelsiorHoveringGun : MonoBehaviour
 
         tk2dMeshSprite ms = Lazy.CreateMeshSpriteObject(this.sprite, this.sprite.WorldCenter, pointMesh: true);
         ms.gameObject.transform.rotation = base.transform.rotation;
-        ms.renderer.material.shader = CwaffShaders.ShatterShader;
-        ms.renderer.material.SetFloat("_Progressive", 0f);
-        ms.renderer.material.SetFloat("_Amplitude", 10f);
-        ms.renderer.material.SetFloat("_RandomSeed", this.offset + BraveTime.ScaledTimeSinceStartup);
         ms.StartCoroutine(DoDissipate(ms, 0.5f));
     }
 
@@ -433,8 +465,13 @@ public class XelsiorHoveringGun : MonoBehaviour
         yield break;
     }
 
-    private static IEnumerator DoDissipate(tk2dMeshSprite ms, float v)
+    internal static IEnumerator DoDissipate(tk2dMeshSprite ms, float v)
     {
+        ms.renderer.material.shader = CwaffShaders.ShatterShader;
+        ms.renderer.material.SetFloat("_Progressive", 0f);
+        ms.renderer.material.SetFloat("_Amplitude", 10f);
+        ms.renderer.material.SetFloat("_RandomSeed", UnityEngine.Random.value);
+
         Material mat = ms.renderer.material;
         for (float elapsed = 0f; elapsed < v; elapsed += BraveTime.DeltaTime)
         {
