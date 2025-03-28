@@ -629,6 +629,22 @@ public static class HeckedMode
         }
     }
 
+    // NOTE: this patch is to prevent a gun replacement null deref encountered by a few people that I haven't been able to replicate down myself
+    // see https://discord.com/channels/998556124250898523/998729971340157040/1354123819781980212
+    [HarmonyPatch(typeof(ShootGunBehavior), nameof(ShootGunBehavior.FindPredictedTargetPosition))]
+    private static class ShootGunBehaviorFindPredictedTargetPositionPatch
+    {
+        static bool Prefix(ShootGunBehavior __instance)
+        {
+            // avoiding a null deref caused by giving enemies Bubble Blasters and possibly other guns
+            if (__instance.m_aiShooter.GetBulletEntry(__instance.OverrideBulletName) is not AIBulletBank.Entry)
+                return false;
+            if (!__instance.m_aiActor.specRigidbody)
+                return false;
+            return true;
+        }
+    }
+
     private static bool ForceJammedBosses(bool original, AIActor actor)
     {
         return original || ((_HeckedModeStatus == Hecked.Retrashed) && actor && actor.healthHaver && (actor.healthHaver.IsBoss || actor.healthHaver.IsSubboss));

@@ -10,6 +10,7 @@
 - Improved Gun destruction VFX for mastery ritual
 - Prevented [REDACTED] from damaging enemies while charging, preventing it from being useful on certain enemies
 - Made the Bubble Blasters given to enemies by Bubble Wand deal no damage to the player
+- Potentially fixed null deref caused by certain enemies trying to fire Bubble Blasters before initialization
 
 ## 1.22.3 (2025-03-21)
 
