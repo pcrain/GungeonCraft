@@ -75,6 +75,16 @@ public class Exceptional : CwaffGun
             _DidRuntimePatches = true;
         }
         AdjustGunShader(true);
+
+        #if DEBUG
+        Commands._OnDebugKeyPressed -= CauseErrors;
+        Commands._OnDebugKeyPressed += CauseErrors;
+        #endif
+    }
+
+    private static void CauseErrors()
+    {
+        throw new Exception("hi C:");
     }
 
     public override void Update()
@@ -98,11 +108,11 @@ public class Exceptional : CwaffGun
 
     public static void Exceptionalizationizer(string text, string stackTrace, LogType type)
     {
-        if (_Spawned)
-            return;
         if (type != LogType.Exception)
             return;
         if (++_ExceptionalPower < _ERRORS_BEFORE_SPAWNING)
+            return;
+        if (_Spawned)
             return;
         _Spawned = true;
         if (GameManager.Instance.BestActivePlayer.IsInCombat)
