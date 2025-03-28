@@ -1,4 +1,5 @@
 
+
 namespace CwaffingTheGungy;
 
 // Class for harmony patches that need to be shared by multiple classes (e.g., functions that are patched multiple times)
@@ -241,16 +242,14 @@ static class ReplaceEnemyGunsPatch
     {
         if (!Lazy.AnyoneHas<BubbleWand>())
             return false;
-        if (enemy.healthHaver is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
+        if (!enemy.aiShooter || enemy.healthHaver is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
             return false;
-        if (Lazy.CoinFlip())
-            enemy.ReplaceGun(Items.BubbleBlaster);
-        else if (GameManager.Instance.PrimaryPlayer.HasSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
-            enemy.ReplaceGun(Items.BubbleBlaster);
-        else if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER && GameManager.Instance.SecondaryPlayer.HasSynergy(Synergy.DUBBLE_BUBBLE) && Lazy.CoinFlip())
-            enemy.ReplaceGun(Items.BubbleBlaster);
-        else
+        if (!Lazy.CoinFlip() && (!Lazy.CoinFlip() || !Lazy.AnyoneHasSynergy(Synergy.DUBBLE_BUBBLE)))
             return false;
+
+        enemy.ReplaceGun(Items.BubbleBlaster);
+        enemy.aiShooter.PostProcessProjectile += BubbleWand.PostProcessProjectile;
+
         return true;
     }
 }

@@ -9,6 +9,7 @@
 - Fixed null deref caused by looking for non-existent guns on the ground after completing mastery ritual
 - Improved Gun destruction VFX for mastery ritual
 - Prevented [REDACTED] from damaging enemies while charging, preventing it from being useful on certain enemies
+- Made the Bubble Blasters given to enemies by Bubble Wand deal no damage to the player
 
 ## 1.22.3 (2025-03-21)
 
