@@ -2,7 +2,7 @@
 
 ## 1.23.0 (TBD)
 
-- Added X-elsior
+- Added X-elsior and Empath
 - Added mastery for X-elsior
 - Added dynamic reload animation speeds to several guns (i.e., their animations reflect changes to the player's reload speed stat)
 	- (Bouncer, Bubblebeam, Carpet Bomber, Derail Gun, Flakseed, Hand Cannon, Hatchling Gun, Lightwing, Nycterian, Platinum Star, Sub Machine Gun, Subtractor Beam, Tranquilizer, Uppskeruvel, Wavefront, and Widowmaker)

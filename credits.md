@@ -12,7 +12,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - [Terraria](https://terraria.wiki.gg/wiki/List_of_weapons): Hatchling Gun (Egg Cannon), Iron Maid (Onyx Blaster), Macchi Auto (recolored Xenopopper), Quarter Pounder (Coin Gun), Tranquilizer (Blowgun)
 
-    - [Tremor Mod](https://tremormod.fandom.com/wiki/Weapons): Alligator (Snake Devourer), B. B. Gun (SBC), Blackjack (Party Over), Crapshooter (edited Blackhole Cannon), Hand Cannon (Hand Cannon), Platinum Star (recolored Dragon Rafale), Subtractor Beam (Cosmic Assault Rifle), Suncaster (Volcannon), Telefragger (Phantablast)
+    - [Tremor Mod](https://tremormod.fandom.com/wiki/Weapons): Alligator (Snake Devourer), B. B. Gun (SBC), Blackjack (Party Over), Crapshooter (edited Blackhole Cannon), Empath (Corruptor Gun), Hand Cannon (Hand Cannon), Platinum Star (recolored Dragon Rafale), Subtractor Beam (Cosmic Assault Rifle), Suncaster (Volcannon), Telefragger (Phantablast)
 
     - [Exodus Mod](https://exodusmod.fandom.com/wiki/Weapons): Aimu Hakurei (Clockwork Annihilator), Chekhov's Gun (Calitoss), Gunbrella (Neombrella), Jugglernaut (Light Grenader), Zag (Ancient Uzi), Overflow (Jolly Roger)
 

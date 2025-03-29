@@ -297,3 +297,6 @@ xelsior_fire_loop,3.0,1,sound,1
 assimilate_sound,-4.0,1,sound,1
 materialize_sound,3.0,1,sound,1
 vaporized_sound,3.0,1,sound,1
+empath_fire_sound,1.0,1,sound,1
+empath_collide_sound,4.0,1,sound,1
+empath_reload_sound_2,3.0,1,sound,1

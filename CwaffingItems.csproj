@@ -192,6 +192,7 @@
     <Compile Include="src\Cwaff-Guns\Exceptional.cs"/>
     <Compile Include="src\Cwaff-Guns\Zag.cs"/>
     <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>
+    <Compile Include="src\Cwaff-Guns\Empath.cs"/>
     <Compile Include="src\Cwaff-Guns\SeltzerPelter.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
     <Compile Include="src\Cwaff-Guns\Missiletoe.cs"/>
