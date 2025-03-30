@@ -17,6 +17,27 @@ public class IceCream : CwaffActive
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 15f);
 
         _HeartVFX = VFX.Create("heart_vfx", fps: 18, emissivePower: 1, emissiveColour: Color.magenta);
+
+        // NOTE: sprites might need lots of padding for hands to render in right positions w.r.t. vanilla sprites, see bullet kin for example
+        AIActor bulletKin = EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
+            bulletKin.sprite.SetUpAnimation("bullet_smile_left", 2, tk2dSpriteAnimationClip.WrapMode.Loop, copyMaterialSettings: true);
+            bulletKin.sprite.SetUpAnimation("bullet_smile_right", 2, tk2dSpriteAnimationClip.WrapMode.Loop, copyMaterialSettings: true);
+            AIAnimator.NamedDirectionalAnimation newOtheranim = new AIAnimator.NamedDirectionalAnimation
+            {
+                name = "smile",
+                anim = new DirectionalAnimation
+                {
+                    Prefix    = "smile",
+                    AnimNames = new string[2]{"bullet_smile_right","bullet_smile_left"},
+                    Type      = DirectionalAnimation.DirectionType.TwoWayHorizontal,
+                    Flipped   = new DirectionalAnimation.FlipType[]{
+                        DirectionalAnimation.FlipType.None,
+                        DirectionalAnimation.FlipType.None,
+                    },
+                }
+            };
+            bulletKin.sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
+            bulletKin.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
     }
 
     public override bool CanBeUsed(PlayerController user)
@@ -50,27 +71,6 @@ public class IceCreamGun : CwaffGun
         Lazy.SetupGun<IceCreamGun>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true)
           .SetAttributes(quality: ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true, preventRotation: true)
           .DefaultModule.projectiles = new(){ Lazy.NoProjectile() };
-
-        // NOTE: sprites might need lots of padding for hands to render in right positions w.r.t. vanilla sprites, see bullet kin for example
-        AIActor bulletKin = EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
-            bulletKin.sprite.SetUpAnimation("bullet_smile_left", 2, tk2dSpriteAnimationClip.WrapMode.Loop, copyMaterialSettings: true);
-            bulletKin.sprite.SetUpAnimation("bullet_smile_right", 2, tk2dSpriteAnimationClip.WrapMode.Loop, copyMaterialSettings: true);
-            AIAnimator.NamedDirectionalAnimation newOtheranim = new AIAnimator.NamedDirectionalAnimation
-            {
-                name = "smile",
-                anim = new DirectionalAnimation
-                {
-                    Prefix    = "smile",
-                    AnimNames = new string[2]{"bullet_smile_right","bullet_smile_left"},
-                    Type      = DirectionalAnimation.DirectionType.TwoWayHorizontal,
-                    Flipped   = new DirectionalAnimation.FlipType[]{
-                        DirectionalAnimation.FlipType.None,
-                        DirectionalAnimation.FlipType.None,
-                    },
-                }
-            };
-            bulletKin.sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
-            bulletKin.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
     }
 }
 
