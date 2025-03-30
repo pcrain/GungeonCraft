@@ -1,5 +1,7 @@
 namespace CwaffingTheGungy;
 
+using static GlobalDungeonData.ValidTilesets;
+
 /// <summary>All-purpose helper methods for being a lazy dumdum</summary>
 public static class Lazy
 {
@@ -704,6 +706,8 @@ public static class Lazy
       chest.forceContentIds = new(){pickup.PickupObjectId};
       if (overrideJunk)
         chest.overrideJunkId = pickup.PickupObjectId;
+      if (position.ToVector2().GetAbsoluteRoom() is RoomHandler room)
+        chest.RegisterChestOnMinimap(room);
       return chest;
     }
 
@@ -1301,5 +1305,23 @@ public static class Lazy
     public static void Dissipate(this tk2dMeshSprite ms, float time, float amplitude = 10f, bool progressive = false)
     {
         ms.StartCoroutine(Dissipate_CR(ms: ms, time: time, amplitude: amplitude, progressive: progressive));
+    }
+
+    /// <summary>Get numerical index of current floor.</summary>
+    public static float GetFloorIndex()
+    {
+        return GameManager.Instance.Dungeon.tileIndices.tilesetId switch {
+            CASTLEGEON    => 1f,
+            SEWERGEON     => 1.5f,
+            GUNGEON       => 2f,
+            CATHEDRALGEON => 2.5f,
+            MINEGEON      => 3f,
+            RATGEON       => 3.5f,
+            CATACOMBGEON  => 4f,
+            OFFICEGEON    => 4.5f,
+            FORGEGEON     => 5f,
+            HELLGEON      => 5.5f,
+            _             => 0f,
+        };
     }
 }

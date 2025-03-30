@@ -364,6 +364,7 @@ public class Initialisation : BaseUnityPlugin
                 PrismaticScope.Init();
                 Lichguard.Init();
                 ScaldingJelly.Init();
+                PizzaPeelPassive.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

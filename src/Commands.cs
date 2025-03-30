@@ -24,7 +24,7 @@ public class Commands
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             DebrisObject debris = LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(Lazy.PickupId<PizzaPeel>()).gameObject,
+                PickupObjectDatabase.GetById(Lazy.PickupId<PizzaPeelPassive>()).gameObject,
                 // PickupObjectDatabase.GetById(IDs.Pickups["bubblebeam"]).gameObject,
                 GameManager.Instance.PrimaryPlayer.CenterPosition,
                 Vector2.zero,
@@ -181,6 +181,38 @@ public class Commands
         {
             GameManager.Instance.LoadCustomLevel(SansDungeon.INTERNAL_NAME);
         });
+        ETGModConsole.Commands.AddGroup("nukefloor", delegate (string[] args)
+        {
+            NukeFloor();
+        });
+    }
+
+    internal static void NukeFloor()
+    {
+        GameManager.Instance.StartCoroutine(NukeFloor_CR());
+    }
+
+    internal static IEnumerator NukeFloor_CR()
+    {
+        // nuke all rooms
+        List<RoomHandler> rooms = GameManager.Instance.Dungeon.data.rooms;
+        List<AIActor> enemiesToKill = new();
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            RoomHandler room = rooms[i];
+            if (room == null)
+                continue;
+            room.ClearReinforcementLayers();
+            room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref enemiesToKill);
+            for (int k = 0; k < enemiesToKill.Count; k++)
+                if (enemiesToKill[k])
+                    enemiesToKill[k].enabled = true;
+            yield return null;
+            for (int j = 0; j < enemiesToKill.Count; j++)
+                if (enemiesToKill[j])
+                    UnityEngine.Object.Destroy(enemiesToKill[j].gameObject);
+        }
+        Lazy.DebugLog($"floor nuked");
     }
 
     [HarmonyPatch]

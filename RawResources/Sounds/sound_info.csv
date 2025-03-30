@@ -300,3 +300,5 @@ vaporized_sound,3.0,1,sound,1
 empath_fire_sound,1.0,1,sound,1
 empath_collide_sound,4.0,1,sound,1
 empath_reload_sound_2,3.0,1,sound,1
+got_some_cash,13.0,1,sound,0
+pizza_event_start_sound,7.0,1,sound,0
