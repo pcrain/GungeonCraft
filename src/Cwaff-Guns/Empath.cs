@@ -1,4 +1,3 @@
-
 namespace CwaffingTheGungy;
 
 public class Empath : CwaffGun
@@ -39,8 +38,8 @@ public class Empath : CwaffGun
     {
         if (frame != 7 || !this.PlayerOwner || clip.name != "empath_reload")
             return;
-        Vector2 pos = this.gun.sprite.WorldCenter + (base.transform.rotation * (new Vector2(-6f/16f, -2f/16f))).XY();
-        CwaffVFX.Spawn(_PsychicVFX, position: pos, lifetime: 0.5f, startScale: 0.5f, endScale: 3.0f, fadeOutTime: 0.4f);
+        Vector2 eyePosition = this.gun.sprite.WorldCenter + (base.transform.rotation * (new Vector2(-6f/16f, -2f/16f))).XY();
+        CwaffVFX.Spawn(_PsychicVFX, position: eyePosition, lifetime: 0.5f, startScale: 0.5f, endScale: 3.0f, fadeOutTime: 0.4f);
     }
 
     public override void PostProcessProjectile(Projectile projectile)

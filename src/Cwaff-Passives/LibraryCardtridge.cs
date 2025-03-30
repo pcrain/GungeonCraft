@@ -7,10 +7,11 @@ public class LibraryCardtridge : CwaffPassive
     public static string LongDescription  = "Books and paper-based items are free at shops. Bookllets are charmed upon entering a room. Piles of books explode when destroyed.";
     public static string Lore             = "It's pretty safe to assume that most who enter the Gungeon don't come there with the primary goal of reading books, but if you're one of the 4 who do, a library cardtridge is a must-have. Not only does it make reading that much more affordable, but when some unruly Bullet Kin inevitably swing by to destroy your preferred chair and knock over your favorite mug filled with ginger peach green tea, you'll be armed with the knowledge to transform the table you're sitting at into a true bastion of defense.";
 
+    internal static GameActorCharmEffect _CharmEffect   = null;
+
     private static HashSet<int>         _BookItemIDs    = null;
     private static HashSet<string>      _BookEnemyGUIDs = null;
     private static bool                 _DidLateInit    = false;
-    private static GameActorCharmEffect _CharmEffect    = null;
     private static ExplosionData        _BookExplosion  = null;
 
     public static void Init()
