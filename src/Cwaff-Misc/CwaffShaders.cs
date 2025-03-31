@@ -1,3 +1,5 @@
+
+
 namespace CwaffingTheGungy;
 
 public static class CwaffShaders
@@ -64,6 +66,55 @@ public static class CwaffShaders
             ScreenBasicShader = shaderBundle.LoadAsset<Shader>("assets/screenbasicshader.shader");
             ShatterShader = shaderBundle.LoadAsset<Shader>("assets/scattershader.shader");
             // ShatterShader = shaderBundle.LoadAsset<Shader>("assets/scattershaderunlit.shader");
+        }
+
+        CwaffEvents.OnCleanStart += ResetShaders;
+        CwaffEvents.OnStatsRecalculated += CheckShaders;
+    }
+
+    internal static void CheckShaders(PlayerController player)
+    {
+        CheckSpiceShaders();
+    }
+
+    private static void ResetShaders()
+    {
+        CheckSpiceShaders(enabled: false);
+    }
+
+    private static bool SpiceShadersEnabled(bool? enabled = null)
+    {
+        if (!(enabled ?? CwaffConfig._Gunfig.Enabled(CwaffConfig._SPICE_SHADERS)))
+            return false;
+        if (!GameManager.Instance || !GameManager.Instance.PrimaryPlayer)
+            return false;
+        if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
+            return false;
+        return GameManager.Instance.PrimaryPlayer.spiceCount > 0;
+    }
+
+    internal static Material _WiggleMat = null;
+    internal static void CheckSpiceShaders(bool? enabled = null)
+    {
+        if (!SpiceShadersEnabled(enabled))
+        {
+            if (Pixelator.Instance)
+                Pixelator.Instance.DeregisterAdditionalRenderPass(_WiggleMat);
+            return;
+        }
+        _WiggleMat ??= new Material(CwaffShaders.ScreenWiggleShader);
+        _WiggleMat.SetFloat("_Amplitude", 0.0008f * GameManager.Instance.PrimaryPlayer.spiceCount);
+        Pixelator.Instance.RegisterAdditionalRenderPass(_WiggleMat);
+        // GameManager.Instance.PrimaryPlayer.ToggleShadowVisiblity(false);
+        // SpriteOutlineManager.ToggleOutlineRenderers(GameManager.Instance.PrimaryPlayer.sprite, false);
+    }
+
+    [HarmonyPatch(typeof(SpiceItem), nameof(SpiceItem.DoEffect))]
+    private static class SpiceItemDoEffectPatch
+    {
+        static void Postfix(SpiceItem __instance, PlayerController user)
+        {
+            CheckShaders(user);
         }
     }
 

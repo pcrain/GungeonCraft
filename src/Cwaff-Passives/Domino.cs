@@ -7,7 +7,7 @@ namespace CwaffingTheGungy;
 public class Domino : CwaffPassive
 {
     public static string ItemName         = "Domino";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "Free Delivery";
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
@@ -48,9 +48,9 @@ public class Domino : CwaffPassive
 public class PizzaPeel : CwaffGun
 {
     public static string ItemName         = "Pizza Peel";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Pizza Time";
+    public static string LongDescription  = "Delivers fresh, hot pizza slices to hungry bullet kin.";
+    public static string Lore             = "";
 
     private const int _SHOOT_FPS = 30;
 
@@ -87,7 +87,7 @@ public class PizzaPeel : CwaffGun
 
         _CashVFX = VFX.Create("cold_hard_cash_vfx", fps: 18, emissivePower: 1, emissiveColour: Color.green);
         _PizzaSliceVFX = VFX.Create("pizza_slice_vfx");
-        _PizzaBox = VFX.Create("pizza_box", fps: 7, emissivePower: 5f);
+        _PizzaBox = VFX.Create("pizza_box");
         SpeculativeRigidbody body = _PizzaBox.GetOrAddComponent<SpeculativeRigidbody>();
         body.CanBePushed          = true;
         body.PixelColliders       = new List<PixelCollider>(){new(){
@@ -705,7 +705,7 @@ public class PizzaTimeController : MonoBehaviour
         _Instance.gameObject.Play("pizza_event_start_sound");
         _PizzaTimeHappening = true; // prevent player from teleporting and some other stuff
         _DeliveryBoi = deliveryboi;
-        _DeliveryBoi.OverrideHat(CwaffHats._PizzaHat);
+        _DeliveryBoi.OverrideHat(CwaffHats._PizzaHat, doPoof: true);
         GivePizzaPeel(deliveryboi); // give player the PizzaPeel and gun lock them
         SpawnHungryBulletKins(); // add bullet kin to a bunch of rooms
         CalculateEventTimer(); // figure out how long to give the player to complete the event
@@ -725,7 +725,7 @@ public class PizzaTimeController : MonoBehaviour
         if (!floorEnded)
             DespawnHungryBulletKins();
         DestroyPizzaPeel(_DeliveryBoi);
-        _DeliveryBoi.ClearHatOverride(CwaffHats._PizzaHat);
+        _DeliveryBoi.ClearHatOverride(CwaffHats._PizzaHat, doPoof: true);
         _DeliveryBoi = null;
         _PizzaTimeHappening = false;
         if (_GoalBox)

@@ -82,14 +82,14 @@ public class Oddjob : CwaffGun
     {
         if (this.PlayerOwner is not PlayerController player)
             return;
-        player.OverrideHat(_OddjobHat);
+        player.OverrideHat(_OddjobHat, doPoof: false);
     }
 
     private void RemoveHatFromHead()
     {
         if (this.PlayerOwner is not PlayerController player)
             return;
-        player.ClearHatOverride(_OddjobHat);
+        player.ClearHatOverride(_OddjobHat, doPoof: false);
     }
 
     public override void OnDestroy()

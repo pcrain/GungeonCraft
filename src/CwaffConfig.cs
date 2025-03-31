@@ -1,3 +1,4 @@
+
 namespace CwaffingTheGungy;
 
 public static class CwaffConfig
@@ -6,7 +7,7 @@ public static class CwaffConfig
 
   internal const string _SHOP_KEY = "Shop Spawning Behaviour";
   internal const string _SECONDARY_RELOAD = "Secondary Reload Button";
-  internal const string _SECONDARY_RELOAD_DESC = "Change the ";
+  internal const string _SPICE_SHADERS = "Enable Spice Shaders";
 
   public enum SecondaryReloadKey { None, Left, Right }
   internal static SecondaryReloadKey _SecondaryReload = SecondaryReloadKey.None;
@@ -66,8 +67,15 @@ public static class CwaffConfig
       updateType: Gunfig.Update.OnRestart
       );
 
+    _Gunfig.AddToggle(_SPICE_SHADERS, enabled: true, callback: OnSpiceShadersChanged); //BUG: gunfig doesn't set the new value until AFTER the callback is called
+
     // Make sure our initial keybind preferences are set up for seconday reload button
     OnSecondaryReloadChange(_SECONDARY_RELOAD, _Gunfig.Value(_SECONDARY_RELOAD));
+  }
+
+  private static void OnSpiceShadersChanged(string key, string value)
+  {
+    CwaffShaders.CheckSpiceShaders(enabled: value == "1");
   }
 
   private static void OnSecondaryReloadChange(string key, string value)

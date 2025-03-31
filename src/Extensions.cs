@@ -3229,7 +3229,7 @@ public static class Extensions
   private static readonly List<string>[] _HatOverrides = [new(), new()];
   private static readonly string[] _OriginalHat = [null, null];
   /// <summary>Add a temporary override for a player's hat</summary>
-  public static void OverrideHat(this PlayerController player, Hat newHat)
+  public static void OverrideHat(this PlayerController player, Hat newHat, bool doPoof = true)
   {
       if (player.gameObject.GetComponent<HatController>() is not HatController hc)
         return;
@@ -3243,10 +3243,11 @@ public static class Extensions
       else
         _HatOverrides[player.PlayerIDX].Add(newHat.hatName);
       hc.SetHat(newHat);
+      LootEngine.DoDefaultItemPoof(player.sprite.WorldBottomCenter + new Vector2(0f, 1f));
   }
 
   /// <summary>Remove a temporary override for a player's hat</summary>
-  public static void ClearHatOverride(this PlayerController player, Hat hatToRemove)
+  public static void ClearHatOverride(this PlayerController player, Hat hatToRemove, bool doPoof = true)
   {
       if (player.gameObject.GetComponent<HatController>() is not HatController hc)
         return;
@@ -3264,6 +3265,7 @@ public static class Extensions
       }
       if (returnHat != null && Hatabase.Hats.TryGetValue(returnHat.GetDatabaseFriendlyHatName(), out Hat origHat))
         hc.SetHat(origHat);
+        LootEngine.DoDefaultItemPoof(player.sprite.WorldBottomCenter + new Vector2(0f, 1f));
   }
 }
 

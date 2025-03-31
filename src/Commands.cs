@@ -7,7 +7,6 @@ public class Commands
 
     internal static Action _OnDebugKeyPressed = null;
 
-    internal static Material _WiggleMat = null;
     private static bool _Wiggling = false;
     private static int _WaterLayer = -1;
 
@@ -47,80 +46,20 @@ public class Commands
         });
         ETGModConsole.Commands.AddGroup("ww", delegate (string[] args)
         {//
-            _WiggleMat ??= new Material(CwaffShaders.ScreenWiggleShader);
+            CwaffShaders._WiggleMat ??= new Material(CwaffShaders.ScreenWiggleShader);
             if (_WaterLayer < 0)
                 _WaterLayer = 1 << LayerMask.NameToLayer("Water");
             _Wiggling = !_Wiggling;
             if (_Wiggling)
             {
-                // ShadowSystem.AllLights.Clear();
-                // Pixelator.Instance.cm_core1 = 0;  // disable background floor / tiles
-                // Pixelator.Instance.cm_core2 = 0;  // disable background reflections / dynamic lighting?
-                // Pixelator.Instance.cm_core3 = 0;  // disable walls, sprite shadows, and basic enemy health bars
-                // Pixelator.Instance.cm_core3 &= ~_WaterLayer;
-                Pixelator.Instance.RegisterAdditionalRenderPass(_WiggleMat);
-                // Pixelator.Instance.AdditionalCoreStackRenderPass = _WiggleMat;
+                Pixelator.Instance.RegisterAdditionalRenderPass(CwaffShaders._WiggleMat);
                 GameManager.Instance.PrimaryPlayer.ToggleShadowVisiblity(false);
                 SpriteOutlineManager.ToggleOutlineRenderers(GameManager.Instance.PrimaryPlayer.sprite, false);
-                PlayerController pc = GameManager.Instance.PrimaryPlayer;
-                MeshRenderer mr = pc.sprite.gameObject.GetComponent<MeshRenderer>();
-                mr.additionalVertexStreams = null;
-                foreach (var mat in mr.materials)
-                    System.Console.WriteLine($"  have material {mat?.name ?? ("nothin")}");
-                foreach (var mat in mr.sharedMaterials)
-                    System.Console.WriteLine($"  have shared material {mat?.name ?? ("nothin")}");
-
-
-                // pc.TogglePitClipping(false);
-                // pc.ToggleShadowVisiblity(false);
-                // pc.SetStencilVal(146);
-
-                // mr.useLightProbes = false;
-                // mr.shadowCastingMode = ShadowCastingMode.Off;
-                mr.receiveShadows = false;
-                // mr.allowOcclusionWhenDynamic = false;
-                // UnityEngine.Object.Destroy(pc.sprite.gameObject.GetComponent<MeshFilter>());
-                // UnityEngine.Object.Destroy(pc.sprite.gameObject.GetComponent<MeshRenderer>());
-                // UnityEngine.Object.Destroy(pc.sprite.gameObject.GetComponentInChildren<PlayerLightController>());
-                // pc.sprite.gameObject.GetComponent<MeshFilter>().sharedMesh = null;
-                // GameManager.Instance.PrimaryPlayer.actorReflectionAdditionalOffset = 1000f;
-                // GameManager.Instance.PrimaryPlayer.sprite.GetComponent<MeshRenderer>().
-                // Transform t = pc.gameObject.transform;
-                // int nc = t.childCount;
-                // for (int i = 0; i < nc; ++i)
-                // {
-                //     Transform tc = t.GetChild(i);
-                //     System.Console.WriteLine($"child {i} is {tc.gameObject.name}");
-                //     foreach (Component c in tc.GetComponents(typeof(Component)))
-                //     {
-                //         System.Console.WriteLine($"  has component {c.GetType().Name}");
-                //     }
-                // }
-                // UnityEngine.Object.Destroy(t.GetChild(3).gameObject);
-                // UnityEngine.Object.Destroy(t.GetChild(2).gameObject.GetComponent<PlayerLightController>());
-                // Shader.SetGlobalFloat("_GlobalReflectionsEnabled", 0f);
-                // Shader.SetGlobalFloat("_MeduziReflectionsEnabled", 0f);
-                // pc.sprite.enabled = false;
-                // int i = 0;
-                foreach (MeshRenderer mr2 in pc.gameObject.GetComponentsInChildren<MeshRenderer>())
-                {
-                    Lazy.DebugLog($"  disabling MR for {mr2.gameObject.name}");
-                    mr2.enabled = false;
-                }
-                pc.sprite.m_renderer.enabled = true;
             }
             else
             {
-                Pixelator.Instance.DeregisterAdditionalRenderPass(_WiggleMat);
-                // Pixelator.Instance.cm_core3 |= _WaterLayer;
-                // Pixelator.Instance.AdditionalCoreStackRenderPass = null;
+                Pixelator.Instance.DeregisterAdditionalRenderPass(CwaffShaders._WiggleMat);
             }
-            // Pixelator.Instance.AdditionalCoreStackRenderPass = new Material(CwaffShaders.ScreenWiggleShader);
-            // PixelatorRenderGame_PrettyPatch._SuperFancyShaderMaterial = new Material(CwaffShaders.ScreenBasicShader);
-            // PixelatorRenderGame_PrettyPatch._SuperFancyShaderMaterial = new Material(CwaffShaders.ScreenWiggleShader);
-            // PixelatorRenderGame_PrettyPatch._SuperFancyShadersEnabled ^= true;
-            // GameManager.Instance.MainCameraController.SetManualControl(true, true);
-            // GameManager.Instance.MainCameraController.OverridePosition = Vector3.zero;
         });
         // Shader tests
         ETGModConsole.Commands.AddGroup("shiny", delegate (string[] args)
