@@ -268,6 +268,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfPlasmarble>(MASTERY_PLASMARBLE, Plasmarble.ItemName);
         // Reloading toggles autotarget mode, allowing Xelsior's secondary guns to autotarget enemies at a reduced fire rate.
         NewMastery<MasteryOfXelsior>(MASTERY_XELSIOR, Xelsior.ItemName);
+        // Projectiles can now hit enemies, and destroy up to 5 of their projectiles on contact.
+        NewMastery<MasteryOfEmpath>(MASTERY_EMPATH, Empath.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -543,6 +545,7 @@ internal class MasteryOfGlockarina           : MasteryDummyItem {}
 internal class MasteryOfMacheening           : MasteryDummyItem {}
 internal class MasteryOfPlasmarble           : MasteryDummyItem {}
 internal class MasteryOfXelsior              : MasteryDummyItem {}
+internal class MasteryOfEmpath               : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -658,4 +661,5 @@ public enum Synergy {
     MASTERY_MACHEENING,
     MASTERY_PLASMARBLE,
     MASTERY_XELSIOR,
+    MASTERY_EMPATH,
 };

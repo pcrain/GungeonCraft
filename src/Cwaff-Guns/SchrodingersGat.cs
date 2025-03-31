@@ -214,7 +214,7 @@ public class SchrodingersStat : MonoBehaviour
             Observe();
     }
 
-    private static IEnumerator PhaseOut(tk2dBaseSprite sprite, Vector2 direction, float amplitude, float frequency, float lifetime)
+    internal static IEnumerator PhaseOut(tk2dBaseSprite sprite, Vector2 direction, float amplitude, float frequency, float lifetime)
     {
         sprite.color = Color.black;
         for (float elapsed = 0f; elapsed < lifetime; elapsed += BraveTime.DeltaTime)

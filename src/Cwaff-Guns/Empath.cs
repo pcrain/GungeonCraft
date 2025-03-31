@@ -7,6 +7,9 @@ public class Empath : CwaffGun
     public static string LongDescription  = "Fires eyeballs that pass through enemies but collide with their projectiles, destroying them and damaging their owners in the process.";
     public static string Lore             = "Within the confines of the Gungeon, a small part of one's spirit is attached to each and every shot fired -- a link enabling the Gungeon's various treasures to impart their properties upon one's projectiles. By amplifying that attachment by several orders of magnitude, it's possible to inflict damage upon a projectile's owner simply by destroying the projectile. Whether treating a projectile to a day at the spa has positive effects on the owner has not yet been tested.";
 
+    private const float _EMPATHY_DAMAGE_MULT = 4f;
+    private const int _MAX_BULLETS_DESTROYED = 5;
+
     internal static GameObject _PsychicVFX = null;
 
     private bool _setupAnimator = false;
@@ -18,7 +21,7 @@ public class Empath : CwaffGun
             fireAudio: "empath_fire_sound", smoothReload: 0.0f, muzzleVFX: "muzzle_empath", muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter)
           .SetReloadAudio("empath_reload_sound_2", 7)
           .InitProjectile(GunData.New(sprite: "empath_projectile", clipSize: 15, cooldown: 0.13f, shootStyle: ShootStyle.SemiAutomatic, fps: 11,
-            damage: 15.0f, speed: 18f, range: 999f, force: 12f, collidesWithProjectiles: true, bossDamageMult: 0.6f, scale: 2.0f, customClip: true))
+            damage: 3.75f, speed: 18f, range: 999f, force: 12f, collidesWithProjectiles: true, bossDamageMult: 0.6f, scale: 2.0f, customClip: true))
           .SetAllImpactVFX(VFX.CreatePool("empath_impact_vfx", fps: 30, loops: false));
 
         _PsychicVFX = VFX.Create("empath_psychic_damage_vfx", fps: 30, loops: false);
@@ -52,14 +55,24 @@ public class Empath : CwaffGun
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
-        if (!otherRigidbody || otherRigidbody.gameObject.GetComponent<Projectile>() is not Projectile p || !p.isActiveAndEnabled)
+        if (!otherRigidbody)
             PhysicsEngine.SkipCollision = true;
+        else if (otherRigidbody.gameObject.GetComponent<Projectile>() is Projectile p && p.isActiveAndEnabled)
+            return;
+        else if (this.Mastered && otherRigidbody.gameObject.GetComponent<AIActor>())
+            return;
+        PhysicsEngine.SkipCollision = true;
     }
 
     private void OnCollision(CollisionData collision)
     {
         if (!collision.OtherRigidbody || collision.OtherRigidbody.gameObject is not GameObject otherObject)
             return;
+        if (this.Mastered && otherObject.GetComponent<AIActor>() is AIActor target)
+        {
+            HandleEnemyCollision(target);
+            return;
+        }
         if (otherObject.GetComponent<Projectile>() is not Projectile other)
             return;
 
@@ -79,8 +92,40 @@ public class Empath : CwaffGun
         p.specRigidbody.Position = new Position(enemyPos);
         p.specRigidbody.UpdateColliderPositions();
         LinearCastResult lcr = LinearCastResult.Pool.Allocate();
+        p.baseData.damage *= _EMPATHY_DAMAGE_MULT;
         p.ForceCollision(enemy.specRigidbody, lcr);
         LinearCastResult.Pool.Free(ref lcr);
         other.DieInAir();
+    }
+
+    private static readonly List<Projectile> _ProjectilesToDestroy = new();
+    private void HandleEnemyCollision(AIActor enemy)
+    {
+        if (!enemy || !enemy.healthHaver || !enemy.healthHaver.IsAlive)
+            return;
+
+        for (int i = StaticReferenceManager.AllProjectiles.Count - 1; i >=0; --i)
+        {
+            Projectile p = StaticReferenceManager.AllProjectiles[i];
+            if (p && p.isActiveAndEnabled && !p.HasDiedInAir && p.Owner == enemy && p.sprite)
+                _ProjectilesToDestroy.Add(p);
+        }
+
+        int numToDestroy = _MAX_BULLETS_DESTROYED;
+        if (numToDestroy > _ProjectilesToDestroy.Count)
+            numToDestroy = _ProjectilesToDestroy.Count;
+        else if (numToDestroy < _ProjectilesToDestroy.Count)
+            _ProjectilesToDestroy.Shuffle();
+
+        for (int i = 0; i < numToDestroy; ++i)
+        {
+            Projectile p = _ProjectilesToDestroy[i];
+            tk2dBaseSprite dupe = p.sprite.DuplicateInWorld();
+            dupe.StartCoroutine(SchrodingersStat.PhaseOut(dupe, Vector2.right, 25f, 90f, 1.0f));
+            p.DieInAir();
+        }
+        if (numToDestroy > 0)
+            enemy.gameObject.Play("schrodinger_dead_sound");
+        _ProjectilesToDestroy.Clear();
     }
 }
