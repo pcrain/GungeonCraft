@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class Empath : CwaffGun
 {
     public static string ItemName         = "Empath";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "More than a Feeling";
+    public static string LongDescription  = "Fires eyeballs that pass through enemies but collide with their projectiles, destroying them and damaging their owners in the process.";
+    public static string Lore             = "Within the confines of the Gungeon, a small part of one's spirit is attached to each and every shot fired -- a link enabling the Gungeon's various treasures to impart their properties upon one's projectiles. By amplifying that attachment by several orders of magnitude, it's possible to inflict damage upon a projectile's owner simply by destroying the projectile. Whether treating a projectile to a day at the spa has positive effects on the owner has not yet been tested.";
 
     internal static GameObject _PsychicVFX = null;
 

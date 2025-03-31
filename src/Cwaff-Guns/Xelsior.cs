@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class Xelsior : CwaffGun
 {
     public static string ItemName         = "X-elsior";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Transcendent Arsenal";
+    public static string LongDescription  = "When fired at a dropped gun, converts that gun into 1-5 pistols depending on its quality and assimilates them into its arsenal. While fired at an enemy, causes all pistols in its arsenal to fire in sequence at that enemy.";
+    public static string Lore             = "A weapon borne of grand ammomancy, crafted to release its user from the shackles limiting them to one firearm per hand. Its innate power is mediocre at best, but given a sufficiently large arsenal of weapons, its destructive potential is unrivaled.";
 
     internal static GameObject _XelsiorReticle  = null;
     internal static GameObject _HoverGunPrefab  = null;
@@ -29,7 +29,7 @@ public class Xelsior : CwaffGun
             fireAudio: null, reloadAudio: null)
           .Attach<XelsiorAmmoDisplay>()
           .InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
-            shootStyle: ShootStyle.Beam, damage: 2f, force: 0f, speed: -1f, ammoCost: 3, angleVariance: 0f,
+            shootStyle: ShootStyle.Beam, damage: 2f, force: 0f, speed: -1f, ammoCost: 3, angleVariance: 0f, hideAmmo: true,
             beamSprite: "xelsior_beam", beamFps: 60, beamChargeFps: 8, beamImpactFps: 30,
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0f, beamEmission: 50f));
 

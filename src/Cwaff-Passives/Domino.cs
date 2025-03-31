@@ -8,13 +8,13 @@ public class Domino : CwaffPassive
 {
     public static string ItemName         = "Domino";
     public static string ShortDescription = "Free Delivery";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Upon clearing a floor of enemies, adds an optional pizza delivery event to the exit elevator room. During the event, grants a Pizza Peel for delivering as many pizzas as possible to Bullet Kin on the way back to the floor entrance. Casings are awarded upon reaching the event marker in the floor entrance based on the amount of pizzas delivered, while an additional casing multiplier or chest reward may be granted for high delivery rates. No rewards are granted if the event marker is not reached before the timer runs out.";
+    public static string Lore             = "Pizza delivery in the Gungeon is rather awkward. Bullet Kin are known to immensely enjoy their pizza; however, Gungeon protocol prohibits them from ordering pizza while on duty. Bullet Kin have consequently been known to occasionally aid adventurers in clearing out floors for the sole purpose of clocking out to enjoy their pizza time earlier.";
 
     public static void Init()
     {
         PassiveItem item  = Lazy.SetupPassive<Domino>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.B;
+        item.quality      = ItemQuality.C;
 
         PizzaPeel.Init();
         MoneyGun.Init();
