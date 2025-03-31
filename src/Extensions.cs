@@ -2323,10 +2323,11 @@ public static class Extensions
   }
 
   /// <summary>Removes an item from a list if it already contains it</summary>
-  public static void TryRemove<T>(this List<T> list, T item)
+  public static bool TryRemove<T>(this List<T> list, T item)
   {
     if (list.Contains(item))
-      list.Remove(item);
+      return list.Remove(item);
+    return false;
   }
 
   /// <summary>Get an appropriate angle for the current projectile</summary>
@@ -3224,5 +3225,45 @@ public static class Extensions
 
   /// <summary>Get maximum component of a Vector3.</summary>
   public static float MaxComponent(this Vector3 v) => Mathf.Max(v.x, v.y, v.z);
+
+  private static readonly List<string>[] _HatOverrides = [new(), new()];
+  private static readonly string[] _OriginalHat = [null, null];
+  /// <summary>Add a temporary override for a player's hat</summary>
+  public static void OverrideHat(this PlayerController player, Hat newHat)
+  {
+      if (player.gameObject.GetComponent<HatController>() is not HatController hc)
+        return;
+      if (player.CurrentHat() is Hat oldHat)
+      {
+        if (_HatOverrides[player.PlayerIDX].Count == 0)
+          _OriginalHat[player.PlayerIDX] = oldHat.hatName;
+        if (_OriginalHat[player.PlayerIDX] != newHat.hatName && !_HatOverrides[player.PlayerIDX].Contains(newHat.hatName))
+          _HatOverrides[player.PlayerIDX].Add(newHat.hatName);
+      }
+      else
+        _HatOverrides[player.PlayerIDX].Add(newHat.hatName);
+      hc.SetHat(newHat);
+  }
+
+  /// <summary>Remove a temporary override for a player's hat</summary>
+  public static void ClearHatOverride(this PlayerController player, Hat hatToRemove)
+  {
+      if (player.gameObject.GetComponent<HatController>() is not HatController hc)
+        return;
+      if (!_HatOverrides[player.PlayerIDX].TryRemove(hatToRemove.hatName))
+        return;
+      if (hc.CurrentHat is Hat curHat && curHat.hatName == hatToRemove.hatName)
+        hc.RemoveCurrentHat();
+      string returnHat = null;
+      if (_HatOverrides[player.PlayerIDX].Count > 0)
+        returnHat = _HatOverrides[player.PlayerIDX].Last();
+      else
+      {
+        returnHat = _OriginalHat[player.PlayerIDX];
+        _OriginalHat[player.PlayerIDX] = null;
+      }
+      if (returnHat != null && Hatabase.Hats.TryGetValue(returnHat.GetDatabaseFriendlyHatName(), out Hat origHat))
+        hc.SetHat(origHat);
+  }
 }
 

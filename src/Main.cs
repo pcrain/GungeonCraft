@@ -282,7 +282,6 @@ public class Initialisation : BaseUnityPlugin
                 Flakseed.Init();
                 Xelsior.Init();
                 Empath.Init();
-                PizzaPeel.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
@@ -364,7 +363,7 @@ public class Initialisation : BaseUnityPlugin
                 PrismaticScope.Init();
                 Lichguard.Init();
                 ScaldingJelly.Init();
-                PizzaPeelPassive.Init();
+                Domino.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

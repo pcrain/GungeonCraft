@@ -2,6 +2,8 @@ namespace CwaffingTheGungy;
 
 public static class CwaffHats
 {
+    internal static Hat _PizzaHat = null;
+
     private static int _NumHats = 0;
     public static void Init()
     {
@@ -78,7 +80,7 @@ public static class CwaffHats
       EasyHat(name: "cardboard_box",         offset: new IntVector2( 0, -3));
       EasyHat(name: "squire_helmet",         offset: new IntVector2( 0, -5), onEyes: true/*, depth: Hat.HatDepthType.ALWAYS_IN_FRONT*/);
       EasyHat(name: "jackolantern",          offset: new IntVector2( 0, -2), displayName: "Jack O'Lantern");
-      EasyHat(name: "pizza_hat",             offset: new IntVector2( 0, -3));
+      _PizzaHat = EasyHat(name: "pizza_hat", offset: new IntVector2( 0, -3));
 
       EasyHat(name: "bicorne",               offset: new IntVector2( 0, -3));
       EasyHat(name: "chicken",               offset: new IntVector2( 0, -1));

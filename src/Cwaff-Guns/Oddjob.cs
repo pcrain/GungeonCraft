@@ -12,7 +12,6 @@ public class Oddjob : CwaffGun
     internal static Projectile _OddjobFlakProjectile = null;
 
     private Projectile _extantOddjobProj = null;
-    private string _capiHatName = null;
 
     public static void Init()
     {
@@ -83,30 +82,14 @@ public class Oddjob : CwaffGun
     {
         if (this.PlayerOwner is not PlayerController player)
             return;
-        if (player.gameObject.GetComponent<HatController>() is not HatController hc)
-            return;
-        if (player.CurrentHat() is Hat hat)
-        {
-            if (hat.hatName == _OddjobHat.hatName)
-                return;
-            this._capiHatName = hat.hatName.GetDatabaseFriendlyHatName();
-        }
-        hc.SetHat(_OddjobHat);
+        player.OverrideHat(_OddjobHat);
     }
 
     private void RemoveHatFromHead()
     {
         if (this.PlayerOwner is not PlayerController player)
             return;
-        if (player.gameObject.GetComponent<HatController>() is not HatController hc)
-            return;
-        if (hc.CurrentHat is Hat curHat && curHat.hatName == _OddjobHat.hatName)
-            hc.RemoveCurrentHat();
-        if (string.IsNullOrEmpty(this._capiHatName))
-            return;
-        if (Hatabase.Hats.TryGetValue(this._capiHatName, out Hat origHat))
-            hc.SetHat(origHat);
-        this._capiHatName = null;
+        player.ClearHatOverride(_OddjobHat);
     }
 
     public override void OnDestroy()

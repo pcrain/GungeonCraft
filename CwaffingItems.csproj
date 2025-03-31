@@ -67,6 +67,7 @@
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\ArmorPiercingRounds.cs"/>
     <Compile Include="src\Cwaff-Passives\ScavengingArms.cs"/>
+    <Compile Include="src\Cwaff-Passives\Domino.cs"/>
     <Compile Include="src\Cwaff-Passives\LibraryCardtridge.cs"/>
     <Compile Include="src\Cwaff-Passives\ReserveAmmolet.cs"/>
     <Compile Include="src\Cwaff-Passives\GorgunEye.cs"/>
@@ -199,7 +200,6 @@
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
     <Compile Include="src\Cwaff-Guns\PistolWhip.cs"/>
     <Compile Include="src\Cwaff-Guns\RCLauncher.cs"/>
-    <Compile Include="src\Cwaff-Guns\PizzaPeel.cs"/>
     <Compile Include="src\Cwaff-Guns\Nycterian.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
     <Compile Include="src\Cwaff-Guns\RacketLauncher.cs"/>
