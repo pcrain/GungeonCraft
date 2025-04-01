@@ -4,7 +4,7 @@ public class GasterBlaster : CwaffActive
 {
     public static string ItemName         = "Gaster Blaster";
     public static string ShortDescription = "Use Your Best Attack First";
-    public static string LongDescription  = "Deploys a blaster behind you that fires an extremely powerful beam after a short delay.";
+    public static string LongDescription  = "Deploys a blaster behind the player that fires an extremely powerful beam after a short delay.";
     public static string Lore             = "Given to Mr. Gundertale by \"a dear old friend\" and passed along to you, this blaster operates using a uniquely powerful combination of science, magic, and friendship. It shows surprisingly little wear, and the initials \"WDG\" can still clearly be seen engraved between the eyes. Holding it in your hands fills with you with a positive feeling you find difficult to determine at the moment.";
 
     internal static Projectile _GasterBlast;

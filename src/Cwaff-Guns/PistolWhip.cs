@@ -8,7 +8,7 @@ public class PistolWhip : CwaffGun
 {
     public static string ItemName         = "Pistol Whip";
     public static string ShortDescription = "What a Horrible Night";
-    public static string LongDescription  = "A long range weapon that deals high melee damage at its tip and fires a fast projectile when fully extended. Can only melee hit enemies when fully extended. Increases curse by 2 while in inventory.";
+    public static string LongDescription  = "Deals high melee damage and fires a fast projectile at its tip when fully extended. Can only melee hit enemies when fully extended. Increases curse by 2 while in inventory.";
     public static string Lore             = "Once wielded by elite foot soldiers in the army of the great Pharaoh Tutancannon, this weapon is contraband in modern gunfare. On top of flouting the Guneva Conventions with its absurd muzzle range and ability to reach around rather tall walls, it is also reported to have been cursed by Tutancannon himself on his deathbed, bound to unleash the foulest creatures upon those who would dare wield it within the Gungeon's chambers.";
 
     internal const int _MINI_BLANKS_ON_KILL = 3; // mini blanks to replenish on kill for mastery

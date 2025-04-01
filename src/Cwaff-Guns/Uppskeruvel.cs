@@ -4,7 +4,7 @@ public class Uppskeruvel : CwaffGun
 {
     public static string ItemName         = "Uppskeruvel";
     public static string ShortDescription = "Aimless Souls";
-    public static string LongDescription  = "Enemies killed with this gun drop soul fragments proportional to their max health. Collecting these fragments spawns Aimless Souls that will attack enemies shot by this gun. New souls are spawned after collecting 10, 30, 60, 100, 150, etc. fragments.";
+    public static string LongDescription  = "Fires projectiles capable of harvesting enemies' souls. Enemies killed with this gun drop soul fragments proportional to their max health. Collecting these fragments spawns Aimless Souls that will attack enemies shot by this gun. New souls are spawned after collecting 10, 30, 60, 100, 150, etc. fragments.";
     public static string Lore             = "The Gungeon has claimed its share of lives from Gungeoneers and Gundead alike. With a few notable exceptions, their souls wander the Gungeon aimlessly, yearning to bear arms once more. The Uppskeruvel calls out to these Aimless Souls and gives them purpose, transforming them into the projectiles they were always meant to be.\n\n\"By the sweat of your brow you will fire your weapon until your last projectile falls to the ground from whence you were both taken; for gunpowder you are and to gunpowder you will return.\" ~ Gunesis 3:19";
 
     internal const int _MAX_SOULS           = 40; // the max souls we can have following us at once

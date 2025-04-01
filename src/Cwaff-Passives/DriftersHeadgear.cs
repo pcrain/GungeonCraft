@@ -4,7 +4,7 @@ public class DriftersHeadgear : CwaffDodgeRollItem
 {
     public static string ItemName         = "Drifter's Headgear";
     public static string ShortDescription = "Hyper Light Dodger";
-    public static string LongDescription  = "Grants the user an extremely quick dash in place of their dodge roll, but leaves them vulnerable to bullets and enemies while dashing.";
+    public static string LongDescription  = "Grants the player an extremely quick dash in place of their dodge roll, but leaves them vulnerable to bullets and enemies while dashing.";
     public static string Lore             = "A memento left behind by a former adventurer said to possess the ability to outrun everything except his inner demons. While he never elaborated on what exactly those demons were, it almost certainly wasn't the likes of the Gundead.";
 
     internal static GameObject _LinkVFXPrefab;

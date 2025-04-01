@@ -4,7 +4,7 @@ public class Bubblebeam : CwaffGun
 {
     public static string ItemName         = "Bubblebeam";
     public static string ShortDescription = "Next to Godliness";
-    public static string LongDescription  = "Fires a stream of bubbles that capture enemy projectiles and have a chance to capture enemies that scales with the enemy's size. Captured projectiles can damage enemies but not the player, and are destroyed when popped. Captured enemies cannot move or shoot, and are released when popped. Bubbles can be used to push around captured projectiles and enemies, but other projectiles will pop bubbles.";
+    public static string LongDescription  = "Fires a stream of bubbles that capture enemy projectiles, and have a chance to capture enemies proportional to the enemy's size. Captured projectiles can damage enemies but not the player, and are destroyed when popped. Captured enemies cannot move or shoot, and are released when popped. Bubbles can be used to push around captured projectiles and enemies, but other projectiles will pop bubbles.";
     public static string Lore             = "A rather lengthy inscryption is printed on the side: 'First go like this, spin around. Stop! Double take three times: one, two, three. Then, pelvic thrust! Whoooo! Whooooooo! Stop on your right foot, don't forget it! Now it's time to bring it around town. Bring-it-around-town. Then you do this, then this, and this, and that, and-this-and-that-and-this-and-that, and then...' -- the rest is cut off.";
 
     internal static GameObject _BubbleVFX = null;

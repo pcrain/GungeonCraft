@@ -4,7 +4,7 @@ public class BlankChecks : CwaffPassive
 {
     public static string ItemName         = "Blank Checks";
     public static string ShortDescription = "Write-off";
-    public static string LongDescription  = "Trying to use a blank without one in your inventory gives you 3 blanks and +1 curse. Will not work if you already have 10 or more curse. Grants 1 blank when first picked up.";
+    public static string LongDescription  = "Pressing the blank button when out of blanks increases curse by 1 and grants 3 additional blanks, one of which is immediately used. Will not work at 10 curse or higher. Grants 1 blank when first picked up.";
     public static string Lore             = "Rumor has it that blank checks were originally conceived of outside the domain of weaponry entirely, and were developed primarily for use in large-scale business transactions. As firearms are only very rarely involved in such transactions, why so many business people have any use for extra blanks remains a mystery to this day.";
 
     private const float _BLANK_EXPRESSION_DISCOUNT = 0.1f;

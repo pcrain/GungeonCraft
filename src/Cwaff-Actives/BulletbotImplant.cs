@@ -4,7 +4,7 @@ public class BulletbotImplant : CwaffActive
 {
     public static string ItemName         = "Bulletbot Implant";
     public static string ShortDescription = "Loyal Gunpanions"; //How to Train your Dragun
-    public static string LongDescription  = "Grants the nearest unarmed companion a random gun and a penchant for violence.";
+    public static string LongDescription  = "Grants the nearest unarmed companion a random gun and the ability to fire it at nearby enemies.";
     public static string Lore             = "A microchip designed to rewire the neurons and DNA of its host to instantaneously train them in the art of armed combat. Conventional wisdom posits that if you give a dog a gun, he'll bark at it all day, but if you teach a dog to gun, he'll fight by your side for the rest of his life.";
 
     private AIActor _nearestCompanion = null;

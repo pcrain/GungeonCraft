@@ -130,7 +130,7 @@ public static class CwaffSynergies
         NewMastery<MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName);
         // Chekhov's Gun has no minimum fire time and restores all unfired shots at the end of the room.
         NewMastery<MasteryOfChekhovsGun>(MASTERY_CHEKHOVS_GUN, ChekhovsGun.ItemName);
-        // Pincushion's pins phase through minor breakables and the gun itself no longer increases in spread.
+        // Pincushion's pins phase through decor, and the gun itself no longer increases in spread.
         NewMastery<MasteryOfPincushion>(MASTERY_PINCUSHION, Pincushion.ItemName);
         // Enemies and projectiles are completely halted while souls are active.
         NewMastery<MasteryOfPlatinumStar>(MASTERY_PLATINUM_STAR, PlatinumStar.ItemName);
@@ -142,7 +142,7 @@ public static class CwaffSynergies
         NewMastery<MasteryOfSchrodingersGat>(MASTERY_SCHRODINGERS_GAT, SchrodingersGat.ItemName);
         // Chicks spawn jammed and deal contact damage to enemies.
         NewMastery<MasteryOfHatchlingGun>(MASTERY_HATCHLING_GUN, HatchlingGun.ItemName);
-        // Die faces no longer resets to 1 when firing, allowing you to hold fire on whatever face you want.
+        // Crapshooter's die face does not reset to 1 upon firing and repeatedly shoots the same-numbered die as long as fire as held.
         NewMastery<MasteryOfCrapshooter>(MASTERY_CRAPSHOOTER, Crapshooter.ItemName);
         // Holy Water Gun deals 16x damage to Jammed enemies. Killing Jammed enemies creates pools of holy goop that grant invulnerability and infinite ammo while active.
         NewMastery<MasteryOfHolyWaterGun>(MASTERY_HOLY_WATER_GUN, HolyWaterGun.ItemName);
@@ -158,7 +158,7 @@ public static class CwaffSynergies
         NewMastery<MasteryOfPistolWhip>(MASTERY_PISTOL_WHIP, PistolWhip.ItemName);
         // Femtobyte gains the ability to digitze enemies and respawn them as allies later.
         NewMastery<MasteryOfFemtobyte>(MASTERY_FEMTOBYTE, Femtobyte.ItemName);
-        // Enemies drop souls and souls attack enemies even when Uppskeruvel is not the active gun.
+        // Enemies drop soul fragments and Aimless Souls attack enemies even when Uppskeruvel is not the active gun.
         NewMastery<MasteryOfUppskeruvel>(MASTERY_UPPSKERUVEL, Uppskeruvel.ItemName);
         // Card speed is dramatically increased, clip size is doubled, and the last 13 cards in each clip become exploding jokers.
         NewMastery<MasteryOfBlackjack>(MASTERY_BLACKJACK, Blackjack.ItemName)
@@ -208,7 +208,7 @@ public static class CwaffSynergies
             .MultFireRate(2.0f);
         // Ki Blast can be charged to fire a Kamehameha capable of breaking boss damage caps. Charging a Kamehameha slows the player down, and firing the Kamehameha prevents the player from moving entirely.
         NewMastery<MasteryOfKiBlast>(MASTERY_KI_BLAST, KiBlast.ItemName);
-        // Hallaeribut becomes permanently ravenous and can be fed items on the ground by reloading with a full clip. Items grant ammo proportional to their quality. If Hallaeribut runs out of ammo, it will automatically consume the least valuable item in the player's inventory for ammo. Hallaeribut will not feed on the player until no more items are available.
+        // Hallaeribut becomes permanently Ravenous and can be fed items on the ground by reloading with a full clip. Items grant ammo proportional to their quality. If Hallaeribut runs out of ammo, it will automatically consume the least valuable item in the player's inventory for ammo. Hallaeribut will not feed on the player until no more items are available.
         NewMastery<MasteryOfHallaeribut>(MASTERY_HALLAERIBUT, Hallaeribut.ItemName);
         // Gunflower passively regenerates up to 10% of its max ammo while active and can gain ammo from all goops.
         NewMastery<MasteryOfGunflower>(MASTERY_GUNFLOWER, Gunflower.ItemName);
@@ -262,9 +262,9 @@ public static class CwaffSynergies
             .MultDamage(1.25f);
         // B. B. Gun projectiles deflect all enemy projectiles in their path, transforming them to pins in the process.
         NewMastery<MasteryOfBBGun>(MASTERY_B_B_GUN, BBGun.ItemName);
-        // Bat echoes have a 100% chance of distracting enemies at any range, and gain the ability to distract bosses.
+        // Bat echoes have a 100% chance of distracting enemies at any distance, and gain the ability to distract bosses.
         NewMastery<MasteryOfNycterian>(MASTERY_NYCTERIAN, Nycterian.ItemName);
-        // Reload time is decreased by 35%, and seltzer water now inflicts hiccups on enemies. Hiccups have a chance to erratically stun enemies for a brief period and cause them to emit a ring of bullets that damage other nearby enemies.
+        // Reload time is decreased by 35%, and seltzer water now inflicts hiccups on enemies. Hiccups have a chance to erratically stun enemies for a brief period and causes them to emit a ring of bullets that damage other nearby enemies.
         NewMastery<MasteryOfSeltzerPelter>(MASTERY_SELTZER_PELTER, SeltzerPelter.ItemName)
             .MultReload(0.65f);
         // Firing uncharged shots no longer consumes ammo, and every active prism fires a parallel beam of light in unison with Suncaster.
@@ -284,7 +284,7 @@ public static class CwaffSynergies
         NewMastery<MasteryOfMacheening>(MASTERY_MACHEENING, Macheening.ItemName);
         // Plasmarble projectiles bounce two additional times before shattering and emit 4 electric bolts per bounce.
         NewMastery<MasteryOfPlasmarble>(MASTERY_PLASMARBLE, Plasmarble.ItemName);
-        // Reloading toggles autotarget mode, allowing Xelsior's secondary guns to autotarget enemies at a reduced fire rate.
+        // Reloading toggles autotarget mode, allowing Xelsior's pistols to autotarget enemies at a reduced fire rate.
         NewMastery<MasteryOfXelsior>(MASTERY_XELSIOR, Xelsior.ItemName);
         // Projectiles can now hit enemies, and destroy up to 5 of their projectiles on contact.
         NewMastery<MasteryOfEmpath>(MASTERY_EMPATH, Empath.ItemName);

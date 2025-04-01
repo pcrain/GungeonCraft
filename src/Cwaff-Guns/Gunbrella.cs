@@ -8,7 +8,7 @@ public class Gunbrella : CwaffGun
 {
     public static string ItemName         = "Gunbrella";
     public static string ShortDescription = "Cloudy with a Chance of Pain";
-    public static string LongDescription  = "Charging and releasing fires projectiles that hail from the sky at the cursor's position.";
+    public static string LongDescription  = "Fires projectiles that hail from the sky at the cursor's position after a charging period.";
     public static string Lore             = "A normal umbrella that was genetically modified to fire bullets, older models fired projectiles from the front much like a traditional firearm. Gungeoneers quickly grew frustrated at being unable to actually see where they were shooting at due to the Gunbrella's large frame. With modern advances in technology and magic, newer models include a touchscreen and GPS that allows the user to target enemies directly with projectiles summoned from the sky itself.";
 
     private const float _MIN_CHARGE_TIME   = 0.75f;

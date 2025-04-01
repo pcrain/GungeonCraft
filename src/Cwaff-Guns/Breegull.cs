@@ -4,7 +4,7 @@ public class Breegull : CwaffGun
 {
     public static string ItemName         = "Breegull";
     public static string ShortDescription = "Rare Wares";
-    public static string LongDescription  = "Fires eggs with varying effects & (ammo costs). Reloading with a full clip cycles egg types:\n (1) Normal: no effect\n (2) Fire: ignites\n (5) Grenade: large explosion\n (2) Ice: freezes\n (3) Clockwork: homing";
+    public static string LongDescription  = "Fires eggs with varying effects and ammo costs. Reloading with a full clip cycles through the following egg types:\n normal (1 ammo)\n fire (2 ammo)\n grenade (5 ammo)\n ice (2 ammo)\n clockwork (3 ammo)";
     public static string Lore             = "With bear no more,\n  the bird's alone.\nAmidst the Gungeon's\n  walls of stone.\nArmed with her trusty\n  eggs and beak.\nShe'll help you kill\n  the past you seek.\n- Guntilda";
 
     private const float TALON_TROT_TIMER = 0.16f;

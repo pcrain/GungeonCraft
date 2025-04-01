@@ -4,7 +4,7 @@ public class JohnsWick : CwaffPassive
 {
     public static string ItemName         = "John's Wick";
     public static string ShortDescription = "No Dogs Harmed";
-    public static string LongDescription  = "Move faster and deal double damage while on fire; take damage from fire more slowly.";
+    public static string LongDescription  = "Move faster and deal double damage while on fire, and take damage from fire more slowly.";
     public static string Lore             = "According to Bello, the wick inside this lantern was once possessed by a man who survived dozens of assassination attempts en route to grabbing breakfast at a hotel. This raises far more questions than it answers, and Bello refuses to elaborate further.";
 
     private const float _FIRE_TIMER_MULT = 0.25f;

@@ -4,7 +4,7 @@ public class Alligator : CwaffGun
 {
     public static string ItemName         = "Alligator";
     public static string ShortDescription = "Shockingly Effective";
-    public static string LongDescription  = "Fires clips that clamp onto enemies and periodically channel electricity from the player. Energy output is proportional to the player's damage stat, and increases further while rolling, walking over carpet, or standing in electrified goop. Each clip channels the full energy output, and up to 8 clips can be attached to each enemy. Passively grants electric immunity while in inventory.";
+    public static string LongDescription  = "Fires clips that clamp onto enemies and periodically channel electricity from the player. Each clip's energy output is proportional to the player's damage stat, and increases further while rolling, walking over carpet, or standing in electrified goop. Up to 8 clips can be attached to each enemy. Passively grants electric immunity while in inventory.";
     public static string Lore             = "Most of the Gundead are either made of metal or carrying metal weaponry on them, making them rather hilariously susceptible to contact with live wires. Thanks to some fancy electrical engineering far beyond your comprehension, the Alligator allows you to channel the ambient static electricity you passively collect directly into the bodies of anything you can clip onto. Outside the Gungeon, it also doubles as an extremely handy tool for do-it-yourself home wiring projects.";
 
     private const float _ELECTRIFIED_ENERGY_BONUS    = 4.0f;

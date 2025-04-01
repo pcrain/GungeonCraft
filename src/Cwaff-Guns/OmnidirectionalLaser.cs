@@ -9,7 +9,7 @@ public class OmnidirectionalLaser : CwaffGun
 {
     public static string ItemName         = "Omnidirectional Laser";
     public static string ShortDescription = "Hula Hooplah";
-    public static string LongDescription  = "Fires a strong laser in the direction of an orbiting targeting reticle. The reticle orbits more quickly each time a laser is fired, and cools down after a short period of inactivity.";
+    public static string LongDescription  = "Fires a strong laser in the direction of an orbiting targeting reticle. The reticle orbits more quickly each time a laser is fired, and orbits more slowly after a short period of inactivity.";
     public static string Lore             = "Initially designed with hundreds of AI-guided lasers around its perimeter, budget cuts during production led to replacing the hundreds of lasers with a single laser that circled around the weapon's perimeter. Further budget cuts let to the removal of the AI targeting system, resulting in a final product that, while potent, is incredibly inconvenient to aim.";
 
     private const int _BASE_FPS          = 8;

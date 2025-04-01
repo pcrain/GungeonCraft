@@ -4,7 +4,7 @@ public class Yggdrashell : CwaffGun
 {
     public static string ItemName         = "Yggdrashell";
     public static string ShortDescription = "The Gun of Life";
-    public static string LongDescription  = "Fires vines that constrict enemies and absorb their life force, with vines increasing in strength as more life absorbed. Max absorption scales with the player's current number of hearts (or armor, for zero-health characters). At max absorption, provides one hit of Earth Armor that negates damage once. Absorbed life force is reset to zero upon getting hit or triggering Earth Armor.";
+    public static string LongDescription  = "Fires vines that constrict enemies and absorb their life force, with vines increasing in strength as more life is absorbed. Max absorption scales with the player's current number of hearts (or armor, for zero-health characters). At max absorption, provides one hit of Earth Armor that negates damage once. Absorbed life force is reset to zero upon getting hit or triggering Earth Armor.";
     public static string Lore             = "Crafted from the wood of the World Tree by Reloadin himself, this gun thrives off the life forces of those at both ends of its barrel. Its true strength manifests only when wielded by one possessing both great might and great fortitude.";
 
     private const float _PARTICLE_RATE          = 0.03f;

@@ -3,6 +3,7 @@
 ## 1.23.1 (TBD)
 
 - Added 9 new synergies
+- Tweaked several gun and item descriptions for clarity, consistency, and grammar
 
 ## 1.23.0 (2025-03-31)
 
