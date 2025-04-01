@@ -572,6 +572,15 @@ public static class Extensions
     return player.healthHaver.GetCurrentHealth() == 0.5f;
   }
 
+  /// <summary>Check the number of hits a player is away from death</summary>
+  public static int NumHitsFromDeath(this PlayerController player)
+  {
+    float hits = player.healthHaver.Armor;
+    if (!player.ForceZeroHealthState)
+      hits += 2f * player.healthHaver.GetCurrentHealth();
+    return Mathf.RoundToInt(hits);
+  }
+
   /// <summary>Check if a player is in a boss room</summary>
   public static bool InBossRoom(this PlayerController player)
   {

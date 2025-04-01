@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.23.1 (TBD)
+
+- Added 3 new synergies
+
 ## 1.23.0 (2025-03-31)
 
 #### Features:

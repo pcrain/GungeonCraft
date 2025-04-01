@@ -112,6 +112,7 @@ public class FlakseedFlower : MonoBehaviour
     const float _FIRE_RATE_VARIANCE = 0.25f;
     const float _WILT_TIME = 15.0f;
     const float _WILT_CHECK_RATE = 0.1f;
+    const float _WATER_GROWTH_MULT = 3f;
     const float _ATTACK_RATE = 2.0f;
     const float _ATTACK_CHECK_RATE = 0.5f;
     const float _ATTACK_DAMAGE = 25f;
@@ -133,6 +134,7 @@ public class FlakseedFlower : MonoBehaviour
     private bool _wilting = false;
     private float _nextAttackCheck = 0;
     private tk2dSpriteAnimator _animator = null;
+    private bool _growsFasterInWater = false;
 
     internal PlayerController _owner = null;
 
@@ -150,6 +152,7 @@ public class FlakseedFlower : MonoBehaviour
         this._firePos = this._sprite.WorldTopCenter + new Vector2(0f, -0.125f);
         this._nextFireRate = _MIN_FIRE_RATE + _FIRE_RATE_VARIANCE * UnityEngine.Random.value;
         this._animator.AnimationCompleted += OnAnimationCompleted;
+        this._growsFasterInWater = Lazy.AnyoneHasSynergy(Synergy.LAWN_CARE);
     }
 
     private void OnAnimationCompleted(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
@@ -279,10 +282,11 @@ public class FlakseedFlower : MonoBehaviour
         if (this.mega && this._grown)
             AttackNearbyEnemies();
 
+        bool inWater = InNutritiousSoil(goopData, goopDef);
         float dtime = BraveTime.DeltaTime;
         if (!this._grown)
         {
-            this._growthTimer += dtime;
+            this._growthTimer += (dtime * ((inWater && this._growsFasterInWater) ? _WATER_GROWTH_MULT : 1f));
             if (this._growthTimer >= _GROWTH_TIME)
             {
                 this._sprite.scale = Vector3.one;
@@ -302,7 +306,7 @@ public class FlakseedFlower : MonoBehaviour
             }
             return;
         }
-        if (InNutritiousSoil(goopData, goopDef))
+        if (inWater)
             this._wiltTimer = 0.0f;
         else if ((this._wiltTimer += (dtime * RateOfWilting())) >= _WILT_TIME)
         {

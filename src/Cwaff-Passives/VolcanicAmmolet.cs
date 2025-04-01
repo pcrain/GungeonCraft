@@ -8,9 +8,10 @@ public class VolcanicAmmolet : CwaffBlankModificationItem, ICustomBlankDoer
     public static string Lore             = "The very talented senior engineers at ACNE corporation's Mt. Fuji Headquarters have discovered how to harness the natural power of volcanoes in Ammolet format...at least that's what their marketing team would have you believe. The reality is that igniting the gunpowder inside projectiles when destroying them is trivial, and most Ammolets have mechanisms that inhibit projectile explosions as a safety feature to comply with local consumer laws. It seems ACNE's legal team has gotten around this by slapping a 'not for retail' label on the Ammolet and giving it away as a free gift with 65-casing glasses of water.";
 
     private const float NORMAL_EXPLOSION_DELAY = 0.125f; // normal explosion queue delay
-    private const float QUICK_EXPLOSION_DELAY  = 0.03125f; // make VolcanicAmmolet queued explosions faster
+    private const float QUICK_EXPLOSION_DELAY  = 0.25f * NORMAL_EXPLOSION_DELAY; // make VolcanicAmmolet queued explosions faster
 
     private static float _ExplosionTimer = NORMAL_EXPLOSION_DELAY; // the current value we're using for explosion queueing timer
+    private static ExplosionData _LargeVolcanicExplosion = null;
 
     public static void Init()
     {
@@ -18,12 +19,19 @@ public class VolcanicAmmolet : CwaffBlankModificationItem, ICustomBlankDoer
         item.quality      = ItemQuality.B;
         ItemBuilder.AddPassiveStatModifier(item, StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
+
+        _LargeVolcanicExplosion = Explosions.DefaultLarge.Clone();
+        _LargeVolcanicExplosion.damageToPlayer = 0f;
     }
 
     public void OnCustomBlankedProjectile(Projectile p)
     {
         _ExplosionTimer = QUICK_EXPLOSION_DELAY;  // temporarily sets the queued explosion speed until the next time the queue is empty
-        Exploder.Explode(p.transform.position, Scotsman._ScotsmanExplosion, Vector2.zero, ignoreQueues: false);
+        Exploder.Explode(
+            p.transform.position,
+            Lazy.AnyoneHasSynergy(Synergy.DEMOLITION_MAN) ? _LargeVolcanicExplosion : Scotsman._ScotsmanExplosion,
+            Vector2.zero,
+            ignoreQueues: false);
     }
 
     // keep accelerated explosion queue rate until after our queue is depleted

@@ -105,6 +105,12 @@ public static class CwaffSynergies
         NewSynergy(PHOTOSYNTHESIS, "Photosynthesis", new[]{IName(Gunflower.ItemName), "camera"});
         // Grants immunity to contact damage while holding Alien Engine and immunity to most other forms of damage while firing Alien Engine.
         NewSynergy(TANK_ENGINE, "Tank Engine", new[]{IName(DerailGun.ItemName), "alien_engine"});
+        // Projectiles detonated by blanks create larger explosions.
+        NewSynergy(DEMOLITION_MAN, "Demolition, Man!", new[]{IName(VolcanicAmmolet.ItemName), IName(Scotsman.ItemName)});
+        // Warrior's Gi activates when 2 hits from death as well as 1 hit from death.
+        NewSynergy(SAIYAN_PRIDE, "Saiyan Pride", new[]{IName(WarriorsGi.ItemName), IName(KiBlast.ItemName)});
+        // Warrior's Gi activates when 2 hits from death as well as 1 hit from death.
+        NewSynergy(LAWN_CARE, "Lawn Care", new[]{IName(Flakseed.ItemName), "starpew"});
       #endregion
 
       #region Masteries
@@ -584,6 +590,9 @@ public enum Synergy {
     CHEATO_PAGE,
     PHOTOSYNTHESIS,
     TANK_ENGINE,
+    DEMOLITION_MAN,
+    SAIYAN_PRIDE,
+    LAWN_CARE,
 
     // Masteries
     MASTERY_GRANDMASTER,

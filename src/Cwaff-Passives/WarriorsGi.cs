@@ -17,7 +17,7 @@ public class WarriorsGi : CwaffPassive
     internal static GameObject _SaiyanSpark;
     internal static GameObject _ZenkaiAura;
 
-    private bool _canActivate = false;
+    private float _lastHitsFromDeath = 0f;
 
     private StatModifier _rateOfFireStat     = null;
     private StatModifier _movementSpeedStat  = null;
@@ -40,7 +40,7 @@ public class WarriorsGi : CwaffPassive
         base.Pickup(player);
         player.healthHaver.OnDamaged += this.OnDamaged;
         player.healthHaver.OnHealthChanged += this.OnHealthChanged;
-        this._canActivate = !player.IsOneHitFromDeath();
+        this._lastHitsFromDeath = player.NumHitsFromDeath();
         RecalculatePower(player);
     }
 
@@ -71,17 +71,15 @@ public class WarriorsGi : CwaffPassive
 
     private void OnHealthChanged(float resultValue, float maxValue)
     {
-        if (!this.Owner.IsOneHitFromDeath())
-            this._canActivate = true;
+        this._lastHitsFromDeath = Mathf.Max(this._lastHitsFromDeath, this.Owner.NumHitsFromDeath());
     }
 
     private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
     {
-        if (this._canActivate && this.Owner.IsOneHitFromDeath())
-        {
+        float newHitsFromDeath = this.Owner.NumHitsFromDeath();
+        if (newHitsFromDeath < Mathf.Min(this._lastHitsFromDeath, this.Owner.HasSynergy(Synergy.SAIYAN_PRIDE) ? 3 : 2))
             DoZenkaiBoost(this.Owner);
-            this._canActivate = false;
-        }
+        this._lastHitsFromDeath = newHitsFromDeath;
     }
 
     private void DoZenkaiBoost(PlayerController player)
