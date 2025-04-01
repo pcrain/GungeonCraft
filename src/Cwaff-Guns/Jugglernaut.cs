@@ -146,7 +146,7 @@ public class Jugglernaut : CwaffGun
 
     private void OnPlayerDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
     {
-        if (this.PlayerOwner)
+        if (this.PlayerOwner && !this.PlayerOwner.HasSynergy(Synergy.SOLID_FOOTING))
             ResetJuggle();
     }
 

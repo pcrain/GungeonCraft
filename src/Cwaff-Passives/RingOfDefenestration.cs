@@ -29,19 +29,25 @@ public class RingOfDefenestration : CwaffPassive
     {
         static void Postfix(TrackedStats stat, float value)
         {
+            const float DOUBLE_REWARD_CHANCE = 0.33f;
+
             if (stat != TrackedStats.ENEMIES_KILLED_WITH_PITS || !Lazy.AnyoneHas<RingOfDefenestration>())
                 return;
 
             int pickupID = _RewardWeights.WeightedRandom();
-            if (pickupID < 0) // currency
-                LootEngine.SpawnCurrency(GameManager.Instance.BestActivePlayer.CenterPosition, -pickupID);
-            else
-                LootEngine.SpawnItem(
-                  item              : PickupObjectDatabase.GetById(pickupID).gameObject,
-                  spawnPosition     : GameManager.Instance.BestActivePlayer.CenterPosition,
-                  spawnDirection    : Vector2.zero,
-                  force             : 0,
-                  doDefaultItemPoof : true);
+            int rewards = ((UnityEngine.Random.value <= DOUBLE_REWARD_CHANCE) && (Lazy.AnyoneHasSynergy(Synergy.THE_ABYSS_STARES_BACK))) ? 2 : 1;
+            for (int i = 0; i < rewards; ++i)
+            {
+                if (pickupID < 0) // currency
+                    LootEngine.SpawnCurrency(GameManager.Instance.BestActivePlayer.CenterPosition, -pickupID);
+                else
+                    LootEngine.SpawnItem(
+                      item              : PickupObjectDatabase.GetById(pickupID).gameObject,
+                      spawnPosition     : GameManager.Instance.BestActivePlayer.CenterPosition,
+                      spawnDirection    : Vector2.zero,
+                      force             : 0,
+                      doDefaultItemPoof : true);
+            }
         }
     }
 }

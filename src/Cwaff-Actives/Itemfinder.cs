@@ -98,6 +98,8 @@ public class Itemfinder : CwaffActive
             return;
 
         LootEngine.SpawnItem(nearestTreasure.pickup.gameObject, nearestTreasure.location, Vector2.zero, 0f, true, true, false);
+        if (user.HasSynergy(Synergy.TREASURE_HUNTER))
+            LootEngine.SpawnCurrency(nearestTreasure.location, UnityEngine.Random.Range(3, 10), false, null, null);
         user.gameObject.Play("itemfinder_get_item");
 
         _Treasure.Remove(nearestTreasure);

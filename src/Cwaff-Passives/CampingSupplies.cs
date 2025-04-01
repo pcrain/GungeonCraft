@@ -110,7 +110,7 @@ public class CampingSupplies : CwaffPassive
         if (this._campLevel == _MaxCampLevel)
             return; // nothing else to do
 
-        this._timeSinceMoving += BraveTime.DeltaTime;
+        this._timeSinceMoving += BraveTime.DeltaTime * (player.HasSynergy(Synergy.COZY_CAMPER) ? 2f : 1f);
         if (this._timeSinceMoving < _CampTimes[this._campLevel + 1])
             return; // haven't reached the next level of camping yet
 

@@ -31,6 +31,15 @@ public class PaintballCannon : CwaffGun
         base.PostProcessProjectile(projectile);
         if (this.Mastered)
             projectile.GetComponent<PaintballColorizer>().mastered = true;
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+        if (player.GetActive((int)Items.PotionOfLeadSkin) is not ReflectShieldPlayerItem leadSkin)
+            return;
+        if (!leadSkin.IsCurrentlyActive)
+            return;
+        if (!player.HasSynergy(Synergy.LEAD_PAINT))
+            return;
+        projectile.GetComponent<PaintballColorizer>().reflectsProjectiles = true;
     }
 }
 
@@ -39,12 +48,14 @@ public class PaintballColorizer : MonoBehaviour
     private enum Goop { CHARM, FIRE, CHEESE, ELECTRIC, POISON, WATER, WEB, ICE };
 
     private Color _tint;
+    private Projectile _proj = null;
 
     public bool mastered = false;
+    public bool reflectsProjectiles = false;
 
     private void Start()
     {
-        Projectile p = base.GetComponent<Projectile>();
+        Projectile p = this._proj = base.GetComponent<Projectile>();
 
         int i = UnityEngine.Random.Range(0, EasyGoopDefinitions.ColorGoopColors.Count);
         Goop g = (Goop)i;
@@ -71,9 +82,25 @@ public class PaintballColorizer : MonoBehaviour
         }
         else
             gm.goopDefinition = EasyGoopDefinitions.ColorGoops[i];
+        if (this.reflectsProjectiles)
+        {
+            p.collidesWithProjectiles = true;
+            p.collidesOnlyWithPlayerProjectiles = false;
+            p.UpdateCollisionMask();
+            p.specRigidbody.OnPreRigidbodyCollision += this.ReflectProjectiles;
+        }
 
         p.AdjustPlayerProjectileTint(_tint, priority: 1);
         p.OnHitEnemy += this.OnHitEnemy;
+    }
+
+    private void ReflectProjectiles(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        if (!this._proj || !otherRigidbody || otherRigidbody.gameObject.GetComponent<Projectile>() is not Projectile p)
+            return;
+        PhysicsEngine.SkipCollision = true;
+        if (p.isActiveAndEnabled && p.Owner is AIActor enemy)
+            PassiveReflectItem.ReflectBullet(p, true, this._proj.Owner, this._proj.baseData.speed);
     }
 
     private void OnHitEnemy(Projectile bullet, SpeculativeRigidbody enemy, bool killed)

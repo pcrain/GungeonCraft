@@ -21,10 +21,12 @@ public class BulletproofTablecloth : CwaffPassive
         {
             if (__instance.gameObject.transform.parent is not Transform parent)
                 return true; // call the original method
-            if (!parent.gameObject.GetComponent<FlippableCover>())
+            if (parent.gameObject.GetComponent<FlippableCover>() is not FlippableCover table)
                 return true; // call the original method
             if (!Lazy.AnyoneHas<BulletproofTablecloth>())
                 return true; // call the original method
+            if (Lazy.AnyoneHasSynergy(Synergy.FURNITURE_POLISH))
+                table.GetComponentInChildren<SpeculativeRigidbody>().ReflectProjectiles = true;
             return false; // skip the original method
         }
     }
