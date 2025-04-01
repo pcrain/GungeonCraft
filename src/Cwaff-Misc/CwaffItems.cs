@@ -559,6 +559,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       }
   }
 
+  //WARNING: i think i reinvented Gun::usesContinuousFireAnimation here ...but why???
   /// <summary>Allow guns to not reset their shooting animation with every bullet fired</summary>
   [HarmonyPatch]
   private class GunShootAnimationPatch

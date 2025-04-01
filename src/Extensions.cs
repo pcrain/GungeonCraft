@@ -855,6 +855,54 @@ public static class Extensions
   }
 
   /// <summary>Set some basic attributes for each gun</summary>
+  /// <param name="gun">The gun we're setting attributes for.</param>
+  /// <param name="quality">The item quality of the gun.</param>
+  /// <param name="gunClass">The gun class of the gun.</param>
+  /// <param name="reloadTime">The base time it takes the gun to reload.</param>
+  /// <param name="ammo">The base ammo for the gun.</param>
+  /// <param name="audioFrom">The gun whose audio switches we use.</param>
+  /// <param name="defaultAudio">Whether we use the gun's default audio (true) or no audio at all (false) by default.</param>
+  /// <param name="infiniteAmmo">Whether the gun has infinite ammo.</param>
+  /// <param name="canGainAmmo">Whether the gun can gaim ammo via normal means.</param>
+  /// <param name="canReloadNoMatterAmmo">Whether the gun can reload even when out of ammo.</param>
+  /// <param name="doesScreenShake">Whether firing the gun does a screen shake effect.</param>
+  /// <param name="idleFps">FPS for the gun's idle animation.</param>
+  /// <param name="shootFps">FPS for the gun's fire animation.</param>
+  /// <param name="reloadFps">FPS for the gun's reload animation.</param>
+  /// <param name="chargeFps">FPS for the gun's charge animation.</param>
+  /// <param name="introFps">FPS for the gun's intro animation.</param>
+  /// <param name="fireAudio">Audio for the first frame of the gun's fire animation.</param>
+  /// <param name="reloadAudio">Audio for the first frame of the gun's reload animation.</param>
+  /// <param name="introAudio">Audio for the first frame of the gun's intro animation.</param>
+  /// <param name="loopChargeAt">Frame at which the gun's charge animation should be looped.</param>
+  /// <param name="loopReloadAt">Frame at which the gun's reload animation should be looped.</param>
+  /// <param name="loopFireAt">Frame at which the gun's fire animation should be looped.</param>
+  /// <param name="muzzleFrom">The gun whose muzzle effects we should use.</param>
+  /// <param name="modulesAreTiers">Whether the gun's currently active module corresponds to its current tier.</param>
+  /// <param name="muzzleVFX">The muzzle VFX object for the gun.</param>
+  /// <param name="muzzleFps">FPS for the gun's muzzle VFX.</param>
+  /// <param name="muzzleScale">Scale for the gun's muzzle VFX.</param>
+  /// <param name="muzzleAnchor">Anchor for the gun's muzzle VFX.</param>
+  /// <param name="muzzleEmission">Emission for the gun's muzzle VFX.</param>
+  /// <param name="carryOffset">Pixel offset for the gun's carry point relative to the player.</param>
+  /// <param name="preventRotation">Whether the gun should be prevented from rotating with the player's aim direction.</param>
+  /// <param name="curse">The amount of curse gained from picking up the gun.</param>
+  /// <param name="continuousFire">Whether the gun uses a continuous fire animation.</param>
+  /// <param name="dynamicBarrelOffsets">Whether the gun's barrel offset is updated dynamically with its animations.</param>
+  /// <param name="banFromBlessedRuns">Whether the gun should be blanned from Blessed Mode's random gun selection.</param>
+  /// <param name="rampUpFireRate">Whether the gun's rate of fire changes as it's continuously fired.</param>
+  /// <param name="rampUpFactor">How quickly the gun's rate of fire changes as it's continuously fired.</param>
+  /// <param name="suppressReloadAnim">Whether the reload animation for the gun should be completely disabled.</param>
+  /// <param name="handedness">Overrides the handedness of the gun.</param>
+  /// <param name="autoPlay">Whether the gun's animations should automatically play by default.</param>
+  /// <param name="attacksThroughWalls">Whether the gun may be fired while pointed inside a wall.</param>
+  /// <param name="suppressReloadLabel">Whether the "Reload" label should be suppressed when the current clip is empty.</param>
+  /// <param name="percentSpeedWhileCharging">Speed multiplier to apply to the player while the gun is charging.</param>
+  /// <param name="onlyUsesIdleInWeaponBox">Whether the gun should only play its idle animation in the weapon box.</param>
+  /// <param name="continuousFireAnimation">Whether the gun uses a continuous fire animation [DUPLICATE HARMONY PATCH VERSION].</param>
+  /// <param name="preventRollingWhenCharging">Whether dodge rolling should be disabled while the gun is charging.</param>
+  /// <param name="percentSpeedWhileFiring">Speed multiplier to apply to the player while the gun is firing.</param>
+  /// <param name="smoothReload">If non-negative, automatically adjusts the speed of the gun's reload animation to finish smoothReload seconds before the reload itself finishes.</param>
   public static Gun SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
