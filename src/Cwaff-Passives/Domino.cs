@@ -62,7 +62,7 @@ public class PizzaPeel : CwaffGun
 
     public static void Init()
     {
-        Lazy.SetupGun<PizzaPeel>(ItemName, ShortDescription, LongDescription, Lore)
+        Lazy.SetupGun<PizzaPeel>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.5f, ammo: 600, shootFps: _SHOOT_FPS, reloadFps: 4,
             muzzleFrom: Items.Mailbox, smoothReload: 0.1f, infiniteAmmo: true)
           .SetReloadAudio("pizza_flip_sound", 0, 8, 16, 20, 24, 28, 32)

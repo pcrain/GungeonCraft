@@ -1,15 +1,23 @@
 # Changelog
 
-## 1.23.0 (TBD)
+## 1.23.0 (2025-03-31)
+
+#### Features:
 
 - Added X-elsior, Empath, and Domino
 - Added masteries for X-elsior and Empath
+
+#### Balance Changes and Polish:
+
 - Added dynamic reload animation speeds to several guns (i.e., their animations reflect changes to the player's reload speed stat)
-	- (Bouncer, Bubblebeam, Carpet Bomber, Derail Gun, Flakseed, Hand Cannon, Hatchling Gun, Lightwing, Nycterian, Platinum Star, Sub Machine Gun, Subtractor Beam, Tranquilizer, Uppskeruvel, Wavefront, and Widowmaker)
-- Fixed null deref caused by looking for non-existent guns on the ground after completing mastery ritual
+	- (Bouncer, Bubblebeam, Carpet Bomber, Derail Gun, Empath, Flakseed, Hand Cannon, Hatchling Gun, Lightwing, Nycterian, Platinum Star, Sub Machine Gun, Subtractor Beam, Tranquilizer, Uppskeruvel, Wavefront, and Widowmaker)
 - Improved Gun destruction VFX for mastery ritual
-- Prevented [REDACTED] from damaging enemies while charging, preventing it from being useful on certain enemies
 - Made the Bubble Blasters given to enemies by Bubble Wand deal no damage to the player
+- Made [REDACTED] no longer damage enemies while charging, preventing it from being useful on certain enemies
+
+#### Bugfixes and Misc:
+
+- Fixed null deref caused by looking for non-existent guns on the ground after completing mastery ritual
 - Potentially fixed null deref caused by certain enemies trying to fire Bubble Blasters before initialization
 
 ## 1.22.3 (2025-03-21)
