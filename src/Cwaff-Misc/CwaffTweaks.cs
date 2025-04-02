@@ -5,7 +5,7 @@ public static class CwaffTweaks
     public static void Init()
     {
         //Make Wolf pettable
-        Gungeon.Game.Items["wolf"].GetComponent<CompanionItem>().MakePettable(
+        Items.Wolf.AsPassive().gameObject.GetComponent<CompanionItem>().MakePettable(
             ResMap.Get("wolf_pet"),
             ResMap.Get("wolf_pet_left"));
 

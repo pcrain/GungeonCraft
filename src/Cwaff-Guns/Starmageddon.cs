@@ -27,7 +27,7 @@ public class Starmageddon : CwaffGun
             reloadFps: 30, loopReloadAt: 0, attacksThroughWalls: true)
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: 30, cooldown: 0.125f, angleVariance: 15.0f,
-            shootStyle: ShootStyle.Automatic, damage: 8.0f, speed: 60.0f, range: 999999f, spawnSound: "starmageddon_fire_sound",
+            shootStyle: ShootStyle.Automatic, damage: 11.0f, speed: 60.0f, range: 999999f, spawnSound: "starmageddon_fire_sound",
             sprite: "starmageddon_bullet", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, useDummyChargeModule: true, customClip: true,
             // overrideColliderPixelSizes: new IntVector2(128, 128), //WARNING: large hitboxes apparently lag the game????
             shrapnelVFX: VFX.Create("starmageddon_shrapnel"), shrapnelCount: 5))
@@ -142,7 +142,7 @@ public class Starmageddon : CwaffGun
         for (int i = 0; i < roomEnemies.Count; ++i)
         {
             AIActor enemy = roomEnemies[i];
-            if (!enemy || !enemy.healthHaver || !enemy.healthHaver.IsAlive || !enemy.healthHaver.IsVulnerable || !enemy.IsWorthShootingAt)
+            if (!enemy || !enemy.healthHaver || !enemy.healthHaver.IsAlive || enemy.healthHaver.PreventAllDamage || !enemy.healthHaver.IsVulnerable || !enemy.IsWorthShootingAt)
                 continue;
             if (!_EffectiveHealth.TryGetValue(enemy, out float estHealth))
                 _EffectiveHealth[enemy] = estHealth = enemy.healthHaver.currentHealth;

@@ -466,7 +466,7 @@ public static class VFX
           newTrailObject.name = "trailObject";
 
           int spriteID = ETGMod.Databases.Items.ProjectileCollection.GetSpriteIdByName(spritePath);
-          tk2dTiledSprite tiledSprite = newTrailObject.GetOrAddComponent<tk2dTiledSprite>();
+          tk2dTiledSprite tiledSprite = newTrailObject.AddComponent<tk2dTiledSprite>();
 
           tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
           tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
@@ -475,8 +475,8 @@ public static class VFX
               def.untrimmedBoundsDataExtents
           };
 
-          tk2dSpriteAnimator animator = newTrailObject.GetOrAddComponent<tk2dSpriteAnimator>();
-          tk2dSpriteAnimation animation = newTrailObject.GetOrAddComponent<tk2dSpriteAnimation>();
+          tk2dSpriteAnimator animator = newTrailObject.AddComponent<tk2dSpriteAnimator>();
+          tk2dSpriteAnimation animation = newTrailObject.AddComponent<tk2dSpriteAnimation>();
           animation.clips = new tk2dSpriteAnimationClip[0];
           animator.Library = animation;
 

@@ -828,7 +828,7 @@ public static class GunBuilder
   public static void SuppressReloadAnimations(this Gun gun)
   {
     gun.reloadAnimation = gun.idleAnimation; // animation shouldn't automatically change when reloading
-    gun.gameObject.GetOrAddComponent<ReloadAnimationSuppressor>();
+    gun.gameObject.AddComponent<ReloadAnimationSuppressor>();
   }
 
   /// <summary>Helper patch for enabling ReloadAnimationSuppressor's functionality</summary>

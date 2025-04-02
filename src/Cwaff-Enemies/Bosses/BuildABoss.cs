@@ -615,7 +615,7 @@ public class BuildABoss
     // in the vanilla BossTriggerZone.cs -> OnTriggerCollision() method. See discussion on Gungeon Modding Discord 2023-11-05
     if (preFight)
       this.prefab.GetComponent<GenericIntroDoer>().triggerType = GenericIntroDoer.TriggerType.BossTriggerZone;
-    T npc = this.prefab.GetOrAddComponent<T>();
+    T npc = this.prefab.AddComponent<T>();
       npc.hasPreFightDialogue  = preFight;
       npc.hasPostFightDialogue = postFight;
       npc.autoFlipSprite       = false;

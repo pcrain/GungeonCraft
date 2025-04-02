@@ -7,7 +7,9 @@
 - Increased Vacuum Cleaner's per-debris chance to restore ammo from 1% to 5%
 	- Increased Scavengest synergy's per-debris chance to restore ammo from 4% to 20%
 - Capped Ki Blast's reflection damage multiplier at 8 times the projectile's original damage
-- Projectile modification items are now properply applied to projectiles created by Flakseed's flowers, Maestro's reflections, enemies infected by Outbreak, Pistol Whip's whip and pistol, Seltzer Pelter's soda cans, Sunderbuss' ground slam, Widowmaker's spider turrets
+- Projectile modification items are now properly applied to projectiles created by Flakseed's flowers, Maestro's reflections, enemies infected by Outbreak, Pistol Whip's whip and pistol, Seltzer Pelter's soda cans, Sunderbuss' ground slam, and Widowmaker's spider turrets
+- X-elsior now always starts with one pistol in its arsenal
+- Increased Starmageddon's projectile damage from 8 to 11
 
 ## 1.23.0 (2025-03-31)
 

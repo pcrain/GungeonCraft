@@ -85,7 +85,7 @@ public class CwaffBezierMesh : MonoBehaviour
   {
     base.transform.rotation = Quaternion.identity;
     base.transform.position = Vector3.zero;
-    m_sprite = this.GetOrAddComponent<tk2dTiledSprite>();
+    m_sprite = this.AddComponent<tk2dTiledSprite>();
     m_sprite.collection = animation.frames[0].spriteCollection;
     m_sprite.spriteId = animation.frames[0].spriteId;
     m_sprite.OverrideGetTiledSpriteGeomDesc = GetTiledSpriteGeomDesc;

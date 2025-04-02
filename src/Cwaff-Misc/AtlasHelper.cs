@@ -316,8 +316,8 @@ internal static class AtlasHelper
   /// <summary>Modification of Alexandria method using our own packed textures</summary>
   public static T SetupDfSpriteFromDef<T>(this GameObject obj, tk2dSpriteDefinition def, Shader shader) where T : dfSprite
   {
-      T sprite = obj.GetOrAddComponent<T>();
-      dfAtlas atlas = obj.GetOrAddComponent<dfAtlas>();
+      T sprite = obj.AddComponent<T>();
+      dfAtlas atlas = obj.AddComponent<dfAtlas>();
       atlas.Material = new Material(shader);
       atlas.Material.mainTexture = def.material.mainTexture;
       atlas.Items.Clear();

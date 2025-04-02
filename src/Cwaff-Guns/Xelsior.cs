@@ -123,6 +123,8 @@ public class Xelsior : CwaffGun
     {
         base.OnSwitchedToThisGun();
         DestroyExtantGuns();
+        if (this.maxGuns == 0)
+            this.maxGuns = 1; // make sure we always have at least one gun
         StartCoroutine(SpawnGunsOnceWeCanMove());
 
         #if DEBUG
