@@ -132,6 +132,8 @@ public class SunderbussProjectile : Projectile
               randomFrame      : true
               );
 
+        PlayerController pc = proj.Owner as PlayerController;
+
         // spawn Blunderbuss projectiles
         for (int i = 0; i < 16; ++i)
         {
@@ -141,9 +143,11 @@ public class SunderbussProjectile : Projectile
               Sunderbuss._BlunderbussProjectile, pos + RADIUS * avec, angle.EulerZ()).GetComponent<Projectile>();
             p.Owner = base.Owner;
             p.Shooter = base.Shooter;
+            if (pc)
+                pc.DoPostProcessProjectile(p);
         }
 
-        if (proj.Owner is PlayerController pc && pc.HasSynergy(Synergy.MASTERY_SUNDERBUSS))
+        if (pc && pc.HasSynergy(Synergy.MASTERY_SUNDERBUSS))
             Sunderbuss._ShockwavePrefab.gameObject.Instantiate(proj.SafeCenter).GetComponent<SunderbussShockwave>()
               .Setup(Sunderbuss._SHOCKWAVE_DAMAGE, proj.transform.right.XY().ToAngle(), 25f, 20f, 2f);
 

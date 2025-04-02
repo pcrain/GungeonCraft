@@ -323,6 +323,7 @@ public class FlakseedFlower : MonoBehaviour
                 position : this._firePos,
                 rotation : (targetPos - this._firePos).EulerZ()).GetComponent<Projectile>();
             proj.SetOwnerAndStats(this._owner);
+            this._owner.DoPostProcessProjectile(proj);
             proj.gameObject.Play("flak_flower_shoot_sound");
         }
     }

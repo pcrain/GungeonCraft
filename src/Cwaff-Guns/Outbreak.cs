@@ -59,6 +59,7 @@ public class Outbreak : CwaffGun
             if (this.Mastered)
                 p.gameObject.GetOrAddComponent<OutbreakHomingModifier>();
             p.SetOwnerAndStats(player);
+            player.DoPostProcessProjectile(p);
             p.specRigidbody.RegisterSpecificCollisionException(enemy.specRigidbody);
         }
         if (found)

@@ -12,6 +12,8 @@ public class KiBlast : CwaffGun
     internal static string _KameAnim;
     internal static string _HameAnim;
 
+    internal const float _DAMAGE_MULT_CAP = 8.0f;
+
     private const float _KI_REFLECT_RANGE = 3.0f;
     private const float _KI_REFLECT_RANGE_SQR = _KI_REFLECT_RANGE * _KI_REFLECT_RANGE;
     private const float _MAX_RECHARGE_TIME = 0.5f;
@@ -239,10 +241,11 @@ public class KiBlastAmmoDisplay : CustomAmmoDisplay
 
 public class KiBlastBehavior : MonoBehaviour
 {
+    private const float _SCALING = 1.5f;
+
     private static float _MinAngleVariance       = 10f;
     private static float _MaxAngleVariance       = 60f;
     private static float _MinReflectableLifetime = 0.15f;
-    private static float _Scaling                = 1.5f;
     private static SlashData _BasicSlashData     = null;
 
     private Projectile _projectile        = null;
@@ -326,7 +329,7 @@ public class KiBlastBehavior : MonoBehaviour
         ++this._numReflections;
         this.reflected = false;
         this._timeSinceLastReflect = 0.0f;
-        this._projectile.baseData.damage = this._startingDamage * Mathf.Pow(_Scaling, this._numReflections);
+        this._projectile.baseData.damage = this._startingDamage * Mathf.Min(KiBlast._DAMAGE_MULT_CAP, Mathf.Pow(_SCALING, this._numReflections));
 
         this._projectile.Owner = player;
         this._projectile.collidesWithPlayer = false;

@@ -284,9 +284,11 @@ public class WhipChainStart : MonoBehaviour
 
                 Projectile proj = SpawnManager.SpawnProjectile(PistolWhip._PistolWhipProjectile.gameObject, pos, baseEuler).GetComponent<Projectile>();
                     proj.SetOwnerAndStats(this._owner);
+                    this._owner.DoPostProcessProjectile(proj);
 
                 Projectile proj2 = SpawnManager.SpawnProjectile(PistolWhip._PistolButtProjectile.gameObject, pos, baseEuler).GetComponent<Projectile>();
                     proj2.SetOwnerAndStats(this._owner);
+                    this._owner.DoPostProcessProjectile(proj2);
 
                 if (mastered && this._whip)
                 {

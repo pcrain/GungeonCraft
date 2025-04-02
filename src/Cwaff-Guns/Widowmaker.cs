@@ -198,6 +198,7 @@ public class Crawlyboi : MonoBehaviour
             rotation : (enemyPos.Value - shootPoint).EulerZ()).GetComponent<Projectile>();
         proj.baseData.damage     = this._damage;
         proj.SetOwnerAndStats(this._owner);
+        this._owner.DoPostProcessProjectile(proj);
         if (this._mastered)
             proj.AddTrail(OmnidirectionalLaser._OmniTrailMasteredPrefab).gameObject.SetGlowiness(10f);
 

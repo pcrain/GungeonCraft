@@ -227,7 +227,11 @@ public class Maestro : CwaffGun
         base.PostProcessProjectile(projectile);
         DetermineTargetEnemyIfNecessary();
         if (this._targetProjectile)
+        {
             RedirectProjectile(this._targetProjectile, this._targetEnemy, projectile);
+            if (this.PlayerOwner)
+                this.PlayerOwner.DoPostProcessProjectile(this._targetProjectile);
+        }
         if (this.gun.CanGainAmmo && !projectile.FiredForFree())
             if (!this._targetProjectile && this.Mastered)
             {

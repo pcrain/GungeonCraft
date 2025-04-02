@@ -4,7 +4,7 @@ public class VacuumCleaner : CwaffGun
 {
     public static string ItemName         = "Vacuum Cleaner";
     public static string ShortDescription = "Lean Mean Cleaning Machine";
-    public static string LongDescription  = "Cleans up debris lying around the Gungeon. Each piece of debris vacuumed has a 1% chance to restore 1% of a random gun's ammo.";
+    public static string LongDescription  = "Cleans up debris lying around the Gungeon. Each piece of debris vacuumed has a 5% chance to restore 1% of a random gun's ammo.";
     public static string Lore             = "Over time, the Gungeon naturally accrues a substantial amount of shrapnel, corpses, and other garbage as Gungeoneers fight their way through hordes of Gundead. The Gungeon's relatively pristine state as each new adventurer begins their descent is thanks largely to the Gungeon Janitorial Crew, whose work largely goes unnoticed and unthanked. Observing how adventurers had a penchant for using guns with flashy particle effects, one cunning janitor modified a few vacuum cleaners to electrify the latent argon in the Gungeon, creating some fancy green eddies in the air as the vacuums are running. The janitor stuffed a few of these modified vacuums in chests, hoping adventurers would be distracted enough by the particles to not notice the complete lack of damage as they unwittingly cleaned the dungeon and made the GJC's lives a little easier.";
 
     internal static GameObject _VacuumVFX = null;
@@ -13,8 +13,8 @@ public class VacuumCleaner : CwaffGun
     internal const float _SPREAD           =    10f; // width (in degrees) of how wide our cone of suction is at the end of our reach
     internal const float _ACCEL_SEC        =  1.80f; // speed (in tiles per second) at which debris accelerates towards the gun near the end of the gun's reach
     internal const float _UPDATE_RATE      =   0.1f; // amount of time between debris checks / updates
-    internal const float _AMMO_CHANCE      =  0.01f; // percent chance debris restores ammo
-    internal const float _HIGH_AMMO_CHANCE =  0.04f; // percent chance debris restores ammo with Scavengest synergy
+    internal const float _AMMO_CHANCE      =  0.05f; // percent chance debris restores ammo
+    internal const float _HIGH_AMMO_CHANCE =  0.20f; // percent chance debris restores ammo with Scavengest synergy
     internal const float _AMMO_AMT         =  0.01f; // percent ammo restored to a random gun selected with _AMMO_CHANCE per debris
     internal const float _CASING_CHANCE    =  0.01f; // percent chance debris grants a casing with the Cleanup Crew synergy
     internal const int   _FLOOR_CASINGS    =     20; // max number of casings that can be picked up this floor
