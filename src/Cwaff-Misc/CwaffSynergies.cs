@@ -109,19 +109,19 @@ public static class CwaffSynergies
         NewSynergy(DEMOLITION_MAN, "Demolition, Man!", new[]{IName(VolcanicAmmolet.ItemName), IName(Scotsman.ItemName)});
         // Warrior's Gi activates when 2 hits from death as well as 1 hit from death.
         NewSynergy(SAIYAN_PRIDE, "Saiyan Pride", new[]{IName(WarriorsGi.ItemName), IName(KiBlast.ItemName)});
-        // Warrior's Gi activates when 2 hits from death as well as 1 hit from death.
+        // Flakseed sprouts grow 3x faster while planted in water.
         NewSynergy(LAWN_CARE, "Lawn Care", new[]{IName(Flakseed.ItemName), "starpew"});
         // Ring of Defenestration's rewards have a 33% chance of being doubled.
         NewSynergy(THE_ABYSS_STARES_BACK, "The Abyss Stares Back", new[]{IName(RingOfDefenestration.ItemName), "amulet_of_the_pit_lord"});
-        // Tables reflect projectiles back at enemies
+        // Tables reflect projectiles back at enemies.
         NewSynergy(FURNITURE_POLISH, "Furniture Polish", new[]{IName(BulletproofTablecloth.ItemName), "potion_of_lead_skin"});
         // Paintball Cannon's projectiles reflect enemy projectiles while Potion of Lead Skin is active.
         NewSynergy(LEAD_PAINT, "Lead Paint", new[]{IName(PaintballCannon.ItemName), "potion_of_lead_skin"});
-        // The damage boost from Camping Supplies builds twice as quickly.
+        // Camping Supplies' damage boost builds twice as quickly.
         NewSynergy(COZY_CAMPER, "Cozy Camper", new[]{IName(CampingSupplies.ItemName), IName(ComfySlippers.ItemName)});
         // Treasure spots uncovered by Itemfinder also spawn 3-9 casings.
         NewSynergy(TREASURE_HUNTER, "Treasure Hunter", new[]{IName(Itemfinder.ItemName), "sense_of_direction"});
-        // Taking damage no longer causes juggled guns to be dropped
+        // Taking damage no longer causes juggled guns to be dropped.
         NewSynergy(SOLID_FOOTING, "Solid Footing", new[]{IName(Jugglernaut.ItemName), "heavy_boots"});
       #endregion
 

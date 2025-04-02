@@ -1,15 +1,21 @@
 # Changelog
 
-## 1.23.1 (TBD)
+## 1.23.1 (2025-04-02)
+
+#### Features:
 
 - Added 9 new synergies
-- Tweaked several gun and item descriptions for clarity, consistency, and grammar
+
+#### Balance Changes and Polish:
+
+- Projectile modification items are now properly applied to projectiles created by Flakseed's flowers, Maestro's reflections, enemies infected by Outbreak, Pistol Whip's whip and pistol, Seltzer Pelter's soda cans, Sunderbuss' ground slam, and Widowmaker's spider turrets
 - Increased Vacuum Cleaner's per-debris chance to restore ammo from 1% to 5%
 	- Increased Scavengest synergy's per-debris chance to restore ammo from 4% to 20%
-- Capped Ki Blast's reflection damage multiplier at 8 times the projectile's original damage
-- Projectile modification items are now properly applied to projectiles created by Flakseed's flowers, Maestro's reflections, enemies infected by Outbreak, Pistol Whip's whip and pistol, Seltzer Pelter's soda cans, Sunderbuss' ground slam, and Widowmaker's spider turrets
-- X-elsior now always starts with one pistol in its arsenal
 - Increased Starmageddon's projectile damage from 8 to 11
+- Prevented Starmageddon from targeting Gunreapers and other invulnerable enemies
+- Capped Ki Blast's reflection damage multiplier at 8 times the projectile's original damage
+- Made X-elsior always starts with one pistol in its arsenal
+- Tweaked several gun and item descriptions for clarity, consistency, and grammar
 
 ## 1.23.0 (2025-03-31)
 
