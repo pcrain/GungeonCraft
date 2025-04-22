@@ -282,6 +282,7 @@ public class Initialisation : BaseUnityPlugin
                 Flakseed.Init();
                 Xelsior.Init();
                 Empath.Init();
+                Sextant.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
