@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.24.0 (TBD)
+
+- Fixed pixel gaps when rendering certain sprite shaders
+
 ## 1.23.1 (2025-04-02)
 
 #### Features:

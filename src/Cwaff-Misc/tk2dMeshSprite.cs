@@ -244,8 +244,8 @@ public class tk2dMeshSprite : tk2dBaseSprite
     Vector3 tl = Vector3.Scale(def.position2, _scale);
     Vector3 tr = Vector3.Scale(def.position3, _scale);
 
-    float xMax = meshX - 1f;
-    float yMax = meshY - 1f;
+    float xMax = meshX; // needs to be a float
+    float yMax = meshY; // needs to be a float
     float z = tr.z;
 
     int n = 0;
