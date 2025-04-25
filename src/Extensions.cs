@@ -2162,9 +2162,9 @@ public static class Extensions
   }
 
   /// <summary>Creates a GameObject with a sprite in the exact same location as an original sprite, as a point mesh.</summary>
-  public static tk2dMeshSprite DuplicateInWorldAsMesh(this tk2dBaseSprite osprite, bool pointMesh = true)
+  public static tk2dMeshSprite DuplicateInWorldAsMesh(this tk2dBaseSprite osprite, bool pointMesh = true, Texture2D optionalPalette = null)
   {
-    tk2dMeshSprite sprite = Lazy.CreateMeshSpriteObject(osprite, osprite.WorldCenter, pointMesh: pointMesh);
+    tk2dMeshSprite sprite = Lazy.CreateMeshSpriteObject(osprite, osprite.WorldCenter, pointMesh: pointMesh, optionalPalette: optionalPalette);
     sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
     sprite.HeightOffGround        = osprite.HeightOffGround;
     sprite.depthUsesTrimmedBounds = osprite.depthUsesTrimmedBounds;
@@ -2172,6 +2172,12 @@ public static class Extensions
     sprite.renderLayer            = osprite.renderLayer;
     sprite.UpdateZDepth();
     return sprite;
+  }
+
+  /// <summary>Creates a GameObject with a sprite in the exact same location as the enemy, as a point mesh.</summary>
+  public static tk2dMeshSprite DuplicateInWorldAsMesh(this AIActor actor, bool pointMesh = true)
+  {
+    return actor.sprite.DuplicateInWorldAsMesh(pointMesh: pointMesh, optionalPalette: actor.optionalPalette);
   }
 
   /// <summary>Freezes a projectile and launches it with a short delay</summary>

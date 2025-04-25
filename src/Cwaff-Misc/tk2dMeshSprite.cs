@@ -29,6 +29,7 @@ public class tk2dMeshSprite : tk2dBaseSprite
   private bool setup = false;
   private bool isPointMesh = false;
 
+  public Texture2D optionalPalette;
   public bool ApplyEmissivePropertyBlock;
 
   private static Vector4[] TangentsForMeshOfSize(int x, int y)
@@ -251,10 +252,10 @@ public class tk2dMeshSprite : tk2dBaseSprite
     int n = 0;
     for (int j = 0; j < meshY; ++j)
     {
-      float yOff = Mathf.Lerp(bl.y, tr.y, j / yMax);
+      float yOff = Mathf.Lerp(bl.y, tr.y, (j + 0.5f) / yMax); // +0.5 -> build from center of pixel
       for (int i = 0; i < meshX; ++i)
       {
-        float xOff = Mathf.Lerp(bl.x, tr.x, i / xMax);
+        float xOff = Mathf.Lerp(bl.x, tr.x, (i + 0.5f) / xMax); // +0.5 -> build from center of pixel
         positions[n++] = new Vector3(xOff, yOff, z);
       }
     }

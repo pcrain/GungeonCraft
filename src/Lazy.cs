@@ -1262,7 +1262,7 @@ public static class Lazy
     }
 
     /// <summary>Create a mesh sprite object at the given position.</summary>
-    public static tk2dMeshSprite CreateMeshSpriteObject(tk2dSpriteCollectionData collection, int spriteId, Vector2 pos, bool pointMesh = false)
+    public static tk2dMeshSprite CreateMeshSpriteObject(tk2dSpriteCollectionData collection, int spriteId, Vector2 pos, bool pointMesh = false, Texture2D optionalPalette = null)
     {
         GameObject g = new GameObject("mesh sprite object");
         g.transform.position = pos.Quantize(0.0625f);
@@ -1273,24 +1273,30 @@ public static class Lazy
         int w = Mathf.RoundToInt(C.PIXELS_PER_TILE * def.boundsDataExtents.x);
         int h = Mathf.RoundToInt(C.PIXELS_PER_TILE * def.boundsDataExtents.y);
         ss.ResizeMesh(w, h, usePointMesh: pointMesh);
+        ss.optionalPalette = optionalPalette;
         return ss;
     }
 
     /// <summary>Create a mesh sprite object at the given position using the given sprite as a reference.</summary>
-    public static tk2dMeshSprite CreateMeshSpriteObject(tk2dBaseSprite s, Vector2 pos, bool pointMesh = false)
+    public static tk2dMeshSprite CreateMeshSpriteObject(tk2dBaseSprite s, Vector2 pos, bool pointMesh = false, Texture2D optionalPalette = null)
     {
-        return CreateMeshSpriteObject(s.collection, s.spriteId, pos, pointMesh: pointMesh);
+        return CreateMeshSpriteObject(s.collection, s.spriteId, pos, pointMesh: pointMesh, optionalPalette: optionalPalette);
     }
 
     /// <summary>Coroutine for dissipating a mesh sprite object over a period of time.</summary>
     public static IEnumerator Dissipate_CR(tk2dMeshSprite ms, float time, float amplitude = 10f, bool progressive = false)
     {
-        ms.renderer.material.shader = CwaffShaders.ShatterShader;
-        ms.renderer.material.SetFloat("_Progressive", progressive ? 1f : 0f);
-        ms.renderer.material.SetFloat("_Amplitude", amplitude);
-        ms.renderer.material.SetFloat("_RandomSeed", UnityEngine.Random.value);
-
         Material mat = ms.renderer.material;
+        mat.shader = CwaffShaders.ShatterShader;
+        mat.SetFloat("_Progressive", progressive ? 1f : 0f);
+        mat.SetFloat("_Amplitude", amplitude);
+        mat.SetFloat("_RandomSeed", UnityEngine.Random.value);
+        if (ms.optionalPalette != null)
+        {
+            mat.SetFloat("_UsePalette", 1f);
+            mat.SetTexture("_PaletteTex", ms.optionalPalette);
+        }
+
         for (float elapsed = 0f; elapsed < time; elapsed += BraveTime.DeltaTime)
         {
             float percentLeft = 1f - elapsed / time;

@@ -93,6 +93,8 @@ public class CwaffTrailController : BraveBehaviour
   [ShowInInspectorIf("UsesDispersalParticles", false)]
   public GameObject DispersalParticleSystemPrefab;
 
+  public bool converted = false; // whether we were converted from a vanilla TrailController
+
   private SpeculativeRigidbody body;
 
   private tk2dBaseSprite parent_sprite;
@@ -125,6 +127,8 @@ public class CwaffTrailController : BraveBehaviour
 
   private bool disconnected = false;
 
+  private bool setup = false;
+
   private const int c_bonePixelLength = 4;
 
   private const float c_boneUnitLength = 0.25f;
@@ -143,18 +147,68 @@ public class CwaffTrailController : BraveBehaviour
     }
   }
 
+  /// <summary>Spawn a standalone disconnected trail between two points.</summary>
+  public static void Spawn(CwaffTrailController prefab, Vector2 start, Vector2 end)
+  {
+    CwaffTrailController ctc = UnityEngine.Object.Instantiate(prefab.gameObject, start, (end - start).EulerZ()).GetComponent<CwaffTrailController>();
+    ctc.transform.localScale = new Vector3(1f, 1f, 1f);
+    ctc.Setup();
+    ctc.HandleExtension(end);
+    ctc.disconnected = true;
+    ctc.destroyOnEmpty = true;
+  }
+
+  /// <summary>Convert a vanilla TrailController to a CwaffTrailController.</summary>
+  public static CwaffTrailController Convert(TrailController tc)
+  {
+    CwaffTrailController ctc = tc.gameObject.ClonePrefab().AddComponent<CwaffTrailController>();
+    UnityEngine.Object.Destroy(ctc.gameObject.GetComponent<TrailController>());  // remove TrailController component from original prefab
+
+    ctc.usesStartAnimation            = tc.usesStartAnimation;
+    ctc.startAnimation                = tc.startAnimation;
+    ctc.usesAnimation                 = tc.usesAnimation;
+    ctc.animation                     = tc.animation;
+    ctc.usesCascadeTimer              = tc.usesCascadeTimer;
+    ctc.cascadeTimer                  = tc.cascadeTimer;
+    ctc.usesSoftMaxLength             = tc.usesSoftMaxLength;
+    ctc.softMaxLength                 = tc.softMaxLength;
+    ctc.usesGlobalTimer               = tc.usesGlobalTimer;
+    ctc.globalTimer                   = tc.globalTimer;
+    ctc.destroyOnEmpty                = tc.destroyOnEmpty;
+    ctc.boneSpawnOffset               = tc.boneSpawnOffset;
+    ctc.UsesDispersalParticles        = tc.UsesDispersalParticles;
+    ctc.DispersalDensity              = tc.DispersalDensity;
+    ctc.DispersalMinCoherency         = tc.DispersalMinCoherency;
+    ctc.DispersalMaxCoherency         = tc.DispersalMaxCoherency;
+    ctc.DispersalParticleSystemPrefab = tc.DispersalParticleSystemPrefab;
+
+    ctc.converted = true;
+    return ctc;
+  }
+
   public void Start()
   {
-    this.body = base.transform.parent.GetComponent<SpeculativeRigidbody>();
-    if (this.body)
-      this.body.Initialize();
-    parent_sprite = base.transform.parent.gameObject.GetComponent<tk2dBaseSprite>();
-    // base.transform.parent = SpawnManager.Instance.VFX; //NOTE: need to be parented to our projectiles so we get destroyed properly
-    base.transform.rotation = Quaternion.identity;
-    base.transform.position = Vector3.zero;
-    if (this.body && this.body.projectile && this.body.projectile.Owner is PlayerController)
+    Setup();
+  }
+
+  private void Setup()
+  {
+    if (setup)
+      return;
+
+    if (base.transform.parent is Transform parentTransform)
     {
-      m_projectileScale = (this.body.projectile.Owner as PlayerController).BulletScaleModifier;
+      this.body = parentTransform.gameObject.GetComponent<SpeculativeRigidbody>();
+      if (this.body)
+        this.body.Initialize();
+      parent_sprite = parentTransform.gameObject.GetComponent<tk2dBaseSprite>();
+      base.transform.position = Vector3.zero; // only set if we have a parent
+      base.transform.rotation = Quaternion.identity;
+    }
+    // base.transform.parent = SpawnManager.Instance.VFX; //NOTE: need to be parented to our projectiles so we get destroyed properly
+    if (this.body && this.body.projectile && this.body.projectile.Owner is PlayerController pc)
+    {
+      m_projectileScale = pc.BulletScaleModifier;
       this.body.projectile.OnDestruction += this.OnProjectileDestruction;
     }
     base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("FG_Critical"));
@@ -179,6 +233,7 @@ public class CwaffTrailController : BraveBehaviour
       this.body.OnCollision += this.UpdateOnCollision;
       this.body.OnPostRigidbodyMovement += this.PostRigidbodyMovement;
     }
+    this.setup = true;
   }
 
   private void OnProjectileDestruction(Projectile obj)
@@ -186,7 +241,7 @@ public class CwaffTrailController : BraveBehaviour
       DisconnectFromSpecRigidbody();
   }
 
-    public void Toggle(bool enable = true)
+  public void Toggle(bool enable = true)
   {
     this.trailActive = enable;
   }
@@ -533,11 +588,36 @@ public class CwaffTrailController : BraveBehaviour
         pos[uvIndex + 3] = nextBone.pos + (nextBone.normal * ymax) - m_minBonePosition;
         Vector2 vector = Vector2.Lerp(segmentSprite.uvs[0], segmentSprite.uvs[1], num10);
         Vector2 vector2 = Vector2.Lerp(segmentSprite.uvs[2], segmentSprite.uvs[3], num10 + num11 / (float)num2);
-        bool hide = bone.Hide;
-        uv[uvIndex    ] = hide ? Vector2.zero : new Vector2(vector.x, vector.y);
-        uv[uvIndex + 1] = hide ? Vector2.zero : new Vector2(vector2.x, vector.y);
-        uv[uvIndex + 2] = hide ? Vector2.zero : new Vector2(vector.x, vector2.y);
-        uv[uvIndex + 3] = hide ? Vector2.zero : new Vector2(vector2.x, vector2.y);
+
+        if (bone.Hide)
+        {
+          uv[uvIndex    ] = Vector2.zero;
+          uv[uvIndex + 1] = Vector2.zero;
+          uv[uvIndex + 2] = Vector2.zero;
+          uv[uvIndex + 3] = Vector2.zero;
+        }
+        else if (!converted || segmentSprite.flipped == tk2dSpriteDefinition.FlipMode.None)
+        { //NOTE: we don't use tk2d flip modes, so only worry about the other flip cases for converted TrailControllers
+          uv[uvIndex    ] = new Vector2(vector.x, vector.y);
+          uv[uvIndex + 1] = new Vector2(vector2.x, vector.y);
+          uv[uvIndex + 2] = new Vector2(vector.x, vector2.y);
+          uv[uvIndex + 3] = new Vector2(vector2.x, vector2.y);
+        }
+        else if (segmentSprite.flipped == tk2dSpriteDefinition.FlipMode.Tk2d)
+        {
+          uv[uvIndex    ] = new Vector2(vector.x, vector.y);
+          uv[uvIndex + 1] = new Vector2(vector.x, vector2.y);
+          uv[uvIndex + 2] = new Vector2(vector2.x, vector.y);
+          uv[uvIndex + 3] = new Vector2(vector2.x, vector2.y);
+        }
+        else if (segmentSprite.flipped == tk2dSpriteDefinition.FlipMode.TPackerCW)
+        {
+          uv[uvIndex    ] =  new Vector2(vector.x, vector.y);
+          uv[uvIndex + 1] =  new Vector2(vector2.x, vector.y);
+          uv[uvIndex + 2] =  new Vector2(vector.x, vector2.y);
+          uv[uvIndex + 3] =  new Vector2(vector2.x, vector2.y);
+        }
+
         uvIndex += 4;
         num10 += invSubtile;
         linkedListNode = linkedListNode.Next;

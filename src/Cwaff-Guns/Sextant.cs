@@ -1,32 +1,19 @@
-
 namespace CwaffingTheGungy;
-
-/* TODO:
-    - charging should decrease spread from 90 to 0, then increase damage from 8 to instakill
-    - should measure
-      - aim angle
-      - distance to target
-      - aim variance
-      - rebound angle
-      - chance to hit target
-      - chance to kill target
-      - target hitbox size
-    - all measurements should be iteratively drawn as gun is charged (dotted lines?)
-*/
 
 public class Sextant : CwaffGun
 {
     public static string ItemName         = "Sextant";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Deadly Precision";
+    public static string LongDescription  = "Fires a calculated, single-target shot that deals more damage the longer Sextant is trained on its target before firing. When completely locked on, fires a critical shot that heavily damages bosses and instantly kills non-boss enemies. Reloading toggles focus mode, which slows down movement speed to assist with aiming.";
+    public static string Lore             = "An essential instrument among mariners for centuries, repurposed against all odds as a deadly weapon. Holding it in your hands evokes painful memories of 10th grade trigonometry lessons. Should you ever be allowed a few seconds of respite in combat, you're certain this device will let you hit your enemies physically and psychologically *exactly* where it hurts most.";
 
-    private const float _PHASE_TIME = 0.35f;
-    private const float _SOUND_GAP = _PHASE_TIME / 4f;
-    private const int _MAX_PHASE = 6;
+    private const float _PHASE_TIME = 0.40f;
+    private const float _SOUND_GAP  = _PHASE_TIME / 4f;
+    private const int _MAX_PHASE    = 6;
 
     internal static readonly bool _UseUnicodeFont = true;
     internal static GameObject _MathSymbols = null;
+    internal static CwaffTrailController _SextantTrailPrefab = null;
 
     private dfLabel _shotAngleLabel     = null;
     private dfLabel _spreadLabel        = null;
@@ -34,6 +21,7 @@ public class Sextant : CwaffGun
     private dfLabel _reboundAngleLabel  = null;
     private dfLabel _widthLabel         = null;
     private dfLabel _heightLabel        = null;
+    private dfLabel _damageLabel        = null;
     private List<dfLabel> _labels       = new();
 
     private Geometry _aimAngleArc       = null;
@@ -42,6 +30,8 @@ public class Sextant : CwaffGun
     private Geometry _reboundArc        = null;
     private Geometry _leftBaseSpread    = null;
     private Geometry _rightBaseSpread   = null;
+    private Geometry _leftFocus         = null;
+    private Geometry _rightFocus        = null;
     private Geometry _leftAdjSpread     = null;
     private Geometry _rightAdjSpread    = null;
     private Geometry _topBbox           = null;
@@ -66,26 +56,35 @@ public class Sextant : CwaffGun
     private float _lastSpread           = 0.0f;
     private float _lastTargetMag        = 0.0f;
     private float _freezeTimer          = 0.0f;
-    private float _cooldownTimer          = 0.0f;
+    private float _cooldownTimer        = 0.0f;
     private float _slidingAngleWindow   = 0.0f;
     private float _slidingMagWindow     = 0.0f;
+    private float _timeFocusing         = 0.0f;
     private PixelCollider _lastCollider = null;
     private AIActor _targetActor         = null;
     private Vector2 _lastNormal         = Vector2.zero;
     private Vector2? _lastContact       = null;
     private Vector2? _lastRebound       = null;
 
+    private bool _focused = false;
+
     public bool canDoCrit = false;
 
     public static void Init()
     {
         Lazy.SetupGun<Sextant>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 100, shootFps: 14, reloadFps: 4,
-            /*muzzleFrom: Items.Mailbox, */ fireAudio: "sextant_shoot_sound"/*, reloadAudio: "paintball_reload_sound"*/)
-          .InitSpecialProjectile<PrecisionProjectile>(GunData.New(sprite: null, clipSize: -1, cooldown: 0.9f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 50.0f, speed: 25f, range: 18f, force: 12f, invisibleProjectile: true/*, customClip: true*/));
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 162, shootFps: 14, reloadFps: 4,
+            muzzleFrom: Items.Mailbox, fireAudio: "sextant_shoot_sound", carryOffset: new IntVector2(6, 0))
+          .InitSpecialProjectile<PrecisionProjectile>(GunData.New(sprite: null, clipSize: 1, cooldown: 0.0f, shootStyle: ShootStyle.SemiAutomatic,
+            damage: 50.0f, speed: 25f, range: 18f, force: 12f, invisibleProjectile: true, customClip: true));
 
         _MathSymbols = VFX.Create("math_symbols", loops: false);
+
+        _SextantTrailPrefab = CwaffTrailController.Convert(Items.Awp.AsGun().DefaultModule.projectiles[0].gameObject
+          .GetComponentInChildren<TrailController>());
+            _SextantTrailPrefab.usesStartAnimation = false;
+            _SextantTrailPrefab.globalTimer = 0.0f;
+            _SextantTrailPrefab.cascadeTimer = 0.02f;
     }
 
     private void Start()
@@ -95,6 +94,8 @@ public class Sextant : CwaffGun
         this._shapes.Add(this._reboundArc = new GameObject().AddComponent<Geometry>());
         this._shapes.Add(this._leftBaseSpread = new GameObject().AddComponent<Geometry>());
         this._shapes.Add(this._rightBaseSpread = new GameObject().AddComponent<Geometry>());
+        this._shapes.Add(this._leftFocus = new GameObject().AddComponent<Geometry>());
+        this._shapes.Add(this._rightFocus = new GameObject().AddComponent<Geometry>());
         this._shapes.Add(this._leftAdjSpread = new GameObject().AddComponent<Geometry>());
         this._shapes.Add(this._rightAdjSpread = new GameObject().AddComponent<Geometry>());
         this._shapes.Add(this._aimAngleArc = new GameObject().AddComponent<Geometry>());
@@ -117,18 +118,75 @@ public class Sextant : CwaffGun
         this._labels.Add(this._reboundAngleLabel = MakeNewLabel());
         this._labels.Add(this._widthLabel = MakeNewLabel());
         this._labels.Add(this._heightLabel = MakeNewLabel());
+        this._labels.Add(this._damageLabel = MakeNewLabel());
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
         ResetCalculations();
+        SetFocus(false);
     }
 
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
         ResetCalculations();
+        SetFocus(false);
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        SetFocus(false);
+        player.OnRollStarted += this.OnDodgeRoll;
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        base.OnDroppedByPlayer(player);
+        player.OnRollStarted -= this.OnDodgeRoll;
+        SetFocus(false);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+        {
+            this.PlayerOwner.OnRollStarted -= this.OnDodgeRoll;
+            SetFocus(false);
+        }
+        base.OnDestroy();
+    }
+
+    public override void OnFullClipReload(PlayerController player, Gun gun)
+    {
+        base.OnFullClipReload(player, gun);
+        if (!gun.IsReloading && !player.IsDodgeRolling && player.AcceptingNonMotionInput)
+        {
+            SetFocus(!this._focused);
+            base.gameObject.Play(this._focused ? "sextant_focus_sound" : "sextant_unfocus_sound");
+        }
+    }
+
+    private void ForceFireGun()
+    {
+        if (this.PlayerOwner is not PlayerController pc)
+            return;
+        if (pc.CurrentGun != this.gun)
+            return;
+        pc.forceFireDown = true;
+    }
+
+    private void SetFocus(bool focus)
+    {
+        if (focus == this._focused)
+            return;
+
+        this._focused = focus;
+        this.gun.RemoveStatFromGun(StatType.MovementSpeed);
+        this.gun.AddStatToGun(StatType.MovementSpeed.Mult(focus ? 0.25f : 1.0f));
+        this.PlayerOwner.stats.RecalculateStats(this.PlayerOwner);
     }
 
     private void ResetCalculations(bool postShotCooldown = false)
@@ -139,16 +197,20 @@ public class Sextant : CwaffGun
         this._freezeTimer = 0.0f;
         this._slidingAngleWindow = 0.0f;
         this._slidingMagWindow = 0.0f;
+        this._timeFocusing = 0.0f;
         this._phase = 0;
         if (postShotCooldown)
-            this._cooldownTimer = Mathf.Max(this._cooldownTimer, this.gun.DefaultModule.cooldownTime);
+            this._cooldownTimer = Mathf.Max(this._cooldownTimer, this.gun.AdjustedReloadTime);
         else
         {
             this._cooldownTimer = 0.0f;
             foreach (Geometry g in this._shapes)
                 g._meshRenderer.enabled = false;
             foreach (dfLabel label in this._labels)
+            {
+                label.Opacity = 0.0f;
                 label.IsVisible = false;
+            }
         }
     }
 
@@ -181,11 +243,17 @@ public class Sextant : CwaffGun
         CwaffVFX.SpawnBurst(prefab: _MathSymbols, numToSpawn: 8, basePosition: gun.barrelOffset.position,
             positionVariance: 1f, baseVelocity: gun.gunAngle.ToVector(velMag), velocityVariance: velMag - 1f, velType: CwaffVFX.Vel.Radial,
             lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
+        SetFocus(false);
+    }
+
+    private void OnDodgeRoll(PlayerController player, Vector2 dirVec)
+    {
+        SetFocus(false);
     }
 
     private float GetDamageMultFromFocusTime()
     {
-        return Mathf.Clamp01((1f + Mathf.Floor(this._drawTimer / _PHASE_TIME)) / this._maxDrawablePhase);
+        return Mathf.Clamp01((/*1f + Mathf.Floor*/(this._drawTimer / _PHASE_TIME)) / this._maxDrawablePhase);
     }
 
     public void DoTrailParticles(bool isCrit)
@@ -203,6 +271,8 @@ public class Sextant : CwaffGun
                 return;
             Vector2 start = n == 0 ? this.gun.barrelOffset.position : this._lastContact.Value;
             Vector2 end = n == 0 ? this._lastContact.Value : this._lastRebound.Value;
+            // CwaffTrailController.Spawn(SubtractorBeam._GreenTrailPrefab, start, end);
+            CwaffTrailController.Spawn(_SextantTrailPrefab, start, end);
             Vector2 delta = end - start;
             Vector2 dnorm = delta.normalized;
             Vector2 gap = gapMag * dnorm;
@@ -215,16 +285,17 @@ public class Sextant : CwaffGun
         }
     }
 
-    public bool OnlyLivingEnemies(SpeculativeRigidbody body)
+    public bool Untargetable(SpeculativeRigidbody body)
     {
-        return !(body && body.aiActor && body.aiActor.IsHostile());
+        bool targetable = body && body.aiActor is AIActor e && e.isActiveAndEnabled && e.healthHaver is HealthHaver hh && hh.IsAlive;
+        return !targetable;
     }
 
     private float[] phaseCompetion = new float[_MAX_PHASE];
     public override void Update()
     {
         const float AIM_CIRCLE_MAG = 3f;
-        const float MAX_PIXEL_MAG_CHANGE_PER_SECOND = 64f;
+        const float MAX_PIXEL_MAG_CHANGE_PER_FRAME = 40f;
         const float MAX_ANGLE_CHANGE_PER_SECOND = 48f;
         const float FREEZE_TIME = 0.1f;  // time to pause redrawing when recalculating
 
@@ -234,12 +305,16 @@ public class Sextant : CwaffGun
             return;
         if (this.PlayerOwner is not PlayerController pc)
             return;
+        pc.forceFireDown = false;
 
-        if (this._cooldownTimer > 0)
+        if (!this.gun.IsReloading && this.gun.ClipShotsRemaining < Mathf.Min(this.gun.ClipCapacity, this.gun.CurrentAmmo))
+            this.gun.Reload(); // force reload while we're not at max clip capacity
+
+        if (this.gun.IsReloading || this._cooldownTimer > 0)
         {
             this._cooldownTimer = Mathf.Max(this._cooldownTimer - dtime, 0f);
-            float fadeoutDelta = dtime / this.gun.DefaultModule.cooldownTime;
-            float fadeoutAbs = this._cooldownTimer / this.gun.DefaultModule.cooldownTime;
+            float fadeoutDelta = dtime / this.gun.AdjustedReloadTime;
+            float fadeoutAbs = this._cooldownTimer / this.gun.AdjustedReloadTime;
             foreach (Geometry g in this._shapes)
                 g._meshRenderer.material.SetColor("_OverrideColor", g.color.WithAlpha(fadeoutAbs));
             foreach (dfLabel label in this._labels)
@@ -271,18 +346,22 @@ public class Sextant : CwaffGun
         Vector2 basePos = pc.sprite.WorldBottomCenter;
         Vector2 barrelPos = gun.barrelOffset.position + gun.gunAngle.EulerZ() * mod.positionOffset;
         float spread = mod.angleVariance * accMult;
-        float baseShotAngle = (gun.gunAngle + gun.m_moduleData[mod].alternateAngleSign * mod.angleFromAim).Clamp360();
-        int enemyMask = CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox);
+        //NOTE: this method has a small discrepancy from the cursor on mouse and a large discrepancy on controller. using unadjusted aim point for now
+        // float baseShotAngle = (gun.gunAngle + gun.m_moduleData[mod].alternateAngleSign * mod.angleFromAim).Clamp360();
+        float baseShotAngle = (pc.unadjustedAimPoint.XY() - barrelPos).ToAngle();
+        //NOTE: only CollisionLayer.EnemyHitBox should be needed in theory, but Gatling Gull and possibly some other have some weird collision...
+        int enemyMask = CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox, CollisionLayer.EnemyCollider, CollisionLayer.BulletBlocker);
         int wallMask = CollisionMask.LayerToMask(CollisionLayer.HighObstacle);
         Vector2 targetContact = Vector2.zero;
         Vector2 targetNormal = Vector2.zero;
         Vector2 shotVector = baseShotAngle.ToVector();
+        Vector2 reboundVector = shotVector;
         float distanceToTarget = 5f;
         PixelCollider bodyCollider = null;
-        Vector2 reboundVector = baseShotAngle.ToVector();
         float reboundMag = 1f;
 
         Color aimColor     = Color.red;
+        Color focusColor   = ExtendedColours.pink;
         Color spreadColor  = ExtendedColours.vibrantOrange;
         Color magColor     = Color.green;
         Color reboundColor = Color.cyan;
@@ -292,6 +371,7 @@ public class Sextant : CwaffGun
         {
             Color critColor = Color.Lerp(Color.white, Color.gray, Mathf.Abs(Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup)));
             aimColor     = critColor;
+            focusColor   = critColor;
             spreadColor  = critColor;
             magColor     = critColor;
             reboundColor = critColor;
@@ -314,19 +394,19 @@ public class Sextant : CwaffGun
             targetContact = result.Contact;
             targetNormal = result.Normal;
 
-            //NOTE: rotate our angle a bit and verify the wall normal matches. if it doesn't, rotate it again and use it as the tiebreaker
-            //      this is an attempt to get around an annoying bug when hitting the corner of a wall
-            if (PhysicsEngine.Instance.Raycast(barrelPos, shotVector.Rotate(1f), 999f, out result, true, false, enemyMask, null, false))
+            if (PhysicsEngine.Instance.Raycast(barrelPos, shotVector.Rotate(1f), 999f, out result, true, false, wallMask))
             {
+                //NOTE: rotate our angle a bit and verify the wall normal matches. if it doesn't, rotate it again and use it as the tiebreaker
+                //      this is an attempt to get around an annoying bug when hitting the corner of a wall
                 if (result.Normal != targetNormal)
                 {
-                    if (PhysicsEngine.Instance.Raycast(barrelPos, shotVector.Rotate(-1f), 999f, out result, true, false, enemyMask, null, false))
+                    if (PhysicsEngine.Instance.Raycast(barrelPos, shotVector.Rotate(-1f), 999f, out result, true, false, wallMask))
                         targetNormal = result.Normal;
                 }
             }
         }
 
-        bool hitLivingEnemyDirectly = PhysicsEngine.Instance.Raycast(barrelPos, shotVector, 999f, out result, false, true, enemyMask, rigidbodyExcluder: OnlyLivingEnemies);
+        bool hitLivingEnemyDirectly = PhysicsEngine.Instance.Raycast(barrelPos, shotVector, 999f, out result, false, true, enemyMask, rigidbodyExcluder: Untargetable);
         if (hitLivingEnemyDirectly && hitWall && result.Distance > distanceToTarget)
             hitLivingEnemyDirectly = false; // wall interrupted our trajectory
         if (hitLivingEnemyDirectly)
@@ -345,7 +425,7 @@ public class Sextant : CwaffGun
             reboundVector = reboundVector.WithY(-reboundVector.y);
         if (hitWall)
         {
-            bool secondContact = PhysicsEngine.Instance.Raycast(targetContact, reboundVector, 999f, out result, false, true, enemyMask, rigidbodyExcluder: OnlyLivingEnemies);
+            bool secondContact = PhysicsEngine.Instance.Raycast(targetContact, reboundVector, 999f, out result, false, true, enemyMask, rigidbodyExcluder: Untargetable);
             if (secondContact)
             {
                 reboundMag = result.Distance;
@@ -363,8 +443,8 @@ public class Sextant : CwaffGun
         float angleChange = this._lastAimAngle.AbsAngleTo(gun.gunAngle);
         this._slidingAngleWindow = Mathf.Max(0f, this._slidingAngleWindow + angleChange - dtime * MAX_ANGLE_CHANGE_PER_SECOND);
         float magChange = C.PIXELS_PER_TILE * Mathf.Abs(this._lastTargetMag - distanceToTarget);
-        this._slidingMagWindow = Mathf.Max(0f, this._slidingMagWindow + magChange - dtime * MAX_PIXEL_MAG_CHANGE_PER_SECOND);
-        if (!this._targetActor || !this._targetActor.IsHostile() || this._slidingAngleWindow > MAX_ANGLE_CHANGE_PER_SECOND)
+        this._slidingMagWindow = Mathf.Max(0f, this._slidingMagWindow + magChange - dtime * MAX_PIXEL_MAG_CHANGE_PER_FRAME);
+        if (!this._targetActor || this._slidingAngleWindow > MAX_ANGLE_CHANGE_PER_SECOND)
         {
             maxPhase = 0;
             this._slidingAngleWindow = 0f;
@@ -375,13 +455,16 @@ public class Sextant : CwaffGun
             maxPhase = 1;
             this._slidingMagWindow = 0f;
         }
-        else if (this._slidingMagWindow > MAX_PIXEL_MAG_CHANGE_PER_SECOND)
+        else if (magChange > MAX_PIXEL_MAG_CHANGE_PER_FRAME)
         {
             maxPhase = 2;
             this._slidingMagWindow = 0f;
         }
-        else if (this._lastNormal != targetNormal)
-            maxPhase = 3;
+        // else if (this._lastNormal != targetNormal) //NOTE: this causes more problems than it's worth, so disabling this particular check for nows
+        // {
+        //     System.Console.WriteLine($"max phase 3");
+        //     maxPhase = 3;
+        // }
         else if (lastTargetActor != this._targetActor)
             maxPhase = 4;
         else
@@ -408,7 +491,7 @@ public class Sextant : CwaffGun
         int currentPhase = 0;
         float curPhaseCompletion;
 
-        // phase 1: aim angle
+        // phase 1a: aim angle
         curPhaseCompletion = phaseCompetion[currentPhase++];
         this._aimAngleArc.Setup(Geometry.Shape.CIRCLE, aimColor, pos: barrelPos, radius: AIM_CIRCLE_MAG, angle: baseShotAngle.Clamp360(), arc: 180f * curPhaseCompletion);
         if (_UseUnicodeFont)
@@ -418,6 +501,15 @@ public class Sextant : CwaffGun
         this._shotAngleLabel.Color = aimColor;
         this._shotAngleLabel.Opacity = curPhaseCompletion;
         PlaceLabel(this._shotAngleLabel, barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG + 0.125f) + (baseShotAngle - 90f).ToVector(1.5f), baseShotAngle - 90f);
+
+        // phase 1b: aim angle
+        this._timeFocusing = Mathf.Clamp(this._timeFocusing + (this._focused ? dtime : -dtime), 0f, _PHASE_TIME);
+        float focusCompletion = Mathf.Clamp01(this._timeFocusing / _PHASE_TIME);
+        Vector2 focusPoint = barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG);
+        Vector2 leftPoint = barrelPos + (baseShotAngle + 90f).ToVector(AIM_CIRCLE_MAG);
+        Vector2 rightPoint = barrelPos + (baseShotAngle - 90f).ToVector(AIM_CIRCLE_MAG);
+        this._leftFocus.Setup(Geometry.Shape.LINE, focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, leftPoint, focusCompletion));
+        this._rightFocus.Setup(Geometry.Shape.LINE, focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, rightPoint, focusCompletion));
 
         // phase 2: aim spread
         curPhaseCompletion = phaseCompetion[currentPhase++];
@@ -473,11 +565,13 @@ public class Sextant : CwaffGun
             this._reboundAngleLabel.IsVisible = false;
         }
 
-        if (bodyCollider != null)
+        if (this._targetActor && this._targetActor.sprite)
         {
             // phase 5: bounding box
             curPhaseCompletion = phaseCompetion[currentPhase++];
-            Rect bounds = new Rect(bodyCollider.UnitBottomLeft, bodyCollider.UnitDimensions).Inset(-0.5f);
+            Bounds spriteBounds = this._targetActor.sprite.GetBounds();
+            // Rect bounds = new Rect(bodyCollider.UnitBottomLeft, bodyCollider.UnitDimensions).Inset(-0.5f);
+            Rect bounds = new Rect(this._targetActor.sprite.WorldBottomLeft, spriteBounds.size).Inset(-0.5f);
             Vector2 center = bounds.center;
             Vector2 tl = center + curPhaseCompletion * (new Vector2(bounds.xMin, bounds.yMax) - center);
             Vector2 bl = center + curPhaseCompletion * (new Vector2(bounds.xMin, bounds.yMin) - center);
@@ -519,6 +613,28 @@ public class Sextant : CwaffGun
             this._weakPointArcB.Setup(Geometry.Shape.CIRCLE, lockonColor, pos: center, radius: radius, angle: 315f, arc: arcLength);
 
             canDoCritThisFrame = (curPhaseCompletion >= 1.0f);
+
+            // phase 6b: damage estimate
+            HealthHaver targetHH = this._targetActor.healthHaver;
+            float damageMult = GetDamageMultFromFocusTime();
+            float damageEstimate = damageMult * this.gun.DefaultModule.projectiles[0].baseData.damage * pc.stats.GetStatValue(PlayerStats.StatType.Damage);
+            if (targetHH.IsBoss)
+                damageEstimate *= pc.stats.GetStatValue(PlayerStats.StatType.DamageToBosses);
+            if ((this.canDoCrit || damageEstimate >= targetHH.GetCurrentHealth()) && this.Mastered)
+                ForceFireGun();
+
+            // if (this.canDoCrit)
+            // {
+            //     if (targetHH.IsBoss)
+            //         damageEstimate = Mathf.Max(damageEstimate, PrecisionProjectile.PERCENT_BOSS_DAMAGE_ON_CRIT * targetHH.AdjustedMaxHealth);
+            //     else
+            //         damageEstimate = targetHH.AdjustedMaxHealth;
+            // }
+            // float percentDamageEstimate = Mathf.FloorToInt(100f * Mathf.Clamp01(damageEstimate / targetHH.AdjustedMaxHealth));
+            // this._damageLabel.Text = $"{percentDamageEstimate}% dmg";
+            // this._damageLabel.Color = lockonColor;
+            // this._damageLabel.Opacity = damageMult;
+            // PlaceLabel(this._damageLabel, bounds.max + new Vector2(0.5f, 0.5f), 0f);
         }
         else
         {
@@ -536,6 +652,7 @@ public class Sextant : CwaffGun
             this._weakPointArcB._meshRenderer.enabled = false;
             this._widthLabel.IsVisible = false;
             this._heightLabel.IsVisible = false;
+            this._damageLabel.IsVisible = false;
         }
 
         this._maxDrawablePhase = currentPhase;
@@ -789,6 +906,8 @@ public class Geometry : MonoBehaviour
 
 public class PrecisionProjectile : Projectile
 {
+    public const float PERCENT_BOSS_DAMAGE_ON_CRIT = 0.2f;
+
     public AIActor target = null;
     public bool isCrit = false;
 
@@ -798,10 +917,17 @@ public class PrecisionProjectile : Projectile
         {
             if (isCrit)
             {
+                //NOTE: friction must be applied BEFORE damage or m_currentMinFriction prevents it from working
+                StickyFrictionManager.Instance.RegisterCustomStickyFriction(0.75f, 0f, true);
                 if (target.healthHaver.IsBoss || target.healthHaver.IsSubboss)
-                    target.healthHaver.ApplyDamage(0.2f * target.healthHaver.AdjustedMaxHealth, target.CenterPosition - base.transform.position.XY(), "Sextant", ignoreDamageCaps: true);
+                    target.healthHaver.ApplyDamage(
+                        Mathf.Max(PERCENT_BOSS_DAMAGE_ON_CRIT * target.healthHaver.AdjustedMaxHealth, baseData.damage),
+                        target.CenterPosition - base.transform.position.XY(), "Sextant", ignoreDamageCaps: true);
                 else
-                    target.healthHaver.ApplyDamage(float.MaxValue, target.CenterPosition - base.transform.position.XY(), "Sextant", ignoreDamageCaps: true);
+                {
+                    target.DuplicateInWorldAsMesh().Dissipate(time: 1.5f, amplitude: 5f, progressive: true);
+                    target.EraseFromExistenceWithRewards();
+                }
                 base.gameObject.Play("sextant_critical_hit_sound");
             }
             else

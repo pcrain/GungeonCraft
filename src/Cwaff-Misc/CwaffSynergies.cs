@@ -288,6 +288,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfXelsior>(MASTERY_XELSIOR, Xelsior.ItemName);
         // Projectiles can now hit enemies, and destroy up to 5 of their projectiles on contact.
         NewMastery<MasteryOfEmpath>(MASTERY_EMPATH, Empath.ItemName);
+        // Sextant automatically fires as soon as it will kill its target or deal a critical hit.
+        NewMastery<MasteryOfSextant>(MASTERY_SEXTANT, Sextant.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -564,6 +566,7 @@ internal class MasteryOfMacheening           : MasteryDummyItem {}
 internal class MasteryOfPlasmarble           : MasteryDummyItem {}
 internal class MasteryOfXelsior              : MasteryDummyItem {}
 internal class MasteryOfEmpath               : MasteryDummyItem {}
+internal class MasteryOfSextant              : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -689,4 +692,5 @@ public enum Synergy {
     MASTERY_PLASMARBLE,
     MASTERY_XELSIOR,
     MASTERY_EMPATH,
+    MASTERY_SEXTANT,
 };

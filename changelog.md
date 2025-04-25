@@ -2,6 +2,8 @@
 
 ## 1.24.0 (TBD)
 
+- Added Sextant
+- Added mastery for Sextant
 - Fixed pixel gaps when rendering certain sprite shaders
 
 ## 1.23.1 (2025-04-02)
