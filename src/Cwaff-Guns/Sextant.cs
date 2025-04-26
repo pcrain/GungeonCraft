@@ -162,6 +162,13 @@ public class Sextant : CwaffGun
             this.PlayerOwner.OnRollStarted -= this.OnDodgeRoll;
             SetFocus(false);
         }
+
+        foreach (Geometry g in this._shapes)
+            if (g)
+                UnityEngine.Object.Destroy(g.gameObject);
+        foreach (dfLabel l in this._labels)
+            if (l)
+                UnityEngine.Object.Destroy(l.gameObject);
         base.OnDestroy();
     }
 

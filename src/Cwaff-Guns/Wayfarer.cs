@@ -96,6 +96,8 @@ public class Wayfarer : CwaffGun
         if (this.PlayerOwner)
             this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         CleanupWayfarer();
+        if (this._pingRing)
+          UnityEngine.Object.Destroy(this._pingRing.gameObject);
         base.OnDestroy();
     }
 
