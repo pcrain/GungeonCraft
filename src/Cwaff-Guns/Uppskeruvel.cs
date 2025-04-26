@@ -218,16 +218,31 @@ public class Uppskeruvel : CwaffGun
 
     public static void DropLostSouls(AIActor enemy, bool hasSoulSearchingSynergy = false)
     {
+        const int LARGE_SOUL_VALUE = 10;
+        const int LARGE_SOUL_DROP_THRES = 50;
+        const int SOUL_SEARCHING_MULT = 2;
+
         Vector2 ppos = enemy.CenterPosition;
         int soulsToSpawn = Mathf.Min(_MAX_DROPS, enemy.healthHaver ? Mathf.CeilToInt(_SOULS_PER_HEALTH * enemy.healthHaver.GetMaxHealth()) : 0);
         if (hasSoulSearchingSynergy)
-            soulsToSpawn *= 2;
-        for (int i = 0; i < soulsToSpawn; ++i)
+            soulsToSpawn *= SOUL_SEARCHING_MULT;
+        bool dropLargeSouls = soulsToSpawn >= LARGE_SOUL_DROP_THRES;
+        while (soulsToSpawn > 0)
         {
             float angle = Lazy.RandomAngle();
             Vector2 finalPos = ppos + BraveMathCollege.DegreesToVector(angle);
-            Uppskeruvel._LostSoulPrefab.Instantiate(finalPos).GetComponent<UppskeruvelLostSoul>(
-                ).Setup(angle.ToVector(_SOUL_LAUNCH_SPEED * UnityEngine.Random.Range(0.8f, 1.2f)));
+            Vector2 vel = angle.ToVector(_SOUL_LAUNCH_SPEED * UnityEngine.Random.Range(0.8f, 1.2f));
+            UppskeruvelLostSoul ls = Uppskeruvel._LostSoulPrefab.Instantiate(finalPos).GetComponent<UppskeruvelLostSoul>();
+            if (dropLargeSouls && soulsToSpawn >= LARGE_SOUL_VALUE)
+            {
+                soulsToSpawn -= LARGE_SOUL_VALUE;
+                ls.Setup(vel, soulValue: LARGE_SOUL_VALUE, scale: 2f);
+            }
+            else
+            {
+                --soulsToSpawn;
+                ls.Setup(vel, soulValue: 1, scale: 1f);
+            }
         }
     }
 
@@ -314,6 +329,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
     const float _HOME_ACCEL         = 44f;  // acceleration per second towards player
     const float _FRICTION           = 0.96f;
     const float _MAX_LIFE           = 10f;  // time before despawning
+    const float _VFX_GAP            = 0.05f;// time between spawning VFX when homing in on player
 
     internal static int _UppskeruvelId = -1;
 
@@ -324,13 +340,17 @@ public class UppskeruvelLostSoul : MonoBehaviour
     private float _lifetime         = 0.0f;
     private Vector2 _velocity       = Vector2.zero;
     private Vector3 _basePos        = Vector2.zero;
+    private int _soulValue          = 1;
+    private float _vfxTimer         = 0.0f;
 
-    public void Setup(Vector2 velocity)
+    public void Setup(Vector2 velocity, int soulValue, float scale)
     {
         this._sprite = base.GetComponent<tk2dSprite>();
         this._velocity = velocity;
         this._basePos = base.transform.position;
         this._setup = true;
+        this._soulValue = soulValue;
+        this._sprite.scale = scale * Vector3.one;
     }
 
     private void Update()
@@ -338,27 +358,32 @@ public class UppskeruvelLostSoul : MonoBehaviour
         if (!this._setup)
             return;
 
+        float dtime = BraveTime.DeltaTime;
         if (GameManager.Instance.PrimaryPlayer.AcceptingAnyInput)
-            this._lifetime += BraveTime.DeltaTime; // don't increase life timer unless player can move
+            this._lifetime += dtime; // don't increase life timer unless player can move
 
         if (this._owner)
         {
             Vector2 delta = (this._owner.CenterPosition - base.transform.position.XY());
             Vector2 deltaNorm = delta.normalized;
-            this._homeSpeed += _HOME_ACCEL * BraveTime.DeltaTime;
+            this._homeSpeed += _HOME_ACCEL * dtime;
             // Weighted average of natural and direct velocity towards player
             this._velocity = this._homeSpeed * Lazy.SmoothestLerp((this._velocity.normalized + deltaNorm).normalized, deltaNorm, 10f);
-            this._basePos += (this._velocity * BraveTime.DeltaTime).ToVector3ZUp();
+            this._basePos += (this._velocity * dtime).ToVector3ZUp();
             base.transform.position = this._basePos.HoverAt(amplitude: _BOB_HEIGHT, frequency: _BOB_SPEED);
 
-            CwaffVFX.Spawn(Outbreak._OutbreakSmokeVFX, base.transform.position, Lazy.RandomEulerZ(),
-                velocity: Lazy.RandomVector(0.1f), lifetime: 0.25f, fadeOutTime: 0.5f);
+            if ((this._vfxTimer += dtime) >= _VFX_GAP)
+            {
+                this._vfxTimer -= _VFX_GAP;
+                CwaffVFX.Spawn(Outbreak._OutbreakSmokeVFX, base.transform.position, Lazy.RandomEulerZ(),
+                    velocity: Lazy.RandomVector(0.1f), lifetime: 0.25f, fadeOutTime: 0.5f);
+            }
 
             if (delta.sqrMagnitude > _PICKUP_RADIUS_SQR)
                 return;
 
             if (this._owner.FindGun<Uppskeruvel>() is Uppskeruvel upp)
-                upp.AcquireSoul();
+                upp.AcquireSoul(this._soulValue);
             base.gameObject.PlayUnique("pickup_poe_soul_sound");
             float rotOffset = 90f * UnityEngine.Random.value;
             for (int i = 0; i < 4; ++i)
@@ -370,8 +395,8 @@ public class UppskeruvelLostSoul : MonoBehaviour
 
         if (this._velocity.sqrMagnitude > 1f)
         {
-            this._velocity *= (float)Lazy.FastPow(_FRICTION, C.FPS * BraveTime.DeltaTime);
-            this._basePos += (this._velocity * BraveTime.DeltaTime).ToVector3ZUp();
+            this._velocity *= (float)Lazy.FastPow(_FRICTION, C.FPS * dtime);
+            this._basePos += (this._velocity * dtime).ToVector3ZUp();
         }
         else
             this._velocity = this._velocity.normalized;
