@@ -61,12 +61,12 @@ public class Sextant : CwaffGun
     private float _slidingMagWindow     = 0.0f;
     private float _timeFocusing         = 0.0f;
     private PixelCollider _lastCollider = null;
-    private AIActor _targetActor         = null;
+    private AIActor _targetActor        = null;
     private Vector2 _lastNormal         = Vector2.zero;
     private Vector2? _lastContact       = null;
     private Vector2? _lastRebound       = null;
 
-    private bool _focused = false;
+    private bool _focused               = false;
 
     public bool canDoCrit = false;
 
