@@ -109,31 +109,30 @@ internal class Caffeination : MonoBehaviour
     {
         if (this._state == State.NEUTRAL)
             this._owner.StartCoroutine(AnotherCup_CR());
+
+        IEnumerator AnotherCup_CR()
+        {
+            this._owner.gameObject.Play("coffee_drink_sound");
+            this._state = State.CAFFEINATED;
+            foreach (StatModifier stat in this._caffeineBuffs)
+                this._owner.ownerlessStatModifiers.Add(stat);
+            this._owner.stats.RecalculateStats(this._owner);
+            yield return new WaitForSeconds(_BOOST_TIME);
+
+            this._state = State.CRASHED;
+            foreach (StatModifier stat in this._caffeineBuffs)
+                this._owner.ownerlessStatModifiers.Remove(stat);
+            foreach (StatModifier stat in this._crashNerfs)
+                this._owner.ownerlessStatModifiers.Add(stat);
+            this._owner.stats.RecalculateStats(this._owner);
+            yield return new WaitForSeconds(_CRASH_TIME);
+
+            this._state = State.NEUTRAL;
+            foreach (StatModifier stat in this._crashNerfs)
+                this._owner.ownerlessStatModifiers.Remove(stat);
+            this._owner.stats.RecalculateStats(this._owner);
+        }
     }
-
-    private IEnumerator AnotherCup_CR()
-    {
-        this._owner.gameObject.Play("coffee_drink_sound");
-        this._state = State.CAFFEINATED;
-        foreach (StatModifier stat in this._caffeineBuffs)
-            this._owner.ownerlessStatModifiers.Add(stat);
-        this._owner.stats.RecalculateStats(this._owner);
-        yield return new WaitForSeconds(_BOOST_TIME);
-
-        this._state = State.CRASHED;
-        foreach (StatModifier stat in this._caffeineBuffs)
-            this._owner.ownerlessStatModifiers.Remove(stat);
-        foreach (StatModifier stat in this._crashNerfs)
-            this._owner.ownerlessStatModifiers.Add(stat);
-        this._owner.stats.RecalculateStats(this._owner);
-        yield return new WaitForSeconds(_CRASH_TIME);
-
-        this._state = State.NEUTRAL;
-        foreach (StatModifier stat in this._crashNerfs)
-            this._owner.ownerlessStatModifiers.Remove(stat);
-        this._owner.stats.RecalculateStats(this._owner);
-    }
-
 
     [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.GetBaseAnimationName))]
     private class CuppajoeAnimationPatch

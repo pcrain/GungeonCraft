@@ -159,23 +159,25 @@ public class BossNPC : FancyNPC
   }
 
   public void FinishBossFight()
-    { StartCoroutine(Defeat_CR()); }
-
-  private IEnumerator Defeat_CR()
   {
-    AIActor enemy = this.gameObject.GetComponent<AIActor>();
-    enemy.transform.position.GetAbsoluteRoom().RegisterInteractable(this);
+    StartCoroutine(FinishBossFight_CR());
 
-    IEnumerator script = DefeatedScript();
-    while(script.MoveNext())
-      yield return script.Current;
+    IEnumerator FinishBossFight_CR()
+    {
+      AIActor enemy = this.gameObject.GetComponent<AIActor>();
+      enemy.transform.position.GetAbsoluteRoom().RegisterInteractable(this);
 
-    if (hasPreFightDialogue)
-      enemy.transform.position.GetAbsoluteRoom().UnsealRoom();
-    if (!hasPostFightDialogue)
-      enemy.healthHaver.DeathAnimationComplete(null, null);
+      IEnumerator script = DefeatedScript();
+      while(script.MoveNext())
+        yield return script.Current;
 
-    this.finishedFight = true;
+      if (hasPreFightDialogue)
+        enemy.transform.position.GetAbsoluteRoom().UnsealRoom();
+      if (!hasPostFightDialogue)
+        enemy.healthHaver.DeathAnimationComplete(null, null);
+
+      this.finishedFight = true;
+    }
   }
 
   protected override IEnumerator NPCTalkingScript()
@@ -1158,21 +1160,22 @@ public static class BH
   public static void LoopMusic(this DungeonFloorMusicController musicController, uint musicPlayingEventId, string musicName, int loopPoint, int rewindAmount)
   {
     musicController.StartCoroutine(LoopMusic_CR(musicPlayingEventId, musicName, loopPoint, rewindAmount));
+
+    static IEnumerator LoopMusic_CR(uint musicPlayingEventId, string musicName, int loopPoint, int rewindAmount)
+    {
+      yield return new WaitForSeconds(1f);  // GetSourcePlayPosition() will fail if we don't wait a bit
+      while (true)
+      {
+        int pos;
+        AKRESULT status = AkSoundEngine.GetSourcePlayPosition(musicPlayingEventId, out pos);
+        if (status != AKRESULT.AK_Success)
+          break;
+        if (pos >= loopPoint)
+          AkSoundEngine.SeekOnEvent(musicName, GameManager.Instance.DungeonMusicController.gameObject, pos - rewindAmount);
+        yield return null;
+      }
+      yield break;
+    }
   }
 
-  private static IEnumerator LoopMusic_CR(uint musicPlayingEventId, string musicName, int loopPoint, int rewindAmount)
-  {
-    yield return new WaitForSeconds(1f);  // GetSourcePlayPosition() will fail if we don't wait a bit
-    while (true)
-    {
-      int pos;
-      AKRESULT status = AkSoundEngine.GetSourcePlayPosition(musicPlayingEventId, out pos);
-      if (status != AKRESULT.AK_Success)
-        break;
-      if (pos >= loopPoint)
-        AkSoundEngine.SeekOnEvent(musicName, GameManager.Instance.DungeonMusicController.gameObject, pos - rewindAmount);
-      yield return null;
-    }
-    yield break;
-  }
 }

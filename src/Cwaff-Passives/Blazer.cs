@@ -56,14 +56,15 @@ public class Blazer : CwaffPassive
         this.passiveStatModifiers = _Boosts;
         this.Owner.stats.RecalculateStats(this.Owner);
         this.Owner.StartCoroutine(RemoveBoosts_CR());
+
+        IEnumerator RemoveBoosts_CR()
+        {
+            yield return new WaitForSeconds(_BOOST_TIME);
+            if (this.Owner)
+                RemoveBoosts(this.Owner);
+        }
     }
 
-    private IEnumerator RemoveBoosts_CR()
-    {
-        yield return new WaitForSeconds(_BOOST_TIME);
-        if (this.Owner)
-            RemoveBoosts(this.Owner);
-    }
 
     private void RemoveBoosts(PlayerController pc)
     {

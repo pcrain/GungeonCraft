@@ -266,16 +266,16 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     public Coroutine Prompt(string optionA, string optionB)
     {
         return StartCoroutine(Prompt_CR(optionA, optionB));
-    }
 
-    private IEnumerator Prompt_CR(string optionA, string optionB)
-    {
-        int selectedResponse = -1;
-        GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, optionA, optionB);
-        while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
-            yield return null;
-        LastResponse = selectedResponse;
-        yield break;
+        IEnumerator Prompt_CR(string optionA, string optionB)
+        {
+            int selectedResponse = -1;
+            GameUIRoot.Instance.DisplayPlayerConversationOptions(this.m_interactor, null, optionA, optionB);
+            while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
+                yield return null;
+            LastResponse = selectedResponse;
+            yield break;
+        }
     }
 
     protected virtual void Update()

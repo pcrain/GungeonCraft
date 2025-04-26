@@ -89,29 +89,29 @@ public class EchoProjectileSpawner : MonoBehaviour
         return this;
     }
 
-    public IEnumerator DelayedTrigger_CR()
-    {
-        GameObject v = SpawnManager.SpawnVFX(EchoChamber._EchoPrefab, this._echoPosition, Quaternion.identity); //TODO: should this ignore pools
-            v.ExpireIn(seconds: 2.0f, fadeFor: 2.0f, startAlpha: 0.25f, shrink: true);
-
-        float baseDamageScale = 0.5f;
-        float baseSpeedScale = 1.0f;
-        float baseSpriteScale = 1.0f;
-        float delay = _INITIAL_DELAY;
-        for (int i = 0; i < _NUM_ECHOS; ++i)
-        {
-            yield return new WaitForSeconds(delay);
-            delay *= _DELAY_SCALE;
-            baseDamageScale *= _DAMAGE_SCALE;
-            baseSpriteScale -= 0.1f;
-            SpawnProjectile(baseDamageScale, baseSpeedScale, baseSpriteScale);
-        }
-        UnityEngine.Object.Destroy(this);
-    }
-
     public void DelayedTrigger()
     {
         StartCoroutine(DelayedTrigger_CR());
+
+        IEnumerator DelayedTrigger_CR()
+        {
+            GameObject v = SpawnManager.SpawnVFX(EchoChamber._EchoPrefab, this._echoPosition, Quaternion.identity); //TODO: should this ignore pools
+                v.ExpireIn(seconds: 2.0f, fadeFor: 2.0f, startAlpha: 0.25f, shrink: true);
+
+            float baseDamageScale = 0.5f;
+            float baseSpeedScale = 1.0f;
+            float baseSpriteScale = 1.0f;
+            float delay = _INITIAL_DELAY;
+            for (int i = 0; i < _NUM_ECHOS; ++i)
+            {
+                yield return new WaitForSeconds(delay);
+                delay *= _DELAY_SCALE;
+                baseDamageScale *= _DAMAGE_SCALE;
+                baseSpriteScale -= 0.1f;
+                SpawnProjectile(baseDamageScale, baseSpeedScale, baseSpriteScale);
+            }
+            UnityEngine.Object.Destroy(this);
+        }
     }
 
     public void Trigger()

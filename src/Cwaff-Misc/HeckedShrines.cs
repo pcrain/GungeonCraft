@@ -39,37 +39,37 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
     {
       if (HeckedMode._HeckedModeStatus != HeckedMode.Hecked.Disabled)
         GameManager.Instance.StartCoroutine(SpawnInShrines_CR());
-    }
 
-    private static IEnumerator SpawnInShrines_CR()
-    {
-        while (GameManager.Instance.IsLoadingLevel)
-            yield return null;  //wait for level to fully load
-
-        Vector3 v3          = Vector3.zero;
-        bool found          = false;
-        PlayerController p1 = GameManager.Instance.BestActivePlayer;
-        foreach (AdvancedShrineController a in StaticReferenceManager.AllAdvancedShrineControllers)
-        {
-            if (a.IsLegendaryHeroShrine)
-            {
-                found = true;
-                v3 = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2,-3f)).ToVector3ZisY(0);
-            }
-        }
-        if (!found)
-        {
-          Lazy.DebugLog($"failed to find hero shrine");
-          yield break;
-        }
-
-      if (HeckedMode._HeckedModeStatus != HeckedMode.Hecked.Retrashed)
+      static IEnumerator SpawnInShrines_CR()
       {
-        SpawnIn(_RetrashShrine, v3);
-        SpawnIn(_LordfortressShrine, v3);
+          while (GameManager.Instance.IsLoadingLevel)
+              yield return null;  //wait for level to fully load
+
+          Vector3 v3          = Vector3.zero;
+          bool found          = false;
+          PlayerController p1 = GameManager.Instance.BestActivePlayer;
+          foreach (AdvancedShrineController a in StaticReferenceManager.AllAdvancedShrineControllers)
+          {
+              if (a.IsLegendaryHeroShrine)
+              {
+                  found = true;
+                  v3 = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2,-3f)).ToVector3ZisY(0);
+              }
+          }
+          if (!found)
+          {
+            Lazy.DebugLog($"failed to find hero shrine");
+            yield break;
+          }
+
+        if (HeckedMode._HeckedModeStatus != HeckedMode.Hecked.Retrashed)
+        {
+          SpawnIn(_RetrashShrine, v3);
+          SpawnIn(_LordfortressShrine, v3);
+        }
+        else
+          SpawnIn(_RetrashAltShrine, v3);
       }
-      else
-        SpawnIn(_RetrashAltShrine, v3);
     }
 
     private static void SpawnIn(HeckedShrine shrinePrefab, Vector3 heroShrinePos)

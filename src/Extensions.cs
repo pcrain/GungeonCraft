@@ -2200,14 +2200,15 @@ public static class Extensions
   public static void FreezeAndLaunchWithDelay(this Projectile p, float delay, float speed, string sound = null)
   {
     p.StartCoroutine(FreezeAndLaunchWithDelay_CR(p, delay, speed, sound));
-  }
-  private static IEnumerator FreezeAndLaunchWithDelay_CR(Projectile p, float delay, float speed, string sound = null)
-  {
-    p.Speed = 0.001f;
-    yield return new WaitForSeconds(delay);
-    p.Speed = speed;
-    if (sound != null)
-      p.gameObject.Play(sound);
+
+    static IEnumerator FreezeAndLaunchWithDelay_CR(Projectile p, float delay, float speed, string sound = null)
+    {
+      p.Speed = 0.001f;
+      yield return new WaitForSeconds(delay);
+      p.Speed = speed;
+      if (sound != null)
+        p.gameObject.Play(sound);
+    }
   }
 
   /// <summary>Returns the distance from a projectile to its owner. Returns -1f if the projectile has no owner.</summary>
@@ -2632,30 +2633,30 @@ public static class Extensions
   {
       sprite.StartCoroutine(ArcTowards_CR(sprite: sprite, animLength: animLength, targetSprite: targetSprite, useBottom: useBottom,
         minScale: minScale, vanishPercent: vanishPercent));
-  }
 
-  private static IEnumerator ArcTowards_CR(tk2dBaseSprite sprite, float animLength, tk2dBaseSprite targetSprite, bool useBottom, float minScale, float vanishPercent)
-  {
-      // Suck the pickup into the present and wait for the animation to play out
-      Vector2 startPosition = sprite.WorldCenter;
-      float loopLength      = animLength * vanishPercent;
-      for (float elapsed = 0f; elapsed < loopLength; elapsed += BraveTime.DeltaTime)
+      static IEnumerator ArcTowards_CR(tk2dBaseSprite sprite, float animLength, tk2dBaseSprite targetSprite, bool useBottom, float minScale, float vanishPercent)
       {
-          if (!sprite)
-              break;
+          // Suck the pickup into the present and wait for the animation to play out
+          Vector2 startPosition = sprite.WorldCenter;
+          float loopLength      = animLength * vanishPercent;
+          for (float elapsed = 0f; elapsed < loopLength; elapsed += BraveTime.DeltaTime)
+          {
+              if (!sprite)
+                  break;
 
-          float percentDone                = Mathf.Clamp01(elapsed / loopLength);
-          float cubicLerp                  = Ease.OutCubic(percentDone);
-          Vector2 extraOffset              = new Vector2(0f, 2f * Mathf.Sin(Mathf.PI * cubicLerp));
-          Vector2 curPosition              = extraOffset + Vector2.Lerp(startPosition, useBottom ? targetSprite.WorldBottomCenter : targetSprite.WorldCenter, cubicLerp);
-          float scale                      = 1f - ((1f - minScale) * cubicLerp);
-          sprite.transform.localScale = new Vector3(scale, scale, 1f);
-          sprite.PlaceAtScaledPositionByAnchor(curPosition, Anchor.MiddleCenter);
-          sprite.renderer.SetAlpha(1f - loopLength);
-          yield return null;
+              float percentDone                = Mathf.Clamp01(elapsed / loopLength);
+              float cubicLerp                  = Ease.OutCubic(percentDone);
+              Vector2 extraOffset              = new Vector2(0f, 2f * Mathf.Sin(Mathf.PI * cubicLerp));
+              Vector2 curPosition              = extraOffset + Vector2.Lerp(startPosition, useBottom ? targetSprite.WorldBottomCenter : targetSprite.WorldCenter, cubicLerp);
+              float scale                      = 1f - ((1f - minScale) * cubicLerp);
+              sprite.transform.localScale = new Vector3(scale, scale, 1f);
+              sprite.PlaceAtScaledPositionByAnchor(curPosition, Anchor.MiddleCenter);
+              sprite.renderer.SetAlpha(1f - loopLength);
+              yield return null;
+          }
+          UnityEngine.Object.Destroy(sprite.gameObject);
+          yield break;
       }
-      UnityEngine.Object.Destroy(sprite.gameObject);
-      yield break;
   }
 
   /// <summary>Unity null safe version of GetComponent</summary>

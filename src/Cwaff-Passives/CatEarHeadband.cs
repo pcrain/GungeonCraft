@@ -58,13 +58,14 @@ public class CatEarHeadband : CwaffPassive
         }
 
         this.Owner.StartCoroutine(BreakStealth_CR());
+
+        IEnumerator BreakStealth_CR()
+        {
+            yield return new WaitForSeconds(_STEALTH_TIME);
+            BreakStealth(this.Owner);
+        }
     }
 
-    private IEnumerator BreakStealth_CR()
-    {
-        yield return new WaitForSeconds(_STEALTH_TIME);
-        BreakStealth(this.Owner);
-    }
 
     private void BreakStealth(PlayerController pc)
     {

@@ -129,29 +129,29 @@ public class Commands
     internal static void NukeFloor()
     {
         GameManager.Instance.StartCoroutine(NukeFloor_CR());
-    }
 
-    internal static IEnumerator NukeFloor_CR()
-    {
-        // nuke all rooms
-        List<RoomHandler> rooms = GameManager.Instance.Dungeon.data.rooms;
-        List<AIActor> enemiesToKill = new();
-        for (int i = 0; i < rooms.Count; i++)
+        static IEnumerator NukeFloor_CR()
         {
-            RoomHandler room = rooms[i];
-            if (room == null)
-                continue;
-            room.ClearReinforcementLayers();
-            room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref enemiesToKill);
-            for (int k = 0; k < enemiesToKill.Count; k++)
-                if (enemiesToKill[k])
-                    enemiesToKill[k].enabled = true;
-            yield return null;
-            for (int j = 0; j < enemiesToKill.Count; j++)
-                if (enemiesToKill[j])
-                    UnityEngine.Object.Destroy(enemiesToKill[j].gameObject);
+            // nuke all rooms
+            List<RoomHandler> rooms = GameManager.Instance.Dungeon.data.rooms;
+            List<AIActor> enemiesToKill = new();
+            for (int i = 0; i < rooms.Count; i++)
+            {
+                RoomHandler room = rooms[i];
+                if (room == null)
+                    continue;
+                room.ClearReinforcementLayers();
+                room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref enemiesToKill);
+                for (int k = 0; k < enemiesToKill.Count; k++)
+                    if (enemiesToKill[k])
+                        enemiesToKill[k].enabled = true;
+                yield return null;
+                for (int j = 0; j < enemiesToKill.Count; j++)
+                    if (enemiesToKill[j])
+                        UnityEngine.Object.Destroy(enemiesToKill[j].gameObject);
+            }
+            Lazy.DebugLog($"floor nuked");
         }
-        Lazy.DebugLog($"floor nuked");
     }
 
     [HarmonyPatch]

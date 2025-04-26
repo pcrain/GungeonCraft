@@ -415,20 +415,21 @@ public static class Lazy
             _SoundTimers[soundName] = timer; // reset the timer
         else
             GameManager.Instance.StartCoroutine(PlaySoundUntilDeathOrTimeout_CR(soundName, source, timer)); // play the sound
+
+        static IEnumerator PlaySoundUntilDeathOrTimeout_CR(string soundName, GameObject source, float timer)
+        {
+            _SoundTimers[soundName] = timer;
+            source.Play(soundName);
+            while (source != null && _SoundTimers[soundName] > 0)
+            {
+                _SoundTimers[soundName] -= BraveTime.DeltaTime;
+                yield return null;
+            }
+            source.Play($"{soundName}_stop_all"); //TODO: probably better to use AkSoundEngine.StopPlayingID()
+            _SoundTimers.Remove(soundName);
+        }
     }
 
-    private static IEnumerator PlaySoundUntilDeathOrTimeout_CR(string soundName, GameObject source, float timer)
-    {
-        _SoundTimers[soundName] = timer;
-        source.Play(soundName);
-        while (source != null && _SoundTimers[soundName] > 0)
-        {
-            _SoundTimers[soundName] -= BraveTime.DeltaTime;
-            yield return null;
-        }
-        source.Play($"{soundName}_stop_all"); //TODO: probably better to use AkSoundEngine.StopPlayingID()
-        _SoundTimers.Remove(soundName);
-    }
 
     /// <summary>Helper class for making sure looping sounds are cleaned up properly</summary>
     private class LoopingSoundHandler : MonoBehaviour
@@ -1283,34 +1284,33 @@ public static class Lazy
         return CreateMeshSpriteObject(s.collection, s.spriteId, pos, pointMesh: pointMesh, optionalPalette: optionalPalette);
     }
 
-    /// <summary>Coroutine for dissipating a mesh sprite object over a period of time.</summary>
-    public static IEnumerator Dissipate_CR(tk2dMeshSprite ms, float time, float amplitude = 10f, bool progressive = false)
-    {
-        Material mat = ms.renderer.material;
-        mat.shader = CwaffShaders.ShatterShader;
-        mat.SetFloat("_Progressive", progressive ? 1f : 0f);
-        mat.SetFloat("_Amplitude", amplitude);
-        mat.SetFloat("_RandomSeed", UnityEngine.Random.value);
-        if (ms.optionalPalette != null)
-        {
-            mat.SetFloat("_UsePalette", 1f);
-            mat.SetTexture("_PaletteTex", ms.optionalPalette);
-        }
-
-        for (float elapsed = 0f; elapsed < time; elapsed += BraveTime.DeltaTime)
-        {
-            float percentLeft = 1f - elapsed / time;
-            mat.SetFloat("_Fade", 1f - percentLeft * percentLeft);
-            yield return null;
-        }
-        UnityEngine.Object.Destroy(ms.gameObject);
-        yield break;
-    }
-
     /// <summary>Dissipate a mesh sprite object over a period of time.</summary>
     public static void Dissipate(this tk2dMeshSprite ms, float time, float amplitude = 10f, bool progressive = false)
     {
         ms.StartCoroutine(Dissipate_CR(ms: ms, time: time, amplitude: amplitude, progressive: progressive));
+
+        static IEnumerator Dissipate_CR(tk2dMeshSprite ms, float time, float amplitude = 10f, bool progressive = false)
+        {
+            Material mat = ms.renderer.material;
+            mat.shader = CwaffShaders.ShatterShader;
+            mat.SetFloat("_Progressive", progressive ? 1f : 0f);
+            mat.SetFloat("_Amplitude", amplitude);
+            mat.SetFloat("_RandomSeed", UnityEngine.Random.value);
+            if (ms.optionalPalette != null)
+            {
+                mat.SetFloat("_UsePalette", 1f);
+                mat.SetTexture("_PaletteTex", ms.optionalPalette);
+            }
+
+            for (float elapsed = 0f; elapsed < time; elapsed += BraveTime.DeltaTime)
+            {
+                float percentLeft = 1f - elapsed / time;
+                mat.SetFloat("_Fade", 1f - percentLeft * percentLeft);
+                yield return null;
+            }
+            UnityEngine.Object.Destroy(ms.gameObject);
+            yield break;
+        }
     }
 
     /// <summary>Get numerical index of current floor.</summary>

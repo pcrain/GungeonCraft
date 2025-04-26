@@ -425,35 +425,36 @@ public static class VFX
     public static void DoGenericItemActivation(this PlayerController player, tk2dBaseSprite itemSprite, string playSound = null)
     {
         player.StartCoroutine(DoGenericItemActivation_CR(player, itemSprite, playSound));
-    }
 
-    public static IEnumerator DoGenericItemActivation_CR(PlayerController player, tk2dBaseSprite itemSprite, string playSound = null)
-    {
-        const float FADE_TIME  = 1.0f;
-        const float BOB_RATE   = 1.0f * 2f * Mathf.PI;
-        const float BOB_OFFSET = -0.5f;
-        const float BOB_AMOUNT = 0.33f;
-        const float SPIN_RATE  = 1.5f * 2f * Mathf.PI;
-
-        if (playSound != null)
-            player.gameObject.Play(playSound);
-
-        tk2dSprite sprite = Lazy.SpriteObject(itemSprite.collection, itemSprite.spriteId);
-            sprite.PlaceAtPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET), Anchor.LowerCenter);
-            sprite.transform.parent = player.transform;
-
-        for (float elapsed = 0f; elapsed < FADE_TIME; elapsed += BraveTime.DeltaTime)
+        static IEnumerator DoGenericItemActivation_CR(PlayerController player, tk2dBaseSprite itemSprite, string playSound = null)
         {
-            float percentDone = elapsed / FADE_TIME;
-            sprite.transform.localScale = new Vector2(Mathf.Cos(elapsed * SPIN_RATE), 1f);
-            sprite.PlaceAtScaledPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET + BOB_AMOUNT * Mathf.Sin(elapsed * BOB_RATE)), Anchor.LowerCenter);
-            sprite.gameObject.SetAlpha(1f - percentDone);
-            yield return null;
-        }
+            const float FADE_TIME  = 1.0f;
+            const float BOB_RATE   = 1.0f * 2f * Mathf.PI;
+            const float BOB_OFFSET = -0.5f;
+            const float BOB_AMOUNT = 0.33f;
+            const float SPIN_RATE  = 1.5f * 2f * Mathf.PI;
 
-        UnityEngine.Object.Destroy(sprite.gameObject);
-        yield break;
+            if (playSound != null)
+                player.gameObject.Play(playSound);
+
+            tk2dSprite sprite = Lazy.SpriteObject(itemSprite.collection, itemSprite.spriteId);
+                sprite.PlaceAtPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET), Anchor.LowerCenter);
+                sprite.transform.parent = player.transform;
+
+            for (float elapsed = 0f; elapsed < FADE_TIME; elapsed += BraveTime.DeltaTime)
+            {
+                float percentDone = elapsed / FADE_TIME;
+                sprite.transform.localScale = new Vector2(Mathf.Cos(elapsed * SPIN_RATE), 1f);
+                sprite.PlaceAtScaledPositionByAnchor(player.sprite.WorldTopCenter - new Vector2(0, BOB_OFFSET + BOB_AMOUNT * Mathf.Sin(elapsed * BOB_RATE)), Anchor.LowerCenter);
+                sprite.gameObject.SetAlpha(1f - percentDone);
+                yield return null;
+            }
+
+            UnityEngine.Object.Destroy(sprite.gameObject);
+            yield break;
+        }
     }
+
 
     // yoinked and adapted from SomeBunny
     public static CwaffTrailController CreateSpriteTrailObject(string spriteName, int fps = -1, string startAnim = null, float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null)

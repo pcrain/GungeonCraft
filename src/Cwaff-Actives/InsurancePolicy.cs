@@ -124,25 +124,26 @@ public class InsurancePolicy : CwaffActive
     public static void InsuranceCheck()
     {
         GameManager.Instance.StartCoroutine(InsuranceCheck_CR());
+
+        IEnumerator InsuranceCheck_CR()
+        {
+            PlayerController p1 = GameManager.Instance.PrimaryPlayer;
+            while (!p1.AcceptingAnyInput)
+                yield return null; // wait for player to finish falling to the ground
+
+            LoadInsuredItems();
+            ClearInsuredItemsFile();
+            if (_InsuredItems.Count == 0)
+                yield break;
+
+            bool success;
+            Chest chest = Chest.Spawn(_InsuranceChestPrefab, GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out success));
+            chest.m_isMimic = false;
+            chest.forceContentIds = new(_InsuredItems);
+            _InsuredItems.Clear();
+        }
     }
 
-    public static IEnumerator InsuranceCheck_CR()
-    {
-        PlayerController p1 = GameManager.Instance.PrimaryPlayer;
-        while (!p1.AcceptingAnyInput)
-            yield return null; // wait for player to finish falling to the ground
-
-        LoadInsuredItems();
-        ClearInsuredItemsFile();
-        if (_InsuredItems.Count == 0)
-            yield break;
-
-        bool success;
-        Chest chest = Chest.Spawn(_InsuranceChestPrefab, GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out success));
-        chest.m_isMimic = false;
-        chest.forceContentIds = new(_InsuredItems);
-        _InsuredItems.Clear();
-    }
 
     public override void DoEffect(PlayerController user)
     {
