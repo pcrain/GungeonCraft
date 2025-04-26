@@ -65,7 +65,7 @@ public class Uppskeruvel : CwaffGun
     {
         GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewFloor;
         player.OnAnyEnemyReceivedDamage += OnAnyEnemyReceivedDamage;
-        StartCoroutine(SpawnSoulsOnceWeCanMove());
+        player.StartCoroutine(SpawnSoulsOnceWeCanMove());
         base.OnPlayerPickup(player);
     }
 
@@ -124,7 +124,8 @@ public class Uppskeruvel : CwaffGun
         if (!this)
             return;
         DestroyExtantCombatSouls();
-        StartCoroutine(SpawnSoulsOnceWeCanMove());
+        if (this.PlayerOwner)
+            this.PlayerOwner.StartCoroutine(SpawnSoulsOnceWeCanMove());
     }
 
     private IEnumerator SpawnSoulsOnceWeCanMove()

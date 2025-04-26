@@ -5,6 +5,7 @@
 - Added Sextant and Wayfarer
 - Added mastery for Sextant
 - Fixed pixel gaps when rendering certain sprite shaders
+- Fixed Uppskeruvel's lost souls not spawning when entering a new floor while Uppskeruvel is not the active gun
 
 ## 1.23.1 (2025-04-02)
 
