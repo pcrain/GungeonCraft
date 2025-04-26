@@ -195,6 +195,7 @@
     <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>
     <Compile Include="src\Cwaff-Guns\Empath.cs"/>
     <Compile Include="src\Cwaff-Guns\SeltzerPelter.cs"/>
+    <Compile Include="src\Cwaff-Guns\Wayfarer.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
     <Compile Include="src\Cwaff-Guns\Missiletoe.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
@@ -257,6 +258,7 @@
     <Compile Include="src\Cwaff-Misc\ModdedShopItemAdder.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffGenericNPC.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffItems.cs"/>
+    <Compile Include="src\Cwaff-Misc\Geometry.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffPrerequisite.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffRaidenBeamController.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffCompanion.cs"/>

@@ -10,7 +10,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
 #### Sprites From Other Games (please check them out! <3)
 
-  - [Terraria](https://terraria.wiki.gg/wiki/List_of_weapons): Hatchling Gun (Egg Cannon), Iron Maid (Onyx Blaster), Macchi Auto (recolored Xenopopper), Quarter Pounder (Coin Gun), Tranquilizer (Blowgun)
+  - [Terraria](https://terraria.wiki.gg/wiki/List_of_weapons): Hatchling Gun (Egg Cannon), Iron Maid (Onyx Blaster), Macchi Auto (recolored Xenopopper), Quarter Pounder (Coin Gun), Sextant (Sextant), Tranquilizer (Blowgun), Wayfarer (Dart Rifle)
 
     - [Tremor Mod](https://tremormod.fandom.com/wiki/Weapons): Alligator (Snake Devourer), B. B. Gun (SBC), Blackjack (Party Over), Crapshooter (edited Blackhole Cannon), Empath (Corruptor Gun), Hand Cannon (Hand Cannon), Platinum Star (recolored Dragon Rafale), Subtractor Beam (Cosmic Assault Rifle), Suncaster (Volcannon), Telefragger (Phantablast)
 

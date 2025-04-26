@@ -2247,9 +2247,9 @@ public static class Extensions
   }
 
   /// <summary>Push a rigidbody out of a wall towards a specific direction, returning the number of pixels that were moved</summary>
-  public static int PullOutOfWall(this SpeculativeRigidbody body, IntVector2 pushDirection)
+  public static int PullOutOfWall(this SpeculativeRigidbody body, IntVector2 pushDirection, bool forceAtLeastOne = false)
   {
-    if (!PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
+    if (!forceAtLeastOne && !PhysicsEngine.Instance.OverlapCast(body, null, true, false, null, null, false, null, null))
       return 0;
     Vector2 vector = body.transform.position.XY();
     for (int pixels = 1; pixels <= 200; ++pixels)

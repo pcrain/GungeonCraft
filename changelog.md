@@ -2,7 +2,7 @@
 
 ## 1.24.0 (TBD)
 
-- Added Sextant
+- Added Sextant and Wayfarer
 - Added mastery for Sextant
 - Fixed pixel gaps when rendering certain sprite shaders
 

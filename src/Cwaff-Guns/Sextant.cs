@@ -7,7 +7,7 @@ public class Sextant : CwaffGun
     public static string LongDescription  = "Fires a calculated, single-target shot that deals more damage the longer Sextant is trained on its target before firing. When completely locked on, fires a critical shot that heavily damages bosses and instantly kills non-boss enemies. Reloading toggles focus mode, which slows down movement speed to assist with aiming.";
     public static string Lore             = "An essential instrument among mariners for centuries, repurposed against all odds as a deadly weapon. Holding it in your hands evokes painful memories of 10th grade trigonometry lessons. Should you ever be allowed a few seconds of respite in combat, you're certain this device will let you hit your enemies physically and psychologically *exactly* where it hurts most.";
 
-    private const float _PHASE_TIME = 0.40f;
+    private const float _PHASE_TIME = 0.35f;
     private const float _SOUND_GAP  = _PHASE_TIME / 4f;
     private const int _MAX_PHASE    = 6;
 
@@ -73,7 +73,7 @@ public class Sextant : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Sextant>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 162, shootFps: 14, reloadFps: 4,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 80, shootFps: 14, reloadFps: 4,
             muzzleFrom: Items.Mailbox, fireAudio: "sextant_shoot_sound", carryOffset: new IntVector2(6, 0))
           .InitSpecialProjectile<PrecisionProjectile>(GunData.New(sprite: null, clipSize: 1, cooldown: 0.0f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 50.0f, speed: 25f, range: 18f, force: 12f, invisibleProjectile: true, customClip: true));
@@ -119,6 +119,12 @@ public class Sextant : CwaffGun
         this._labels.Add(this._widthLabel = MakeNewLabel());
         this._labels.Add(this._heightLabel = MakeNewLabel());
         this._labels.Add(this._damageLabel = MakeNewLabel());
+
+        // #if DEBUG
+        // foreach (RoomHandler room in GameManager.Instance.Dungeon.data.rooms)
+        //     if (room.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
+        //         System.Console.WriteLine($"boss room is {room.GetRoomName()}");
+        // #endif
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -204,13 +210,18 @@ public class Sextant : CwaffGun
         else
         {
             this._cooldownTimer = 0.0f;
-            foreach (Geometry g in this._shapes)
-                g._meshRenderer.enabled = false;
-            foreach (dfLabel label in this._labels)
-            {
-                label.Opacity = 0.0f;
-                label.IsVisible = false;
-            }
+            HideHUDElements();
+        }
+    }
+
+    private void HideHUDElements()
+    {
+        foreach (Geometry g in this._shapes)
+            g._meshRenderer.enabled = false;
+        foreach (dfLabel label in this._labels)
+        {
+            label.Opacity = 0.0f;
+            label.IsVisible = false;
         }
     }
 
@@ -301,6 +312,11 @@ public class Sextant : CwaffGun
 
         base.Update();
         float dtime = BraveTime.DeltaTime;
+        if (GameManager.Instance.IsPaused)
+        {
+            HideHUDElements();
+            return;
+        }
         if (dtime == 0.0f)
             return;
         if (this.PlayerOwner is not PlayerController pc)
@@ -622,19 +638,6 @@ public class Sextant : CwaffGun
                 damageEstimate *= pc.stats.GetStatValue(PlayerStats.StatType.DamageToBosses);
             if ((this.canDoCrit || damageEstimate >= targetHH.GetCurrentHealth()) && this.Mastered)
                 ForceFireGun();
-
-            // if (this.canDoCrit)
-            // {
-            //     if (targetHH.IsBoss)
-            //         damageEstimate = Mathf.Max(damageEstimate, PrecisionProjectile.PERCENT_BOSS_DAMAGE_ON_CRIT * targetHH.AdjustedMaxHealth);
-            //     else
-            //         damageEstimate = targetHH.AdjustedMaxHealth;
-            // }
-            // float percentDamageEstimate = Mathf.FloorToInt(100f * Mathf.Clamp01(damageEstimate / targetHH.AdjustedMaxHealth));
-            // this._damageLabel.Text = $"{percentDamageEstimate}% dmg";
-            // this._damageLabel.Color = lockonColor;
-            // this._damageLabel.Opacity = damageMult;
-            // PlaceLabel(this._damageLabel, bounds.max + new Vector2(0.5f, 0.5f), 0f);
         }
         else
         {
@@ -701,10 +704,7 @@ public class Sextant : CwaffGun
         Vector2 finalPos = pos;
         float uiScale = Pixelator.Instance.ScaleTileScale / Pixelator.Instance.CurrentTileScale; // 1.33, usually
         float fontSizeToPixels = uiScale / C.PIXELS_PER_CELL;
-        // System.Console.WriteLine($"ui scale is {uiScale}");
         float adj = label.PixelsToUnits() / uiScale; // PixelsToUnits() == 1 / 303.75 == 16/9 * 2/1080
-        // System.Console.WriteLine($"pixels -> units = {label.PixelsToUnits()}");
-        // System.Console.WriteLine($"units -> pixels = {1f / label.PixelsToUnits()}");
         if (Mathf.Abs(rot) > 90f)
         {
             rot = (rot + 180f).Clamp180();
@@ -727,186 +727,9 @@ public class Sextant : CwaffGun
     }
 }
 
-public class Geometry : MonoBehaviour
-{
-    public enum Shape
-    {
-        NONE,
-        FILLEDCIRCLE,
-        CIRCLE,
-        DASHEDLINE,
-        LINE,
-    }
-
-    public Color color = default;
-    public Vector2 pos = default;
-    public float radius = 1f;
-    public float angle = 0f;
-    public float arc = 360f;
-
-    private const int _CIRCLE_SEGMENTS = 100;
-    private const int _MAX_LINE_SEGMENTS = 100;
-    private const int _MAX_LINE_VERTICES = _MAX_LINE_SEGMENTS * 2;
-    private const float _MIN_SEG_LEN = 0.2f;
-
-    internal MeshRenderer _meshRenderer = null;
-
-    private bool _didSetup = false;
-    private GameObject _meshObject = new GameObject("debug_circle", typeof(MeshFilter), typeof(MeshRenderer));
-    private Mesh _mesh = new();
-    private Vector3[] _vertices;
-    private Shape _shape = Shape.NONE;
-
-    private void Awake()
-    {
-        this._meshObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
-        this._meshObject.GetComponent<MeshFilter>().mesh = this._mesh;
-        this._meshRenderer = this._meshObject.GetComponent<MeshRenderer>();
-    }
-
-    private void CreateMesh()
-    {
-        switch (this._shape)
-        {
-            case Shape.FILLEDCIRCLE:
-                this._vertices = new Vector3[_CIRCLE_SEGMENTS + 2];
-                int[] triangles = new int[3 * _CIRCLE_SEGMENTS];
-                for (int i = 0; i < _CIRCLE_SEGMENTS; i++) //NOTE: triangle fan
-                {
-                    triangles[i * 3]     = 0;
-                    triangles[i * 3 + 1] = i + 1;
-                    triangles[i * 3 + 2] = i + 2;
-                }
-                this._mesh.vertices = this._vertices;
-                this._mesh.uv = new Vector2[this._vertices.Length];
-                this._mesh.triangles = triangles;
-                break;
-            case Shape.CIRCLE:
-                this._vertices = new Vector3[_CIRCLE_SEGMENTS + 1];
-                int[] segments = new int[2 * _CIRCLE_SEGMENTS];
-                for (int i = 0; i < _CIRCLE_SEGMENTS; i++)
-                {
-                    segments[i * 2]     = i;
-                    segments[i * 2 + 1] = i + 1;
-                }
-                this._mesh.vertices = this._vertices;
-                this._mesh.uv = new Vector2[this._vertices.Length];
-                this._mesh.SetIndices(segments, MeshTopology.Lines, 0);
-                break;
-            case Shape.DASHEDLINE:
-                this._vertices = new Vector3[2 * _MAX_LINE_SEGMENTS];
-                int[] segmentsB = new int[2 * _MAX_LINE_SEGMENTS];
-                for (int i = 0; i < 2 * _MAX_LINE_SEGMENTS; i++)
-                    segmentsB[i] = i;
-                this._mesh.vertices = this._vertices;
-                this._mesh.uv = new Vector2[this._vertices.Length];
-                this._mesh.SetIndices(segmentsB, MeshTopology.Lines, 0);
-                break;
-            case Shape.LINE:
-                this._vertices = new Vector3[2];
-                int[] segment = new int[2];
-                segment[0] = 0;
-                segment[1] = 1;
-                this._mesh.vertices = this._vertices;
-                this._mesh.uv = new Vector2[this._vertices.Length];
-                this._mesh.SetIndices(segment, MeshTopology.Lines, 0);
-                break;
-            default:
-                break;
-        }
-
-        Material mat = this._meshRenderer.material = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
-        mat.shader = ShaderCache.Acquire("tk2d/BlendVertexColorAlphaTintableTilted");
-        mat.SetColor("_OverrideColor", this.color);
-    }
-
-    // private static bool _PrintVertices = true;
-    private static readonly Vector2 _WayOffscreen = new Vector2(1000f, 1000f);
-    private void RebuildMeshes()
-    {
-        Vector3 basePos = this.pos;
-        switch (this._shape)
-        {
-            case Shape.FILLEDCIRCLE:
-                this._vertices[0] = basePos;
-                for (int i = 0; i <= _CIRCLE_SEGMENTS; ++i)
-                    this._vertices[i + 1] = basePos + (i * (360f / _CIRCLE_SEGMENTS)).ToVector3(this.radius);
-                break;
-            case Shape.CIRCLE:
-                float start = (this.angle - 0.5f * this.arc).Clamp360();
-                float gap = this.arc / (_CIRCLE_SEGMENTS - 1);
-                for (int i = 0; i <= _CIRCLE_SEGMENTS; ++i)
-                    this._vertices[i] = basePos + (start + i * gap).ToVector3(this.radius);
-                break;
-            case Shape.DASHEDLINE:
-                float vertexSpacing = Mathf.Max(_MIN_SEG_LEN, this.radius / (_MAX_LINE_VERTICES - 1));
-                float verticesNeeded = this.radius / vertexSpacing;
-                int maxVertexToDraw = Mathf.FloorToInt(verticesNeeded);
-                if (maxVertexToDraw % 2 != 1)  // start and end with a line segment
-                    --maxVertexToDraw;
-                float offset = 0.5f * (verticesNeeded - maxVertexToDraw);
-                for (int i = 0; i <= maxVertexToDraw; ++i)
-                    this._vertices[i] = basePos + this.angle.ToVector3((offset + i) * vertexSpacing);
-                for (int i = maxVertexToDraw + 1; i < _MAX_LINE_VERTICES; ++i)
-                    this._vertices[i] = _WayOffscreen;
-                break;
-            case Shape.LINE:
-                this._vertices[0] = basePos;
-                this._vertices[1] = basePos + this.angle.ToVector3(this.radius);
-                break;
-            default:
-                break;
-        }
-        this._mesh.vertices = this._vertices; // necessary to actually trigger an update for some reason
-        this._mesh.RecalculateBounds();
-        if (this._shape == Shape.FILLEDCIRCLE)
-            this._mesh.RecalculateNormals();
-    }
-
-    public void Setup(Shape shape, Color? color = null, Vector2? pos = null, float? radius = null, float? angle = null, float? arc = null, Vector2? pos2 = null)
-    {
-        if (shape == Shape.NONE || (this._shape != Shape.NONE && this._shape != shape))
-        {
-            Lazy.DebugLog($"can't change shape of mesh!");
-            return;
-        }
-        this._shape = shape;
-        if (!this._didSetup)
-            CreateMesh();
-
-        this.color  = color  ?? this.color;
-        this.pos    = pos    ?? this.pos;
-        if (pos2.HasValue)
-        {
-            Vector2 delta = pos2.Value - this.pos;
-            this.radius   = delta.magnitude;
-            this.angle    = delta.ToAngle();
-            this.arc      = arc    ?? this.arc;
-        }
-        else
-        {
-            this.radius = radius ?? this.radius;
-            this.angle  = angle  ?? this.angle;
-            this.arc    = arc    ?? this.arc;
-        }
-        if (color.HasValue)
-            this._meshRenderer.material.SetColor("_OverrideColor", this.color);
-        if (!this._didSetup || pos.HasValue || radius.HasValue)
-            RebuildMeshes();
-        this._didSetup = true;
-        this._meshRenderer.enabled = true;
-    }
-
-    private void OnDestroy()
-    {
-        if (this._meshObject)
-            UnityEngine.Object.Destroy(this._meshObject);
-    }
-}
-
 public class PrecisionProjectile : Projectile
 {
-    public const float PERCENT_BOSS_DAMAGE_ON_CRIT = 0.2f;
+    public const float BOSS_DAMAGE_MULT_ON_CRIT = 2f;
 
     public AIActor target = null;
     public bool isCrit = false;
@@ -921,7 +744,7 @@ public class PrecisionProjectile : Projectile
                 StickyFrictionManager.Instance.RegisterCustomStickyFriction(0.75f, 0f, true);
                 if (target.healthHaver.IsBoss || target.healthHaver.IsSubboss)
                     target.healthHaver.ApplyDamage(
-                        Mathf.Max(PERCENT_BOSS_DAMAGE_ON_CRIT * target.healthHaver.AdjustedMaxHealth, baseData.damage),
+                        BOSS_DAMAGE_MULT_ON_CRIT * baseData.damage,
                         target.CenterPosition - base.transform.position.XY(), "Sextant", ignoreDamageCaps: true);
                 else
                 {
