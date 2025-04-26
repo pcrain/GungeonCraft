@@ -80,7 +80,7 @@ public class MidasProjectile : MonoBehaviour
         if (!enemy.aiActor || !enemy.healthHaver || enemy.healthHaver.IsBoss || enemy.healthHaver.IsSubboss)
             return; // don't do anything to bosses //NOTE: technically works on most bosses, but causes problems with Dragun and who knows what modded bosses...so just disabling
 
-        tk2dBaseSprite sprite = enemy.aiActor.sprite.DuplicateInWorld();
+        tk2dBaseSprite sprite = enemy.aiActor.DuplicateInWorld();
         GameObject statue = sprite.gameObject;
 
         IntVector2 offset = (16f * (sprite.WorldBottomLeft - statue.transform.position.XY())).ToIntVector2(); // compute offsets to make speculative rigid body work correctly

@@ -2148,8 +2148,8 @@ public static class Extensions
     return p.transform.right.XY().ToAngle();
   }
 
-  /// <summary>Creates a GameObject with a sprite in the exact same location as an original sprite</summary>
-  public static tk2dBaseSprite DuplicateInWorld(this tk2dBaseSprite osprite)
+  /// <summary>Creates a GameObject with a sprite in the exact same location as an original sprite.</summary>
+  public static tk2dBaseSprite DuplicateInWorld(this tk2dBaseSprite osprite, Texture2D optionalPalette = null)
   {
     tk2dBaseSprite sprite = Lazy.SpriteObject(osprite.collection, osprite.spriteId);
     sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
@@ -2158,7 +2158,23 @@ public static class Extensions
     sprite.SortingOrder           = osprite.SortingOrder;
     sprite.renderLayer            = osprite.renderLayer;
     sprite.UpdateZDepth();
+    if (optionalPalette != null)
+    {
+      Material mat = sprite.renderer.material;
+      sprite.usesOverrideMaterial = true;
+      if (!mat.HasProperty("_PaletteTex"))
+        mat.shader = osprite.renderer.material.shader;
+      if (mat.HasProperty("_UsePalette"))
+        mat.SetFloat("_UsePalette", 1f);
+      mat.SetTexture("_PaletteTex", optionalPalette);
+    }
     return sprite;
+  }
+
+  /// <summary>Creates a GameObject with a sprite in the exact same location as the enemy.</summary>
+  public static tk2dBaseSprite DuplicateInWorld(this AIActor actor)
+  {
+    return actor.sprite.DuplicateInWorld(optionalPalette: actor.optionalPalette);
   }
 
   /// <summary>Creates a GameObject with a sprite in the exact same location as an original sprite, as a point mesh.</summary>
@@ -3329,6 +3345,20 @@ public static class Extensions
       if (returnHat != null && Hatabase.Hats.TryGetValue(returnHat.GetDatabaseFriendlyHatName(), out Hat origHat))
         hc.SetHat(origHat);
         LootEngine.DoDefaultItemPoof(player.sprite.WorldBottomCenter + new Vector2(0f, 1f));
+  }
+
+  /// <summary>Postprocess a beam that may not have run its Start() method yet</summary>
+  public static void DoPostProcessBeamSafe(this PlayerController player, BeamController beam)
+  {
+    player.StartCoroutine(DoPostProcessBeamSafe_CR(player, beam));
+
+    static IEnumerator DoPostProcessBeamSafe_CR(PlayerController player, BeamController beam)
+    {
+      yield return null;
+      if (player && beam)
+        player.DoPostProcessBeam(beam);
+      yield break;
+    }
   }
 }
 

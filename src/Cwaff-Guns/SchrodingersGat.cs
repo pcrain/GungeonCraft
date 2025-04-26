@@ -152,7 +152,7 @@ public class SchrodingersStat : MonoBehaviour
             p.DieInAir();
         }
 
-        tk2dBaseSprite edupe = this._enemy.sprite.DuplicateInWorld();
+        tk2dBaseSprite edupe = this._enemy.DuplicateInWorld();
         edupe.StartCoroutine(PhaseOut(edupe, Vector2.right, 25f, 90f, 1.0f));
 
         base.gameObject.Play("schrodinger_dead_sound");
@@ -190,7 +190,7 @@ public class SchrodingersStat : MonoBehaviour
 
             if (UnityEngine.Random.value < 0.1f)  // create an afterimage
             {
-                tk2dBaseSprite dupe = this._enemy.sprite.DuplicateInWorld();
+                tk2dBaseSprite dupe = this._enemy.DuplicateInWorld();
                 dupe.StartCoroutine(PhaseOut(dupe, Lazy.RandomVector(), 5f, 90f, 0.5f));
             }
         }

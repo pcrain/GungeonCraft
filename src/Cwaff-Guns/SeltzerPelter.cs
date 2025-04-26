@@ -136,7 +136,7 @@ public class SeltzerProjectile : MonoBehaviour
             this._beam.HitsEnemies = true;
             this._beam.Origin      = this._canProjectile.SafeCenter;
             this._beam.Direction   = -this._canProjectile.sprite.transform.rotation.z.ToVector();
-            this._owner.DoPostProcessBeam(this._beam);
+            this._owner.DoPostProcessBeamSafe(this._beam);
         if (this._mastered)
             theBeamObject.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.SuperSeltzerGoop;
     }

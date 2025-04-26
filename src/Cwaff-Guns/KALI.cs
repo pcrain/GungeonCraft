@@ -199,7 +199,7 @@ public class KaliProjectile : MonoBehaviour
     {
         if (!body.aiActor || body.aiActor.IsABoss(canBeDead: true))
             return;
-        tk2dBaseSprite glowyBoi = body.aiActor.sprite.DuplicateInWorld();
+        tk2dBaseSprite glowyBoi = body.aiActor.DuplicateInWorld();
         glowyBoi.SetGlowiness(300f, overrideColor: Color.cyan, glowColor: Color.cyan, clampBrightness: false);
         glowyBoi.StartCoroutine(CriticalGlow(glowyBoi));
         if (this.Mastered)

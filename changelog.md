@@ -8,6 +8,8 @@
 - Fixed Uppskeruvel's lost souls not spawning when entering a new floor while Uppskeruvel is not the active gun
 - Fixed empty ammo clip sprites for Outbreak, Schrodinger's Gat, Soul Kaliber, and Stereoscope being a pixel offset from their full ammo clip sprites
 - Fixed Prismatic Scope not recognizing several beam weapons as such
+- Fixed null deref caused by Silver Bullets attempting to tint Seltzer Pelter's soda streams before they were set up
+- Fixed certain VFX not playing correctly on Blue and Red Shotgun Kin
 
 ## 1.23.1 (2025-04-02)
 

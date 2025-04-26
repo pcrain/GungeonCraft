@@ -87,7 +87,7 @@ public class SafetyGloves : CwaffPassive
         this._extantVfx.SafeDestroy();
         this._extantVfx = null;
 
-        closestEnemy.sprite.DuplicateInWorld().ArcTowards(0.5f, pc.sprite, false, 0.1f, 1.0f);
+        closestEnemy.DuplicateInWorld().ArcTowards(0.5f, pc.sprite, false, 0.1f, 1.0f);
         pc.gameObject.Play("safety_glove_grab_sound");
         closestEnemy.gameObject.Play("Play_ENM_Death");
         closestEnemy.EraseFromExistence(suppressDeathSounds: true);
