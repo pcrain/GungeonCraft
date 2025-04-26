@@ -10,6 +10,7 @@
 - Fixed Prismatic Scope not recognizing several beam weapons as such
 - Fixed null deref caused by Silver Bullets attempting to tint Seltzer Pelter's soda streams before they were set up
 - Fixed certain VFX not playing correctly on Blue and Red Shotgun Kin
+- Fixed (hopefully) null deref caused by Borrowed Time attempting to activate after being destroyed or while the player was not in a valid room
 
 ## 1.23.1 (2025-04-02)
 
