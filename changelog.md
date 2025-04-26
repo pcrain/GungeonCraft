@@ -13,6 +13,8 @@
 - Fixed (hopefully) null deref caused by Borrowed Time attempting to activate after being destroyed or while the player was not in a valid room
 - Enemies with high HP now drop large soul fragments worth 10 normal soul fragments each when killed by Uppskeruvel
 - Reduced frequency of particles spawned by soul fragments created by enemies killed with Uppskeruvel
+- Homing behavior of Uppskeruvel's Aimless Souls is no longer framerate dependent
+- Uppskeruvel's Aimless Souls now render above most objects
 
 ## 1.23.1 (2025-04-02)
 

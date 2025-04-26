@@ -475,6 +475,7 @@ public class UppskeruvelCombatSoul : MonoBehaviour
         this._sprite.SetAlphaImmediate(0.0f);
         this._trail = this._sprite.AddTrail(Uppskeruvel._SoulTrailPrefab);
         base.gameObject.Play("soul_spawn_sound");
+        base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
         this._setup   = true;
     }
 
@@ -513,12 +514,14 @@ public class UppskeruvelCombatSoul : MonoBehaviour
 
     private void HomeTowardsTarget()
     {
+        const float VEL = 144f; // NOTE: this was framerate dependent before but looked good at 144FPS, so we're going with this
+        float dtime = BraveTime.DeltaTime;
         this._velocity = this._basePos.XY().LerpDirectAndNaturalVelocity(
             target          : this._targetPos,
             naturalVelocity : this._velocity,
-            accel           : _ACCEL_SEC * BraveTime.DeltaTime,
+            accel           : _ACCEL_SEC * dtime,
             lerpFactor      : 1f);
-        this._basePos += this._velocity.ToVector3ZUp();
+        this._basePos += (VEL * dtime * this._velocity).ToVector3ZUp();
     }
 
     public bool CanLaunch()
