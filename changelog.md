@@ -15,6 +15,7 @@
 - Reduced frequency of particles spawned by soul fragments created by enemies killed with Uppskeruvel
 - Homing behavior of Uppskeruvel's Aimless Souls is no longer framerate dependent
 - Uppskeruvel's Aimless Souls now render above most objects
+- Added 1 new synergy
 
 ## 1.23.1 (2025-04-02)
 

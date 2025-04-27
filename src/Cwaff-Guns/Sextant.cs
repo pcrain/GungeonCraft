@@ -10,6 +10,7 @@ public class Sextant : CwaffGun
     private const float _PHASE_TIME = 0.35f;
     private const float _SOUND_GAP  = _PHASE_TIME / 4f;
     private const int _MAX_PHASE    = 6;
+    private const float CALCULATOR_SYNERGY_MULT = 1.3f;
 
     internal static readonly bool _UseUnicodeFont = true;
     internal static GameObject _MathSymbols = null;
@@ -328,15 +329,19 @@ public class Sextant : CwaffGun
             return;
         if (this.PlayerOwner is not PlayerController pc)
             return;
+
         pc.forceFireDown = false;
+        float adjustedDtime = dtime;
+        if (pc.HasSynergy(Synergy.YOU_MAY_USE_A_CALCULATOR))
+            adjustedDtime *= CALCULATOR_SYNERGY_MULT;
 
         if (!this.gun.IsReloading && this.gun.ClipShotsRemaining < Mathf.Min(this.gun.ClipCapacity, this.gun.CurrentAmmo))
             this.gun.Reload(); // force reload while we're not at max clip capacity
 
         if (this.gun.IsReloading || this._cooldownTimer > 0)
         {
-            this._cooldownTimer = Mathf.Max(this._cooldownTimer - dtime, 0f);
-            float fadeoutDelta = dtime / this.gun.AdjustedReloadTime;
+            this._cooldownTimer = Mathf.Max(this._cooldownTimer - adjustedDtime, 0f);
+            float fadeoutDelta = adjustedDtime / this.gun.AdjustedReloadTime;
             float fadeoutAbs = this._cooldownTimer / this.gun.AdjustedReloadTime;
             foreach (Geometry g in this._shapes)
                 g._meshRenderer.material.SetColor("_OverrideColor", g.color.WithAlpha(fadeoutAbs));
@@ -348,11 +353,11 @@ public class Sextant : CwaffGun
             return;
         }
 
-        this._freezeTimer = Mathf.Max(this._freezeTimer - dtime, 0f);
+        this._freezeTimer = Mathf.Max(this._freezeTimer - adjustedDtime, 0f);
         if (this._freezeTimer == 0f)
         {
-            this._drawTimer += dtime;
-            this._soundTimer += dtime;
+            this._drawTimer += adjustedDtime;
+            this._soundTimer += adjustedDtime;
             if (this._soundTimer >= _SOUND_GAP && this._drawTimer <= this._maxDrawablePhase * _PHASE_TIME + 0.05f)
             {
                 this._soundTimer -= _SOUND_GAP;
@@ -525,7 +530,7 @@ public class Sextant : CwaffGun
         this._shotAngleLabel.Opacity = curPhaseCompletion;
         PlaceLabel(this._shotAngleLabel, barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG + 0.125f) + (baseShotAngle - 90f).ToVector(1.5f), baseShotAngle - 90f);
 
-        // phase 1b: aim angle
+        // phase 1b: focus triangle
         this._timeFocusing = Mathf.Clamp(this._timeFocusing + (this._focused ? dtime : -dtime), 0f, _PHASE_TIME);
         float focusCompletion = Mathf.Clamp01(this._timeFocusing / _PHASE_TIME);
         Vector2 focusPoint = barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG);
