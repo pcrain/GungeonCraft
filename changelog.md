@@ -25,6 +25,8 @@
 	- Projectiles can now be caught while they're in motion to restore ammo
 	- Projectiles now knock the player back when caught
 	- Ammo is now restored upon clearing a combat room
+- Fixed (hopefully) null deref caused by trying to reflect Ki Blast's projectiles towards non-existent enemies
+- Lowered volume and reverb of impact sounds for Ki Blast's projectiles
 
 ## 1.23.1 (2025-04-02)
 

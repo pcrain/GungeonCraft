@@ -118,8 +118,10 @@ public class KiBlast : CwaffGun
         KiBlastBehavior closestBlast = null;
         foreach (Projectile p in StaticReferenceManager.AllProjectiles)
         {
-            KiBlastBehavior k = p.GetComponent<KiBlastBehavior>();
-            if (k == null || (!k.reflected))
+            if (!p || !p.isActiveAndEnabled)
+                continue;
+            KiBlastBehavior k = p.gameObject.GetComponent<KiBlastBehavior>();
+            if (!k || !k.reflected)
                 continue;
             float sqrDist = (player.CenterPosition - p.SafeCenter).sqrMagnitude;
             if (sqrDist > closestDistanceSqr)
@@ -319,11 +321,11 @@ public class KiBlastBehavior : MonoBehaviour
 
     public void ReturnFromPlayer(PlayerController player)
     {
-        if (!this.reflected)
+        if (!this.reflected || !this._projectile)
             return;
         if (this._projectile.Owner is not AIActor enemy)
             return;
-        if (player.CurrentRoom is not RoomHandler room)
+        if (!player || player.CurrentRoom is not RoomHandler room)
             return;
 
         ++this._numReflections;
@@ -334,7 +336,6 @@ public class KiBlastBehavior : MonoBehaviour
         this._projectile.Owner = player;
         this._projectile.collidesWithPlayer = false;
         this._projectile.collidesWithEnemies = true;
-        this._arc.SetNewTarget(enemy.CenterPosition);
 
         EasyTrailBullet trail = this._projectile.gameObject.GetComponent<EasyTrailBullet>();
             trail.BaseColor = Color.cyan;
@@ -355,6 +356,8 @@ public class KiBlastBehavior : MonoBehaviour
             enemy = room.GetRandomActiveEnemy(true);
         }
         float angle = success ? (enemy.CenterPosition - player.CenterPosition).ToAngle() : Lazy.RandomAngle();
+        this._arc.SetNewTarget(success ? enemy.CenterPosition : (
+            player.CenterPosition + player.m_currentGunAngle.ToVector(UnityEngine.Random.Range(1f, 5f))));
         SlashDoer.DoSwordSlash(
             position        : player.CenterPosition,
             angle           : angle,
