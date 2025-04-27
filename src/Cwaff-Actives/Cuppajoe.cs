@@ -40,7 +40,7 @@ public class Cuppajoe : CwaffActive
     public override void DoEffect(PlayerController user)
     {
         this._caffeine.AnotherCup();
-        this.m_activeDuration  = Caffeination._BOOST_TIME;
+        this.m_activeDuration  = user.HasSynergy(Synergy.CAFFEINE_ADDICTION) ? Caffeination._ADDICTED_BOOST_TIME : Caffeination._BOOST_TIME;
         this.m_activeElapsed   = 0f;
         this.IsCurrentlyActive = true;
     }
@@ -54,7 +54,7 @@ public class Cuppajoe : CwaffActive
         if (this.IsCurrentlyActive && (this.m_activeElapsed >= this.m_activeDuration))
         {
             this.IsCurrentlyActive = false;
-            this.CurrentTimeCooldown = Caffeination._CRASH_TIME;
+            this.CurrentTimeCooldown = this._owner.HasSynergy(Synergy.CAFFEINE_ADDICTION) ? Caffeination._ADDICTED_CRASH_TIME : Caffeination._CRASH_TIME;
         }
     }
 }
@@ -70,6 +70,8 @@ internal class Caffeination : MonoBehaviour
 
     internal const float _BOOST_TIME = 12f;
     internal const float _CRASH_TIME = 8f;
+    internal const float _ADDICTED_BOOST_TIME = 9f;
+    internal const float _ADDICTED_CRASH_TIME = 3f;
 
     private PlayerController _owner         = null;
     private StatModifier[]   _caffeineBuffs = null;
@@ -112,12 +114,14 @@ internal class Caffeination : MonoBehaviour
 
         IEnumerator AnotherCup_CR()
         {
+            bool addicted = this._owner.HasSynergy(Synergy.CAFFEINE_ADDICTION);
+
             this._owner.gameObject.Play("coffee_drink_sound");
             this._state = State.CAFFEINATED;
             foreach (StatModifier stat in this._caffeineBuffs)
                 this._owner.ownerlessStatModifiers.Add(stat);
             this._owner.stats.RecalculateStats(this._owner);
-            yield return new WaitForSeconds(_BOOST_TIME);
+            yield return new WaitForSeconds(addicted ? _ADDICTED_BOOST_TIME : _BOOST_TIME);
 
             this._state = State.CRASHED;
             foreach (StatModifier stat in this._caffeineBuffs)
@@ -125,7 +129,7 @@ internal class Caffeination : MonoBehaviour
             foreach (StatModifier stat in this._crashNerfs)
                 this._owner.ownerlessStatModifiers.Add(stat);
             this._owner.stats.RecalculateStats(this._owner);
-            yield return new WaitForSeconds(_CRASH_TIME);
+            yield return new WaitForSeconds(addicted ? _ADDICTED_CRASH_TIME : _CRASH_TIME);
 
             this._state = State.NEUTRAL;
             foreach (StatModifier stat in this._crashNerfs)

@@ -135,6 +135,18 @@ public static class CwaffSynergies
         NewSynergy(SEGALS_LAW, "Segal's Law", new[]{IName(DeadRinger.ItemName), "super_hot_watch"});
         // Allays are twice as likely to find items upon clearing a room with at least one torch placed in it.
         NewSynergy(SPAWNPROOFING, "Spawnproofing", new[]{IName(AmethystShard.ItemName), IName(StackOfTorches.ItemName)});
+        // Cuppajoe's stat boost duration is reduced to 9 seconds, but crash time is reduced to 3 seconds.
+        NewSynergy(CAFFEINE_ADDICTION, "Caffeine Addiction", new[]{IName(MacchiAuto.ItemName), IName(Cuppajoe.ItemName)});
+        // Kaliber's Justice can no longer take items from the player.
+        NewSynergy(KALIBERS_FAVOR, "Kaliber's Favor", new[]{IName(KalibersJustice.ItemName), "seven_leaf_clover"});
+        // Tryhard Snacks stay active for twice as long after an enemy spawns.
+        NewSynergy(GAMER_REFLEXES, "Gamer Reflexes", new[]{IName(TryhardSnacks.ItemName), "3rd_party_controller"});
+        // Derail Gun reloads 35% faster.
+        NewSynergy(AHEAD_OF_SCHEDULE, "Ahead of Schedule", new[]{IName(DerailGun.ItemName), "sense_of_direction"})
+            .MultReload(0.65f);
+        // Sextant reloads 70% faster.
+        NewSynergy(WRONG_KIND_OF_COMPASS, "Wrong Kind of Compass", new[]{IName(Sextant.ItemName), "sense_of_direction"})
+            .MultReload(0.3f);
       #endregion
 
       #region Masteries
@@ -638,6 +650,11 @@ public enum Synergy {
     STAY_HUNGRY,
     SEGALS_LAW,
     SPAWNPROOFING,
+    CAFFEINE_ADDICTION,
+    KALIBERS_FAVOR,
+    GAMER_REFLEXES,
+    AHEAD_OF_SCHEDULE,
+    WRONG_KIND_OF_COMPASS,
 
     // Masteries
     MASTERY_GRANDMASTER,

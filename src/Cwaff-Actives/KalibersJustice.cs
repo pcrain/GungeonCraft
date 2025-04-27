@@ -94,7 +94,7 @@ public class KalibersJustice : CwaffActive
 
         // Figure out what item we're giving and give it
         Need? whatToOffer = null;
-        if (offerList != null && offerList.Count > 0)
+        if (offerList != null && offerList.Count > 0 && !user.HasSynergy(Synergy.KALIBERS_FAVOR))
         {
             whatToOffer = offerList.ChooseRandom<Need>();
             switch(whatToOffer.Value.type)
