@@ -18,6 +18,13 @@
 - Added 1 new synergy
 - Added missing music credits to credits page
 - Fixed transparency of Vacuum Cleaner's particles being framerate dependent
+- Reworked B. B. Gun:
+	- Reduced max ammo from 3 to 1
+	- Changed clip size from 3 to unlimited (e.g., clip size now matches max ammo)
+	- Increased projectile friction at high speeds, making them slow down faster
+	- Projectiles can now be caught while they're in motion to restore ammo
+	- Projectiles now knock the player back when caught
+	- Ammo is now restored upon clearing a combat room
 
 ## 1.23.1 (2025-04-02)
 
