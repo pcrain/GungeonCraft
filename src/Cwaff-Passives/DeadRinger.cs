@@ -16,6 +16,7 @@ public class DeadRinger : CwaffPassive
     internal const float _DEAD_RINGER_SURPRISE_TIMER = 2.0f;
     internal const float _LENIENCE                   = 0.75f; // minimum time after getting hit we can decloak (to prevent instantly losing cloak in panic)
     internal const float _DECOY_LIFE                 = 3f;
+    internal const float SEGALS_LAW_STOP_TIME        = 5.0f;
 
     internal static GameObject _CorpsePrefab;
     internal static GameObject _DecoyPrefab;
@@ -77,6 +78,8 @@ public class DeadRinger : CwaffPassive
             if (decoy.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
                 body.RegisterGhostCollisionException(this.Owner.specRigidbody);
         }
+        if (this.Owner.HasSynergy(Synergy.SEGALS_LAW))
+            JojoReferenceHandler.RefreshTimeStop(SEGALS_LAW_STOP_TIME);
         StartCoroutine(AnimateTheCorpse(this.Owner));
     }
 

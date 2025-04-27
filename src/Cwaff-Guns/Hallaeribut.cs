@@ -232,7 +232,7 @@ public class Hallaeribut : CwaffGun
         float ammoPercent = (float)this._cachedAmmo / this.gun.AdjustedMaxAmmo;
         int ti = this.Mastered ? 5 : _AmmoThresholds.FirstGE(ammoPercent);
         UpdateState((State)ti);
-        int newTier = Mathf.Max(ti - 1, 0);
+        int newTier = this.PlayerOwner.HasSynergy(Synergy.STAY_HUNGRY) ? 4 : Mathf.Max(ti - 1, 0);
         if (this.gun.CurrentStrengthTier != newTier)
             this.gun.CurrentStrengthTier = newTier;
     }

@@ -75,11 +75,7 @@ public class AllayCompanion : CwaffCompanionController
             ITEM_DANCE,    // (scout mode) circle around located item once near enough
         }
 
-        #if DEBUG
-            private const float _ROOM_CLEAR_ITEM_CHANCE = 1.0f;
-        #else
-            private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
-        #endif
+        private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
 
         public float PathInterval = 0.25f;
         public float IdealRadius = 3f;
@@ -201,7 +197,8 @@ public class AllayCompanion : CwaffCompanionController
         {
             if (!this._scouting || this._heldItemId == -1 || controller.CurrentRoom == null || !this._allayItem)
                 return;
-            if (UnityEngine.Random.value > Mathf.Max(_ROOM_CLEAR_ITEM_CHANCE - 0.01f * this._allayItem.itemsFound, 0.025f))
+            float baseItemFindChance = _ROOM_CLEAR_ITEM_CHANCE * (controller.HasSynergy(Synergy.SPAWNPROOFING) ? 2f : 1f);
+            if (UnityEngine.Random.value > Mathf.Max(baseItemFindChance - 0.01f * this._allayItem.itemsFound, 0.025f))
                 return;
 
             ++this._allayItem.itemsFound;

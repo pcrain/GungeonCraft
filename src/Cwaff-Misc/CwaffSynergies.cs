@@ -129,6 +129,12 @@ public static class CwaffSynergies
         NewSynergy(STRAGGLER, "Straggler", new[]{IName(Wayfarer.ItemName), "gas_mask"});
         // Wayfarer's drones leave a trail of fire
         NewSynergy(TRAILBLAZER, "Trailblazer", new[]{IName(Wayfarer.ItemName), "ring_of_fire_resistance"});
+        // Hallaeribut always fires 10 piranhas per shot at all hunger levels.
+        NewSynergy(STAY_HUNGRY, "Stay Hungry", new[]{IName(Hallaeribut.ItemName), "hungry_bullets"});
+        // Upon taking damage, time freezes for everything but the player for 5 seconds.
+        NewSynergy(SEGALS_LAW, "Segal's Law", new[]{IName(DeadRinger.ItemName), "super_hot_watch"});
+        // Allays are twice as likely to find items upon clearing a room with at least one torch placed in it.
+        NewSynergy(SPAWNPROOFING, "Spawnproofing", new[]{IName(AmethystShard.ItemName), IName(StackOfTorches.ItemName)});
       #endregion
 
       #region Masteries
@@ -629,6 +635,9 @@ public enum Synergy {
     YOU_MAY_USE_A_CALCULATOR,
     STRAGGLER,
     TRAILBLAZER,
+    STAY_HUNGRY,
+    SEGALS_LAW,
+    SPAWNPROOFING,
 
     // Masteries
     MASTERY_GRANDMASTER,

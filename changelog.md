@@ -15,7 +15,7 @@
 - Reduced frequency of particles spawned by soul fragments created by enemies killed with Uppskeruvel
 - Homing behavior of Uppskeruvel's Aimless Souls is no longer framerate dependent
 - Uppskeruvel's Aimless Souls now render above most objects
-- Added 3 new synergies
+- Added 6 new synergies
 - Added missing music credits to credits page
 - Fixed transparency of Vacuum Cleaner's particles being framerate dependent
 - Reworked B. B. Gun:
