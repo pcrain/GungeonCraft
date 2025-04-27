@@ -16,10 +16,10 @@ public class Wayfarer : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Wayfarer>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 0.0f, ammo: 60, shootFps: 14, reloadFps: 4,
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 0.0f, ammo: 50, shootFps: 14, reloadFps: 4,
             muzzleFrom: Items.Mailbox, fireAudio: "wayfarer_launch_sound")
           .AddToShop(ItemBuilder.ShopType.Goopton)
-          .InitProjectile(GunData.New(sprite: "wayfarer_projectile", scale: 0.9f, clipSize: 1, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
+          .InitProjectile(GunData.New(sprite: "wayfarer_projectile", scale: 0.9f, clipSize: 1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 30.0f, speed: 70f, range: 1000f, force: 12f, hitSound: "wayfarer_impact_sound", customClip: true,
             pierceBreakables: true, anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2)))
           .SetAllImpactVFX(Items.Blooper.AsGun().DefaultModule.projectiles[0].hitEffects.enemy)
@@ -232,6 +232,7 @@ public class WayfarerProjectile : MonoBehaviour
     private int _duplicateCollisions = 0;
     private bool _autonomous = false;
     private Geometry _pingRing = null;
+    private Geometry _ownerRing = null;
     private float _pingTimer = 0.0f;
     private float _shootTimer = 0.0f;
 
@@ -254,6 +255,24 @@ public class WayfarerProjectile : MonoBehaviour
         this._projectile.specRigidbody.OnTileCollision += this.OnTileCollision;
         this._projectile.specRigidbody.OnRigidbodyCollision += this.OnRigidBodyCollision;
         this._pingRing = new GameObject().AddComponent<Geometry>();
+        this._ownerRing = new GameObject().AddComponent<Geometry>();
+
+        bool straggler = this._owner.HasSynergy(Synergy.STRAGGLER);
+        bool trailblazer = this._owner.HasSynergy(Synergy.TRAILBLAZER);
+        if (!straggler && !trailblazer)
+          return;
+
+        GoopModifier gm = this._projectile.gameObject.GetOrAddComponent<GoopModifier>();
+        gm.SpawnGoopOnCollision   = false;
+        gm.SpawnGoopInFlight      = true;
+        gm.InFlightSpawnRadius    = 0.625f;
+        gm.InFlightSpawnFrequency = 0.01f;
+        if (straggler && trailblazer)
+          gm.goopDefinition = EasyGoopDefinitions.GreenFireDef;
+        else if (straggler)
+          gm.goopDefinition = EasyGoopDefinitions.PoisonDef;
+        else if (trailblazer)
+          gm.goopDefinition = EasyGoopDefinitions.FireDef;
     }
 
     public void MakeAutonomous() {
@@ -375,15 +394,26 @@ public class WayfarerProjectile : MonoBehaviour
       float percentDone = time / MAX_TIME;
       float dist = percentDone * MAX_RING_DIST;
       float alpha = Mathf.Min(percentDone, 1f - percentDone);
-      this._pingRing.Setup(Geometry.Shape.RING,
-        color: (this._autonomous ? Color.red : Color.green).WithAlpha(alpha),
-        pos: this._projectile.SafeCenter, radius: dist, radiusInner: Mathf.Max(0f, dist - RING_THICKNESS));
+      for (int i = 0; i < 2; ++i)
+      {
+        ((i == 0) ? this._pingRing : this._ownerRing).Setup(Geometry.Shape.RING,
+          color: (this._autonomous ? Color.red : Color.green).WithAlpha(alpha),
+          pos: (i == 0) ? this._projectile.SafeCenter : this._owner.CenterPosition,
+          radius: dist, radiusInner: Mathf.Max(0f, dist - RING_THICKNESS));
+        if (this._autonomous)
+        {
+          this._ownerRing._meshRenderer.enabled = false;
+          break;
+        }
+      }
     }
 
     private void OnDestroy()
     {
       if (this._pingRing)
         UnityEngine.Object.Destroy(this._pingRing.gameObject);
+      if (this._ownerRing)
+        UnityEngine.Object.Destroy(this._ownerRing.gameObject);
       base.gameObject.Play("wayfarer_destroy_sound");
     }
 }

@@ -125,6 +125,10 @@ public static class CwaffSynergies
         NewSynergy(SOLID_FOOTING, "Solid Footing", new[]{IName(Jugglernaut.ItemName), "heavy_boots"});
         // Sextant locks on 30% faster.
         NewSynergy(YOU_MAY_USE_A_CALCULATOR, "You May Use a Calculator", new[]{IName(Sextant.ItemName), IName(Calculator.ItemName)});
+        // Wayfarer's drones leave a trail of poison
+        NewSynergy(STRAGGLER, "Straggler", new[]{IName(Wayfarer.ItemName), "gas_mask"});
+        // Wayfarer's drones leave a trail of fire
+        NewSynergy(TRAILBLAZER, "Trailblazer", new[]{IName(Wayfarer.ItemName), "ring_of_fire_resistance"});
       #endregion
 
       #region Masteries
@@ -623,6 +627,8 @@ public enum Synergy {
     TREASURE_HUNTER,
     SOLID_FOOTING,
     YOU_MAY_USE_A_CALCULATOR,
+    STRAGGLER,
+    TRAILBLAZER,
 
     // Masteries
     MASTERY_GRANDMASTER,
