@@ -205,7 +205,6 @@ public class VacuumParticle : MonoBehaviour
     private const float _MAX_LIFE           = 1.0f;
     private const float _MIN_DIST_TO_VACUUM = 0.5f;
     private const float _MIN_VAC_DIST_SQR   = _MIN_DIST_TO_VACUUM * _MIN_DIST_TO_VACUUM;
-    private const float _MIN_ALPHA          = 0.01f;
     private const float _MAX_ALPHA          = 0.5f;
     private const float _DLT_ALPHA          = 0.01f;
 
@@ -215,7 +214,6 @@ public class VacuumParticle : MonoBehaviour
     private float _accel           = 0.0f;
     private Vector2 _velocity      = Vector2.zero;
     private float _lifetime        = 0.0f;
-    private float _alpha           = _MIN_ALPHA;
     private bool _isDebris         = true; // false for the VFX particles created by the vacuum animation itself, true for actual debris
     private DebrisObject _debris   = null;
     private float _startDistance   = 0.0f;
@@ -245,14 +243,13 @@ public class VacuumParticle : MonoBehaviour
         // handle particle fading logic exclusive to the vacuum particles
         if (!this._isDebris)
         {
-            this._alpha = Mathf.Min(this._alpha + _DLT_ALPHA, _MAX_ALPHA);
-            this._sprite.renderer.SetAlpha(this._alpha);
             this._lifetime += BraveTime.DeltaTime;
             if (!this._gun || this._lifetime > _MAX_LIFE)
             {
                 UnityEngine.GameObject.Destroy(base.gameObject);
                 return;
             }
+            this._sprite.renderer.SetAlpha(_MAX_ALPHA * (1f - this._lifetime / _MAX_LIFE));
         }
 
         Vector2 towardsVacuum = (this._gun.barrelOffset.position.XY() - this._sprite.WorldCenter);

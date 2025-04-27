@@ -17,6 +17,7 @@
 - Uppskeruvel's Aimless Souls now render above most objects
 - Added 1 new synergy
 - Added missing music credits to credits page
+- Fixed transparency of Vacuum Cleaner's particles being framerate dependent
 
 ## 1.23.1 (2025-04-02)
 
