@@ -10,7 +10,7 @@ public class VacuumCleaner : CwaffGun
     internal static GameObject _VacuumVFX = null;
 
     internal const float _REACH            =  8.00f; // how far (in tiles) the gun reaches
-    internal const float _SPREAD           =    10f; // width (in degrees) of how wide our cone of suction is at the end of our reach
+    internal const float _SPREAD           =    10f; // radius (in degrees) of suction cone at the end of our reach
     internal const float _ACCEL_SEC        =  1.80f; // speed (in tiles per second) at which debris accelerates towards the gun near the end of the gun's reach
     internal const float _UPDATE_RATE      =   0.1f; // amount of time between debris checks / updates
     internal const float _AMMO_CHANCE      =  0.05f; // percent chance debris restores ammo
@@ -108,12 +108,11 @@ public class VacuumCleaner : CwaffGun
         if (UnityEngine.Random.value < 0.66f * (BraveTime.DeltaTime * C.FPS))
         {
             float angleFromGun = this.gun.CurrentAngle + UnityEngine.Random.Range(-_SPREAD, _SPREAD);
+            //WARNING: verify this doesn't cause pooling issues
             GameObject o = SpawnManager.SpawnVFX(_VacuumVFX, (gunpos + angleFromGun.ToVector(_REACH)).ToVector3ZUp(), Lazy.RandomEulerZ());
-            o.AddComponent<VacuumParticle>().Setup(this, _REACH);
+            o.AddComponent<VacuumParticle>().Setup(this.gun, _REACH);
         }
 
-        float minAngle = this.gun.CurrentAngle - _SPREAD;
-        float maxAngle = this.gun.CurrentAngle + _SPREAD;
         foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100, allowJunk: this.Mastered))
         {
             if (debris.gameObject.GetComponent<VacuumParticle>())
@@ -130,7 +129,7 @@ public class VacuumCleaner : CwaffGun
 
             // Actually add the VacuumParticle component to it
             Vector2 debrisCenter = debris.sprite ? debris.sprite.WorldCenter : debris.gameObject.transform.position.XY();
-            debris.gameObject.AddComponent<VacuumParticle>().Setup(this, (debrisCenter - gunpos).magnitude);
+            debris.gameObject.AddComponent<VacuumParticle>().Setup(this.gun, (debrisCenter - gunpos).magnitude);
         }
     }
 
@@ -201,7 +200,6 @@ public class VacuumCleaner : CwaffGun
     }
 }
 
-// TODO: setting alpha on the first frame a sprite exists doesn't seem to work, so we create a dummy sprite
 public class VacuumParticle : MonoBehaviour
 {
     private const float _MAX_LIFE           = 1.0f;
@@ -225,10 +223,10 @@ public class VacuumParticle : MonoBehaviour
     private float _startScaleY     = 1.0f;
     private Vector2 _spriteCenter  = Vector2.zero;
 
-    public void Setup(VacuumCleaner vac, float startDistance = 0.0f)
+    public void Setup(Gun gun, float startDistance = 0.0f)
     {
-        this._vac           = vac;
-        this._gun           = vac.gun;
+        this._gun           = gun;
+        this._vac           = gun.gameObject.GetComponent<VacuumCleaner>();
         this._startDistance = startDistance;
         this._debris        = base.gameObject.GetComponent<DebrisObject>();
         this._isDebris      = this._debris != null;
@@ -243,11 +241,6 @@ public class VacuumParticle : MonoBehaviour
     {
         if (BraveTime.DeltaTime == 0.0f)
             return; // nothing to do if time isn't passing
-        if (!this._vac)
-        {
-            UnityEngine.GameObject.Destroy(base.gameObject);
-            return; // our vacuum cleaner no longer exists for some reason, so bail out
-        }
 
         // handle particle fading logic exclusive to the vacuum particles
         if (!this._isDebris)
@@ -265,7 +258,7 @@ public class VacuumParticle : MonoBehaviour
         Vector2 towardsVacuum = (this._gun.barrelOffset.position.XY() - this._sprite.WorldCenter);
         if (towardsVacuum.sqrMagnitude < _MIN_VAC_DIST_SQR)
         {
-            if (this._isDebris)
+            if (this._vac && this._isDebris)
                 this._vac.ProcessDebris(this._debris);
             UnityEngine.GameObject.Destroy(base.gameObject);
             return;

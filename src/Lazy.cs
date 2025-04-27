@@ -615,6 +615,31 @@ public static class Lazy
     }
 
     /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
+    public static IEnumerable<AIActor> AllEnemiesWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool ignoreWalls = false)
+    {
+        float maxSqrDist = maxDistance * maxDistance;
+        start.SafeGetEnemiesInRoom(ref _TempEnemies);
+        foreach (AIActor enemy in _TempEnemies)
+        {
+            if (!enemy.IsHostile(canBeNeutral: true))
+                continue;
+            Vector2 tentativeTarget = enemy.CenterPosition;
+            if (!ignoreWalls && !start.HasLineOfSight(tentativeTarget))
+                continue;
+            Vector2 delta        = (tentativeTarget - start);
+            float angle          = delta.ToAngle().Clamp360();
+            float angleDeviation = Mathf.Abs((coneAngle - angle).Clamp180());
+            if (angleDeviation > maxDeviation)
+                continue;
+            float sqrDist        = delta.sqrMagnitude;
+            if (sqrDist > maxSqrDist)
+                continue;
+            yield return enemy;
+        }
+        yield break;
+    }
+
+    /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
     public static AIActor NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
     {
         float bestAngle    = maxDeviation;
@@ -1330,4 +1355,10 @@ public static class Lazy
             _             => 0f,
         };
     }
+
+  /// <summary>Returns the vector with the greater magnitude</summary>
+  public static Vector2 MaxMagnitude(Vector2 a, Vector2 b)
+  {
+    return (a.sqrMagnitude > b.sqrMagnitude) ? a : b;
+  }
 }

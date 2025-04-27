@@ -2,7 +2,7 @@
 
 ## 1.24.0 (TBD)
 
-- Added Sextant and Wayfarer
+- Added Sextant, Wayfarer, and Leafblower
 - Added mastery for Sextant
 - Fixed pixel gaps when rendering certain sprite shaders
 - Fixed Uppskeruvel's lost souls not spawning when entering a new floor while Uppskeruvel is not the active gun
@@ -16,6 +16,7 @@
 - Homing behavior of Uppskeruvel's Aimless Souls is no longer framerate dependent
 - Uppskeruvel's Aimless Souls now render above most objects
 - Added 1 new synergy
+- Added missing music credits to credits page
 
 ## 1.23.1 (2025-04-02)
 

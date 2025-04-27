@@ -27,6 +27,8 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
     - [Elements Awoken Mod](https://elementsawoken.fandom.com/wiki/Weapons): K.A.L.I. (Particle Accelerator), R.C. Launcher (Dubstep Gun), Soul Kaliber (Sapphire Blaster)
 
     - [Enigma Mod](https://enigmamod.fandom.com/wiki/Weapons): Lightwing (edited Frost Thrower)
+    
+    - [Split Mod](https://splitmod.fandom.com/wiki/SNOW-FLAK-E): Leafblower (edited SNOW-FLAK-E)
 
   - [Raining Blood](https://store.steampowered.com/app/2147530/Raining_Blood_Hellfire/): Blamethrower, Bouncer, Natascha, Vacuum Cleaner
 
@@ -74,6 +76,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 	* Digital sounds by [jalastram](https://opengameart.org/content/sound-effects-sfx003)
 * [SPOILERS] boss music [by tomori](https://www.youtube.com/watch?v=pC_7lrh6mGs)
 * Circus music from [Entry of the Gladiators Commodore 64, 6581 Clown Music](https://www.youtube.com/watch?v=ZnHwPX2WxZs)
+* It's Pizza Time! 8-bit cover [by TheFunnyDude](https://www.youtube.com/watch?v=lRFWKvmOGXY)
 
 ## Special Thanks
 
