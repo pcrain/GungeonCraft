@@ -181,7 +181,7 @@ public class Commands
             if (Input.GetKeyDown(KeyCode.M)) // acquire mastery token for current gun
             {
                 __instance.AcquireMastery(__instance.CurrentGun);
-                if (__instance.CurrentGun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
+                if (__instance.CurrentGun && __instance.CurrentGun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
                     cg.OnSwitchedToThisGun(); //NOTE: remove this if this causes problems
             }
 

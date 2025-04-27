@@ -3,7 +3,7 @@
 ## 1.24.0 (TBD)
 
 - Added Sextant, Wayfarer, and Leafblower
-- Added mastery for Sextant
+- Added masteries for Sextant, Wayfarer, and Leafblower
 - Fixed pixel gaps when rendering certain sprite shaders
 - Fixed Uppskeruvel's lost souls not spawning when entering a new floor while Uppskeruvel is not the active gun
 - Fixed empty ammo clip sprites for Outbreak, Schrodinger's Gat, Soul Kaliber, and Stereoscope being a pixel offset from their full ammo clip sprites

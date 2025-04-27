@@ -292,6 +292,10 @@ public static class CwaffSynergies
         NewMastery<MasteryOfEmpath>(MASTERY_EMPATH, Empath.ItemName);
         // Sextant automatically fires as soon as it will kill its target or deal a critical hit.
         NewMastery<MasteryOfSextant>(MASTERY_SEXTANT, Sextant.ItemName);
+        // Leafblower gains increased knockback and the ability to blow around projectiles.
+        NewMastery<MasteryOfLeafblower>(MASTERY_LEAFBLOWER, Leafblower.ItemName);
+        // Reloading while a drone is active disconnects the drone and makes it autonomous, causing it to automatically seek out enemies in its line of sight.
+        NewMastery<MasteryOfWayfarer>(MASTERY_WAYFARER, Wayfarer.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -569,6 +573,8 @@ internal class MasteryOfPlasmarble           : MasteryDummyItem {}
 internal class MasteryOfXelsior              : MasteryDummyItem {}
 internal class MasteryOfEmpath               : MasteryDummyItem {}
 internal class MasteryOfSextant              : MasteryDummyItem {}
+internal class MasteryOfLeafblower           : MasteryDummyItem {}
+internal class MasteryOfWayfarer             : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -696,4 +702,6 @@ public enum Synergy {
     MASTERY_XELSIOR,
     MASTERY_EMPATH,
     MASTERY_SEXTANT,
+    MASTERY_LEAFBLOWER,
+    MASTERY_WAYFARER,
 };

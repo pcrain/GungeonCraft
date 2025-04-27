@@ -3,19 +3,15 @@
 public class Wayfarer : CwaffGun
 {
     public static string ItemName         = "Wayfarer";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Search and Destroy";
+    public static string LongDescription  = "Launches a high velocity drone projectile that pierces enemies and sticks to walls. Attempting to fire while the drone is stuck to a wall will relaunch the drone towards the cursor without consuming additional ammo. The drone is destroyed upon reloading, colliding with certain objects, or exiting the current room. Only one drone can be deployed at any given time. Guns cannot be changed while a drone is active.";
+    public static string Lore             = "Developed as a secret research project coincidentally timed around the invention of sticky notes, this weapons grants its wielder unprecedented control over the trajectory of its projectiles. Once released to the general public, it quickly became apparent this level of control was often both unnecessary and disorienting. While it never reached mainstream popularity, it did find a niche use among the wealthy as an excellent car key locator.";
 
     private const string _WAYFARER_OVERRIDE = "Wayfarer Gunlock";
 
     private Projectile _extantProjectile = null;
     private PlayerController _prevOwner = null;
     private OverrideLerper _lerpyboi = null;
-
-    private Geometry _pingRing = null;
-    // private Geometry _pingCursor = null;
-    private float _pingTimer = 0.0f;
 
     public static void Init()
     {
@@ -30,12 +26,6 @@ public class Wayfarer : CwaffGun
           .Attach<PierceProjModifier>(pierce => { pierce.penetration = 10000; pierce.penetratesBreakables = true; })
           .Attach<WayfarerProjectile>()
           .AttachTrail("wayfarer_trail", fps: 30, cascadeTimer: C.FRAME, softMaxLength: 1f);
-    }
-
-    private void Start()
-    {
-        this._pingRing = new GameObject().AddComponent<Geometry>();
-        // this._pingCursor = new GameObject().AddComponent<Geometry>();
     }
 
     private void OnTriedToInitiateAttack(PlayerController player)
@@ -87,7 +77,10 @@ public class Wayfarer : CwaffGun
         this._lerpyboi.Deactivate();
       if (!this._extantProjectile)
         return;
-      this._extantProjectile.DieInAir();
+      if (this.Mastered)
+        this._extantProjectile.gameObject.GetComponent<WayfarerProjectile>().MakeAutonomous();
+      else
+        this._extantProjectile.DieInAir();
       this._extantProjectile = null;
     }
 
@@ -96,19 +89,8 @@ public class Wayfarer : CwaffGun
         if (this.PlayerOwner)
             this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         CleanupWayfarer();
-        if (this._pingRing)
-          UnityEngine.Object.Destroy(this._pingRing.gameObject);
         base.OnDestroy();
     }
-
-    // public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
-    // {
-    //     if (!this._extantProjectile)
-    //         return projectile; // fine to proceed as normal
-    //     mod.ammoCost = 0;
-    //     gun.ClipShotsRemaining = gun.CurrentAmmo + 1;
-    //     return Lazy.NoProjectile(); //REFACTOR: actually prevent shooting here with ilmanip / patch
-    // }
 
     public override void PostProcessProjectile(Projectile projectile)
     {
@@ -151,23 +133,7 @@ public class Wayfarer : CwaffGun
           Vector2 curPos = this._extantProjectile.SafeCenter;
           if (curPos != Vector2.zero)
           {
-            const float MAX_RING_DIST  = 2f;
-            const float MAX_TIME       = Mathf.PI * 2f;
-            const float RING_THICKNESS = 0.1f;
-            const float PING_SPEED     = 6f;
-
-            this._pingTimer += BraveTime.DeltaTime;
-            float time = (PING_SPEED * this._pingTimer) % MAX_TIME;
-            float percentDone = time / MAX_TIME;
-            float dist = percentDone * MAX_RING_DIST;
-            float alpha = Mathf.Min(percentDone, 1f - percentDone);
-            this._pingRing.Setup(Geometry.Shape.RING,
-              color: Color.green.WithAlpha(alpha),
-              pos: curPos, radius: dist, radiusInner: Mathf.Max(0f, dist - RING_THICKNESS));
             this._lerpyboi.Recenter(0.5f * (player.CenterPosition + curPos), lerpFactor: 2f);
-            // Vector2 barrelPos = this.gun.barrelOffset.position.XY();
-            // this._pingCursor.Setup(Geometry.Shape.DASHEDLINE, color: Color.white.WithAlpha(0.125f),
-            //   pos: curPos, pos2: barrelPos);
             player.OverrideCursorCenter(curPos);
           }
         }
@@ -176,9 +142,6 @@ public class Wayfarer : CwaffGun
           player.inventory.GunLocked.SetOverride(_WAYFARER_OVERRIDE, false);
           this.gun.CanBeDropped = true;
           this._lerpyboi.Deactivate();
-          this._pingTimer = 0.0f;
-          this._pingRing._meshRenderer.enabled = false;
-          // this._pingCursor._meshRenderer.enabled = false;
           player.OverrideCursorCenter(null);
         }
     }
@@ -255,7 +218,9 @@ public class OverrideLerper : MonoBehaviour
 
 public class WayfarerProjectile : MonoBehaviour
 {
-    private const float MAX_DUPE_COLLISIONS = 5;
+    private const float _MAX_DUPE_COLLISIONS = 5;
+    private const float _AUTO_FIRE_RATE = 0.75f;
+    private const float _MAX_ANGLE_DEV = 88f;
 
     private Projectile _projectile;
     private PlayerController _owner;
@@ -265,6 +230,15 @@ public class WayfarerProjectile : MonoBehaviour
     private float prevSpeed = 0.0f;
     private SpeculativeRigidbody _lastCollisionBody = null;
     private int _duplicateCollisions = 0;
+    private bool _autonomous = false;
+    private Geometry _pingRing = null;
+    private float _pingTimer = 0.0f;
+    private float _shootTimer = 0.0f;
+
+    public bool Autonomous {
+      get { return this._autonomous; }
+      private set { this._autonomous = value; }
+    }
 
     private void Start()
     {
@@ -279,15 +253,21 @@ public class WayfarerProjectile : MonoBehaviour
         this._projectile.BulletScriptSettings.surviveTileCollisions = true;
         this._projectile.specRigidbody.OnTileCollision += this.OnTileCollision;
         this._projectile.specRigidbody.OnRigidbodyCollision += this.OnRigidBodyCollision;
+        this._pingRing = new GameObject().AddComponent<Geometry>();
+    }
+
+    public void MakeAutonomous() {
+      this._autonomous = true;
+      base.gameObject.Play("wayfarer_autonomize_sound");
     }
 
     private void OnRigidBodyCollision(CollisionData rigidbodyCollision)
     {
       if (rigidbodyCollision.OtherRigidbody == this._lastCollisionBody)
       {
-        if ((++this._duplicateCollisions) >= MAX_DUPE_COLLISIONS)
+        if ((++this._duplicateCollisions) >= _MAX_DUPE_COLLISIONS)
         {
-          Lazy.DebugLog($"got stuck in a wall ):");
+          Lazy.DebugLog($"wayfarer drone got stuck in a wall ):");
           this._projectile.DieInAir();
           return;
         }
@@ -318,7 +298,7 @@ public class WayfarerProjectile : MonoBehaviour
     {
       if (!this.stationary)
         return;
-      if (angle.AbsAngleTo(this.normalAngle) > 88f)
+      if (angle.AbsAngleTo(this.normalAngle) > _MAX_ANGLE_DEV)
         return; // disallow shooting into wall
 
       this.stationary = false;
@@ -334,16 +314,76 @@ public class WayfarerProjectile : MonoBehaviour
 
     private void Update()
     {
-      if (this._owner && this._owner.CurrentRoom == null || this._owner.CurrentRoom != base.transform.position.GetAbsoluteRoom())
+      if (!this._owner || this._owner.CurrentRoom == null || this._owner.CurrentRoom != base.transform.position.GetAbsoluteRoom())
+      {
         this._projectile.DieInAir();
-      if (this.stationary)
+        return;
+      }
+
+      HandlePing();
+
+      if (!this.stationary)
+        return;
+
+      if (!this._autonomous)
+      {
         this._projectile.transform.rotation = this._owner.IsKeyboardAndMouse()
             ? (this._owner.unadjustedAimPoint.XY() - this._projectile.SafeCenter).EulerZ()
             : this._owner.m_currentGunAngle.EulerZ();
+        return;
+      }
+
+      if ((this._shootTimer += BraveTime.DeltaTime) < _AUTO_FIRE_RATE)
+          return;
+
+      //NOTE: we might have a bad wall normal, so check in all 4 cardinal directions
+      Vector2 scanCenter = this._projectile.sprite.WorldCenter;
+      Vector2 scanPoint = default;
+      Vector2 enemyPos = default;
+      bool foundEnemy = false;
+      for (int i = 0; i < 4; ++i)
+      {
+        Vector2 tempNormal = this.normal.Rotate(90f * i);
+        scanPoint = this._projectile.sprite.WorldCenter + tempNormal;
+        if (Lazy.NearestEnemyPos(scanPoint) is not Vector2 tempEnemyPos)
+            continue;
+        enemyPos = tempEnemyPos;
+        this.normal = tempNormal;
+        this.normalAngle = this.normal.ToAngle();
+        foundEnemy = true;
+        break;
+      }
+      if (!foundEnemy)
+        return;
+
+      float angleToEnemy = (enemyPos - scanPoint).ToAngle();
+      Quaternion rot = angleToEnemy.EulerZ();
+      this._projectile.transform.rotation = rot;
+      Redirect(angleToEnemy);
+      this._shootTimer = 0f;
+    }
+
+    private void HandlePing()
+    {
+      const float MAX_RING_DIST  = 2f;
+      const float MAX_TIME       = Mathf.PI * 2f;
+      const float RING_THICKNESS = 0.1f;
+      const float PING_SPEED     = 6f;
+
+      this._pingTimer += BraveTime.DeltaTime;
+      float time = (PING_SPEED * this._pingTimer) % MAX_TIME;
+      float percentDone = time / MAX_TIME;
+      float dist = percentDone * MAX_RING_DIST;
+      float alpha = Mathf.Min(percentDone, 1f - percentDone);
+      this._pingRing.Setup(Geometry.Shape.RING,
+        color: (this._autonomous ? Color.red : Color.green).WithAlpha(alpha),
+        pos: this._projectile.SafeCenter, radius: dist, radiusInner: Mathf.Max(0f, dist - RING_THICKNESS));
     }
 
     private void OnDestroy()
     {
+      if (this._pingRing)
+        UnityEngine.Object.Destroy(this._pingRing.gameObject);
       base.gameObject.Play("wayfarer_destroy_sound");
     }
 }

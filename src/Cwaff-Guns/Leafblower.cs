@@ -1,17 +1,19 @@
+
 namespace CwaffingTheGungy;
 
 public class Leafblower : CwaffGun
 {
     public static string ItemName         = "Leafblower";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Winds of Change";
+    public static string LongDescription  = "Pushes around debris on the floor. Deals no direct damage, but can push enemies into pits.";
+    public static string Lore             = "Any sensible project manager in charge of designing an industrial strength leafblower would ensure the final product was as effective as possible. Instead, the entire design budget of this leafblower was allocated towards making it look intimidating to the Gundead, with the hopes of scaring them away as the Gungeon's janitors performed their duties. Not only was this approach ineffective -- as the Gundead couldn't care less about the aesthetics of invaders' equipment -- but the horsepower of this leafblower is mediocre at best.";
 
     private const float _MAX_REACH        = 10.00f; // how far (in tiles) the leafblower reaches
     private const float _MIN_REACH        =  3.00f; // how far (in tiles) the leafblower blows at max power
     private const float _SPREAD           =    30f; // radius (in degrees) of gust cone at the end of our reach
     private const float _DEBRIS_FORCE     =   2.0f; // force with which debris is blown around
     private const float _ACTOR_FORCE      =  20.0f; // force with which enemies are blown around
+    private const float _PROJ_FORCE       = 120.0f; // force with which projectiles are blown around
 
     private const float _SQR_MAX_REACH = _MAX_REACH * _MAX_REACH;
     private const float _SQR_MIN_REACH = _MIN_REACH * _MIN_REACH;
@@ -34,7 +36,8 @@ public class Leafblower : CwaffGun
         base.Update();
         if (this.PlayerOwner is not PlayerController player)
             return;
-        if (BraveTime.DeltaTime == 0.0f)
+        float dtime = BraveTime.DeltaTime;
+        if (dtime == 0.0f)
             return;
         if (!this.gun.IsCharging)
             return;
@@ -42,7 +45,7 @@ public class Leafblower : CwaffGun
 
         // do sfx and vfx
         Lazy.PlaySoundUntilDeathOrTimeout(soundName: "leafblower_loop", source: this.gun.gameObject, timer: 0.05f);
-        if (UnityEngine.Random.value < 0.66f * (BraveTime.DeltaTime * C.FPS))
+        if (UnityEngine.Random.value < 0.66f * (dtime * C.FPS))
         {
             float angleFromGun = this.gun.CurrentAngle + UnityEngine.Random.Range(-_SPREAD, _SPREAD);
             GameObject o = SpawnManager.SpawnVFX(VacuumCleaner._VacuumVFX, gunpos, Lazy.RandomEulerZ(), ignoresPools: true);
@@ -50,12 +53,13 @@ public class Leafblower : CwaffGun
         }
 
         // blow around debris
+        float debrisForce = _DEBRIS_FORCE * (this.Mastered ? 2f : 1f);
         foreach (DebrisObject debris in gunpos.DebrisWithinCone(_SQR_MAX_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100))
         {
             Vector2 debrisCenter = debris.sprite ? debris.sprite.WorldCenter : debris.gameObject.transform.position.XY();
             Vector2 angleFromPlayer = debrisCenter - gunpos;
             float sqrDist = angleFromPlayer.sqrMagnitude;
-            Vector2 applyVelocity = (_DEBRIS_FORCE * (1f - Mathf.Clamp01((sqrDist - _SQR_MIN_REACH) / (_SQR_MAX_REACH - _SQR_MIN_REACH)))) * angleFromPlayer.normalized;
+            Vector2 applyVelocity = (debrisForce * (1f - Mathf.Clamp01((sqrDist - _SQR_MIN_REACH) / (_SQR_MAX_REACH - _SQR_MIN_REACH)))) * angleFromPlayer.normalized;
             if (debris.HasBeenTriggered)
                 debris.ApplyVelocity(applyVelocity);
             else
@@ -63,13 +67,14 @@ public class Leafblower : CwaffGun
         }
 
         // blow around enemies
+        float actorForce = _ACTOR_FORCE * (this.Mastered ? 2f : 1f);
         foreach (AIActor enemy in Lazy.AllEnemiesWithinConeOfVision(gunpos, this.gun.CurrentAngle, _SPREAD, _MAX_REACH))
         {
             if (enemy.knockbackDoer is not KnockbackDoer kb || kb.m_isImmobile.Value)
                 continue;
             Vector2 knockbackAngle = enemy.CenterPosition - gunpos;
             float sqrDist = knockbackAngle.sqrMagnitude;
-            Vector2 applyVelocity = (_ACTOR_FORCE * (1f - Mathf.Clamp01((sqrDist - _SQR_MIN_REACH) / (_SQR_MAX_REACH - _SQR_MIN_REACH)))) * knockbackAngle.normalized;
+            Vector2 applyVelocity = (actorForce * (1f - Mathf.Clamp01((sqrDist - _SQR_MIN_REACH) / (_SQR_MAX_REACH - _SQR_MIN_REACH)))) * knockbackAngle.normalized;
             float force = applyVelocity.magnitude;
             if (kb.ApplySourcedKnockback(applyVelocity, force, base.gameObject) is ActiveKnockbackData data)
                 _Knockbacks[enemy] = data;
@@ -79,6 +84,32 @@ public class Leafblower : CwaffGun
                 previousData.knockback = Lazy.MaxMagnitude(previousData.knockback, applyVelocity.normalized * (force / (kb.weight / 10f)));
                 previousData.initialKnockback = previousData.knockback;
                 previousData.elapsedTime = 0.0f;
+            }
+        }
+
+        // blow around projectiles if mastered
+        if (this.Mastered)
+        {
+            ReadOnlyCollection<Projectile> allProj = StaticReferenceManager.AllProjectiles;
+            for (int j = allProj.Count - 1; j >= 0; j--)
+            {
+                Projectile p = allProj[j];
+                if (!p || p.Owner is PlayerController)
+                    continue;
+
+                Vector2 delta = p.SafeCenter - gunpos;
+                float sqrMag = delta.sqrMagnitude;
+                if (sqrMag > _SQR_MAX_REACH)
+                    continue;
+
+                float angle = delta.ToAngle().Clamp360();
+                float angleDeviation = Mathf.Abs((this.gun.CurrentAngle - angle).Clamp180());
+                if (angleDeviation > _SPREAD)
+                    continue;
+
+                p.RemoveBulletScriptControl();
+                Vector2 applyVelocity = (_PROJ_FORCE * (1f - Mathf.Clamp01((sqrMag - _SQR_MIN_REACH) / (_SQR_MAX_REACH - _SQR_MIN_REACH)))) * delta.normalized;
+                p.gameObject.GetOrAddComponent<BlownByLeafblowerBehavior>().Blow(applyVelocity);
             }
         }
 
@@ -92,6 +123,44 @@ public class Leafblower : CwaffGun
         foreach (AIActor key in _RemovableKeys)
             _Knockbacks.Remove(key);
         _RemovableKeys.Clear();
+    }
+
+    public class BlownByLeafblowerBehavior : MonoBehaviour
+    {
+        private Projectile _projectile;
+        private PlayerController _owner;
+        private bool _setup = false;
+        private bool _active = false;
+        private Vector2 _windVector;
+
+        public void Blow(Vector2 windVector)
+        {
+            if (!this._setup)
+                Setup();
+            if (!this._projectile)
+            {
+                UnityEngine.Object.Destroy(this);
+                return;
+            }
+            this._windVector = windVector;
+            this._active = true;
+        }
+
+        private void Setup()
+        {
+            this._projectile = base.GetComponent<Projectile>();
+            this._owner = this._projectile.Owner as PlayerController;
+            this._projectile.ModifyVelocity += this.ModifyVelocity;
+            this._setup = true;
+        }
+
+        private Vector2 ModifyVelocity(Vector2 inVector)
+        {
+            if (!this._active)
+                return inVector;
+            this._active = false;
+            return inVector + BraveTime.DeltaTime * this._windVector;
+        }
     }
 
     private class LeafblowerParticle : MonoBehaviour

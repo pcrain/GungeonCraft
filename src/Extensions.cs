@@ -3361,5 +3361,17 @@ public static class Extensions
       yield break;
     }
   }
+
+  /// <summary>Get center right of a sprite in world coordinates, accounting for rotation.</summary>
+  public static Vector2 WorldCenterRight(this tk2dBaseSprite sprite)
+  {
+    return sprite.transform.position.XY() + sprite.GetRelativePositionFromAnchor(Anchor.MiddleRight).Rotate(sprite.transform.eulerAngles.z);
+  }
+
+  /// <summary>Get center left of a sprite in world coordinates, accounting for rotation.</summary>
+  public static Vector2 WorldCenterLeft(this tk2dBaseSprite sprite)
+  {
+    return sprite.transform.position.XY() + sprite.GetRelativePositionFromAnchor(Anchor.MiddleLeft).Rotate(sprite.transform.eulerAngles.z);
+  }
 }
 
