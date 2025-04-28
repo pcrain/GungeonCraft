@@ -9,6 +9,7 @@
 - Added 13 new synergies
 
 #### Balance Changes and Polish:
+
 - Reworked B. B. Gun:
 	- Reduced max ammo from 3 to 1
 	- Changed clip size from 3 to unlimited (i.e., clip size now matches max ammo)
