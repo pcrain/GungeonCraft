@@ -147,6 +147,10 @@ public static class CwaffSynergies
         // Sextant reloads 70% faster.
         NewSynergy(WRONG_KIND_OF_COMPASS, "Wrong Kind of Compass", new[]{IName(Sextant.ItemName), "sense_of_direction"})
             .MultReload(0.3f);
+        // Custodian's Badge can no longer incur strikes.
+        NewSynergy(JOB_SECURITY, "Job Security", new[]{IName(CustodiansBadge.ItemName), IName(RatPoison.ItemName)});
+        // Vacuum Cleaner and Leafblower are dual wielded.
+        NewSynergy(FULL_CIRCULATION, "Full Circulation", new[]{IName(VacuumCleaner.ItemName), IName(Leafblower.ItemName)});
       #endregion
 
       #region Masteries
@@ -655,6 +659,8 @@ public enum Synergy {
     GAMER_REFLEXES,
     AHEAD_OF_SCHEDULE,
     WRONG_KIND_OF_COMPASS,
+    JOB_SECURITY,
+    FULL_CIRCULATION,
 
     // Masteries
     MASTERY_GRANDMASTER,

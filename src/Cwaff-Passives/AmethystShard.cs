@@ -198,6 +198,9 @@ public class AllayCompanion : CwaffCompanionController
             if (!this._scouting || this._heldItemId == -1 || controller.CurrentRoom == null || !this._allayItem)
                 return;
             float baseItemFindChance = _ROOM_CLEAR_ITEM_CHANCE * (controller.HasSynergy(Synergy.SPAWNPROOFING) ? 2f : 1f);
+            if (controller.HasSynergy(Synergy.SPAWNPROOFING))
+                if (StackOfTorches._TorchesInRoom.TryGetValue(controller.CurrentRoom, out int torches) && torches > 0)
+                    baseItemFindChance *= 2f;
             if (UnityEngine.Random.value > Mathf.Max(baseItemFindChance - 0.01f * this._allayItem.itemsFound, 0.025f))
                 return;
 

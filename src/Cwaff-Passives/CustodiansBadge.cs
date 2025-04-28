@@ -25,6 +25,8 @@ public class CustodiansBadge : CwaffPassive
         "Look, your job is to keep stuff from breaking...and you're not doing that. One more muck-up like this and you're fired!";
     internal static string _MSG_FIRED =
         "ALRIGHT, THAT'S IT, YOU'RE OUT OF THE JOB!";
+    internal static string _MSG_POISONED =
+        "Ughh...it seems like some food poisoning has caught up to me, so your performance review will have to wait. Hope you're not letting too much break....";
 
     // NOTE: controllerbutton.prefab contains a list of valid sprites we can insert into notes
     internal static string _SIGNATURE =
@@ -96,9 +98,13 @@ public class CustodiansBadge : CwaffPassive
         {
             if (this.Owner.CurrentRoom.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
                 return; // be a little more forgiving in boss rooms
-            --chancesLeft;
+            bool jobSecurity = this.Owner.HasSynergy(Synergy.JOB_SECURITY);
             string angry;
-            if (chancesLeft == 2)
+            if (!jobSecurity)
+                --chancesLeft;
+            if (jobSecurity)
+                angry = _MSG_POISONED;
+            else if (chancesLeft == 2)
                 angry = _MSG_STRIKE_ONE;
             else if (chancesLeft == 1)
                 angry = _MSG_STRIKE_TWO;

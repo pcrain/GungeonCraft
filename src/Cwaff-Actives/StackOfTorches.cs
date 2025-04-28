@@ -11,13 +11,14 @@ public class StackOfTorches : CwaffActive
     private const float _CHANCE_TO_END_DARK_ROOM = 0.60f;
     private const float _REWARD_CHANCE_PER_TORCH = 0.05f;
 
+    internal static Dictionary<RoomHandler, int> _TorchesInRoom = new();
+
     private static GameObject _TorchPrefab       = null;
     private static GameObject _TorchPurplePrefab = null;
     private static GameObject _TorchBluePrefab   = null;
     private static GameObject _TorchSidePrefab   = null;
     private static GameObject _SconcePrefab      = null;
     private static List<GameObject> _Torches     = null;
-    private static Dictionary<RoomHandler, int> _TorchesInRoom = new();
 
     private PlayerController _owner              = null;
 

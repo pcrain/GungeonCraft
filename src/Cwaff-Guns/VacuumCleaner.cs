@@ -32,6 +32,7 @@ public class VacuumCleaner : CwaffGun
         Lazy.SetupGun<VacuumCleaner>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.D, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
             chargeFps: 16, banFromBlessedRuns: true)
+          .AddDualWieldSynergy(Synergy.FULL_CIRCULATION)
           .Attach<VacuumAmmoDisplay>()
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .AddToShop(ModdedShopType.Rusty)

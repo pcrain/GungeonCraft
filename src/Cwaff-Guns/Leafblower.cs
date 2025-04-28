@@ -26,6 +26,7 @@ public class Leafblower : CwaffGun
         Lazy.SetupGun<Leafblower>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.D, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
             chargeFps: 60, banFromBlessedRuns: true)
+          .AddDualWieldSynergy(Synergy.FULL_CIRCULATION)
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .AddToShop(ModdedShopType.Rusty)
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, hideAmmo: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot

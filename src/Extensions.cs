@@ -3373,5 +3373,27 @@ public static class Extensions
   {
     return sprite.transform.position.XY() + sprite.GetRelativePositionFromAnchor(Anchor.MiddleLeft).Rotate(sprite.transform.eulerAngles.z);
   }
+
+  private static Dictionary<Synergy, Gun> _UnresolvedDualWields = new();
+  /// <summary>Add a dual-wield synergy with another gun.</summary>
+  public static Gun AddDualWieldSynergy(this Gun gun, Synergy dualWieldSynergy)
+  {
+    if (!_UnresolvedDualWields.TryGetValue(dualWieldSynergy, out Gun otherGun))
+    {
+      _UnresolvedDualWields[dualWieldSynergy] = gun;
+      return gun;
+    }
+
+    DualWieldSynergyProcessor dspA = gun.gameObject.AddComponent<DualWieldSynergyProcessor>();
+    dspA.SynergyToCheck = dualWieldSynergy.Synergy();
+    dspA.PartnerGunID = otherGun.PickupObjectId;
+
+    DualWieldSynergyProcessor dspB = otherGun.gameObject.AddComponent<DualWieldSynergyProcessor>();
+    dspB.SynergyToCheck = dualWieldSynergy.Synergy();
+    dspB.PartnerGunID = gun.PickupObjectId;
+
+    _UnresolvedDualWields.Remove(dualWieldSynergy);
+    return gun;
+  }
 }
 
