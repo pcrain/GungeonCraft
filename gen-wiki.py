@@ -284,7 +284,9 @@ def scanSynergies(passives, actives, guns):
           filenames.append(f"""[[File:{e[1]}]]""")
           itemnames.append(e[0])
       else:
-          cap_item = " ".join([(w if w in ["of", "the"] else w.title()) for w in item_id.replace("_"," ").split()])
+          cap_item = " ".join([(w if w in ["of", "the", "3rd"] else w.title()) for w in item_id.replace("_"," ").split()])
+          if cap_item == "Seven Leaf Clover":
+            cap_item = "Seven-Leaf Clover"
           filenames.append(f"""[[File:{cap_item.replace(" ","_")}.png]]""")
           itemnames.append(cap_item)
     if len(filenames) < 2:

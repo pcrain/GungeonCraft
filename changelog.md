@@ -1,32 +1,40 @@
 # Changelog
 
-## 1.24.0 (TBD)
+## 1.24.0 (2025-04-27)
+
+#### Features:
 
 - Added Sextant, Wayfarer, and Leafblower
 - Added masteries for Sextant, Wayfarer, and Leafblower
-- Fixed pixel gaps when rendering certain sprite shaders
-- Fixed Uppskeruvel's lost souls not spawning when entering a new floor while Uppskeruvel is not the active gun
-- Fixed empty ammo clip sprites for Outbreak, Schrodinger's Gat, Soul Kaliber, and Stereoscope being a pixel offset from their full ammo clip sprites
-- Fixed Prismatic Scope not recognizing several beam weapons as such
-- Fixed null deref caused by Silver Bullets attempting to tint Seltzer Pelter's soda streams before they were set up
-- Fixed certain VFX not playing correctly on Blue and Red Shotgun Kin
-- Fixed (hopefully) null deref caused by Borrowed Time attempting to activate after being destroyed or while the player was not in a valid room
-- Enemies with high HP now drop large soul fragments worth 10 normal soul fragments each when killed by Uppskeruvel
-- Reduced frequency of particles spawned by soul fragments created by enemies killed with Uppskeruvel
-- Homing behavior of Uppskeruvel's Aimless Souls is no longer framerate dependent
-- Uppskeruvel's Aimless Souls now render above most objects
-- Added 11 new synergies
-- Added missing music credits to credits page
-- Fixed transparency of Vacuum Cleaner's particles being framerate dependent
+- Added 13 new synergies
+
+#### Balance Changes and Polish:
 - Reworked B. B. Gun:
 	- Reduced max ammo from 3 to 1
-	- Changed clip size from 3 to unlimited (e.g., clip size now matches max ammo)
+	- Changed clip size from 3 to unlimited (i.e., clip size now matches max ammo)
 	- Increased projectile friction at high speeds, making them slow down faster
 	- Projectiles can now be caught while they're in motion to restore ammo
 	- Projectiles now knock the player back when caught
-	- Ammo is now restored upon clearing a combat room
-- Fixed (hopefully) null deref caused by trying to reflect Ki Blast's projectiles towards non-existent enemies
+	- Ammo is now fully restored upon room clear
+- Polished Uppskeruvel:
+	- Enemies with high HP now drop large soul fragments worth 10 normal soul fragments each when killed by Uppskeruvel
+	- Reduced frequency of particles spawned by soul fragments created by enemies killed with Uppskeruvel
+	- Uppskeruvel's Aimless Souls now render above most objects
 - Lowered volume and reverb of impact sounds for Ki Blast's projectiles
+
+#### Bugfixes and Misc:
+
+- Fixed null deref caused by Silver Bullets attempting to tint Seltzer Pelter's soda streams before they were set up
+- Fixed (hopefully) null deref caused by Borrowed Time attempting to activate after being destroyed or while the player was not in a valid room
+- Fixed (hopefully) null deref caused by trying to reflect Ki Blast's projectiles towards non-existent enemies
+- Fixed Uppskeruvel's lost souls not spawning when entering a new floor while Uppskeruvel is not the active gun
+- Fixed empty ammo clip sprites for Outbreak, Schrodinger's Gat, Soul Kaliber, and Stereoscope being a pixel offset from their full ammo clip sprites
+- Fixed Prismatic Scope not recognizing several beam weapons as such
+- Fixed transparency of Vacuum Cleaner's particles being framerate dependent
+- Fixed homing behavior of Uppskeruvel's Aimless Souls being framerate dependent
+- Fixed certain VFX not playing correctly on Blue and Red Shotgun Kin
+- Fixed pixel gaps when rendering certain sprite shaders
+- Added missing music credits to credits page
 
 ## 1.23.1 (2025-04-02)
 
