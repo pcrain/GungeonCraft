@@ -126,9 +126,6 @@ internal static class AtlasHelper
     return _PackedTextures.TryGetValue(s.Split('/').Last(), out tk2dSpriteDefinition value) ? value : null;
   }
 
-  public static readonly tk2dSpriteCollectionData CharacterCollection =
-     SpriteBuilder.ConstructCollection(new GameObject().RegisterPrefab(false, false, true), $"{C.MOD_NAME}_Character_Collection");
-
   /// <summary>Load a packed texture from a resource string</summary>
   public static void LoadPackedTextureResource(Texture2D atlas, Dictionary<string, tk2dSpriteDefinition.AttachPoint[]> attachPoints, string metaDataResourcePath)
   {
@@ -215,7 +212,7 @@ internal static class AtlasHelper
     AddSpritesToCollection(newDefs: ammonomiconSprites, collection: AmmonomiconController.ForceInstance.EncounterIconCollection);
     AddSpritesToCollection(newDefs: itemSprites,        collection: ETGMod.Databases.Items.ItemCollection);
     AddSpritesToCollection(newDefs: weaponSprites,      collection: ETGMod.Databases.Items.WeaponCollection, attachPoints: weaponAttachPoints);
-    AddSpritesToCollection(newDefs: characterSprites,   collection: CharacterCollection);
+    AddSpritesToCollection(newDefs: characterSprites,   collection: CwaffCharacter.Collection);
     AddSpritesToCollection(newDefs: miscSprites,        collection: VFX.Collection); // NOTE: all miscellaneous sprites go into the VFX collection
     AddSpritesToCollection(newDefs: uiSprites,          collection: ((GameObject)ResourceCache.Acquire("ControllerButtonSprite")).GetComponent<tk2dBaseSprite>().Collection);
     AddUISpriteBatch(uiSprites);
