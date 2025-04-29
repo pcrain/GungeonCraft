@@ -378,6 +378,10 @@ public class Initialisation : BaseUnityPlugin
             setupLateHarmonyThread.Join();
             awaitLateHarmonyWatch.Stop();
 
+            #region Custom Character Initialization
+                Rogo.Init();
+            #endregion
+
             #region Floor and Flow Initialization (sync for now, might not need to be)
                 System.Diagnostics.Stopwatch setupFloorsWatch = System.Diagnostics.Stopwatch.StartNew();
 

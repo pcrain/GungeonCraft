@@ -27,15 +27,14 @@ public class TryhardSnacks : CwaffPassive
     public override void DisableEffect(PlayerController player)
     {
         base.DisableEffect(player);
-        if (!player)
-            return;
-        player.PostProcessProjectile -= PostProcessProjectile;
+        if (player)
+            player.PostProcessProjectile -= PostProcessProjectile;
     }
 
     private static void PostProcessProjectile(Projectile proj, float effectChanceScalar)
     {
         if (!proj.gameObject.GetComponent<TryhardDamage>())
-            proj.gameObject.GetOrAddComponent<TryhardDamage>();
+            proj.gameObject.AddComponent<TryhardDamage>();
     }
 
     private class TryhardDamage : DamageAdjuster

@@ -3213,6 +3213,7 @@ public static class Extensions
       };
       // Lazy.DebugLog($"adding loot chance x{u.multiplier} for {Lazy.PickupId(u.type)} == {Lazy.Pickup(u.type).DisplayName} when possessing {pickup.DisplayName}");
     }
+    _UnresolvedLootChances.Clear();
   }
 
   /// <summary>Check whether a projectile is in front of the player or behind the player relative to its direction of travel. Returns true if the projectile is not moving.</summary>
