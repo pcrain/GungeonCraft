@@ -1,3 +1,4 @@
+
 namespace CwaffingTheGungy;
 
 public class Rogo
@@ -14,10 +15,10 @@ public class Rogo
       nameShort         = Name,
       nameInternal      = Name,
       nickname          = Name,
-      health            = 4,
+      health            = 2,
       armor             = 2,
       normalMaterial    = new Material(ShaderCache.Acquire("Brave/PlayerShader")),
-      foyerPos          = new Vector3(30.125f, 29.5f),
+      foyerPos          = new Vector3(32.5f, 20.5f),
       characterID       = CharacterBuilder.storedCharacters.Count,
     };
 
@@ -42,14 +43,23 @@ public class Rogo
     pc.AllowZeroHealthState = false;
     pc.ForceZeroHealthState = false;
     pc.FinalizeCharacter(data);
+
+    #if DEBUG
+    Commands._OnDebugKeyPressed += PrintPlayerPosition;
+    #endif
   }
 
-  private static Dictionary<string, float> _AnimFPS = new()
+  private static void PrintPlayerPosition()
+  {
+    Lazy.DebugLog($"player is at {GameManager.Instance.PrimaryPlayer.sprite.WorldBottomCenter}");
+  }
+
+    private static Dictionary<string, float> _AnimFPS = new()
   {
     // { "death",                4 },
     // { "death_coop",           4 },
     // { "death_shot",           4 },
-    { "dodge",                18 },
+    { "dodge",                18 }, //NOTE: FPS overrides apparently have no effect on dodge roll animations
     { "dodge_bw",             18 },
     { "dodge_left",           24 },
     { "dodge_left_bw",        24 },
@@ -75,10 +85,10 @@ public class Rogo
     // { "jetpack_right_bw",     4 },
     // { "jetpack_up",           4 },
     // { "past_off",             4 },
-    // { "pet",                  4 },
+    { "pet",                  4 },
     // { "pitfall",              4 },
     // { "pitfall_down",         4 },
-    // { "pitfall_return",       4 },
+    { "pitfall_return",       27 },
     { "run_down",             20 },
     { "run_down_hand",        20 },
     { "run_right",            20 },
@@ -87,7 +97,7 @@ public class Rogo
     { "run_up",               20 },
     { "run_up_hand",          20 },
     // { "select_casing",        4 },
-    // { "select_choose",        4 },
+    { "select_choose",        8 },
     // { "select_choose_long",   4 },
     // { "select_headspin",      4 },
     // { "select_idle",          4 },

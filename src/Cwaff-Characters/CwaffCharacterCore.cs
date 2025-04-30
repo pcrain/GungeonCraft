@@ -51,7 +51,7 @@ public static class CwaffCharacter
         }
       }
 
-      // System.Console.WriteLine($"  updated animations for {clip.name} a.k.a. {frameName} with framerate {newFps}");
+      System.Console.WriteLine($"  updated animations for {clip.name} a.k.a. {frameName} with framerate {newClip.fps}");
       clips[i] = newClip;
     }
   }
@@ -70,6 +70,9 @@ public static class CwaffCharacter
 
   public static void FinalizeCharacter(this PlayerController pc, CustomCharacterData data)
   {
+    pc.healthHaver.CursedMaximum = data.health;
+    pc.healthHaver.maximumHealth = data.health;
+    pc.stats.SetBaseStatValue(StatType.Health, data.health, pc);
     CharacterBuilder.CustomizeCharacterNoSprites(
       player               : pc,
       data                 : data,
