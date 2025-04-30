@@ -20,9 +20,16 @@ public static class CwaffCharacter
       if (!fpsDict.TryGetValue(clip.name, out float newFps))
         newFps = clip.fps;
       int loopStart = clip.wrapMode == tk2dSpriteAnimationClip.WrapMode.Once ? -1 : clip.loopStart;
-      if (col.AddAnimation($"{charName}_{clip.name}", animName: clip.name, fps: newFps, loopStart: loopStart) is not tk2dSpriteAnimationClip newClip)
-      {
-        string frameName = clip.frames[0].spriteCollection.spriteDefinitions[clip.frames[0].spriteId].name;
+      // for (int f = 0; f < clip.frames.Length; ++f)
+      // {
+      //   if (!clip.frames[f].groundedFrame)
+      //     System.Console.WriteLine($"    frame {f}/{clip.frames.Length-1} in {clip.name} is airborne");
+      //   if (clip.frames[f].invulnerableFrame)
+      //     System.Console.WriteLine($"    frame {f}/{clip.frames.Length-1} in {clip.name} is invulnerable");
+      // }
+      string frameName = clip.frames[0].spriteCollection.spriteDefinitions[clip.frames[0].spriteId].name;
+      // if (col.AddAnimation($"{charName}_{clip.name}", animName: clip.name, fps: newFps, loopStart: loopStart) is not tk2dSpriteAnimationClip newClip)
+      // {
         int firstUnderscore = frameName.IndexOf("_") + 1;
         int lastUnderscore = frameName.LastIndexOf("_");
         string baseFrameName = frameName.Substring(firstUnderscore, lastUnderscore - firstUnderscore);
@@ -31,11 +38,50 @@ public static class CwaffCharacter
           System.Console.WriteLine($"    COULD NOT FIND animation for {clip.name} aka {baseFrameName}");
           continue;
         }
-        newClip = newClipAlt;
+        tk2dSpriteAnimationClip newClip = newClipAlt;
+      // }
+
+      if (clip.name.Contains("dodge"))
+      {
+        int airFrames = Mathf.CeilToInt(0.5f * newClip.frames.Length);
+        for (int f = 0; f < airFrames; ++f)
+        {
+          newClip.frames[f].invulnerableFrame = true;
+          newClip.frames[f].groundedFrame = false;
+        }
       }
-      System.Console.WriteLine($"  updating animations for {clip.name}");
+
+      // System.Console.WriteLine($"  updated animations for {clip.name} a.k.a. {frameName} with framerate {newFps}");
       clips[i] = newClip;
     }
+  }
+
+  /// <summary>Set an audio event for a specific frame of a specific animation</summary>
+  public static tk2dSpriteAnimator SetAudio(this tk2dSpriteAnimator animator, string name = null, string audio = "", params int[] frameIds)
+  {
+    tk2dSpriteAnimationFrame[] frames = animator.GetClipByName(name).frames;
+    foreach (int f in frameIds)
+    {
+      frames[f].triggerEvent = true;
+      frames[f].eventAudio = audio;
+    }
+    return animator;
+  }
+
+  public static void FinalizeCharacter(this PlayerController pc, CustomCharacterData data)
+  {
+    CharacterBuilder.CustomizeCharacterNoSprites(
+      player               : pc,
+      data                 : data,
+      d1                   : null,
+      tk2DSpriteAnimation1 : null,
+      d2                   : null,
+      tk2DSpriteAnimation2 : null,
+      paradoxUsesSprites   : false
+      );
+
+    CharacterBuilder.storedCharacters.Add(data.nameInternal.ToLower(), new(data, pc.gameObject));
+    ETGModConsole.Characters.Add(data.nameShort.ToLowerInvariant(), data.nameShort); //Adds characters to MTGAPIs character database
   }
 }
 
@@ -80,12 +126,12 @@ internal static class SpriteHandlerHandleSpritesBundlePatch
     }
 }
 
-[HarmonyPatch]
-internal static class CustomCharacterGetDataPatch
-{
-    [HarmonyPatch(typeof(CustomCharacter), nameof(CustomCharacter.GetData))]
-    static void Prefix(CustomCharacter __instance)
-    {
-        System.Console.WriteLine($"attempting to get data for {__instance.gameObject.name}");
-    }
-}
+// [HarmonyPatch]
+// internal static class CustomCharacterGetDataPatch
+// {
+//     [HarmonyPatch(typeof(CustomCharacter), nameof(CustomCharacter.GetData))]
+//     static void Prefix(CustomCharacter __instance)
+//     {
+//         System.Console.WriteLine($"attempting to get data for {__instance.gameObject.name}");
+//     }
+// }

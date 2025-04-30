@@ -14,7 +14,7 @@ public class Rogo
       nameShort         = Name,
       nameInternal      = Name,
       nickname          = Name,
-      health            = 2,
+      health            = 4,
       armor             = 2,
       normalMaterial    = new Material(ShaderCache.Acquire("Brave/PlayerShader")),
       foyerPos          = new Vector3(30.125f, 29.5f),
@@ -24,21 +24,24 @@ public class Rogo
     GameObject gameObject = CharacterBuilder.GetPlayerPrefab(data.baseCharacter).ClonePrefab();
     gameObject.AddComponent<CustomCharacter>().data = data;
 
-    PlayerController playerController = gameObject.GetComponent<PlayerController>();
-    playerController.UpdateAnimations(data, _AnimFPS);
-
-    CharacterBuilder.CustomizeCharacterNoSprites(
-      player               : playerController,
-      data                 : data,
-      d1                   : null,
-      tk2DSpriteAnimation1 : null,
-      d2                   : null,
-      tk2DSpriteAnimation2 : null,
-      paradoxUsesSprites   : false
-      );
-
-    CharacterBuilder.storedCharacters.Add(data.nameInternal.ToLower(), new(data, gameObject));
-    ETGModConsole.Characters.Add(data.nameShort.ToLowerInvariant(), data.nameShort); //Adds characters to MTGAPIs character database
+    PlayerController pc = gameObject.GetComponent<PlayerController>();
+    pc.UpdateAnimations(data, _AnimFPS);
+    pc.spriteAnimator
+      .SetAudio("dodge",          "rogo_dodge_sound", 0)
+      .SetAudio("dodge_bw",       "rogo_dodge_sound", 0)
+      .SetAudio("dodge_left",     "rogo_dodge_sound", 0)
+      .SetAudio("dodge_left_bw",  "rogo_dodge_sound", 0)
+      .SetAudio("run_down",       "rogo_step_sound", 3, 7)
+      // .SetAudio("run_down_hand",  "rogo_step_sound", 3, 7)
+      .SetAudio("run_right",      "rogo_step_sound", 3, 7)
+      .SetAudio("run_right_bw",   "rogo_step_sound", 3, 7)
+      // .SetAudio("run_right_hand", "rogo_step_sound", 3, 7)
+      .SetAudio("run_up",         "rogo_step_sound", 3, 7)
+      // .SetAudio("run_up_hand",    "rogo_step_sound", 3, 7)
+      ;
+    pc.AllowZeroHealthState = false;
+    pc.ForceZeroHealthState = false;
+    pc.FinalizeCharacter(data);
   }
 
   private static Dictionary<string, float> _AnimFPS = new()
@@ -46,10 +49,10 @@ public class Rogo
     // { "death",                4 },
     // { "death_coop",           4 },
     // { "death_shot",           4 },
-    // { "dodge",                4 },
-    // { "dodge_bw",             4 },
-    // { "dodge_left",           4 },
-    // { "dodge_left_bw",        4 },
+    { "dodge",                18 },
+    { "dodge_bw",             18 },
+    { "dodge_left",           24 },
+    { "dodge_left_bw",        24 },
     // { "doorway",              4 },
     // { "ghost_idle_back",      4 },
     // { "ghost_idle_back_left", 4 },
@@ -59,13 +62,13 @@ public class Rogo
     // { "ghost_idle_right",     4 },
     // { "ghost_sneeze_left",    4 },
     // { "ghost_sneeze_right",   4 },
-    // { "idle",                 4 },
-    // { "idle_backward",        4 },
-    // { "idle_backward_hand",   4 },
-    // { "idle_bw",              4 },
-    // { "idle_forward",         4 },
-    // { "idle_forward_hand",    4 },
-    // { "idle_hand",            4 },
+    { "idle",                 9 },
+    { "idle_backward",        9 },
+    { "idle_backward_hand",   9 },
+    { "idle_bw",              9 },
+    { "idle_forward",         9 },
+    { "idle_forward_hand",    9 },
+    { "idle_hand",            9 },
     // { "item_get",             4 },
     // { "jetpack_down",         4 },
     // { "jetpack_right",        4 },
