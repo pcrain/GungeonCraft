@@ -1,5 +1,18 @@
-
 namespace CwaffingTheGungy;
+
+/*
+  TODO:
+    - fix select idle dance without music notes missing a frame
+    - fix pitfall doorway frame resetting to idle animation
+    - add sounds to animations (pitfall, pit return, spinfall)
+    - add foyer card
+    - add boss card
+    - add loudout card
+    - add punchout sprites
+    - implement pogo stick dodge roll item
+    - implement starter weapon
+    - flesh out stats
+*/
 
 public class Rogo
 {
@@ -45,20 +58,15 @@ public class Rogo
     pc.FinalizeCharacter(data);
 
     #if DEBUG
-    Commands._OnDebugKeyPressed += PrintPlayerPosition;
+    Commands._OnDebugKeyPressed += () => Lazy.DebugLog($"player is at {GameManager.Instance.PrimaryPlayer.sprite.WorldBottomCenter}");
     #endif
   }
 
-  private static void PrintPlayerPosition()
+  private static Dictionary<string, float> _AnimFPS = new()
   {
-    Lazy.DebugLog($"player is at {GameManager.Instance.PrimaryPlayer.sprite.WorldBottomCenter}");
-  }
-
-    private static Dictionary<string, float> _AnimFPS = new()
-  {
-    // { "death",                4 },
-    // { "death_coop",           4 },
-    // { "death_shot",           4 },
+    { "death",                6 },
+    { "death_coop",           6 },
+    { "death_shot",           6 },
     { "dodge",                18 }, //NOTE: FPS overrides apparently have no effect on dodge roll animations
     { "dodge_bw",             18 },
     { "dodge_left",           24 },
@@ -96,13 +104,13 @@ public class Rogo
     { "run_right_hand",       20 },
     { "run_up",               20 },
     { "run_up_hand",          20 },
-    // { "select_casing",        4 },
-    { "select_choose",        8 },
-    // { "select_choose_long",   4 },
+    // { "select_casing",        4 },  // a.k.a. robot_select_tummy
+    { "select_choose",        10 },
+    { "select_choose_long",   9 },
     // { "select_headspin",      4 },
-    // { "select_idle",          4 },
-    // { "select_stargaze",      4 },
-    // { "select_stargaze_cry",  4 },
+    { "select_idle",          9 },
+    { "select_stargaze",      9 },
+    { "select_stargaze_cry",  9 },
     // { "slide_down",           4 },
     // { "slide_right",          4 },
     // { "slide_up",             4 },
