@@ -35,26 +35,17 @@ public static class CwaffCharacter
       if (!fpsDict.TryGetValue(clip.name, out float newFps))
         newFps = clip.fps;
       int loopStart = clip.wrapMode == tk2dSpriteAnimationClip.WrapMode.Once ? -1 : clip.loopStart;
-      // for (int f = 0; f < clip.frames.Length; ++f)
-      // {
-      //   if (!clip.frames[f].groundedFrame)
-      //     System.Console.WriteLine($"    frame {f}/{clip.frames.Length-1} in {clip.name} is airborne");
-      //   if (clip.frames[f].invulnerableFrame)
-      //     System.Console.WriteLine($"    frame {f}/{clip.frames.Length-1} in {clip.name} is invulnerable");
-      // }
       string frameName = clip.frames[0].spriteCollection.spriteDefinitions[clip.frames[0].spriteId].name;
-      // if (col.AddAnimation($"{charName}_{clip.name}", animName: clip.name, fps: newFps, loopStart: loopStart) is not tk2dSpriteAnimationClip newClip)
-      // {
-        int firstUnderscore = frameName.IndexOf("_") + 1;
-        int lastUnderscore = frameName.LastIndexOf("_");
-        string baseFrameName = frameName.Substring(firstUnderscore, lastUnderscore - firstUnderscore);
-        if (col.AddAnimation($"{charName}_{baseFrameName}", animName: clip.name, fps: newFps, loopStart: loopStart) is not tk2dSpriteAnimationClip newClipAlt)
-        {
-          System.Console.WriteLine($"    COULD NOT FIND animation for {clip.name} aka {baseFrameName}");
-          continue;
-        }
-        tk2dSpriteAnimationClip newClip = newClipAlt;
-      // }
+
+      int firstUnderscore = frameName.IndexOf("_") + 1;
+      int lastUnderscore = frameName.LastIndexOf("_");
+      string baseFrameName = frameName.Substring(firstUnderscore, lastUnderscore - firstUnderscore);
+      if (col.AddAnimation($"{charName}_{baseFrameName}", animName: clip.name, fps: newFps, loopStart: loopStart) is not tk2dSpriteAnimationClip newClipAlt)
+      {
+        System.Console.WriteLine($"    COULD NOT FIND animation for {clip.name} aka {baseFrameName}");
+        continue;
+      }
+      tk2dSpriteAnimationClip newClip = newClipAlt;
 
       if (clip.name.Contains("dodge"))
       {
@@ -113,183 +104,87 @@ public static class CwaffCharacter
     ETGModConsole.Characters.Add(data.nameShort.ToLowerInvariant(), data.nameShort); //Adds characters to MTGAPIs character database
   }
 
-  private static readonly HashSet<CustomCharacterData> _ProcessedChars = new();
   private static readonly Dictionary<CustomCharacterData, GameObject> _OverheadPrefabs = new();
+  private static readonly Vector3 BASEGAME_FACECARD_POSITION = new Vector3(0, 1.687546f, 0.2250061f);
+  private static readonly tk2dSpriteCollectionData UICollection = ((GameObject)ResourceCache.Acquire("ControllerButtonSprite")).GetComponent<tk2dBaseSprite>().Collection;
+  private static readonly dfAtlas UIAtlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
 
-  private static GameObject DeepClone(this GameObject g, int indent = 2, bool topLevel = true)
+  private static GameObject CwaffCreateOverheadCard(this CustomCharacterData data, FoyerCharacterSelectFlag selectCharacter)
   {
-    // if (g.GetComponent<CharacterSelectFacecardIdleDoer>())
-    //   System.Console.WriteLine($"{new string(' ', indent)}> processing '{g.name}' with active={g.activeSelf}/{g.activeInHierarchy} (with CharacterSelectFacecardIdleDoer)");
-    // else
-    //   System.Console.WriteLine($"{new string(' ', indent)}> processing '{g.name}' with active={g.activeSelf}/{g.activeInHierarchy}");
-
-    GameObject newG = UnityEngine.Object.Instantiate(g);
-    newG.name = g.name;
-    // if (!topLevel)
-      newG.SetActive(true);
-    GameObject.DontDestroyOnLoad(newG);
-    List<Transform> newChildren = new();
-    while (newG.transform.childCount > 0)
-    {
-      Transform child = newG.transform.GetChild(0);
-      GameObject co = child.gameObject;
-      newChildren.Add(co.DeepClone(indent + 2, topLevel: false).transform);
-      child.transform.parent = null;
-      UnityEngine.Object.DestroyImmediate(co);
-    }
-    foreach (Transform newChild in newChildren)
-      newChild.transform.parent = newG.transform;
-
-    // System.Console.WriteLine($"{new string(' ', indent)}< processed '{newG.name}'");
-    return newG;
-  }
-
-  [HarmonyPatch]
-  private static class FoyerCharacterSelectFlagCreateOverheadElementPatch
-  {
-      [HarmonyPatch(typeof(FoyerCharacterSelectFlag), nameof(FoyerCharacterSelectFlag.CreateOverheadElement))]
-      static void Prefix(FoyerCharacterSelectFlag __instance)
-      {
-          if (__instance.OverheadElement)
-            return;
-          System.Console.WriteLine($"creating overhead for {__instance.name}. null? {__instance.OverheadElement == null}");
-          __instance.OverheadElement = _OverheadPrefabs.First().Value;
-          System.Console.WriteLine($"  how about now for key {_OverheadPrefabs.First().Key.name}? {__instance.OverheadElement == null}");
-      }
-  }
-
-  private static void CwaffCreateOverheadCard(this CustomCharacterData data, FoyerCharacterSelectFlag selectCharacter)
-  {
-      if (selectCharacter.OverheadElement == null)
-      {
-          ETGModConsole.Log($"CHR_{data.nameShort}Panel is null");
-          return;
-      }
-
-      if (selectCharacter.OverheadElement?.name == $"CHR_{data.nameShort}Panel")
-      {
-          ETGModConsole.Log($"CHR_{data.nameShort}Panel already exists");
-          return;
-      }
-
-      if (_OverheadPrefabs.TryGetValue(data, out GameObject oPrefab))
-      {
-        selectCharacter.ClearOverheadElement();
-        System.Console.WriteLine($"attempting prefab load!");
-        // GameObject newOverhead = UnityEngine.Object.Instantiate(oPrefab);
-        // FoyerInfoPanelController fipc = newOverhead.GetComponent<FoyerInfoPanelController>();
-        // fipc.followTransform = selectCharacter.transform;
-        // System.Console.WriteLine($"doing a danger");
-        // // fipc.scaledSprites[0].transform.localScale = Vector3.one;
-        // System.Console.WriteLine($"danger done");
-        // if (!fipc.arrow.GetComponentInChildren<CharacterSelectFacecardIdleDoer>())
-        // {
-        //   Lazy.DebugLog($"  NO IDLEDOER");
-        //   if (newOverhead.GetComponentInChildren<CharacterSelectFacecardIdleDoer>() is CharacterSelectFacecardIdleDoer inChild)
-        //     Lazy.DebugLog($"    prefab facecard parent is {(inChild.transform.parent ? inChild.transform.parent.gameObject.name : "NOTHING")}");
-        //   else
-        //     Lazy.DebugLog($"    prefab facecard not found");
-        //   Lazy.DebugLog($"      setup failed, bailing out");
-        //   return;
-        // }
-        selectCharacter.OverheadElement = oPrefab;
-        selectCharacter.OverheadElement.name = $"CHR_{data.nameShort}Panel";
-        System.Console.WriteLine($"  are we null here? {selectCharacter.OverheadElement == null}");
-        return;
-      }
-
-      //Create new card instance
-      selectCharacter.ClearOverheadElement();
-
-      GameObject newOverheadElement = selectCharacter.OverheadElement.DeepClone();
-      newOverheadElement.SetActive(true);
+      // Create new card prefab
+      GameObject newOverheadElement = selectCharacter.OverheadElement.ClonePrefab(markFake: false);
       newOverheadElement.name = $"CHR_{data.nameShort}Panel";
-      newOverheadElement.GetComponent<FoyerInfoPanelController>().followTransform = selectCharacter.transform;
 
-      //Change text
+      // Change text
       FoyerInfoPanelController infoPanel = newOverheadElement.GetComponent<FoyerInfoPanelController>();
-      //HACK: temporarily hardcoded to robot, should be more general
-      infoPanel.arrow = newOverheadElement.transform.Find("Robot Arrow").gameObject.GetComponent<tk2dSprite>();
-      infoPanel.textPanel = newOverheadElement.transform.Find("TextPanel").gameObject.GetComponent<dfPanel>();
-      dfLabel nameLabel = infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>();
-      nameLabel.Text = "#CHAR_" + data.nameShort.ToString().ToUpper();
-      dfLabel pastKilledLabel = infoPanel.textPanel.transform.Find("PastKilledLabel").GetComponent<dfLabel>();
-      pastKilledLabel.ProcessMarkup = true;
-      pastKilledLabel.ColorizeSymbols = true;
-      if (data.metaCost != 0)
-      {
-          pastKilledLabel.ModifyLocalizedText(pastKilledLabel.Text + " (" + data.metaCost.ToString() + "[sprite \"hbux_text_icon\"])");
-          pastKilledLabel.ModifyLocalizedText("(Past Killed)" + " (" + data.metaCost.ToString() + "[sprite \"hbux_text_icon\"])");
-      }
+      infoPanel.followTransform = selectCharacter.transform;
+      infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>().Text = "#CHAR_" + data.nameShort.ToUpper();
 
       // Loadout setup
-      infoPanel.itemsPanel = infoPanel.textPanel.transform.Find("ItemsPanel (1)").gameObject.GetComponent<dfPanel>();
-      infoPanel.itemsPanel.enabled = true;
-      var spriteObject = FakePrefab.Clone(infoPanel.itemsPanel.GetComponentInChildren<dfSprite>().gameObject);
-      foreach (var child in infoPanel.itemsPanel.GetComponentsInChildren<dfSprite>())
+      var referenceSprite = FakePrefab.Clone(infoPanel.itemsPanel.GetComponentInChildren<dfSprite>().gameObject);
+      foreach (dfSprite child in infoPanel.itemsPanel.GetComponentsInChildren<dfSprite>())
           UnityEngine.Object.DestroyImmediate(child.gameObject);
-      dfAtlas uiAtlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
       for (int i = 0; i < data.loadout.Count; i++)
       {
           string uiSpriteName = data.loadout[i].First.itemName.InternalName() + "_ui";
-          if (!uiAtlas.map.TryGetValue(uiSpriteName, out dfAtlas.ItemInfo itemInfo))
+          if (!UIAtlas.map.TryGetValue(uiSpriteName, out dfAtlas.ItemInfo itemInfo))
           {
             Lazy.DebugWarn($"failed to find ui sprite {uiSpriteName} for character {data.nameShort}, skipping");
             continue;
           }
-          var sprite = FakePrefab.Clone(spriteObject).GetComponent<dfSprite>();
-          sprite.gameObject.SetActive(true);
-
+          dfSprite sprite = FakePrefab.Clone(referenceSprite).GetComponent<dfSprite>();
           sprite.SpriteName = uiSpriteName;
           sprite.Size = 3f * itemInfo.sizeInPixels;
-          sprite.Atlas = uiAtlas;
-
           sprite.transform.parent = infoPanel.itemsPanel.transform;
-          infoPanel.itemsPanel.Controls.Add(sprite);
-          sprite.transform.position = new Vector3(1 + ((i + 0.1f) * 0.1f), -((i + 0.1f) * 0.1f), 0);
           sprite.transform.localPosition = new Vector3(((i + 0.1f) * 0.1f), 0, 0);
+          infoPanel.itemsPanel.Controls.Add(sprite);
       }
 
       // Facecard setup
       CharacterSelectFacecardIdleDoer facecard = newOverheadElement.GetComponentInChildren<CharacterSelectFacecardIdleDoer>();
-
       facecard.gameObject.name = data.nameShort + " Sprite FaceCard";// <---------------- this object needs to be shrank
-      facecard.gameObject.SetActive(true);
       facecard.spriteAnimator = facecard.gameObject.GetComponent<tk2dSpriteAnimator>();
-      // facecard.spriteAnimator.sprite.scale = 8f * Vector3.one; //TODO: magic number, why does this work (Alexandria uses 7f which looks wrong at first, but right after returning to breach once????)
-
-      string appearAnimName = $"{data.nameShort}_facecard_appear";
-      string idleAnimName = $"{data.nameShort}_facecard_idle";
-
-      if (!_ProcessedChars.Contains(data))
+      facecard.transform.localPosition = BASEGAME_FACECARD_POSITION;
+      facecard.transform.parent.localPosition = Vector3.zero;
+      facecard.spriteAnimator.sprite.scale = 8f * Vector3.one; //TODO: magic number, why does this work (Alexandria uses 7f)
+      string appearAnimName = $"{data.nameShort.ToLower()}_facecard_appear";
+      if (UICollection.AddAnimation($"{appearAnimName}", fps: 17, loopStart: -1) is tk2dSpriteAnimationClip clipA)
       {
-        tk2dSpriteCollectionData uiCollection = ((GameObject)ResourceCache.Acquire("ControllerButtonSprite")).GetComponent<tk2dBaseSprite>().Collection;
-
-        if (uiCollection.AddAnimation($"{appearAnimName}", fps: 17, loopStart: -1) is tk2dSpriteAnimationClip clipA)
-        {
-          foreach (tk2dSpriteAnimationFrame frame in clipA.frames)
-            frame.spriteCollection.spriteDefinitions[frame.spriteId].BetterConstructOffsetsFromAnchor(anchor: Anchor.LowerCenter);
-          facecard.spriteAnimator.AddClip(clipA);
-        }
-
-        if (uiCollection.AddAnimation($"{idleAnimName}", fps: 17) is tk2dSpriteAnimationClip clipB)
-        {
-          foreach (tk2dSpriteAnimationFrame frame in clipB.frames)
-            frame.spriteCollection.spriteDefinitions[frame.spriteId].BetterConstructOffsetsFromAnchor(anchor: Anchor.LowerCenter);
-          facecard.spriteAnimator.AddClip(clipB);
-        }
+        foreach (tk2dSpriteAnimationFrame frame in clipA.frames)
+          frame.spriteCollection.spriteDefinitions[frame.spriteId].BetterConstructOffsetsFromAnchor(anchor: Anchor.LowerCenter);
+        facecard.spriteAnimator.AddClip(clipA);
+        facecard.appearAnimation = appearAnimName;
+        facecard.spriteAnimator.DefaultClipId = facecard.spriteAnimator.Library.clips.Length - 1;
       }
+      string idleAnimName = $"{data.nameShort.ToLower()}_facecard_idle";
+      if (UICollection.AddAnimation($"{idleAnimName}", fps: 17) is tk2dSpriteAnimationClip clipB)
+      {
+        foreach (tk2dSpriteAnimationFrame frame in clipB.frames)
+          frame.spriteCollection.spriteDefinitions[frame.spriteId].BetterConstructOffsetsFromAnchor(anchor: Anchor.LowerCenter);
+        facecard.spriteAnimator.AddClip(clipB);
+        facecard.coreIdleAnimation = idleAnimName;
+      }
+      infoPanel.scaledSprites = new tk2dSprite[1] { facecard.spriteAnimator.sprite as tk2dSprite };
 
-      facecard.appearAnimation = appearAnimName;
-      facecard.coreIdleAnimation = idleAnimName;
-      facecard.spriteAnimator.DefaultClipId = facecard.spriteAnimator.Library.GetClipIdByName(facecard.appearAnimation);
-      Lazy.Append(ref infoPanel.scaledSprites, facecard.spriteAnimator.sprite as tk2dSprite);
-      Array.Resize(ref infoPanel.scaledSprites, 0); //HACK: there's a caching issue here that needs to be fixed, look into it later
+      return newOverheadElement.RegisterPrefab(); // cache the prefab for quick lookup later
+  }
 
-      _ProcessedChars.Add(data);
-      _OverheadPrefabs[data] = newOverheadElement.RegisterPrefab();
-      System.Console.WriteLine($"are we null? {_OverheadPrefabs[data] == null}");
-      CwaffCreateOverheadCard(data, selectCharacter);
+  //NOTE: we handle our own foyer card setup, so don't call CreateOverheadCard()
+  [HarmonyPatch]
+  private static class FoyerCharacterHandlerCreateOverheadCardPatch
+  {
+      [HarmonyPatch(typeof(FoyerCharacterHandler), "CreateOverheadCard")]
+      static bool Prefix(FoyerCharacterSelectFlag selectCharacter, CustomCharacterData data)
+      {
+          if (!_CwaffCharacters.Contains(data))
+            return true; // call the original method
+
+          selectCharacter.ClearOverheadElement();
+          if (!_OverheadPrefabs.TryGetValue(data, out GameObject oPrefab))
+            oPrefab = _OverheadPrefabs[data] = data.CwaffCreateOverheadCard(selectCharacter);
+          selectCharacter.OverheadElement = oPrefab;
+          return false; // skip the original method
+      }
   }
 
   //HACK: prevent skin swapper setup for Rogo, build this check into Alexandria at some point
@@ -301,22 +196,6 @@ public static class CwaffCharacter
       {
           if (data.altObjSprite1 == null && data.altObjSprite2 == null)
               return false;    // skip the original method
-          return true;     // call the original method
-      }
-  }
-
-  //NOTE: we handle our own foyer card setup, so don't call CreateOverheadCard()
-  [HarmonyPatch]
-  private static class FoyerCharacterHandlerCreateOverheadCardPatch
-  {
-      [HarmonyPatch(typeof(FoyerCharacterHandler), "CreateOverheadCard")]
-      static bool Prefix(FoyerCharacterSelectFlag selectCharacter, CustomCharacterData data)
-      {
-          if (_CwaffCharacters.Contains(data))
-          {
-              data.CwaffCreateOverheadCard(selectCharacter);
-              return false;    // skip the original method
-          }
           return true;     // call the original method
       }
   }

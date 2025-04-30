@@ -15,7 +15,7 @@ namespace CwaffingTheGungy;
 
 public class Rogo
 {
-  public static string Name = "rogo";
+  public static string Name = "Rogo";
   public static PlayableCharacters Character = Name.ExtendEnum<PlayableCharacters>();
 
   public static void Init()
