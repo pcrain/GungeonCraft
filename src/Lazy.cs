@@ -1361,4 +1361,12 @@ public static class Lazy
   {
     return (a.sqrMagnitude > b.sqrMagnitude) ? a : b;
   }
+
+  /// <summary>Add an item to an array</summary>
+  public static void Append<T>(ref T[] array, T value)
+  {
+    int oldCount = array.Length;
+    Array.Resize(ref array, oldCount + 1);
+    array[oldCount] = value;
+  }
 }

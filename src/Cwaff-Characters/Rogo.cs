@@ -2,12 +2,11 @@ namespace CwaffingTheGungy;
 
 /*
   TODO:
-    - fix select idle dance without music notes missing a frame
     - fix pitfall doorway frame resetting to idle animation
     - add sounds to animations (pitfall, pit return, spinfall)
     - add foyer card
     - add boss card
-    - add loudout card
+    - add loadout card
     - add punchout sprites
     - implement pogo stick dodge roll item
     - implement starter weapon
@@ -30,36 +29,30 @@ public class Rogo
       nickname          = Name,
       health            = 2,
       armor             = 2,
-      normalMaterial    = new Material(ShaderCache.Acquire("Brave/PlayerShader")),
       foyerPos          = new Vector3(32.5f, 20.5f),
-      characterID       = CharacterBuilder.storedCharacters.Count,
+      loadout           = new(){
+        new(Lazy.Pickup<PaintballCannon>(), false),
+        new(Lazy.Pickup<TryhardSnacks>(), false),
+      },
     };
 
-    GameObject gameObject = CharacterBuilder.GetPlayerPrefab(data.baseCharacter).ClonePrefab();
-    gameObject.AddComponent<CustomCharacter>().data = data;
-
-    PlayerController pc = gameObject.GetComponent<PlayerController>();
+    PlayerController pc = data.MakeNewCustomCharacter();
     pc.UpdateAnimations(data, _AnimFPS);
     pc.spriteAnimator
+      // .SetLoopPoint("select_casing", 0)
       .SetAudio("dodge",          "rogo_dodge_sound", 0)
       .SetAudio("dodge_bw",       "rogo_dodge_sound", 0)
       .SetAudio("dodge_left",     "rogo_dodge_sound", 0)
       .SetAudio("dodge_left_bw",  "rogo_dodge_sound", 0)
       .SetAudio("run_down",       "rogo_step_sound", 3, 7)
-      // .SetAudio("run_down_hand",  "rogo_step_sound", 3, 7)
+      .SetAudio("run_down_hand",  "rogo_step_sound", 3, 7)
       .SetAudio("run_right",      "rogo_step_sound", 3, 7)
       .SetAudio("run_right_bw",   "rogo_step_sound", 3, 7)
-      // .SetAudio("run_right_hand", "rogo_step_sound", 3, 7)
+      .SetAudio("run_right_hand", "rogo_step_sound", 3, 7)
       .SetAudio("run_up",         "rogo_step_sound", 3, 7)
-      // .SetAudio("run_up_hand",    "rogo_step_sound", 3, 7)
+      .SetAudio("run_up_hand",    "rogo_step_sound", 3, 7)
       ;
-    pc.AllowZeroHealthState = false;
-    pc.ForceZeroHealthState = false;
     pc.FinalizeCharacter(data);
-
-    #if DEBUG
-    Commands._OnDebugKeyPressed += () => Lazy.DebugLog($"player is at {GameManager.Instance.PrimaryPlayer.sprite.WorldBottomCenter}");
-    #endif
   }
 
   private static Dictionary<string, float> _AnimFPS = new()

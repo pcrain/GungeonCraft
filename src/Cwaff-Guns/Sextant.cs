@@ -682,7 +682,7 @@ public class Sextant : CwaffGun
         public float lastRot;
     }
 
-    private static dfLabel MakeNewLabel()
+    internal static dfLabel MakeNewLabel()
     {
         dfLabel label = UnityEngine.Object.Instantiate(GameUIRoot.Instance.p_needsReloadLabel.gameObject, GameUIRoot.Instance.transform).GetComponent<dfLabel>();
         if (_UseUnicodeFont)
@@ -710,7 +710,7 @@ public class Sextant : CwaffGun
         PlaceLabel(label, le.lastPos, le.lastRot);
     }
 
-    private static void PlaceLabel(dfLabel label, Vector2 pos, float rot)
+    internal static void PlaceLabel(dfLabel label, Vector2 pos, float rot)
     {
         rot = rot.Clamp180();
         Vector2 finalPos = pos;

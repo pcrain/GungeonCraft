@@ -341,11 +341,8 @@ public static class AnimatedBullet // stolen and modified from NN
         proj.sprite.spriteAnimator.PlayFromFrame(frame);
     }
 
-    public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, bool overwriteExisting = false)
+    public static void AddClip(this tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, bool overwriteExisting = false)
     {
-        if (proj.sprite.spriteAnimator == null)
-            proj.sprite.spriteAnimator = proj.sprite.gameObject.AddComponent<tk2dSpriteAnimator>();
-        tk2dSpriteAnimator animator = proj.sprite.spriteAnimator;
         if (animator.Library == null)
         {
             animator.Library = animator.gameObject.AddComponent<tk2dSpriteAnimation>();
@@ -357,6 +354,14 @@ public static class AnimatedBullet // stolen and modified from NN
             animator.Library.clips = new tk2dSpriteAnimationClip[] { clip };
         else
             animator.Library.clips = animator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+    }
+
+    public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, bool overwriteExisting = false)
+    {
+        if (proj.sprite.spriteAnimator == null)
+            proj.sprite.spriteAnimator = proj.sprite.gameObject.AddComponent<tk2dSpriteAnimator>();
+        tk2dSpriteAnimator animator = proj.sprite.spriteAnimator;
+        animator.AddClip(clip, overwriteExisting);
         animator.playAutomatically = true;
         animator.deferNextStartClip = false;
     }

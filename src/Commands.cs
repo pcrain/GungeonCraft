@@ -157,18 +157,19 @@ public class Commands
     [HarmonyPatch]
     private class DebugInputPatch // handle debug input
     {
-        [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
-        static bool Prefix(PlayerController __instance)
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.Update))]
+        static bool Prefix(GameManager __instance)
         {
             if (!C.DEBUG_BUILD)
                 return true; // disable debug keys in non-debug builds
             if (!Input.GetKey(KeyCode.RightControl))
                 return true; // all debug keys require left control to be held
 
+            PlayerController player = __instance.PrimaryPlayer;
             if (Input.GetKeyDown(KeyCode.S)) // debug stealth
             {
                 _DebugStealth = !_DebugStealth;
-                __instance.SetIsStealthed(_DebugStealth, "Debug stealth");
+                player.SetIsStealthed(_DebugStealth, "Debug stealth");
             }
 
             if (Input.GetKeyDown(KeyCode.C)) // debug camera lock
@@ -180,8 +181,8 @@ public class Commands
 
             if (Input.GetKeyDown(KeyCode.M)) // acquire mastery token for current gun
             {
-                __instance.AcquireMastery(__instance.CurrentGun);
-                if (__instance.CurrentGun && __instance.CurrentGun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
+                player.AcquireMastery(player.CurrentGun);
+                if (player.CurrentGun && player.CurrentGun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
                     cg.OnSwitchedToThisGun(); //NOTE: remove this if this causes problems
             }
 
@@ -192,12 +193,12 @@ public class Commands
 
             if (Input.GetKeyDown(KeyCode.E)) // throw an error immediately
             {
-                __instance.GetComponent<Projectile>().DieInAir();
+                player.GetComponent<Projectile>().DieInAir();
             }
 
             if (Input.GetKeyDown(KeyCode.Z)) // set ammo to 1 / max
             {
-                Gun gun = GameManager.Instance.PrimaryPlayer.CurrentGun;
+                Gun gun = player.CurrentGun;
                 if (gun.CurrentAmmo > 1)
                     gun.CurrentAmmo = 1;
                 else
