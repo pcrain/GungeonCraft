@@ -114,6 +114,49 @@ public static class CwaffCharacter
   }
 
   private static readonly HashSet<CustomCharacterData> _ProcessedChars = new();
+  private static readonly Dictionary<CustomCharacterData, GameObject> _OverheadPrefabs = new();
+
+  private static GameObject DeepClone(this GameObject g, int indent = 2, bool topLevel = true)
+  {
+    // if (g.GetComponent<CharacterSelectFacecardIdleDoer>())
+    //   System.Console.WriteLine($"{new string(' ', indent)}> processing '{g.name}' with active={g.activeSelf}/{g.activeInHierarchy} (with CharacterSelectFacecardIdleDoer)");
+    // else
+    //   System.Console.WriteLine($"{new string(' ', indent)}> processing '{g.name}' with active={g.activeSelf}/{g.activeInHierarchy}");
+
+    GameObject newG = UnityEngine.Object.Instantiate(g);
+    newG.name = g.name;
+    // if (!topLevel)
+      newG.SetActive(true);
+    GameObject.DontDestroyOnLoad(newG);
+    List<Transform> newChildren = new();
+    while (newG.transform.childCount > 0)
+    {
+      Transform child = newG.transform.GetChild(0);
+      GameObject co = child.gameObject;
+      newChildren.Add(co.DeepClone(indent + 2, topLevel: false).transform);
+      child.transform.parent = null;
+      UnityEngine.Object.DestroyImmediate(co);
+    }
+    foreach (Transform newChild in newChildren)
+      newChild.transform.parent = newG.transform;
+
+    // System.Console.WriteLine($"{new string(' ', indent)}< processed '{newG.name}'");
+    return newG;
+  }
+
+  [HarmonyPatch]
+  private static class FoyerCharacterSelectFlagCreateOverheadElementPatch
+  {
+      [HarmonyPatch(typeof(FoyerCharacterSelectFlag), nameof(FoyerCharacterSelectFlag.CreateOverheadElement))]
+      static void Prefix(FoyerCharacterSelectFlag __instance)
+      {
+          if (__instance.OverheadElement)
+            return;
+          System.Console.WriteLine($"creating overhead for {__instance.name}. null? {__instance.OverheadElement == null}");
+          __instance.OverheadElement = _OverheadPrefabs.First().Value;
+          System.Console.WriteLine($"  how about now for key {_OverheadPrefabs.First().Key.name}? {__instance.OverheadElement == null}");
+      }
+  }
 
   private static void CwaffCreateOverheadCard(this CustomCharacterData data, FoyerCharacterSelectFlag selectCharacter)
   {
@@ -129,27 +172,47 @@ public static class CwaffCharacter
           return;
       }
 
+      if (_OverheadPrefabs.TryGetValue(data, out GameObject oPrefab))
+      {
+        selectCharacter.ClearOverheadElement();
+        System.Console.WriteLine($"attempting prefab load!");
+        // GameObject newOverhead = UnityEngine.Object.Instantiate(oPrefab);
+        // FoyerInfoPanelController fipc = newOverhead.GetComponent<FoyerInfoPanelController>();
+        // fipc.followTransform = selectCharacter.transform;
+        // System.Console.WriteLine($"doing a danger");
+        // // fipc.scaledSprites[0].transform.localScale = Vector3.one;
+        // System.Console.WriteLine($"danger done");
+        // if (!fipc.arrow.GetComponentInChildren<CharacterSelectFacecardIdleDoer>())
+        // {
+        //   Lazy.DebugLog($"  NO IDLEDOER");
+        //   if (newOverhead.GetComponentInChildren<CharacterSelectFacecardIdleDoer>() is CharacterSelectFacecardIdleDoer inChild)
+        //     Lazy.DebugLog($"    prefab facecard parent is {(inChild.transform.parent ? inChild.transform.parent.gameObject.name : "NOTHING")}");
+        //   else
+        //     Lazy.DebugLog($"    prefab facecard not found");
+        //   Lazy.DebugLog($"      setup failed, bailing out");
+        //   return;
+        // }
+        selectCharacter.OverheadElement = oPrefab;
+        selectCharacter.OverheadElement.name = $"CHR_{data.nameShort}Panel";
+        System.Console.WriteLine($"  are we null here? {selectCharacter.OverheadElement == null}");
+        return;
+      }
+
       //Create new card instance
       selectCharacter.ClearOverheadElement();
-      var newOverheadElement = FakePrefab.Clone(selectCharacter.OverheadElement.GetComponentInChildren<CharacterSelectFacecardIdleDoer>().gameObject);
-      selectCharacter.OverheadElement = Alexandria.PrefabAPI.PrefabBuilder.Clone(selectCharacter.OverheadElement); //NOTE: needs to be a deep clone
-      selectCharacter.OverheadElement.name = $"CHR_{data.nameShort}Panel";
-      selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>().followTransform = selectCharacter.transform;
 
-      string replaceKey = data.baseCharacter.ToString().ToUpper();
-      if (data.baseCharacter == PlayableCharacters.Soldier)
-          replaceKey = "MARINE";
-      else if (data.baseCharacter == PlayableCharacters.Pilot)
-          replaceKey = "ROGUE";
-      else if (data.baseCharacter == PlayableCharacters.Eevee)
-          replaceKey = "PARADOX";
+      GameObject newOverheadElement = selectCharacter.OverheadElement.DeepClone();
+      newOverheadElement.SetActive(true);
+      newOverheadElement.name = $"CHR_{data.nameShort}Panel";
+      newOverheadElement.GetComponent<FoyerInfoPanelController>().followTransform = selectCharacter.transform;
 
       //Change text
-      FoyerInfoPanelController infoPanel = selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>();
-
+      FoyerInfoPanelController infoPanel = newOverheadElement.GetComponent<FoyerInfoPanelController>();
+      //HACK: temporarily hardcoded to robot, should be more general
+      infoPanel.arrow = newOverheadElement.transform.Find("Robot Arrow").gameObject.GetComponent<tk2dSprite>();
+      infoPanel.textPanel = newOverheadElement.transform.Find("TextPanel").gameObject.GetComponent<dfPanel>();
       dfLabel nameLabel = infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>();
       nameLabel.Text = "#CHAR_" + data.nameShort.ToString().ToUpper();
-
       dfLabel pastKilledLabel = infoPanel.textPanel.transform.Find("PastKilledLabel").GetComponent<dfLabel>();
       pastKilledLabel.ProcessMarkup = true;
       pastKilledLabel.ColorizeSymbols = true;
@@ -159,9 +222,9 @@ public static class CwaffCharacter
           pastKilledLabel.ModifyLocalizedText("(Past Killed)" + " (" + data.metaCost.ToString() + "[sprite \"hbux_text_icon\"])");
       }
 
-      infoPanel.itemsPanel.enabled = true;
-
       // Loadout setup
+      infoPanel.itemsPanel = infoPanel.textPanel.transform.Find("ItemsPanel (1)").gameObject.GetComponent<dfPanel>();
+      infoPanel.itemsPanel.enabled = true;
       var spriteObject = FakePrefab.Clone(infoPanel.itemsPanel.GetComponentInChildren<dfSprite>().gameObject);
       foreach (var child in infoPanel.itemsPanel.GetComponentsInChildren<dfSprite>())
           UnityEngine.Object.DestroyImmediate(child.gameObject);
@@ -188,28 +251,20 @@ public static class CwaffCharacter
       }
 
       // Facecard setup
-      CharacterSelectFacecardIdleDoer facecard = selectCharacter.OverheadElement.GetComponentInChildren<CharacterSelectFacecardIdleDoer>();
-      newOverheadElement.transform.parent = facecard.transform.parent;
-      newOverheadElement.transform.localScale = facecard.transform.localScale;
-      newOverheadElement.transform.localPosition = facecard.transform.localPosition;
-      facecard.gameObject.SetActive(false);
-      facecard.transform.parent = null;
-      UnityEngine.Object.Destroy(facecard.gameObject);
-      facecard = newOverheadElement.GetComponent<CharacterSelectFacecardIdleDoer>();
+      CharacterSelectFacecardIdleDoer facecard = newOverheadElement.GetComponentInChildren<CharacterSelectFacecardIdleDoer>();
 
       facecard.gameObject.name = data.nameShort + " Sprite FaceCard";// <---------------- this object needs to be shrank
       facecard.gameObject.SetActive(true);
       facecard.spriteAnimator = facecard.gameObject.GetComponent<tk2dSpriteAnimator>();
-      facecard.spriteAnimator.sprite.scale = 8f * Vector3.one; //TODO: magic number, why does this work (Alexandria uses 7f which looks wrong)
-
-      tk2dSpriteCollectionData uiCollection = ((GameObject)ResourceCache.Acquire("ControllerButtonSprite")).GetComponent<tk2dBaseSprite>().Collection;
-
+      // facecard.spriteAnimator.sprite.scale = 8f * Vector3.one; //TODO: magic number, why does this work (Alexandria uses 7f which looks wrong at first, but right after returning to breach once????)
 
       string appearAnimName = $"{data.nameShort}_facecard_appear";
       string idleAnimName = $"{data.nameShort}_facecard_idle";
 
       if (!_ProcessedChars.Contains(data))
       {
+        tk2dSpriteCollectionData uiCollection = ((GameObject)ResourceCache.Acquire("ControllerButtonSprite")).GetComponent<tk2dBaseSprite>().Collection;
+
         if (uiCollection.AddAnimation($"{appearAnimName}", fps: 17, loopStart: -1) is tk2dSpriteAnimationClip clipA)
         {
           foreach (tk2dSpriteAnimationFrame frame in clipA.frames)
@@ -229,8 +284,12 @@ public static class CwaffCharacter
       facecard.coreIdleAnimation = idleAnimName;
       facecard.spriteAnimator.DefaultClipId = facecard.spriteAnimator.Library.GetClipIdByName(facecard.appearAnimation);
       Lazy.Append(ref infoPanel.scaledSprites, facecard.spriteAnimator.sprite as tk2dSprite);
+      Array.Resize(ref infoPanel.scaledSprites, 0); //HACK: there's a caching issue here that needs to be fixed, look into it later
 
       _ProcessedChars.Add(data);
+      _OverheadPrefabs[data] = newOverheadElement.RegisterPrefab();
+      System.Console.WriteLine($"are we null? {_OverheadPrefabs[data] == null}");
+      CwaffCreateOverheadCard(data, selectCharacter);
   }
 
   //HACK: prevent skin swapper setup for Rogo, build this check into Alexandria at some point
