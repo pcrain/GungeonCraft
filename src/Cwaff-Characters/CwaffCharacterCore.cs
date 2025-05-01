@@ -22,6 +22,24 @@ public static class CwaffCharacter
     return gameObject.GetComponent<PlayerController>();
   }
 
+  public static tk2dSpriteAnimator ReplaceAnimation(this tk2dSpriteAnimator animator, string animName, string spriteName, int fps = 4, int loopStart = -1)
+  {
+    tk2dSpriteCollectionData col = Collection;
+    int clipId = animator.Library.GetClipIdByName(animName);
+    if (clipId < 0)
+    {
+      Lazy.DebugWarn($"could not add animation {animName}");
+      return animator;
+    }
+    if (col.AddAnimation(spriteName, animName: animName, fps: fps, loopStart: loopStart) is not tk2dSpriteAnimationClip newClip)
+    {
+      Lazy.DebugWarn($"could not find animation {animName}");
+      return animator;
+    }
+    animator.Library.clips[clipId] = newClip;
+    return animator;
+  }
+
   public static void UpdateAnimations(this PlayerController pc, CustomCharacterData data, Dictionary<string, float> fpsDict)
   {
     string charName = data.nameInternal.ToLower();
@@ -42,7 +60,7 @@ public static class CwaffCharacter
       string baseFrameName = frameName.Substring(firstUnderscore, lastUnderscore - firstUnderscore);
       if (col.AddAnimation($"{charName}_{baseFrameName}", animName: clip.name, fps: newFps, loopStart: loopStart) is not tk2dSpriteAnimationClip newClipAlt)
       {
-        System.Console.WriteLine($"    COULD NOT FIND animation for {clip.name} aka {baseFrameName}");
+        Lazy.DebugWarn($"    COULD NOT FIND animation for {clip.name} aka {baseFrameName}");
         continue;
       }
       tk2dSpriteAnimationClip newClip = newClipAlt;
@@ -78,17 +96,22 @@ public static class CwaffCharacter
   public static tk2dSpriteAnimator SetLoopPoint(this tk2dSpriteAnimator animator, string name = null, int loopPoint = 0)
   {
     tk2dSpriteAnimationClip clip = animator.GetClipByName(name);
-    clip.wrapMode = (loopPoint < 0) ? tk2dSpriteAnimationClip.WrapMode.Once : tk2dSpriteAnimationClip.WrapMode.Loop;
+    clip.wrapMode = (loopPoint < 0)
+      ? tk2dSpriteAnimationClip.WrapMode.Once : loopPoint == 0
+      ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.LoopSection;
     clip.loopStart = loopPoint;
     return animator;
   }
 
   public static void FinalizeCharacter(this PlayerController pc, CustomCharacterData data)
   {
+    string spriteName = data.nameShort.ToLower();
     pc.AllowZeroHealthState = data.health == 0;
     pc.ForceZeroHealthState = data.health == 0;
     pc.healthHaver.CursedMaximum = data.health;
     pc.healthHaver.maximumHealth = data.health;
+    pc.uiPortraitName = $"{spriteName}_facecard_idle_001";
+    pc.BosscardSprites = new(){ResourceExtractor.GetTextureFromResource($"{C.MOD_INT_NAME}/Resources/{spriteName}_bosscard.png")};
     pc.stats.SetBaseStatValue(StatType.Health, data.health, pc);
     CharacterBuilder.CustomizeCharacterNoSprites(
       player               : pc,

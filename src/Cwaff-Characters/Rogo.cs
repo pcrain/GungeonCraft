@@ -2,11 +2,7 @@ namespace CwaffingTheGungy;
 
 /*
   TODO:
-    - fix pitfall doorway frame resetting to idle animation
     - add sounds to animations (pitfall, pit return, spinfall)
-    - add foyer card
-    - add boss card
-    - add loadout card
     - add punchout sprites
     - implement pogo stick dodge roll item
     - implement starter weapon
@@ -39,7 +35,8 @@ public class Rogo
     PlayerController pc = data.MakeNewCustomCharacter();
     pc.UpdateAnimations(data, _AnimFPS);
     pc.spriteAnimator
-      // .SetLoopPoint("select_casing", 0)
+      .ReplaceAnimation("doorway", "rogo_doorway", fps: 10, loopStart: 8)
+      .SetLoopPoint("select_casing", 0)
       .SetAudio("dodge",          "rogo_dodge_sound", 0)
       .SetAudio("dodge_bw",       "rogo_dodge_sound", 0)
       .SetAudio("dodge_left",     "rogo_dodge_sound", 0)
