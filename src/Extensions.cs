@@ -1866,7 +1866,7 @@ public static class Extensions
       return clipName;
   }
 
-  /// <summary>Fixed version fo Alexandria's ConstructOffsetsFromAnchor() to deal with atlas sprites correctly</summary>
+  /// <summary>Fixed version of Alexandria's ConstructOffsetsFromAnchor() to deal with atlas sprites correctly</summary>
   public static void BetterConstructOffsetsFromAnchor(this tk2dSpriteDefinition def, tk2dBaseSprite.Anchor anchor, Vector2? scale = null, bool fixesScale = false, bool changesCollider = true)
   {
       Vector2 scaling = scale ?? def.untrimmedBoundsDataExtents.XY();

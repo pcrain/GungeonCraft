@@ -307,3 +307,4 @@ wayfarer_destroy_sound,0.0,1,sound,1
 bb_catch_sound,10.0,1,sound,0
 rogo_step_sound,-14.0,1,sound,0
 rogo_dodge_sound,-8.0,1,sound,0
+rogo_pet_sound,-6.0,1,sound,0

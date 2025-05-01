@@ -2,11 +2,10 @@ namespace CwaffingTheGungy;
 
 /*
   TODO:
-    - add sounds to animations (pitfall, pit return, spinfall)
-    - add punchout sprites
     - implement pogo stick dodge roll item
     - implement starter weapon
     - flesh out stats
+    - add punchout sprites
 */
 
 public class Rogo
@@ -16,6 +15,7 @@ public class Rogo
 
   public static void Init()
   {
+    // Basic setup
     CustomCharacterData data = new() {
       baseCharacter     = PlayableCharacters.Robot,
       identity          = Character,
@@ -31,8 +31,9 @@ public class Rogo
         new(Lazy.Pickup<TryhardSnacks>(), false),
       },
     };
-
     PlayerController pc = data.MakeNewCustomCharacter();
+
+    // Sprite setup
     pc.UpdateAnimations(data, _AnimFPS);
     pc.spriteAnimator
       .ReplaceAnimation("doorway", "rogo_doorway", fps: 10, loopStart: 8)
@@ -48,8 +49,50 @@ public class Rogo
       .SetAudio("run_right_hand", "rogo_step_sound", 3, 7)
       .SetAudio("run_up",         "rogo_step_sound", 3, 7)
       .SetAudio("run_up_hand",    "rogo_step_sound", 3, 7)
+      .SetAudio("pitfall",        "Play_Fall", 0)
+      .SetAudio("pitfall_down",   "Play_Fall", 0)
+      .SetAudio("pitfall_return", "rogo_shake_sound", 3, 7, 11, 15)
+      .SetAudio("pet",            "rogo_pet_sound", 1)
       ;
+    pc.spriteAnimator.library.name = $"{data.nameInternal.ToLower()} library";
     pc.FinalizeCharacter(data);
+
+    // Hat offset setup
+    HatUtility.SetupHatOffsets(pc.spriteAnimator.library.name, 0, -2, 0, -7);
+    var headOffsets = Hatabase.HeadFrameOffsets;
+    var eyeOffsets = Hatabase.EyeFrameOffsets;
+    headOffsets["rogo_run_front_001"] = eyeOffsets["rogo_run_front_001"] = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_run_front_002"] = eyeOffsets["rogo_run_front_002"] = new Hatabase.FrameOffset(2, 0);
+    headOffsets["rogo_run_front_003"] = eyeOffsets["rogo_run_front_003"] = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_run_front_004"] = eyeOffsets["rogo_run_front_004"] = new Hatabase.FrameOffset(0, 0);
+    headOffsets["rogo_run_front_005"] = eyeOffsets["rogo_run_front_005"] = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_run_front_006"] = eyeOffsets["rogo_run_front_006"] = new Hatabase.FrameOffset(-2, 0);
+    headOffsets["rogo_run_front_007"] = eyeOffsets["rogo_run_front_007"] = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_run_front_008"] = eyeOffsets["rogo_run_front_008"] = new Hatabase.FrameOffset(0, 0);
+    headOffsets["rogo_run_back_001"]  = eyeOffsets["rogo_run_back_001"]  = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_run_back_002"]  = eyeOffsets["rogo_run_back_002"]  = new Hatabase.FrameOffset(2, 0);
+    headOffsets["rogo_run_back_003"]  = eyeOffsets["rogo_run_back_003"]  = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_run_back_004"]  = eyeOffsets["rogo_run_back_004"]  = new Hatabase.FrameOffset(0, 0);
+    headOffsets["rogo_run_back_005"]  = eyeOffsets["rogo_run_back_005"]  = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_run_back_006"]  = eyeOffsets["rogo_run_back_006"]  = new Hatabase.FrameOffset(-2, 0);
+    headOffsets["rogo_run_back_007"]  = eyeOffsets["rogo_run_back_007"]  = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_run_back_008"]  = eyeOffsets["rogo_run_back_008"]  = new Hatabase.FrameOffset(0, 0);
+    headOffsets["rogo_run_side_001"]  = eyeOffsets["rogo_run_side_001"]  = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_run_side_002"]  = eyeOffsets["rogo_run_side_002"]  = new Hatabase.FrameOffset(2, 0);
+    headOffsets["rogo_run_side_003"]  = eyeOffsets["rogo_run_side_003"]  = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_run_side_004"]  = eyeOffsets["rogo_run_side_004"]  = new Hatabase.FrameOffset(0, 0);
+    headOffsets["rogo_run_side_005"]  = eyeOffsets["rogo_run_side_005"]  = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_run_side_006"]  = eyeOffsets["rogo_run_side_006"]  = new Hatabase.FrameOffset(-2, 0);
+    headOffsets["rogo_run_side_007"]  = eyeOffsets["rogo_run_side_007"]  = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_run_side_008"]  = eyeOffsets["rogo_run_side_008"]  = new Hatabase.FrameOffset(0, 0);
+    headOffsets["rogo_run_bw_001"]    = eyeOffsets["rogo_run_bw_001"]    = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_run_bw_002"]    = eyeOffsets["rogo_run_bw_002"]    = new Hatabase.FrameOffset(2, 0);
+    headOffsets["rogo_run_bw_003"]    = eyeOffsets["rogo_run_bw_003"]    = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_run_bw_004"]    = eyeOffsets["rogo_run_bw_004"]    = new Hatabase.FrameOffset(0, 0);
+    headOffsets["rogo_run_bw_005"]    = eyeOffsets["rogo_run_bw_005"]    = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_run_bw_006"]    = eyeOffsets["rogo_run_bw_006"]    = new Hatabase.FrameOffset(-2, 0);
+    headOffsets["rogo_run_bw_007"]    = eyeOffsets["rogo_run_bw_007"]    = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_run_bw_008"]    = eyeOffsets["rogo_run_bw_008"]    = new Hatabase.FrameOffset(0, 0);
   }
 
   private static Dictionary<string, float> _AnimFPS = new()

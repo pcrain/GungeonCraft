@@ -122,6 +122,10 @@ public static class CwaffCharacter
       tk2DSpriteAnimation2 : null,
       paradoxUsesSprites   : false
       );
+    int handSpriteId = Collection.GetSpriteIdByName($"{data.nameInternal.ToLower()}_hand_001");
+    Collection.spriteDefinitions[handSpriteId].BetterConstructOffsetsFromAnchor(Anchor.MiddleCenter);
+    pc.primaryHand.sprite.SetSprite(Collection, handSpriteId);
+    pc.secondaryHand.sprite.SetSprite(Collection, handSpriteId);
 
     CharacterBuilder.storedCharacters.Add(data.nameInternal.ToLower(), new(data, pc.gameObject));
     ETGModConsole.Characters.Add(data.nameShort.ToLowerInvariant(), data.nameShort); //Adds characters to MTGAPIs character database
