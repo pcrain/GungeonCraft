@@ -2,8 +2,8 @@ namespace CwaffingTheGungy;
 
 /*
   TODO:
-    - implement pogo stick dodge roll item
-    - implement starter weapon
+    - implement pogo stick active item
+    - implement pogo stick starter weapon
     - flesh out stats
     - add punchout sprites
 */
@@ -21,22 +21,31 @@ public class Rogo
       identity          = Character,
       name              = Name,
       nameShort         = Name,
-      nameInternal      = Name,
       nickname          = Name,
       health            = 2,
       armor             = 2,
-      foyerPos          = new Vector3(32.5f, 20.5f),
+      foyerPos          = new Vector3(30.25f, 21.25f),
       loadout           = new(){
         new(Lazy.Pickup<PaintballCannon>(), false),
         new(Lazy.Pickup<TryhardSnacks>(), false),
       },
+      idleDoer          = new GameObject().RegisterPrefab().InitComponent<CharacterSelectIdleDoer>(i => {
+          i.phases = new CharacterSelectIdlePhase[]{
+            new(){ inAnimation = "select_error",    holdMin = 0, holdMax = 0 },
+            new(){ inAnimation = "select_off",      holdMin = 1, holdMax = 1 },
+            new(){ inAnimation = "select_casing",   holdMin = 0, holdMax = 0 },
+            new(){ inAnimation = "select_headspin", holdMin = 0, holdMax = 0 },
+            new(){ inAnimation = "select_stargaze", holdMin = 2, holdMax = 4 },
+          };
+      }),
     };
     PlayerController pc = data.MakeNewCustomCharacter();
 
     // Sprite setup
-    pc.UpdateAnimations(data, _AnimFPS);
-    pc.spriteAnimator
-      .ReplaceAnimation("doorway", "rogo_doorway", fps: 10, loopStart: 8)
+    pc.InitAnimations(data, _AnimFPS)
+      .AddOrReplaceAnimation("doorway", "rogo_doorway", fps: 10, loopStart: 8)
+      .AddOrReplaceAnimation("select_error", "rogo_select_error", fps: 10)
+      .AddOrReplaceAnimation("select_off", "rogo_select_off", fps: 10)
       .SetLoopPoint("select_casing", 0)
       .SetAudio("dodge",          "rogo_dodge_sound", 0)
       .SetAudio("dodge_bw",       "rogo_dodge_sound", 0)
@@ -54,8 +63,7 @@ public class Rogo
       .SetAudio("pitfall_return", "rogo_shake_sound", 3, 7, 11, 15)
       .SetAudio("pet",            "rogo_pet_sound", 1)
       ;
-    pc.spriteAnimator.library.name = $"{data.nameInternal.ToLower()} library";
-    pc.FinalizeCharacter(data);
+    // pc.FinalizeCharacter(data);
 
     // Hat offset setup
     HatUtility.SetupHatOffsets(pc.spriteAnimator.library.name, 0, -2, 0, -7);
@@ -93,6 +101,18 @@ public class Rogo
     headOffsets["rogo_run_bw_006"]    = eyeOffsets["rogo_run_bw_006"]    = new Hatabase.FrameOffset(-2, 0);
     headOffsets["rogo_run_bw_007"]    = eyeOffsets["rogo_run_bw_007"]    = new Hatabase.FrameOffset(-1, 0);
     headOffsets["rogo_run_bw_008"]    = eyeOffsets["rogo_run_bw_008"]    = new Hatabase.FrameOffset(0, 0);
+    headOffsets["rogo_item_get_001"]  = eyeOffsets["rogo_item_get_001"]  = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_item_get_002"]  = eyeOffsets["rogo_item_get_002"]  = new Hatabase.FrameOffset(2, 0);
+    headOffsets["rogo_item_get_003"]  = eyeOffsets["rogo_item_get_003"]  = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_item_get_004"]  = eyeOffsets["rogo_item_get_004"]  = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_item_get_005"]  = eyeOffsets["rogo_item_get_005"]  = new Hatabase.FrameOffset(-2, 0);
+    headOffsets["rogo_item_get_006"]  = eyeOffsets["rogo_item_get_006"]  = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_item_get_007"]  = eyeOffsets["rogo_item_get_007"]  = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_item_get_008"]  = eyeOffsets["rogo_item_get_008"]  = new Hatabase.FrameOffset(2, 0);
+    headOffsets["rogo_item_get_009"]  = eyeOffsets["rogo_item_get_009"]  = new Hatabase.FrameOffset(1, 0);
+    headOffsets["rogo_item_get_010"]  = eyeOffsets["rogo_item_get_010"]  = new Hatabase.FrameOffset(-1, 0);
+    headOffsets["rogo_item_get_011"]  = eyeOffsets["rogo_item_get_011"]  = new Hatabase.FrameOffset(-2, 0);
+    headOffsets["rogo_item_get_012"]  = eyeOffsets["rogo_item_get_012"]  = new Hatabase.FrameOffset(-1, 0);
   }
 
   private static Dictionary<string, float> _AnimFPS = new()
@@ -111,8 +131,8 @@ public class Rogo
     // { "ghost_idle_front",     4 },
     // { "ghost_idle_left",      4 },
     // { "ghost_idle_right",     4 },
-    // { "ghost_sneeze_left",    4 },
-    // { "ghost_sneeze_right",   4 },
+    { "ghost_sneeze_left",    12 },
+    { "ghost_sneeze_right",   12 },
     { "idle",                 9 },
     { "idle_backward",        9 },
     { "idle_backward_hand",   9 },

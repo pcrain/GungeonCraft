@@ -2997,6 +2997,15 @@ public static class Extensions
     return go;
   }
 
+  /// <summary>Add a component to a gameObject, perform setup if necessary, and return the component</summary>
+  public static T InitComponent<T>(this GameObject go, Action<T> predicate = null, bool allowDuplicates = false) where T : MonoBehaviour
+  {
+    T component = allowDuplicates ? go.gameObject.AddComponent<T>() : go.gameObject.GetOrAddComponent<T>();
+    if (predicate != null)
+      predicate(component);
+    return component;
+  }
+
   /// <summary>Create an animation and add it to a sprite collection</summary>
   public static tk2dSpriteAnimationClip AddAnimation(this tk2dSpriteCollectionData coll, string spriteName, string animName = null, float fps = 4,
       int loopStart = 0, Anchor? adjustToAnchor = null)
