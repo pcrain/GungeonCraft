@@ -162,7 +162,8 @@ public static class CwaffCharacter
           UnityEngine.Object.DestroyImmediate(child.gameObject);
       for (int i = 0; i < data.loadout.Count; i++)
       {
-          string uiSpriteName = data.loadout[i].First.itemName.InternalName() + "_ui";
+          PickupObject item = data.loadout[i].First;
+          string uiSpriteName = ((item.PickupObjectId > 823) ? item.itemName : item.DisplayName).InternalName() + "_ui";
           if (!UIAtlas.map.TryGetValue(uiSpriteName, out dfAtlas.ItemInfo itemInfo))
           {
             Lazy.DebugWarn($"failed to find ui sprite {uiSpriteName} for character {data.nameShort}, skipping");

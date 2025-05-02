@@ -8,6 +8,21 @@ namespace CwaffingTheGungy;
     - add punchout sprites
 */
 
+#if DEBUG
+[HarmonyPatch]
+static class MetaInjectionDataPreprocessRunPatch
+{
+    [HarmonyPatch(typeof(MetaInjectionData), nameof(MetaInjectionData.PreprocessRun))]
+    static void Prefix(MetaInjectionData __instance, bool doDebug)
+    {
+        if (!GameManager.SKIP_FOYER)
+            return;
+        GameManager.PlayerPrefabForNewGame = CharacterBuilder.storedCharacters["rogo"].Second;
+        Lazy.DebugLog($"  quickstart character set to {GameManager.PlayerPrefabForNewGame.name} for debugging");
+    }
+}
+#endif
+
 public class Rogo
 {
   public static string Name = "Rogo";
@@ -15,6 +30,9 @@ public class Rogo
 
   public static void Init()
   {
+    // Item setup
+    PogoStick.Init();
+
     // Basic setup
     CustomCharacterData data = new() {
       baseCharacter     = PlayableCharacters.Robot,
@@ -26,8 +44,8 @@ public class Rogo
       armor             = 2,
       foyerPos          = new Vector3(30.25f, 21.25f),
       loadout           = new(){
-        new(Lazy.Pickup<PaintballCannon>(), false),
-        new(Lazy.Pickup<TryhardSnacks>(), false),
+        new(Items.RobotsRightHand.AsGun(), false),
+        new(Lazy.Pickup<PogoStick>(), false),
       },
       idleDoer          = new GameObject().RegisterPrefab().InitComponent<CharacterSelectIdleDoer>(i => {
           i.phases = new CharacterSelectIdlePhase[]{

@@ -138,9 +138,10 @@ internal class Caffeination : MonoBehaviour
         }
     }
 
-    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.GetBaseAnimationName))]
+    [HarmonyPatch]
     private class CuppajoeAnimationPatch
     {
+        [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.GetBaseAnimationName))]
         static bool Prefix(PlayerController __instance, Vector2 v, float gunAngle, bool invertThresholds, bool forceTwoHands, ref string __result)
         {
             if (__instance.GetComponent<Caffeination>() is not Caffeination caff || caff._state != Caffeination.State.CAFFEINATED)
