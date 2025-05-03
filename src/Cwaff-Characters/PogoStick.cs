@@ -26,6 +26,7 @@ public class PogoStick : CwaffDodgeRollActiveItem
 
     internal bool _active = false;
     internal tk2dSprite _attachedPogoSprite = null;
+    internal bool _inFrontOfPlayer = false;
 
     private GameObject _attachedPogo = null;
     private float _bounceTimer = 0.0f;
@@ -126,8 +127,11 @@ public class PogoStick : CwaffDodgeRollActiveItem
     {
         if (this._owner is PlayerController player)
         {
-            player.sprite.SpriteChanged -= HandlePlayerSpriteChanged;
-            player.sprite.transform.localPosition = player.sprite.transform.localPosition.WithY(0f);
+            if (player.sprite)
+            {
+                player.sprite.SpriteChanged -= HandlePlayerSpriteChanged;
+                player.sprite.transform.localPosition = player.sprite.transform.localPosition.WithY(0f);
+            }
             player.AdditionalCanDodgeRollWhileFlying.RemoveOverride(ItemName);
         }
         if (this._attachedPogo)
@@ -137,7 +141,8 @@ public class PogoStick : CwaffDodgeRollActiveItem
         }
         this._attachedPogo = null;
         this._attachedPogoSprite = null;
-        this._dodgeRoller.IsEnabled = false;
+        if (this._dodgeRoller)
+            this._dodgeRoller.IsEnabled = false;
         this._active = false;
     }
 
@@ -168,8 +173,15 @@ public class PogoStick : CwaffDodgeRollActiveItem
             Deactivate();
             return;
         }
-        if (!this._active || !this._attachedPogo || !this._attachedPogoSprite)
+        if (!this._active || !this._attachedPogo || !this._attachedPogoSprite || !this._attachedPogoSprite.renderer)
             return;
+
+        if (!this._owner.sprite || !this._owner.sprite.renderer.enabled)
+        {
+            this._attachedPogoSprite.renderer.enabled = false;
+            return;
+        }
+        this._attachedPogoSprite.renderer.enabled = true;
 
         UpdatePogo(this._owner.sprite);
         float newY = this._owner.sprite.transform.localPosition.y;
@@ -203,8 +215,8 @@ public class PogoStick : CwaffDodgeRollActiveItem
     private void UpdatePogo(tk2dBaseSprite playerSprite, bool updateTimer = true)
     {
         const float NORTH_DEPTH   =  1.5f;
-        // const float SOUTH_DEPTH   = -0.3f;
-        const float SOUTH_DEPTH   = -0.15f;
+        // const float SOUTH_DEPTH   = 0.75f;
+        const float SOUTH_DEPTH   = 0.85f;
         const float BOUNCE_HEIGHT = 0.25f;
         const float BOUNCE_FREQ   = 7.0f;
         if (!this._owner || !this._attachedPogo)
@@ -219,12 +231,12 @@ public class PogoStick : CwaffDodgeRollActiveItem
 
         if (this._state != State.BOUNCING)
             playerSprite.transform.localPosition = playerSprite.transform.localPosition.WithY(newY);
-        bool facingSouth = (this._owner.m_currentGunAngle > 155f || this._owner.m_currentGunAngle < 25f);
+        this._inFrontOfPlayer = (this._owner.m_currentGunAngle > 155f || this._owner.m_currentGunAngle < 25f);
         Vector2 basePos = playerSprite.WorldBottomCenter.Quantize(0.0625f, VectorConversions.Floor);
         string playerSpriteName = playerSprite.CurrentSprite.name;
         if (playerSprite.FlipX && !playerSpriteName.Contains("front") && !playerSpriteName.Contains("back"))
             basePos += new Vector2(-1/16f, 0f); //HACK: one pixel off when facing left
-        this._attachedPogo.transform.position = (basePos + _OFFSET).ToVector3ZisY(facingSouth ? SOUTH_DEPTH : NORTH_DEPTH);
+        this._attachedPogo.transform.position = (basePos + _OFFSET).ToVector3ZisY(this._inFrontOfPlayer ? SOUTH_DEPTH : NORTH_DEPTH);
         // System.Console.WriteLine($"  now at {this._attachedPogo.transform.position} (local: {this._attachedPogo.transform.localPosition}) (scale: {newPlayerSprite.scale})");
     }
 
@@ -264,6 +276,21 @@ public class PogoStick : CwaffDodgeRollActiveItem
               return;
           if (pogo._active && pogo._lastMovingDown)
               __result *= pogo._phase;
+        }
+    }
+
+    /// <summary>Disable pogo when entering a boss arena.</summary>
+    [HarmonyPatch]
+    private static class GenericIntroDoerTriggerSequencePatch
+    {
+        [HarmonyPatch(typeof(GenericIntroDoer), nameof(GenericIntroDoer.TriggerSequence))]
+        [HarmonyPatch(typeof(GatlingGullIntroDoer), nameof(GatlingGullIntroDoer.TriggerSequence))]
+        static void Prefix(PlayerController enterer)
+        {
+            if (!enterer || enterer.GetActive<PogoStick>() is not PogoStick pogo)
+                return;
+            // Lazy.DebugLog($"deactivating pogo");
+            pogo.Deactivate();
         }
     }
 }

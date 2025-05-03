@@ -56,6 +56,38 @@ public class PogoGun : CwaffGun
             this._leftHand.renderer.enabled = false;
     }
 
+    private void UpdateHandRenderers()
+    {
+        tk2dSprite pogoSprite = this._onPogo ? this._pogoItem._attachedPogoSprite : null;
+        if (pogoSprite && pogoSprite.renderer.enabled)
+        {
+            float height = this._pogoItem._inFrontOfPlayer ? 1.25f : 0f;
+            if (this._rightHand)
+            {
+                this._rightHand.renderer.enabled = true;
+                this._rightHand.transform.parent = pogoSprite.transform;
+                this._rightHand.transform.position = pogoSprite.transform.position + _PogoRightHandOffset;
+                this._rightHand.HeightOffGround = height;
+                this._rightHand.UpdateZDepth();
+            }
+            if (this._leftHand)
+            {
+                this._leftHand.renderer.enabled = true;
+                this._leftHand.transform.parent = pogoSprite.transform;
+                this._leftHand.transform.position = pogoSprite.transform.position + _PogoLeftHandOffset;
+                this._leftHand.HeightOffGround = height;
+                this._leftHand.UpdateZDepth();
+            }
+        }
+        else
+        {
+            if (this._rightHand)
+                this._rightHand.renderer.enabled = false;
+            if (this._leftHand)
+                this._leftHand.renderer.enabled = false;
+        }
+    }
+
     private void DisableRenderers(PlayerController pc = null)
     {
         if (!pc)
@@ -73,33 +105,7 @@ public class PogoGun : CwaffGun
             this._leftHand.SetSprite(pc.primaryHand.sprite.collection, pc.primaryHand.sprite.spriteId);
         }
 
-        tk2dSprite pogoSprite = this._pogoItem ? this._pogoItem._attachedPogoSprite : null;
-        if (pogoSprite)
-        {
-            if (this._rightHand)
-            {
-                this._rightHand.renderer.enabled = true;
-                this._rightHand.transform.parent = pogoSprite.transform;
-                this._rightHand.transform.position = pogoSprite.transform.position + _PogoRightHandOffset;
-                this._rightHand.HeightOffGround = 2f;
-                this._rightHand.UpdateZDepth();
-            }
-            if (this._leftHand)
-            {
-                this._leftHand.renderer.enabled = true;
-                this._leftHand.transform.parent = pogoSprite.transform;
-                this._leftHand.transform.position = pogoSprite.transform.position + _PogoLeftHandOffset;
-                this._leftHand.HeightOffGround = 2f;
-                this._leftHand.UpdateZDepth();
-            }
-        }
-        else
-        {
-            if (this._rightHand)
-                this._rightHand.renderer.enabled = false;
-            if (this._leftHand)
-                this._leftHand.renderer.enabled = false;
-        }
+        UpdateHandRenderers();
     }
 
     private void OnTriedToInitiateAttack(PlayerController player)
@@ -169,18 +175,19 @@ public class PogoGun : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
+        if (!this.PlayerOwner)
             return;
 
         CheckPogoActive();
         bool onPogo = this._onPogo;
-        if (onPogo == this._wasOnPogo)
-            return;
-
-        this._wasOnPogo = onPogo;
-        if (onPogo)
-            DisableRenderers();
-        else
-            EnableRenderers();
+        if (onPogo != this._wasOnPogo)
+        {
+            this._wasOnPogo = onPogo;
+            if (onPogo)
+                DisableRenderers();
+            else
+                EnableRenderers();
+        }
+        UpdateHandRenderers();
     }
 }
