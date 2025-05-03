@@ -19,6 +19,7 @@ public static class CwaffCharacter
     data.characterID = CharacterBuilder.storedCharacters.Count;
     data.altGun = new();
     data.bossCard = new(){ResourceExtractor.GetTextureFromResource($"{C.MOD_INT_NAME}/Resources/{data.nameInternal}_bosscard.png")};
+    data.pastWinPic = ResourceExtractor.GetTextureFromResource($"{C.MOD_INT_NAME}/Resources/{data.nameInternal}_victory.png"); //NOTE: 115x71 pixels...also unused since we have no past D:
     _CwaffCharacters.Add(data);
 
     GameObject gameObject = CharacterBuilder.GetPlayerPrefab(data.baseCharacter).ClonePrefab();
@@ -155,6 +156,7 @@ public static class CwaffCharacter
       FoyerInfoPanelController infoPanel = newOverheadElement.GetComponent<FoyerInfoPanelController>();
       infoPanel.followTransform = selectCharacter.transform;
       infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>().Text = "#CHAR_" + data.nameShort.ToUpper();
+      infoPanel.textPanel.transform.Find("PastKilledLabel").GetComponent<dfLabel>().ModifyLocalizedText("(No Past)");
 
       // Loadout setup
       var referenceSprite = FakePrefab.Clone(infoPanel.itemsPanel.GetComponentInChildren<dfSprite>().gameObject);

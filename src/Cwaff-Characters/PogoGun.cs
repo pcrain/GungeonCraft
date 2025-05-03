@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class PogoGun : CwaffGun
 {
     public static string ItemName         = "Pogo Gun";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Shoot Mode";
+    public static string LongDescription  = "Fires ordinary projectiles via extraordinary mechanisms. Cannot be fired while being ridden. Infinite ammo. Does not reveal secret walls.";
+    public static string Lore             = "Rogo's trusty pogo, versatile as both a weapon and a mode of transportation. He never goes anywhere without it.";
 
     private static readonly Vector3 _PogoLeftHandOffset = new Vector3(-3/16f, 17/16f, 0f);
     private static readonly Vector3 _PogoRightHandOffset = new Vector3(4/16f, 17/16f, 0f);
@@ -27,6 +27,7 @@ public class PogoGun : CwaffGun
           .InitProjectile(GunData.New(baseProjectile: Items.Ak47.Projectile(), sprite: null, clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 4.5f, speed: 30f, range: 18f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound"));
         gun.PreventStartingOwnerFromDropping = true;
+        gun.SetName(PogoStick.ItemName); // because canonically, they are the same item
     }
 
     private void CheckPogoActive()

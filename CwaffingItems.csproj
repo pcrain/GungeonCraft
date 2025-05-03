@@ -299,6 +299,7 @@
     <EmbeddedResource Include="Resources\Atlases\atlas_1.atlas"/>
     <EmbeddedResource Include="Resources\cwaffshaders-windows"/>
     <EmbeddedResource Include="Resources\rogo_bosscard.png"/>
+    <EmbeddedResource Include="Resources\rogo_victory.png"/>
     <EmbeddedResource Include="Resources\Rooms\barter.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\insurance.newroom"/>

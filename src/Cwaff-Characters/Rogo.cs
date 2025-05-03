@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 /*
   TODO:
-    - fix colliding with enemies after taking damage mid bounce
+    - (fixed?) fix colliding with enemies after taking damage mid bounce
     - (eventually) add punchout sprites
 */
 

@@ -5,9 +5,9 @@ using static PogoDodgeRoll;
 public class PogoStick : CwaffDodgeRollActiveItem
 {
     public static string ItemName         = "Pogo Stick";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Bounce Mode";
+    public static string LongDescription  = "Rides or dismounts a pogo stick upon use. Holding the dodge roll button while riding the pogo stick charges a super bounce. Releasing the dodge roll button launches the player towards their current aim point as indicated by a targeting reticle. Landing on an enemy with a super bounce deals massive damage, triggers a mini blank effect, and rebounds the player towards their aim point with slightly reduced velocity.";
+    public static string Lore             = "Rogo's trusty pogo, versatile as both a weapon and a mode of transportation. He never goes anywhere without it.";
 
     public static GameObject PogoPrefab = null;
 

@@ -313,5 +313,5 @@ pogo_gun_shoot_sound,-13.5,1,sound,0
 pogo_gun_reload_sound,-7.5,1,sound,0
 rogo_off_balance_sound,-5.0,1,sound,0
 rogo_more_off_balance_sound,-5.0,1,sound,0
-rogo_stumble_sound,-5.0,1,sound,0
+rogo_stumble_sound,-2.0,1,sound,0
 rogo_recover_sound,-5.0,1,sound,0
