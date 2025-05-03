@@ -44,7 +44,7 @@ manifesttemplate=`cat <<HERE
   "description": "A mechanics-focused mod for Enter the Gungeon O:",
   "dependencies": [
     "MtG_API-Mod_the_Gungeon_API-1.9.2",
-    "Alexandria-Alexandria-0.4.20",
+    "Alexandria-Alexandria-0.4.21",
     "CaptainPretzel-Gunfig-1.1.5"
   ]
 }
