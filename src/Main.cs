@@ -315,6 +315,7 @@ public class Initialisation : BaseUnityPlugin
                 WeightedRobes.Init();
                 Detergent.Init();
                 BottledAbyss.Init();
+                PogoStick.Init();
 
                 setupActivesWatch.Stop();
             #endregion

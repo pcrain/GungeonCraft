@@ -81,6 +81,9 @@ def main():
   npcData = getNPCs()
   WIKI_PARAMS["npcs"] = "".join([NPC_TEMPLATE.format(**v) for k,v in npcData.items()])
 
+  characterData = getCharacters()
+  WIKI_PARAMS["characters"] = "".join([CHARACTER_TEMPLATE.format(**v) for k,v in characterData.items()])
+
   wikitext = WIKI_TEMPLATE.format(**WIKI_PARAMS)
   print(wikitext)
 
@@ -381,6 +384,20 @@ def getNPCs():
     },
   }
 
+
+def getCharacters():
+  return {
+    "rogo" : {
+      "filename"      : imageFor("rogo_happy.png"),
+      "charname"      : "Rogo<br/>(from [https://store.steampowered.com/app/2870280/Pogo_Rogue/ Pogo Rogue])",
+      "itemfilename1" : imageFor(iconForItem("Pogo Stick", nameOnly=True)),
+      "item1"         : "Pogo Stick",
+      "itemfilename2" : imageFor(iconForGun("Pogo Gun", nameOnly=True)),
+      "item2"         : "Pogo Stick",
+      "description"   : "Rogo pogos his way into action! Though a little clumsy on his feet, his unrivaled mobility on his trusty pogo stick opens up new possibilites for navigating the dangers of the Gungeon.",
+    },
+  }
+
 PASSIVE_TEMPLATE='''
 |-
 |<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename}</div>{itemname}
@@ -432,6 +449,15 @@ NPC_TEMPLATE='''
 |<div style="transform-origin: center; transform: scale(2);">{icon}</div>
 |{type}
 |{condition}
+|{description}
+'''
+
+CHARACTER_TEMPLATE='''
+|- style="vertical-align:middle; height: 128px;"
+|<div style="transform-origin: center; transform: scale(2);">{filename}</div>
+|{charname}
+|<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{itemfilename1}</div>{item1}
+|<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{itemfilename2}</div>{item2}
 |{description}
 '''
 
@@ -500,6 +526,17 @@ WIKI_TEMPLATE='''
 !Spawn Condition (Classic)
 !style="width: 50%"|Description
 {npcs}
+|}}
+
+== Custom Character ==
+
+{{| {tablestyle}
+!style="font-weight: bold; width: 112px;"|Icon
+!Name
+!Starting Item
+!Starting Gun
+!style="width: 50%"|Description
+{characters}
 |}}
 '''
 

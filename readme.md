@@ -9,11 +9,12 @@
 
 ### Features
 
-- 145 new items, including
+- 146 new items, including
 	+ 79 new guns
 	+ 45 new passive items
-	+ 21 new active items
+	+ 22 new active items
 - Lore for all new guns and items
+- A new custom character: Rogo from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/)
 - 90 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
 - Companion Shop: sells 3 random unlocked companions at a 30% discount
 - Bartering Shop: trades 3 random D-A tier items for any higher-tiered item
@@ -25,6 +26,8 @@
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
 - And more!
+
+![](previews/rogo_stumble.png)
 
 ### Goals
 

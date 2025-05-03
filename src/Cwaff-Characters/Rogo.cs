@@ -6,20 +6,20 @@ namespace CwaffingTheGungy;
     - (eventually) add punchout sprites
 */
 
-#if DEBUG
-[HarmonyPatch]
-static class MetaInjectionDataPreprocessRunPatch
-{
-    [HarmonyPatch(typeof(MetaInjectionData), nameof(MetaInjectionData.PreprocessRun))]
-    static void Prefix(MetaInjectionData __instance, bool doDebug)
-    {
-        if (!GameManager.SKIP_FOYER)
-            return;
-        GameManager.PlayerPrefabForNewGame = CharacterBuilder.storedCharacters["rogo"].Second;
-        Lazy.DebugLog($"  quickstart character set to {GameManager.PlayerPrefabForNewGame.name} for debugging");
-    }
-}
-#endif
+// #if DEBUG
+// [HarmonyPatch]
+// static class MetaInjectionDataPreprocessRunPatch
+// {
+//     [HarmonyPatch(typeof(MetaInjectionData), nameof(MetaInjectionData.PreprocessRun))]
+//     static void Prefix(MetaInjectionData __instance, bool doDebug)
+//     {
+//         if (!GameManager.SKIP_FOYER)
+//             return;
+//         GameManager.PlayerPrefabForNewGame = CharacterBuilder.storedCharacters["rogo"].Second;
+//         Lazy.DebugLog($"  quickstart character set to {GameManager.PlayerPrefabForNewGame.name} for debugging");
+//     }
+// }
+// #endif
 
 public class Rogo
 {
@@ -29,7 +29,6 @@ public class Rogo
   public static void Init()
   {
     // Item setup
-    PogoStick.Init();
     PogoGun.Init();
 
     // Basic setup

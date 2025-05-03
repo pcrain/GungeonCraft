@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.25.0 (2025-05-03)
+
+#### Features:
+
+- Added new custom character: Rogo from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/)!
+- Added Pogo Stick
+
+#### Bugfixes and Misc:
+
+- Fixed Sextant being able to target companions
+- Fixed potential null deref when starting a run with Gyroscope or Drifter's Headgear (e.g., with Paradox)
+
 ## 1.24.0 (2025-04-27)
 
 #### Features:

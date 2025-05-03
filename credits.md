@@ -62,13 +62,13 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
 ### Other Sprites
 
-* Several custom shopkeeper, item, clip, projectile, and miscellaneous sprites by [Lynceus](https://thunderstore.io/c/enter-the-gungeon/p/Lynceus/)
+* Thunderstore preview icon plus several custom shopkeeper, item, clip, projectile, and miscellaneous sprites by [Lynceus](https://thunderstore.io/c/enter-the-gungeon/p/Lynceus/)
 * Most hat sprites plus various item and NPC sprites by [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)
 * More item sprites from various games including Knights in the Nightmare, Blaze Union, Pokemon, Dragonball Z: Buu's Fury, and Minecraft
 * [SPOILERS] boss sprites [by askywalker from Spriter's Resource](https://www.spriters-resource.com/custom_edited/undertalecustoms/sheet/126792/)
 * [SPOILERS] boss card art [by synistersyrup from DeviantArt](https://www.deviantart.com/synistersyrup/art/Sans-Uses-Flirt-665517108)
+* Rogo character concept, boss card art, and facecard art from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/)
 * Other item and effect sprites from various games on [Spriter's Resource](https://www.spriters-resource.com/) and from [OpenGameArt.org](https://opengameart.org)
-* Thunderstore preview icon by Lynceus
 	
 ### Sounds
 

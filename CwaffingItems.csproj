@@ -96,7 +96,6 @@
     <Compile Include="src\Cwaff-Passives\RingOfDefenestration.cs"/>
     <Compile Include="src\Lazy.cs"/>
     <Compile Include="src\Commands.cs"/>
-    <Compile Include="src\Cwaff-Characters\PogoStick.cs"/>
     <Compile Include="src\Cwaff-Characters\PogoGun.cs"/>
     <Compile Include="src\Cwaff-Characters\Rogo.cs"/>
     <Compile Include="src\Cwaff-Characters\CwaffCharacterCore.cs"/>
@@ -133,6 +132,7 @@
     <Compile Include="src\Cwaff-NPCs\WhiteMageScrapped.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bart.cs"/>
     <Compile Include="src\Common.cs"/>
+    <Compile Include="src\Cwaff-Actives\PogoStick.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
     <Compile Include="src\Cwaff-Actives\WeightedRobes.cs"/>
     <Compile Include="src\Cwaff-Actives\Unfinished\GungeonitePickaxe.cs"/>
