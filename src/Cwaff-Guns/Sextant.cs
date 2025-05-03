@@ -306,7 +306,7 @@ public class Sextant : CwaffGun
 
     public bool Untargetable(SpeculativeRigidbody body)
     {
-        bool targetable = body && body.aiActor is AIActor e && e.isActiveAndEnabled && e.healthHaver is HealthHaver hh && hh.IsAlive;
+        bool targetable = body && body.aiActor is AIActor e && e.isActiveAndEnabled && e.IsWorthShootingAt && !e.CompanionOwner && e.healthHaver is HealthHaver hh && hh.IsAlive && !hh.isPlayerCharacter;
         return !targetable;
     }
 
