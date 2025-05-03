@@ -627,6 +627,14 @@ public abstract class CwaffDodgeRollItem : CustomDodgeRollItem, ICwaffItem
   }
 }
 
+public abstract class CwaffDodgeRollActiveItem : CustomDodgeRollActiveItem, ICwaffItem
+{
+  public virtual void OnFirstPickup(PlayerController player)
+  {
+
+  }
+}
+
 public abstract class CwaffCompanion : CompanionItem, ICwaffItem
 {
   public override void Pickup(PlayerController player)

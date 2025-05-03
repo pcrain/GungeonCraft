@@ -79,25 +79,24 @@ public class ProjectileExpiration : MonoBehaviour
 /// <summary>Class for fake items that don't show up in inventory or ammonomicon, but can persistently update and get serialized during midgame saves</summary>
 public class FakeItem : CwaffPassive
 {
-    private static Dictionary<Type, FakeItem> _Prefabs     = new();
-    private static Dictionary<int, FakeItem>  _PrefabsById = new();
-
     public static void Create<T>() where T : FakeItem
     {
-        FakeItem fake                     = Lazy.SetupFakeItem<T>();
+        T fake                            = Lazy.SetupFakeItem<T>();
         _Prefabs[typeof(T)]               = fake;
         _PrefabsById[fake.PickupObjectId] = fake;
     }
 
-    public static FakeItem Get<T>() where T : FakeItem
-    {
-        return _Prefabs[typeof(T)];
-    }
+    public static FakeItem Get<T>() where T : FakeItem => _Prefabs[typeof(T)];
+    public static FakeItem Get(int id) => _PrefabsById[id];
+    private static Dictionary<Type, FakeItem> _Prefabs     = new();
+    private static Dictionary<int, FakeItem>  _PrefabsById = new();
+}
 
-    public static FakeItem Get(int id)
-    {
-        return _PrefabsById[id];
-    }
+public class FakeDodgeRollItem : CwaffDodgeRollItem
+{
+    public static void Create<T>() where T : FakeDodgeRollItem => _Prefabs[typeof(T)] = Lazy.SetupFakeItem<T>();
+    public static FakeDodgeRollItem Get<T>() where T : FakeDodgeRollItem => _Prefabs[typeof(T)];
+    private static Dictionary<Type, FakeDodgeRollItem> _Prefabs = new();
 }
 
 public class BulletLifeTimer : MonoBehaviour

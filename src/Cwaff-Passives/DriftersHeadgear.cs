@@ -17,11 +17,10 @@ public class DriftersHeadgear : CwaffDodgeRollItem
         PassiveItem item  = Lazy.SetupPassive<DriftersHeadgear>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
+        item.gameObject.AddComponent<HLDRoll>();
 
         _LinkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX)
             .RegisterPrefab(deactivate: false);
-
-        var comp = item.gameObject.AddComponent<HLDRoll>();
 
         _LightningProjectile = Items.GunslingersAshes.CloneProjectile(GunData.New(damage: 5.0f, speed: 0.001f));
     }

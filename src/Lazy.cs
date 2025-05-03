@@ -122,7 +122,7 @@ public static class Lazy
     }
 
     /// <summary>Perform basic initialization for a new fake passive items for update / synergy / save serialization purposes.</summary>
-    public static FakeItem SetupFakeItem<TItemSpecific>() where TItemSpecific : FakeItem
+    public static TItemSpecific SetupFakeItem<TItemSpecific>() where TItemSpecific : PassiveItem
     {
         string itemName = typeof(TItemSpecific).Name;
         string baseItemName = itemName.InternalName();  //get saner gun name for commands
@@ -130,7 +130,7 @@ public static class Lazy
 
         tk2dSprite sprite = Lazy.SpriteObject(ETGMod.Databases.Items.ItemCollection, 0).RegisterPrefab();
 
-        FakeItem item = sprite.AddComponent<TItemSpecific>();
+        TItemSpecific item = sprite.AddComponent<TItemSpecific>();
 
         ETGMod.Databases.Items.SetupItem(item, itemName);
         if (C.DEBUG_BUILD) // only allow spawning fake items through console in debug mode

@@ -2020,11 +2020,9 @@ public static class Extensions
       }
   }
 
-  /// <summary>Acquire a fake item and put it in a player's inventory (generic version)</summary>
-  public static T AcquireFakeItem<T>(this PlayerController player) where T : FakeItem
+  private static FakeItem AcquireFakeItem(this PlayerController player, GameObject prefab)
   {
-    GameObject gameObject = UnityEngine.Object.Instantiate(FakeItem.Get<T>().gameObject);
-    T fakePassive = gameObject.GetComponent<T>();
+    FakeItem fakePassive = UnityEngine.Object.Instantiate(prefab).GetComponent<FakeItem>();
     EncounterTrackable trackable = fakePassive.GetComponent<EncounterTrackable>();
     if (trackable)
       trackable.DoNotificationOnEncounter = false;
@@ -2034,18 +2032,16 @@ public static class Extensions
     return fakePassive;
   }
 
+  /// <summary>Acquire a fake item and put it in a player's inventory (generic version)</summary>
+  public static T AcquireFakeItem<T>(this PlayerController player) where T : FakeItem
+  {
+    return player.AcquireFakeItem(FakeItem.Get<T>().gameObject) as T;
+  }
+
   /// <summary>Acquire a fake item and put it in a player's inventory (id version)</summary>
   public static FakeItem AcquireFakeItem(this PlayerController player, int id)
   {
-    GameObject gameObject = UnityEngine.Object.Instantiate(FakeItem.Get(id).gameObject);
-    FakeItem fakePassive = gameObject.GetComponent<FakeItem>();
-    EncounterTrackable trackable = fakePassive.GetComponent<EncounterTrackable>();
-    if (trackable)
-      trackable.DoNotificationOnEncounter = false;
-    fakePassive.suppressPickupVFX = true;
-    _SuppressNextPassivePickupSound = true;
-    fakePassive.Pickup(player);
-    return fakePassive;
+    return player.AcquireFakeItem(FakeItem.Get(id).gameObject);
   }
 
   /// <summary>Acquire a passive item and put it in a player's inventory without notification or sound (id version)</summary>
