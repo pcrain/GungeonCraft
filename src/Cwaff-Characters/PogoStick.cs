@@ -323,6 +323,7 @@ public class PogoDodgeRoll : CustomDodgeRoll
     private Geometry _chargeTarget = null;
     private StatModifier _noSpeed = StatType.MovementSpeed.Mult(0f);
     private int _pogoKnockbackId = -1;
+    private bool _didStomp = false;
 
     private void EnsurePogo()
     {
@@ -402,49 +403,67 @@ public class PogoDodgeRoll : CustomDodgeRoll
             yield return null;
       #endregion
 
-      #region Begin bouncing phase
-        const float GRAVITY = 100f;
-        const float VELOCITY = 25f;
-        const float BOUNCE_TIME = (2f * VELOCITY) / GRAVITY;
-        this._state = State.BOUNCING;
-        this._owner.SetIsFlying(true, PogoStick.ItemName, adjustShadow: false);
-        this._owner.specRigidbody.AddCollisionLayerIgnoreOverride(_IgnoreCollisions);
-        int originalLayer = this._owner.gameObject.layer;
-        this._owner.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
-        Vector2 startingPos = this._owner.transform.position;
         target -= Vector3.Scale(this._owner.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter), this._owner.sprite.scale).XY();
-        Vector2 velocity = (target - startingPos) / BOUNCE_TIME;
-        KnockbackDoer kb = this._owner.knockbackDoer;
-        this._pogoKnockbackId = kb.ApplyContinuousKnockback(velocity.normalized, velocity.magnitude * 0.1f * kb.weight);
-        Transform spriteTransform = this._owner.sprite.transform;
-        base.gameObject.Play("rogo_charge_bounce_sound");
-        for (float elapsed = 0f; elapsed < BOUNCE_TIME; elapsed += BraveTime.DeltaTime)
+        bool didRebound = false;
+        Vector2 velocity = default;
+        while (true)
         {
-            float height = GetHeight(VELOCITY, GRAVITY, elapsed);
-            float percentDone = elapsed / BOUNCE_TIME;
-            spriteTransform.localPosition = spriteTransform.localPosition.WithY(height);
-            yield return null;
-        }
-        kb.EndContinuousKnockback(this._pogoKnockbackId);
-        this._pogoKnockbackId = -1;
-        this._owner.gameObject.SetLayerRecursively(originalLayer);
-      #endregion
+            const float GRAVITY = 100f;
+            const float VELOCITY = 25f;
+            const float BOUNCE_TIME = (2f * VELOCITY) / GRAVITY;
+            const float LANDING_TIME = 0.05f;
+            const float BOUNCE_VEL_DECAY = 0.75f;
 
-      #region Begin landing phase
-        const float LANDING_TIME = 0.05f;
-        this._state = State.LANDING;
-        CwaffEvents.OnWillApplyRollDamage += TimeFreezeOnPogoStomp;
-        this._owner.OnRolledIntoEnemy += this.DoPogoStomp;
-        this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreCollisions);
-        this._owner.specRigidbody.AddCollisionLayerIgnoreOverride(_IgnoreProjectiles);
-        yield return new WaitForSeconds(LANDING_TIME);
-        yield return null;
-        CwaffEvents.OnWillApplyRollDamage -= TimeFreezeOnPogoStomp;
-        this._owner.OnRolledIntoEnemy -= this.DoPogoStomp;
-        this._owner.SetIsFlying(false, PogoStick.ItemName, adjustShadow: false);
-        this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreProjectiles);
-        ClearTableSlides();
-      #endregion
+          #region Begin bouncing phase
+            this._state = State.BOUNCING;
+            this._owner.SetIsFlying(true, PogoStick.ItemName, adjustShadow: false);
+            this._owner.healthHaver.TriggerInvulnerabilityPeriod(BOUNCE_TIME + LANDING_TIME + 0.05f);
+            this._owner.specRigidbody.AddCollisionLayerIgnoreOverride(_IgnoreCollisions);
+            int originalLayer = this._owner.gameObject.layer;
+            this._owner.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
+            Vector2 startingPos = this._owner.transform.position;
+            if (!didRebound)
+                velocity = (target - startingPos) / BOUNCE_TIME;
+            else
+            {
+                float newMagnitude = velocity.magnitude * BOUNCE_VEL_DECAY;
+                velocity = newMagnitude * (this._owner.unadjustedAimPoint.XY() - this._owner.sprite.WorldCenter).normalized;
+            }
+            KnockbackDoer kb = this._owner.knockbackDoer;
+            this._pogoKnockbackId = kb.ApplyContinuousKnockback(velocity.normalized, velocity.magnitude * 0.1f * kb.weight);
+            Transform spriteTransform = this._owner.sprite.transform;
+            base.gameObject.Play("rogo_charge_bounce_sound");
+            for (float elapsed = 0f; elapsed < BOUNCE_TIME; elapsed += BraveTime.DeltaTime)
+            {
+                float height = GetHeight(VELOCITY, GRAVITY, elapsed);
+                float percentDone = elapsed / BOUNCE_TIME;
+                spriteTransform.localPosition = spriteTransform.localPosition.WithY(height);
+                yield return null;
+            }
+            kb.EndContinuousKnockback(this._pogoKnockbackId);
+            this._pogoKnockbackId = -1;
+            this._owner.gameObject.SetLayerRecursively(originalLayer);
+          #endregion
+
+          #region Begin landing phase
+            this._state = State.LANDING;
+            this._didStomp = false;
+            CwaffEvents.OnWillApplyRollDamage += TimeFreezeOnPogoStomp;
+            this._owner.OnRolledIntoEnemy += this.DoPogoStomp;
+            this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreCollisions);
+            this._owner.specRigidbody.AddCollisionLayerIgnoreOverride(_IgnoreProjectiles);
+            yield return new WaitForSeconds(LANDING_TIME);
+            CwaffEvents.OnWillApplyRollDamage -= TimeFreezeOnPogoStomp;
+            this._owner.OnRolledIntoEnemy -= this.DoPogoStomp;
+            this._owner.SetIsFlying(false, PogoStick.ItemName, adjustShadow: false);
+            this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreProjectiles);
+            ClearTableSlides();
+            didRebound = true;
+          #endregion
+
+            if (!this._didStomp)
+              break;
+        }
 
         yield break;
     }
@@ -460,6 +479,7 @@ public class PogoDodgeRoll : CustomDodgeRoll
         pc.specRigidbody.RegisterGhostCollisionException(actor.specRigidbody);
         Lazy.DoMicroBlankAt(pc.sprite.WorldBottomCenter, pc);
         DoGroundParticles(actor.CenterPosition);
+        this._didStomp = true;
     }
 
     private static void DoGroundParticles(Vector2 pos)
