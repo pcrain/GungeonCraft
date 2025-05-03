@@ -2,7 +2,6 @@ namespace CwaffingTheGungy;
 
 /*
   TODO:
-    - implement pogo stick active item
     - implement pogo stick starter weapon
     - flesh out stats
     - add punchout sprites

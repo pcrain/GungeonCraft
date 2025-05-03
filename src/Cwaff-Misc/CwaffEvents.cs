@@ -30,6 +30,8 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action<PlayerController> OnStatsRecalculated;
     // Run whenever a player interacts without a valid interaction target
     public static Action<PlayerController> OnEmptyInteract;
+    // Run right before a player is about to apply roll damage
+    public static Action<PlayerController, AIActor> OnWillApplyRollDamage;
 
     internal static bool _OnFirstFloor = false;
     internal static bool _RunJustStarted = false;
@@ -237,6 +239,19 @@ public static class CwaffEvents // global custom events we can listen for
                 return;
             if (OnEmptyInteract != null)
                 OnEmptyInteract(__instance);
+        }
+    }
+
+    [HarmonyPatch]
+    private static class PlayerControllerApplyRollDamagePatch
+    {
+        [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.ApplyRollDamage))]
+        static void Prefix(PlayerController __instance, AIActor actor)
+        {
+            if (__instance.m_rollDamagedEnemies.Contains(actor))
+                return;
+            if (CwaffEvents.OnWillApplyRollDamage != null)
+                CwaffEvents.OnWillApplyRollDamage(__instance, actor);
         }
     }
 }
