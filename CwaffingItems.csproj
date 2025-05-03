@@ -97,6 +97,7 @@
     <Compile Include="src\Lazy.cs"/>
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\Cwaff-Characters\PogoStick.cs"/>
+    <Compile Include="src\Cwaff-Characters\PogoGun.cs"/>
     <Compile Include="src\Cwaff-Characters\Rogo.cs"/>
     <Compile Include="src\Cwaff-Characters\CwaffCharacterCore.cs"/>
     <Compile Include="src\Cwaff-Enemies\BulletScriptHelper.cs"/>

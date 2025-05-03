@@ -2,9 +2,9 @@ namespace CwaffingTheGungy;
 
 /*
   TODO:
-    - implement pogo stick starter weapon
     - flesh out stats
     - add punchout sprites
+    - polish sprites and sounds for animations (character select fall, death pogo drop, etc.)
 */
 
 #if DEBUG
@@ -31,6 +31,7 @@ public class Rogo
   {
     // Item setup
     PogoStick.Init();
+    PogoGun.Init();
 
     // Basic setup
     CustomCharacterData data = new() {
@@ -43,7 +44,7 @@ public class Rogo
       armor             = 2,
       foyerPos          = new Vector3(30.25f, 21.25f),
       loadout           = new(){
-        new(Items.RobotsRightHand.AsGun(), false),
+        new(Lazy.Pickup<PogoGun>(), false),
         new(Lazy.Pickup<PogoStick>(), false),
       },
       idleDoer          = new GameObject().RegisterPrefab().InitComponent<CharacterSelectIdleDoer>(i => {
@@ -80,7 +81,6 @@ public class Rogo
       .SetAudio("pitfall_return", "rogo_shake_sound", 3, 7, 11, 15)
       .SetAudio("pet",            "rogo_pet_sound", 1)
       ;
-    // pc.FinalizeCharacter(data);
 
     // Hat offset setup
     pc.SetupHatOffsets(0, -2, 0, -7);

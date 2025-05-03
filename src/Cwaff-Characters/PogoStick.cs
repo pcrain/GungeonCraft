@@ -1,6 +1,5 @@
 namespace CwaffingTheGungy;
 
-using System;
 using static PogoDodgeRoll;
 
 public class PogoStick : CwaffDodgeRollActiveItem
@@ -26,9 +25,9 @@ public class PogoStick : CwaffDodgeRollActiveItem
     }
 
     internal bool _active = false;
+    internal tk2dSprite _attachedPogoSprite = null;
 
     private GameObject _attachedPogo = null;
-    private tk2dSprite _attachedPogoSprite = null;
     private float _bounceTimer = 0.0f;
     private PogoDodgeRoll _dodgeRoller = null;
 
@@ -124,11 +123,12 @@ public class PogoStick : CwaffDodgeRollActiveItem
 
     private void Deactivate()
     {
-        if (this._owner is not PlayerController player)
-            return;
-
-        player.sprite.SpriteChanged -= HandlePlayerSpriteChanged;
-        player.sprite.transform.localPosition = player.sprite.transform.localPosition.WithY(0f);
+        if (this._owner is PlayerController player)
+        {
+            player.sprite.SpriteChanged -= HandlePlayerSpriteChanged;
+            player.sprite.transform.localPosition = player.sprite.transform.localPosition.WithY(0f);
+            player.AdditionalCanDodgeRollWhileFlying.RemoveOverride(ItemName);
+        }
         if (this._attachedPogo)
         {
             this._attachedPogo.transform.parent = null;
@@ -136,7 +136,6 @@ public class PogoStick : CwaffDodgeRollActiveItem
         }
         this._attachedPogo = null;
         this._attachedPogoSprite = null;
-        player.AdditionalCanDodgeRollWhileFlying.RemoveOverride(ItemName);
         this._dodgeRoller.IsEnabled = false;
         this._active = false;
     }
@@ -163,7 +162,12 @@ public class PogoStick : CwaffDodgeRollActiveItem
         //     Sextant.PlaceLabel(this._debugLabel, this._owner.sprite.WorldTopCenter + new Vector2(0f, 1f), 0f);
         // }
         // #endif
-        if (!this._active || !this._owner || !this._attachedPogo || !this._attachedPogoSprite)
+        if (!this._owner || this._owner.healthHaver.IsDead)
+        {
+            Deactivate();
+            return;
+        }
+        if (!this._active || !this._attachedPogo || !this._attachedPogoSprite)
             return;
 
         UpdatePogo(this._owner.sprite);
