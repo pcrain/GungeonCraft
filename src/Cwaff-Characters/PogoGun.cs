@@ -23,8 +23,10 @@ public class PogoGun : CwaffGun
             muzzleFrom: Items.Mailbox, fireAudio: "pogo_gun_shoot_sound", smoothReload: 0.1f)
           .SetReloadAudio("rogo_dodge_sound", 3, 6, 9)
           .SetReloadAudio("pogo_gun_reload_sound", 18)
+          .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(baseProjectile: Items.Ak47.Projectile(), sprite: null, clipSize: 12, cooldown: 0.2f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 4.5f, speed: 30f, range: 18f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound"));
+        gun.PreventStartingOwnerFromDropping = true;
     }
 
     private void CheckPogoActive()

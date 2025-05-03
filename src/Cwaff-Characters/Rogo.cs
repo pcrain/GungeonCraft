@@ -3,8 +3,7 @@ namespace CwaffingTheGungy;
 /*
   TODO:
     - flesh out stats
-    - add punchout sprites
-    - polish sprites and sounds for animations (character select fall, death pogo drop, etc.)
+    - (eventually) add punchout sprites
 */
 
 #if DEBUG
@@ -80,6 +79,10 @@ public class Rogo
       .SetAudio("pitfall_down",   "Play_Fall", 0)
       .SetAudio("pitfall_return", "rogo_shake_sound", 3, 7, 11, 15)
       .SetAudio("pet",            "rogo_pet_sound", 1)
+      .SetAudio("select_choose",  "rogo_off_balance_sound", 9, 11, 13)
+      .SetAudio("select_choose",  "rogo_more_off_balance_sound", 15, 17, 19)
+      .SetAudio("select_choose",  "rogo_stumble_sound", 22)
+      .SetAudio("select_choose",  "rogo_recover_sound", 28)
       ;
 
     // Hat offset setup
@@ -134,7 +137,7 @@ public class Rogo
   {
     { "death",                6 },
     { "death_coop",           6 },
-    { "death_shot",           6 },
+    { "death_shot",           18 },
     { "dodge",                18 }, //NOTE: FPS overrides apparently have no effect on dodge roll animations
     { "dodge_bw",             18 },
     { "dodge_left",           24 },
@@ -173,7 +176,7 @@ public class Rogo
     { "run_up",               20 },
     { "run_up_hand",          20 },
     // { "select_casing",        4 },  // a.k.a. robot_select_tummy
-    { "select_choose",        10 },
+    { "select_choose",        14 },
     { "select_choose_long",   9 },
     // { "select_headspin",      4 },
     { "select_idle",          9 },

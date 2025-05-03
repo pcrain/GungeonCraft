@@ -35,6 +35,7 @@ public class PogoStick : CwaffDodgeRollActiveItem
     {
         PlayerItem item  = Lazy.SetupActive<PogoStick>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.EXCLUDED;
+        item.PreventStartingOwnerFromDropping = true;
         item.consumable = false;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
         item.gameObject.AddComponent<PogoDodgeRoll>();
@@ -70,7 +71,7 @@ public class PogoStick : CwaffDodgeRollActiveItem
     public override void OnPreDrop(PlayerController player)
     {
         Deactivate();
-        this._owner.OnNewFloorLoaded -= this.OnNewFloorLoaded;
+        player.OnNewFloorLoaded -= this.OnNewFloorLoaded;
         this._owner = null;
         base.OnPreDrop(player);
     }
