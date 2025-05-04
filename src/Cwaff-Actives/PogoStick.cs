@@ -441,9 +441,7 @@ public class PogoDodgeRoll : CustomDodgeRoll
             base.gameObject.Play("rogo_charge_bounce_sound");
             for (float elapsed = 0f; elapsed < BOUNCE_TIME; elapsed += BraveTime.DeltaTime)
             {
-                float height = GetHeight(VELOCITY, GRAVITY, elapsed);
-                float percentDone = elapsed / BOUNCE_TIME;
-                spriteTransform.localPosition = spriteTransform.localPosition.WithY(height);
+                spriteTransform.localPosition = spriteTransform.localPosition.WithY(GetHeight(VELOCITY, GRAVITY, elapsed));
                 yield return null;
                 if (delayInvulnerability && hh.vulnerable)
                 {

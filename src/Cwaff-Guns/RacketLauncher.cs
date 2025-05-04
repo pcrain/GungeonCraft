@@ -19,7 +19,7 @@ public class RacketLauncher : CwaffGun
         Lazy.SetupGun<RacketLauncher>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true,
             idleFps: _IDLE_FPS, shootFps: 60, autoPlay: false)
-          .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
+          .InitProjectile(GunData.New(ammoCost: 1, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
             damage: 10.0f, speed: 20.0f, range: 300.0f, force: 12f, sprite: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter,
             surviveRigidbodyCollisions: true))
           .Attach<BounceProjModifier>(bounce => {
@@ -35,6 +35,7 @@ public class RacketLauncher : CwaffGun
         base.OnPlayerPickup(player);
         gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.Play();
+        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -42,19 +43,23 @@ public class RacketLauncher : CwaffGun
         base.OnDroppedByPlayer(player);
         gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.StopAndResetFrameToDefault();
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
     }
 
-    public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
+    public override void OnDestroy()
     {
-        if (gun.GunPlayerOwner() is not PlayerController player)
-            return projectile;
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        base.OnDestroy();
+    }
 
+    private void OnTriedToInitiateAttack(PlayerController player)
+    {
+        if (!player || player.CurrentGun != this.gun)
+            return; // inactive, do normal firing stuff
         if (this._extantTennisBalls.Count == 0 && gun.CurrentAmmo > 0)
-        {
-            mod.ammoCost = 1;
-            gun.ClipShotsRemaining = gun.CurrentAmmo;
-            return projectile;
-        }
+            return; // we should just try to fire normally
+
         Vector2 racketpos = player.CenterPosition;
         float reflectRange = this.Mastered ? _MAX_REFLECT_DISTANCE_MASTERED : _MAX_REFLECT_DISTANCE;
         TennisBall closest = null;
@@ -76,14 +81,16 @@ public class RacketLauncher : CwaffGun
         if (closest)
             closest.GotWhacked(gun.CurrentAngle.ToVector());
         else if (this.Mastered)
-        {
-            mod.ammoCost = 1;
-            gun.ClipShotsRemaining = gun.CurrentAmmo;
-            return projectile;
-        }
-        mod.ammoCost = 0;
-        gun.ClipShotsRemaining = gun.CurrentAmmo + 1;
-        return Lazy.NoProjectile(); //REFACTOR: actually prevent shooting here with ilmanip / patch
+            return;
+
+        base.spriteAnimator.PlayFromFrame(this.gun.shootAnimation, 0);
+        player.SuppressThisClick = true;
+    }
+
+    public override void OnPostFired(PlayerController player, Gun gun)
+    {
+        base.OnPostFired(player, gun);
+        player.StopFiringImmediately(); // make sure we can't just hold down fire to spam tennis balls
     }
 
     public override void OnAmmoChanged(PlayerController player, Gun gun)

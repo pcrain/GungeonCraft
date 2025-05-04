@@ -6,6 +6,7 @@
 - Lowered volume on some of Rogo's sounds
 - Fixed charging phase of Pogo Stick bounce counting as airborne, allowing the player to hover over pits
 - Fixed collision jankiness when charging and landing Pogo Stick's super bounce immediately after taking damage
+- Fixed not being able to swing Racket Launcher at extant tennis balls when out of ammo
 
 ## 1.25.0 (2025-05-03)
 

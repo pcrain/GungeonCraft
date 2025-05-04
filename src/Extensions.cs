@@ -3401,5 +3401,20 @@ public static class Extensions
     _UnresolvedDualWields.Remove(dualWieldSynergy);
     return gun;
   }
+
+  /// <summary>Immediately release all shoot buttons as far as the game is concerned.</summary>
+  public static void StopFiringImmediately(this PlayerController pc)
+  {
+    if (BraveInput.GetInstanceForPlayer(pc.PlayerIDX) is not BraveInput input)
+      return;
+    while (input.GetButtonDown(GungeonActions.GungeonActionType.Shoot))
+    {
+      input.ConsumeButtonDown(GungeonActions.GungeonActionType.Shoot);
+      if (input.GetButtonUp(GungeonActions.GungeonActionType.Shoot))
+        input.ConsumeButtonUp(GungeonActions.GungeonActionType.Shoot);
+    }
+    if (input.GetButton(GungeonActions.GungeonActionType.Shoot))
+      input.ConsumeAll(GungeonActions.GungeonActionType.Shoot);
+  }
 }
 
