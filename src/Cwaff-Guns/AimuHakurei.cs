@@ -77,9 +77,9 @@ public class AimuHakurei : CwaffGun
         _GrazeVFX = VFX.Create("graze_vfx", fps: 5, emissivePower: 5f);
     }
 
-    public override void PostProcessProjectile(Projectile projectile)
+    public override void OnPostFired(PlayerController player, Gun gun)
     {
-        base.PostProcessProjectile(projectile);
+        base.OnPostFired(player, gun);
         SetFocus(false);
     }
 

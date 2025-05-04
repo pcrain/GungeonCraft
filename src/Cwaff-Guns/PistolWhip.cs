@@ -61,9 +61,9 @@ public class PistolWhip : CwaffGun
         Lazy.DoMicroBlankAt(pos, this.PlayerOwner);
     }
 
-    public override void PostProcessProjectile(Projectile projectile)
+    public override void OnPostFired(PlayerController player, Gun gun)
     {
-        base.PostProcessProjectile(projectile);
+        base.OnPostFired(player, gun);
         this._unlockAngleTime = BraveTime.ScaledTimeSinceStartup + WhipChainStart.TIMES.Last();
     }
 

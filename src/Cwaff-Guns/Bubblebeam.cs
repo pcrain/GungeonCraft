@@ -52,9 +52,9 @@ public class Bubblebeam : CwaffGun
           );
     }
 
-    public override void PostProcessProjectile(Projectile projectile)
+    public override void OnPostFired(PlayerController player, Gun gun)
     {
-        base.PostProcessProjectile(projectile);
+        base.OnPostFired(player, gun);
         CwaffVFX.SpawnBurst(
             prefab           : _BurstBubbleVFX,
             numToSpawn       : 4,
