@@ -171,6 +171,8 @@ public class Initialisation : BaseUnityPlugin
                 HeckedShrine.Init();
                 // HUD Stuff
                 // HUDController.Init();
+                // Midrun data
+                CwaffRunData.Init();
                 setupConfigWatch.Stop();
             #endregion
 

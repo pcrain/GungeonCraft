@@ -1,9 +1,5 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - make sure killed enemies serialize properly on game saves and reloads
-*/
-
 public class BulletThatCanKillTheFuture : CwaffActive
 {
     public static string ItemName         = "Bullet That Can Kill the Future";
@@ -14,7 +10,6 @@ public class BulletThatCanKillTheFuture : CwaffActive
     internal static string _BelloItemHint       = "A blue-clad skeleton stopped by earlier for some armor. I saw him walk behind the Hero Shrine and haven't seen him since.";
     internal static tk2dBaseSprite _Sprite      = null;
     internal static bool _BulletSpawnedThisRun  = false;
-    internal static string _EnemyWithoutAFuture = "";
     internal static Texture2D _EeveeTexture     = null;
 
     private PlayerController _owner = null;
@@ -36,7 +31,6 @@ public class BulletThatCanKillTheFuture : CwaffActive
     private static void ResetBTCKTF(PlayerController arg1, PlayerController arg2, GameManager.GameMode arg3)
     {
         _BulletSpawnedThisRun = false;
-        _EnemyWithoutAFuture = "";
     }
 
     private static void SpawnFutureBullet()
@@ -285,7 +279,7 @@ public class BulletThatCanKillTheFuture : CwaffActive
         bool killedOwnFuture = (pdist < Mathf.Min(2f, victimDistance));
         if (!killedOwnFuture && victim != null)
         {
-            _EnemyWithoutAFuture = victim.EnemyGuid;
+            CwaffRunData.Instance.btcktfEnemyGuid = victim.EnemyGuid;
             Lazy.CustomNotification("Future Erased", victim.GetActorName(), _Sprite);
             // ETGModConsole.Log("future erased for "+victim.EnemyGuid);
             VFXPool vfx = VFX.CreatePoolFromVFXGameObject(Items.MagicLamp.AsGun().DefaultModule.projectiles[0].hitEffects.overrideMidairDeathVFX);
@@ -379,7 +373,8 @@ public class BulletThatCanKillTheFuture : CwaffActive
     {
         static bool Prefix(AIActor __instance)
         {
-            if (string.IsNullOrEmpty(_EnemyWithoutAFuture) || __instance.EnemyGuid != _EnemyWithoutAFuture)
+            string futureless = CwaffRunData.Instance.btcktfEnemyGuid;
+            if (string.IsNullOrEmpty(futureless) || __instance.EnemyGuid != futureless)
                 return true;
 
             Memorialize(__instance);
@@ -439,7 +434,6 @@ static class NoDamageBlankPatch
         {
             __instance.ForceNoDamage = true;
             ForceNextBlankToDoNoDamage = false;
-            Lazy.DebugLog($"fixed!");
         }
     }
 }

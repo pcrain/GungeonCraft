@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.25.1 (TBD)
+
+- Fixed enemy killed by [REDACTED] not being remembered when reloading a midgame save
+
 ## 1.25.0 (2025-05-03)
 
 #### Features:
