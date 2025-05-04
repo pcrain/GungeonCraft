@@ -194,7 +194,7 @@ public class PogoStick : CwaffDodgeRollActiveItem
         if (movingDown)
             return;
 
-        this._owner.gameObject.Play("rogo_dodge_sound");
+        this._owner.gameObject.Play("rogo_bounce_sound");
         if (this._state == State.WAITING)
         {
             this._state = State.CHARGING;
@@ -312,6 +312,7 @@ public class PogoDodgeRoll : CustomDodgeRoll
     public override bool  lockedDirection     => false; // we're allowed to aim, just not to move
     public override float  bufferWindow       => 0.5f;
     public override bool  takesContactDamage  => (this._state < State.BOUNCING);
+    public override bool  isAirborne          => (this._state >= State.BOUNCING);
     public override float  overrideRollDamage => ((this._state >= State.BOUNCING) ? 100f : -1f);
     // public override bool  canSlide            => false;
 
@@ -406,6 +407,8 @@ public class PogoDodgeRoll : CustomDodgeRoll
         target -= Vector3.Scale(this._owner.sprite.GetRelativePositionFromAnchor(Anchor.LowerCenter), this._owner.sprite.scale).XY();
         bool didRebound = false;
         Vector2 velocity = default;
+        bool delayInvulnerability = false;
+        HealthHaver hh = this._owner.healthHaver;
         while (true)
         {
             const float GRAVITY = 100f;
@@ -417,7 +420,10 @@ public class PogoDodgeRoll : CustomDodgeRoll
           #region Begin bouncing phase
             this._state = State.BOUNCING;
             this._owner.SetIsFlying(true, PogoStick.ItemName, adjustShadow: false);
-            this._owner.healthHaver.TriggerInvulnerabilityPeriod(BOUNCE_TIME + LANDING_TIME + 0.05f);
+            if (hh.vulnerable)
+                hh.TriggerInvulnerabilityPeriod(BOUNCE_TIME + LANDING_TIME + 0.05f);
+            else //WARN: if we start a bounce during invulnerability, it can wear off during bounce since it's handled by a coroutine
+                delayInvulnerability = true;
             this._owner.specRigidbody.AddCollisionLayerIgnoreOverride(_IgnoreCollisions);
             int originalLayer = this._owner.gameObject.layer;
             this._owner.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
@@ -439,6 +445,11 @@ public class PogoDodgeRoll : CustomDodgeRoll
                 float percentDone = elapsed / BOUNCE_TIME;
                 spriteTransform.localPosition = spriteTransform.localPosition.WithY(height);
                 yield return null;
+                if (delayInvulnerability && hh.vulnerable)
+                {
+                    delayInvulnerability = false;
+                    hh.TriggerInvulnerabilityPeriod(BOUNCE_TIME + LANDING_TIME + 0.05f - elapsed);
+                }
             }
             kb.EndContinuousKnockback(this._pogoKnockbackId);
             this._pogoKnockbackId = -1;
@@ -452,7 +463,15 @@ public class PogoDodgeRoll : CustomDodgeRoll
             this._owner.OnRolledIntoEnemy += this.DoPogoStomp;
             this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreCollisions);
             this._owner.specRigidbody.AddCollisionLayerIgnoreOverride(_IgnoreProjectiles);
-            yield return new WaitForSeconds(LANDING_TIME);
+            for (float elapsed = 0f; elapsed < LANDING_TIME; elapsed += BraveTime.DeltaTime)
+            {
+                yield return null;
+                if (delayInvulnerability && hh.vulnerable)
+                {
+                    delayInvulnerability = false;
+                    hh.TriggerInvulnerabilityPeriod(LANDING_TIME + 0.05f - elapsed);
+                }
+            }
             CwaffEvents.OnWillApplyRollDamage -= TimeFreezeOnPogoStomp;
             this._owner.OnRolledIntoEnemy -= this.DoPogoStomp;
             this._owner.SetIsFlying(false, PogoStick.ItemName, adjustShadow: false);
@@ -510,7 +529,6 @@ public class PogoDodgeRoll : CustomDodgeRoll
         this._owner.OnReceivedDamage -= this.OnReceivedDamage;
         this._owner.OnRolledIntoEnemy -= this.DoPogoStomp;
         this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreCollisions);
-        // this._owner.specRigidbody.CollideWithOthers = true;
         this._owner.ownerlessStatModifiers.TryRemove(this._noSpeed);
         this._owner.stats.RecalculateStats(this._owner);
         this._chargeRadius._meshRenderer.enabled = false;

@@ -63,10 +63,10 @@ public class CwaffRunData : FakeItem
     {
         Lazy.DebugLog($"deserializing extra mid run data");
         base.MidGameDeserialize(data);
-
         int i = 0;
+
         btcktfEnemyGuid = (string)data[i++];
-        Lazy.DebugLog($"memorialized enemy is {btcktfEnemyGuid}");
+        Lazy.DebugLog($"  memorialized enemy is {btcktfEnemyGuid}");
 
         _Instance = this;
         this._deserialized = true;

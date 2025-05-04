@@ -4,7 +4,10 @@ namespace CwaffingTheGungy;
 [HarmonyPatch]
 internal static class CwaffDebug
 {
-  #if DEBUG && false //NOTE: change this to DEBUG && true to make every chest item the same
+  //NOTE: uncomment to make every chest item the same
+  // #define DEBUGCHESTS
+
+  #if DEBUG && DEBUGCHESTS
     private static int _DebugItemId => Lazy.PickupId<Gunbrella>();
     // private static int _DebugItemId => (int)Items.CoolantLeak;
     // private static int _DebugItemId => (int)Items.Casey;

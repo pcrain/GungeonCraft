@@ -305,13 +305,14 @@ pizza_event_start_sound,7.0,1,sound,0
 leafblower_loop,0.0,0,sound,0
 wayfarer_destroy_sound,0.0,1,sound,1
 bb_catch_sound,10.0,1,sound,0
-rogo_step_sound,-14.0,1,sound,0
-rogo_dodge_sound,-8.0,1,sound,0
+rogo_step_sound,-16.0,1,sound,0
+rogo_dodge_sound,-9.5,1,sound,0
 rogo_pet_sound,-6.0,1,sound,0
 rogo_stomp_sound,5.0,1,sound,0
-pogo_gun_shoot_sound,-13.5,1,sound,0
+pogo_gun_shoot_sound,-15.0,1,sound,0
 pogo_gun_reload_sound,-7.5,1,sound,0
 rogo_off_balance_sound,-5.0,1,sound,0
 rogo_more_off_balance_sound,-5.0,1,sound,0
 rogo_stumble_sound,-2.0,1,sound,0
 rogo_recover_sound,-5.0,1,sound,0
+rogo_bounce_sound,-12.5,1,sound,0
