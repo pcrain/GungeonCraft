@@ -21,7 +21,7 @@ public static class CwaffSynergies
     {
         // Extend the base game's CustomSynergyType enum to make room for our new synergy
         for (int i = 0; i < _SynergyNames.Count; ++i)
-            _Synergies[i] = ETGModCompatibility.ExtendEnum<CustomSynergyType>(C.MOD_PREFIX.ToUpper(), _SynergyEnums[i]);
+            _Synergies[i] = _SynergyEnums[i].ExtendEnum<CustomSynergyType>();
     }
 
     public static void Init()
@@ -412,7 +412,7 @@ public static class CwaffSynergies
         AdvancedSynergyEntry ase = NewSynergy(
             synergy              : synergy,
             name                 : $"{gun.EncounterNameOrDisplayName} Mastery",
-            mandatory            : new string[1]{IDs.InternalNames[gun.gunName]},
+            mandatory            : [IName(gun.gunName)],
             masteryId            : tokenId,
             ignoreLichEyeBullets : true);
         _MasteryIds.Add(tokenId);
@@ -490,7 +490,7 @@ public static class CwaffSynergies
         }
     }
 
-    private static string IName(string itemName) => IDs.InternalNames[itemName];
+    private static string IName(string itemName) => C.MOD_PREFIX+":"+itemName.InternalName();
     public static CustomSynergyType Synergy(this Synergy synergy) => _Synergies[(int)synergy];
     public static string SynergyName(this Synergy synergy) => _SynergyNames[(int)synergy];
     public static bool HasSynergy(this PlayerController player, Synergy synergy) => player.ActiveExtraSynergies.Contains((int)_SynergyIds[(int)synergy]);

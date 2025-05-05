@@ -46,7 +46,6 @@ public static class Lazy
         string baseItemName = itemName.InternalName();  //get saner gun name for commands
         string internalName = C.MOD_PREFIX+":"+baseItemName;
         string ammonomiconSprite;
-        IDs.InternalNames[itemName] = internalName;
 
         TItemClass item;
         bool isGun = typeof(TItemClass) == typeof(Gun);
@@ -101,7 +100,6 @@ public static class Lazy
         if (hideFromAmmonomicon)
             item.encounterTrackable.journalData.SuppressInAmmonomicon = true;
 
-        IDs.Pickups[baseItemName] = item.PickupObjectId; //register item in pickup ID database
         if (!isGun)
         {
             _CustomPickups[typeof(TItemSpecific)] = item; // register item in pickup by type database

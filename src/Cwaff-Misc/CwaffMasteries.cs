@@ -1,9 +1,7 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - add some kind of signifier for guns that have masteries
-    - only allow ritual once per run
-    - actually make decent masteries
+    - only allow ritual once per run?
 */
 
 public static class CwaffMasteries

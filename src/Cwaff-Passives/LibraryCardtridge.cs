@@ -91,10 +91,10 @@ public class LibraryCardtridge : CwaffPassive
         if (!_DidLateInit)
         {
             // Add my modded items to the book items list
-            _BookItemIDs.Add(IDs.Pickups[AmmoConservationManual.ItemName.InternalName()]);
-            _BookItemIDs.Add(IDs.Pickups[MMReloading.ItemName.InternalName()]);
-            _BookItemIDs.Add(IDs.Pickups[MMAiming.ItemName.InternalName()]);
-            _BookItemIDs.Add(IDs.Pickups[BlankChecks.ItemName.InternalName()]);
+            _BookItemIDs.Add(Lazy.PickupId<AmmoConservationManual>());
+            _BookItemIDs.Add(Lazy.PickupId<MMReloading>());
+            _BookItemIDs.Add(Lazy.PickupId<MMAiming>());
+            _BookItemIDs.Add(Lazy.PickupId<BlankChecks>());
             //TODO: Add other modded items to the book items list
             _DidLateInit = true;
         }

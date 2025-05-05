@@ -48,7 +48,7 @@ public class BulletThatCanKillTheFuture : CwaffActive
 
             Vector3 pos = a.transform.position + (new Vector2(a.sprite.GetCurrentSpriteDef().position3.x/2, 6f)).ToVector3ZisY(0);
             GameObject futureBulletObject = LootEngine.SpawnItem(
-              item: PickupObjectDatabase.GetById(IDs.Pickups["bullet_that_can_kill_the_future"]).gameObject,
+              item: Lazy.Pickup<BulletThatCanKillTheFuture>().gameObject,
               spawnPosition: pos,
               spawnDirection: Vector2.zero,
               force: 0).gameObject;

@@ -1,5 +1,3 @@
-
-
 namespace CwaffingTheGungy;
 
 public static class CwaffShaders

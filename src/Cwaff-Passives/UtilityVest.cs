@@ -83,7 +83,7 @@ public class UtilityVest : CwaffPassive
     {
         if (!item.CanActuallyBeDropped(owner))
             return -1f;
-        if (item.PickupObjectId == IDs.Pickups["utility_vest"])
+        if (item.PickupObjectId == Lazy.PickupId<UtilityVest>())
             return 0f;
         if (item.PickupObjectId == (int)Items.Junk)
             return 6f;

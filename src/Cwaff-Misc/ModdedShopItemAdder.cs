@@ -7,7 +7,7 @@ namespace CwaffingTheGungy;
         goopton                   // goop, slime, and alien items
         cursula                   // magic, cursed, and evil items
         old red                   // blank-themed items
-        flynt                     // key, look, and chest items
+        flynt                     // key, lock, and chest items
     Currently known modded shop IDs:
         psog:tabletechshop        // table and mimic related items
         psog:timedshop            // "rare" items (we add time and space related items)

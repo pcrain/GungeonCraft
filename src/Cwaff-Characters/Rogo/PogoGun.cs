@@ -16,7 +16,7 @@ public class PogoGun : CwaffGun
     private bool       _wasOnPogo = false;
     private bool       _onPogo    => this._pogoItem && this._pogoItem._active;
 
-    public static void Init()
+    public static void Init() //NOTE: called in Rogo.cs, not Main.cs
     {
         Lazy.SetupGun<PogoGun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.EXCLUDED, gunClass: GunClass.RIFLE, reloadTime: 1.5f, ammo: 1000, infiniteAmmo: true, shootFps: 30,

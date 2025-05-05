@@ -9,7 +9,7 @@ internal static class AtlasHelper
 
   internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
 
-  /// <summary>Batches UI sprite additions from a list of sprite definitinos</summary>
+  /// <summary>Batches UI sprite additions from a list of sprite definitions</summary>
   public static void AddUISpriteBatch(List<tk2dSpriteDefinition> defs)
   {
     foreach (tk2dSpriteDefinition def in defs)
@@ -101,9 +101,9 @@ internal static class AtlasHelper
         collisionLayer             = CollisionLayer.HighObstacle,
         material                   = material,
         materialInst               = material,
-        position0                  = offset + Vector3.zero,
-        position1                  = offset + extents.WithY(0f),
-        position2                  = offset + extents.WithX(0f),
+        position0                  = offset,
+        position1                  = offset + new Vector3(extents.x, 0f, 0f),
+        position2                  = offset + new Vector3(0f, extents.y, 0f),
         position3                  = offset + extents,
         boundsDataExtents          = extents,
         boundsDataCenter           = offset + 0.5f * extents,
@@ -150,8 +150,8 @@ internal static class AtlasHelper
         if (tokens.Length < 9)
           continue; // first line, skip it since it doesn't have relevant information
         string[] pathName = tokens[0].Split('/'); // trim off path and extension
-        string collName   = pathName.First();
-        string spriteName = pathName.Last().Split('.').First();  // trim off path and extension
+        string collName   = pathName[0];
+        string spriteName = pathName[pathName.Length - 1].Split('.')[0];  // trim off path and extension
         tk2dSpriteDefinition def = _PackedTextures[spriteName] = atlas.SpriteDefFromSegment(
             spriteName : spriteName,
             x          : Int32.Parse(tokens[1]),

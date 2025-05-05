@@ -1,5 +1,3 @@
-
-
 namespace CwaffingTheGungy;
 
 // Class for harmony patches that need to be shared by multiple classes (e.g., functions that are patched multiple times)

@@ -10,7 +10,7 @@ public class Kevlar
         CwaffEvents.OnCleanStart += () => _SpawnedThisRun = false;
 
         List<int> shopItems = new(){
-            IDs.Pickups["insurance_policy"],
+            Lazy.PickupId<InsurancePolicy>(),
         };
 
         bool fixedSpawn = CwaffConfig._Gunfig.Value(CwaffConfig._SHOP_KEY) == "Classic";
