@@ -9,7 +9,7 @@ public class Yggdrashell : CwaffGun
 
     private const float _PARTICLE_RATE          = 0.03f;
     private const float _LIFEFORCE_VALUE        = 100f;
-    private const float _LEAF_GLOW              = 20f;
+    private const float _LEAF_GLOW              = 100f;
     private const float _ACCUM_RATE             = 2f;
     private static readonly float[] _Thresholds = [0f, 1f * _LIFEFORCE_VALUE, 3f * _LIFEFORCE_VALUE, 6f * _LIFEFORCE_VALUE, 10f * _LIFEFORCE_VALUE];
 
@@ -95,7 +95,7 @@ public class Yggdrashell : CwaffGun
                 endScale         : 0.1f,
                 randomFrame      : true,
                 emissivePower    : _LEAF_GLOW,
-                emitColorPower   : _LEAF_GLOW,
+                emitColorPower   : 1.55f,
                 emissiveColor    : _LeafColor
               );
         }
@@ -135,9 +135,9 @@ public class Yggdrashell : CwaffGun
             startScale: 1.0f,
             endScale: 0.1f,
             randomFrame: true,
-            emissivePower    : _LEAF_GLOW,
-            emitColorPower   : _LEAF_GLOW,
-            emissiveColor    : _LeafColor
+            emissivePower: _LEAF_GLOW,
+            emitColorPower: 1.55f,
+            emissiveColor: _LeafColor
           );
     }
 
@@ -208,7 +208,7 @@ public class Yggdrashell : CwaffGun
             endScale         : 0.1f,
             randomFrame      : true,
             emissivePower    : _LEAF_GLOW,
-            emitColorPower   : _LEAF_GLOW,
+            emitColorPower   : 1.55f,
             emissiveColor    : _LeafColor
           );
 

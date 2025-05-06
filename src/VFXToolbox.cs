@@ -1153,11 +1153,13 @@ public partial class CwaffVFX // private
         if (this._changesScale)
             this._endScale = endScale.Value;
 
-        this._sprite.usesOverrideMaterial = true;
+        this._sprite.OverrideMaterialMode = SpriteMaterialOverrideMode.OVERRIDE_MATERIAL_COMPLEX;
         this._material = this._sprite.renderer.material;
+        this._sprite.ApplyEmissivePropertyBlock = false;
         if (emissivePower > 0)
         {
-            this._sprite.ApplyEmissivePropertyBlock = true;
+            this._material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+            this._material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
             if (emissiveColor is Color emissiveColorValue)
             {
                 this._material.SetColor("_EmissiveColor", emissiveColorValue);
@@ -1171,7 +1173,6 @@ public partial class CwaffVFX // private
         }
         else
         {
-            this._sprite.ApplyEmissivePropertyBlock = false;
             this._material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
         }
 
