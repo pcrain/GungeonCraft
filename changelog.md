@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.25.2 (TBD)
+
+- Improved muzzle lighting for Natascha and Alyx
+
 ## 1.25.1 (2025-05-04)
 
 - Fixed enemy killed by [REDACTED] not being remembered when reloading a midgame save

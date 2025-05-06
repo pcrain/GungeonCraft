@@ -28,7 +28,8 @@ public class Alyx : CwaffGun
         Lazy.SetupGun<Alyx>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FULLAUTO, reloadTime: 0.5f, ammo: _BASE_MAX_AMMO,
             shootFps: 20, reloadFps: 20, muzzleVFX: "muzzle_alyx", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
-            reloadAudio: "alyx_reload_sound")
+            reloadAudio: "alyx_reload_sound", muzzleLightStrength: 50.0f, muzzleLightRange: 0.25f, muzzleLightColor: Color.green,
+            muzzleEmission: 34.77f, muzzleEmissionColorPower: 24.9f, muzzleEmissionColor: Color.green)
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .InitProjectile(GunData.New(clipSize: 10, shootStyle: ShootStyle.Automatic, customClip: true, damage: 15.0f, speed: 20.0f, poison: 1.0f,
             fire: 1.0f, sprite: "alyx_projectile", fps: 16, scale: 0.5625f, anchor: Anchor.MiddleCenter, spawnSound: "alyx_shoot_sound", uniqueSounds: true));

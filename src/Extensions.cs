@@ -746,7 +746,9 @@ public static class Extensions
       gun.SetGunAudio(name: gun.idleAnimation, audio: audio, frame: frame);
     return gun;
   }
-  public static Gun SetMuzzleVFX(this Gun gun, string resPath = null, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft, bool orphaned = false, float emissivePower = -1, bool continuous = false)
+  public static Gun SetMuzzleVFX(this Gun gun, string resPath = null, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft,
+    bool orphaned = false, float emissivePower = -1, float emissiveColorPower = -1f, Color? emissiveColor = null, bool continuous = false, bool unlit = true,
+    float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null)
   {
     if (string.IsNullOrEmpty(resPath))
     {
@@ -755,7 +757,8 @@ public static class Extensions
     }
 
     gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
-      loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower);
+      loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower, emissiveColour: emissiveColor,
+      emissiveColorPower: emissiveColorPower, unlit: unlit, lightStrength: lightStrength, lightRange: lightRange, lightColor: lightColor);
     gun.usesContinuousMuzzleFlash = continuous;
     return gun;
   }
@@ -893,6 +896,12 @@ public static class Extensions
   /// <param name="muzzleScale">Scale for the gun's muzzle VFX.</param>
   /// <param name="muzzleAnchor">Anchor for the gun's muzzle VFX.</param>
   /// <param name="muzzleEmission">Emission for the gun's muzzle VFX.</param>
+  /// <param name="muzzleEmissionColor">Emission color for the gun's muzzle VFX.</param>
+  /// <param name="muzzleEmissionColorPower">Emissiive color power for the gun's muzzle VFX.</param>
+  /// <param name="muzzleLit">Whether the gun's muzzle VFX are lit (true) or unlit (false, default).</param>
+  /// <param name="muzzleLightStrength">The strength of the lighting produced by the muzzle. Note this is separate from muzzle emission.</param>
+  /// <param name="muzzleLightRange">The range of the lighting produced by the muzzle.</param>
+  /// <param name="muzzleLightColor">The color of the lighting produced by the muzzle.</param>
   /// <param name="carryOffset">Pixel offset for the gun's carry point relative to the player.</param>
   /// <param name="preventRotation">Whether the gun should be prevented from rotating with the player's aim direction.</param>
   /// <param name="curse">The amount of curse gained from picking up the gun.</param>
@@ -916,7 +925,8 @@ public static class Extensions
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
-    float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
+    float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, Color? muzzleEmissionColor = null, float muzzleEmissionColorPower = -1f, bool muzzleLit = false, float muzzleLightStrength = 0f,
+    float muzzleLightRange = 0f, Color? muzzleLightColor = null, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
     bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f)
@@ -1004,14 +1014,20 @@ public static class Extensions
     else
     {
       gun.SetMuzzleVFX(
-        resPath       : muzzleVFX,
-        fps           : muzzleFps,
-        scale         : muzzleScale,
-        anchor        : muzzleAnchor,
-        emissivePower : muzzleEmission,
-        loops         : false,
-        orphaned      : false,
-        continuous    : false
+        resPath            : muzzleVFX,
+        fps                : muzzleFps,
+        scale              : muzzleScale,
+        anchor             : muzzleAnchor,
+        emissivePower      : muzzleEmission,
+        emissiveColor      : muzzleEmissionColor,
+        emissiveColorPower : muzzleEmissionColorPower,
+        loops              : false,
+        orphaned           : false,
+        continuous         : false,
+        unlit              : !muzzleLit,
+        lightStrength      : muzzleLightStrength,
+        lightRange         : muzzleLightRange,
+        lightColor         : muzzleLightColor
         );
     }
 

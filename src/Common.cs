@@ -110,6 +110,7 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
 
     public static void CompareFieldsAndProperties<T>(T o1, T o2)
     {
+        // System.Console.WriteLine($"comparing fields and properties for {typeof(T)}");
         // Type type = o.GetType();
         Type type = typeof(T);
         foreach (var f in type.GetFields()) {

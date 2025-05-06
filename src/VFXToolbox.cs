@@ -79,8 +79,8 @@ public static class VFX
     /// </summary>
     public static void RegisterVFX(string name, List<string> spritePaths, float fps = 2, bool loops = true, int loopStart = -1,
         float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0,
-        bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null,
-        bool orphaned = false, bool attached = true, bool unlit = false)
+        bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, float emissiveColorPower = -1f, Color? emissiveColour = null,
+        bool orphaned = false, bool attached = true, bool unlit = false, float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null)
     {
         if (animations.ContainsKey(name))
         {
@@ -106,15 +106,20 @@ public static class VFX
         else
             defaultDef.colliderVertices = new Vector3[]{Vector3.zero, defaultDef.position3}; //NOTE: the original code for this was wrong and probably unused
         sprite.SetSprite(Collection, spriteId);
+        sprite.renderer.sortingLayerName = "Player";
+        sprite.renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
 
         tk2dSpriteAnimationClip clip = vfxEffect.NewAnimation(animName: "start", spritePaths: spritePaths, fps: fps, loops: loops, loopStart: loopStart,
             anchor: anchor, emissivePower: emissivePower, emissiveColour: emissiveColour);
-        Shader shader = ShaderCache.Acquire(unlit ?
-            "Brave/UnlitTintableCutoutColorEmissive" : "Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
         if (emissivePower > 0) {
-            sprite.renderer.material.shader = shader;
+            sprite.renderer.material.shader = ShaderCache.Acquire(unlit
+                ? "Brave/UnlitTintableCutoutColorEmissive" : "Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
             sprite.renderer.material.SetFloat("_EmissivePower", emissivePower);
-            sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+            sprite.renderer.material.SetFloat("_EmissiveColorPower", (emissiveColorPower >= 0f) ? emissiveColorPower : 1.55f);
+        }
+        else
+        {
+            sprite.renderer.material.shader = ShaderCache.Acquire(unlit ? "Brave/PlayerShader" : "tk2d/CutoutVertexColorTilted");
         }
         if (emissiveColour != null)
             sprite.renderer.material.SetColor("_EmissiveColor", (Color)emissiveColour);
@@ -132,6 +137,19 @@ public static class VFX
         }
         if (scale != 1.0f)
             sprite.scale = new Vector3(scale, scale, scale);
+
+        if (lightStrength > 0)
+        {
+            Light light = new GameObject().AddComponent<Light>();
+            light.color = lightColor ?? Color.white;
+            light.intensity = lightStrength;
+            light.range = lightRange;
+            light.type = LightType.Point;
+            light.bounceIntensity = 1f;
+            light.gameObject.transform.parent = vfxEffect.transform;
+            light.gameObject.transform.localPosition = new Vector3(0, 0, -0.8f);
+            light.gameObject.AddComponent<ObjectHeightController>().heightOffGround = -0.8f;
+        }
 
         VFXObject vfxObject = new(){
             attached        = attached,
@@ -154,7 +172,10 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXObject
     /// </summary>
-    public static GameObject Create(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static GameObject Create(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter,
+        IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
+        float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
+        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f)
     {
         RegisterVFX(
             name           : name,
@@ -172,7 +193,12 @@ public static class VFX
             emissivePower  : emissivePower,
             emissiveColour : emissiveColour,
             orphaned       : orphaned,
-            attached       : attached
+            attached       : attached,
+            unlit          : unlit,
+            lightStrength  : lightStrength,
+            lightRange     : lightRange,
+            lightColor     : lightColor,
+            emissiveColorPower: emissiveColorPower
             );
         return animations[name];
     }
@@ -180,7 +206,10 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXPool
     /// </summary>
-    public static VFXPool CreatePool(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static VFXPool CreatePool(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter,
+        IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
+        float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
+        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f)
     {
         RegisterVFX(
             name           : name,
@@ -198,7 +227,12 @@ public static class VFX
             emissivePower  : emissivePower,
             emissiveColour : emissiveColour,
             orphaned       : orphaned,
-            attached       : attached
+            attached       : attached,
+            unlit          : unlit,
+            lightStrength  : lightStrength,
+            lightRange     : lightRange,
+            lightColor     : lightColor,
+            emissiveColorPower: emissiveColorPower
             );
         return vfxpool[name];
     }
@@ -206,7 +240,10 @@ public static class VFX
     /// <summary>
     /// Register and return a VFXComplex
     /// </summary>
-    public static VFXComplex CreateComplex(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true)
+    public static VFXComplex CreateComplex(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter,
+        IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
+        float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
+        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f)
     {
         RegisterVFX(
             name           : name,
@@ -224,7 +261,12 @@ public static class VFX
             emissivePower  : emissivePower,
             emissiveColour : emissiveColour,
             orphaned       : orphaned,
-            attached       : attached
+            attached       : attached,
+            unlit          : unlit,
+            lightStrength  : lightStrength,
+            lightRange     : lightRange,
+            lightColor     : lightColor,
+            emissiveColorPower: emissiveColorPower
             );
         return vfxcomplex[name];
     }

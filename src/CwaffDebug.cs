@@ -1,11 +1,14 @@
+//NOTE: uncomment to make every chest item the same
+// #define DEBUGCHESTS
+//NOTE: uncomment to print out properties of all spawned VFXComplex object
+// #define DEBUGVFX
+
 namespace CwaffingTheGungy;
 
 /// <summary>Class mostly containing debug Harmony patches that can be commented / uncommented as needed</summary>
 [HarmonyPatch]
 internal static class CwaffDebug
 {
-  //NOTE: uncomment to make every chest item the same
-  // #define DEBUGCHESTS
 
   #if DEBUG && DEBUGCHESTS
     private static int _DebugItemId => Lazy.PickupId<Gunbrella>();
@@ -43,6 +46,41 @@ internal static class CwaffDebug
     {
       if (C.DEBUG_BUILD)
         i = PickupObjectDatabase.GetById(_DebugItemId);
+    }
+  #endif
+
+  #if DEBUG && DEBUGVFX
+    // protected void InternalSpawnAtLocation(Vector3 position, float zRotation, Transform parent, Vector2? sourceNormal, Vector2? sourceVelocity, Action<VFXObject, tk2dSprite> vfxSpriteManipulator, bool keepReferences, SpawnMethod spawnMethod, bool ignoresPools)
+    [HarmonyPatch]
+    private static class VFXComplexInternalSpawnAtLocationPatch
+    {
+        [HarmonyPatch(typeof(VFXComplex), nameof(VFXComplex.InternalSpawnAtLocation))]
+        static void Prefix(VFXComplex __instance, Vector3 position, float zRotation, Transform parent, Vector2? sourceNormal, Vector2? sourceVelocity, Action<VFXObject, tk2dSprite> vfxSpriteManipulator, bool keepReferences, VFXComplex.SpawnMethod spawnMethod, bool ignoresPools)
+        {
+            System.Console.WriteLine($"spawning VFX with the following properties:");
+            System.Console.WriteLine($"  num vfx: {__instance.effects.Length}");
+            for (int i = 0; i < __instance.effects.Length; ++i)
+            {
+                GameObject v = __instance.effects[i].effect;
+                if (!v)
+                {
+                    System.Console.WriteLine($"   vfx {i+1} name: NULL");
+                    continue;
+                }
+                System.Console.WriteLine($"   vfx {i+1} name: {v.name}");
+                System.Console.WriteLine($"    vfx {i+1} gameObject layer: {v.layer} ({LayerMask.LayerToName(v.layer)})");
+                System.Console.WriteLine($"    vfx {i+1} render layer: {v.GetComponent<MeshRenderer>().sortingLayerName} ({v.GetComponent<MeshRenderer>().sortingLayerID})");
+                tk2dBaseSprite s = v.GetComponent<tk2dBaseSprite>();
+                System.Console.WriteLine($"    vfx {i+1} sprite: {s.GetCurrentSpriteDef().name}");
+                Material m = s.renderer.material;
+                System.Console.WriteLine($"    vfx {i+1} material: {m.name} (override? {s.usesOverrideMaterial})");
+                System.Console.WriteLine($"    vfx {i+1} shader: {m.shader.name}");
+                System.Console.WriteLine($"    vfx {i+1} emissive color: {m.GetColor("_EmissiveColor")}");
+                System.Console.WriteLine($"    vfx {i+1} emissive power: {m.GetFloat("_EmissivePower")}");
+                System.Console.WriteLine($"    vfx {i+1} emissive color power: {m.GetFloat("_EmissiveColorPower")}");
+                System.Console.WriteLine($"    vfx {i+1} emissive sensitivity: {m.GetFloat("_EmissiveThresholdSensitivity")}");
+            }
+        }
     }
   #endif
 }
