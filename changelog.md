@@ -8,6 +8,7 @@
 - Fixed premature charging sound effect playing when firing normal projectiles with Ki Blast's mastery active
 - Fixed onslaught of null derefs caused by Sextant trying to load stale UI elements when loading a new floor
 - Replaced Voodoo Doll item sprite with a new one by Dallan (thanks Dallan!)
+- Fixed Ki Blast idle sprite appearing for a single frame under certain circumstances where it should be invisible
 
 ## 1.25.1 (2025-05-04)
 

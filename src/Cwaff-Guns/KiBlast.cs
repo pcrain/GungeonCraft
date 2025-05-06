@@ -77,43 +77,6 @@ public class KiBlast : CwaffGun
         this._nextRecharge = _MAX_RECHARGE_TIME;
     }
 
-    public override void OnSwitchedToThisGun()
-    {
-        base.OnSwitchedToThisGun();
-        if (this.PlayerOwner is not PlayerController player)
-            return;
-        player.ToggleGunRenderers(false, ItemName);
-    }
-
-    public override void OnSwitchedAwayFromThisGun()
-    {
-        base.OnSwitchedAwayFromThisGun();
-        if (this.PlayerOwner is not PlayerController player)
-            return;
-        player.ToggleGunRenderers(true, ItemName);
-    }
-
-    public override void OnInitializedWithOwner(GameActor actor)
-    {
-        base.OnInitializedWithOwner(actor);
-        if (actor is not PlayerController player)
-            return;
-        player.ToggleGunRenderers(false, ItemName);
-    }
-
-    public override void OnDroppedByPlayer(PlayerController player)
-    {
-        player.ToggleGunRenderers(true, ItemName);
-        base.OnDroppedByPlayer(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.PlayerOwner)
-            this.PlayerOwner.ToggleGunRenderers(true, ItemName);
-        base.OnDestroy();
-    }
-
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
         base.OnReloadPressed(player, gun, manualReload);
@@ -212,7 +175,6 @@ public class KiBlast : CwaffGun
             this._timeCharging = 0.0f;
             UpdateIdleAnimation(); // reset idle animation to default if we're not actively charging or firing a kamehameha
         }
-        this.PlayerOwner.ToggleGunRenderers(!this.gun.isActiveAndEnabled, ItemName);
         if (this.gun.CurrentAmmo >= this.gun.AdjustedMaxAmmo)
             return;
         this._rechargeTimer += BraveTime.DeltaTime;
@@ -221,6 +183,14 @@ public class KiBlast : CwaffGun
         this._rechargeTimer -= this._nextRecharge;
         this._nextRecharge = Mathf.Max(this._nextRecharge * _RECHARGE_DECAY, _MIN_RECHARGE_TIME);
         this.gun.ammo = Math.Min(this.gun.ammo + 1, this.gun.AdjustedMaxAmmo);
+    }
+
+    private void LateUpdate()
+    {
+        bool ownerless = !this.PlayerOwner;
+        this.gun.sprite.renderer.enabled = ownerless;
+        if (!this.gun.sprite.renderer.enabled)
+            SpriteOutlineManager.RemoveOutlineFromSprite(this.gun.sprite);
     }
 }
 
