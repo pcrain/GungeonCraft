@@ -68,6 +68,7 @@ public class Sextant : CwaffGun
     private Vector2? _lastRebound       = null;
 
     private bool _focused               = false;
+    private bool _uiElementsValid       = false;
 
     public bool canDoCrit = false;
 
@@ -90,29 +91,53 @@ public class Sextant : CwaffGun
 
     private void Start()
     {
-        this._shapes.Add(this._perfectShot = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._reboundShot = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._reboundArc = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._leftBaseSpread = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._rightBaseSpread = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._leftFocus = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._rightFocus = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._leftAdjSpread = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._rightAdjSpread = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._aimAngleArc = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._topBbox = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._bottomBbox = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._leftBbox = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._rightBbox = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._weakPointL = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._weakPointR = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._weakPointT = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._weakPointB = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._weakPointArcL = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._weakPointArcR = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._weakPointArcT = new GameObject().AddComponent<Geometry>());
-        this._shapes.Add(this._weakPointArcB = new GameObject().AddComponent<Geometry>());
+        RegenerateGeometry();
+        RegenerateLabels();
+        this._uiElementsValid = true;
 
+        // #if DEBUG
+        // foreach (RoomHandler room in GameManager.Instance.Dungeon.data.rooms)
+        //     if (room.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
+        //         System.Console.WriteLine($"boss room is {room.GetRoomName()}");
+        // #endif
+    }
+
+    private void RegenerateGeometry()
+    {
+        foreach (Geometry g in this._shapes)
+            if (g)
+                UnityEngine.Object.Destroy(g.gameObject);
+        this._shapes.Clear();
+        this._shapes.Add(this._perfectShot = MakeNewGeometry());
+        this._shapes.Add(this._reboundShot = MakeNewGeometry());
+        this._shapes.Add(this._reboundArc = MakeNewGeometry());
+        this._shapes.Add(this._leftBaseSpread = MakeNewGeometry());
+        this._shapes.Add(this._rightBaseSpread = MakeNewGeometry());
+        this._shapes.Add(this._leftFocus = MakeNewGeometry());
+        this._shapes.Add(this._rightFocus = MakeNewGeometry());
+        this._shapes.Add(this._leftAdjSpread = MakeNewGeometry());
+        this._shapes.Add(this._rightAdjSpread = MakeNewGeometry());
+        this._shapes.Add(this._aimAngleArc = MakeNewGeometry());
+        this._shapes.Add(this._topBbox = MakeNewGeometry());
+        this._shapes.Add(this._bottomBbox = MakeNewGeometry());
+        this._shapes.Add(this._leftBbox = MakeNewGeometry());
+        this._shapes.Add(this._rightBbox = MakeNewGeometry());
+        this._shapes.Add(this._weakPointL = MakeNewGeometry());
+        this._shapes.Add(this._weakPointR = MakeNewGeometry());
+        this._shapes.Add(this._weakPointT = MakeNewGeometry());
+        this._shapes.Add(this._weakPointB = MakeNewGeometry());
+        this._shapes.Add(this._weakPointArcL = MakeNewGeometry());
+        this._shapes.Add(this._weakPointArcR = MakeNewGeometry());
+        this._shapes.Add(this._weakPointArcT = MakeNewGeometry());
+        this._shapes.Add(this._weakPointArcB = MakeNewGeometry());
+    }
+
+    private void RegenerateLabels()
+    {
+        foreach (dfLabel l in this._labels)
+            if (l)
+                UnityEngine.Object.Destroy(l.gameObject);
+        this._labels.Clear();
         this._labels.Add(this._shotAngleLabel = MakeNewLabel());
         this._labels.Add(this._spreadLabel = MakeNewLabel());
         this._labels.Add(this._shotDistanceLabel = MakeNewLabel());
@@ -120,12 +145,6 @@ public class Sextant : CwaffGun
         this._labels.Add(this._widthLabel = MakeNewLabel());
         this._labels.Add(this._heightLabel = MakeNewLabel());
         this._labels.Add(this._damageLabel = MakeNewLabel());
-
-        // #if DEBUG
-        // foreach (RoomHandler room in GameManager.Instance.Dungeon.data.rooms)
-        //     if (room.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
-        //         System.Console.WriteLine($"boss room is {room.GetRoomName()}");
-        // #endif
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -225,9 +244,12 @@ public class Sextant : CwaffGun
     private void HideHUDElements()
     {
         foreach (Geometry g in this._shapes)
-            g._meshRenderer.enabled = false;
+            if (g)
+                g._meshRenderer.enabled = false;
         foreach (dfLabel label in this._labels)
         {
+            if (!label)
+                continue;
             label.Opacity = 0.0f;
             label.IsVisible = false;
         }
@@ -320,6 +342,17 @@ public class Sextant : CwaffGun
 
         base.Update();
         float dtime = BraveTime.DeltaTime;
+        if (GameManager.Instance.IsLoadingLevel)
+        {
+            this._uiElementsValid = false;
+            return;
+        }
+        if (!this._uiElementsValid || this._shapes.Count == 0 || !this._shapes[0] || this._labels.Count == 0 || !this._labels[0])
+        {
+            RegenerateGeometry();
+            RegenerateLabels();
+            this._uiElementsValid = true;
+        }
         if (GameManager.Instance.IsPaused)
         {
             HideHUDElements();
@@ -682,6 +715,11 @@ public class Sextant : CwaffGun
         public float lastRot;
     }
 
+    private Geometry MakeNewGeometry()
+    {
+        return new GameObject().AddComponent<Geometry>();
+    }
+
     internal static dfLabel MakeNewLabel()
     {
         dfLabel label = UnityEngine.Object.Instantiate(GameUIRoot.Instance.p_needsReloadLabel.gameObject, GameUIRoot.Instance.transform).GetComponent<dfLabel>();
@@ -698,7 +736,6 @@ public class Sextant : CwaffGun
         label.Opacity = 1f;
         label.Text = string.Empty;
         label.gameObject.SetActive(true);
-        // label.enabled = true;
         label.IsVisible = true;
         label.gameObject.AddComponent<LabelExt>();
         return label;

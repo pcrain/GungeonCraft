@@ -5,6 +5,7 @@
 - Improved muzzle lighting for Natascha and Alyx
 - Improved lighting on Yggdrashell's leaves and Ki Blast's projectiles
 - Fixed premature charging sound effect playing when firing normal projectiles with Ki Blast's mastery active
+- Fixed onslaught of null derefs caused by Sextant trying to load stale UI elements when loading a new floor
 
 ## 1.25.1 (2025-05-04)
 
