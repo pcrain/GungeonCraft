@@ -106,8 +106,6 @@ public static class VFX
         else
             defaultDef.colliderVertices = new Vector3[]{Vector3.zero, defaultDef.position3}; //NOTE: the original code for this was wrong and probably unused
         sprite.SetSprite(Collection, spriteId);
-        sprite.renderer.sortingLayerName = "Player";
-        sprite.renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
 
         tk2dSpriteAnimationClip clip = vfxEffect.NewAnimation(animName: "start", spritePaths: spritePaths, fps: fps, loops: loops, loopStart: loopStart,
             anchor: anchor, emissivePower: emissivePower, emissiveColour: emissiveColour);
@@ -122,7 +120,10 @@ public static class VFX
             sprite.renderer.material.shader = ShaderCache.Acquire(unlit ? "Brave/PlayerShader" : "tk2d/CutoutVertexColorTilted");
         }
         if (emissiveColour != null)
+        {
+            sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive"); //NOTE: tintable version doesn't have an _EmissiveColor property
             sprite.renderer.material.SetColor("_EmissiveColor", (Color)emissiveColour);
+        }
 
         animation.clips            = new tk2dSpriteAnimationClip[1]{clip};
         animator.Library           = animation;
@@ -1033,6 +1034,7 @@ public partial class CwaffVFX // private
     private bool       _shouldDespawn = false;
     private Transform  _anchorTransform = null;
     private Vector3    _anchorPos     = default;
+    private int        _lastSpriteId  = -1;
 
     /// <summary>Manager for our pooled projectiles</summary>
     private class CwaffVFXManager : MonoBehaviour
@@ -1155,14 +1157,23 @@ public partial class CwaffVFX // private
         this._material = this._sprite.renderer.material;
         if (emissivePower > 0)
         {
-            this._material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+            this._sprite.ApplyEmissivePropertyBlock = true;
+            if (emissiveColor is Color emissiveColorValue)
+            {
+                this._material.SetColor("_EmissiveColor", emissiveColorValue);
+                this._material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive"); //NOTE: tintable version doesn't have an _EmissiveColor property
+            }
+            else
+                this._material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
             this._material.SetFloat("_EmissivePower", emissivePower);
             this._material.SetFloat("_EmissiveColorPower", emitColorPower);
-            this._material.SetColor("_EmissiveColor", emissiveColor ?? Color.white);
             this._material.SetColor("_OverrideColor", overrideColor ?? Color.clear);
         }
         else
+        {
+            this._sprite.ApplyEmissivePropertyBlock = false;
             this._material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
+        }
 
         if (specificFrame >= 0)
             this._animator.PickFrame(frame: specificFrame);
@@ -1173,6 +1184,8 @@ public partial class CwaffVFX // private
             this._animator.Resume();
             this._animator.PlayFromFrame(0);
         }
+        this._lastSpriteId = this._sprite.spriteId;
+        this._sprite.UpdateMaterial();
 
         this._setup = true;
     }
@@ -1198,6 +1211,11 @@ public partial class CwaffVFX // private
             this._anchorPos = this._anchorTransform.position;
         }
         this._sprite.UpdateZDepth();
+        if (this._lastSpriteId != this._sprite.spriteId)
+        {
+            this._lastSpriteId = this._sprite.spriteId;
+            this._sprite.UpdateMaterial();
+        }
 
         if (this._changesScale)
         {

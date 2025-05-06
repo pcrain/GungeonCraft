@@ -3,6 +3,7 @@
 ## 1.25.2 (TBD)
 
 - Improved muzzle lighting for Natascha and Alyx
+- Improved lighting on Yggdrashell's leaves
 
 ## 1.25.1 (2025-05-04)
 

@@ -9,10 +9,12 @@ public class Yggdrashell : CwaffGun
 
     private const float _PARTICLE_RATE          = 0.03f;
     private const float _LIFEFORCE_VALUE        = 100f;
+    private const float _LEAF_GLOW              = 20f;
     private const float _ACCUM_RATE             = 2f;
     private static readonly float[] _Thresholds = [0f, 1f * _LIFEFORCE_VALUE, 3f * _LIFEFORCE_VALUE, 6f * _LIFEFORCE_VALUE, 10f * _LIFEFORCE_VALUE];
 
     internal static Color _EarthBlankColor         = new Color(0.75f, 1.0f, 0.75f, 1f);
+    internal static Color _LeafColor               = new Color(107/255f,164/255f,17/255f);
     internal static tk2dBaseSprite _HeartVFXSprite = null;
     internal static tk2dBaseSprite _ArmorVFXSprite = null;
     internal static GameObject _LeafVFX            = null;
@@ -92,8 +94,9 @@ public class Yggdrashell : CwaffGun
                 startScale       : 1.0f,
                 endScale         : 0.1f,
                 randomFrame      : true,
-                emissiveColor    : Color.green,
-                emissivePower    : 100f
+                emissivePower    : _LEAF_GLOW,
+                emitColorPower   : _LEAF_GLOW,
+                emissiveColor    : _LeafColor
               );
         }
         int oldTier = this.gun.CurrentStrengthTier;
@@ -131,7 +134,10 @@ public class Yggdrashell : CwaffGun
             lifetime: 0.5f,
             startScale: 1.0f,
             endScale: 0.1f,
-            randomFrame: true
+            randomFrame: true,
+            emissivePower    : _LEAF_GLOW,
+            emitColorPower   : _LEAF_GLOW,
+            emissiveColor    : _LeafColor
           );
     }
 
@@ -201,8 +207,9 @@ public class Yggdrashell : CwaffGun
             startScale       : 1.0f,
             endScale         : 0.1f,
             randomFrame      : true,
-            emissiveColor    : Color.green,
-            emissivePower    : 10f
+            emissivePower    : _LEAF_GLOW,
+            emitColorPower   : _LEAF_GLOW,
+            emissiveColor    : _LeafColor
           );
 
         this.OnReceivedDamage(this.PlayerOwner);
