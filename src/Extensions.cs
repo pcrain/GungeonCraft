@@ -401,11 +401,18 @@ public static class Extensions
       sprite.SetGlowiness(a);
   }
 
-  public static void SetGlowiness(this tk2dBaseSprite sprite, float glowAmount, Color? glowColor = null, Color? overrideColor = null, bool? clampBrightness = null)
+  public static void SetGlowiness(this tk2dBaseSprite sprite, float glowAmount, Color? glowColor = null, Color? overrideColor = null, bool? clampBrightness = null, float? glowColorPower = null)
   {
     sprite.usesOverrideMaterial = true;
     Material m = sprite.renderer.material;
-    m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+    if (glowColor is Color c)
+    {
+      m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive"); //NOTE: tintable version doesn't have an _EmissiveColor property
+      m.SetFloat("_EmissiveColorPower", glowColorPower ?? 1.55f);
+      m.SetColor("_EmissiveColor", c);
+    }
+    else
+      m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
     if (clampBrightness.HasValue)
     {
       if (!clampBrightness.Value)
@@ -420,11 +427,6 @@ public static class Extensions
       }
     }
     m.SetFloat("_EmissivePower", glowAmount);
-    if (glowColor is Color c)
-    {
-      m.SetFloat("_EmissiveColorPower", 1.55f);
-      m.SetColor("_EmissiveColor", c);
-    }
     if (overrideColor is Color c2)
       m.SetColor("_OverrideColor", c2);
   }

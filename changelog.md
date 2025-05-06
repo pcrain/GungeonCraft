@@ -3,7 +3,8 @@
 ## 1.25.2 (TBD)
 
 - Improved muzzle lighting for Natascha and Alyx
-- Improved lighting on Yggdrashell's leaves
+- Improved lighting on Yggdrashell's leaves and Ki Blast's projectiles
+- Fixed premature charging sound effect playing when firing normal projectiles with Ki Blast's mastery active
 
 ## 1.25.1 (2025-05-04)
 

@@ -105,8 +105,12 @@ public sealed class GunData
   public string spinupSound;
   public float glowAmount;
   public Color? glowColor;
+  public float? glowColorPower;
   public int beamDissipateFps;
   public float? spinRate;
+  public float? lightStrength;
+  public float? lightRange;
+  public Color? lightColor;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -201,8 +205,12 @@ public sealed class GunData
   /// <param name="spinupSound">The sound to play while the gun is spinning up.</param>
   /// <param name="glowAmount">The emissive power of the projectile.</param>
   /// <param name="glowColor">The emissive color of the projectile.</param>
+  /// <param name="glowColorPower">The emissive color power of the projectile.</param>
   /// <param name="beamDissipateFps">The framerate for the beam's dissipate animation.</param>
   /// <param name="spinRate">The speed at which the projectile spins while moving in degrees per second (requires shouldRotate == false).</param>
+  /// <param name="lightStrength">The strength of the light produced by the projectile.</param>
+  /// <param name="lightRange">The range of the light produced by the projectile.</param>
+  /// <param name="lightColor">The color of the light produced by the projectile.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -219,7 +227,8 @@ public sealed class GunData
     float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f, GoopDefinition beamGoop = null, bool? beamInterpolate = null,
     int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null, float beamKnockback = -1f,
     BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
-    bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, int beamDissipateFps = -1, float? spinRate = null)
+    bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, float? glowColorPower = null,
+    int beamDissipateFps = -1, float? spinRate = null, float? lightStrength = null, float? lightRange = null, Color? lightColor = null)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -313,8 +322,12 @@ public sealed class GunData
       _Instance.spinupSound                       = spinupSound;
       _Instance.glowAmount                        = glowAmount;
       _Instance.glowColor                         = glowColor;
+      _Instance.glowColorPower                    = glowColorPower;
       _Instance.beamDissipateFps                  = beamDissipateFps;
       _Instance.spinRate                          = spinRate;
+      _Instance.lightStrength                     = lightStrength;
+      _Instance.lightRange                        = lightRange;
+      _Instance.lightColor                        = lightColor;
       return _Instance;
   }
 }
@@ -457,6 +470,9 @@ public static class GunBuilder
       c.becomeDebris        = b.becomeDebris        ?? c.becomeDebris;
       c.preventSparks       = b.preventSparks       ?? c.preventSparks;
       c.spinRate            = b.spinRate            ?? c.spinRate;
+      c.lightStrength       = b.lightStrength       ?? c.lightStrength;
+      c.lightRange          = b.lightRange          ?? c.lightRange;
+      c.lightColor          = b.lightColor          ?? c.lightColor;
 
     // Non-defaulted
     p.BossDamageMultiplier         = b.bossDamageMult;
@@ -493,7 +509,7 @@ public static class GunBuilder
 
     // Determine the emissive properties of the projectile
     if (b.glowAmount > 0f)
-      p.sprite.SetGlowiness(glowAmount: b.glowAmount, glowColor: b.glowColor);
+      p.sprite.SetGlowiness(glowAmount: b.glowAmount, glowColor: b.glowColor, glowColorPower: b.glowColorPower);
 
     return p;
   }

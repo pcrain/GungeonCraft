@@ -22,6 +22,7 @@ public class KiBlast : CwaffGun
     private const float _CHARGE_START_TIME = 0.5f;
     private const float _CHARGE_FINISH_TIME = 4.5f;
     private const float _CHARGE_TOTAL_TIME = _CHARGE_FINISH_TIME - _CHARGE_START_TIME;
+    private const float _CHARGE_SOUND_DELAY = 0.25f;
 
     private Vector2 _currentTarget = Vector2.zero;
 
@@ -29,6 +30,7 @@ public class KiBlast : CwaffGun
     private float _rechargeTimer = 0.0f;
     private float _nextRecharge = 0.0f;
     private int _nextChargeSound = 1;
+    private float _timeCharging = 0.0f;
 
     public static void Init()
     {
@@ -41,8 +43,9 @@ public class KiBlast : CwaffGun
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, chargeTime: 0.0f,
             customClip: true, damage: 4.0f, range: 1000.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
-            ignoreDamageCaps: true, hitSound: "ki_blast_explode_sound", spawnSound: "ki_blast_sound"))
-          .SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f))
+            ignoreDamageCaps: true, hitSound: "ki_blast_explode_sound", spawnSound: "ki_blast_sound",
+            glowAmount: 50.0f, lightStrength: 2.1f, lightRange: 2.4f, lightColor: Color.cyan))
+          .SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f, emissivePower: 10f))
           .Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.2f;
@@ -158,7 +161,8 @@ public class KiBlast : CwaffGun
         bool isChargingOrFiring = false;
         if (beam.State == BeamState.Charging)
         {
-            this.gun.LoopSoundIf(true, "kamehameha_charge_sound");
+            this._timeCharging += BraveTime.DeltaTime;
+            this.gun.LoopSoundIf(this._timeCharging >= _CHARGE_SOUND_DELAY, "kamehameha_charge_sound");
              //NOTE: first frame of charge animation is blank to avoid 1-frame delay on making it invisible
             bool preCharge = beam.m_chargeTimer < _CHARGE_START_TIME;
             if (beam.m_beamMuzzleAnimator && beam.m_beamMuzzleAnimator.sprite)
@@ -204,7 +208,10 @@ public class KiBlast : CwaffGun
         if (!this.PlayerOwner || !this.gun)
             return;
         if (!HandleKamehameha())
+        {
+            this._timeCharging = 0.0f;
             UpdateIdleAnimation(); // reset idle animation to default if we're not actively charging or firing a kamehameha
+        }
         this.PlayerOwner.ToggleGunRenderers(!this.gun.isActiveAndEnabled, ItemName);
         if (this.gun.CurrentAmmo >= this.gun.AdjustedMaxAmmo)
             return;

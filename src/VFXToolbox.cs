@@ -141,6 +141,7 @@ public static class VFX
 
         if (lightStrength > 0)
         {
+            //REFACTOR: see if this is a use case for LightAPI
             Light light = new GameObject().AddComponent<Light>();
             light.color = lightColor ?? Color.white;
             light.intensity = lightStrength;
@@ -1011,6 +1012,12 @@ public partial class CwaffVFX // private
     private static readonly LinkedList<CwaffVFX> _SpawnedVFX = new();
     private static readonly LinkedList<CwaffVFX> _DespawnedVFX = new();
 
+    // constants
+    private static readonly int _EmissivePowerId      = Shader.PropertyToID("_EmissivePower");
+    private static readonly int _EmissiveColorId      = Shader.PropertyToID("_EmissiveColor");
+    private static readonly int _EmissiveColorPowerId = Shader.PropertyToID("_EmissiveColorPower");
+    private static readonly int _OverrideColorId      = Shader.PropertyToID("_OverrideColor");
+
     // locals
     private GameObject _vfx;
     private LinkedListNode<CwaffVFX> _node;
@@ -1162,14 +1169,14 @@ public partial class CwaffVFX // private
             this._material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
             if (emissiveColor is Color emissiveColorValue)
             {
-                this._material.SetColor("_EmissiveColor", emissiveColorValue);
+                this._material.SetColor(_EmissiveColorId, emissiveColorValue);
                 this._material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive"); //NOTE: tintable version doesn't have an _EmissiveColor property
             }
             else
                 this._material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            this._material.SetFloat("_EmissivePower", emissivePower);
-            this._material.SetFloat("_EmissiveColorPower", emitColorPower);
-            this._material.SetColor("_OverrideColor", overrideColor ?? Color.clear);
+            this._material.SetFloat(_EmissivePowerId, emissivePower);
+            this._material.SetFloat(_EmissiveColorPowerId, emitColorPower);
+            this._material.SetColor(_OverrideColorId, overrideColor ?? Color.clear);
         }
         else
         {

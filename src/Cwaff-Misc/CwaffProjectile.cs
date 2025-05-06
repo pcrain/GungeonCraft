@@ -17,6 +17,9 @@ public class CwaffProjectile : MonoBehaviour
     public bool becomeDebris         = false;
     public bool preventSparks        = false;
     public float spinRate            = 0f;
+    public float lightStrength       = 0f;
+    public float lightRange          = 0f;
+    public Color lightColor          = Color.white;
 
     private Projectile _projectile;
     private PlayerController _owner;
@@ -38,6 +41,23 @@ public class CwaffProjectile : MonoBehaviour
               base.gameObject.Play($"{spawnSound}_stop_all");
             base.gameObject.Play(spawnSound);
           }
+        #endregion
+
+        #region Light Handling
+        if (this.lightStrength > 0)
+        {
+          Light light = new GameObject().AddComponent<Light>();
+          light.color = this.lightColor;
+          light.intensity = this.lightStrength;
+          light.range = this.lightRange;
+          light.type = LightType.Point;
+          light.bounceIntensity = 1f;
+          light.renderMode = LightRenderMode.Auto;
+          light.shadows = LightShadows.None;
+          light.gameObject.transform.parent = base.transform;
+          light.gameObject.transform.localPosition = new Vector3(0, 0, -0.8f);
+          light.gameObject.AddComponent<ObjectHeightController>().heightOffGround = -0.8f;
+        }
         #endregion
     }
 
