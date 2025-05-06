@@ -25,7 +25,8 @@ public class Macheening : CwaffGun
           .LoopAnimation(gun.shootAnimation, 4)
           .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.11f, shootStyle: ShootStyle.Automatic, scale: 0.75f,
             damage: 7.0f, speed: 50f, range: 1000f, sprite: "macheening_projectile", hideAmmo: true, spinupTime: _BASE_SPINUP_TIME,
-            hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound", glowAmount: 20f, glowColor: Color.yellow))
+            hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound", glowAmount: 20f, glowColor: Color.yellow,
+            lightStrength: 5f, lightRange: 2f))
           .SetAllImpactVFX(Items.Excaliber.AsGun().DefaultModule.projectiles[0].hitEffects.enemy)
           .Attach<CombineEvaporateEffect>(c => {
             CombineEvaporateEffect cvePrefab =

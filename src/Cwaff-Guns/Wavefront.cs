@@ -17,7 +17,8 @@ public class Wavefront : CwaffGun
             attacksThroughWalls: true, smoothReload: 0.1f)
           .SetReloadAudio("wavefront_reload_sound", 0, 6, 12, 18)
           .InitProjectile(GunData.New(damage: 12f, clipSize: 12, cooldown: 0.125f, shootStyle: ShootStyle.Automatic, range: 999999f, speed: 60f, shouldRotate: true,
-            customClip: true, sprite: "wavefront_projectile_alt", scale: 0.25f, fps: 24, glowAmount: 1f, glowColor: Color.cyan))
+            customClip: true, sprite: "wavefront_projectile_alt", scale: 0.25f, fps: 24, glowAmount: 1f, glowColor: Color.cyan, lightStrength: 10f, lightRange: 1f,
+            lightColor: Color.white))
           .SetEnemyImpactVFX(VFX.CreatePool("wavefront_impact_particles", fps: 24, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f, emissivePower: 2f))
           .Attach<TeslaProjectileBehavior>();
 

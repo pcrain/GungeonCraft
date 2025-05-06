@@ -19,7 +19,7 @@ public class Lightwing : CwaffGun
             muzzleVFX: "muzzle_lightwing", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
             fireAudio: "lightwing_fire_sound", reloadAudio: "lightwing_reload_sound", smoothReload: 0.1f)
           .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 4.0f, customClip: true,
-            speed: 20.0f, collidesWithProjectiles: true)) // collidesWithProjectiles needs to be set up front because...Unity
+            speed: 20.0f, collidesWithProjectiles: true, glowAmount: 30f, lightStrength: 5f, lightRange: 2f, lightColor: Color.white)) // collidesWithProjectiles needs to be set up front because...Unity
           .AddAnimations(
             AnimatedBullet.Create(refClip: ref _NeutralSprite,    name: "lightwing_projectile",          fps: 12, anchor: Anchor.MiddleLeft),
             AnimatedBullet.Create(refClip: ref _HuntingSprite,    name: "lightwing_projectile_hunt",     fps: 12, anchor: Anchor.MiddleLeft),

@@ -17,8 +17,9 @@ namespace CwaffingTheGungy;
         omitb:Rusty               // poor quality items (not necessarily D tier)
         omitb:Ironside            // armour and defense themed items
         omitb:Boomhildr           // explosive themed items
+        [OMITB doug shop]         // bullet modifiers (broadly, anything that ends with Bullets or Rounds)
 
-        ski:Arms_Dealer           // body implants and transplants that can physically replace organs
+        ski:Arms_Dealer           // body implants and transplants that can physically replace organs (ask ski before adding)
 
         cg:cammy                  // companions and companion-adjacent items
 */

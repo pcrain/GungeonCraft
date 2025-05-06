@@ -129,11 +129,12 @@ public class Exceptional : CwaffGun
 
     private static void SpawnErrorChestImmediately()
     {
-        Lazy.SpawnChestWithSpecificItem(
+        Chest chest = Lazy.SpawnChestWithSpecificItem(
           pickup: Lazy.Pickup<Exceptional>(),
           position: GameManager.Instance.BestActivePlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success),
           overrideChestQuality: ItemQuality.S,
           overrideJunk: true);
+        chest.MimicGuid = null;
     }
 
     public class ExceptionalAmmoDisplay : CustomAmmoDisplay

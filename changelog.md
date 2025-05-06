@@ -3,9 +3,11 @@
 ## 1.25.2 (TBD)
 
 - Improved muzzle lighting for Natascha and Alyx
-- Improved lighting on Yggdrashell's leaves and Ki Blast's projectiles
+- Improved lighting on Yggdrashell's leaves
+- Improved lighting on projectiles from Ki Blast, Suncaster, Plasmarble, Macheening, Wavefront, and Lightwing
 - Fixed premature charging sound effect playing when firing normal projectiles with Ki Blast's mastery active
 - Fixed onslaught of null derefs caused by Sextant trying to load stale UI elements when loading a new floor
+- Replaced Voodoo Doll item sprite with a new one by Dallan (thanks Dallan!)
 
 ## 1.25.1 (2025-05-04)
 
@@ -26,6 +28,7 @@
 
 - Fixed Sextant being able to target companions
 - Fixed potential null deref when starting a run with Gyroscope or Drifter's Headgear (e.g., with Paradox)
+- Updated required Alexandria version to 0.4.21 for new Dodge Roll API features
 
 ## 1.24.0 (2025-04-27)
 
