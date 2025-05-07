@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.25.3 (TBD)
+
+- Fixed earsplitting audio glitch when cancelling mastered Ki Blast's charge attack at the wrong time
+
 ## 1.25.2 (2025-05-06)
 
 #### Balance Changes and Polish:

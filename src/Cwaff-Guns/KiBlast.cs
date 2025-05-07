@@ -113,7 +113,7 @@ public class KiBlast : CwaffGun
     {
         this.percentSpeedWhileFiring = 1f;
         if (!this.gun.IsFiring)
-            _nextChargeSound = 1;
+            return false;
         if (this.gun.Volley.projectiles.Count < 2
           || this.gun.m_moduleData == null
           || !this.gun.m_moduleData.TryGetValue(this.gun.Volley.projectiles[1], out ModuleShootData msd))
@@ -173,6 +173,7 @@ public class KiBlast : CwaffGun
         if (!HandleKamehameha())
         {
             this._timeCharging = 0.0f;
+            this._nextChargeSound = 1;
             UpdateIdleAnimation(); // reset idle animation to default if we're not actively charging or firing a kamehameha
         }
         if (this.gun.CurrentAmmo >= this.gun.AdjustedMaxAmmo)
