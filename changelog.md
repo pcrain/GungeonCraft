@@ -3,6 +3,7 @@
 ## 1.25.3 (TBD)
 
 - Fixed earsplitting audio glitch when cancelling mastered Ki Blast's charge attack at the wrong time
+- Fixed secret floor's flag for returning to previous floor not being reset when dying, causing weird floor skips and repeats
 
 ## 1.25.2 (2025-05-06)
 

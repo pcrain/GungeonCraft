@@ -1,9 +1,11 @@
 namespace CwaffingTheGungy;
 
-/// <summary>Class for saving various extra info for mid-run saves</summary>
+/// <summary>Class for saving various extra info for runs, serialized for mid-run saves</summary>
 public class CwaffRunData : FakeItem
 {
     public string btcktfEnemyGuid = string.Empty;
+    public bool shouldReturnToPreviousFloor = false;
+    public string nameOfPreviousFloor = null;
 
     private bool _deserialized = false;
 

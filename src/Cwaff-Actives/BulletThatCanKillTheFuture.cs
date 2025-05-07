@@ -339,19 +339,17 @@ public class BulletThatCanKillTheFuture : CwaffActive
         {
             UnityEngine.Object.Destroy(clockhair.gameObject);
             yield return new WaitForSeconds(0.25f);
-            _NameOfPreviousFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
+            CwaffRunData.Instance.nameOfPreviousFloor = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
             GameManager.Instance.OnNewLevelFullyLoaded += ForceElevatorToReturnToPreviousFloor;
             GameManager.Instance.LoadCustomLevel(SansDungeon.INTERNAL_NAME);
         }
         yield break;
     }
 
-    private static string _NameOfPreviousFloor = ""; // used to set the floor elevator should take us to
-    private static bool _ShouldReturnToPreviousFloor = false;
     private static void ForceElevatorToReturnToPreviousFloor()
     {
         GameManager.Instance.OnNewLevelFullyLoaded -= ForceElevatorToReturnToPreviousFloor;
-        _ShouldReturnToPreviousFloor = true;
+        CwaffRunData.Instance.shouldReturnToPreviousFloor = true;
     }
 
     [HarmonyPatch(typeof(ElevatorDepartureController), nameof(ElevatorDepartureController.TransitionToDepart))]
@@ -359,12 +357,12 @@ public class BulletThatCanKillTheFuture : CwaffActive
     {
         static void Prefix(ElevatorDepartureController __instance, tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
         {
-            if (!_ShouldReturnToPreviousFloor)
+            if (!CwaffRunData.Instance.shouldReturnToPreviousFloor)
                 return;
 
             __instance.UsesOverrideTargetFloor = false;
-            GameManager.Instance.InjectedLevelName = _NameOfPreviousFloor;
-            _ShouldReturnToPreviousFloor = false;
+            GameManager.Instance.InjectedLevelName = CwaffRunData.Instance.nameOfPreviousFloor;
+            CwaffRunData.Instance.shouldReturnToPreviousFloor = false;
         }
     }
 
