@@ -12,6 +12,7 @@ public class Macheening : CwaffGun
     private static string _PrefireAnim;
 
     private bool _hasLichguard = false;
+    private EasyLight _light = null;
 
     public static void Init()
     {
@@ -38,6 +39,7 @@ public class Macheening : CwaffGun
         _PrefireAnim = gun.QuickUpdateGunAnimation("prefire", returnToIdle: true, fps: 20);
         gun.LoopAnimation(_PrefireAnim, 11);
         gun.SetGunAudio(_PrefireAnim, "macheening_brandish", frame: 6);
+        CwaffGun.SetUpDynamicBarrelOffsetsForExtraAnimation(gun, _PrefireAnim);
     }
 
     public override void Update()
@@ -64,10 +66,36 @@ public class Macheening : CwaffGun
         CheckForLichguard(player);
     }
 
+    public override void OnSwitchedToThisGun()
+    {
+        base.OnSwitchedToThisGun();
+        this.gun.spriteAnimator.AnimationEventTriggered -= ProduceLight;
+        if (this.PlayerOwner)
+            this.gun.spriteAnimator.AnimationEventTriggered += ProduceLight;
+    }
+
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        base.OnSwitchedAwayFromThisGun();
+        this.gun.spriteAnimator.AnimationEventTriggered -= ProduceLight;
+    }
+
+    private void ProduceLight(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
+    {
+        if (clip.name != _PrefireAnim)
+            return;
+        EasyLight.Create(parent: this.gun.barrelOffset, color: Color.Lerp(Color.yellow, Color.white, 0.65f), fadeInTime: 0.1f, fadeOutTime: 0.4f,
+          radius: 5f, brightness: 5f, maxLifeTime: 0.5f, grownIn: true);
+    }
+
     private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
     {
         if (!this._hasLichguard && this.gun.CurrentOwner is PlayerController player && player.CurrentGun == this.gun)
+        {
             data.ModifiedDamage *= 2f;
+            // CwaffVFX.Spawn(Lichguard._NoLichguardVFX, player.sprite.WorldTopCenter, lifetime: 0.4f, fadeOutTime: 0.4f);
+            base.gameObject.Play("lichguard_curse_sound");
+        }
     }
 
     public override void OnDroppedByPlayer(PlayerController player)

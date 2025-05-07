@@ -251,3 +251,36 @@ static class ReplaceEnemyGunsPatch
         return true;
     }
 }
+
+//NOTE: used by Adrenaline Shot, Sunderbuss, and Macheening
+[HarmonyPatch]
+static class HeartUIPatch
+{
+    private static int _AdrenalineShotId = -1;
+    private static int _LichguardId      = -1;
+    private static int _SunderbussId     = -1;
+    private static int _MacheeningId     = -1;
+    [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.ProcessHeartSpriteModifications))]
+    private static void Postfix(GameUIHeartController __instance, PlayerController associatedPlayer)
+    {
+        if (_AdrenalineShotId == -1)
+        {
+            _AdrenalineShotId = Lazy.PickupId<AdrenalineShot>();
+            _LichguardId      = Lazy.PickupId<Lichguard>();
+            _SunderbussId     = Lazy.PickupId<Sunderbuss>();
+            _MacheeningId     = Lazy.PickupId<Macheening>();
+        }
+        if (associatedPlayer.GetPassive(_AdrenalineShotId) is AdrenalineShot shot && shot._adrenalineActive)
+        {
+            __instance.m_currentFullHeartName  = "adrenaline_heart_full_ui";
+            __instance.m_currentHalfHeartName  = "adrenaline_heart_half_ui";
+            __instance.m_currentEmptyHeartName = "adrenaline_heart_empty_ui";
+        }
+        else if (associatedPlayer.CurrentGun is Gun gun && (gun.PickupObjectId == _SunderbussId || gun.PickupObjectId == _MacheeningId) && !associatedPlayer.HasPassive(_LichguardId))
+        {
+            __instance.m_currentFullHeartName  = "lichguard_heart_full_ui";
+            __instance.m_currentHalfHeartName  = "lichguard_heart_half_ui";
+            // __instance.m_currentEmptyHeartName = "lichguard_heart_empty_ui";
+        }
+    }
+}

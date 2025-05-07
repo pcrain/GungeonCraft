@@ -13,7 +13,7 @@ public class AdrenalineShot : CwaffPassive
     internal const int   _CASINGS_FOR_ROBOT   = 20;
     internal static float _LastHeartbeatTime = 0f;
 
-    private bool  _adrenalineActive = false;
+    internal bool  _adrenalineActive = false;
     private float _adrenalineTimer  = _MAX_ADRENALINE_TIME;
 
     public static void Init()
@@ -21,21 +21,6 @@ public class AdrenalineShot : CwaffPassive
         PassiveItem item  = Lazy.SetupPassive<AdrenalineShot>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
-    }
-
-    [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.ProcessHeartSpriteModifications))]
-    private class AdrenalineShotPatch
-    {
-        static void Postfix(GameUIHeartController __instance, PlayerController associatedPlayer)
-        {
-            if (associatedPlayer.GetPassive<AdrenalineShot>() is not AdrenalineShot shot)
-                return;
-            if (!shot._adrenalineActive)
-                return;
-            __instance.m_currentFullHeartName  = "adrenaline_heart_full_ui";
-            __instance.m_currentHalfHeartName  = "adrenaline_heart_half_ui";
-            __instance.m_currentEmptyHeartName = "adrenaline_heart_empty_ui";
-        }
     }
 
     public override void OnFirstPickup(PlayerController player)

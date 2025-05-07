@@ -5,13 +5,17 @@
 - Fixed earsplitting audio glitch when cancelling mastered Ki Blast's charge attack at the wrong time
 - Fixed secret floor's flag for returning to previous floor not being reset when dying, causing weird floor skips and repeats
 - Fixed null deref caused by trying to flip sprites towards non-existent players
+- Added better impact sounds and VFX for Wavefront's projectiles
+- Added new sounds and UI heart indicators for when the player is under the effects of Sunderbuss' or Macheening's double damage penalty
+- Added lighting effects to Macheening's charge animation
+- Rebuffed Paintball Cannon's damage from 4.5 to 5.5
 
 ## 1.25.2 (2025-05-06)
 
 #### Balance Changes and Polish:
 
 - Rebalanced Paintball Cannon:
-	- Reduced damage from 9 to 4.5 (it's C tier for heaven's sake)
+	- Reduced damage from 9 to 4.5
 	- Changed gun class from PISTOL to RIFLE
 	- Slightly increased projectile size
 - Replaced Voodoo Doll item sprite with a new one by Dallan (thanks Dallan!)

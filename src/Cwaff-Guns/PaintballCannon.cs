@@ -14,7 +14,7 @@ public class PaintballCannon : CwaffGun
             muzzleFrom: Items.Mailbox, fireAudio: "paintball_shoot_sound", reloadAudio: "paintball_reload_sound")
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .InitProjectile(GunData.New(sprite: "paintball_cannon_projectile", clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 4.5f, speed: 25f, range: 18f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound",
+            damage: 5.5f, speed: 25f, range: 18f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound",
             customClip: true))
           .Attach<PaintballColorizer>()
           .Attach<GoopModifier>(g => {

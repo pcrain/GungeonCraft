@@ -70,11 +70,17 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.chargeAnimation);
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.reloadAnimation);
     SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.shootAnimation);
+    SetUpDynamicBarrelOffsetsForAnimation(d, gun, gun.shootAnimation);
   }
 
   private static void SetUpDefaultDynamicBarrelOffset(Dictionary<string, List<Vector3>> d, Gun gun)
   {
     d[_DEFAULT_BARREL_OFFSET] = new(){ gun.barrelOffset.localPosition };
+  }
+
+  internal static void SetUpDynamicBarrelOffsetsForExtraAnimation(Gun gun, string anim)
+  {
+    SetUpDynamicBarrelOffsetsForAnimation(_BarrelOffsetCache[gun.GetUnmodifiedDisplayName()], gun, anim);
   }
 
   private static void SetUpDynamicBarrelOffsetsForAnimation(Dictionary<string, List<Vector3>> d, Gun gun, string anim)

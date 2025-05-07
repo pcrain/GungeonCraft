@@ -76,7 +76,11 @@ public class Sunderbuss : CwaffGun
     private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
     {
         if (!this._hasLichguard && this.gun.CurrentOwner is PlayerController player && player.CurrentGun == this.gun)
+        {
             data.ModifiedDamage *= 2f;
+            // CwaffVFX.Spawn(Lichguard._NoLichguardVFX, player.sprite.WorldTopCenter, lifetime: 0.4f, fadeOutTime: 0.4f);
+            base.gameObject.Play("lichguard_curse_sound");
+        }
     }
 
     public override void OnDestroy()
