@@ -2,13 +2,17 @@
 
 ## 1.25.2 (TBD)
 
-- Improved muzzle lighting for Natascha and Alyx
+- Improved muzzle lighting for Natascha, Alyx, and Platinum Star
 - Improved lighting on Yggdrashell's leaves
 - Improved lighting on projectiles from Ki Blast, Suncaster, Plasmarble, Macheening, Wavefront, and Lightwing
 - Fixed premature charging sound effect playing when firing normal projectiles with Ki Blast's mastery active
 - Fixed onslaught of null derefs caused by Sextant trying to load stale UI elements when loading a new floor
 - Replaced Voodoo Doll item sprite with a new one by Dallan (thanks Dallan!)
 - Fixed Ki Blast idle sprite appearing for a single frame under certain circumstances where it should be invisible
+- Rebalanced Paintball Cannon:
+	- Reduced damage from 9 to 4.5 (it's C tier for heaven's sake)
+	- Changed gun class from PISTOL to RIFLE
+	- Slightly increased projectile size
 
 ## 1.25.1 (2025-05-04)
 

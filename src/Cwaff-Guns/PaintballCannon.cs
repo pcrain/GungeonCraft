@@ -10,11 +10,11 @@ public class PaintballCannon : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<PaintballCannon>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.PISTOL, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
             muzzleFrom: Items.Mailbox, fireAudio: "paintball_shoot_sound", reloadAudio: "paintball_reload_sound")
           .AddToShop(ItemBuilder.ShopType.Goopton)
-          .InitProjectile(GunData.New(sprite: "paintball_cannon_projectile", scale: 0.9f, clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 9.0f, speed: 25f, range: 18f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound",
+          .InitProjectile(GunData.New(sprite: "paintball_cannon_projectile", clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
+            damage: 4.5f, speed: 25f, range: 18f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound", hitWallSound: "paintball_impact_wall_sound",
             customClip: true))
           .Attach<PaintballColorizer>()
           .Attach<GoopModifier>(g => {

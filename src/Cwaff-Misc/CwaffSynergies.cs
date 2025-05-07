@@ -308,7 +308,7 @@ public static class CwaffSynergies
             .MultChargeRate(2f);
         // Glockarina gains infinite ammo and fires 3 rings of notes when reloading an empty clip.
         NewMastery<MasteryOfGlockarina>(MASTERY_GLOCKARINA, Glockarina.ItemName);
-        // Macheening's charge-up time is halved, and its projectiles destroy enemy projectile upon collision.
+        // Macheening's charge-up time is halved, and its projectiles destroy enemy projectiles upon collision.
         NewMastery<MasteryOfMacheening>(MASTERY_MACHEENING, Macheening.ItemName);
         // Plasmarble projectiles bounce two additional times before shattering and emit 4 electric bolts per bounce.
         NewMastery<MasteryOfPlasmarble>(MASTERY_PLASMARBLE, Plasmarble.ItemName);

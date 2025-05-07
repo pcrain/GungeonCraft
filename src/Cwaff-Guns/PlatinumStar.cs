@@ -14,7 +14,9 @@ public class PlatinumStar : CwaffGun
     {
         Lazy.SetupGun<PlatinumStar>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 1f, ammo: 480, shootFps: 20, reloadFps: 40, smoothReload: 0.1f,
-            muzzleVFX: "muzzle_platinum_star", muzzleFps: 60, muzzleScale: 0.25f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "platinum_fire_sound")
+            muzzleVFX: "muzzle_platinum_star", muzzleFps: 60, muzzleScale: 0.25f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "platinum_fire_sound",
+            muzzleEmissionColor: Color.magenta, muzzleLightStrength: 7.5f, muzzleLightRange: 1.375f, muzzleEmission: 1f, muzzleEmissionColorPower: 1.55f,
+            muzzleLightColor: Color.magenta)
           .SetReloadAudio("platinum_reload_sound", frame: 5)
           .AddToShop(ModdedShopType.TimeTrader)
           .InitProjectile(GunData.New(clipSize: 28, cooldown: 0.125f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
