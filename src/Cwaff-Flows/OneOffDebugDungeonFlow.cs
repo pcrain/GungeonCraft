@@ -1,175 +1,74 @@
 namespace CwaffingTheGungy;
 
 public static class OneOffDebugDungeonFlow {
+    private static DungeonFlow _CurrentCustomDebugFlow = null;
+    private static readonly string DEBUG_FLOW_NAME = "cwaff_debug_flow";
 
-    public static DungeonFlow CreateAndWarp(string shopName) {
-        PrototypeDungeonRoom theRoom = FancyShopBuilder.FancyShopRooms[shopName];
-        DungeonFlow m_CachedFlow = CreateFlowWithSingleTestRoom(theRoom);
-        m_CachedFlow.name = shopName;
+    public static void TestSingleRoom(PrototypeDungeonRoom theRoom) {
+        _CurrentCustomDebugFlow = CreateFlowWithSingleTestRoom(theRoom);
+        _CurrentCustomDebugFlow.name = DEBUG_FLOW_NAME;
 
-        ETGModConsole.Log($"Attempting to warp to floor with {shopName} room");
         GameLevelDefinition floorDef = new GameLevelDefinition()
         {
-            dungeonSceneName           = shopName, //this is the name we will use whenever we want to load our dungeons scene
-            dungeonPrefabPath          = shopName, //this is what we will use when we want to acess our dungeon prefab
-            priceMultiplier            = 1f, //multiplies how much things cost in the shop
-            secretDoorHealthMultiplier = 1, //multiplies how much health secret room doors have, aka how many shots you will need to expose them
-            enemyHealthMultiplier      = 2, //multiplies how much health enemies have
-            damageCap                  = 300, // damage cap for regular enemies
-            bossDpsCap                 = 78, // damage cap for bosses
-            flowEntries                = new List<DungeonFlowLevelEntry>(0),
-            predefinedSeeds            = new List<int>(0)
+            dungeonSceneName  = DEBUG_FLOW_NAME, //this is the name we will use whenever we want to load our dungeons scene
+            dungeonPrefabPath = DEBUG_FLOW_NAME, //this is what we will use when we want to acess our dungeon prefab
+            flowEntries       = new(),
+            predefinedSeeds   = new(),
         };
 
-        CwaffDungeons.Register(internalName: shopName, floorName: shopName,
+        CwaffDungeons.Register(internalName: DEBUG_FLOW_NAME, floorName: DEBUG_FLOW_NAME,
             dungeonGenerator: OneOffDungeonGenerator, gameLevelDefinition: floorDef);
 
-        _CurrentCustomDebugFlow = m_CachedFlow;
-        GameManager.Instance.LoadCustomLevel(shopName);
-
-        return m_CachedFlow;
+        GameManager.Instance.LoadCustomLevel(DEBUG_FLOW_NAME);
     }
 
-    public static Dungeon OneOffDungeonGenerator(Dungeon dungeon)
+    private static DungeonFlowNode Sanitize(this DungeonFlowNode node)
+    {
+        node.subchainIdentifiers ??= new();
+        node.chainRules          ??= new();
+        return node;
+    }
+
+    private static Dungeon OneOffDungeonGenerator(Dungeon dungeon)
     {
         dungeon.PatternSettings = new SemioticDungeonGenSettings()
         {
-            flows = new List<DungeonFlow>() {
-                OneOffDebugDungeonFlow.GetCurrentCustomDebugFlow(),
-            },
-            mandatoryExtraRooms = new List<ExtraIncludedRoomData>(0),
-            optionalExtraRooms = new List<ExtraIncludedRoomData>(0),
-            MAX_GENERATION_ATTEMPTS = 250,
-            DEBUG_RENDER_CANVASES_SEPARATELY = false
+            flows               = new() { _CurrentCustomDebugFlow },
+            mandatoryExtraRooms = new(),
+            optionalExtraRooms  = new(),
         };
         return dungeon;
     }
 
-    public static DungeonFlow CreateFlowWithSingleTestRoom(PrototypeDungeonRoom theRoom)
+    private static DungeonFlow CreateFlowWithSingleTestRoom(PrototypeDungeonRoom theRoom)
     {
-        DungeonFlow m_CachedFlow = ScriptableObject.CreateInstance<DungeonFlow>();
+        DungeonFlow flow = ScriptableObject.CreateInstance<DungeonFlow>();
 
-        DungeonFlowNode Node_00 = new DungeonFlowNode(m_CachedFlow) {
-            isSubchainStandin = false,
-            nodeType = DungeonFlowNode.ControlNodeType.ROOM,
-            roomCategory = PrototypeDungeonRoom.RoomCategory.CONNECTOR,
-            percentChance = 1f,
-            priority = DungeonFlowNode.NodePriority.MANDATORY,
+        DungeonFlowNode entranceNode = new DungeonFlowNode(flow) {
+            roomCategory = PrototypeDungeonRoom.RoomCategory.ENTRANCE,
             overrideExactRoom = CwaffDungeonPrefabs.elevator_entrance,
-            overrideRoomTable = null,
-            capSubchain = false,
-            subchainIdentifier = string.Empty,
-            limitedCopiesOfSubchain = false,
-            maxCopiesOfSubchain = 1,
-            subchainIdentifiers = new List<string>(0),
-            receivesCaps = false,
-            isWarpWingEntrance = false,
-            handlesOwnWarping = false,
-            forcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
-            loopForcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
-            nodeExpands = false,
-            initialChainPrototype = "n",
-            chainRules = new List<ChainRule>(0),
-            minChainLength = 3,
-            maxChainLength = 8,
-            minChildrenToBuild = 1,
-            maxChildrenToBuild = 1,
-            canBuildDuplicateChildren = false,
-            parentNodeGuid = string.Empty,
-            childNodeGuids = new List<string>(0),
-            loopTargetNodeGuid = string.Empty,
-            loopTargetIsOneWay = false,
-            guidAsString = Guid.NewGuid().ToString(),
-            flow = m_CachedFlow,
-        };
+        }.Sanitize();
 
-        DungeonFlowNode CustomShopNode = new DungeonFlowNode(m_CachedFlow) {
-            isSubchainStandin = false,
-            nodeType = DungeonFlowNode.ControlNodeType.ROOM,
-            roomCategory = PrototypeDungeonRoom.RoomCategory.CONNECTOR,
-            percentChance = 1f,
-            priority = DungeonFlowNode.NodePriority.MANDATORY,
+        DungeonFlowNode roomNode = new DungeonFlowNode(flow) {
             overrideExactRoom = theRoom,
-            overrideRoomTable = null,
-            capSubchain = false,
-            subchainIdentifier = string.Empty,
-            limitedCopiesOfSubchain = false,
-            maxCopiesOfSubchain = 1,
-            subchainIdentifiers = new List<string>(0),
-            receivesCaps = false,
-            isWarpWingEntrance = false,
-            handlesOwnWarping = false,
-            forcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
-            loopForcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
-            nodeExpands = false,
-            initialChainPrototype = "n",
-            chainRules = new List<ChainRule>(0),
-            minChainLength = 3,
-            maxChainLength = 8,
-            minChildrenToBuild = 1,
-            maxChildrenToBuild = 1,
-            canBuildDuplicateChildren = false,
-            parentNodeGuid = string.Empty,
-            childNodeGuids = new List<string>(0),
-            loopTargetNodeGuid = string.Empty,
-            loopTargetIsOneWay = false,
-            guidAsString = Guid.NewGuid().ToString(),
-        };
+        }.Sanitize();
 
-        DungeonFlowNode Node_99 = new DungeonFlowNode(m_CachedFlow) {
-            isSubchainStandin = false,
-            nodeType = DungeonFlowNode.ControlNodeType.ROOM,
+        DungeonFlowNode exitNode = new DungeonFlowNode(flow) {
             roomCategory = PrototypeDungeonRoom.RoomCategory.EXIT,
-            percentChance = 1f,
-            priority = DungeonFlowNode.NodePriority.MANDATORY,
             overrideExactRoom = CwaffDungeonPrefabs.exit_room_basic,
-            overrideRoomTable = null,
-            capSubchain = false,
-            subchainIdentifier = string.Empty,
-            limitedCopiesOfSubchain = false,
-            maxCopiesOfSubchain = 1,
-            subchainIdentifiers = new List<string>(0),
-            receivesCaps = false,
-            isWarpWingEntrance = false,
-            handlesOwnWarping = false,
-            forcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
-            loopForcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
-            nodeExpands = false,
-            initialChainPrototype = "n",
-            chainRules = new List<ChainRule>(0),
-            minChainLength = 3,
-            maxChainLength = 8,
-            minChildrenToBuild = 1,
-            maxChildrenToBuild = 1,
-            canBuildDuplicateChildren = false,
-            parentNodeGuid = string.Empty,
-            childNodeGuids = new List<string>(0),
-            loopTargetNodeGuid = string.Empty,
-            loopTargetIsOneWay = false,
-            guidAsString = Guid.NewGuid().ToString(),
-            flow = m_CachedFlow,
-        };
+        }.Sanitize();
 
-        // m_CachedFlow.fallbackRoomTable = BossrushFlows.Bossrush_01_Castle.fallbackRoomTable;
-        m_CachedFlow.fallbackRoomTable = CwaffDungeonPrefabs.SewersRoomTable;
-        m_CachedFlow.subtypeRestrictions = new List<DungeonFlowSubtypeRestriction>(0);
-        m_CachedFlow.flowInjectionData = new List<ProceduralFlowModifierData>(0);
-        m_CachedFlow.sharedInjectionData = new List<SharedInjectionData>(0);
+        flow.fallbackRoomTable   = CwaffDungeonPrefabs.SewersRoomTable;
+        flow.subtypeRestrictions = new();
+        flow.flowInjectionData   = new();
+        flow.sharedInjectionData = new();
+        flow.FirstNode           = entranceNode;
 
-        m_CachedFlow.Initialize();
+        flow.Initialize();
+        flow.AddNodeToFlow(entranceNode, null);
+        flow.AddNodeToFlow(roomNode, entranceNode);
+        flow.AddNodeToFlow(exitNode, roomNode);
 
-        m_CachedFlow.AddNodeToFlow(Node_00, null);
-        m_CachedFlow.AddNodeToFlow(CustomShopNode, Node_00);
-        m_CachedFlow.AddNodeToFlow(Node_99, CustomShopNode);
-
-        m_CachedFlow.FirstNode = Node_00;
-
-        return m_CachedFlow;
-    }
-
-    internal static DungeonFlow _CurrentCustomDebugFlow = null;
-    public static DungeonFlow GetCurrentCustomDebugFlow()
-    {
-      return _CurrentCustomDebugFlow;
+        return flow;
     }
 }

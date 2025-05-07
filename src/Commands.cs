@@ -211,6 +211,11 @@ public class Commands
                     _OnDebugKeyPressed();
             }
 
+            if (Input.GetKeyDown(KeyCode.Alpha8))
+            {
+                OneOffDebugDungeonFlow.TestSingleRoom(LoadHelper.LoadAssetFromAnywhere<PrototypeDungeonRoom>("Shrine_DemonFace_Room"));
+            }
+
             return true;
         }
     }
