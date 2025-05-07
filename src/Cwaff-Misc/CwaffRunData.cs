@@ -14,7 +14,6 @@ public class CwaffRunData : FakeItem
 
     public static void Init()
     {
-        // CwaffEvents.On;
         CwaffEvents.OnCleanStart += OnCleanStart; // make sure this runs AFTER any deserialization
         CwaffEvents.OnFirstFloorOfRunFullyLoaded += ResetForNewRun; // make sure this runs AFTER any deserialization
 
@@ -46,19 +45,10 @@ public class CwaffRunData : FakeItem
         // Lazy.DebugLog("granting player 1 mid run data storage");
     }
 
-    public override void Pickup(PlayerController player)
-    {
-        base.Pickup(player);
-        // Lazy.DebugLog($"player {player.PlayerIDX + 1} acquired mid run data");
-    }
-
     public override void MidGameSerialize(List<object> data)
     {
-        // Lazy.DebugLog($"serializing extra mid run data");
         base.MidGameSerialize(data);
         data.Add(btcktfEnemyGuid);
-
-        // Lazy.DebugLog($"memorialized enemy is {btcktfEnemyGuid}");
     }
 
     public override void MidGameDeserialize(List<object> data)

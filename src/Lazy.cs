@@ -120,7 +120,7 @@ public static class Lazy
     }
 
     /// <summary>Perform basic initialization for a new fake passive items for update / synergy / save serialization purposes.</summary>
-    public static TItemSpecific SetupFakeItem<TItemSpecific>() where TItemSpecific : PassiveItem
+    public static TItemSpecific SetupFakeItem<TItemSpecific>() where TItemSpecific : FakeItem
     {
         string itemName = typeof(TItemSpecific).Name;
         string baseItemName = itemName.InternalName();  //get saner gun name for commands

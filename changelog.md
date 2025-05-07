@@ -4,6 +4,7 @@
 
 - Fixed earsplitting audio glitch when cancelling mastered Ki Blast's charge attack at the wrong time
 - Fixed secret floor's flag for returning to previous floor not being reset when dying, causing weird floor skips and repeats
+- Fixed null deref caused by trying to flip sprites towards non-existent players
 
 ## 1.25.2 (2025-05-06)
 

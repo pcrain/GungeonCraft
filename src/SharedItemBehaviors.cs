@@ -92,13 +92,6 @@ public class FakeItem : CwaffPassive
     private static Dictionary<int, FakeItem>  _PrefabsById = new();
 }
 
-public class FakeDodgeRollItem : CwaffDodgeRollItem
-{
-    public static void Create<T>() where T : FakeDodgeRollItem => _Prefabs[typeof(T)] = Lazy.SetupFakeItem<T>();
-    public static FakeDodgeRollItem Get<T>() where T : FakeDodgeRollItem => _Prefabs[typeof(T)];
-    private static Dictionary<Type, FakeDodgeRollItem> _Prefabs = new();
-}
-
 public class BulletLifeTimer : MonoBehaviour
 {
     public BulletLifeTimer()
