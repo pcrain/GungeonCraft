@@ -1,6 +1,7 @@
 namespace CwaffingTheGungy;
 
 public static class OneOffDebugDungeonFlow {
+
     private static DungeonFlow _CurrentCustomDebugFlow = null;
     private static readonly string DEBUG_FLOW_NAME = "cwaff_debug_flow";
 
@@ -8,7 +9,7 @@ public static class OneOffDebugDungeonFlow {
         _CurrentCustomDebugFlow = CreateFlowWithSingleTestRoom(theRoom);
         _CurrentCustomDebugFlow.name = DEBUG_FLOW_NAME;
 
-        GameLevelDefinition floorDef = new GameLevelDefinition()
+        GameLevelDefinition floorDef = new()
         {
             dungeonSceneName  = DEBUG_FLOW_NAME, //this is the name we will use whenever we want to load our dungeons scene
             dungeonPrefabPath = DEBUG_FLOW_NAME, //this is what we will use when we want to acess our dungeon prefab

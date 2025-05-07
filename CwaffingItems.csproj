@@ -232,7 +232,6 @@
     <Compile Include="src\Cwaff-Flows\CwaffDungeons.cs"/>
     <Compile Include="src\Cwaff-Flows\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Cwaff-Flows\SansDungeon.cs"/>
-    <Compile Include="src\Cwaff-Flows\CwaffDungeonFlows.cs"/>
     <Compile Include="src\Cwaff-Flows\FlowPrefabs.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>

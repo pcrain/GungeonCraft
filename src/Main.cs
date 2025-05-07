@@ -405,7 +405,7 @@ public class Initialisation : BaseUnityPlugin
                     encounterAssets = ResourceManager.LoadAssetBundle("encounters_base_001");
 
                     CwaffDungeonPrefabs.InitCustomPrefabs(sharedAssets, sharedAssets2, braveResources, enemiesBase);
-                    CwaffDungeonFlow.InitDungeonFlows(sharedAssets2);
+                    CwaffDungeons.InitDungeonFlows(sharedAssets2);
                 } catch (Exception ex) {
                     ETGModConsole.Log("[CtG] ERROR: Exception occured while building prefabs!", true);
                     Debug.LogException(ex);

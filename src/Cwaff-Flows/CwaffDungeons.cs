@@ -2,6 +2,8 @@ namespace CwaffingTheGungy;
 
 public class CwaffDungeons
 {
+    internal static List<DungeonFlow> _KnownFlows;
+
     public string internalName                     = null;
     public string floorName                        = null;
     public string floorMusic                       = null;
@@ -12,6 +14,12 @@ public class CwaffDungeons
     public Func<Dungeon, Dungeon> dungeonGenerator = null;
 
     public static Dictionary<string, CwaffDungeons> Flows = new();
+
+    public static void InitDungeonFlows(AssetBundle sharedAssets2, bool refreshFlows = false) {
+        _KnownFlows = new List<DungeonFlow>(){
+            SansDungeonFlow.Init(),
+        };
+    }
 
     public static CwaffDungeons Register(string internalName, string floorName, Func<Dungeon, Dungeon> dungeonGenerator,
         string dungeonPrefabTemplate = null, GameLevelDefinition gameLevelDefinition = null, string floorMusic = null,
@@ -109,6 +117,30 @@ public class CwaffDungeons
                         musicName: cd.floorMusic, loopPoint: cd.loopPoint, rewindAmount: cd.rewindAmount);
                 break;
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(FlowDatabase), nameof(FlowDatabase.GetOrLoadByName))]
+    private class LoadCustomFlowPatch // Patch for making sure we can load custom flows okay
+    {
+        static bool Prefix(string name, ref DungeonFlow __result)
+        {
+            if (_KnownFlows == null || _KnownFlows.Count <= 0)
+                return true;
+
+            string flowName = name.ToLower();
+            if (flowName.Contains("/"))
+                flowName = flowName.Substring(flowName.LastIndexOf("/") + 1);
+
+            foreach (DungeonFlow flow in _KnownFlows)
+            {
+                if (!string.IsNullOrEmpty(flow.name) && flowName == flow.name.ToLower())
+                {
+                    __result = flow;
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
