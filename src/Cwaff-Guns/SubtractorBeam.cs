@@ -7,11 +7,11 @@ public class SubtractorBeam : CwaffGun
     public static string LongDescription  = "Fires a fast piercing beam that uses the health of the first enemy it hits as its damage. The beam's damage is reduced by the health of each subsequent enemy it hits, and dissipates once its damage reaches zero. Cannot damage the first enemy it hits. Reveals enemies' health while active.";
     public static string Lore             = "In a time and place where weaponry seems to have an ever-increasing disregard for the biology, chemistry, and physics that govern our universe, the Subtractor Beam spits in the face of something even more fundamental: math. Invented by someone who wasn't a mad scientist so much as a moderately irritable elementary school professor, the destructive potential of this gun has been calibrated to vary with the resilience of the first object it passes through. As to why a weapon with near limitless potential would be designed with such arbitrary limitations, the creator has claimed it is 'to show the kids that subtraction tables ARE useful in real life! Now if only I could do something for multiplication tables....'";
 
-    internal static Dictionary<int, Nametag> _Nametags = new();
-
     internal static CwaffTrailController _GreenTrailPrefab;
     internal static CwaffTrailController _RedTrailPrefab;
     internal static GameObject _HitEffects;
+    private static readonly LinkedList<dfLabel> _PooledNametags = new();
+    private static readonly LinkedList<dfLabel> _ActiveNametags = new();
 
     internal HealthHaver _lastHitEnemy = null;
 
@@ -38,67 +38,57 @@ public class SubtractorBeam : CwaffGun
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
-        WhoAreTheyAgain();
+        ClearNametags();
         base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
-        WhoAreTheyAgain();
+        ClearNametags();
         base.OnDestroy();
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
-        WhoAreTheyAgain();
+        ClearNametags();
         base.OnSwitchedAwayFromThisGun();
     }
 
     public override void Update()
     {
         base.Update();
-        if ((this.PlayerOwner is not PlayerController player) || !player.healthHaver || player.healthHaver.IsDead)
-            WhoAreTheyAgain();
-        else
+        ClearNametags();
+        if (this.PlayerOwner is PlayerController player && player.healthHaver && player.healthHaver.IsAlive)
             YouShallKnowTheirNames();
     }
 
-    private void WhoAreTheyAgain()
+    private void ClearNametags()
     {
-        UpdateNametags(false);
-    }
-
-    private void UpdateNametags(bool enable)
-    {
-        List<int> deadEnemies = new();
-        foreach(KeyValuePair<int, Nametag> entry in _Nametags)
+        while (_ActiveNametags.Last is LinkedListNode<dfLabel> current)
         {
-            if (!entry.Value.UpdateWhileParentAlive())
-                deadEnemies.Add(entry.Key);
-            else
-                entry.Value.SetEnabled(enable);
+            _ActiveNametags.RemoveLast();
+            if (current.Value is not dfLabel label)
+                continue;
+            label.IsVisible = false;
+            _PooledNametags.AddLast(current);
         }
-        foreach (int key in deadEnemies)
-            _Nametags.Remove(key);
     }
 
     private void YouShallKnowTheirNames()
     {
-        UpdateNametags(true);
-        if (!this.PlayerOwner)
-            return;
-
         foreach (AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
         {
-            if (!enemy.IsHostile(canBeNeutral: true))
+            if (!enemy.IsHostile(canBeNeutral: true) || !enemy.sprite)
                 continue;
-            if (!enemy.gameObject.GetComponent<Nametag>())
-            {
-                Nametag nametag = enemy.gameObject.AddComponent<Nametag>();
-                nametag.Setup();
-                _Nametags[enemy.GetHashCode()] = nametag;
-            }
-            enemy.GetComponent<Nametag>().SetName($"{enemy.healthHaver.GetCurrentHealth()}");
+            if (_PooledNametags.Count == 0)
+                _PooledNametags.AddLast(CwaffLabel.MakeNewLabel(unicode: false, outline: true));
+            LinkedListNode<dfLabel> current = _PooledNametags.Last;
+            _PooledNametags.RemoveLast();
+            _ActiveNametags.AddLast(current);
+            if (current.Value is not dfLabel label)
+                label = current.Value = CwaffLabel.MakeNewLabel(unicode: false, outline: true);
+            label.Text = $"{Mathf.CeilToInt(enemy.healthHaver.currentHealth)}[sprite \"mini_heart_ui\"]";
+            label.Place(enemy.sprite.WorldBottomCenter + new Vector2(0, -1f));
         }
     }
 
@@ -204,7 +194,7 @@ public class SubtractorProjectile : MonoBehaviour
         if (!this._hitFirstEnemy)
         {
             this._hitFirstEnemy = enemy.healthHaver;
-            this._damage = this._hitFirstEnemy.GetCurrentHealth();
+            this._damage = Mathf.Ceil(this._hitFirstEnemy.GetCurrentHealth());
             this._projectile.baseData.damage = this._damage;
             if (this._trail)
                 this._trail.DisconnectFromSpecRigidbody(); // we want to have a red trail after hitting the enemy, but want the old green trail around as well

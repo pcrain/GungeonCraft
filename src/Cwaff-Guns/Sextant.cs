@@ -12,7 +12,6 @@ public class Sextant : CwaffGun
     private const int _MAX_PHASE    = 6;
     private const float CALCULATOR_SYNERGY_MULT = 1.3f;
 
-    internal static readonly bool _UseUnicodeFont = true;
     internal static GameObject _MathSymbols = null;
     internal static CwaffTrailController _SextantTrailPrefab = null;
 
@@ -138,13 +137,13 @@ public class Sextant : CwaffGun
             if (l)
                 UnityEngine.Object.Destroy(l.gameObject);
         this._labels.Clear();
-        this._labels.Add(this._shotAngleLabel = MakeNewLabel());
-        this._labels.Add(this._spreadLabel = MakeNewLabel());
-        this._labels.Add(this._shotDistanceLabel = MakeNewLabel());
-        this._labels.Add(this._reboundAngleLabel = MakeNewLabel());
-        this._labels.Add(this._widthLabel = MakeNewLabel());
-        this._labels.Add(this._heightLabel = MakeNewLabel());
-        this._labels.Add(this._damageLabel = MakeNewLabel());
+        this._labels.Add(this._shotAngleLabel = CwaffLabel.MakeNewLabel());
+        this._labels.Add(this._spreadLabel = CwaffLabel.MakeNewLabel());
+        this._labels.Add(this._shotDistanceLabel = CwaffLabel.MakeNewLabel());
+        this._labels.Add(this._reboundAngleLabel = CwaffLabel.MakeNewLabel());
+        this._labels.Add(this._widthLabel = CwaffLabel.MakeNewLabel());
+        this._labels.Add(this._heightLabel = CwaffLabel.MakeNewLabel());
+        this._labels.Add(this._damageLabel = CwaffLabel.MakeNewLabel());
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -555,13 +554,10 @@ public class Sextant : CwaffGun
         // phase 1a: aim angle
         curPhaseCompletion = phaseCompetion[currentPhase++];
         this._aimAngleArc.Setup(Geometry.Shape.CIRCLE, aimColor, pos: barrelPos, radius: AIM_CIRCLE_MAG, angle: baseShotAngle.Clamp360(), arc: 180f * curPhaseCompletion);
-        if (_UseUnicodeFont)
-            this._shotAngleLabel.Text = $"θ={Mathf.RoundToInt(pc.m_currentGunAngle.Clamp180())}°";
-        else
-            this._shotAngleLabel.Text = $"{Mathf.RoundToInt(pc.m_currentGunAngle.Clamp180())} deg";
+        this._shotAngleLabel.Text = $"θ={Mathf.RoundToInt(pc.m_currentGunAngle.Clamp180())}°";
         this._shotAngleLabel.Color = aimColor;
         this._shotAngleLabel.Opacity = curPhaseCompletion;
-        PlaceLabel(this._shotAngleLabel, barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG + 0.125f) + (baseShotAngle - 90f).ToVector(1.5f), baseShotAngle - 90f);
+        this._shotAngleLabel.Place(barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG + 0.125f) + (baseShotAngle - 90f).ToVector(1.5f), baseShotAngle - 90f);
 
         // phase 1b: focus triangle
         this._timeFocusing = Mathf.Clamp(this._timeFocusing + (this._focused ? dtime : -dtime), 0f, _PHASE_TIME);
@@ -577,25 +573,18 @@ public class Sextant : CwaffGun
         float approxSpread = spread * curPhaseCompletion;
         this._leftAdjSpread.Setup(Geometry.Shape.DASHEDLINE, spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle - approxSpread).Clamp360());
         this._rightAdjSpread.Setup(Geometry.Shape.DASHEDLINE, spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle + approxSpread).Clamp360());
-        if (_UseUnicodeFont)
-            this._spreadLabel.Text = $"±{approxSpread:0.0}°";
-        else
-            this._spreadLabel.Text = $"+/-{approxSpread:0.0} deg";
+        this._spreadLabel.Text = $"±{approxSpread:0.0}°";
         this._spreadLabel.Color = spreadColor;
         this._spreadLabel.Opacity = curPhaseCompletion;
-        PlaceLabel(this._spreadLabel, barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG + 0.625f) + (baseShotAngle - 90f).ToVector(1.75f), baseShotAngle - 90f);
+        this._spreadLabel.Place(barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG + 0.625f) + (baseShotAngle - 90f).ToVector(1.75f), baseShotAngle - 90f);
 
         // phase 3: aim distance
         curPhaseCompletion = phaseCompetion[currentPhase++];
         this._perfectShot.Setup(Geometry.Shape.LINE, magColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: baseShotAngle.Clamp360());
-        if (_UseUnicodeFont)
-            this._shotDistanceLabel.Text = $"Δ={Mathf.RoundToInt(C.PIXELS_PER_TILE * distanceToTarget * curPhaseCompletion)}";
-        else
-            this._shotDistanceLabel.Text = $"dx={Mathf.RoundToInt(C.PIXELS_PER_TILE * distanceToTarget * curPhaseCompletion)}";
+        this._shotDistanceLabel.Text = $"Δ={Mathf.RoundToInt(C.PIXELS_PER_TILE * distanceToTarget * curPhaseCompletion)}";
         this._shotDistanceLabel.Color = magColor;
         this._shotDistanceLabel.Opacity = curPhaseCompletion;
-        PlaceLabel(this._shotDistanceLabel,
-          barrelPos + baseShotAngle.ToVector(0.5f * distanceToTarget * curPhaseCompletion) + (baseShotAngle - 90f).ToVector(-0.25f), baseShotAngle);
+        this._shotDistanceLabel.Place(barrelPos + baseShotAngle.ToVector(0.5f * distanceToTarget * curPhaseCompletion) + (baseShotAngle - 90f).ToVector(-0.25f), baseShotAngle);
 
         // phase 4: rebound distance and angle
         if (hitWall)
@@ -611,13 +600,10 @@ public class Sextant : CwaffGun
             this._reboundArc.Setup(Geometry.Shape.CIRCLE, reboundColor, pos: reboundArcCenter, radius: reboundArcRadius,
               angle: targetNormal.ToAngle(), arc: reboundTheta * curPhaseCompletion);
 
-            if (_UseUnicodeFont)
-                this._reboundAngleLabel.Text = $"∠{Mathf.RoundToInt(0.5f * reboundTheta * curPhaseCompletion)}°";
-            else
-                this._reboundAngleLabel.Text = $"{Mathf.RoundToInt(0.5f * reboundTheta * curPhaseCompletion)} deg";
+            this._reboundAngleLabel.Text = $"∠{Mathf.RoundToInt(0.5f * reboundTheta * curPhaseCompletion)}°";
             this._reboundAngleLabel.Color = reboundColor;
             this._reboundAngleLabel.Opacity = curPhaseCompletion;
-            PlaceLabel(this._reboundAngleLabel, targetContact + (reboundArcDiameter + 0.125f) * targetNormal, targetNormal.ToAngle() - 90f);
+            this._reboundAngleLabel.Place(targetContact + (reboundArcDiameter + 0.125f) * targetNormal, targetNormal.ToAngle() - 90f);
         }
         else
         {
@@ -646,13 +632,13 @@ public class Sextant : CwaffGun
             this._widthLabel.Text = $"w={Mathf.RoundToInt(C.PIXELS_PER_TILE * (tr.x - tl.x))}";
             this._widthLabel.Color = bboxColor;
             this._widthLabel.Opacity = curPhaseCompletion;
-            PlaceLabel(this._widthLabel, 0.5f * (tr + tl) + new Vector2(0f, 0.25f), 0f);
+            this._widthLabel.Place(0.5f * (tr + tl) + new Vector2(0f, 0.25f), 0f);
 
             this._heightLabel.Text = $"h={Mathf.RoundToInt(C.PIXELS_PER_TILE * (tr.y - br.y))}";
             this._heightLabel.Color = bboxColor;
             this._heightLabel.Opacity = curPhaseCompletion;
             //HACK: horrendous math since I can't get labels to be anything other than bottom-center aligned...fix later maybe
-            PlaceLabel(this._heightLabel, 0.5f * (tr + br) + new Vector2(
+            this._heightLabel.Place(0.5f * (tr + br) + new Vector2(
                 this._heightLabel.Size.x * 0.5f * fontSizeToPixels + 0.25f, -this._heightLabel.Size.y * 0.5f * fontSizeToPixels),
               0f);
 
@@ -709,70 +695,15 @@ public class Sextant : CwaffGun
         this.canDoCrit = canDoCritThisFrame;
     }
 
-    internal class LabelExt : MonoBehaviour
-    {
-        public Vector2 lastPos;
-        public float lastRot;
-    }
-
     private Geometry MakeNewGeometry()
     {
         return new GameObject().AddComponent<Geometry>();
     }
 
-    internal static dfLabel MakeNewLabel()
-    {
-        dfLabel label = UnityEngine.Object.Instantiate(GameUIRoot.Instance.p_needsReloadLabel.gameObject, GameUIRoot.Instance.transform).GetComponent<dfLabel>();
-        if (_UseUnicodeFont)
-        {
-            label.Font = (ResourceCache.Acquire("Alternate Fonts/JackeyFont12_DF") as GameObject).GetComponent<dfFont>();
-            label.Atlas = (label.Font as dfFont).Atlas;
-            label.TextScale = 2.0f;
-        }
-        label.transform.localScale = Vector3.one / GameUIRoot.GameUIScalar;
-        label.Anchor = dfAnchorStyle.CenterVertical | dfAnchorStyle.CenterHorizontal;
-        label.TextAlignment = TextAlignment.Center;
-        label.VerticalAlignment = dfVerticalAlignment.Middle;
-        label.Opacity = 1f;
-        label.Text = string.Empty;
-        label.gameObject.SetActive(true);
-        label.IsVisible = true;
-        label.gameObject.AddComponent<LabelExt>();
-        return label;
-    }
-
     private static void StabilizeLabel(dfLabel label)
     {
         LabelExt le = label.gameObject.GetComponent<LabelExt>();
-        PlaceLabel(label, le.lastPos, le.lastRot);
-    }
-
-    internal static void PlaceLabel(dfLabel label, Vector2 pos, float rot)
-    {
-        rot = rot.Clamp180();
-        Vector2 finalPos = pos;
-        float uiScale = Pixelator.Instance.ScaleTileScale / Pixelator.Instance.CurrentTileScale; // 1.33, usually
-        float fontSizeToPixels = uiScale / C.PIXELS_PER_CELL;
-        float adj = label.PixelsToUnits() / uiScale; // PixelsToUnits() == 1 / 303.75 == 16/9 * 2/1080
-        if (Mathf.Abs(rot) > 90f)
-        {
-            rot = (rot + 180f).Clamp180();
-            //NOTE: need to adjust position of bottom-aligned text
-            //HACK: 0.5 seems to be the magic number for this font size here, idk how to arrive at this answer computationally though...
-            //NOTE: label.Font.LineHeight == 40, label.TextScale == 0.6, label.Size.Y == 24, label.PixelsToUnits() == (1 / 303.75)
-            //NOTE: df magic pixel scale = 1 / 64 == 1 / C.PIXELS_PER_CELL
-            finalPos += (rot - 90f).ToVector(label.Size.y * fontSizeToPixels);  //WARN: guessing at the math here...
-        }
-        label.transform.position = dfFollowObject.ConvertWorldSpaces(
-            finalPos,
-            GameManager.Instance.MainCameraController.Camera,
-            GameUIRoot.Instance.m_manager.RenderCamera).WithZ(0f);
-        label.transform.position = label.transform.position.QuantizeFloor(adj);
-        label.transform.localRotation = rot.EulerZ();
-        label.IsVisible = true;
-        LabelExt le = label.gameObject.GetComponent<LabelExt>();
-        le.lastPos = pos;
-        le.lastRot = rot;
+        label.Place(le.lastPos, le.lastRot);
     }
 }
 

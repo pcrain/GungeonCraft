@@ -9,6 +9,7 @@
 - Added new sounds and UI heart indicators for when the player is under the effects of Sunderbuss' or Macheening's double damage penalty
 - Added lighting effects to Macheening's charge animation
 - Rebuffed Paintball Cannon's damage from 4.5 to 5.5
+- Made Subtractor Beam's health labels look significantly nicer
 
 ## 1.25.2 (2025-05-06)
 
