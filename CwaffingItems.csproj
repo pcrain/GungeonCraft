@@ -119,7 +119,6 @@
     <Compile Include="src\GungoSaveAPI\AdvancedGameStatsManager.cs"/>
     <Compile Include="src\GungoSaveAPI\CustomDungeonPrerequisite.cs"/>
     <Compile Include="src\GungoSaveAPI\CustomHuntQuest.cs"/>
-    <Compile Include="src\PhysicsFixes.cs"/>
     <Compile Include="src\Extensions.cs"/>
     <Compile Include="src\Cwaff-NPCs\Kevlar.cs"/>
     <Compile Include="src\Cwaff-NPCs\Cammy.cs"/>
