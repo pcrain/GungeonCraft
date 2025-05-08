@@ -1,3 +1,6 @@
+//NOTE: uncomment to print out modded shop item initialization
+// #define DEBUGMODDEDSHOPS
+
 namespace CwaffingTheGungy;
 
 /*
@@ -14,10 +17,10 @@ namespace CwaffingTheGungy;
         psog:gregthly             // not sure we have anything to contribute here
         psog:masteryRewardTrader  // we don't need to muck with this
 
-        omitb:Rusty               // poor quality items (not necessarily D tier)
-        omitb:Ironside            // armour and defense themed items
-        omitb:Boomhildr           // explosive themed items
-        [OMITB doug shop]         // bullet modifiers (broadly, anything that ends with Bullets or Rounds)
+        nn:Rusty                  // poor quality items (not necessarily D tier)
+        nn:Ironside               // armour and defense themed items
+        nn:Boomhildr              // explosive themed items
+        nn:Doug                   // bullet modifiers (broadly, anything that ends with Bullets or Rounds)
 
         ski:Arms_Dealer           // body implants and transplants that can physically replace organs (ask ski before adding)
 
@@ -30,7 +33,8 @@ public enum ModdedShopType {
     Rusty,      //OMITB
     Boomhildr,  //OMITB
     Ironside,   //OMITB
-    Handy   ,   //Knife to a Gunfight
+    Doug,       //OMITB
+    Handy,      //Knife to a Gunfight
 };
 
 public static class ModdedShopItemAdder
@@ -56,9 +60,10 @@ public static class ModdedShopItemAdder
         // Populate our map of modded shop ids to a proper ModdedShopType
         _ModdedShopNameMap["psog:timedshop"]     = ModdedShopType.TimeTrader;
         _ModdedShopNameMap["psog:tabletechshop"] = ModdedShopType.Talbert;
-        _ModdedShopNameMap["omitb:Rusty"]        = ModdedShopType.Rusty;
-        _ModdedShopNameMap["omitb:Boomhildr"]    = ModdedShopType.Boomhildr;
-        _ModdedShopNameMap["omitb:Ironside"]     = ModdedShopType.Ironside;
+        _ModdedShopNameMap["nn:Rusty"]           = ModdedShopType.Rusty;
+        _ModdedShopNameMap["nn:Boomhildr"]       = ModdedShopType.Boomhildr;
+        _ModdedShopNameMap["nn:Ironside"]        = ModdedShopType.Ironside;
+        _ModdedShopNameMap["nn:Doug"]            = ModdedShopType.Doug;
         _ModdedShopNameMap["ski:Arms_Dealer"]    = ModdedShopType.Handy;
     }
 
@@ -109,17 +114,17 @@ public static class ModdedShopItemAdder
             return;
         _OurShopsInitialized = true;
 
-        // Lazy.DebugLog($"scanning custom items: ");
+        ShopLog($"adding modded items to our shops: ");
         foreach (GameObject shop in FancyShopBuilder.DelayedModdedLootAdditions.Keys)
         {
-            // Lazy.DebugLog($"  looking in shop {shop.name}");
+            ShopLog($"  looking in shop {shop.name}");
             GenericLootTable lootTable = shop.GetComponent<BaseShopController>().shopItems;
             foreach (string moddedItem in FancyShopBuilder.DelayedModdedLootAdditions[shop])
             {
                 PickupObject moddedPickup = Lazy.GetModdedItem(moddedItem);
                 if (!moddedPickup)
                     continue; // mod not loaded or item not found
-                // Lazy.DebugLog($"    adding modded item {moddedPickup.EncounterNameOrDisplayName} to shop");
+                ShopLog($"    adding modded item {moddedPickup.EncounterNameOrDisplayName} to shop");
                 lootTable.AddItemToPool(moddedPickup.PickupObjectId);
             }
         }
@@ -131,7 +136,7 @@ public static class ModdedShopItemAdder
             return;
         _ModdedShopsInitialized = true;
 
-        // Lazy.DebugLog($"scanning custom shops: ");
+        ShopLog($"adding our items to modded shops: ");
         var watch = System.Diagnostics.Stopwatch.StartNew();
         foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
@@ -142,7 +147,7 @@ public static class ModdedShopItemAdder
             Type perModShopController = assembly.GetType("NpcApi.CustomShopController");
             if (perModShopApi == null || perModShopController == null)
                 continue;
-            // Lazy.DebugLog($"  found assembly: {assembly.GetName().Name}");
+            ShopLog($"  found assembly: {assembly.GetName().Name}");
 
             // See if the assembly has actually defined builtShops
             FieldInfo builtShopsInfo = perModShopApi.GetField("builtShops", BindingFlags.Public | BindingFlags.Static);
@@ -176,7 +181,7 @@ public static class ModdedShopItemAdder
                 continue;
             if (bsc.shopItems is not GenericLootTable shopItems)
                 continue;
-            // Lazy.DebugLog($"    found shop {entry.Key}");
+            ShopLog($"    found shop {entry.Key}");
             if (!_ModdedShopNameMap.TryGetValue(entry.Key, out ModdedShopType shop))
                 continue;
 
@@ -188,9 +193,15 @@ public static class ModdedShopItemAdder
 
             foreach(int itemToAdd in _ModdedShopItems[shop])
             {
-                // Lazy.DebugLog($"      adding {itemToAdd} == {PickupObjectDatabase.GetById(itemToAdd).EncounterNameOrDisplayName} with weight 1");
+                ShopLog($"      adding {itemToAdd} == {PickupObjectDatabase.GetById(itemToAdd).EncounterNameOrDisplayName} with weight 1");
                 shopItems.AddItemToPool(itemToAdd);
             }
         }
     }
+
+    #if DEBUG && DEBUGMODDEDSHOPS
+        private static void ShopLog(object text) => Lazy.DebugLog(text);
+    #else
+        private static void ShopLog(object text) {}
+    #endif
 }

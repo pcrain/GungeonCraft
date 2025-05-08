@@ -15,6 +15,7 @@ public class EchoChamber : CwaffPassive
     {
         PassiveItem item   = Lazy.SetupPassive<EchoChamber>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.C;
+        item.AddToShop(ModdedShopType.Doug);
 
         _FlakProjectile = (ItemHelper.Get(Items.FlakBullets) as ComplexProjectileModifier).CollisionSpawnProjectile;
         _DefaultSprite = Items.Ak47.Projectile().gameObject.GetComponentInChildren<tk2dSprite>();

@@ -43,6 +43,7 @@ public class Cammy
             "nn:scroll_of_exact_knowledge",
             "nn:lil_munchy",
             "nn:hapulon",
+            "nn:cubud",
             // Frost and Gunfire
             "kp:penguin",
             "kp:blue_balloon",

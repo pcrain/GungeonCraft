@@ -25,6 +25,7 @@ public class ArmorPiercingRounds : CwaffPassive
         PassiveItem item  = Lazy.SetupPassive<ArmorPiercingRounds>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
+        item.AddToShop(ModdedShopType.Doug);
 
         _PierceVFX = VFX.Create("armor_pierce_effect", fps: 40, loops: false);
     }

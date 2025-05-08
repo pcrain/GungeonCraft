@@ -10,6 +10,10 @@
 - Added lighting effects to Macheening's charge animation
 - Rebuffed Paintball Cannon's damage from 4.5 to 5.5
 - Made Subtractor Beam's health labels look significantly nicer
+- Fixed Stereoscope's VFX not rendering above Bullet King and probably some other enemies
+- Fixed broken cross-mod compatibility with [Once More Into the Breach](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/Once_More_Into_The_Breach/)'s Shops
+- Added Cubud from Once More Into the Breach into the companion shop
+- Added Armor Piercing Rounds, 4D Bullets, and Echo Chamber to Once More Into the Breach's Doug shop
 
 ## 1.25.2 (2025-05-06)
 

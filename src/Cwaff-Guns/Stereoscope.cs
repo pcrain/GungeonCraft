@@ -44,7 +44,7 @@ public class Stereoscope : CwaffGun
     {
         CwaffVFX.SpawnBurst(prefab: _ResonancePrefab, numToSpawn: 6, basePosition: pos, positionVariance: 0.4f, velocityVariance: 10f,
             velType: CwaffVFX.Vel.AwayRadial, rotType: CwaffVFX.Rot.Position, lifetime: 0.25f, fadeOutTime: 0.25f, uniform: true,
-            startScale: 1.0f, endScale: 0.1f, specificFrame: freq + 6, height: 3f);
+            startScale: 1.0f, endScale: 0.1f, specificFrame: freq + 6, height: 8f);
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -236,7 +236,7 @@ public class Stereoscope : CwaffGun
         {
             CwaffVFX.SpawnBurst(prefab: _ResonancePrefab, numToSpawn: power, basePosition: pos, positionVariance: 1.75f, velocityVariance: 1f,
               velType: CwaffVFX.Vel.AwayRadial, rotType: CwaffVFX.Rot.Position, lifetime: 0.25f, fadeOutTime: 0.25f, uniform: true,
-              startScale: 1.0f, endScale: 0.1f, specificFrame: this.frequency + 6, height: 3f);
+              startScale: 1.0f, endScale: 0.1f, specificFrame: this.frequency + 6, height: 8f);
             Exploder.DoDistortionWave(center: pos, distortionIntensity: 1.5f, distortionRadius: 0.05f, maxRadius: 1.75f, duration: 0.25f);
         }
 

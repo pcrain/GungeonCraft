@@ -12,6 +12,7 @@ public class FourDBullets : CwaffPassive
         PassiveItem item   = Lazy.SetupPassive<FourDBullets>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality       = ItemQuality.A;
         item.AddToShop(ModdedShopType.TimeTrader);
+        item.AddToShop(ModdedShopType.Doug);
     }
 
     public override void Pickup(PlayerController player)
