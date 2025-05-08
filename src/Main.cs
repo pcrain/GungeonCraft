@@ -18,7 +18,6 @@
     global using MonoMod.RuntimeDetour;
     global using MonoMod.Cil;
     global using Mono.Cecil.Cil; //Instruction
-    global using SGUI;
     global using FullSerializer;
     global using HarmonyLib; //
 
@@ -35,6 +34,7 @@
     global using Alexandria.cAPI;
     global using Alexandria.CustomDodgeRollAPI;
     global using Brave.BulletScript;
+    global using Gunfiguration;
 
     global using SaveAPI; // only nonstandard api copied in from elsewhere, hopefully Alexandria standardizes this eventually
 #endregion
@@ -47,8 +47,6 @@ global using ExoticObjects            = Alexandria.DungeonAPI.SetupExoticObjects
 global using StaticReferences         = Alexandria.DungeonAPI.StaticReferences;
 global using CustomShopController     = Alexandria.NPCAPI.CustomShopController;
 global using CustomShopItemController = Alexandria.NPCAPI.CustomShopItemController;
-
-global using Gunfiguration;
 
 global using static ProjectileModule;        //ShootStyle, ProjectileSequenceStyle
 global using static tk2dBaseSprite;          //Anchor
@@ -84,14 +82,9 @@ public class Initialisation : BaseUnityPlugin
             var watch = System.Diagnostics.Stopwatch.StartNew();
             System.Diagnostics.Process currentProcess = System.Diagnostics.Process.GetCurrentProcess();
             long oldMemory = currentProcess.WorkingSet64;
-            if (C.DEBUG_BUILD)
-            {
-                #if DEBUG
-                    ETGModConsole.Log("Cwaffing the Gungy initializing...[DEBUG BUILD]");
-                #else // in theory shouldn't be able to reach this part anymore since C.DEBUG_BUILD is synced
-                    ETGModConsole.Log("Cwaffing the Gungy initializing...[RELEASE BUILD]");
-                #endif
-            }
+            #if DEBUG
+                ETGModConsole.Log("Cwaffing the Gungy initializing...[DEBUG BUILD]");
+            #endif
 
             Instance = this;
             _Harmony = new Harmony(C.MOD_GUID);
@@ -169,8 +162,6 @@ public class Initialisation : BaseUnityPlugin
                 CwaffTweaks.Init();
                 // Hecked Mode Tribute Statues
                 HeckedShrine.Init();
-                // HUD Stuff
-                // HUDController.Init();
                 // Midrun data
                 CwaffRunData.Init();
                 setupConfigWatch.Stop();
@@ -483,9 +474,6 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
                 ETGModMainBehaviour.Instance.gameObject.Play("vc_kirby_appeal01");
                 // ETGModConsole.Log($"you've played {GameStatsManager.Instance.GetPlayerStatValue(TrackedStats.TIME_PLAYED)} seconds");
-                //HACK: disable ETG debug log
-                // if (C.DEBUG_BUILD)
-                //     Application.logMessageReceived -= ETGModDebugLogMenu.Logger;
             #endif
         }
         catch (Exception e)

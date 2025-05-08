@@ -1,19 +1,24 @@
 # Changelog
 
-## 1.25.3 (TBD)
+## 1.25.3 (2025-05-07)
 
-- Fixed earsplitting audio glitch when cancelling mastered Ki Blast's charge attack at the wrong time
-- Fixed secret floor's flag for returning to previous floor not being reset when dying, causing weird floor skips and repeats
-- Fixed null deref caused by trying to flip sprites towards non-existent players
-- Added better impact sounds and VFX for Wavefront's projectiles
-- Added new sounds and UI heart indicators for when the player is under the effects of Sunderbuss' or Macheening's double damage penalty
-- Added lighting effects to Macheening's charge animation
-- Rebuffed Paintball Cannon's damage from 4.5 to 5.5
+#### Balance Changes and Polish:
+
 - Made Subtractor Beam's health labels look significantly nicer
+- Added new sounds and UI heart indicators for when the player is under the effects of Sunderbuss' or Macheening's double damage penalty
+- Added better impact sounds and VFX for Wavefront's projectiles
+- Added lighting effects to Macheening's charge animation
+- Added Armor Piercing Rounds, 4D Bullets, and Echo Chamber to [Once More Into the Breach](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/Once_More_Into_The_Breach/)'s Doug shop
+- Added Cubud from Once More Into the Breach to the companion shop
+- Rebuffed Paintball Cannon's damage from 4.5 to 5.5
+
+#### Bugfixes and Misc:
+
+- Fixed broken cross-mod compatibility with Once More Into the Breach's Shops
+- Fixed earsplitting audio glitch when cancelling mastered Ki Blast's charge attack at the wrong time
+- Fixed secret floor's flag for returning to the previous floor not being reset when dying, causing weird floor skips and repeats
+- Fixed null deref caused by trying to flip sprites towards non-existent players
 - Fixed Stereoscope's VFX not rendering above Bullet King and probably some other enemies
-- Fixed broken cross-mod compatibility with [Once More Into the Breach](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/Once_More_Into_The_Breach/)'s Shops
-- Added Cubud from Once More Into the Breach into the companion shop
-- Added Armor Piercing Rounds, 4D Bullets, and Echo Chamber to Once More Into the Breach's Doug shop
 - Added version checks for modding library dependencies to prevent errors resulting from launching using out of date libraries 
 
 ## 1.25.2 (2025-05-06)
