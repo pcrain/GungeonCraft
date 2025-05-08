@@ -14,6 +14,7 @@
 - Fixed broken cross-mod compatibility with [Once More Into the Breach](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/Once_More_Into_The_Breach/)'s Shops
 - Added Cubud from Once More Into the Breach into the companion shop
 - Added Armor Piercing Rounds, 4D Bullets, and Echo Chamber to Once More Into the Breach's Doug shop
+- Added version checks for modding library dependencies to prevent errors resulting from launching using out of date libraries 
 
 ## 1.25.2 (2025-05-06)
 

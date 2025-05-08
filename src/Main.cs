@@ -60,9 +60,9 @@ global using static PlayerStats;             //StatType
 namespace CwaffingTheGungy;
 
 [BepInPlugin(C.MOD_GUID, C.MOD_NAME, C.MOD_VERSION)]
-[BepInDependency(ETGModMainBehaviour.GUID)]
-[BepInDependency(Alexandria.Alexandria.GUID)]
-[BepInDependency(Gunfiguration.C.MOD_GUID)]
+[BepInDependency(ETGModMainBehaviour.GUID, "1.9.2")]
+[BepInDependency(Alexandria.Alexandria.GUID, "0.4.22")]
+[BepInDependency(Gunfiguration.C.MOD_GUID, "1.1.5")]
 public class Initialisation : BaseUnityPlugin
 {
     public static Initialisation Instance;
