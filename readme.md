@@ -22,7 +22,6 @@
 - Hecked Mode: randomize enemies' guns for a truly hecked playing experience (enabled via the Mod Config menu)
 - A new secret boss
 - Gun mastery system
-- Vanilla bugfixes
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
 - And more!
@@ -34,14 +33,6 @@
 - **Balance and Diversity**: all items and guns should be fun, engaging, and useful in a variety of situations
 - **Fun New Mechanics**: most items and guns should offer their own distinct ways of interacting with the Gungeon
 - **Playstyle Variety**: defensive and strategic play should feel as rewarding as aggressive and proactive play
-
-### Vanilla Bugs Fixed
-* In co-op Turbo Mode, the 2nd player now has the same speed as the first player without having to die first
-* When saving and reloading a run, guns no longer lose any other guns duct-taped to them
-* Rooms that can only spawn once per run (e.g., specialty shops) are now properly marked as "not spawned this run" after a Quick Restart
-* Certain algorithms for shuffling the order of a list (e.g., for floor generation) will now randomly shuffle the first and last items in the list
-* Orbiting guns no longer shoot projectiles from a weird position if created while the player is facing left
-* VFX that play on the ammo display when firing a gun no longer render behind final projectiles
 
 ### FAQ
 

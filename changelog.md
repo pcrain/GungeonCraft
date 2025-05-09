@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.25.4 (2025-05-08)
+
+- Separated vanilla bugfixes and optimizations into its own mod for the greater good: [Gungeon Go Vroom](https://thunderstore.io/c/enter-the-gungeon/p/CaptainPretzel/Gungeon_Go_Vroom/)
+- Updated required Gunfig version to 1.1.6 for configuration bugfixes
+
 ## 1.25.3 (2025-05-07)
 
 #### Balance Changes and Polish:
