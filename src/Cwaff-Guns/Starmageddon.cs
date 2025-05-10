@@ -12,8 +12,6 @@ public class Starmageddon : CwaffGun
     internal static CwaffTrailController _MeteorTrailPrefab = null;
     private static List<Vector2> _EnemyWeights = new(16);
 
-    internal bool _mastered = false;
-
     private int _nextIndex = 0;
     private int _curBatch  = 0;
     private bool _masteryVolleyReplaced = false;
@@ -239,7 +237,7 @@ public class StarmageddonProjectile : MonoBehaviour
             this._index = sm.GetNextIndex();
             this._batch = sm.GetBatch();
             this._naturalSpawn = true;
-            this._mastered = sm._mastered;
+            this._mastered = sm.Mastered;
         }
         else
             sm = null;
