@@ -3,6 +3,7 @@
 ## 1.25.5 (TBD)
 
 - Optimized code for checking when interact is pressed with no interactible nearby (used by Scalding Jelly)
+- Optimized code for drawing mastery labels for guns
 
 ## 1.25.4 (2025-05-08)
 

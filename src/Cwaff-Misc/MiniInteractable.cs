@@ -132,6 +132,7 @@ public class MiniInteractable : BraveBehaviour, IPlayerInteractable
       SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.01f, 0.005f);
   }
 
+  // REFACTOR: optimize for Blackjack's cards
   public float GetDistanceToPoint(Vector2 point)
   {
     if (!this)
