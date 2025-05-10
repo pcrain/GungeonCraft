@@ -232,13 +232,11 @@ public static class CwaffEvents // global custom events we can listen for
         [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
         static void Postfix(PlayerController __instance)
         {
-            if (!__instance || __instance.m_currentRoom is not RoomHandler room)
+            if (OnEmptyInteract == null)
                 return;
-            IPlayerInteractable playerInteractable = room.GetNearestInteractable(__instance.CenterPosition, 1f, __instance);
-            if (playerInteractable != null || __instance.m_activeActions == null || !__instance.m_activeActions.InteractAction.WasPressed || __instance.IsPetting || __instance.IsDodgeRolling || __instance.m_handlingQueuedAnimation)
+            if (__instance.m_lastInteractionTarget != null || __instance.m_activeActions == null || !__instance.m_activeActions.InteractAction.WasPressed || __instance.IsPetting || __instance.IsDodgeRolling || __instance.m_handlingQueuedAnimation)
                 return;
-            if (OnEmptyInteract != null)
-                OnEmptyInteract(__instance);
+            OnEmptyInteract(__instance);
         }
     }
 

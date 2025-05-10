@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.25.5 (TBD)
+
+- Optimized code for checking when interact is pressed with no interactible nearby (used by Scalding Jelly)
+
 ## 1.25.4 (2025-05-08)
 
 - Separated vanilla bugfixes and optimizations into its own mod for the greater good: [Gungeon Go Vroom](https://thunderstore.io/c/enter-the-gungeon/p/CaptainPretzel/Gungeon_Go_Vroom/)
