@@ -1703,8 +1703,9 @@ public static class Extensions
   /// <summary>Get the first matching gun in the Player's inventory</summary>
   public static GunType FindGun<GunType>(this PlayerController p) where GunType : MonoBehaviour
   {
-    foreach (Gun gun in p.inventory.AllGuns)
-      if (gun.GetComponent<GunType>() is GunType g)
+    List<Gun> guns = p.inventory.AllGuns;
+    for (int i = guns.Count - 1; i >= 0; --i)
+      if (guns[i].gameObject.GetComponent<GunType>() is GunType g)
         return g;
     return null;
   }
@@ -1712,9 +1713,10 @@ public static class Extensions
   /// <summary>Get the Gun behavior for the first matching gun in the Player's inventory</summary>
   public static Gun FindBaseGun<GunType>(this PlayerController p) where GunType : MonoBehaviour
   {
-    foreach (Gun gun in p.inventory.AllGuns)
-      if (gun.GetComponent<GunType>() is GunType g)
-        return gun;
+    List<Gun> guns = p.inventory.AllGuns;
+    for (int i = guns.Count - 1; i >= 0; --i)
+      if (guns[i].gameObject.GetComponent<GunType>() is GunType g)
+        return guns[i];
     return null;
   }
 
@@ -2166,7 +2168,9 @@ public static class Extensions
   public static tk2dBaseSprite DuplicateInWorld(this tk2dBaseSprite osprite, Texture2D optionalPalette = null)
   {
     tk2dBaseSprite sprite = Lazy.SpriteObject(osprite.collection, osprite.spriteId);
-    sprite.PlaceAtPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
+    sprite.transform.localScale = osprite.transform.localScale;
+    sprite.transform.rotation = osprite.transform.rotation;
+    sprite.PlaceAtRotatedPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
     sprite.HeightOffGround        = osprite.HeightOffGround;
     sprite.depthUsesTrimmedBounds = osprite.depthUsesTrimmedBounds;
     sprite.SortingOrder           = osprite.SortingOrder;

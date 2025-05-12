@@ -157,28 +157,43 @@ public class ThrownCard : MonoBehaviour
 
     private void CreatePlayingCardPickup(Projectile p)
     {
-        if (p.FiredForFree())
-            return; // don't create free ammo from, e.g., scattershot
-
-        MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(
-          p.sprite, // correct transform w.r.t. MiddleLeft anchor
-          p.sprite.transform.position + new Vector3(0.5f * 12f / C.PIXELS_PER_TILE, 0, 0),
-          PickUpPlayingCardScript);
-        mi.autoInteract = true;
-        mi.transform.rotation = p.transform.rotation;
-        mi.sprite.renderer.material = p.sprite.renderer.material;
+        if (!p.FiredForFree() && p.sprite) // don't create free ammo from, e.g., scattershot
+            PlayingCard.Create(p);
     }
 
-    public static IEnumerator PickUpPlayingCardScript(MiniInteractable i, PlayerController p)
+    private class PlayingCard : MonoBehaviour
     {
-        if ((p.FindBaseGun<Blackjack>() is Gun gun) && (gun.CurrentAmmo < gun.AdjustedMaxAmmo))
+        const float PICKUP_RADIUS = 3f;
+        const float PICKUP_RADIUS_SQR = PICKUP_RADIUS * PICKUP_RADIUS;
+
+        private tk2dBaseSprite _sprite = null;
+
+        internal static PlayingCard Create(Projectile p)
         {
-            gun.CurrentAmmo += 1;
-            p.gameObject.PlayUnique("card_pickup_sound");
-            SpawnManager.SpawnVFX(VFX.MiniPickup, i.sprite.WorldCenter, Lazy.RandomEulerZ());
-            UnityEngine.Object.Destroy(i.gameObject);
+            tk2dBaseSprite sprite = p.sprite.DuplicateInWorld();
+            PlayingCard card = sprite.gameObject.AddComponent<PlayingCard>();
+            card._sprite = sprite;
+            return card;
         }
-        i.interacting = false;
-        yield break;
+
+        private void Update()
+        {
+            Vector2 pos = this._sprite.WorldCenter;
+            for (int i = 0; i < GameManager.Instance.AllPlayers.Length; ++i)
+            {
+                PlayerController p = GameManager.Instance.AllPlayers[i];
+                if (!p || p.IsGhost || p.healthHaver.IsDead)
+                    continue;
+                if ((p.CenterPosition - pos).sqrMagnitude > PICKUP_RADIUS_SQR)
+                    continue;
+                if ((p.FindBaseGun<Blackjack>() is not Gun gun) || (gun.CurrentAmmo >= gun.AdjustedMaxAmmo))
+                    continue;
+                gun.CurrentAmmo += 1;
+                p.gameObject.PlayUnique("card_pickup_sound");
+                SpawnManager.SpawnVFX(VFX.MiniPickup, pos, Lazy.RandomEulerZ());
+                UnityEngine.Object.Destroy(base.gameObject);
+                break;
+            }
+        }
     }
 }

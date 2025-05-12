@@ -5,6 +5,7 @@
 - Optimized code for checking when interact is pressed with no interactible nearby (used by Scalding Jelly)
 - Optimized code for drawing mastery labels for guns
 - Fixed Starmageddon's mastery being completely nonfunctional
+- Optimized laggy code for checking whether Blackjack's card should be picked up
 
 ## 1.25.4 (2025-05-08)
 
