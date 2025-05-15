@@ -54,7 +54,10 @@ public static class Lazy
         {
             _BaseModule ??= Items._38Special.AsGun().DefaultModule;
 
-            GameObject go          = UnityEngine.Object.Instantiate(ItemHelper.Get(Items.PeaShooter).gameObject);
+            GameObject prefabGun   = ItemHelper.Get(Items.PeaShooter).gameObject;
+            prefabGun.SetActive(false); // prevent Awake() from being called on the new prefab and setting up audio events
+            GameObject go          = UnityEngine.Object.Instantiate(prefabGun);
+            prefabGun.SetActive(true);
             go.name                = baseItemName;
             ammonomiconSprite      = $"{baseItemName}_ammonomicon";
 

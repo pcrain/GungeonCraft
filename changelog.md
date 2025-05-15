@@ -7,6 +7,7 @@
 - Fixed Starmageddon's mastery being completely nonfunctional since 1.22.1
 - Optimized laggy code for checking whether Blackjack's card should be picked up
 - Optimized some code checking whether screen shaders should be applied
+- Slightly optimized gun setup code
 
 ## 1.25.4 (2025-05-08)
 
