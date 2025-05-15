@@ -96,13 +96,14 @@ public static class CwaffShaders
     {
         if (!SpiceShadersEnabled(enabled))
         {
-            if (Pixelator.Instance)
+            if (Pixelator.HasInstance)
                 Pixelator.Instance.DeregisterAdditionalRenderPass(_WiggleMat);
             return;
         }
         _WiggleMat ??= new Material(CwaffShaders.ScreenWiggleShader);
         _WiggleMat.SetFloat("_Amplitude", 0.0008f * GameManager.Instance.PrimaryPlayer.spiceCount);
-        Pixelator.Instance.RegisterAdditionalRenderPass(_WiggleMat);
+        if (Pixelator.HasInstance)
+            Pixelator.Instance.RegisterAdditionalRenderPass(_WiggleMat);
         // GameManager.Instance.PrimaryPlayer.ToggleShadowVisiblity(false);
         // SpriteOutlineManager.ToggleOutlineRenderers(GameManager.Instance.PrimaryPlayer.sprite, false);
     }
