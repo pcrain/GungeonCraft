@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 public class C // constants and common variables
 {
-    public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+    public static readonly bool DEBUG_BUILD = false; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
     public const string MOD_NAME     = "GungeonCraft";
     public const string MOD_INT_NAME = "CwaffingTheGungy";
@@ -54,16 +54,14 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
         // Get the name of each PNG resource and stuff it into a sorted array by its index number
         foreach(string s in AtlasHelper._PackedTextures.Keys)
         {
-            string path = s.Replace('.','/');
-            string[] tokens = path.Split('/');
-            string baseName = tokens[tokens.Length - 1];
-            Match match = _NumberAtEnd.Match(baseName);
+            Match match = _NumberAtEnd.Match(s);
             // If we aren't numbered at the end, we're just a singular sprite
             if (!match.Success)
             {
+                string baseName = s.Substring(s.LastIndexOf('.') + 1);
                 if (!tempMap.ContainsKey(baseName))
                     tempMap[baseName] = new string[1];
-                tempMap[baseName][0] = path;
+                tempMap[baseName][0] = s.Replace('.','/');
                 continue;
             }
             string name = match.Groups[1].Value;
@@ -80,7 +78,7 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
                 Array.Resize(ref arr, index);
                 tempMap[name] = arr;
             }
-            tempMap[name][index - 1] = path;
+            tempMap[name][index - 1] = s.Replace('.','/');
         }
 
         // Convert our arrays to lists

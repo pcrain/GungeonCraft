@@ -109,7 +109,7 @@ public static class SaveAPIManager
             typeof(SaveAPIManager).GetMethod("AIActorEngagedHook")
         );
         LoadGameStatsFirstLoad();
-        BreachShopTool.DoSetup();
+        // BreachShopTool.DoSetup(); //HACK: slows down loading so disabling until I need it
         m_loaded = true;
     }
 
