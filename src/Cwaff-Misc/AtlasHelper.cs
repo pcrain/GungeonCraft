@@ -378,7 +378,15 @@ internal static class AtlasHelper
       _TemporaryPatches.Add(new(harmony,
         typeof(SpriteBuilder).GetMethod("AddSpriteToCollection", types: new[]{typeof(string), typeof(tk2dSpriteCollectionData), typeof(Assembly)}),
         typeof(AddSpriteToCollectionPatch).GetMethod("Prefix", bindingAttr: anyFlags)));
+
+      // Prevent MTG API's sprite replacement stuff from triggering overzealously
+      Assembly MtGAssembly = typeof(GunBehaviour).Assembly;
+      _TemporaryPatches.Add(new(harmony,
+        MtGAssembly.GetType("HarmonyPatches").GetMethod("AddMissingReplacements", bindingAttr: anyFlags, binder: null, callConvention: CallingConventions.Any, types: new[]{typeof(tk2dSpriteCollectionData)}, modifiers: null),
+        typeof(AtlasHelper).GetMethod("False", bindingAttr: anyFlags)));
   }
+
+  private static bool False() => false; // skip method unconditionally
 
   internal static void RemoveSetupPatches(Harmony harmony)
   {
