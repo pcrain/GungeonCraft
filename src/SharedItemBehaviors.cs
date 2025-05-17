@@ -329,29 +329,34 @@ public static class AnimatedBullet // stolen and modified from NN
 
     public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0)
     {
-        proj.sprite.spriteAnimator.currentClip = clip;
-        proj.sprite.spriteAnimator.PlayFromFrame(frame);
+        tk2dSpriteAnimator animator = proj.sprite.spriteAnimator;
+        animator.currentClip = clip;
+        animator.PlayFromFrame(frame);
     }
 
     public static void AddClip(this tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, bool overwriteExisting = false)
     {
         if (animator.Library == null)
         {
-            animator.Library = animator.gameObject.AddComponent<tk2dSpriteAnimation>();
+            animator.Library = animator.gameObject.GetOrAddComponent<tk2dSpriteAnimation>();
             animator.Library.clips = new tk2dSpriteAnimationClip[0];
             animator.Library.enabled = true;
         }
 
-        if (overwriteExisting)
+        if (overwriteExisting || animator.Library.clips == null)
             animator.Library.clips = new tk2dSpriteAnimationClip[] { clip };
         else
-            animator.Library.clips = animator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+        {
+            int nextIndex = animator.Library.clips.Length;
+            Array.Resize(ref animator.Library.clips, nextIndex + 1);
+            animator.Library.clips[nextIndex] = clip;
+        }
     }
 
     public static void AddAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, bool overwriteExisting = false)
     {
-        if (proj.sprite.spriteAnimator == null)
-            proj.sprite.spriteAnimator = proj.sprite.gameObject.AddComponent<tk2dSpriteAnimator>();
+        if (!proj.sprite.spriteAnimator)
+            proj.sprite.spriteAnimator = proj.sprite.gameObject.GetOrAddComponent<tk2dSpriteAnimator>();
         tk2dSpriteAnimator animator = proj.sprite.spriteAnimator;
         animator.AddClip(clip, overwriteExisting);
         animator.playAutomatically = true;

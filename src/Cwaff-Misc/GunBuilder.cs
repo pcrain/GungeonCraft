@@ -425,6 +425,8 @@ public static class GunBuilder
   {
     b ??= GunData.Default;
     ProjectileType p = projectile.ClonePrefab();
+    if (!p.sprite)
+      p.sprite = p.gameObject.GetComponentInChildren<tk2dBaseSprite>();
     p.AddDefaultAnimation(b);
 
     // Defaulted

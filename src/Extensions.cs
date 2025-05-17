@@ -114,7 +114,13 @@ public static class Extensions
   /// <summary>Instantiate a prefab and clone it as a new prefab, with generic support</summary>
   public static T ClonePrefab<T>(this T self, bool deactivate = true, bool markFake = true, bool dontUnload = true) where T : Component
   {
-    return UnityEngine.Object.Instantiate(self.gameObject).RegisterPrefab(deactivate, markFake, dontUnload).GetComponent<T>();
+    bool wasActive = self.gameObject.activeSelf;
+    if (wasActive)
+      self.gameObject.SetActive(false); // prevent Awake() and friends from being called
+    T t = UnityEngine.Object.Instantiate(self.gameObject).RegisterPrefab(deactivate, markFake, dontUnload).GetComponent<T>();
+    if (wasActive)
+      self.gameObject.SetActive(true);
+    return t;
   }
 
   /// <summary>Convert degrees to a Vector2 angle</summary>

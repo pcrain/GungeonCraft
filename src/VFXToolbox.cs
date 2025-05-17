@@ -586,6 +586,7 @@ public static class VFX
             int spriteID = collection.GetSpriteIdByName(spritePath);
             tk2dTiledSprite tiledSprite = projectile.gameObject.GetOrAddComponent<tk2dTiledSprite>();
 
+            tiledSprite.m_transform = tiledSprite.transform; //NOTE: necessary now that we're working with deactivated objects
             tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
             tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
             def.colliderVertices = new Vector3[]{
