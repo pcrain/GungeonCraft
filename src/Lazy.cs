@@ -128,11 +128,13 @@ public static class Lazy
         string itemName = typeof(TItemSpecific).Name;
         string baseItemName = itemName.InternalName();  //get saner gun name for commands
         string internalName = C.MOD_PREFIX+":"+baseItemName;
+        GameObject fakeItemObject = new GameObject(itemName).RegisterPrefab();
 
-        tk2dSprite sprite = Lazy.SpriteObject(ETGMod.Databases.Items.ItemCollection, 0).RegisterPrefab();
+        tk2dSprite sprite = fakeItemObject.AddComponent<tk2dSprite>();
+        sprite.collection = ETGMod.Databases.Items.ItemCollection;
+        sprite.spriteId   = 0;
 
-        TItemSpecific item = sprite.AddComponent<TItemSpecific>();
-
+        TItemSpecific item = fakeItemObject.AddComponent<TItemSpecific>();
         ETGMod.Databases.Items.SetupItem(item, itemName);
         if (C.DEBUG_BUILD) // only allow spawning fake items through console in debug mode
             Gungeon.Game.Items.Add(internalName, item);
