@@ -255,9 +255,14 @@ internal static class AtlasHelper
         tk2dSpriteDefinition.AttachPoint[] aps = attachPoints[j];
         if (aps == null)
           continue;
-        collection.SetAttachPoints(oldLength + j, aps);
+        int spriteId = oldLength + j;
+        collection.SpriteIDsWithAttachPoints.Add(spriteId);
+        collection.SpriteDefinedAttachPoints.Add(new AttachPointData(aps));
         if (collection.inst != collection)
-            collection.inst.SetAttachPoints(oldLength + j, aps);
+        {
+            collection.inst.SpriteIDsWithAttachPoints.Add(spriteId);
+            collection.inst.SpriteDefinedAttachPoints.Add(new AttachPointData(aps));
+        }
         // ETGModConsole.Log($"setting attach points for {id} == {spriteName}");
       }
 
