@@ -3357,7 +3357,8 @@ public static class Extensions
       else
         _HatOverrides[player.PlayerIDX].Add(newHat.hatName);
       hc.SetHat(newHat);
-      LootEngine.DoDefaultItemPoof(player.sprite.WorldBottomCenter + new Vector2(0f, 1f));
+      if (doPoof)
+        LootEngine.DoDefaultItemPoof(player.sprite.WorldBottomCenter + new Vector2(0f, 1f));
   }
 
   /// <summary>Remove a temporary override for a player's hat</summary>
@@ -3379,6 +3380,7 @@ public static class Extensions
       }
       if (returnHat != null && Hatabase.Hats.TryGetValue(returnHat.GetDatabaseFriendlyHatName(), out Hat origHat))
         hc.SetHat(origHat);
+      if (doPoof)
         LootEngine.DoDefaultItemPoof(player.sprite.WorldBottomCenter + new Vector2(0f, 1f));
   }
 

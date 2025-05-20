@@ -8,6 +8,7 @@
 - Optimized laggy code for checking whether Blackjack's card should be picked up
 - Optimized some code checking whether screen shaders should be applied
 - Slightly optimized gun setup code
+- Fixed Oddjob poofing whenever it is attached and detached from the player's head (broken since 1.23.0)
 
 ## 1.25.4 (2025-05-08)
 
