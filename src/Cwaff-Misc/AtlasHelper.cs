@@ -312,9 +312,9 @@ internal static class AtlasHelper
       if (_CreatedAmmoTypes.Contains(name))
         return name;
       GameUIAmmoType uiammotype = new GameUIAmmoType {
-          ammoBarBG      = new GameObject("sprite bg").RegisterPrefab().SetupDfSpriteFromDef<dfTiledSprite>(
+          ammoBarBG      = new GameObject("sprite bg").RegisterPrefab().SetupDfSpriteFromDef(
             _PackedTextures[ammoBackgroundSpritePath], ShaderCache.Acquire("Daikon Forge/Default UI Shader")),
-          ammoBarFG      = new GameObject("sprite fg").RegisterPrefab().SetupDfSpriteFromDef<dfTiledSprite>(
+          ammoBarFG      = new GameObject("sprite fg").RegisterPrefab().SetupDfSpriteFromDef(
             _PackedTextures[ammoTypeSpritePath], ShaderCache.Acquire("Daikon Forge/Default UI Shader")),
           ammoType       = GameUIAmmoType.AmmoType.CUSTOM,
           customAmmoType = name
@@ -327,9 +327,8 @@ internal static class AtlasHelper
   }
 
   /// <summary>Modification of Alexandria method using our own packed textures</summary>
-  public static T SetupDfSpriteFromDef<T>(this GameObject obj, tk2dSpriteDefinition def, Shader shader) where T : dfSprite
+  public static dfTiledSprite SetupDfSpriteFromDef(this GameObject obj, tk2dSpriteDefinition def, Shader shader)
   {
-      T sprite = obj.AddComponent<T>();
       dfAtlas atlas = obj.AddComponent<dfAtlas>();
       atlas.Material = new Material(shader);
       atlas.Material.mainTexture = def.material.mainTexture;
@@ -346,6 +345,7 @@ internal static class AtlasHelper
           textureGUID  = "main_sprite"
       };
       atlas.AddItem(info);
+      dfTiledSprite sprite = obj.AddComponent<dfTiledSprite>();
       sprite.Atlas = atlas;
       sprite.SpriteName = "main_sprite";
       return sprite;

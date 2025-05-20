@@ -1,31 +1,5 @@
 namespace CwaffingTheGungy;
 
-// Fixes ignoreDamageCaps not working on beams
-[HarmonyPatch(typeof(BasicBeamController), nameof(BasicBeamController.FrameUpdate))]
-public static class BasicBeamControllerFrameUpdatePatch
-{
-    [HarmonyILManipulator]
-    private static void BasicBeamControllerFrameUpdateIL(ILContext il)
-    {
-        ILCursor cursor = new ILCursor(il);
-        for (int i = 0; i < 3; ++i) // move right before the 3rd ApplyDamage() call
-            if (!cursor.TryGotoNext(i == 2 ? MoveType.Before : MoveType.After,
-              instr => instr.MatchCallvirt<HealthHaver>(nameof(HealthHaver.ApplyDamage))))
-                return;
-
-        if (!cursor.TryGotoPrev(MoveType.After, instr => instr.MatchLdcI4(0))) // hardcoded false for ignoreDamageCaps
-            return;
-
-        cursor.Emit(OpCodes.Ldarg_0);
-        cursor.CallPrivate(typeof(BasicBeamControllerFrameUpdatePatch), nameof(BeamShouldIgnoreDamageCaps));
-    }
-
-    private static bool BeamShouldIgnoreDamageCaps(bool origVal, BasicBeamController beam)
-    {
-        return origVal || (beam.projectile && beam.projectile.ignoreDamageCaps);
-    }
-}
-
 // Fixes UI armor sprites slowly shifting offscreen whenever they're changed
 //   (doesn't crop up in Vanilla due to armor sprite never changing)
 [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.UpdateHealth))]
