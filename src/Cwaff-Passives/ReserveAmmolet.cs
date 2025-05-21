@@ -13,7 +13,7 @@ public class ReserveAmmolet : CwaffBlankModificationItem, ICustomBlankDoer
     {
         PassiveItem item  = Lazy.SetupPassive<ReserveAmmolet>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
-        ItemBuilder.AddPassiveStatModifier(item, StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
+        item.AddPassiveStatModifier(StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
     }
 

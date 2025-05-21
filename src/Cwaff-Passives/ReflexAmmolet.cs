@@ -11,7 +11,7 @@ public class ReflexAmmolet : CwaffBlankModificationItem
     {
         PassiveItem item  = Lazy.SetupPassive<ReflexAmmolet>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
-        ItemBuilder.AddPassiveStatModifier(item, StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
+        item.AddPassiveStatModifier(StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
     }
 

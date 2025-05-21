@@ -15,7 +15,7 @@ public class RCLauncher : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<RCLauncher>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: _FULL_RELOAD_TIME, ammo: 240, shootFps: 30, reloadFps: 16,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: _FULL_RELOAD_TIME, ammo: 320, shootFps: 30, reloadFps: 16,
             loopReloadAt: 0, fireAudio: "rc_car_launch_sound", reloadAudio: "rc_car_reload_sound")
           .InitSpecialProjectile<RCGuidedProjectile>(GunData.New(sprite: "rc_car_projectile", clipSize: 7, cooldown: 0.1f,
             shootStyle: ShootStyle.SemiAutomatic, speed: 20f, damage: 9f, range: 9999f, pierceBreakables: true,

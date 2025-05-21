@@ -147,7 +147,7 @@ omni_spin_sound,-6.5,1,sound,0
 omnilaser_shoot_sound,-8.0,1,sound,0
 rc_car_launch_sound,-8.0,1,sound,0
 rc_car_engine_sound,-14.0,0,sound,0
-rc_car_crash_sound,-4.0,1,sound,0
+rc_car_crash_sound,-8.0,1,sound,0
 rc_car_reload_sound,-2.0,1,sound,0
 pincushion_fire,-15.0,1,sound,0
 breegull_shoot_sound,-8.5,1,sound,0
@@ -210,7 +210,7 @@ kazooie_walk_a,-5.5,1,sound,0
 kazooie_walk_b,-5.5,1,sound,0
 knife_hit_wall_sound,-4.5,1,sound,0
 knife_hit_enemy_sound,-5.0,1,sound,0
-paintball_impact_enemy_sound,-2.5,1,sound,0
+paintball_impact_enemy_sound,-5.5,1,sound,0
 bb_impact_sound,2.5,1,sound,0
 generic_bullet_impact,-2.0,1,sound,0
 femtobyte_hit_enemy_sound,-2.0,1,sound,0

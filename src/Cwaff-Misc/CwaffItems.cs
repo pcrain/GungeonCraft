@@ -100,6 +100,13 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     }
   }
 
+  internal bool CanBeMastered()
+  {
+    if (this._cachedMasteryTokenId < -1)
+      this._cachedMasteryTokenId = this.gun.MasteryTokenId();
+    return this._cachedMasteryTokenId >= 0;
+  }
+
   internal void DoMasteryChecks(PlayerController player)
   {
     bool wasMastered = this.Mastered;

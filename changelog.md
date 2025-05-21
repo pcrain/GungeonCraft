@@ -9,6 +9,14 @@
 - Optimized some code checking whether screen shaders should be applied
 - Slightly optimized gun setup code
 - Fixed Oddjob poofing whenever it is attached and detached from the player's head (broken since 1.23.0)
+- Reduced volume on Pogo Stick Gun, R. C. Launcher, and Paintball Cannon projectile sounds
+- Pogo Stick item now grants an additional active item slot while held
+- Increased R.C. Launcher's ammo from 240 to 320
+- Fixed hats sometimes improperly rendering below the player when riding Pogo Stick
+- Added custom ammo clip sprite for Oddjob
+- Removed indicator incorrectly suggesting that Pogo Stick Gun can be mastered
+- Added "Revved" indicator for when Natascha will stay spun up when not firing
+- Ki Blast now passively recharges Ki even when it is not the active gun
 
 ## 1.25.4 (2025-05-08)
 

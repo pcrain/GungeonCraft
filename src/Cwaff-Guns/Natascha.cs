@@ -23,6 +23,7 @@ public class Natascha : CwaffGun
             shootFps: (int)((float)_FIRE_ANIM_FRAMES / _BASE_COOLDOWN) + 1, rampUpFireRate: true,
             muzzleVFX: "muzzle_natascha", muzzleFps: 60, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmissionColor: Color.white,
             muzzleLightStrength: 15.0f, muzzleLightRange: 0.375f, muzzleEmission: 34.77f, muzzleEmissionColorPower: 24.9f)
+          .Attach<NataschaAmmoDisplay>()
           .SetCasing(Items.Ak47)
           .AddToShop(ItemBuilder.ShopType.Trorc)
           .AddToShop(ModdedShopType.Rusty)
@@ -159,4 +160,29 @@ public class Natascha : CwaffGun
 
     //NOTE: Only works if GainsRateOfFireAsContinueAttack is true (i.e., rampUpFireRate: true is set in attributes)
     public override float GetDynamicFireRate() => (this._speedMult / (1f + _MAX_SPIN_UP));
+
+    private class NataschaAmmoDisplay : CustomAmmoDisplay
+    {
+        private Gun _gun;
+        private Natascha _natascha;
+        private PlayerController _owner;
+
+        private void Start()
+        {
+            this._gun = base.GetComponent<Gun>();
+            this._natascha = this._gun.GetComponent<Natascha>();
+            this._owner = this._gun.CurrentOwner as PlayerController;
+        }
+
+        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+        {
+            if (!this._owner || !this._natascha)
+                return false;
+            if (!this._natascha._maintainSpinup)
+                uic.GunAmmoCountLabel.Text = this._owner.VanillaAmmoDisplay();
+            else
+                uic.GunAmmoCountLabel.Text = $"[color #ddffaa]Revved[/color]\n{this._owner.VanillaAmmoDisplay()}";
+            return true;
+        }
+    }
 }

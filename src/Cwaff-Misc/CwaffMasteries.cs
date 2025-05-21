@@ -68,7 +68,7 @@ public static class CwaffMasteries
         {
             if (__instance.gameObject.GetComponent<Gun>() is not Gun gun || gun.m_owner is not PlayerController p)
               return;
-            if (__instance.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg)
+            if (__instance.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg || !cg.CanBeMastered())
               return;
             bool mastered = cg.Mastered;
             uint hash = (uint)gun.PickupObjectId + (mastered ? 65536u : 0u);

@@ -40,6 +40,7 @@ public class PogoStick : CwaffDodgeRollActiveItem
         item.consumable = false;
         item.SetCooldownType(ItemBuilder.CooldownType.Timed, 0.5f);
         item.gameObject.AddComponent<PogoDodgeRoll>();
+        item.AddPassiveStatModifier(StatType.AdditionalItemCapacity, 1f, StatModifier.ModifyMethod.ADDITIVE);
 
         PogoPrefab = VFX.Create("pogo_stick_vfx", anchor: Anchor.LowerCenter);
     }
@@ -230,7 +231,10 @@ public class PogoStick : CwaffDodgeRollActiveItem
         float newY = BOUNCE_HEIGHT * this._phase;
 
         if (this._state != State.BOUNCING)
+        {
             playerSprite.transform.localPosition = playerSprite.transform.localPosition.WithY(newY);
+            playerSprite.UpdateZDepth();
+        }
         this._inFrontOfPlayer = (this._owner.m_currentGunAngle > 155f || this._owner.m_currentGunAngle < 25f);
         Vector2 basePos = playerSprite.WorldBottomCenter.Quantize(0.0625f, VectorConversions.Floor);
         string playerSpriteName = playerSprite.CurrentSprite.name;

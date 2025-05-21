@@ -165,6 +165,19 @@ public class KiBlast : CwaffGun
         return true;
     }
 
+    public override void OwnedUpdatePlayer(PlayerController owner, GunInventory inventory)
+    {
+        base.OwnedUpdatePlayer(owner, inventory);
+        if (this.gun.CurrentAmmo >= this.gun.AdjustedMaxAmmo)
+            return;
+        this._rechargeTimer += BraveTime.DeltaTime;
+        if (this._rechargeTimer < this._nextRecharge)
+            return;
+        this._rechargeTimer -= this._nextRecharge;
+        this._nextRecharge = Mathf.Max(this._nextRecharge * _RECHARGE_DECAY, _MIN_RECHARGE_TIME);
+        this.gun.ammo = Math.Min(this.gun.ammo + 1, this.gun.AdjustedMaxAmmo);
+    }
+
     public override void Update()
     {
         base.Update();
@@ -176,14 +189,6 @@ public class KiBlast : CwaffGun
             this._nextChargeSound = 1;
             UpdateIdleAnimation(); // reset idle animation to default if we're not actively charging or firing a kamehameha
         }
-        if (this.gun.CurrentAmmo >= this.gun.AdjustedMaxAmmo)
-            return;
-        this._rechargeTimer += BraveTime.DeltaTime;
-        if (this._rechargeTimer < this._nextRecharge)
-            return;
-        this._rechargeTimer -= this._nextRecharge;
-        this._nextRecharge = Mathf.Max(this._nextRecharge * _RECHARGE_DECAY, _MIN_RECHARGE_TIME);
-        this.gun.ammo = Math.Min(this.gun.ammo + 1, this.gun.AdjustedMaxAmmo);
     }
 
     private void LateUpdate()

@@ -21,7 +21,7 @@ public class Oddjob : CwaffGun
             onlyUsesIdleInWeaponBox: true)
           .Attach<Unthrowable>()
           .InitProjectile(GunData.New(sprite: "oddjob_projectile", clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 25.0f, speed: 40f, range: 9999f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound",
+            damage: 25.0f, speed: 40f, range: 9999f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound", customClip: true,
             hitWallSound: "paintball_impact_wall_sound", shouldRotate: false, fps: 30, preventOrbiting: true))
           .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; })
           .Attach<OddjobProjectile>();
