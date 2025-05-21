@@ -1,22 +1,26 @@
 # Changelog
 
-## 1.25.5 (TBD)
+## 1.25.5 (2025-05-21)
 
+#### Balance Changes and Polish:
+
+- Ki Blast now passively recharges Ki even when it is not the active gun
+- Pogo Stick item now grants an additional active item slot
+- Added custom ammo clip sprite for Oddjob
+- Added "Revved" indicator for when Natascha will stay spun up when not firing
+- Increased R.C. Launcher's ammo from 240 to 320
+
+#### Bugfixes and Misc:
+
+- Fixed Starmageddon's mastery being completely nonfunctional since 1.22.1
+- Fixed Oddjob poofing whenever it is attached and detached from the player's head (broken since 1.23.0)
+- Fixed hats sometimes improperly rendering below the player when riding Pogo Stick
+- Fixed lag when several of Blackjack's cards are lying on the ground
+- Removed indicator incorrectly suggesting that Pogo Stick Gun can be mastered
+- Reduced volume on Pogo Stick Gun, R. C. Launcher, and Paintball Cannon projectile sounds
 - Optimized code for checking when interact is pressed with no interactible nearby (used by Scalding Jelly)
 - Optimized code for drawing mastery labels for guns
-- Fixed Starmageddon's mastery being completely nonfunctional since 1.22.1
-- Optimized laggy code for checking whether Blackjack's card should be picked up
 - Optimized some code checking whether screen shaders should be applied
-- Slightly optimized gun setup code
-- Fixed Oddjob poofing whenever it is attached and detached from the player's head (broken since 1.23.0)
-- Reduced volume on Pogo Stick Gun, R. C. Launcher, and Paintball Cannon projectile sounds
-- Pogo Stick item now grants an additional active item slot while held
-- Increased R.C. Launcher's ammo from 240 to 320
-- Fixed hats sometimes improperly rendering below the player when riding Pogo Stick
-- Added custom ammo clip sprite for Oddjob
-- Removed indicator incorrectly suggesting that Pogo Stick Gun can be mastered
-- Added "Revved" indicator for when Natascha will stay spun up when not firing
-- Ki Blast now passively recharges Ki even when it is not the active gun
 
 ## 1.25.4 (2025-05-08)
 
