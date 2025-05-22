@@ -213,7 +213,15 @@ public class Commands
 
             if (Input.GetKeyDown(KeyCode.Alpha8))
             {
-                OneOffDebugDungeonFlow.TestSingleRoom(LoadHelper.LoadAssetFromAnywhere<PrototypeDungeonRoom>("Shrine_DemonFace_Room"));
+                PrototypeDungeonRoom room = FloorPuzzleRoomController._FloorPuzzleRooms[0];
+                if (room != null)
+                {
+                    System.Console.WriteLine($"generating debug flow with room {room.name}");
+                    OneOffDebugDungeonFlow.TestSingleRoom(room);
+                }
+                else
+                    System.Console.WriteLine($"attempted to generate null room");
+                // OneOffDebugDungeonFlow.TestSingleRoom(LoadHelper.LoadAssetFromAnywhere<PrototypeDungeonRoom>("Shrine_DemonFace_Room"));
             }
 
             return true;

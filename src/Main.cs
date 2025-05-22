@@ -416,6 +416,9 @@ public class Initialisation : BaseUnityPlugin
                 // Modified version of Anywhere mod, further stolen and modified from Apache's version
                 FlowCommands.Install();
 
+                // Setup custom rooms and room objects
+                FloorPuzzleRoomController.Init();
+
                 setupFloorsWatch.Stop();
             #endregion
 
