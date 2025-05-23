@@ -1372,4 +1372,15 @@ public static class Lazy
     Array.Resize(ref array, oldCount + 1);
     array[oldCount] = value;
   }
+
+  /// <summary>Register an easy placeable for use in Room Architect Tool</summary>
+  public static T RegisterEasyRATPlaceable<T>(string guid) where T : MonoBehaviour
+  {
+    GameObject placeableObject = new GameObject(guid).RegisterPrefab();
+    T t = placeableObject.AddComponent<T>(); // called after registering prefab so Start() isn't immediately called
+    DungeonPlaceable placeable = BreakableAPIToolbox.GenerateDungeonPlaceable(new(){{placeableObject, 1f}});
+    StaticReferences.StoredDungeonPlaceables.Add(guid, placeable);
+    Alexandria.DungeonAPI.StaticReferences.customPlaceables.Add($"{C.MOD_PREFIX}:{guid}", placeable); // prepend our mod's prefix to the guid for RAT
+    return t;
+  }
 }

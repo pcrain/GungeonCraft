@@ -3,13 +3,14 @@ namespace CwaffingTheGungy;
 public class FloorPuzzleRoomController : MonoBehaviour
 {
   internal static readonly List<PrototypeDungeonRoom> _FloorPuzzleRooms = new();
-  internal static readonly string _Id                                   = "floor_puzzle_controller";
+  internal static readonly string _GUID = "floor_puzzle_controller"; //WARNING: don't change without also updating GUID in RAT
 
   private const float MAX_TIME_BETWEEN_TRIGGERS = 0.1f;
 
   internal FloorPuzzleTile _last = null;
   internal bool _puzzleSucceeded = false;
   internal bool _puzzleStarted = false;
+  internal PlayerController _puzzleDoer = null;
 
   private float _dirtyCheaterTimer = 0.0f;
   private bool _puzzleFailed = false;
@@ -22,15 +23,9 @@ public class FloorPuzzleRoomController : MonoBehaviour
   public static void Init()
   {
     // set up the controller itself
-    GameObject protoController = new GameObject(_Id).RegisterPrefab();
-    protoController.AddComponent<FloorPuzzleRoomController>(); // called after registering prefab so Start() isn't immediately called
-    DungeonPlaceable placeable = BreakableAPIToolbox.GenerateDungeonPlaceable(new(){{protoController, 1f}});
-    StaticReferences.StoredDungeonPlaceables.Add(_Id, placeable);
-    Alexandria.DungeonAPI.StaticReferences.customPlaceables.Add($"{C.MOD_PREFIX}:{_Id}", placeable);
-
+    Lazy.RegisterEasyRATPlaceable<FloorPuzzleRoomController>(_GUID);
     // set up the puzzle tiles
     FloorPuzzleTile.Init();
-
     // set up puzzle rooms using the controller
     _FloorPuzzleRooms.Add(RoomFactory.BuildNewRoomFromResource($"{C.MOD_INT_NAME}/Resources/Rooms/floor_puzzle.newroom").room);
   }
@@ -38,24 +33,34 @@ public class FloorPuzzleRoomController : MonoBehaviour
   private void Start()
   {
     const float TILE_SIZE = 24f / 16f; // size of the sprites in game units
-    const int PUZZLE_SIZE = 4; // radius of the puzzle
-    const int SIDE_LENGTH = PUZZLE_SIZE + PUZZLE_SIZE + 1;
+    const float COVERAGE = 0.75f; // approximate percentage of puzzle that should be floor tiles (as opposed to wall tiles)
+    int puzzleSize = 9;
+
+    #if !DEBUG // always max difficulty in debug mode
+    GlobalDungeonData.ValidTilesets tileSet = GameManager.Instance.Dungeon.tileIndices.tilesetId;
+    if (tileSet == GlobalDungeonData.ValidTilesets.CASTLEGEON || tileSet == GlobalDungeonData.ValidTilesets.GUNGEON)
+      puzzleSize = 7;
+    else if (tileSet == GlobalDungeonData.ValidTilesets.MINEGEON || tileSet == GlobalDungeonData.ValidTilesets.CATACOMBGEON || tileSet == GlobalDungeonData.ValidTilesets.SEWERGEON)
+      puzzleSize = 8;
+    #endif
+
+    float puzzleRadius = 0.5f * (puzzleSize - 1);
     this._room = base.transform.position.GetAbsoluteRoom();
     CellArea area = this._room.area;
-    Lazy.DebugLog($"  spawned floor puzzle room of size {area.dimensions.x} by {area.dimensions.y} at {area.UnitCenter}");
+    Lazy.DebugLog($"  spawning floor puzzle of size {puzzleSize} by {puzzleSize} in room of size {area.dimensions.x} by {area.dimensions.y} at {area.UnitCenter}");
 
-    LinkedList<IntVector2> path = FloorPuzzleGenerator.GeneratePuzzleOfSize(SIDE_LENGTH, SIDE_LENGTH, 0.75f);
+    LinkedList<IntVector2> path = FloorPuzzleGenerator.GeneratePuzzleOfSize(puzzleSize, puzzleSize, targetCoverage: COVERAGE);
     HashSet<IntVector2> pathPositions = new(path);
     IntVector2 startPos = path.First.Value;
     IntVector2 endPos = path.Last.Value;
-    for (int i = 0; i < SIDE_LENGTH; ++i)
+    for (int i = 0; i < puzzleSize; ++i)
     {
-      for (int j = 0; j < SIDE_LENGTH; ++j)
+      for (int j = 0; j < puzzleSize; ++j)
       {
         GameObject puzzleTile = UnityEngine.Object.Instantiate(FloorPuzzleTile.Prefab);
-        puzzleTile.transform.position = area.UnitCenter + TILE_SIZE * new Vector2(i - PUZZLE_SIZE, j - PUZZLE_SIZE);
+        puzzleTile.transform.position = area.UnitCenter + TILE_SIZE * new Vector2(i - puzzleRadius, j - puzzleRadius);
         FloorPuzzleTile tile = puzzleTile.GetComponent<FloorPuzzleTile>();
-        tile.Setup(parent: this, isWall: !pathPositions.Contains(new IntVector2(i, j)));
+        tile.Setup(controller: this, isWall: !pathPositions.Contains(new IntVector2(i, j)));
         if (i == startPos.x && j == startPos.y)
         {
           tile._type = FloorPuzzleTile.TileType.ENTRY;
@@ -90,7 +95,13 @@ public class FloorPuzzleRoomController : MonoBehaviour
 
   private void HandleQueuedTileCollisions()
   {
-    PlayerController player = GameManager.Instance.BestActivePlayer; // TODO: handle coop better
+    PlayerController player = this._puzzleDoer;
+    if (!player)
+    {
+      Lazy.DebugWarn("handling puzzle collisions without a puzzle doer...this shouldn't happen");
+      return;
+    }
+
     Vector2 ppos = player.specRigidbody.UnitCenter;
     FloorPuzzleTile closest = _tilesCollidedThisFrame[0];
     float closestDist = (ppos - closest._trigger.UnitCenter).sqrMagnitude;
@@ -104,6 +115,8 @@ public class FloorPuzzleRoomController : MonoBehaviour
     }
     closest.HandleCollision();
     _tilesCollidedThisFrame.Clear();
+    if (!this._puzzleStarted)
+      this._puzzleDoer = null; // allow any player to do the puzzle if we haven't started it yet
   }
 
   internal void StartPuzzle()
@@ -130,6 +143,7 @@ public class FloorPuzzleRoomController : MonoBehaviour
     foreach (FloorPuzzleTile child in this._children)
       child.Reset();
     this._puzzleStarted = false;
+    this._puzzleDoer = null;
     if (this._puzzleFailed)
       this._puzzleFailed = false;
     else
@@ -138,6 +152,10 @@ public class FloorPuzzleRoomController : MonoBehaviour
 
   internal void CollidedWithTileThisFrame(FloorPuzzleTile tile, PlayerController pc)
   {
+    if (this._puzzleDoer == null)
+      this._puzzleDoer = pc;
+    else if (this._puzzleDoer != pc)
+      return;
     _tilesCollidedThisFrame.Add(tile);
   }
 
@@ -155,7 +173,10 @@ public class FloorPuzzleRoomController : MonoBehaviour
     if (GameStatsManager.Instance.IsRainbowRun)
         LootEngine.SpawnBowlerNote(GameManager.Instance.RewardManager.BowlerNoteChest, bestRewardLocation.ToCenterVector2(), this._room, true);
     else
-      this._room.SpawnRoomRewardChest(null, bestRewardLocation);
+    {
+      Chest chest = this._room.SpawnRoomRewardChest(null, bestRewardLocation);
+      chest.ForceUnlock();
+    }
     base.gameObject.Play("puzzle_solve");
     return true;
   }
@@ -192,11 +213,13 @@ public class FloorPuzzleTile : MonoBehaviour
     Prefab.AddComponent<FloorPuzzleTile>();
   }
 
-  public void Setup(FloorPuzzleRoomController parent, bool isWall)
+  public void Setup(FloorPuzzleRoomController controller, bool isWall)
   {
-    this._controller = parent;
+    this._controller = controller;
 
     this._sprite = base.gameObject.GetComponent<tk2dSprite>();
+    this._sprite.usesOverrideMaterial = true;
+    this._sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader"); // flat shading
     this._sprite.HeightOffGround = -4f;
     this._sprite.UpdateZDepth();
     this._animator = base.gameObject.GetComponent<tk2dSpriteAnimator>();
@@ -279,12 +302,12 @@ public class FloorPuzzleTile : MonoBehaviour
 
 internal static class FloorPuzzleGenerator
 {
+  /// <summary>Generates a solution path through a grid of size (width, height) where the first node of the path is the starting node at the
+  /// bottom of the grid and the final node is the exit at the top of the grid. All tiles not on the solution path should be considered walls.</summary>
   public static LinkedList<IntVector2> GeneratePuzzleOfSize(int width = 9, int height = 9, float targetCoverage = 0.75f)
   {
-      int startCol = UnityEngine.Random.Range(0, width);
-      int endCol = UnityEngine.Random.Range(0, width);
-      IntVector2 start = new IntVector2(startCol, 0);
-      IntVector2 end = new IntVector2(endCol, height - 1);
+      IntVector2 start = new IntVector2(UnityEngine.Random.Range(0, width), 0); // entry is always on the bottom of the grid
+      IntVector2 end = new IntVector2(UnityEngine.Random.Range(0, width), height - 1); // exit is always on the top of the grid
 
       LinkedList<IntVector2> path = new();
       HashSet<IntVector2> visited = new();
@@ -294,27 +317,26 @@ internal static class FloorPuzzleGenerator
       int c = start.x;
       int r = start.y;
 
-      int vertSteps = start.y - end.y;
+      int vertSteps = end.y - start.y;
       int horizSteps = end.x - start.x;
 
       // generate manhattan path from entrance to exit
-      List<string> steps = new List<string>();
+      List<char> steps = new List<char>();
       for (int i = 0; i < Math.Abs(vertSteps); i++)
-          steps.Add(vertSteps > 0 ? "U" : "D");
+          steps.Add(vertSteps > 0 ? 'U' : 'D');
       for (int i = 0; i < Math.Abs(horizSteps); i++)
-          steps.Add(horizSteps > 0 ? "R" : "L");
+          steps.Add(horizSteps > 0 ? 'R' : 'L');
       steps.Shuffle();
-      foreach (var step in steps)
+      foreach (char step in steps)
       {
           switch (step)
           {
-              case "U": r -= 1; break;
-              case "D": r += 1; break;
-              case "L": c -= 1; break;
-              case "R": c += 1; break;
+              case 'D': r -= 1; break;
+              case 'U': r += 1; break;
+              case 'L': c -= 1; break;
+              case 'R': c += 1; break;
           }
-          // System.Console.WriteLine($"  adding {c},{r}");
-          var newPoint = new IntVector2(c, r);
+          IntVector2 newPoint = new IntVector2(c, r);
           path.AddLast(newPoint);
           visited.Add(newPoint);
       }
@@ -322,56 +344,50 @@ internal static class FloorPuzzleGenerator
       // extrude random loop nodes until failure
       const int MAX_RETRIES = 1000;
       int retries = MAX_RETRIES;
-      // int retries = 1;
-      System.Diagnostics.Stopwatch tempWatchWatch = System.Diagnostics.Stopwatch.StartNew();
       while (retries > 0)
       {
-          // get two random adjacent nodes
+          // get two random adjacent nodes on the solution path
           int pathLength = path.Count;
-          int nodeId = UnityEngine.Random.Range(1, pathLength - 1); //TODO: maybe 1
+          int nodeId = UnityEngine.Random.Range(0, pathLength - 1);
           LinkedListNode<IntVector2> nthNode = path.First;
           for (int i = 0; i < nodeId; ++i)
             nthNode = nthNode.Next;
           LinkedListNode<IntVector2> neighbor = nthNode.Next;
 
-          // get their values
+          // get the nodes' positions
           IntVector2 nthValue      = nthNode.Value;
           IntVector2 neighborValue = neighbor.Value;
 
-          // determine their delta
+          // get the delta vector between the two positions
           IntVector2 delta = new IntVector2(neighborValue.x - nthValue.x, neighborValue.y - nthValue.y);
 
-          // determine their perpendicular direction
+          // pick a random vector perpendicular to the delta
           IntVector2 perp = delta.y == 0 ? new IntVector2(0, Lazy.CoinFlip() ? 1 : -1) : new IntVector2(Lazy.CoinFlip() ? 1 : -1, 0);
 
-          // determine adjacentNodes
-          // System.Console.WriteLine($"extruding {nthValue.x},{nthValue.y} and {neighborValue.x},{neighborValue.y}");
+          // get the positions adjacent to the two path nodes
           IntVector2 adjMe = nthValue + perp;
           IntVector2 adjNeighbor = neighborValue + perp;
-          // check if the adjacent nodes are already part of the path
+
+          // check if the adjacent positions are out of bounds or already part of the solution path
           if (
             adjMe.x < 0 || adjMe.x >= width || adjMe.y < 0 || adjMe.y >= height ||
             adjNeighbor.x < 0 || adjNeighbor.x >= width || adjNeighbor.y < 0 || adjNeighbor.y >= height ||
             visited.Contains(adjMe) || visited.Contains(adjNeighbor))
           {
-            --retries;
+            --retries;  // they're already part of the solution path or out of bounds, so retry
             continue;
           }
 
-          // System.Console.WriteLine($"  adding {adjMe.x},{adjMe.y} and {adjNeighbor.x},{adjNeighbor.y}");
+          // bend the path to include the adjacent nodes
           path.AddAfter(nthNode, adjMe);
           path.AddBefore(neighbor, adjNeighbor);
           visited.Add(adjMe);
           visited.Add(adjNeighbor);
 
+          // if more than targetCoverage percent of tiles are part of the solution path, we've achieved a sufficiently complex puzzle
           if ((float)visited.Count / (height * width) >= targetCoverage)
             break;
       }
-      tempWatchWatch.Stop();
-      // System.Console.WriteLine($"    {tempWatchWatch.ElapsedMilliseconds,4}ms tempWatch");
-
-      // foreach (var v in visited)
-      //   System.Console.WriteLine($"  visited {v.x},{v.y}");
 
       return path;
   }
