@@ -418,6 +418,7 @@ public class Initialisation : BaseUnityPlugin
 
                 // Setup custom rooms and room objects
                 FloorPuzzleRoomController.Init();
+                ShufflePuzzleRoomController.Init();
 
                 setupFloorsWatch.Stop();
             #endregion

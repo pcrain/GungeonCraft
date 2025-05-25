@@ -11,10 +11,11 @@ internal static class CwaffDebug
 {
 
   #if DEBUG && DEBUGCHESTS
-    private static int _DebugItemId => Lazy.PickupId<Gunbrella>();
+    // private static int _DebugItemId => Lazy.PickupId<Gunbrella>();
     // private static int _DebugItemId => (int)Items.CoolantLeak;
     // private static int _DebugItemId => (int)Items.Casey;
     // private static int _DebugItemId => (int)Items.Ration;
+    private static int _DebugItemId => (int)Items.Gunther;
 
     [HarmonyPatch(typeof(RewardPedestal), nameof(RewardPedestal.DetermineContents))]
     [HarmonyPrefix]

@@ -306,6 +306,8 @@ internal static class FloorPuzzleGenerator
   /// bottom of the grid and the final node is the exit at the top of the grid. All tiles not on the solution path should be considered walls.</summary>
   public static LinkedList<IntVector2> GeneratePuzzleOfSize(int width = 9, int height = 9, float targetCoverage = 0.75f)
   {
+      const int MAX_RETRIES = 1000;
+
       IntVector2 start = new IntVector2(UnityEngine.Random.Range(0, width), 0); // entry is always on the bottom of the grid
       IntVector2 end = new IntVector2(UnityEngine.Random.Range(0, width), height - 1); // exit is always on the top of the grid
 
@@ -342,7 +344,6 @@ internal static class FloorPuzzleGenerator
       }
 
       // extrude random loop nodes until failure
-      const int MAX_RETRIES = 1000;
       int retries = MAX_RETRIES;
       while (retries > 0)
       {
@@ -384,7 +385,7 @@ internal static class FloorPuzzleGenerator
           visited.Add(adjMe);
           visited.Add(adjNeighbor);
 
-          // if more than targetCoverage percent of tiles are part of the solution path, we've achieved a sufficiently complex puzzle
+          // if at least targetCoverage percent of tiles are part of the solution path, we've achieved a sufficiently complex puzzle
           if ((float)visited.Count / (height * width) >= targetCoverage)
             break;
       }
