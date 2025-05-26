@@ -74,7 +74,8 @@ public class FloorPuzzleRoomController : MonoBehaviour
         this._children.Add(tile);
       }
     }
-    this._entry._animator.PickFrame(3);
+    this._entry._animator.defaultClipId = this._entry._animator.GetClipIdByName("goal");
+    this._entry._animator.Pause();
   }
 
   internal void ResetTimers()
@@ -122,7 +123,16 @@ public class FloorPuzzleRoomController : MonoBehaviour
   internal void StartPuzzle()
   {
     this._puzzleStarted = true;
-    this._exit._animator.PickFrame(3);
+    this._exit._animator.PlayFromFrame("goal", 0);
+    this._exit._animator.Pause();
+
+    foreach (FloorPuzzleTile child in this._children)
+    {
+      if (child == this._entry || child == this._exit || child._type == FloorPuzzleTile.TileType.WALL)
+        continue;
+      child._animator.PlayFromFrame("startup", 0);
+      child._animator.Resume();
+    }
   }
 
   private void Update()
@@ -142,6 +152,9 @@ public class FloorPuzzleRoomController : MonoBehaviour
 
     foreach (FloorPuzzleTile child in this._children)
       child.Reset();
+    this._entry._animator.PlayFromFrame("goal", 0);
+    this._entry._animator.Pause();
+    this._last = null;
     this._puzzleStarted = false;
     this._puzzleDoer = null;
     if (this._puzzleFailed)
@@ -208,9 +221,20 @@ public class FloorPuzzleTile : MonoBehaviour
 
   public static void Init()
   {
-    Prefab = VFX.Create("puzzle_tile_square", emissivePower: 2f);
+    Prefab = VFX.Create("puzzle_tile_square",/*, emissivePower: 2f*/ anchor: Anchor.MiddleCenter);
     Prefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.PlayerBlocker);
     Prefab.AddComponent<FloorPuzzleTile>();
+
+    Prefab.AddAnimation("wall",        "pressedplate_broken",                  fps: 30, anchor: Anchor.MiddleCenter, loops: false);
+    Prefab.AddAnimation("goal",        "pressedplate_goal",                    fps: 30, anchor: Anchor.MiddleCenter, loops: false);
+    Prefab.AddAnimation("press",       "pressedplate_presseddown_first",       fps: 30, anchor: Anchor.MiddleCenter, loops: false);
+    Prefab.AddAnimation("repress",     "pressedplate_presseddown_second",      fps: 30, anchor: Anchor.MiddleCenter, loops: false);
+    Prefab.AddAnimation("unpress",     "pressedplate_pressedup_first",         fps: 30, anchor: Anchor.MiddleCenter, loops: false);
+    Prefab.AddAnimation("startup",     "pressedplate_startup",                 fps: 30, anchor: Anchor.MiddleCenter, loops: false);
+    Prefab.AddAnimation("fail",        "pressedplate_turnred",                 fps: 30, anchor: Anchor.MiddleCenter, loops: false);
+    Prefab.AddAnimation("reset_red",   "pressedplate_presseddown_reset_red",   fps: 10, anchor: Anchor.MiddleCenter, loops: false);
+    Prefab.AddAnimation("reset_green", "pressedplate_presseddown_reset_green", fps: 10, anchor: Anchor.MiddleCenter, loops: false);
+    Prefab.AddAnimation("reset_white", "pressedplate_presseddown_reset_white", fps: 10, anchor: Anchor.MiddleCenter, loops: false);
   }
 
   public void Setup(FloorPuzzleRoomController controller, bool isWall)
@@ -223,7 +247,10 @@ public class FloorPuzzleTile : MonoBehaviour
     this._sprite.HeightOffGround = -4f;
     this._sprite.UpdateZDepth();
     this._animator = base.gameObject.GetComponent<tk2dSpriteAnimator>();
-    this._animator.PickFrame(2);
+    this._animator.defaultClipId = this._animator.GetClipIdByName(isWall ? "wall" : "startup");
+    // this._animator.PlayFromFrame(isWall ? "wall" : "startup", 0);
+    this._animator.Pause();
+    // this._sprite.SetSprite(isWall ? "pressedplate_broken_001" : "pressedplate_startup_001");
 
     this._body = base.gameObject.GetComponent<SpeculativeRigidbody>();
     this._trigger = this._body.PixelColliders[0];
@@ -232,7 +259,7 @@ public class FloorPuzzleTile : MonoBehaviour
       this._type = TileType.WALL;
       this._active = true; // walls are always active
       this._trigger.IsTrigger = false; // make the rigidbody solid
-      this._sprite.SetGlowiness(0f);
+      // this._sprite.SetGlowiness(0f);
     }
     else
     {
@@ -262,7 +289,13 @@ public class FloorPuzzleTile : MonoBehaviour
     {
       if (this._controller._last != this && this._triggerTimer >= LEEWAY)
       {
-        this._animator.PickFrame(0);
+        if (this._controller._last)
+        {
+          this._controller._last._animator.Resume();
+          this._controller._last._animator.PlayFromFrame("unpress", 0);
+        }
+        this._animator.Resume();
+        this._animator.PlayFromFrame("repress", 0);
         this._controller.Fail();
       }
       this._triggerTimer = 0.0f;
@@ -270,15 +303,24 @@ public class FloorPuzzleTile : MonoBehaviour
     }
 
     this._active = true;
+    if (this._controller._last)
+    {
+      this._controller._last._animator.Resume();
+      this._controller._last._animator.PlayFromFrame("unpress", 0);
+    }
     this._controller._last = this;
-    this._animator.PickFrame(1);
+    this._animator.Resume();
+    this._animator.PlayFromFrame("press", 0);
     if (this._type == TileType.ENTRY)
       this._controller.StartPuzzle();
     if (this._controller.CheckSuccess())
+    {
+      this._animator.QueueAnimation("unpress");
       return;
+    }
     if (this._type == TileType.EXIT) // stepping on the exit prematurely is a fail
     {
-        this._animator.PickFrame(0);
+        this._controller._last._animator.PlayFromFrame("fail", 0);
         this._controller.Fail();
         return;
     }
@@ -291,7 +333,13 @@ public class FloorPuzzleTile : MonoBehaviour
     if (this._type == TileType.WALL)
       return; // walls are always active
     this._active = false;
-    this._animator.PickFrame(this._type == TileType.ENTRY ? 3 : 2);
+    this._animator.Resume();
+    if (this._animator.IsPlaying("fail") || this._animator.IsPlaying("repress"))
+      this._animator.PlayFromFrame("reset_red", 0);
+    else if (this._animator.IsPlaying("unpress"))
+      this._animator.PlayFromFrame("reset_green", 0);
+    else
+      this._animator.PlayFromFrame("reset_white", 0);
   }
 
   private void Update()

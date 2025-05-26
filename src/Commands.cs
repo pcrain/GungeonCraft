@@ -213,8 +213,8 @@ public class Commands
 
             if (Input.GetKeyDown(KeyCode.Alpha8))
             {
-                // PrototypeDungeonRoom room = FloorPuzzleRoomController._FloorPuzzleRooms[0];
-                PrototypeDungeonRoom room = ShufflePuzzleRoomController._ShufflePuzzleRooms[0];
+                PrototypeDungeonRoom room = FloorPuzzleRoomController._FloorPuzzleRooms[0];
+                // PrototypeDungeonRoom room = ShufflePuzzleRoomController._ShufflePuzzleRooms[0];
                 if (room != null)
                 {
                     System.Console.WriteLine($"generating debug flow with room {room.name}");

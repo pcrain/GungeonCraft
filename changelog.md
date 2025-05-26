@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.26.0 (2025-05-25)
+
+- Added a new puzzle room (sprites thanks to Some Bunny!)
+
 ## 1.25.5 (2025-05-21)
 
 #### Balance Changes and Polish:
