@@ -79,6 +79,8 @@ public class CwaffTrailController : BraveBehaviour
 
   public Vector2 boneSpawnOffset;
 
+  public bool useBody = true; // if true, use position of SpeculativeRigidBody if available (false == use sprite)
+
   public bool UsesDispersalParticles;
 
   [ShowInInspectorIf("UsesDispersalParticles", false)]
@@ -198,9 +200,12 @@ public class CwaffTrailController : BraveBehaviour
 
     if (base.transform.parent is Transform parentTransform)
     {
-      this.body = parentTransform.gameObject.GetComponent<SpeculativeRigidbody>();
-      if (this.body)
-        this.body.Initialize();
+      if (this.useBody)
+      {
+        this.body = parentTransform.gameObject.GetComponent<SpeculativeRigidbody>();
+        if (this.body)
+          this.body.Initialize();
+      }
       parent_sprite = parentTransform.gameObject.GetComponent<tk2dBaseSprite>();
       base.transform.position = Vector3.zero; // only set if we have a parent
       base.transform.rotation = Quaternion.identity;

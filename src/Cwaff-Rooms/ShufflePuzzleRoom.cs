@@ -28,6 +28,8 @@ public class ShufflePuzzleRoomController : MonoBehaviour
   private float _swapRadius   = 4f;
   private int _numSwappables  = 7;
   private List<SwappyThing> _swappies = new();
+  private int _intQuality = 0;
+  private int _prizePos = 0;
 
   public static void Init()
   {
@@ -42,14 +44,38 @@ public class ShufflePuzzleRoomController : MonoBehaviour
 
   private void Start()
   {
-    System.Console.WriteLine($"created shuffle puzzle room");
     this._room = base.transform.position.GetAbsoluteRoom();
     this._swapCenter = this._room.area.UnitCenter.Quantize(0.0625f) + new Vector2(0, 1/32f); //NOTE: 1/32f offset to fix weird outlining issues with odd-pixeled sprites
 
+    float rng = UnityEngine.Random.value;
+    #if DEBUG
+    ItemQuality quality = rng switch
+    {
+      > 0.80f => ItemQuality.S,
+      > 0.60f => ItemQuality.A,
+      > 0.40f => ItemQuality.B,
+      > 0.20f => ItemQuality.C,
+      _       => ItemQuality.D,
+    };
+    #else
+    ItemQuality quality = rng switch
+    {
+      > 0.95f => ItemQuality.S,
+      > 0.85f => ItemQuality.A,
+      > 0.65f => ItemQuality.B,
+      > 0.35f => ItemQuality.C,
+      _       => ItemQuality.D,
+    };
+    #endif
+
+    Lazy.DebugLog($"spawning shuffle puzzle with {quality} quality item");
+    this._intQuality = (int)quality;
+    this._numSwappables = 4 + this._intQuality;
+
     // determine chest contents
-    PickupObject grandPrize = GameManager.Instance.PrimaryPlayer.GetRandomChestRewardOfQuality(ItemQuality.C).GetComponent<PickupObject>();
+    PickupObject grandPrize = GameManager.Instance.PrimaryPlayer.GetRandomChestRewardOfQuality(quality).GetComponent<PickupObject>();
     PassiveItem junk = Items.Junk.AsPassive();
-    int prizePos = UnityEngine.Random.Range(0, this._numSwappables);
+    this._prizePos = UnityEngine.Random.Range(0, this._numSwappables);
 
     for (int i = 0; i < this._numSwappables; ++i)
     {
@@ -58,7 +84,7 @@ public class ShufflePuzzleRoomController : MonoBehaviour
       s.UpdateZDepth();
       SwappyThing swap = s.gameObject.AddComponent<SwappyThing>();
       Vector2 offset = (360f * (float)i / this._numSwappables).ToVector(this._swapRadius);
-      swap.Setup(controller: this, index: i, contents: i == prizePos ? grandPrize : junk);
+      swap.Setup(controller: this, index: i, contents: i == _prizePos ? grandPrize : junk);
       swap.Relocate(pos: this._swapCenter);
       this._swappies.Add(swap);
       if (i == 0)
@@ -73,27 +99,30 @@ public class ShufflePuzzleRoomController : MonoBehaviour
 
   private IEnumerator DoShuffle()
   {
-    const float START_DELAY = 1f;
-    const float SWAP_TIME   = 0.4f;
-    const float SWAP_DELAY  = 0.1f;
-    const int   NUM_SWAPS   = 2;
-    const float MAX_RPS     = 120f; // max rotation per second, in degrees
-    const float ROT_ACCEL   = 120f; // max rotation change per second, in degrees
-    const float SPREAD_TIME = 1f;
-    const float ABSORB_TIME = 1f;
-    const float ITEM_OFFSET = 2f;
-    const float TEASE_TIME  = 1.5f;
+    const float SWAP_TIME     = 0.4f;
+    const float SWAP_ACCEL    = 0.01f;
+    const float SWAP_DELAY    = 0.1f;
+    const float MAX_RPS       = 120f; // max rotation per second, in degrees
+    const float ROT_ACCEL     = 40f; // max rotation change per second, in degrees
+    const float ROT_DECEL     = 120f;
+    const float SPREAD_TIME   = 1f;
+    const float ABSORB_TIME   = 1f;
+    const float ITEM_OFFSET   = 2f;
+    const float TEASE_TIME    = 1.5f;
+    const int   BASE_SWAPS    = 25;
 
-    Lazy.DebugLog($"shuffle starting in {START_DELAY} seconds with {this._numSwappables} swappables");
+    // stuff that scales with item quality
+    int   numSwaps    = BASE_SWAPS + 5 * this._intQuality;
+    float minSwapTime = 0.3f - 0.05f * this._intQuality;
 
-    float rotspeed = 0;
-    float rotation = 0;
-    float rotdir = 1;
-    float swapTimer = 0;
+    float rotspeed   = 0;
+    float rotation   = 0;
+    float rotdir     = 1;
+    float swapTimer  = 0;
     int swapIndexOne = -1;
     int swapIndexTwo = -1;
-    bool doingSwap = false;
-    int swapsLeft = NUM_SWAPS;
+    bool doingSwap   = false;
+    int swapsLeft    = numSwaps;
 
     // spread out
     for (float elapsed = 0f; elapsed < SPREAD_TIME; elapsed += BraveTime.DeltaTime)
@@ -127,6 +156,7 @@ public class ShufflePuzzleRoomController : MonoBehaviour
 
     // swapping time
     float dtime = BraveTime.DeltaTime;
+    float swapTime = SWAP_TIME;
     while (swapsLeft > 0)
     {
       yield return null;
@@ -146,7 +176,8 @@ public class ShufflePuzzleRoomController : MonoBehaviour
           swapTimer = 0;
           doingSwap = true;
           base.gameObject.Play("puzzle_item_swap_sound");
-          swapIndexOne = UnityEngine.Random.Range(0, this._numSwappables);
+          // we should swap the actual item around half the time
+          swapIndexOne = Lazy.CoinFlip() ? this._prizePos : UnityEngine.Random.Range(0, this._numSwappables);
           // don't swap with self or adjacent items
           swapIndexTwo = (swapIndexOne + UnityEngine.Random.Range(2, this._numSwappables - 1)) % this._numSwappables;
         }
@@ -154,7 +185,7 @@ public class ShufflePuzzleRoomController : MonoBehaviour
       else
       {
         swapTimer += dtime;
-        if (swapTimer >= SWAP_TIME)
+        if (swapTimer >= swapTime)
         {
           swapTimer = 0;
           doingSwap = false;
@@ -164,6 +195,7 @@ public class ShufflePuzzleRoomController : MonoBehaviour
           swapIndexOne = -1;
           swapIndexTwo = -1;
           --swapsLeft;
+          swapTime = Mathf.Max(minSwapTime, swapTime - SWAP_ACCEL);
         }
       }
 
@@ -176,13 +208,29 @@ public class ShufflePuzzleRoomController : MonoBehaviour
           continue;
         }
         Vector2 otherBasePos = this._swapCenter + (360f * ((float)(i != swapIndexOne ? swapIndexOne : swapIndexTwo) / this._numSwappables) + rotation).ToVector(this._swapRadius);
-        float percentSwapDone = swapTimer / SWAP_TIME;
+        float percentSwapDone = swapTimer / swapTime;
         Vector2 swapPos = Vector2.Lerp(basePos, otherBasePos, percentSwapDone);
         Vector2 perpVec = Mathf.Min(percentSwapDone , 1f - percentSwapDone) * (otherBasePos - basePos).normalized.Rotate(90f);
         this._swappies[i].Relocate(swapPos + perpVec);
       }
     }
 
+    // slow down to a halt
+    rotdir = (rotspeed > 0) ? -1 : 1;
+    while ((rotdir * rotspeed) < 0)
+    {
+      yield return null;
+      dtime = BraveTime.DeltaTime;
+      rotspeed += ROT_DECEL * rotdir * dtime;
+      rotation = (rotation + rotspeed * dtime) % 360f;
+      for (int i = 0; i < this._numSwappables; ++i)
+      {
+        Vector2 basePos = this._swapCenter + (360f * ((float)i / this._numSwappables) + rotation).ToVector(this._swapRadius);
+        this._swappies[i].Relocate(basePos);
+      }
+    }
+
+    // allow the player to move and select an item
     this._state = PLAYERWAIT;
     this._puzzleDoer.ClearInputOverride(PUZZLE_STRING);
     for (int i = 0; i < this._numSwappables; ++i)
@@ -195,7 +243,6 @@ public class ShufflePuzzleRoomController : MonoBehaviour
         if (p && p.specRigidbody)
           this._swappies[i]._body.RegisterGhostCollisionException(p.specRigidbody);
     }
-    System.Console.WriteLine($"shuffling done!");
   }
 
   private void StartPuzzle(PlayerController puzzleDoer)
@@ -208,6 +255,7 @@ public class ShufflePuzzleRoomController : MonoBehaviour
     this._room.DeregisterInteractable(this._swappies[0]);
     this._puzzleStarted = true;
     this._state = SHUFFLING;
+    base.gameObject.Play("shuffle_puzzle_start_sound");
     base.StartCoroutine(DoShuffle());
   }
 
@@ -247,7 +295,10 @@ public class ShufflePuzzleRoomController : MonoBehaviour
       this._contents   = contents;
 
       this._sprite     = base.gameObject.GetComponent<tk2dSprite>();
+
       this._trail      = this._sprite.AddTrail(Uppskeruvel._SoulTrailPrefab); //TODO: use different trail
+      this._trail.useBody = false; // we want the trail anchored to the sprite, not the SRB
+
       this._body       = base.gameObject.GetComponent<SpeculativeRigidbody>();
 
       this._body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
@@ -260,10 +311,7 @@ public class ShufflePuzzleRoomController : MonoBehaviour
     private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
       if (this._controller._puzzleStarted && this._controller._state != PLAYERWAIT)
-      {
-        System.Console.WriteLine($"skippadoo");
         PhysicsEngine.SkipCollision = true;
-      }
     }
 
     public void Relocate(Vector2 pos)
@@ -273,7 +321,8 @@ public class ShufflePuzzleRoomController : MonoBehaviour
         this._sprite.renderer.enabled = true;
         SpriteOutlineManager.AddOutlineToSprite(this._sprite, Color.black, _OUTLINE_OFFSET, 0f);
       }
-      base.transform.position = (pos - this._sprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter));
+      // base.transform.position = (pos - this._sprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter));
+      this._sprite.PlaceAtPositionByAnchor(pos, Anchor.MiddleCenter);
       this._sprite.UpdateZDepth();
     }
 
@@ -287,8 +336,9 @@ public class ShufflePuzzleRoomController : MonoBehaviour
       }
       if (player != this._controller._puzzleDoer)
         return;
-      Vector2 extents = this._itemSprite.GetCurrentSpriteDef().boundsDataExtents.XY();
-      LootEngine.SpawnItem(this._contents.gameObject, this._sprite.WorldCenter - 0.5f * extents, Vector2.up, 1f);
+      tk2dSpriteDefinition def = this._itemSprite.GetCurrentSpriteDef();
+      Vector2 extents = def.boundsDataExtents.XY();
+      LootEngine.SpawnItem(this._contents.gameObject, this._sprite.WorldCenter - extents, Vector2.up, 1f);
       this._controller.EndPuzzle();
     }
 

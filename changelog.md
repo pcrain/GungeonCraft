@@ -2,7 +2,7 @@
 
 ## 1.26.0 (2025-05-25)
 
-- Added a new puzzle room (sprites thanks to Some Bunny!)
+- Added two new puzzle rooms (sprites thanks to Some Bunny!)
 
 ## 1.25.5 (2025-05-21)
 
