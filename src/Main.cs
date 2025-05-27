@@ -361,6 +361,7 @@ public class Initialisation : BaseUnityPlugin
                 Lichguard.Init();
                 ScaldingJelly.Init();
                 Domino.Init();
+                DisplayPedestal.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

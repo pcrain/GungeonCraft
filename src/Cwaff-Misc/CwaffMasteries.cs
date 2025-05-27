@@ -55,33 +55,6 @@ public static class CwaffMasteries
           __instance.gunNameLabels[labelTarget].AutoHeight = true; // make sure we can have multiple lines
         }
     }
-
-    /// <summary>Add "Mastered" before mastered guns when displaying gun cards</summary>
-    [HarmonyPatch(typeof(EncounterTrackable), nameof(EncounterTrackable.GetModifiedDisplayName))]
-    private class DisplayMasteryInGunNamePatch
-    {
-        private const string MASTERED_STRING = "[color #dd6666]Mastered[/color]\n";
-        private const string NORMAL_STRING = "[color #888888]Normal[/color]\n";
-        private static readonly uint[] _HashedGunId       = [uint.MaxValue, uint.MaxValue];
-        private static readonly string[] _CachedGunString = [null, null];
-        static void Postfix(EncounterTrackable __instance, ref string __result)
-        {
-            if (__instance.gameObject.GetComponent<Gun>() is not Gun gun || gun.m_owner is not PlayerController p)
-              return;
-            if (__instance.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg || !cg.CanBeMastered())
-              return;
-            bool mastered = cg.Mastered;
-            uint hash = (uint)gun.PickupObjectId + (mastered ? 65536u : 0u);
-            int pid = p.PlayerIDX;
-            if (hash == _HashedGunId[pid])
-            {
-              __result = _CachedGunString[pid];
-              return;
-            }
-            _HashedGunId[pid] = hash;
-            __result = _CachedGunString[pid] = $"{(mastered ? MASTERED_STRING : NORMAL_STRING)}{__result}";
-        }
-    }
 }
 
 public class MasteryRitualComponent : MonoBehaviour

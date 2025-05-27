@@ -86,6 +86,7 @@
     <Compile Include="src\Cwaff-Passives\WarriorsGi.cs"/>
     <Compile Include="src\Cwaff-Passives\DeadRinger.cs"/>
     <Compile Include="src\Cwaff-Passives\CreditCard.cs"/>
+    <Compile Include="src\Cwaff-Passives\DisplayPedestal.cs"/>
     <Compile Include="src\Cwaff-Passives\Gyroscope.cs"/>
     <Compile Include="src\Cwaff-Passives\JohnsWick.cs"/>
     <Compile Include="src\Cwaff-Passives\RingOfDefenestration.cs"/>

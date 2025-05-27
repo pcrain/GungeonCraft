@@ -176,9 +176,10 @@ public static class CwaffTweaks
             item.passiveStatModifiers = [StatType.Coolness.Add(float.Epsilon)];
         }
 
-        [HarmonyPatch(typeof(Gun), nameof(Gun.Pickup))]
+        [HarmonyPatch]
         private class GunPickupPatch
         {
+            [HarmonyPatch(typeof(Gun), nameof(Gun.Pickup))]
             static void Postfix(Gun __instance, PlayerController player)
             {
                 if (UnityEngine.Random.value < _CHANCE_TO_DIRT)

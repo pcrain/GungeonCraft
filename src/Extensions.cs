@@ -3446,5 +3446,13 @@ public static class Extensions
     if (input.GetButton(GungeonActions.GungeonActionType.Shoot))
       input.ConsumeAll(GungeonActions.GungeonActionType.Shoot);
   }
+
+  /// <summary>Get the current value for a PassiveItem flag for a player</summary>
+  public static int GetFlagCount(this PlayerController pc, Type flag)
+  {
+    if (PassiveItem.ActiveFlagItems.TryGetValue(pc, out var d))
+      return d.TryGetValue(flag, out int count) ? count : 0;
+    return 0;
+  }
 }
 

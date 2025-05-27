@@ -284,3 +284,49 @@ static class HeartUIPatch
         }
     }
 }
+
+//NOTE: used by gun masteries and Display Case
+[HarmonyPatch(typeof(EncounterTrackable), nameof(EncounterTrackable.GetModifiedDisplayName))]
+static class DisplayMasteryInGunNamePatch
+{
+    private const uint MASTERY_FLAG  = 1 << 16;
+    private const uint PRISTINE_FLAG = 1 << 17;
+    private const string PRISTINE_STRING = "[color #bbbbdd]M[/color][color #aabbdd]i[/color][color #99bbdd]n[/color][color #88bbdd]t[/color][color #77bbdd] [/color][color #66bbdd]C[/color][color #55bbdd]o[/color][color #44bbdd]n[/color][color #33bbdd]d[/color][color #22bbdd]i[/color][color #11bbdd]t[/color][color #00bbdd]i[/color][color #00aadd]o[/color][color #0099dd]n[/color]\n";
+    // private const string PRISTINE_STRING = "[color #bbbbdd]M[/color]int Condition\n";
+    private const string MASTERED_STRING = "[color #dd6666]Mastered[/color]\n";
+    private const string NORMAL_STRING = "[color #888888]Normal[/color]\n";
+    private static readonly uint[] _HashedGunId       = [uint.MaxValue, uint.MaxValue];
+    private static readonly string[] _CachedGunString = [null, null];
+    /// <summary>Add "Mastered" before mastered guns when displaying gun cards</summary>
+    static void Postfix(EncounterTrackable __instance, ref string __result)
+    {
+        if (__instance.gameObject.GetComponent<Gun>() is not Gun gun || gun.m_owner is not PlayerController p)
+          return;
+        int pid = p.PlayerIDX;
+        if (PassiveItem.IsFlagSetForCharacter(p, typeof(DisplayPedestal)) && __instance.gameObject.GetComponent<PristineGun>())
+        {
+            uint hash = (uint)gun.PickupObjectId + PRISTINE_FLAG;
+            if (hash == _HashedGunId[pid])
+            {
+              __result = _CachedGunString[pid];
+              return;
+            }
+            _HashedGunId[pid] = hash;
+            __result = _CachedGunString[pid] = $"{PRISTINE_STRING}{__result}";
+            return;
+        }
+        if (__instance.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.CanBeMastered())
+        {
+            bool mastered = cg.Mastered;
+            uint hash = (uint)gun.PickupObjectId + (mastered ? MASTERY_FLAG : 0u);
+            if (hash == _HashedGunId[pid])
+            {
+              __result = _CachedGunString[pid];
+              return;
+            }
+            _HashedGunId[pid] = hash;
+            __result = _CachedGunString[pid] = $"{(mastered ? MASTERED_STRING : NORMAL_STRING)}{__result}";
+            return;
+        }
+    }
+}
