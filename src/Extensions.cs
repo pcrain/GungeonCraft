@@ -1332,28 +1332,18 @@ public static class Extensions
     return vecs;
   }
 
-  //REFACTOR: this can be simplified
+  private static FieldInfo _AlexandriaShopItemBaseShopField = null;
   /// <summary>Find a custom shop item currently under consideration by player</summary>
   public static CustomShopItemController GetTargetedItemByPlayer(this CustomShopController shop, PlayerController player)
   {
-      if (!player || !shop || !shop.transform)
-          return null;
+      _AlexandriaShopItemBaseShopField ??= typeof(CustomShopItemController).GetField("m_baseParentShop", BindingFlags.NonPublic | BindingFlags.Instance);
       if (player.m_lastInteractionTarget is not IPlayerInteractable target)
           return null;
-      foreach (Transform child in shop.transform)
-      {
-          if (!child || !child.gameObject)
-              continue;
-          if (child.gameObject.GetComponentsInChildren<CustomShopItemController>() is not CustomShopItemController[] shopItems)
-              continue;
-          if (shopItems.Length == 0)
-              continue;
-          if (shopItems[0] is not CustomShopItemController shopItem)
-              continue;
-          if (target.Equals(shopItem))
-              return shopItem;
-      }
-      return null;
+      if (target is not CustomShopItemController shopItem)
+          return null;
+      if (((CustomShopController)_AlexandriaShopItemBaseShopField.GetValue(shopItem)) != shop)
+          return null;
+      return shopItem;
   }
 
   /// <summary>Pseudo-homing behavior</summary>

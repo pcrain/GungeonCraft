@@ -78,6 +78,7 @@ public class TradingGuide : CwaffActive
             AkSoundEngine.PostEvent("Play_OBJ_item_purchase_01", shopItem.gameObject);
         }
 
+        RoomHandler.unassignedInteractableObjects.TryRemove(this._barterOffer as IPlayerInteractable);
         Lazy.DoSmokeAt(this._barterOffer.sprite.WorldCenter);
         UnityEngine.Object.Destroy(this._barterOffer.gameObject);
     }

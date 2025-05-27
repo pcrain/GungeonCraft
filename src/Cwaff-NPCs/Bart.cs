@@ -116,15 +116,15 @@ public class Bart
     internal static PickupObject ExactlyOneBarterableItemNearby(PlayerController player)
     {
         PickupObject bestCandidate = null;
-        foreach (DebrisObject debris in StaticReferenceManager.AllDebris)
+        foreach (IPlayerInteractable ix in RoomHandler.unassignedInteractableObjects)
         {
-            if (!debris.IsPickupObject)
-                continue; // not a pickup
-            if (debris.GetComponentInChildren<PickupObject>() is not PickupObject pickup)
+            if (ix is ShopItemController)
+                continue; // not ours to sell
+            if (ix is not PickupObject pickup)
                 continue; // not a pickup
             if (!pickup.CanBeSold)
                 continue; // not sellable
-            if (pickup.sprite.WorldCenter.GetAbsoluteRoom() != player.CurrentRoom)
+            if (!pickup.sprite || pickup.sprite.WorldCenter.GetAbsoluteRoom() != player.CurrentRoom)
                 continue; // too far
             if (bestCandidate != null)
                 return null; // more than one item nearby
@@ -148,6 +148,7 @@ public class Bart
     {
         if (ExactlyOneBarterableItemNearby(player) is not PickupObject pickup)
             return 0;
+        RoomHandler.unassignedInteractableObjects.TryRemove(pickup as IPlayerInteractable);
         Lazy.DoSmokeAt(pickup.sprite.WorldCenter);
         UnityEngine.Object.Destroy(pickup.gameObject);
         return 0;
