@@ -82,6 +82,7 @@
     <Compile Include="src\Cwaff-Passives\AdrenalineShot.cs"/>
     <Compile Include="src\Cwaff-Passives\CampingSupplies.cs"/>
     <Compile Include="src\Cwaff-Passives\AmmoConservationManual.cs"/>
+    <Compile Include="src\Cwaff-Passives\GoopStabilizer.cs"/>
     <Compile Include="src\Cwaff-Passives\BubbleWand.cs"/>
     <Compile Include="src\Cwaff-Passives\WarriorsGi.cs"/>
     <Compile Include="src\Cwaff-Passives\DeadRinger.cs"/>

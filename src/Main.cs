@@ -364,6 +364,7 @@ public class Initialisation : BaseUnityPlugin
                 ScaldingJelly.Init();
                 Domino.Init();
                 DisplayPedestal.Init();
+                GoopStabilizer.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 
