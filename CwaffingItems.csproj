@@ -127,6 +127,7 @@
     <Compile Include="src\Cwaff-NPCs\Cammy.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bart.cs"/>
     <Compile Include="src\Common.cs"/>
+    <Compile Include="src\Cwaff-Actives\TradingGuide.cs"/>
     <Compile Include="src\Cwaff-Actives\PogoStick.cs"/>
     <Compile Include="src\Cwaff-Actives\AmazonPrimer.cs"/>
     <Compile Include="src\Cwaff-Actives\WeightedRobes.cs"/>

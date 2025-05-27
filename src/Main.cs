@@ -310,6 +310,7 @@ public class Initialisation : BaseUnityPlugin
                 BottledAbyss.Init();
                 PogoStick.Init();
                 GlassAmmoBox.Init();
+                TradingGuide.Init();
 
                 setupActivesWatch.Stop();
             #endregion

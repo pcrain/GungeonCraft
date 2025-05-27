@@ -2,7 +2,7 @@
 
 ## 1.26.0 (2025-05-25)
 
-- Added Display Pedestal and Glass Ammo Box
+- Added Display Pedestal, Glass Ammo Box, and Trading Guide
 - Added two new puzzle rooms (sprites thanks to Some Bunny!)
 
 ## 1.25.5 (2025-05-21)

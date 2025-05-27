@@ -1332,6 +1332,7 @@ public static class Extensions
     return vecs;
   }
 
+  //REFACTOR: this can be simplified
   /// <summary>Find a custom shop item currently under consideration by player</summary>
   public static CustomShopItemController GetTargetedItemByPlayer(this CustomShopController shop, PlayerController player)
   {

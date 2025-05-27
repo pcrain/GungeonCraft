@@ -139,6 +139,8 @@ public class Bart
             return false;
         if (shop.GetTargetedItemByPlayer(player) is not CustomShopItemController shopItem)
             return false;
+        if (player.HasActive<TradingGuide>())
+            return (barterItem.QualityGrade() >= shopItem.item.QualityGrade()); // better deals with Trading Guide
         return (barterItem.QualityGrade() > shopItem.item.QualityGrade());
     }
 
