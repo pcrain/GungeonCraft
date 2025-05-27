@@ -316,3 +316,5 @@ rogo_more_off_balance_sound,-5.0,1,sound,0
 rogo_stumble_sound,-2.0,1,sound,0
 rogo_recover_sound,-5.0,1,sound,0
 rogo_bounce_sound,-12.5,1,sound,0
+glass_shatter_sound,8.0,1,sound,0
+glass_assemble_sound,8.0,1,sound,0

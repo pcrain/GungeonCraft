@@ -309,6 +309,7 @@ public class Initialisation : BaseUnityPlugin
                 Detergent.Init();
                 BottledAbyss.Init();
                 PogoStick.Init();
+                GlassAmmoBox.Init();
 
                 setupActivesWatch.Stop();
             #endregion
