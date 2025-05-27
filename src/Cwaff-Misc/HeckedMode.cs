@@ -1048,26 +1048,31 @@ public static class HeckedMode
     // NOTE: All of this code is basically undoing AIShooter.Initialize() in reverse order
     public static void ReplaceGun(this AIActor enemy, Items replacementGunId)
     {
-        if (enemy.aiShooter is not AIShooter shooter)
+        if (!enemy || enemy.aiShooter is not AIShooter shooter)
             return;
 
         // ETGModConsole.Log($"  BUBBLETIME");
         // ETGModConsole.Log($"before init: ");
         // shooter.AttachStats();
 
+        Gun curGun = shooter.CurrentGun;
+        tk2dBaseSprite curGunSprite = curGun ? curGun.GetSprite() : null;
+
         for (int i = shooter.transform.childCount - 1; i >= 0; --i)
         {
             Transform t = shooter.transform.GetChild(i);
             if (t.gameObject.GetComponent<PlayerHandController>() is PlayerHandController hc)
             {
-                if (shooter.healthHaver)
+                if (shooter.healthHaver && shooter.healthHaver.bodySprites != null)
                 {
                     tk2dSprite hcsprite = hc.GetComponent<tk2dSprite>();
                     shooter.healthHaver.bodySprites.TryRemove(hcsprite);
                 }
-                shooter.m_attachedHands.TryRemove(hc);
+                if (shooter.m_attachedHands != null)
+                    shooter.m_attachedHands.TryRemove(hc);
                 // hc.attachPoint = null;
-                shooter.CurrentGun.GetSprite().DetachRenderer(hc.sprite);
+                if (curGunSprite)
+                    curGunSprite.DetachRenderer(hc.sprite);
                 // UnityEngine.Object.Destroy(hc);
                 t.parent = null;
                 UnityEngine.Object.Destroy(t.gameObject);
@@ -1082,8 +1087,12 @@ public static class HeckedMode
                 }
             }
         }
-        shooter.sprite.DetachRenderer(shooter.CurrentGun.GetSprite());
-        SpriteOutlineManager.RemoveOutlineFromSprite(shooter.CurrentGun.GetSprite());
+        if (curGunSprite)
+        {
+            if (shooter.sprite)
+                shooter.sprite.DetachRenderer(curGunSprite);
+            SpriteOutlineManager.RemoveOutlineFromSprite(curGunSprite);
+        }
 
         shooter.equippedGunId = (int)replacementGunId;
         // shooter.customShootCooldownPeriod = 0f;

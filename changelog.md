@@ -4,6 +4,7 @@
 
 - Added Display Pedestal, Glass Ammo Box, Trading Guide, and Goop Stabilizer
 - Added two new puzzle rooms (sprites thanks to Some Bunny!)
+- Fixed (hopefully) null deref caused by enemy gun replacement code not checking for the presence of hand sprites or gun sprites
 
 ## 1.25.5 (2025-05-21)
 
