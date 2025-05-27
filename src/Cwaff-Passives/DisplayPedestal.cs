@@ -1,3 +1,4 @@
+
 namespace CwaffingTheGungy;
 
 public class DisplayPedestal : CwaffPassive
@@ -110,9 +111,28 @@ public class PristineGun : MonoBehaviour
         this._inInventory = true;
         this._gun.OnDropped += Drop;
         this._gun.OnPostFired += PostFired;
+        this._player.GunChanged += GunChanged;
         PassiveItem.IncrementFlag(this._player, typeof(PristineGun));
         if (this._player.GetPassive<DisplayPedestal>() is DisplayPedestal dp)
             dp.UpdateStats();
+        if (this._player.CurrentGun == this._gun && this._gun.sprite)
+            OohShiny();
+    }
+
+    private void GunChanged(Gun previous, Gun current, bool newGun)
+    {
+        if (current == this._gun && this._gun.sprite)
+            OohShiny();
+    }
+
+    private void OohShiny()
+    {
+        this._gun.gameObject.Play("shiny_new_gun_sound");
+        CwaffVFX.SpawnBurst(prefab: AllayCompanion._AllaySparkles, numToSpawn: 20,
+            basePosition: this._gun.sprite.WorldCenter, baseVelocity: new Vector2(0, 3f), positionVariance: 1f,
+            minVelocity: 1f, velocityVariance: 1f, velType: CwaffVFX.Vel.AwayRadial,
+            rotType: CwaffVFX.Rot.Random, lifetime: 1.0f, startScale: 0.75f,
+            endScale: 0.5f, fadeOutTime: 0.5f, emissivePower: 5f);
     }
 
     private void PostFired(PlayerController player, Gun gun)
@@ -128,6 +148,7 @@ public class PristineGun : MonoBehaviour
         if (!this._player)
             return;
 
+        this._player.GunChanged -= GunChanged;
         PassiveItem.DecrementFlag(this._player, typeof(PristineGun));
         if (this._player.GetPassive<DisplayPedestal>() is DisplayPedestal dp)
             dp.UpdateStats();
@@ -137,6 +158,7 @@ public class PristineGun : MonoBehaviour
     {
         this._gun.OnDropped -= Drop;
         this._gun.OnPostFired -= PostFired;
+        this._player.GunChanged -= GunChanged;
         if (this._inInventory)
         {
             PassiveItem.DecrementFlag(this._player, typeof(PristineGun));
