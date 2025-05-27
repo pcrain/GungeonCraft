@@ -79,9 +79,9 @@ public class Bart
             );
 
         _BarterTable = shop.loot;
-        shop.owner.gameObject.AddComponent<BarteringPriceFixer>();
         shop.SetShotAnimation(paths: ResMap.Get("bart_shot"), fps: 1);
         shop.shop.AddComponent<ForceOutOfStockOnFailedSteal>();
+        shop.shop.AddComponent<BarterShopController>();
     }
 
     public static bool OnSecondOrThirdFloor(SpawnConditions conds)
@@ -170,29 +170,43 @@ public class Bart
     }
 }
 
-public class BarteringPriceFixer : MonoBehaviour
+public class BarterShopController : MonoBehaviour
 {
+    private static readonly List<BarterShopController> _ExtantShops = new();
+
+    private CustomShopController _shop = null;
     private void Start()
     {
-        if (!base.gameObject || !base.gameObject.transform || base.gameObject.transform.parent is not Transform shopTransform)
-            return;
-        foreach (Transform child in shopTransform)
+        this._shop = base.GetComponent<CustomShopController>();
+        _ExtantShops.Add(this);
+        UpdatePrices();
+    }
+
+    private void OnDestroy()
+    {
+        _ExtantShops.TryRemove(this);
+    }
+
+    public static void UpdateBarterShopPrices()
+    {
+        foreach (BarterShopController shop in _ExtantShops)
+            shop.UpdatePrices();
+    }
+
+    private void UpdatePrices()
+    {
+        bool isDiscounted = Lazy.AnyoneHasActive<TradingGuide>();
+        Lazy.DebugLog($"updating prices for {this._shop.m_shopItems.Count} barter shop items with discount {isDiscounted}");
+        foreach (ShopItemController baseController in this._shop.m_itemControllers)
         {
-            if (!child || !child.gameObject)
+            if (baseController is not CustomShopItemController customItemController || !customItemController.item)
                 continue;
-            CustomShopItemController[] shopItems = child.gameObject.GetComponentsInChildren<CustomShopItemController>();
-            if (shopItems == null || shopItems.Length == 0)
-                continue;
-            if (shopItems[0] is not CustomShopItemController shopItem)
-                continue;
-            if (!shopItem.item)
-                continue;
-            switch (shopItem.item.quality)
-            { // all trades are one tier down
-                case ItemQuality.A: shopItem.customPriceSprite = "barter_s_icon"; break;
-                case ItemQuality.B: shopItem.customPriceSprite = "barter_a_icon"; break;
-                case ItemQuality.C: shopItem.customPriceSprite = "barter_b_icon"; break;
-                case ItemQuality.D: shopItem.customPriceSprite = "barter_c_icon"; break;
+            switch (customItemController.item.quality)
+            { // all trades are one tier down unless we have the Trading Guide
+                case ItemQuality.A: customItemController.customPriceSprite = isDiscounted ? "barter_a_icon" : "barter_s_icon"; break;
+                case ItemQuality.B: customItemController.customPriceSprite = isDiscounted ? "barter_b_icon" : "barter_a_icon"; break;
+                case ItemQuality.C: customItemController.customPriceSprite = isDiscounted ? "barter_c_icon" : "barter_b_icon"; break;
+                case ItemQuality.D: customItemController.customPriceSprite = isDiscounted ? "barter_d_icon" : "barter_c_icon"; break;
             }
         }
     }

@@ -20,6 +20,24 @@ public class TradingGuide : CwaffActive
         ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 1f);
     }
 
+    public override void Pickup(PlayerController player)
+    {
+        base.Pickup(player);
+        BarterShopController.UpdateBarterShopPrices();
+    }
+
+    public override void OnPreDrop(PlayerController player)
+    {
+        base.OnPreDrop(player);
+        BarterShopController.UpdateBarterShopPrices();
+    }
+
+    public override void OnDestroy()
+    {
+        BarterShopController.UpdateBarterShopPrices();
+        base.OnDestroy();
+    }
+
     public override bool CanBeUsed(PlayerController user)
     {
         if (user.m_lastInteractionTarget is not IPlayerInteractable ixTarget)
