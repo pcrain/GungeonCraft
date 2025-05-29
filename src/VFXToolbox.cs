@@ -883,10 +883,13 @@ public partial class CwaffVFX // public
     /// <param name="anchorTransform">If non-null, projectile moves as its anchor transform moves (not a real parent since that causes pooling issues).</param>
     /// <param name="overrideColor">If non-null, projectile is given an override color at the shader lever.</param>
     /// <param name="emitColorPower">Emissive color power of the VFX. Ignored if fadeOutTime is non-null.</param>
-    public static void Spawn(GameObject prefab, Vector3 position, Quaternion? rotation = null,
+    /// <param name="spriteCol">The sprite collection to use if not passing a prefab.</param>
+    /// <param name="spriteId">The sprite id to use if not passing a prefab.</param>
+    public static void Spawn(GameObject prefab = null, Vector3 position = default, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null,
         bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1,
-        bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f)
+        bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f,
+        tk2dSpriteCollectionData spriteCol = null, int spriteId = -1)
     {
         CwaffVFX c = (_DespawnedVFX.Count > 0) ? _DespawnedVFX.Pop() : new();
         if (c._node == null)
@@ -910,9 +913,11 @@ public partial class CwaffVFX // public
             specificFrame : specificFrame,
             flipX         : flipX,
             flipY         : flipY,
-            anchorTransform: anchorTransform,
-            overrideColor : overrideColor,
-            emitColorPower : emitColorPower
+            anchorTransform : anchorTransform,
+            overrideColor   : overrideColor,
+            emitColorPower  : emitColorPower,
+            spriteCol       : spriteCol,
+            spriteId        : spriteId
             );
     }
 
@@ -953,10 +958,12 @@ public partial class CwaffVFX // public
     /// <param name="overrideColor">If non-null, projectile is given an override color at the shader lever.</param>
     /// <param name="emitColorPower">Emissive color power of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="spread">If > 0, applies a random rotation with magnitude up to spread degress to final velocity.</param>
-    public static void SpawnBurst(GameObject prefab, int numToSpawn, Vector2 basePosition, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
+    /// <param name="spriteCol">The sprite collection to use if not passing a prefab.</param>
+    /// <param name="spriteId">The sprite id to use if not passing a prefab.</param>
+    public static void SpawnBurst(GameObject prefab = null, int numToSpawn = 1, Vector2 basePosition = default, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false,
         bool uniform = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false,
-        Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f, float spread = 0f)
+        Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f, float spread = 0f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
@@ -1001,7 +1008,9 @@ public partial class CwaffVFX // public
                 specificFrame : specificFrame,
                 anchorTransform: anchorTransform,
                 overrideColor : overrideColor,
-                emitColorPower : emitColorPower
+                emitColorPower : emitColorPower,
+                spriteCol       : spriteCol,
+                spriteId        : spriteId
                 );
         }
     }
@@ -1009,15 +1018,16 @@ public partial class CwaffVFX // public
 
 public partial class CwaffVFX // private
 {
+    // constants
+    internal static readonly int _EmissivePowerId      = Shader.PropertyToID("_EmissivePower");
+    internal static readonly int _EmissiveColorId      = Shader.PropertyToID("_EmissiveColor");
+    internal static readonly int _EmissiveColorPowerId = Shader.PropertyToID("_EmissiveColorPower");
+    internal static readonly int _OverrideColorId      = Shader.PropertyToID("_OverrideColor");
+    internal static readonly int _FadeId               = Shader.PropertyToID("_Fade");
+
     // pools
     private static readonly LinkedList<CwaffVFX> _SpawnedVFX = new();
     private static readonly LinkedList<CwaffVFX> _DespawnedVFX = new();
-
-    // constants
-    private static readonly int _EmissivePowerId      = Shader.PropertyToID("_EmissivePower");
-    private static readonly int _EmissiveColorId      = Shader.PropertyToID("_EmissiveColor");
-    private static readonly int _EmissiveColorPowerId = Shader.PropertyToID("_EmissiveColorPower");
-    private static readonly int _OverrideColorId      = Shader.PropertyToID("_OverrideColor");
 
     // locals
     private GameObject _vfx;
@@ -1103,25 +1113,40 @@ public partial class CwaffVFX // private
         c._vfx.SetActive(false);
     }
 
-    private void Setup(GameObject prefab, Vector3 position, Quaternion? rotation = null,
+    private void Setup(GameObject prefab = null, Vector3 position = default, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null,
         bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null,
-        float emitColorPower = 1.55f)
+        float emitColorPower = 1.55f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1)
     {
         this._shouldDespawn = false;
         this._vfx.SetActive(true);
-        this._vfx.transform.position = position;
-        this._vfx.transform.localRotation = rotation ?? Quaternion.identity;
 
-        this._anchorTransform = anchorTransform;
+        Transform t = this._vfx.transform;
+        t.position = position;
+        t.localRotation = rotation ?? Quaternion.identity;
+
+        this._anchorTransform = anchorTransform; // don't use it as our actual parent in case it gets destroyed
         if (anchorTransform != null)
             this._anchorPos = anchorTransform.position;
 
-        tk2dSprite          prefabSprite  = prefab.GetComponent<tk2dSprite>();
-        tk2dSpriteAnimator  prefabAnim    = prefab.GetComponent<tk2dSpriteAnimator>();
-        tk2dSpriteAnimation prefabLibrary = prefab.GetComponent<tk2dSpriteAnimation>();
-        this._sprite.SetSprite(prefabSprite.collection, prefabSprite.spriteId);
+        tk2dSprite prefabSprite = prefab ? prefab.GetComponent<tk2dSprite>() : null;
+        if (prefab)
+        {
+            this._animator.defaultClipId = prefab.GetComponent<tk2dSpriteAnimator>().defaultClipId;
+            this._library.clips = prefab.GetComponent<tk2dSpriteAnimation>().clips;
+            this._sprite.SetSprite(prefabSprite.collection, prefabSprite.spriteId);
+            this._animator.playAutomatically = true;
+            this._animator.currentClip = this._animator.DefaultClip;
+        }
+        else //NOTE: both spriteCol and spriteId must be set if we don't have a prefab...we don't check because it's slow, but don't be dumb here...
+        {
+            this._animator.defaultClipId = 0;
+            this._library.clips = null;
+            this._animator.playAutomatically = false;
+            this._sprite.SetSprite(spriteCol, spriteId);
+        }
+
         if (startScale.HasValue)
         {
             this._startScale = startScale.Value;
@@ -1129,16 +1154,11 @@ public partial class CwaffVFX // private
         }
         else
         {
-            this._sprite.scale = prefabSprite.scale;
+            this._sprite.scale = prefabSprite ? prefabSprite.scale : Vector3.one;
             this._startScale = this._sprite.scale.x;
         }
         this._sprite.FlipX = flipX;
         this._sprite.FlipY = flipY;
-        this._sprite.renderer.SetAlpha(1.0f);
-        this._library.clips = prefabLibrary.clips;
-        this._animator.playAutomatically = true;
-        this._animator.defaultClipId = prefabAnim.defaultClipId;
-        this._animator.currentClip = this._animator.DefaultClip;
 
         this._curLifeTime  = 0.0f;
         this._fadeIn       = fadeIn;
@@ -1182,16 +1202,20 @@ public partial class CwaffVFX // private
         else
         {
             this._material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
+            this._material.SetFloat(_FadeId, 1.0f);
         }
 
-        if (specificFrame >= 0)
-            this._animator.PickFrame(frame: specificFrame);
-        else if (randomFrame)
-            this._animator.PickFrame();
-        else
+        if (prefab)
         {
-            this._animator.Resume();
-            this._animator.PlayFromFrame(0);
+            if (specificFrame >= 0)
+                this._animator.PickFrame(frame: specificFrame);
+            else if (randomFrame)
+                this._animator.PickFrame();
+            else
+            {
+                this._animator.Resume();
+                this._animator.PlayFromFrame(0);
+            }
         }
         this._lastSpriteId = this._sprite.spriteId;
         this._sprite.UpdateMaterial();
@@ -1228,7 +1252,7 @@ public partial class CwaffVFX // private
 
         if (this._changesScale)
         {
-            float scale = Mathf.Lerp(this._startScale, this._endScale, percentDone);
+            float scale = (1f - percentDone) * this._startScale + percentDone * this._endScale;
             this._sprite.scale = new Vector3(scale, scale, 1.0f);
         }
 
@@ -1237,7 +1261,7 @@ public partial class CwaffVFX // private
             float alpha = (this._curLifeTime - this._fadeStartTime) / this._fadeTotalTime;
             if (!this._fadeIn)
                 alpha = 1.0f - alpha;
-            this._sprite.renderer.SetAlpha(alpha);
+            this._sprite.renderer.material.SetFloat(_FadeId, alpha);
         }
     }
 }

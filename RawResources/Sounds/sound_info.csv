@@ -318,3 +318,10 @@ rogo_recover_sound,-5.0,1,sound,0
 rogo_bounce_sound,-12.5,1,sound,0
 glass_shatter_sound,8.0,1,sound,0
 glass_assemble_sound,8.0,1,sound,0
+fork_impact_sound,6.5,1,sound,0
+forkbomb_charge_sound_1,-2.0,1,sound,0
+forkbomb_charge_sound_2,-2.0,1,sound,0
+forkbomb_charge_sound_3,-2.0,1,sound,0
+forkbomb_charge_sound_4,-2.0,1,sound,0
+forkbomb_charge_sound_5,-2.0,1,sound,0
+forkbomb_charge_sound_6,-2.0,1,sound,0

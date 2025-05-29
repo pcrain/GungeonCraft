@@ -1,10 +1,12 @@
 namespace CwaffingTheGungy;
 
 /// <summary>Extensions for improved projectile handling</summary>
+[HarmonyPatch]
 public class CwaffProjectile : MonoBehaviour
 {
     // sane defaults
     public string spawnSound         = null;
+    public string chargeSound        = null; //handled in a patch
     public bool stopSoundOnDeath     = false;
     public bool uniqueSounds         = false;
     public GameObject shrapnelVFX    = null;
@@ -130,39 +132,44 @@ public class CwaffProjectile : MonoBehaviour
 
     /// <summary>Prevent projectiles from being affected by Orbital Bullets if preventOrbiting is set</summary>
     [HarmonyPatch(typeof(GunVolleyModificationItem), nameof(GunVolleyModificationItem.HandleStartOrbit))]
-    private class PreventOrbitingProjectilePatch
+    [HarmonyPrefix]
+    private static bool PreventOrbitingProjectilePatch(GunVolleyModificationItem __instance, BounceProjModifier bouncer, SpeculativeRigidbody srb)
     {
-        static bool Prefix(GunVolleyModificationItem __instance, BounceProjModifier bouncer, SpeculativeRigidbody srb)
-        {
-            if (bouncer.projectile.GetComponent<CwaffProjectile>() is not CwaffProjectile c)
-              return true; // call the original method
-            return !c.preventOrbiting; // skip the original method iff we are supposed to prevent orbiting
-        }
+        if (bouncer.projectile.GetComponent<CwaffProjectile>() is not CwaffProjectile c)
+          return true; // call the original method
+        return !c.preventOrbiting; // skip the original method iff we are supposed to prevent orbiting
     }
 
     /// <summary>Prevent beams from being affected by Orbital Bullets if preventOrbiting is set</summary>
     [HarmonyPatch(typeof(GunVolleyModificationItem), nameof(GunVolleyModificationItem.PostProcessProjectileOrbitBeam))]
-    private class PreventOrbitingBeamPatch
+    [HarmonyPrefix]
+    private static bool PreventOrbitingBeamPatch(GunVolleyModificationItem __instance, BeamController beam)
     {
-        static bool Prefix(GunVolleyModificationItem __instance, BeamController beam)
-        {
-            if (beam.projectile.GetComponent<CwaffProjectile>() is not CwaffProjectile c)
-              return true; // call the original method
-            return !c.preventOrbiting; // skip the original method iff we are supposed to prevent orbiting
-        }
+        if (beam.projectile.GetComponent<CwaffProjectile>() is not CwaffProjectile c)
+          return true; // call the original method
+        return !c.preventOrbiting; // skip the original method iff we are supposed to prevent orbiting
     }
 
     /// <summary>Prevent electric damage bullets from emitting sparks when they're electric / cursed</summary>
     [HarmonyPatch(typeof(Projectile), nameof(Projectile.HandleSparks))]
-    private class ProjectileHandleSparksPatch
+    [HarmonyPrefix]
+    private static bool ProjectileHandleSparksPatch(Projectile __instance, Vector2? overridePoint)
     {
-        static bool Prefix(Projectile __instance, Vector2? overridePoint)
-        {
-          if (__instance.GetComponent<CwaffProjectile>() is CwaffProjectile cp)
-            return !cp.preventSparks; // skip original method if preventSparks is true
-          if (__instance.GetComponent<FakeProjectileComponent>())
-            return false; // skip original method if we're a fake projectile
-          return true;     // call the original method
-        }
+      if (__instance.GetComponent<CwaffProjectile>() is CwaffProjectile cp)
+        return !cp.preventSparks; // skip original method if preventSparks is true
+      if (__instance.GetComponent<FakeProjectileComponent>())
+        return false; // skip original method if we're a fake projectile
+      return true;     // call the original method
+    }
+
+    /// <summary>Play charge sounds for individual charge projectiles</summary>
+    [HarmonyPatch(typeof(Gun), nameof(Gun.HandleChargeEffects))]
+    [HarmonyPostfix]
+    private static void GunHandleChargeEffectsPatch(Gun __instance, ProjectileModule.ChargeProjectile oldChargeProjectile, ProjectileModule.ChargeProjectile newChargeProjectile)
+    {
+      if (newChargeProjectile == null || newChargeProjectile.Projectile.gameObject.GetComponent<CwaffProjectile>() is not CwaffProjectile cp)
+        return;
+      if (!string.IsNullOrEmpty(cp.chargeSound))
+        __instance.gameObject.Play(cp.chargeSound);
     }
 }

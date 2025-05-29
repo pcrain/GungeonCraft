@@ -155,6 +155,7 @@
     <Compile Include="src\Cwaff-Actives\Itemfinder.cs"/>
     <Compile Include="src\CwaffDebug.cs"/>
     <Compile Include="src\Cwaff-Guns\Lightwing.cs"/>
+    <Compile Include="src\Cwaff-Guns\Forkbomb.cs"/>
     <Compile Include="src\Cwaff-Guns\Leafblower.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\Magunet.cs"/>

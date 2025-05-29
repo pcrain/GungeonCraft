@@ -278,6 +278,7 @@ public class Initialisation : BaseUnityPlugin
                 Sextant.Init();
                 Wayfarer.Init();
                 Leafblower.Init();
+                Forkbomb.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

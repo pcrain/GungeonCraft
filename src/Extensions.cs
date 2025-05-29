@@ -414,8 +414,8 @@ public static class Extensions
     if (glowColor is Color c)
     {
       m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive"); //NOTE: tintable version doesn't have an _EmissiveColor property
-      m.SetFloat("_EmissiveColorPower", glowColorPower ?? 1.55f);
-      m.SetColor("_EmissiveColor", c);
+      m.SetFloat(CwaffVFX._EmissiveColorPowerId, glowColorPower ?? 1.55f);
+      m.SetColor(CwaffVFX._EmissiveColorId, c);
     }
     else
       m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
@@ -432,9 +432,9 @@ public static class Extensions
         m.EnableKeyword("BRIGHTNESS_CLAMP_ON");
       }
     }
-    m.SetFloat("_EmissivePower", glowAmount);
+    m.SetFloat(CwaffVFX._EmissivePowerId, glowAmount);
     if (overrideColor is Color c2)
-      m.SetColor("_OverrideColor", c2);
+      m.SetColor(CwaffVFX._OverrideColorId, c2);
   }
 
   /// <summary>Randomly add or subtract an amount from an angle</summary>

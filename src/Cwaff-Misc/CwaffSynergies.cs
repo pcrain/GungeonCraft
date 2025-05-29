@@ -322,6 +322,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfLeafblower>(MASTERY_LEAFBLOWER, Leafblower.ItemName);
         // Reloading while a drone is active disconnects the drone and makes it autonomous, causing it to automatically seek out enemies in its line of sight.
         NewMastery<MasteryOfWayfarer>(MASTERY_WAYFARER, Wayfarer.ItemName);
+        // Forks explode upon multiplying.
+        NewMastery<MasteryOfForkbomb>(MASTERY_FORKBOMB, Forkbomb.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -601,6 +603,7 @@ internal class MasteryOfEmpath               : MasteryDummyItem {}
 internal class MasteryOfSextant              : MasteryDummyItem {}
 internal class MasteryOfLeafblower           : MasteryDummyItem {}
 internal class MasteryOfWayfarer             : MasteryDummyItem {}
+internal class MasteryOfForkbomb             : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -742,4 +745,5 @@ public enum Synergy {
     MASTERY_SEXTANT,
     MASTERY_LEAFBLOWER,
     MASTERY_WAYFARER,
+    MASTERY_FORKBOMB,
 };
