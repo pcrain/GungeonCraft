@@ -7,6 +7,13 @@
 - Added two new puzzle rooms
 	- Floor puzzle tile sprites thanks to Some Bunny!
 - Fixed (hopefully) null deref caused by enemy gun replacement code not checking for the presence of hand sprites or gun sprites
+- Decreased Gunflower's ammo usage from 10 per second to 3 per second
+- Updated Pogo Stick's description to mention granting an extra active item slot
+- Lowered volume on Nycterian's projectile and alert sounds
+- Touched up Yggdrashell's Earth Armor heart sprites and added a proper half heart sprite
+- Made Barter Shop sign that explains how bartering works indestructible
+- Fixed Xelsior's reticle persisting if changing or dropping guns while firing at an enemy
+- Fixed B. B. Gun sometimes not giving player ammo back when the player catches the projectile
 
 ## 1.25.5 (2025-05-21)
 

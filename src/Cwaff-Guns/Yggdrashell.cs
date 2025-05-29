@@ -55,7 +55,7 @@ public class Yggdrashell : CwaffGun
 
             __instance.m_currentFullHeartName  = "yggdrashell_heart_full_ui";
             __instance.m_currentHalfHeartName  = "yggdrashell_heart_half_ui";
-            __instance.m_currentEmptyHeartName = "yggdrashell_heart_empty_ui";
+            // __instance.m_currentEmptyHeartName = "yggdrashell_heart_empty_ui";
             __instance.m_currentArmorName      = "yggdrashell_armor_ui";
         }
     }

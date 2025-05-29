@@ -231,9 +231,9 @@ public class TheBB : MonoBehaviour
                 PhysicsEngine.SkipCollision = true; // don't collide with other player in coop
             return;
         }
-        if (!this._freebie && (this._owner.FindBaseGun<BBGun>() is Gun gun) && (gun.CurrentAmmo < gun.AdjustedMaxAmmo))
+        if (this._owner.FindBaseGun<BBGun>() is Gun gun)
         {
-            gun.CurrentAmmo += 1;
+            gun.GainAmmo(1);
             gun.ForceImmediateReload();
         }
         // don't do knockback if player is behind us

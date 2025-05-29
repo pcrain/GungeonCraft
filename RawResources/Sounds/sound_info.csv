@@ -160,11 +160,11 @@ adrenaline_tank_damage_sound,2.5,1,sound,0
 the_sound_of_mastering_a_weapon,-2.0,1,sound,0
 mastery_ritual_activate_sound,6.0,1,sound,0
 mastery_ritual_complete_sound,3.0,1,sound,0
-bat_screech_sound,1.0,1,sound,0
+bat_screech_sound,-4.0,1,sound,0
 nycterian_shoot_sound,-1.0,1,sound,0
 nycterian_reload_sound,7.0,1,sound,0
 armor_pierced_sound,-2.0,1,sound,0
-distracted_sound,-8.0,1,sound,0
+distracted_sound,-13.0,1,sound,0
 frisbee_spin_sound_alt,-10.0,1,sound,0
 frisbee_bounce_sound,-4.5,1,sound,0
 starmageddon_bullet_fall_sound,-0.5,1,sound,0

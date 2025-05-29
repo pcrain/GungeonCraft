@@ -138,6 +138,8 @@ public class Xelsior : CwaffGun
         base.OnSwitchedAwayFromThisGun();
         DestroyExtantGuns();
         this._target = null;
+        if (this._reticle)
+            this._reticle.GetComponent<tk2dSprite>().renderer.enabled = this._target;
     }
 
     private void CheckForDroppedGuns()
@@ -234,6 +236,8 @@ public class Xelsior : CwaffGun
         base.OnDroppedByPlayer(player);
         StopAllCoroutines();
         DestroyExtantGuns();
+        if (this._reticle)
+            UnityEngine.Object.Destroy(this._reticle);
         this._target = null;
     }
 
@@ -257,6 +261,8 @@ public class Xelsior : CwaffGun
         GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
         StopAllCoroutines();
         DestroyExtantGuns();
+        if (this._reticle)
+            this._reticle.GetComponent<tk2dSprite>().renderer.enabled = this._target;
         base.OnDestroy();
 
         #if DEBUG

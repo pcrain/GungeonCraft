@@ -178,6 +178,18 @@ public class BarterShopController : MonoBehaviour
     private void Start()
     {
         this._shop = base.GetComponent<CustomShopController>();
+        // make the sign explaining how bartering works indestructible
+        RoomHandler room = this._shop.transform.position.GetAbsoluteRoom();
+        foreach (var ix in room.interactableObjects)
+        {
+            if (ix is not Component c)
+                continue;
+            if (!c.gameObject.name.Contains("Sign"))
+                continue;
+            MajorBreakable mb = c.gameObject.GetComponent<MajorBreakable>();
+            mb.TemporarilyInvulnerable = true;
+            break;
+        }
         _ExtantShops.Add(this);
         UpdatePrices();
     }

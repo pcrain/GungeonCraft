@@ -23,7 +23,7 @@ public class Gunflower : CwaffGun
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 100, shootFps: 4, reloadFps: 4,
             muzzleFrom: Items.Mailbox, dynamicBarrelOffsets: true, loopFireAt: 4)
           .InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
-            shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, customClip: true, ammoCost: 10, angleVariance: 0f,
+            shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, customClip: true, ammoCost: 3, angleVariance: 0f,
             beamSprite: "gunflower_beam", beamFps: 17, beamChargeFps: 8, beamImpactFps: 14,
             beamLoopCharge: false, beamReflections: 0, beamChargeDelay: 0.8f, beamEmission: 40f));
 
