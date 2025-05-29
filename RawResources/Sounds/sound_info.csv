@@ -325,3 +325,5 @@ forkbomb_charge_sound_3,-2.0,1,sound,0
 forkbomb_charge_sound_4,-2.0,1,sound,0
 forkbomb_charge_sound_5,-2.0,1,sound,0
 forkbomb_charge_sound_6,-2.0,1,sound,0
+zealot_shoot_sound,-11.0,1,sound,0
+zealot_impact_sound,-14.0,1,sound,0

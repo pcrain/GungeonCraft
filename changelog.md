@@ -2,7 +2,7 @@
 
 ## 1.26.0 (2025-05-25)
 
-- Added Display Pedestal, Glass Ammo Box, Trading Guide, Goop Stabilizer, and Forkbomb
+- Added Display Pedestal, Glass Ammo Box, Trading Guide, Goop Stabilizer, Forkbomb, and Zealot
 	- Display Pedestal, Trading Guide, Goop Stabilizer, and Forkbomb sprites thanks to Dallan!
 - Added two new puzzle rooms
 	- Floor puzzle tile sprites thanks to Some Bunny!

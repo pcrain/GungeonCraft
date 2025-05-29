@@ -330,3 +330,45 @@ static class DisplayMasteryInGunNamePatch
         }
     }
 }
+
+//NOTE: used by Zealot and a TBD item
+/// <summary>Patches to allow the player to attack while dodge rolling.</summary>
+[HarmonyPatch]
+static class AttackWhileRollingPatch
+{
+    /// <summary>Enable the player to attack while dodgerolling.</summary>
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.m_CanAttack), MethodType.Getter)]
+    [HarmonyILManipulator]
+    private static void AttackWhileRollingIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCall<PlayerController>("get_IsDodgeRolling")))
+          return;
+
+        cursor.Emit(OpCodes.Ldarg_0);
+        cursor.CallPrivate(typeof(AttackWhileRollingPatch), nameof(CanAttackWhileDodgeRolling));
+    }
+
+    //NOTE: the conditional is inverted, so return false to allow shooting, true to prevent it
+    private static bool CanAttackWhileDodgeRolling(bool isDodgeRolling, PlayerController player)
+    {
+      if (!isDodgeRolling)
+        return false;
+      if (player.CurrentGun is Gun gun && gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.canAttackWhileRolling)
+        return false;
+      return true;
+    }
+
+    /// <summary>Keep renderers active while dodge rolling if necessary</summary>
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.ToggleGunRenderers))]
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.ToggleHandRenderers))]
+    [HarmonyPrefix]
+    private static bool KeepRenderersOnWhileDodgeRollingPatch(PlayerController __instance, bool value, string reason)
+    {
+      if (value || reason != "dodgeroll")
+        return true; // call original method
+      if (__instance.CurrentGun is Gun gun && gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.canAttackWhileRolling)
+        return false; // skip original method
+      return true;
+    }
+}

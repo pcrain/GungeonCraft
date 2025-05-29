@@ -279,6 +279,7 @@ public class Initialisation : BaseUnityPlugin
                 Wayfarer.Init();
                 Leafblower.Init();
                 Forkbomb.Init();
+                Zealot.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
@@ -378,7 +379,9 @@ public class Initialisation : BaseUnityPlugin
             awaitLateHarmonyWatch.Stop();
 
             #region Custom Character Initialization
+                System.Diagnostics.Stopwatch setupCharactersWatch = System.Diagnostics.Stopwatch.StartNew();
                 Rogo.Init();
+                setupCharactersWatch.Stop();
             #endregion
 
             #region Floor and Flow Initialization (sync for now, might not need to be)
@@ -473,6 +476,7 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"  {setupActivesWatch.ElapsedMilliseconds,      5}ms       setupActives     ");
                 ETGModConsole.Log($"  {setupPassivesWatch.ElapsedMilliseconds,     5}ms       setupPassives    ");
                 ETGModConsole.Log($"  {awaitLateHarmonyWatch.ElapsedMilliseconds,  5}ms       awaitLateHarmony ");
+                ETGModConsole.Log($"  {setupCharactersWatch.ElapsedMilliseconds,   5}ms       setupCharacters  ");
                 ETGModConsole.Log($"  {setupFloorsWatch.ElapsedMilliseconds,       5}ms       setupFloors      ");
                 ETGModConsole.Log($"  {setupBossesWatch.ElapsedMilliseconds,       5}ms       setupBosses      ");
                 ETGModConsole.Log($"  {awaitItemsWatch.ElapsedMilliseconds,        5}ms       awaitItems       ");

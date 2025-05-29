@@ -324,6 +324,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfWayfarer>(MASTERY_WAYFARER, Wayfarer.ItemName);
         // Forks explode upon multiplying.
         NewMastery<MasteryOfForkbomb>(MASTERY_FORKBOMB, Forkbomb.ItemName);
+        // Zealot gains infinite ammo and fires even while dodge rolling.
+        NewMastery<MasteryOfZealot>(MASTERY_ZEALOT, Zealot.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -604,6 +606,7 @@ internal class MasteryOfSextant              : MasteryDummyItem {}
 internal class MasteryOfLeafblower           : MasteryDummyItem {}
 internal class MasteryOfWayfarer             : MasteryDummyItem {}
 internal class MasteryOfForkbomb             : MasteryDummyItem {}
+internal class MasteryOfZealot               : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -746,4 +749,5 @@ public enum Synergy {
     MASTERY_LEAFBLOWER,
     MASTERY_WAYFARER,
     MASTERY_FORKBOMB,
+    MASTERY_ZEALOT,
 };

@@ -59,6 +59,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public  bool                              continuousFireAnimation    = false;  // if true, don't restart shooting animation when firing bullet
   public  bool                              useSmoothReload            = false;  // if true, synchronize reload animation with reload speed
   public  float                             smoothReloadOffset         = 0f;     // time between reloading finishing visually and functionally
+  public  bool                              canAttackWhileRolling      = false;  // if true, allows the player to fire the gun while dodge rolling
 
   public  bool                              Mastered {get; private set;}         // whether the gun has been mastered
 
@@ -572,7 +573,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       }
   }
 
-  //WARNING: i think i reinvented Gun::usesContinuousFireAnimation here ...but why???
+  //REFACTOR: i think i reinvented Gun::usesContinuousFireAnimation here ...but why???
   /// <summary>Allow guns to not reset their shooting animation with every bullet fired</summary>
   [HarmonyPatch]
   private class GunShootAnimationPatch
