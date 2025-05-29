@@ -367,6 +367,7 @@ public class Initialisation : BaseUnityPlugin
                 Domino.Init();
                 DisplayPedestal.Init();
                 GoopStabilizer.Init();
+                CombatLeotard.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

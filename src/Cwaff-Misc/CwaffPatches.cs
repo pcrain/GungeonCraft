@@ -331,7 +331,7 @@ static class DisplayMasteryInGunNamePatch
     }
 }
 
-//NOTE: used by Zealot and a TBD item
+//NOTE: used by Zealot and Combat Leotard
 /// <summary>Patches to allow the player to attack while dodge rolling.</summary>
 [HarmonyPatch]
 static class AttackWhileRollingPatch
@@ -354,6 +354,8 @@ static class AttackWhileRollingPatch
     {
       if (!isDodgeRolling)
         return false;
+      if (PassiveItem.IsFlagSetForCharacter(player, typeof(CombatLeotard)))
+        return false;
       if (player.CurrentGun is Gun gun && gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.canAttackWhileRolling)
         return false;
       return true;
@@ -367,6 +369,8 @@ static class AttackWhileRollingPatch
     {
       if (value || reason != "dodgeroll")
         return true; // call original method
+      if (PassiveItem.IsFlagSetForCharacter(__instance, typeof(CombatLeotard)))
+        return false; // skip original method
       if (__instance.CurrentGun is Gun gun && gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.canAttackWhileRolling)
         return false; // skip original method
       return true;

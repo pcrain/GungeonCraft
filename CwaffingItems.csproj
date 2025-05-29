@@ -59,6 +59,7 @@
     <Compile Include="src\Cwaff-Passives\Lichguard.cs"/>
     <Compile Include="src\Cwaff-Passives\RatPoison.cs"/>
     <Compile Include="src\Cwaff-Passives\MMReloading.cs"/>
+    <Compile Include="src\Cwaff-Passives\CombatLeotard.cs"/>
     <Compile Include="src\Cwaff-Passives\BlankChecks.cs"/>
     <Compile Include="src\Cwaff-Passives\ArmorPiercingRounds.cs"/>
     <Compile Include="src\Cwaff-Passives\ScavengingArms.cs"/>

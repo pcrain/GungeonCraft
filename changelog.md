@@ -2,8 +2,9 @@
 
 ## 1.26.0 (2025-05-25)
 
-- Added Display Pedestal, Glass Ammo Box, Trading Guide, Goop Stabilizer, Forkbomb, and Zealot
+- Added Display Pedestal, Glass Ammo Box, Trading Guide, Goop Stabilizer, Forkbomb, Zealot, and Combat Leotard
 	- Display Pedestal, Trading Guide, Goop Stabilizer, and Forkbomb sprites thanks to Dallan!
+- Added masteries for Forkbomb and Zealot
 - Added two new puzzle rooms
 	- Floor puzzle tile sprites thanks to Some Bunny!
 - Fixed (hopefully) null deref caused by enemy gun replacement code not checking for the presence of hand sprites or gun sprites
