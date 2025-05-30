@@ -106,6 +106,7 @@ public class ForkbombProjectile : MonoBehaviour
     private Material             _mat;
     private float                _originalSpeed;
     private SpeculativeRigidbody _body;
+    private Vector2              _contact;
 
     public int forks = -1;
     public bool mastered;
@@ -151,6 +152,7 @@ public class ForkbombProjectile : MonoBehaviour
 
         PhysicsEngine.PostSliceVelocity = Vector2.zero;
 
+        this._contact = coll.Contact;
         this._stickNormal = coll.Normal;
         this._body.OnRigidbodyCollision -= this.StickToSurface;
         this._body.OnTileCollision -= this.StickToSurface;
@@ -232,11 +234,12 @@ public class ForkbombProjectile : MonoBehaviour
         }
 
         --this.forks;
-        Vector2 explodePos =
-          this._projectile.sprite ? this._projectile.sprite.WorldCenterRight() :
-          this._projectile.transform.position;
         if (this._stuckEnemy || this._stickNormal == default(Vector2))
           this._stickNormal = -this._projectile.transform.right;
+        Vector2 explodePos =
+          (!this._stuckEnemy) ? this._contact :
+          this._projectile.sprite ? this._projectile.sprite.WorldCenterRight() :
+          this._projectile.transform.position;
         float baseAngle = this._stickNormal.ToAngle();
         for (int i = 0; i < 2; ++i)
         {
@@ -245,7 +248,7 @@ public class ForkbombProjectile : MonoBehaviour
           if (i == 0)
           {
             newFork = SpawnManager.SpawnProjectile(
-              Forkbomb._ForkbombProj.gameObject, explodePos, Quaternion.Euler(0f, 0f, zRotation))
+              Forkbomb._ForkbombProj.gameObject, this._projectile.transform.position, Quaternion.Euler(0f, 0f, zRotation))
               .GetComponent<Projectile>();
             newFork.SpawnedFromOtherPlayerProjectile = true;
             newFork.Owner = this._projectile.Owner;
@@ -257,8 +260,6 @@ public class ForkbombProjectile : MonoBehaviour
           else
           {
             newFork = this._projectile;
-            newFork.transform.position = explodePos;
-            newFork.specRigidbody.Reinitialize();
             newFork.ResetPiercing();
             newFork.SetSpeed(this._originalSpeed);
             newFork.SendInDirection(zRotation.ToVector(), resetDistance: true);

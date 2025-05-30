@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.26.1 (TBD)
+
+- Substantially reduced frequency of Forkbomb projectiles getting stuck inside walls
+
 ## 1.26.0 (2025-05-29)
 
 #### Features:
