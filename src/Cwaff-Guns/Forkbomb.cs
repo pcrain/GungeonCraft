@@ -5,7 +5,7 @@ public class Forkbomb : CwaffGun
     public static string ItemName         = "Forkbomb";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string Lore             = "For more information on Forkbomb, please see the Ammonomicon entries for Forkbomb and Forkbomb.";
 
     private const float _EXPLODE_DAMAGE = 50f;
 

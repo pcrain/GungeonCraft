@@ -6,7 +6,7 @@ public class DisplayPedestal : CwaffPassive
     public static string ItemName         = "Display Pedestal";
     public static string ShortDescription = "Professionally Graded";
     public static string LongDescription  = "Picking up any new gun preserves it in Mint Condition until fired or dropped. Each Mint Condition gun increases coolness by one, and can be sold to the Sell Creep at its full purchase price.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A miniature replica of the pedestal one often encounters after a particularly challenging fight, with the same propensity for making guns appear a lot more prestigious than they actually are. With proper care and the right buyer, you too can get away with selling unwanted weaponry for the same ludicrous prices as Bello.";
 
     public static void Init()
     {

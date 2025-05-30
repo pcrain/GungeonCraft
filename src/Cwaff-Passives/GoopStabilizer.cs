@@ -5,7 +5,7 @@ public class GoopStabilizer : CwaffPassive
     public static string ItemName         = "Goop Stabilizer";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string Lore             = "The finest researchers the Gungeon has to offer have spent many sleepless minutes pondering the mechanics of goops. Why do they dissipate so quickly? Why are they so chemically reactive? Is cheese goop safe to eat? Investigations of the latter two questions have all ended in constipation, but a breakthrough in goop stabilization has led to this compound.";
 
     private const float _STABILIZATION_MULT = 4f;
 

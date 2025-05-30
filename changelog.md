@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.26.0 (2025-05-25)
+## 1.26.0 (TBD)
 
 - Added Display Pedestal, Glass Ammo Box, Trading Guide, Goop Stabilizer, Forkbomb, Zealot, and Combat Leotard
 	- Display Pedestal, Trading Guide, Goop Stabilizer, and Forkbomb sprites thanks to Dallan!

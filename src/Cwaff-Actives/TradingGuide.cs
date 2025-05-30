@@ -5,7 +5,7 @@ public class TradingGuide : CwaffActive
     public static string ItemName         = "Trading Guide";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string Lore             = "An illustrated compendium listing the values of the various commodities found within the Gungeon, as assessed by a panel of 'independent experts.' Both the independence and expertise of these panel members are up for dispute, but what's certain is the exorbitant prices are only taken at face value by the shopowners referencing them to sell Gungeoneers a Klobbe for 56 casings.";
 
     private IPlayerInteractable _barterTargetIx = null;
     private int _barterTargetId = -1;

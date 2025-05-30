@@ -5,7 +5,7 @@ public class GlassAmmoBox : CwaffActive
     public static string ItemName         = "Glass Ammo Box";
     public static string ShortDescription = "TBD";
     public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A magical wellspring of ammo whose bounty is matched only by its fragility. Though it gets its name from its glasslike appearance, in reality the box of ammo is held together by something even more brittle and fragile -- the hopes and prayers of hundreds of ammo-starved Gungeoneers forced to fight the Dragun with their rusty budget-grade weaponry.";
 
     internal static GameObject _GlassVFX = null;
 
