@@ -3,8 +3,8 @@
 public class Zealot : CwaffGun
 {
     public static string ItemName         = "Zealot";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Relentless Drive";
+    public static string LongDescription  = "Rapidly fires high damage rounds. Upon firing once, autofires until running out of ammo or exiting the current floor. Cannot be dropped or switched out while autofiring.";
     public static string Lore             = "A gun with an unyielding fervor for combat. It's said that even the Lich himself could not contain its rampage upon firing it once. While the Lich likely didn't have to worry about running out of ammo, accidentally breaking chests, or cheesing off Bello, you unfortunately do not have those same luxuries.";
 
     private bool _zealous = false;

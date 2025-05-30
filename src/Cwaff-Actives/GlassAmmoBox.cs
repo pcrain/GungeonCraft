@@ -3,8 +3,8 @@ namespace CwaffingTheGungy;
 public class GlassAmmoBox : CwaffActive
 {
     public static string ItemName         = "Glass Ammo Box";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Infinite Ammo?";
+    public static string LongDescription  = "Grants a single gun infinite ammo, but reduces the gun's ammo to zero upon taking damage while using it or dropping it on the ground.";
     public static string Lore             = "A magical wellspring of ammo whose bounty is matched only by its fragility. Though it gets its name from its glasslike appearance, in reality the box of ammo is held together by something even more brittle and fragile -- the hopes and prayers of hundreds of ammo-starved Gungeoneers forced to fight the Dragun with their rusty budget-grade weaponry.";
 
     internal static GameObject _GlassVFX = null;
@@ -13,7 +13,7 @@ public class GlassAmmoBox : CwaffActive
     {
         PlayerItem item = Lazy.SetupActive<GlassAmmoBox>(ItemName, ShortDescription, LongDescription, Lore);
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
-        item.quality    = ItemQuality.B;
+        item.quality    = ItemQuality.C;
 
         _GlassVFX = VFX.Create("glass_shard_vfx");
     }

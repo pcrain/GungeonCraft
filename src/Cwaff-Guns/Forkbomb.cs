@@ -3,8 +3,8 @@ namespace CwaffingTheGungy;
 public class Forkbomb : CwaffGun
 {
     public static string ItemName         = "Forkbomb";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Recursion Excursion";
+    public static string LongDescription  = "Throws a large dinner fork that bursts into two more copies of itself shortly after impact. Can be charged up to 6 times, with each charge level doubling the maximum number of forks spawned.";
     public static string Lore             = "For more information on Forkbomb, please see the Ammonomicon entries for Forkbomb and Forkbomb.";
 
     private const float _EXPLODE_DAMAGE = 50f;
