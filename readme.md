@@ -9,15 +9,15 @@
 
 ### Features
 
-- 146 new items, including
-	+ 79 new guns
-	+ 45 new passive items
-	+ 22 new active items
+- 153 new items, including
+	+ 81 new guns
+	+ 48 new passive items
+	+ 24 new active items
 - Lore for all new guns and items
 - A new custom character: Rogo from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/)
 - 90 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
 - Companion Shop: sells 3 random unlocked companions at a 30% discount
-- Bartering Shop: trades 3 random D-A tier items for any higher-tiered item
+- Barter Shop: trades 3 random D-A tier items for any higher-tiered item
 - Insurance Shop: sells insurance policies that let you carry items over to the next run
 - Hecked Mode: randomize enemies' guns for a truly hecked playing experience (enabled via the Mod Config menu)
 - A new secret boss

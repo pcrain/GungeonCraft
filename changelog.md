@@ -1,21 +1,29 @@
 # Changelog
 
-## 1.26.0 (TBD)
+## 1.26.0 (2025-05-29)
+
+#### Features:
 
 - Added Display Pedestal, Glass Ammo Box, Trading Guide, Goop Stabilizer, Forkbomb, Zealot, and Combat Leotard
 	- Display Pedestal, Trading Guide, Goop Stabilizer, and Forkbomb sprites thanks to Dallan!
 - Added masteries for Forkbomb and Zealot
 - Added two new puzzle rooms
 	- Floor puzzle tile sprites thanks to Some Bunny!
-- Fixed (hopefully) null deref caused by enemy gun replacement code not checking for the presence of hand sprites or gun sprites
+
+#### Balance Changes and Polish:
+
 - Decreased Gunflower's ammo usage from 10 per second to 3 per second
-- Updated Pogo Stick's description to mention granting an extra active item slot
-- Lowered volume on Nycterian's projectile and alert sounds
 - Touched up Yggdrashell's Earth Armor heart sprites and added a proper half heart sprite
-- Made Barter Shop sign that explains how bartering works indestructible
-- Fixed Xelsior's reticle persisting if changing or dropping guns while firing at an enemy
-- Fixed B. B. Gun sometimes not giving player ammo back when the player catches the projectile
 - Added missing outlines to ammo clip sprites for Bouncer, Bubblebeam, Derail Gun, and Plasmarble
+
+#### Bugfixes and Misc:
+
+- Fixed (hopefully) null deref caused by enemy gun replacement code not checking for the presence of hand sprites or gun sprites
+- Fixed X-elsior's reticle persisting when changing or dropping guns while firing at an enemy
+- Fixed B. B. Gun sometimes not giving player ammo back when the player catches the projectile
+- Made Barter Shop sign that explains how bartering works indestructible
+- Lowered volume on Nycterian's projectile and alert sounds
+- Updated Pogo Stick's description to mention granting an extra active item slot
 
 ## 1.25.5 (2025-05-21)
 
