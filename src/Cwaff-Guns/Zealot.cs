@@ -15,7 +15,7 @@ public class Zealot : CwaffGun
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SHITTY, reloadTime: 0.75f, ammo: 1200, shootFps: 60, reloadFps: 12,
             muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft, attacksThroughWalls: true, fireAudio: "zealot_shoot_sound",
             canAttackWhileRolling: false)
-          .InitProjectile(GunData.New(sprite: "zealot_projectile", clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Automatic,
+          .InitProjectile(GunData.New(sprite: "zealot_projectile", clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Automatic, customClip: true,
             damage: 10.0f, speed: 60f, range: 9999f, force: 12f, scale: 0.5f, hitSound: "zealot_impact_sound"))
           .Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;

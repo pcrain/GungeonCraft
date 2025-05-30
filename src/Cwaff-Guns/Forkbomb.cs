@@ -19,7 +19,7 @@ public class Forkbomb : CwaffGun
             loopChargeAt: 4, muzzleFrom: Items.Mailbox, fireAudio: "knife_gun_launch")
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(sprite: "forkbomb_projectile", clipSize: 1, cooldown: 0.18f, shootStyle: ShootStyle.Charged/*, anchor: Anchor.MiddleRight*/,
-            damage: 15.0f, speed: 75f, range: 100f, force: 12f,
+            damage: 15.0f, speed: 75f, range: 100f, force: 12f, customClip: true,
             anchorsChangeColliders: true, overrideColliderPixelSizes: new IntVector2(1, 1), overrideColliderOffsets: new IntVector2(16, 3), pierceBreakables: true))
           .Attach<ForkbombProjectile>(f => f.forks = 1)
           .Assign(out _ForkbombProj)

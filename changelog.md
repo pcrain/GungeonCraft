@@ -15,6 +15,7 @@
 - Made Barter Shop sign that explains how bartering works indestructible
 - Fixed Xelsior's reticle persisting if changing or dropping guns while firing at an enemy
 - Fixed B. B. Gun sometimes not giving player ammo back when the player catches the projectile
+- Added missing outlines to ammo clip sprites for Bouncer, Bubblebeam, Derail Gun, and Plasmarble
 
 ## 1.25.5 (2025-05-21)
 
