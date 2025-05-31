@@ -19,7 +19,6 @@ public class Alyx : CwaffGun
     private static DeadlyDeadlyGoopManager _PoisonGooper = null;
 
     private DamageTypeModifier _poisonImmunity = null;
-    private Coroutine _decayCoroutine = null;
 
     public float timeAtLastRecalc = -1f; // must be public so it serializes properly when dropped / picked up
 
@@ -39,6 +38,10 @@ public class Alyx : CwaffGun
     {
         gun.sprite.gameObject.SetGlowiness(50f);
         RecalculateAmmo();
+        this._poisonImmunity ??= new DamageTypeModifier {
+            damageType = CoreDamageTypes.Poison,
+            damageMultiplier = 0f,
+        };
     }
 
     public override void Update()
@@ -46,15 +49,16 @@ public class Alyx : CwaffGun
         base.Update();
         Material m = gun.sprite.renderer.material;
         m.SetFloat(CwaffVFX._EmissivePowerId, 50f + 100f * Mathf.Abs(Mathf.Sin(BraveTime.ScaledTimeSinceStartup)));
-        RecalculateAmmo();
-        if (this.Mastered && this._poisonImmunity == null && this.PlayerOwner)
-        {
-            this._poisonImmunity = new DamageTypeModifier {
-                damageType = CoreDamageTypes.Poison,
-                damageMultiplier = 0f,
-            };
+        if (!this.PlayerOwner)
+            RecalculateAmmo();
+        else if (this.Mastered)
             this.PlayerOwner.healthHaver.damageTypeModifiers.AddUnique(this._poisonImmunity);
-        }
+    }
+
+    public override void OwnedUpdatePlayer(PlayerController player, GunInventory inventory)
+    {
+        base.OwnedUpdatePlayer(player, inventory);
+        RecalculateAmmo();
     }
 
     public override void OnFirstPickup(PlayerController player)
@@ -69,11 +73,6 @@ public class Alyx : CwaffGun
     {
         base.OnPlayerPickup(player);
         RecalculateAmmo();
-        if (this._decayCoroutine != null)
-        {
-            StopCoroutine(this._decayCoroutine);
-            this._decayCoroutine = null;
-        }
     }
 
     public override void OnSwitchedToThisGun()
@@ -82,40 +81,17 @@ public class Alyx : CwaffGun
         RecalculateAmmo();
     }
 
-    public override void OnSwitchedAwayFromThisGun()
-    {
-        base.OnSwitchedAwayFromThisGun();
-        this._decayCoroutine ??= this.PlayerOwner.StartCoroutine(DecayWhileInactive());
-    }
-
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
-        if (this._poisonImmunity != null)
-            player.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
+        player.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
     }
 
     public override void OnDestroy()
     {
-        if (this._decayCoroutine != null)
-        {
-            StopCoroutine(this._decayCoroutine);
-            this._decayCoroutine = null;
-        }
-        if (this.PlayerOwner && this._poisonImmunity != null)
+        if (this.PlayerOwner)
             this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
         base.OnDestroy();
-    }
-
-    private IEnumerator DecayWhileInactive()
-    {
-        while (this && this.gameObject && this.PlayerOwner && this.PlayerOwner.CurrentGun != this)
-        {
-            if (GameManager.Instance && !GameManager.Instance.IsPaused && !GameManager.Instance.IsLoadingLevel)
-                RecalculateAmmo();
-            yield return null;
-        }
-        this._decayCoroutine = null;
     }
 
     internal static int ComputeExponentialDecay(float startAmount, float lambda, float timeElapsed)

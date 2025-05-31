@@ -22,7 +22,6 @@ public class AimuHakurei : CwaffGun
     public int graze = 0;
 
     private float _lastDecayTime = 0f;
-    private Coroutine _decayCoroutine = null;
     private bool _focused = false;
 
     public static void Init()
@@ -115,11 +114,6 @@ public class AimuHakurei : CwaffGun
             this.PlayerOwner.OnRollStarted -= this.OnDodgeRoll;
             this.PlayerOwner.OnReceivedDamage -= this.OnReceivedDamage;
         }
-        if (this._decayCoroutine != null)
-        {
-            StopCoroutine(this._decayCoroutine);
-            this._decayCoroutine = null;
-        }
         base.OnDestroy();
     }
 
@@ -137,7 +131,6 @@ public class AimuHakurei : CwaffGun
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
-        this._decayCoroutine ??= this.PlayerOwner.StartCoroutine(DecayWhileInactive());
         SetFocus(false);
     }
 
@@ -162,17 +155,6 @@ public class AimuHakurei : CwaffGun
         // NOTE: since time is slowed down, the player's effective speed is 0.65 * 0.65. This is intentional
         this.gun.AddStatToGun(StatType.MovementSpeed.Mult((focus && !this.Mastered) ? 0.65f : 1.0f));
         this.PlayerOwner.stats.RecalculateStats(this.PlayerOwner);
-    }
-
-    private IEnumerator DecayWhileInactive()
-    {
-        while (this && this.gameObject && this.PlayerOwner && this.PlayerOwner.CurrentGun != this)
-        {
-            if (GameManager.Instance && !GameManager.Instance.IsPaused && !GameManager.Instance.IsLoadingLevel)
-                UpdateGraze();
-            yield return null;
-        }
-        this._decayCoroutine = null;
     }
 
     private static ProjectileModule AimuMod(List<Projectile> projectiles, float fireRate, int level, Gun gun)
@@ -211,6 +193,11 @@ public class AimuHakurei : CwaffGun
         base.Update();
         if (this.PlayerOwner is PlayerController pc && pc.CurrentInputState != PlayerInputState.AllInput)
             SetFocus(false);
+    }
+
+    public override void OwnedUpdatePlayer(PlayerController player, GunInventory inventory)
+    {
+        base.OwnedUpdatePlayer(player, inventory);
         UpdateGraze();
     }
 
