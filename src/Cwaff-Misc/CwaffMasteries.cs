@@ -436,9 +436,9 @@ public class MasteryRitualComponent : MonoBehaviour
       sprite.renderer.material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
       sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
       sprite.renderer.material.SetFloat("_EmissiveThresholdSensitivity", 5f);
-      sprite.renderer.material.SetFloat("_EmissiveColorPower", 1f);
+      sprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, 1f);
       sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitCutoutUber");
-      sprite.renderer.material.SetFloat("_EmissivePower", 10f);
+      sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, 10f);
 
       // Fade away
       for (float elapsed = 0f; elapsed < _BURN_TIME; elapsed += BraveTime.DeltaTime)

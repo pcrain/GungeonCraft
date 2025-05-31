@@ -148,8 +148,8 @@ public class Deadline : CwaffGun
         else
             return; // unknown animation, nothing to do
         Color c = Color.Lerp(_Green, _Red, t);
-        sprite.renderer.material.SetColor("_OverrideColor", c);
-        sprite.renderer.material.SetColor("_EmissiveColor", c);
+        sprite.renderer.material.SetColor(CwaffVFX._OverrideColorId, c);
+        sprite.renderer.material.SetColor(CwaffVFX._EmissiveColorId, c);
     }
 
     // Using LateUpdate() here instead of Update() so laser sight is updated correctly without jittering
@@ -417,7 +417,7 @@ public class Deadline : CwaffGun
             else
             {
                 this.laserComp.dimensions = new Vector2(curLength, 1);
-                this.laserMat.SetFloat("_EmissivePower", this._power);
+                this.laserMat.SetFloat(CwaffVFX._EmissivePowerId, this._power);
             }
 
             if (this.markedForDestruction || !this._mastered)

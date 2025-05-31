@@ -110,7 +110,7 @@ public class Geometry : MonoBehaviour
 
         Material mat = this._meshRenderer.material = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
         mat.shader = ShaderCache.Acquire("tk2d/BlendVertexColorAlphaTintableTilted");
-        mat.SetColor("_OverrideColor", this.color);
+        mat.SetColor(CwaffVFX._OverrideColorId, this.color);
     }
 
     // private static bool _PrintVertices = true;
@@ -192,7 +192,7 @@ public class Geometry : MonoBehaviour
             this.radiusInner = radiusInner ?? this.radiusInner;
         }
         if (color.HasValue)
-            this._meshRenderer.material.SetColor("_OverrideColor", this.color);
+            this._meshRenderer.material.SetColor(CwaffVFX._OverrideColorId, this.color);
         if (!this._didSetup || pos.HasValue || pos2.HasValue || radius.HasValue || radiusInner.HasValue)
             RebuildMeshes();
         this._didSetup = true;

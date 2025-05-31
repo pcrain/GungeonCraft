@@ -196,8 +196,8 @@ public class ChamberJammedBehavior : MonoBehaviour
             return;
 
         m.shader = _FakePhantomShader;
-        m.SetColor("_OverrideColor", _FakePhantomRed);
-        m.SetFloat("_EmissivePower", 30.0f);
+        m.SetColor(CwaffVFX._OverrideColorId, _FakePhantomRed);
+        m.SetFloat(CwaffVFX._EmissivePowerId, 30.0f);
     }
 
     private void OnFired(Projectile p)

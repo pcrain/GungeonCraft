@@ -180,14 +180,14 @@ public class GoldenDeath : MonoBehaviour, IPlayerInteractable
                     p.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
                     p.sprite.usesOverrideMaterial = true;
                     p.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-                    p.sprite.renderer.material.SetFloat("_EmissivePower", 50f);
+                    p.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, 50f);
                 }
                 base.gameObject.Play("midas_explode_sound");
                 UnityEngine.Object.Destroy(base.gameObject);
                 return;
             }
             emit = _MIN_EMIT + (_MAX_EMIT - _MIN_EMIT) * (this._lifetime / _EXPLODE_TIME);
-            this._sprite.renderer.material.SetFloat("_EmissivePower", emit);
+            this._sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, emit);
             return;
         }
         if (this._decaying)
@@ -196,12 +196,12 @@ public class GoldenDeath : MonoBehaviour, IPlayerInteractable
                 return;
             this._lifetime = Mathf.Min(this._lifetime + BraveTime.DeltaTime, _DECAY_TIME);
             emit = _MAX_EMIT - (_MAX_EMIT - _MIN_EMIT) * (this._lifetime / _DECAY_TIME);
-            this._sprite.renderer.material.SetFloat("_EmissivePower", emit);
+            this._sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, emit);
             return;
         }
         this._lifetime = Mathf.Min(this._lifetime + BraveTime.DeltaTime, _GROW_TIME);
         emit = _START_EMIT + (_MAX_EMIT - _START_EMIT) * (this._lifetime / _GROW_TIME);
-        this._sprite.renderer.material.SetFloat("_EmissivePower", emit);
+        this._sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, emit);
         if (this._lifetime >= _GROW_TIME)
         {
             this._decaying = true;

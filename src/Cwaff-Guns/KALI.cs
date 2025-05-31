@@ -74,7 +74,7 @@ public class KALI : CwaffGun
             this._timeCharging = 0f;
             this.gun.chargeAnimation = _ChargeAnimations[0];
             this.gun.sprite.usesOverrideMaterial = false;
-            this.gun.sprite.renderer.material.SetFloat("_EmissivePower", 0f);
+            this.gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, 0f);
             this.gun.sprite.UpdateMaterial();
             return;
         }
@@ -214,7 +214,7 @@ public class KaliProjectile : MonoBehaviour
         for (float elapsed = 0f; elapsed < 0.5f; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / 0.5f;
-            m.SetFloat("_EmissivePower", 300f + 2700f * percentDone);
+            m.SetFloat(CwaffVFX._EmissivePowerId, 300f + 2700f * percentDone);
             yield return null;
         }
         CwaffVFX.SpawnBurst(

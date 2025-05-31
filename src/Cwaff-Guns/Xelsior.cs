@@ -385,7 +385,7 @@ public class XelsiorHoveringGun : MonoBehaviour
         this._mesh.gameObject.transform.rotation = base.transform.rotation;
         this._mesh.renderer.material.shader = CwaffShaders.ShatterShader;
         this._mesh.renderer.material.SetFloat("_Progressive", 1f);
-        this._mesh.renderer.material.SetFloat("_Fade", 1f);
+        this._mesh.renderer.material.SetFloat(CwaffVFX._FadeId, 1f);
         this._mesh.renderer.material.SetFloat("_Amplitude", 4f);
         this._mesh.renderer.material.SetFloat("_RandomSeed", UnityEngine.Random.value);
         this.StartCoroutine(DoMaterialize(this, this._mesh, _MATERIALIZE_TIME));
@@ -581,7 +581,7 @@ public class XelsiorHoveringGun : MonoBehaviour
             ms.transform.rotation = xg.transform.rotation;
             ms.FlipY = xg.sprite.FlipY;
             float percentLeft = 1f - elapsed / v;
-            mat.SetFloat("_Fade", percentLeft);
+            mat.SetFloat(CwaffVFX._FadeId, percentLeft);
             yield return null;
         }
         UnityEngine.Object.Destroy(xg._mesh.gameObject);

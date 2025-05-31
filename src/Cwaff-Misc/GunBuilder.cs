@@ -544,7 +544,7 @@ public static class GunBuilder
         //TODO: verify this change doesn't break things
         // beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
         beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-        beamComp.sprite.renderer.material.SetFloat("_EmissivePower", b.beamEmission);
+        beamComp.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, b.beamEmission);
         if (beamComp.UsesImpactSprite)
         {
           //NOTE: stolen from basegame BasicBeamController.Start()
@@ -568,7 +568,7 @@ public static class GunBuilder
           tk2dSprite impactSprite = impactTransform.GetComponent<tk2dSprite>();
           impactSprite.usesOverrideMaterial = true;
           impactSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-          impactSprite.renderer.material.SetFloat("_EmissivePower", b.beamEmission);
+          impactSprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, b.beamEmission);
         }
       }
       if (b.beamReflections >= 0f)

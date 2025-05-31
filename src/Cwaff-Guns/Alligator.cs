@@ -81,7 +81,7 @@ public class Alligator : CwaffGun
         m.shader = CwaffShaders.ElectricShader;
         m.SetTexture("_ShaderTex", CwaffShaders.NoiseTexture);
         m.SetFloat("_Strength", 6.0f);
-        m.SetFloat("_EmissivePower", 400f);
+        m.SetFloat(CwaffVFX._EmissivePowerId, 400f);
     }
 
     public override void OwnedUpdate(GameActor owner, GunInventory inventory)
@@ -267,7 +267,7 @@ public class AlligatorCableHandler : MonoBehaviour
         this._stringFilter.mesh       = _mesh;
         MeshRenderer meshRenderer     = gameObject.AddComponent<MeshRenderer>();
             meshRenderer.material     = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
-            meshRenderer.material.SetColor("_OverrideColor", Alligator._RedClipColor);
+            meshRenderer.material.SetColor(CwaffVFX._OverrideColorId, Alligator._RedClipColor);
 
         if (this._owner && this._targetingEnemy)
         {

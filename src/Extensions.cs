@@ -2979,7 +2979,7 @@ public static class Extensions
           tk2dSprite blankVfxSprite = blankVfx.GetComponentInChildren<tk2dSprite>();
           blankVfxSprite.usesOverrideMaterial = true;
           blankVfxSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-          blankVfxSprite.renderer.material.SetColor("_OverrideColor", color.WithAlpha(0.25f));
+          blankVfxSprite.renderer.material.SetColor(CwaffVFX._OverrideColorId, color.WithAlpha(0.25f));
       UnityEngine.Object.Destroy(blankVfx, 1f);
 
       user.DoVibration(Vibration.Time.Quick, Vibration.Strength.Medium);
@@ -2999,7 +2999,7 @@ public static class Extensions
           tk2dSprite blankVfxSprite = blankVfx.GetComponentInChildren<tk2dSprite>();
           blankVfxSprite.usesOverrideMaterial = true;
           blankVfxSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-          blankVfxSprite.renderer.material.SetColor("_OverrideColor", color.WithAlpha(0.25f));
+          blankVfxSprite.renderer.material.SetColor(CwaffVFX._OverrideColorId, color.WithAlpha(0.25f));
       UnityEngine.Object.Destroy(blankVfx, 1f);
 
       user.DoVibration(Vibration.Time.Quick, Vibration.Strength.Medium);

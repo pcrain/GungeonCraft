@@ -44,8 +44,8 @@ public class BatProjectile : MonoBehaviour
         sprite.usesOverrideMaterial = true;
         Material m = sprite.renderer.material;
         m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-        m.SetFloat("_EmissivePower", 3f);
-        m.SetFloat("_EmissiveColorPower", 1.55f);
+        m.SetFloat(CwaffVFX._EmissivePowerId, 3f);
+        m.SetFloat(CwaffVFX._EmissiveColorPowerId, 1.55f);
 
         this._proj = base.gameObject.GetComponent<Projectile>();
         EasyTrailBullet trail = this._proj.gameObject.AddComponent<EasyTrailBullet>();

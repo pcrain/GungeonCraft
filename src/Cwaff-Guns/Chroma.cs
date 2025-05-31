@@ -53,9 +53,9 @@ public class Chroma : CwaffGun
             Material mat = beamComp.sprite.renderer.material;
             mat.DisableKeyword("BRIGHTNESS_CLAMP_ON");
             mat.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
-            mat.SetFloat("_EmissiveColorPower", 8f);
-            mat.SetColor("_EmissiveColor", c);
-            mat.SetColor("_OverrideColor", Color.Lerp(c, Color.white, 0.5f));
+            mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 8f);
+            mat.SetColor(CwaffVFX._EmissiveColorId, c);
+            mat.SetColor(CwaffVFX._OverrideColorId, Color.Lerp(c, Color.white, 0.5f));
         }
 
         _PigmentPrefab = VFX.Create("pigment_ball_white_small").Attach<PigmentDrop>();
@@ -81,7 +81,7 @@ public class Chroma : CwaffGun
     {
         int i = this.gun.CurrentStrengthTier;
         Material mat = this.gun.DefaultModule.projectiles[0].GetComponent<BasicBeamController>().sprite.renderer.material;
-        mat.SetFloat("_EmissivePower", 300f * (1 + this._pigmentPowers[i]));
+        mat.SetFloat(CwaffVFX._EmissivePowerId, 300f * (1 + this._pigmentPowers[i]));
     }
 
     public override void OnSwitchedToThisGun()
@@ -116,7 +116,7 @@ public class Chroma : CwaffGun
         sprite.usesOverrideMaterial = true;
         Material mat = sprite.renderer.material;
         mat.shader = CwaffShaders.DesatShader;
-        mat.SetFloat("_Saturation", desat._saturation);
+        mat.SetFloat(CwaffVFX._SaturationId, desat._saturation);
         if (original.optionalPalette != null)
         {
             mat.SetFloat("_UsePalette", 1f);
@@ -158,8 +158,8 @@ public class Chroma : CwaffGun
             if (this._cachedTribeamMat == null)
                 this._cachedTribeamMat = this.gun.DefaultModule.projectiles[0].GetComponent<BasicBeamController>().sprite.renderer.material;
             Color c = this._cachedTribeamColor = Color.HSVToRGB(now - Mathf.Floor(now), 0.75f, 1.0f);
-            this._cachedTribeamMat.SetColor("_EmissiveColor", c);
-            this._cachedTribeamMat.SetColor("_OverrideColor", Color.Lerp(c, Color.white, 0.5f));
+            this._cachedTribeamMat.SetColor(CwaffVFX._EmissiveColorId, c);
+            this._cachedTribeamMat.SetColor(CwaffVFX._OverrideColorId, Color.Lerp(c, Color.white, 0.5f));
             this._ammoDisplayDirty = true;
         }
 
@@ -260,10 +260,10 @@ public class Chroma : CwaffGun
         mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
         mat.DisableKeyword("BRIGHTNESS_CLAMP_ON");
         mat.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
-        mat.SetFloat("_EmissivePower", 400f);
-        mat.SetFloat("_EmissiveColorPower", 8f);
-        mat.SetColor("_EmissiveColor", c);
-        mat.SetColor("_OverrideColor", Color.Lerp(c, Color.white, 0.5f));
+        mat.SetFloat(CwaffVFX._EmissivePowerId, 400f);
+        mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 8f);
+        mat.SetColor(CwaffVFX._EmissiveColorId, c);
+        mat.SetColor(CwaffVFX._OverrideColorId, Color.Lerp(c, Color.white, 0.5f));
     }
 
     private void RecalculateAllPigmentPowers()
@@ -374,7 +374,7 @@ public class Desaturator : MonoBehaviour
         sprite.usesOverrideMaterial = true;
         Material mat = sprite.renderer.material;
         mat.shader = CwaffShaders.DesatShader;
-        mat.SetFloat("_Saturation", 1f);
+        mat.SetFloat(CwaffVFX._SaturationId, 1f);
         this._desatMats.Add(mat);
         this._addedShader = true;
     }
@@ -507,7 +507,7 @@ public class Desaturator : MonoBehaviour
         }
         foreach (Material mat in this._desatMats)
             if (mat)
-                mat.SetFloat("_Saturation", this._saturation);
+                mat.SetFloat(CwaffVFX._SaturationId, this._saturation);
     }
 }
 

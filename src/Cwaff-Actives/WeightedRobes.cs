@@ -183,12 +183,12 @@ public class WeightedRobes : CwaffActive, ILabelItem
         Material[] mats = player.SetOverrideShader(CwaffShaders.UnlitDigitizeShader);
         foreach (Material mat in mats)
         {
-            mat.SetTexture("_BinaryTex", active ? CwaffShaders.PowerdownTexture : CwaffShaders.PowerupTexture);
-            mat.SetColor("_Color", active ? _TrainingRed : _TrainingGreen);
-            mat.SetFloat("_BinarizeProgress", 0.5f);
-            mat.SetFloat("_ColorizeProgress", 1.0f);
-            mat.SetFloat("_FadeProgress", 0.0f);
-            mat.SetFloat("_ScrollSpeed", active ? 3.0f : -3.0f);
+            mat.SetTexture(CwaffVFX._BinaryTexId, active ? CwaffShaders.PowerdownTexture : CwaffShaders.PowerupTexture);
+            mat.SetColor(CwaffVFX._ColorId, active ? _TrainingRed : _TrainingGreen);
+            mat.SetFloat(CwaffVFX._BinarizeProgressId, 0.5f);
+            mat.SetFloat(CwaffVFX._ColorizeProgressId, 1.0f);
+            mat.SetFloat(CwaffVFX._FadeProgressId, 0.0f);
+            mat.SetFloat(CwaffVFX._ScrollSpeedId, active ? 3.0f : -3.0f);
         }
         yield return new WaitForSeconds(1.0f);
         player.ClearOverrideShader();

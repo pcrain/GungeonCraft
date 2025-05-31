@@ -263,7 +263,7 @@ public class Jugglernaut : CwaffGun
         }
         else
         {
-            gun.sprite.renderer.material.SetFloat("_EmissivePower", _MinEmission[this._juggleLevel]);
+            gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, _MinEmission[this._juggleLevel]);
             if (this._juggleLevel < oldLevel)
             {
                 if (this._juggledEnemies.Count == 0)
@@ -290,19 +290,19 @@ public class Jugglernaut : CwaffGun
         float minEmit = _MinEmission[this._juggleLevel];
 
         Material m = gun.sprite.renderer.material;
-        m.SetFloat("_EmissivePower", 0f);
+        m.SetFloat(CwaffVFX._EmissivePowerId, 0f);
         gun.gameObject.Play("juggle_add_sound");
 
         for (float elapsed = 0f; elapsed < GLOW_TIME; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / GLOW_TIME;
-            m.SetFloat("_EmissivePower", MAX_EMISSION * percentDone * percentDone);
+            m.SetFloat(CwaffVFX._EmissivePowerId, MAX_EMISSION * percentDone * percentDone);
             yield return null;
         }
         for (float elapsed = 0f; elapsed < GLOW_FADE_TIME; elapsed += BraveTime.DeltaTime)
         {
             float percentLeft = 1f - elapsed / GLOW_FADE_TIME;
-            m.SetFloat("_EmissivePower", minEmit + (MAX_EMISSION - minEmit) * percentLeft * percentLeft);
+            m.SetFloat(CwaffVFX._EmissivePowerId, minEmit + (MAX_EMISSION - minEmit) * percentLeft * percentLeft);
             yield return null;
         }
         yield break;

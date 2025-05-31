@@ -45,7 +45,7 @@ public class Telefragger : CwaffGun
     private void Start()
     {
         this.gun.sprite.SetGlowiness(10f, glowColor: new Color(0.0f, 0.625f, 0.664f, 1f));
-        this.gun.sprite.renderer.material.SetFloat("_EmissiveColorPower", 10f); // extra spicy colors
+        this.gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, 10f); // extra spicy colors
     }
 
     private bool SynchronizeSpriteWithBeam()
@@ -65,7 +65,7 @@ public class Telefragger : CwaffGun
             chargeFraction = beam.m_chargeTimer / beam.chargeDelay;
         Material m = gun.sprite.renderer.material;
         m.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-        m.SetFloat("_EmissivePower", _GLOW * chargeFraction);
+        m.SetFloat(CwaffVFX._EmissivePowerId, _GLOW * chargeFraction);
         return true;
     }
 

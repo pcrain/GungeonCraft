@@ -53,11 +53,11 @@ public static class VFX
             frameDef.colliderVertices = defaultDef.colliderVertices; //NOTE: this overrides any prespecified collider vertices, unsure we want this
             frameDef.material.shader = shader; //NOTE: materialInst is the same as material for all of our sprites, so we don't need to adjust it separately
             if (emissivePower > 0) {
-                frameDef.material.SetFloat("_EmissivePower", emissivePower);
-                frameDef.material.SetFloat("_EmissiveColorPower", 1.55f);
+                frameDef.material.SetFloat(CwaffVFX._EmissivePowerId, emissivePower);
+                frameDef.material.SetFloat(CwaffVFX._EmissiveColorPowerId, 1.55f);
             }
             if (emissiveColour != null)
-                frameDef.material.SetColor("_EmissiveColor", (Color)emissiveColour);
+                frameDef.material.SetColor(CwaffVFX._EmissiveColorId, (Color)emissiveColour);
             clip.frames[i] = new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = Collection };
         }
         return clip;
@@ -112,8 +112,8 @@ public static class VFX
         if (emissivePower > 0) {
             sprite.renderer.material.shader = ShaderCache.Acquire(unlit
                 ? "Brave/UnlitTintableCutoutColorEmissive" : "Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            sprite.renderer.material.SetFloat("_EmissivePower", emissivePower);
-            sprite.renderer.material.SetFloat("_EmissiveColorPower", (emissiveColorPower >= 0f) ? emissiveColorPower : 1.55f);
+            sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, emissivePower);
+            sprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, (emissiveColorPower >= 0f) ? emissiveColorPower : 1.55f);
         }
         else
         {
@@ -122,7 +122,7 @@ public static class VFX
         if (emissiveColour != null)
         {
             sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive"); //NOTE: tintable version doesn't have an _EmissiveColor property
-            sprite.renderer.material.SetColor("_EmissiveColor", (Color)emissiveColour);
+            sprite.renderer.material.SetColor(CwaffVFX._EmissiveColorId, (Color)emissiveColour);
         }
 
         animation.clips            = new tk2dSpriteAnimationClip[1]{clip};
@@ -429,10 +429,10 @@ public static class VFX
         {
             component2.usesOverrideMaterial = true;
             component2.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            component2.sprite.renderer.material.SetColor("_OverrideColor", (Color)colour);
-            component2.sprite.renderer.material.SetColor("_EmissiveColor", (Color)colour);
-            component2.sprite.renderer.material.SetFloat("_EmissivePower", power);
-            component2.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+            component2.sprite.renderer.material.SetColor(CwaffVFX._OverrideColorId, (Color)colour);
+            component2.sprite.renderer.material.SetColor(CwaffVFX._EmissiveColorId, (Color)colour);
+            component2.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, power);
+            component2.sprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, 1.55f);
         }
         return gameObject;
     }
@@ -449,19 +449,19 @@ public static class VFX
                 sprite.usesOverrideMaterial = true;
             renderer.material.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
         }
-        renderer.material.SetFloat("_Fade", newAlpha);
+        renderer.material.SetFloat(CwaffVFX._FadeId, newAlpha);
 
         // todo: these don't seem to be necessary or to work particularly well
 
         // if (renderer.sharedMaterial.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
         //     renderer.sharedMaterial.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
-        // renderer.sharedMaterial.SetFloat("_Fade", newAlpha);
+        // renderer.sharedMaterial.SetFloat(CwaffVFX._FadeId, newAlpha);
 
         // foreach(Material m in renderer.sharedMaterials)
         // {
         //     if (m.shader.name != "Brave/Internal/SimpleAlphaFadeUnlit")
         //         m.shader = ShaderCache.Acquire("Brave/Internal/SimpleAlphaFadeUnlit");
-        //     m.SetFloat("_Fade", newAlpha);
+        //     m.SetFloat(CwaffVFX._FadeId, newAlpha);
         // }
     }
 
@@ -1024,6 +1024,16 @@ public partial class CwaffVFX // private
     internal static readonly int _EmissiveColorPowerId = Shader.PropertyToID("_EmissiveColorPower");
     internal static readonly int _OverrideColorId      = Shader.PropertyToID("_OverrideColor");
     internal static readonly int _FadeId               = Shader.PropertyToID("_Fade");
+    // constants used outside CwaffVFX TODO: relocate to more netural location
+    internal static readonly int _BinarizeProgressId   = Shader.PropertyToID("_BinarizeProgress");
+    internal static readonly int _ColorizeProgressId   = Shader.PropertyToID("_ColorizeProgress");
+    internal static readonly int _FadeProgressId       = Shader.PropertyToID("_FadeProgress");
+    internal static readonly int _ScrollSpeedId        = Shader.PropertyToID("_ScrollSpeed");
+    internal static readonly int _HScrollSpeedId       = Shader.PropertyToID("_HScrollSpeed");
+    internal static readonly int _ColorId              = Shader.PropertyToID("_Color");
+    internal static readonly int _BinaryTexId          = Shader.PropertyToID("_BinaryTex");
+    internal static readonly int _SaturationId         = Shader.PropertyToID("_Saturation");
+    internal static readonly int _EmissionId           = Shader.PropertyToID("_Emission");
 
     // pools
     private static readonly LinkedList<CwaffVFX> _SpawnedVFX = new();
@@ -1398,7 +1408,7 @@ public class OrbitalEffect : MonoBehaviour
                 sprite.SetAlpha((avec.y > 0) ? 0f : Mathf.Abs(Mathf.Sin(radAngle)));
 
             if (this._isEmissive)
-                sprite.renderer.material.SetFloat("_EmissivePower", power);
+                sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, power);
 
             ++i;
         }
@@ -1433,7 +1443,7 @@ public class GlowAndFadeOut : MonoBehaviour //NOTE: can't be used with pooled VF
         {
             float percentLeft = 1f - elapsed / glowInTime;
             float quadraticEase = 1f - percentLeft * percentLeft;
-            sprite.renderer.material.SetFloat("_EmissivePower", maxEmit * quadraticEase);
+            sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, maxEmit * quadraticEase);
             yield return null;
         }
 
@@ -1444,7 +1454,7 @@ public class GlowAndFadeOut : MonoBehaviour //NOTE: can't be used with pooled VF
         {
             float percentDone = elapsed / glowOutTime;
             float quadraticEase = 1f - percentDone * percentDone;
-            sprite.renderer.material.SetFloat("_EmissivePower", maxEmit * quadraticEase);
+            sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, maxEmit * quadraticEase);
             yield return null;
         }
 

@@ -119,7 +119,7 @@ public class DeadRinger : CwaffPassive
         // Apply a shadowy shader
         foreach (Material m in this.Owner.SetOverrideShader(ShaderCache.Acquire("Brave/Internal/HighPriestAfterImage")))
         {
-            m.SetFloat("_EmissivePower", 0f);
+            m.SetFloat(CwaffVFX._EmissivePowerId, 0f);
             m.SetFloat("_Opacity", 0.5f);
             m.SetColor("_DashColor", Color.gray);
         }

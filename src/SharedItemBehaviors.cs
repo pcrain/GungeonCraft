@@ -423,7 +423,7 @@ public class EasyTrailBullet : BraveBehaviour // stolen from NN
             tr.material = mat;
             tr.minVertexDistance = 0.1f;
             //======
-            mat.SetColor("_Color", BaseColor);
+            mat.SetColor(CwaffVFX._ColorId, BaseColor);
             tr.startColor = StartColor;
             tr.endColor = EndColor;
             //======
@@ -439,7 +439,7 @@ public class EasyTrailBullet : BraveBehaviour // stolen from NN
         if (!tro)
             return;
         tro.transform.localPosition = TrailPos;
-        mat.SetColor("_Color", BaseColor);
+        mat.SetColor(CwaffVFX._ColorId, BaseColor);
         tr.startColor = StartColor;
         tr.endColor = EndColor;
         //======
@@ -841,8 +841,8 @@ public class EmissiveTrail : MonoBehaviour // stolen from NN
                     sproot.usesOverrideMaterial = true;
                     sproot.renderer.material.shader = glowshader;
                     sproot.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
-                    sproot.renderer.material.SetFloat("_EmissivePower", EmissivePower);
-                    sproot.renderer.material.SetFloat("_EmissiveColorPower", EmissiveColorPower);
+                    sproot.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, EmissivePower);
+                    sproot.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, EmissiveColorPower);
                 }
                 else
                 {
@@ -915,9 +915,9 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
                 mat.shader = glowshader;
                 mat.DisableKeyword("BRIGHTNESS_CLAMP_ON");
                 mat.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
-                mat.SetFloat("_EmissivePower", emissivePower);
-                mat.SetFloat("_EmissiveColorPower", 1.55f);
-                mat.SetColor("_EmissiveColor", color);
+                mat.SetFloat(CwaffVFX._EmissivePowerId, emissivePower);
+                mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 1.55f);
+                mat.SetColor(CwaffVFX._EmissiveColorId, color);
                 this.extantLink.color = color;
             }
             if (disownTimer <= 0 && fadeTimer > 0)  // if we immediately have a fadeTimer > 0 and no disownTimer, start fading out immediately
@@ -972,8 +972,8 @@ public class OwnerConnectLightningModifier : MonoBehaviour // mostly stolen from
                 this.extantLink.color = this.extantLink.color.WithAlpha(timer/halftimer);
             }
             else {
-                this.extantLink.renderer.material.SetFloat("_EmissivePower", emissivePower*(timer/halftimer));
-                this.extantLink.renderer.material.SetFloat("_EmissiveColorPower", 1.55f*(timer/halftimer));
+                this.extantLink.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, emissivePower*(timer/halftimer));
+                this.extantLink.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, 1.55f*(timer/halftimer));
             }
             yield return null;
         }

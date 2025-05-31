@@ -45,7 +45,7 @@ public class Alyx : CwaffGun
     {
         base.Update();
         Material m = gun.sprite.renderer.material;
-        m.SetFloat("_EmissivePower", 50f + 100f * Mathf.Abs(Mathf.Sin(BraveTime.ScaledTimeSinceStartup)));
+        m.SetFloat(CwaffVFX._EmissivePowerId, 50f + 100f * Mathf.Abs(Mathf.Sin(BraveTime.ScaledTimeSinceStartup)));
         RecalculateAmmo();
         if (this.Mastered && this._poisonImmunity == null && this.PlayerOwner)
         {

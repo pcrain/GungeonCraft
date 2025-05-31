@@ -162,11 +162,11 @@ public static class CwaffShaders
     public static IEnumerator Digitize_CR(tk2dBaseSprite s, float delay = 0.0f)
     {
         s.renderer.material.shader = CwaffShaders.DigitizeShader;
-        s.renderer.material.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
-        s.renderer.material.SetFloat("_BinarizeProgress", 0.0f);
-        s.renderer.material.SetFloat("_ColorizeProgress", 0.0f);
-        s.renderer.material.SetFloat("_FadeProgress", 0.0f);
-        s.renderer.material.SetFloat("_ScrollSpeed", -3.0f);
+        s.renderer.material.SetTexture(CwaffVFX._BinaryTexId, CwaffShaders.DigitizeTexture);
+        s.renderer.material.SetFloat(CwaffVFX._BinarizeProgressId, 0.0f);
+        s.renderer.material.SetFloat(CwaffVFX._ColorizeProgressId, 0.0f);
+        s.renderer.material.SetFloat(CwaffVFX._FadeProgressId, 0.0f);
+        s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, -3.0f);
         SpriteOutlineManager.RemoveOutlineFromSprite(s);
 
         if (delay > 0)
@@ -176,29 +176,29 @@ public static class CwaffShaders
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / phaseTime;
-            s.renderer.material.SetFloat("_BinarizeProgress", percentDone);
+            s.renderer.material.SetFloat(CwaffVFX._BinarizeProgressId, percentDone);
             yield return null;
         }
         yield return new WaitForSeconds(0.35f);
 
         phaseTime = 0.2f;
-        s.renderer.material.SetFloat("_ScrollSpeed", -3.75f);
+        s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, -3.75f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / phaseTime;
-            s.renderer.material.SetFloat("_ColorizeProgress", percentDone);
-            // s.renderer.material.SetFloat("_ScrollSpeed", 2.5f + 2.5f * percentDone);
+            s.renderer.material.SetFloat(CwaffVFX._ColorizeProgressId, percentDone);
+            // s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, 2.5f + 2.5f * percentDone);
             yield return null;
         }
         yield return new WaitForSeconds(0.2f);
 
         phaseTime = 0.2f;
-        // s.renderer.material.SetFloat("_ScrollSpeed", -4.5f);
+        // s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, -4.5f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / phaseTime;
-            s.renderer.material.SetFloat("_FadeProgress", percentDone);
-            // s.renderer.material.SetFloat("_ScrollSpeed", 5f + 5f * percentDone);
+            s.renderer.material.SetFloat(CwaffVFX._FadeProgressId, percentDone);
+            // s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, 5f + 5f * percentDone);
             yield return null;
         }
 
@@ -211,18 +211,18 @@ public static class CwaffShaders
 
         s.usesOverrideMaterial = true;
         s.renderer.material.shader = CwaffShaders.DigitizeShader;
-        s.renderer.material.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
-        s.renderer.material.SetFloat("_BinarizeProgress", 1.0f);
-        s.renderer.material.SetFloat("_ColorizeProgress", 1.0f);
-        s.renderer.material.SetFloat("_FadeProgress", 1.0f);
+        s.renderer.material.SetTexture(CwaffVFX._BinaryTexId, CwaffShaders.DigitizeTexture);
+        s.renderer.material.SetFloat(CwaffVFX._BinarizeProgressId, 1.0f);
+        s.renderer.material.SetFloat(CwaffVFX._ColorizeProgressId, 1.0f);
+        s.renderer.material.SetFloat(CwaffVFX._FadeProgressId, 1.0f);
 
         float phaseTime = 0.1f;
-        s.renderer.material.SetFloat("_ScrollSpeed", -4.5f);
+        s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, -4.5f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / phaseTime;
-            s.renderer.material.SetFloat("_FadeProgress", 1f - percentDone);
-            // s.renderer.material.SetFloat("_ScrollSpeed", 5f + 5f * percentDone);
+            s.renderer.material.SetFloat(CwaffVFX._FadeProgressId, 1f - percentDone);
+            // s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, 5f + 5f * percentDone);
             yield return null;
         }
         if (partial)
@@ -230,21 +230,21 @@ public static class CwaffShaders
         yield return new WaitForSeconds(0.4f);
 
         phaseTime = 0.15f;
-        s.renderer.material.SetFloat("_ScrollSpeed", -3.75f);
+        s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, -3.75f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / phaseTime;
-            s.renderer.material.SetFloat("_ColorizeProgress", 1f - percentDone);
-            // s.renderer.material.SetFloat("_ScrollSpeed", 2.5f + 2.5f * percentDone);
+            s.renderer.material.SetFloat(CwaffVFX._ColorizeProgressId, 1f - percentDone);
+            // s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, 2.5f + 2.5f * percentDone);
             yield return null;
         }
 
         phaseTime = 0.1f;
-        s.renderer.material.SetFloat("_ScrollSpeed", -3.0f);
+        s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, -3.0f);
         for (float elapsed = 0f; elapsed < phaseTime; elapsed += BraveTime.DeltaTime)
         {
             float percentDone = elapsed / phaseTime;
-            s.renderer.material.SetFloat("_BinarizeProgress", 1f - percentDone);
+            s.renderer.material.SetFloat(CwaffVFX._BinarizeProgressId, 1f - percentDone);
             yield return null;
         }
 

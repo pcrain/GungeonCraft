@@ -2,6 +2,7 @@
 
 ## 1.26.1 (TBD)
 
+- Fixed pitch distortion on several audio clips 
 - Substantially reduced frequency of Forkbomb projectiles getting stuck inside walls
 
 ## 1.26.0 (2025-05-29)

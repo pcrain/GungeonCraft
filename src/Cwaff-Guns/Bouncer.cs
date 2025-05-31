@@ -151,9 +151,9 @@ public class HarmlessUntilBounce : MonoBehaviour
         {
             float percentDone = elapsed / _BOUNCE_TIME;
             Color newColor = Color.Lerp(Color.white, Color.yellow, 0.8f * percentDone);
-            m.SetFloat("_EmissivePower", 100f * percentDone);
-            m.SetColor("_EmissiveColor", newColor);
-            m.SetColor("_OverrideColor", newColor);
+            m.SetFloat(CwaffVFX._EmissivePowerId, 100f * percentDone);
+            m.SetColor(CwaffVFX._EmissiveColorId, newColor);
+            m.SetColor(CwaffVFX._OverrideColorId, newColor);
             this._projectile.spriteAnimator.transform.localScale = oldScale.WithX(Mathf.Max(0.1f, percentDone));
             yield return null;
         }

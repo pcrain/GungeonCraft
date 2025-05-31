@@ -340,7 +340,7 @@ public class TheBB : MonoBehaviour
         }
 
         Material m = this._projectile.sprite.renderer.material;
-        m.SetFloat("_EmissivePower", _BASE_EMISSION + _EXTRA_EMISSION * (speed / _maxSpeed));
+        m.SetFloat(CwaffVFX._EmissivePowerId, _BASE_EMISSION + _EXTRA_EMISSION * (speed / _maxSpeed));
         m.SetFloat("_Cutoff", 0.1f);
 
         this._projectile.baseData.damage        = this._damageMult * speed;

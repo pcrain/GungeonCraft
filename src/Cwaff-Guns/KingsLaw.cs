@@ -325,7 +325,7 @@ public class KingsLawBullets : MonoBehaviour
             this._runeLarge.SetAlpha(runeAlpha);
             this._runeSmall.SetAlpha(runeAlpha);
             float glowAmount = (_GLOW_TIME - moveTimer) / _GLOW_TIME;
-            m.SetFloat("_EmissivePower", glowAmount * _GLOW_MAX);
+            m.SetFloat(CwaffVFX._EmissivePowerId, glowAmount * _GLOW_MAX);
             moveTimer -= BraveTime.DeltaTime;
             yield return null;
         }

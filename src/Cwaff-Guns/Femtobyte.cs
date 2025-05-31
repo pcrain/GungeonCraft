@@ -397,11 +397,11 @@ public class Femtobyte : CwaffGun
             this._oldShader = s.renderer.material.shader;
             s.usesOverrideMaterial = true;
             s.renderer.material.shader = CwaffShaders.DigitizeShader;
-            s.renderer.material.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
-            s.renderer.material.SetFloat("_BinarizeProgress", 1.0f);
-            s.renderer.material.SetFloat("_ColorizeProgress", 1.0f);
-            s.renderer.material.SetFloat("_FadeProgress", 0.0f);
-            s.renderer.material.SetFloat("_ScrollSpeed", -4.5f);
+            s.renderer.material.SetTexture(CwaffVFX._BinaryTexId, CwaffShaders.DigitizeTexture);
+            s.renderer.material.SetFloat(CwaffVFX._BinarizeProgressId, 1.0f);
+            s.renderer.material.SetFloat(CwaffVFX._ColorizeProgressId, 1.0f);
+            s.renderer.material.SetFloat(CwaffVFX._FadeProgressId, 0.0f);
+            s.renderer.material.SetFloat(CwaffVFX._ScrollSpeedId, -4.5f);
             p.OnDestruction += DestroyReplicantProjectile;
         }
 
@@ -477,12 +477,12 @@ public class Femtobyte : CwaffGun
         }
         this.gun.sprite.usesOverrideMaterial = true;
         m.shader = CwaffShaders.UnlitDigitizeShader;
-        m.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
-        m.SetFloat("_BinarizeProgress", 1.0f);
-        m.SetFloat("_ColorizeProgress", 0.0f);
-        m.SetFloat("_FadeProgress", 0.0f);
-        m.SetFloat("_ScrollSpeed", 1.5f);
-        m.SetFloat("_HScrollSpeed", 0.35f);
+        m.SetTexture(CwaffVFX._BinaryTexId, CwaffShaders.DigitizeTexture);
+        m.SetFloat(CwaffVFX._BinarizeProgressId, 1.0f);
+        m.SetFloat(CwaffVFX._ColorizeProgressId, 0.0f);
+        m.SetFloat(CwaffVFX._FadeProgressId, 0.0f);
+        m.SetFloat(CwaffVFX._ScrollSpeedId, 1.5f);
+        m.SetFloat(CwaffVFX._HScrollSpeedId, 0.35f);
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -514,13 +514,13 @@ public class Femtobyte : CwaffGun
             this._placementPhantom.usesOverrideMaterial = true;
             Material m = this._placementMaterial = this._placementPhantom.gameObject.GetComponent<Renderer>().material;
             m.shader = CwaffShaders.UnlitDigitizeShader;
-            m.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
-            m.SetFloat("_BinarizeProgress", 1.0f);
-            m.SetFloat("_ColorizeProgress", 1.0f);
-            m.SetFloat("_FadeProgress", 0.0f);
-            m.SetFloat("_ScrollSpeed", -4.0f);
-            m.SetFloat("_HScrollSpeed", 0.35f);
-            m.SetColor("_Color", _Invalid);
+            m.SetTexture(CwaffVFX._BinaryTexId, CwaffShaders.DigitizeTexture);
+            m.SetFloat(CwaffVFX._BinarizeProgressId, 1.0f);
+            m.SetFloat(CwaffVFX._ColorizeProgressId, 1.0f);
+            m.SetFloat(CwaffVFX._FadeProgressId, 0.0f);
+            m.SetFloat(CwaffVFX._ScrollSpeedId, -4.0f);
+            m.SetFloat(CwaffVFX._HScrollSpeedId, 0.35f);
+            m.SetColor(CwaffVFX._ColorId, _Invalid);
         }
         if (this.gun.CurrentStrengthTier == 0)
         {
@@ -541,7 +541,7 @@ public class Femtobyte : CwaffGun
         this._placementPhantom.PlaceAtPositionByAnchor(player.unadjustedAimPoint, Anchor.MiddleCenter);
         if (!this._placementMaterial)
             this._placementMaterial = this._placementPhantom.gameObject.GetComponent<Renderer>().material;
-        this._placementMaterial.SetColor("_Color", this.CanPlacePhantom(player.unadjustedAimPoint, d) ? _Valid : _Invalid);
+        this._placementMaterial.SetColor(CwaffVFX._ColorId, this.CanPlacePhantom(player.unadjustedAimPoint, d) ? _Valid : _Invalid);
     }
 
     private void UpdateCurrentSlot()
@@ -896,13 +896,13 @@ public class FemtobyteProjectile : MonoBehaviour
             trailSprite.usesOverrideMaterial = true;
             Material m = trailSprite.renderer.material;
             m.shader = CwaffShaders.DigitizeShader;
-            m.SetTexture("_BinaryTex", CwaffShaders.DigitizeTexture);
-            m.SetFloat("_BinarizeProgress", 1.0f);
-            m.SetFloat("_ColorizeProgress", 1.0f);
-            m.SetFloat("_FadeProgress", 0.0f);
-            m.SetFloat("_ScrollSpeed", 3.5f);
-            m.SetFloat("_HScrollSpeed", 0.25f);
-            m.SetFloat("_Emission", 10f);
+            m.SetTexture(CwaffVFX._BinaryTexId, CwaffShaders.DigitizeTexture);
+            m.SetFloat(CwaffVFX._BinarizeProgressId, 1.0f);
+            m.SetFloat(CwaffVFX._ColorizeProgressId, 1.0f);
+            m.SetFloat(CwaffVFX._FadeProgressId, 0.0f);
+            m.SetFloat(CwaffVFX._ScrollSpeedId, 3.5f);
+            m.SetFloat(CwaffVFX._HScrollSpeedId, 0.25f);
+            m.SetFloat(CwaffVFX._EmissionId, 10f);
     }
 
     private void OnHitEnemy(Projectile p, SpeculativeRigidbody body, bool killed)

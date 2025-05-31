@@ -1177,13 +1177,13 @@ public static class Lazy
         }
         if (hh.gameActor)
             for (int k = 0; k < hh.materialsToFlash.Count; k++)
-                hh.materialsToFlash[k].SetColor("_OverrideColor", hh.gameActor.CurrentOverrideColor);
+                hh.materialsToFlash[k].SetColor(CwaffVFX._OverrideColorId, hh.gameActor.CurrentOverrideColor);
         if (hh.outlineMaterialsToFlash != null)
             for (int l = 0; l < hh.outlineMaterialsToFlash.Count; l++)
             {
                 if (l >= hh.sourceColors.Count)
                     break;
-                hh.outlineMaterialsToFlash[l].SetColor("_OverrideColor", hh.sourceColors[l]);
+                hh.outlineMaterialsToFlash[l].SetColor(CwaffVFX._OverrideColorId, hh.sourceColors[l]);
             }
         hh.m_flashOnHitCoroutine = hh.StartCoroutine(hh.FlashOnHit(DamageCategory.Normal, null));
     }
@@ -1333,7 +1333,7 @@ public static class Lazy
             for (float elapsed = 0f; elapsed < time; elapsed += BraveTime.DeltaTime)
             {
                 float percentLeft = 1f - elapsed / time;
-                mat.SetFloat("_Fade", 1f - percentLeft * percentLeft);
+                mat.SetFloat(CwaffVFX._FadeId, 1f - percentLeft * percentLeft);
                 yield return null;
             }
             UnityEngine.Object.Destroy(ms.gameObject);

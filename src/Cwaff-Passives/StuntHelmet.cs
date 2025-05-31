@@ -92,7 +92,7 @@ public class StuntHelmet : CwaffPassive
         target.gameObject.PlayUnique("stunt_time");
         Material mat = SpriteOutlineManager.GetOutlineMaterial(target.sprite);
         if (mat)
-            mat.SetColor("_OverrideColor", new Color(128f, 0f, 16f));
+            mat.SetColor(CwaffVFX._OverrideColorId, new Color(128f, 0f, 16f));
         target.ownerlessStatModifiers.Add(_StuntStats);
         target.stats.RecalculateStats(target);
 
@@ -104,7 +104,7 @@ public class StuntHelmet : CwaffPassive
         }
 
         if (mat)
-            mat.SetColor("_OverrideColor", new Color(0f, 0f, 0f));
+            mat.SetColor(CwaffVFX._OverrideColorId, new Color(0f, 0f, 0f));
         target.ownerlessStatModifiers.Remove(_StuntStats);
         target.stats.RecalculateStats(target);
 

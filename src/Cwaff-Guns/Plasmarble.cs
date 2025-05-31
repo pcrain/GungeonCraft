@@ -67,7 +67,7 @@ public class Plasmarble : CwaffGun
         {
             this._chargeLevel = -1;
             this.gun.sprite.usesOverrideMaterial = false;
-            this._mat.SetFloat("_EmissivePower", 0f);
+            this._mat.SetFloat(CwaffVFX._EmissivePowerId, 0f);
             this.gun.sprite.UpdateMaterial();
             return;
         }

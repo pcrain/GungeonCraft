@@ -277,7 +277,7 @@ public class Scotsman : CwaffGun
             this._meshRenderer = this._coneMeshObject.AddComponent<MeshRenderer>();
             Material mat = this._meshRenderer.material = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
             mat.shader = ShaderCache.Acquire("tk2d/BlendVertexColorAlphaTintableTilted");
-            mat.SetColor("_OverrideColor", new Color(1.0f, 0.0f, 0.0f, 0.15f));
+            mat.SetColor(CwaffVFX._OverrideColorId, new Color(1.0f, 0.0f, 0.0f, 0.15f));
         }
 
         // rebuild cone mesh

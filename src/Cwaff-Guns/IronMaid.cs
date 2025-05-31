@@ -220,7 +220,7 @@ public class IronMaidBullets : MonoBehaviour
                 _projectile.SendInDirection(targetDir, true); // rotate the projectile
             }
             float glowAmount = (_GLOW_TIME - this._moveTimer) / _GLOW_TIME;
-            m.SetFloat("_EmissivePower", _BASE_GLOW + glowAmount * _GLOW_MAX);
+            m.SetFloat(CwaffVFX._EmissivePowerId, _BASE_GLOW + glowAmount * _GLOW_MAX);
             this._moveTimer -= BraveTime.DeltaTime;
             yield return null;
         }

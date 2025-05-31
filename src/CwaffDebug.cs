@@ -342,7 +342,7 @@ internal static class DebugDraw
             this._meshRenderer = this._meshObject.AddComponent<MeshRenderer>();
             Material mat = this._meshRenderer.material = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
             mat.shader = ShaderCache.Acquire("tk2d/BlendVertexColorAlphaTintableTilted");
-            mat.SetColor("_OverrideColor", this.color);
+            mat.SetColor(CwaffVFX._OverrideColorId, this.color);
         }
 
         private void RebuildMeshes()
@@ -363,7 +363,7 @@ internal static class DebugDraw
             this.pos    = pos ?? this.pos;
             this.radius = radius ?? this.radius;
             if (color.HasValue)
-                this._meshRenderer.material.SetColor("_OverrideColor", this.color);
+                this._meshRenderer.material.SetColor(CwaffVFX._OverrideColorId, this.color);
             if (!this._didSetup || pos.HasValue || radius.HasValue)
                 RebuildMeshes();
             this._didSetup = true;
@@ -397,7 +397,7 @@ public class Distortyboi : MonoBehaviour
       if (this._mat)
       {
         // this._mat.SetFloat("_Amplitude", Mathf.Sin(3f * BraveTime.ScaledTimeSinceStartup));
-        this._mat.SetFloat("_Fade", Mathf.Max(0f, Mathf.Sin(0.9f * BraveTime.ScaledTimeSinceStartup)));
+        this._mat.SetFloat(CwaffVFX._FadeId, Mathf.Max(0f, Mathf.Sin(0.9f * BraveTime.ScaledTimeSinceStartup)));
       }
     }
 }
