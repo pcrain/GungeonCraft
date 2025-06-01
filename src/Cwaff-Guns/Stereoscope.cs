@@ -137,6 +137,11 @@ public class Stereoscope : CwaffGun
         return "stereoscope_charge_sound_0";
     }
 
+    internal static int FrequencyFromGunAngle(PlayerController player)
+    {
+        return Mathf.FloorToInt(player.m_currentGunAngle.Clamp360() / 30f) - 6;
+    }
+
     public void HandleAudioChecks()
     {
         if (!this.PlayerOwner)
@@ -144,7 +149,7 @@ public class Stereoscope : CwaffGun
 
         bool isCurrentGun = this.gun == this.PlayerOwner.CurrentGun;
         if (isCurrentGun)
-            this._frequency = Mathf.FloorToInt(this.PlayerOwner.m_currentGunAngle.Clamp360() / 30f) - 6;
+            this._frequency = FrequencyFromGunAngle(this.PlayerOwner);
         else if (this._extantStereo)
             this._frequency = this._extantStereo.freq;
         float now = BraveTime.ScaledTimeSinceStartup;
@@ -234,10 +239,21 @@ public class Stereoscope : CwaffGun
         public int power = 8;
         public Gun gun = null;
 
+        public override void Start()
+        {
+            base.Start();
+            this.m_usesNormalMoveRegardless = true;
+        }
+
         public override void Move()
         {
             if (this.frequency == NO_FREQ)
-                this.frequency = UnityEngine.Random.Range(-6, 6);
+            {
+                if (this.m_owner is PlayerController player)
+                    this.frequency = Stereoscope.FrequencyFromGunAngle(player);
+                else
+                    this.frequency = UnityEngine.Random.Range(-6, 6);
+            }
             Vector3 pos = base.transform.position;
             Reverberate(pos);
             RoomHandler absoluteRoom = pos.GetAbsoluteRoom();
