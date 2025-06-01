@@ -137,7 +137,15 @@ public class Macheening : CwaffGun
         projectile.collidesWithProjectiles           = true;
         projectile.collidesOnlyWithPlayerProjectiles = false;
         projectile.UpdateCollisionMask();
+        projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
         projectile.specRigidbody.OnCollision += this.OnProjectileCollision;
+    }
+
+    private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+        if (otherRigidbody && otherRigidbody.gameObject.GetComponent<Projectile>() is Projectile other)
+           if (other.Owner is PlayerController)
+            PhysicsEngine.SkipCollision = true;
     }
 
     private void OnProjectileCollision(CollisionData data)

@@ -7,6 +7,7 @@
 - Bubblebeam's projectiles no longer collide with other projectiles belonging to the player until they have unbubbled something
 - Fixed Stereoscope's projectiles throwing an exception every frame when not fired from Stereoscope directly
 - Fixed Stereoscope's projectiles not working properly with Helix Bullets
+- Fixed Mastered Macheening's projectiles colliding with and destroying other player-owned projectiles
 
 ## 1.26.0 (2025-05-29)
 
