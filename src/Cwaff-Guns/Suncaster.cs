@@ -309,9 +309,14 @@ public class SuncasterProjectile : MonoBehaviour
       }
 
       if (this._canRefract)
-        foreach (SuncasterPrism other in this._gun.extantPrisms)
-          if (other != prism)
-            Refract(prism, newDirection: other.transform.position - prism.transform.position);
+      {
+        if (!this._gun && this._owner)
+          this._gun = this._owner.GetGun<Suncaster>();
+        if (this._gun)
+          foreach (SuncasterPrism other in this._gun.extantPrisms)
+            if (other != prism)
+              Refract(prism, newDirection: other.transform.position - prism.transform.position);
+      }
 
       this._proj.sprite.SetGlowiness(this._proj.baseData.damage);
       this._proj.specRigidbody.Position = new Position(prism.BasePosition());

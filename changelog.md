@@ -9,6 +9,7 @@
 - Fixed Stereoscope's projectiles not working properly with Helix Bullets
 - Fixed Mastered Macheening's projectiles colliding with and destroying other player-owned projectiles
 - Fixed Empath's projectiles colliding with and destroying other player-owned projectiles
+- Fixed null deref caused by Suncaster projectiles not spawned by Suncaster trying to refract to their non-existent gun's prisms
 
 ## 1.26.0 (2025-05-29)
 
