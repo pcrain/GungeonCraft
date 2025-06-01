@@ -444,7 +444,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   }
 
   // REFACTOR: this should allow individual guns to opt out and be relocated to Alexandria eventually
-  /// <summary>Patch to prevent duct tape from duct taping multiple modules at once</summary>
+  /// <summary>Patch to prevent duct tape from duct taping multiple modules at once or from using our dummy audio switch data.</summary>
   [HarmonyPatch(typeof(DuctTapeItem), nameof(DuctTapeItem.CombineVolleys))]
   private class DuctTapeItemCombineVolleysPatch
   {
@@ -470,6 +470,16 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           cursor.CallPrivate(typeof(DuctTapeItemCombineVolleysPatch), nameof(ShouldDuctTapeModule));
           cursor.Emit(OpCodes.Brfalse, loopEnd); // skip the current loop iteration
           cursor.Emit(OpCodes.Ldarg_1); // restore mergeGun on stack if we don't skip the current loop iteration
+
+          // prevent duct tape guns from using our dummy audio switch data from Banana
+          cursor.Index = 0;
+          while (cursor.TryGotoNext(MoveType.After,
+            instr => instr.MatchLdfld<Gun>("gunSwitchGroup"),
+            instr => instr.MatchCall<string>(nameof(string.IsNullOrEmpty)) ))
+          {
+            cursor.Emit(OpCodes.Ldarg_1); // mergeGun
+            cursor.CallPrivate(typeof(DuctTapeItemCombineVolleysPatch), nameof(CheckNullOrEmptySwitchGroup));
+          }
       }
 
       private static bool ShouldDuctTapeModule(Gun gun, int i)
@@ -479,6 +489,13 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
         if (!gun.gameObject.GetComponent<CwaffGun>())
           return true; // don't affect vanilla guns
         return false;
+      }
+
+      private static bool CheckNullOrEmptySwitchGroup(bool wasNullOrEmpty, Gun mergeGun)
+      {
+        if (mergeGun.gunSwitchGroup == "Banana" && mergeGun.GetComponent<CwaffGun>())
+          return true; // we use the Banana switch group as a dummy switch group without reload or charge sounds, but it still has a fire sound, so suppress it
+        return wasNullOrEmpty;
       }
   }
 
