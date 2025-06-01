@@ -121,16 +121,15 @@ public class BubblebeamProjectile : MonoBehaviour
             return;
         if (otherRigidbody.gameObject.GetComponent<Projectile>() is not Projectile p)
             return;
+
+        PhysicsEngine.SkipCollision = true;
         if (p.gameObject.GetComponent<BubblebeamProjectile>())
-        {
-            PhysicsEngine.SkipCollision = true;
             return;
-        }
         if (p.Owner is not AIActor enemy)
             return;
+
         EnbubbleProjectile(p);
         PopSelf();
-        PhysicsEngine.SkipCollision = true;
     }
 
     private void PopSelf()

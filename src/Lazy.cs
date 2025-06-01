@@ -915,8 +915,8 @@ public static class Lazy
         hgc.Position                     = HoveringGunController.HoverPosition.CIRCULATE;
         hgc.Aim                          = HoveringGunController.AimType.PLAYER_AIM;
         hgc.Trigger                      = HoveringGunController.FireType.ON_FIRED_GUN;
-        hgc.CooldownTime                 = 1f;
-        hgc.ShootDuration                = 2f;
+        hgc.CooldownTime                 = 0.01f;
+        hgc.ShootDuration                = 0f;
         hgc.OnlyOnEmptyReload            = false;
         hgc.Initialize(player.CurrentGun, player);
     }

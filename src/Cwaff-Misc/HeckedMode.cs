@@ -326,11 +326,7 @@ public static class HeckedMode
             return;
 
         // 10x shop price multiplier
-        GameManager.Instance.PrimaryPlayer.ownerlessStatModifiers.Add(new(){
-            statToBoost = StatType.GlobalPriceMultiplier,
-            modifyType = StatModifier.ModifyMethod.MULTIPLICATIVE,
-            amount = 10f
-        });
+        GameManager.Instance.PrimaryPlayer.ownerlessStatModifiers.Add(StatType.GlobalPriceMultiplier.Mult(10f));
         GameManager.Instance.PrimaryPlayer.stats.RecalculateStats(GameManager.Instance.PrimaryPlayer);
     }
 

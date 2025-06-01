@@ -4,6 +4,7 @@
 
 - Fixed pitch distortion on several audio clips 
 - Substantially reduced frequency of Forkbomb projectiles getting stuck inside walls
+- Bubblebeam's projectiles no longer collide with other projectiles belonging to the player until they have unbubbled something
 
 ## 1.26.0 (2025-05-29)
 
