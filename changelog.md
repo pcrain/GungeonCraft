@@ -10,6 +10,7 @@
 - Fixed Mastered Macheening's projectiles colliding with and destroying other player-owned projectiles
 - Fixed Empath's projectiles colliding with and destroying other player-owned projectiles
 - Fixed null deref caused by Suncaster projectiles not spawned by Suncaster trying to refract to their non-existent gun's prisms
+- Fixed null deref caused by Racket Launcher projectiles trying to deregister themselves from their parent gun after it was destroyed
 
 ## 1.26.0 (2025-05-29)
 

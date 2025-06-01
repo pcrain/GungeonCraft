@@ -181,7 +181,7 @@ public class TennisBall : MonoBehaviour
 
     private void OnDestruction(Projectile p)
     {
-        if (p.GetComponent<TennisBall>() is TennisBall tc)
+        if (this._parentGun && p.GetComponent<TennisBall>() is TennisBall tc)
             this._parentGun.RemoveExtantTennisBall(tc);
     }
 
@@ -271,7 +271,8 @@ public class TennisBall : MonoBehaviour
     private IEnumerator DieNextFrame()
     {
         yield return null;
-        this.DieInAir();
+        if (this && this._projectile)
+            this.DieInAir();
     }
 
     private void ReturnToSender()
