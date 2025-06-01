@@ -303,8 +303,10 @@ public class AlligatorCableHandler : MonoBehaviour
             this._alligator = null;
         }
 
-        for (int i = 0; i < this._extantSparks.Count; ++i)
-            UnityEngine.Object.Destroy(this._extantSparks[i]);
+        for (int i = this._extantSparks.Count - 1; i >= 0; --i)
+            if (this._extantSparks[i])
+                UnityEngine.Object.Destroy(this._extantSparks[i]);
+        this._extantSparks.Clear();
 
         base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("BG_Critical")); // render below most objects
         base.transform.position = this._startTransform.position.WithZ(10f);
@@ -389,11 +391,13 @@ public class AlligatorCableHandler : MonoBehaviour
     {
         if (this._alligator)
             this._alligator._cables.Remove(this);
-        this._clippyboi.SafeDestroy();
+        for (int i = this._extantSparks.Count - 1; i >= 0; --i)
+            if (this._extantSparks[i])
+                UnityEngine.Object.Destroy(this._extantSparks[i]);
+        if (this._clippyboi)
+            UnityEngine.Object.Destroy(this._clippyboi);
         if (this._stringFilter)
             UnityEngine.Object.Destroy(this._stringFilter.gameObject);
-        for (int i = 0; i < this._extantSparks.Count; ++i)
-            UnityEngine.Object.Destroy(this._extantSparks[i]);
         if (this._fallen)
             UnityEngine.Object.Destroy(this._endTransform.gameObject);
     }
