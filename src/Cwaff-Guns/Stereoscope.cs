@@ -228,9 +228,22 @@ public class Stereoscope : CwaffGun
 
     private class ResonantProjectile : Projectile
     {
-        public int frequency = 99; // guaranteed unused initial value
-        public int power = 4;
+        private const int NO_FREQ = 99; // guaranteed unused initial value
+
+        public int frequency = NO_FREQ;
+        public int power = 8;
         public Gun gun = null;
+
+        public override void Move()
+        {
+            if (this.frequency == NO_FREQ)
+                this.frequency = UnityEngine.Random.Range(-6, 6);
+            Vector3 pos = base.transform.position;
+            Reverberate(pos);
+            RoomHandler absoluteRoom = pos.GetAbsoluteRoom();
+            absoluteRoom.ApplyActionToNearbyEnemies(pos.XY(), 100f, ProcessEnemy);
+            DieInAir(true, false, false, false);
+        }
 
         private void Reverberate(Vector2 pos)
         {
@@ -238,15 +251,6 @@ public class Stereoscope : CwaffGun
               velType: CwaffVFX.Vel.AwayRadial, rotType: CwaffVFX.Rot.Position, lifetime: 0.25f, fadeOutTime: 0.25f, uniform: true,
               startScale: 1.0f, endScale: 0.1f, specificFrame: this.frequency + 6, height: 8f);
             Exploder.DoDistortionWave(center: pos, distortionIntensity: 1.5f, distortionRadius: 0.05f, maxRadius: 1.75f, duration: 0.25f);
-        }
-
-        public override void Move()
-        {
-            Vector3 pos = base.transform.position;
-            Reverberate(pos);
-            RoomHandler absoluteRoom = pos.GetAbsoluteRoom();
-            absoluteRoom.ApplyActionToNearbyEnemies(pos.XY(), 100f, ProcessEnemy);
-            DieInAir(true, false, false, false);
         }
 
         private void ProcessEnemy(AIActor enemy, float b)

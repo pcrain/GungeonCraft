@@ -5,6 +5,7 @@
 - Fixed pitch distortion on several audio clips 
 - Substantially reduced frequency of Forkbomb projectiles getting stuck inside walls
 - Bubblebeam's projectiles no longer collide with other projectiles belonging to the player until they have unbubbled something
+- Fixed Stereoscope's projectiles throwing an exception every frame when not fired from Stereoscope directly
 
 ## 1.26.0 (2025-05-29)
 
