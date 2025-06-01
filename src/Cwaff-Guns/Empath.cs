@@ -58,7 +58,11 @@ public class Empath : CwaffGun
         if (!otherRigidbody)
             PhysicsEngine.SkipCollision = true;
         else if (otherRigidbody.gameObject.GetComponent<Projectile>() is Projectile p && p.isActiveAndEnabled)
+        {
+            if (p.m_owner is PlayerController)
+                PhysicsEngine.SkipCollision = true;
             return;
+        }
         else if (this.Mastered && otherRigidbody.gameObject.GetComponent<AIActor>())
             return;
         PhysicsEngine.SkipCollision = true;
