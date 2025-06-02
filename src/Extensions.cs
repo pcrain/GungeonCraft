@@ -2660,14 +2660,6 @@ public static class Extensions
       pathMover.PathStartNode = 0;
   }
 
-  /// <summary>Return and remove the last element of a LinkedList</summary>
-  public static T Pop<T>(this LinkedList<T> linked)
-  {
-    T t = linked.Last();
-    linked.RemoveLast();
-    return t;
-  }
-
   // Make a sprite arc smoothly from its current position to a target position
   // minScale == minimum scale our pickup can shrink down to
   // vanishPercent == percent of the way through the wrap animation the pickup should vanish

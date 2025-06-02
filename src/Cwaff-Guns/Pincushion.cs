@@ -37,7 +37,8 @@ public class Pincushion : CwaffGun
             trail.StartColor = Color.gray;
             trail.BaseColor  = Color.gray;
             trail.EndColor   = Color.gray;
-          });
+          })
+          ;
 
       _ImpactVFX = VFX.Create("microdust", fps: 30, loops: false);
     }

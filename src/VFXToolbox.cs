@@ -892,12 +892,17 @@ public partial class CwaffVFX // public
         bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f,
         tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null)
     {
-        CwaffVFX c = (_DespawnedVFX.Count > 0) ? _DespawnedVFX.Pop() : new();
-        if (c._node == null)
-            c._node = _SpawnedVFX.AddLast(c);
-        else
-            _SpawnedVFX.AddLast(c._node);
-        c.Setup(
+        if (_DespawnedVFX.Count == 0)
+        {
+            CwaffVFX newC = new CwaffVFX();
+            LinkedListNode<CwaffVFX> newNode = new(newC);
+            newC._node = newNode;
+            _DespawnedVFX.AddLast(newNode);
+        }
+        LinkedListNode<CwaffVFX> cNode = _DespawnedVFX.Last;
+        _DespawnedVFX.RemoveLast();
+        _SpawnedVFX.AddLast(cNode);
+        cNode.Value.Setup(
             prefab        : prefab,
             position      : position,
             rotation      : rotation,
@@ -1114,7 +1119,7 @@ public partial class CwaffVFX // private
 
         this._animator.library = this._library;
         this._animator.playAutomatically = true;
-        // ETGModConsole.Log($"created new vfx {_SpawnedVFX.Count}");
+        // System.Console.WriteLine($"created new vfx {_SpawnedVFX.Count}");
     }
 
     /// <summary>Despawning is handled automatically and internally by the CwaffVFXManager</summary>
