@@ -21,7 +21,7 @@ public class Flakseed : CwaffGun
             reloadFps: 18, muzzleFrom: Items.Mailbox, fireAudio: "flakseed_shoot_sound", smoothReload: 0.1f)
           .SetReloadAudio("flakseed_reload_sound", 3, 22)
           .SetReloadAudio("flakseed_deposit_sound", 13, 14, 16, 17)
-          .InitSpecialProjectile<GrenadeProjectile>(GunData.New(clipSize: 12, cooldown: 0.16f,
+          .InitSpecialProjectile<GrenadeProjectile>(GunData.New(clipSize: 12, cooldown: 0.16f, preventOrbiting: true,
             shootStyle: ShootStyle.Automatic, damage: 0f, speed: 24f, force: 10f, range: 30f, customClip: true,
             sprite: "flakseed_bullet", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false))
           .Attach<GrenadeProjectile>(g => { g.startingHeight = 0.5f; })
