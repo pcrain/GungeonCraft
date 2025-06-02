@@ -714,6 +714,12 @@ public class PrecisionProjectile : Projectile
     public AIActor target = null;
     public bool isCrit = false;
 
+    public override void Start()
+    {
+        base.Start();
+        this.m_usesNormalMoveRegardless = true; // ignore Helix Bullets, etc.
+    }
+
     public override void Move()
     {
         if (target && target.IsNormalEnemy && target.healthHaver && !target.IsGone)

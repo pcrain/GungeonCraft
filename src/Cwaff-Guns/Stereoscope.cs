@@ -242,7 +242,7 @@ public class Stereoscope : CwaffGun
         public override void Start()
         {
             base.Start();
-            this.m_usesNormalMoveRegardless = true;
+            this.m_usesNormalMoveRegardless = true; // ignore Helix Bullets, etc.
         }
 
         public override void Move()

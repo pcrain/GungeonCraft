@@ -111,6 +111,12 @@ public class Sunderbuss : CwaffGun
 
 public class SunderbussProjectile : Projectile
 {
+    public override void Start()
+    {
+        base.Start();
+        this.m_usesNormalMoveRegardless = true; // ignore Helix Bullets, etc.
+    }
+
     public override void Move()
     {
         const float RADIUS = 3f;
