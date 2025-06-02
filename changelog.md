@@ -13,6 +13,7 @@
 - Fixed null deref caused by Racket Launcher projectiles trying to deregister themselves from their parent gun after it was destroyed
 - Fixed null deref caused by Alligator's projectiles trying to destroy their cables / sparks after already destroying them
 - Fixed sounds from Banana playing when GungeonCraft guns are fired as part of a Duct Tape weapon
+- Fixed (for real this time) B. B. Gun sometimes not giving player ammo back when the player catches the projectile
 
 ## 1.26.0 (2025-05-29)
 

@@ -233,7 +233,9 @@ public class TheBB : MonoBehaviour
         }
         if (this._owner.FindBaseGun<BBGun>() is Gun gun)
         {
-            gun.GainAmmo(1);
+            gun.CanGainAmmo = true;
+            gun.GainAmmo(1); // temporarily allow gaining ammo normally to take advantage of OnAmmoChanged callbacks
+            gun.CanGainAmmo = false;
             gun.ForceImmediateReload();
         }
         // don't do knockback if player is behind us
