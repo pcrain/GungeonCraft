@@ -58,7 +58,8 @@ public class Sunderbuss : CwaffGun
         base.OnPlayerPickup(player);
         gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS);
         gun.spriteAnimator.Play();
-        player.healthHaver.ModifyDamage += this.OnTakeDamage;
+        player.healthHaver.ModifyDamage += this.ModifyDamage;
+        player.healthHaver.OnDamaged += this.OnDamaged;
         CwaffEvents.OnStatsRecalculated += this.CheckForLichguard;
         CheckForLichguard(player);
     }
@@ -68,26 +69,30 @@ public class Sunderbuss : CwaffGun
         base.OnDroppedByPlayer(player);
         gun.SetAnimationFPS(gun.idleAnimation, 0);
         gun.spriteAnimator.StopAndResetFrameToDefault();
-        player.healthHaver.ModifyDamage -= this.OnTakeDamage;
-        CwaffEvents.OnStatsRecalculated += this.CheckForLichguard;
+        player.healthHaver.ModifyDamage -= this.ModifyDamage;
+        player.healthHaver.OnDamaged -= this.OnDamaged;
+        CwaffEvents.OnStatsRecalculated -= this.CheckForLichguard;
         CheckForLichguard(player);
     }
 
-    private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
+    private void ModifyDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
     {
         if (!this._hasLichguard && this.gun.CurrentOwner is PlayerController player && player.CurrentGun == this.gun)
-        {
             data.ModifiedDamage *= 2f;
-            // CwaffVFX.Spawn(Lichguard._NoLichguardVFX, player.sprite.WorldTopCenter, lifetime: 0.4f, fadeOutTime: 0.4f);
+    }
+
+    private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
+    {
+        if (!this._hasLichguard && this.gun.CurrentOwner is PlayerController player && player.CurrentGun == this.gun)
             base.gameObject.Play("lichguard_curse_sound");
-        }
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
         {
-            this.PlayerOwner.healthHaver.ModifyDamage -= this.OnTakeDamage;
+            this.PlayerOwner.healthHaver.ModifyDamage -= this.ModifyDamage;
+            this.PlayerOwner.healthHaver.OnDamaged -= this.OnDamaged;
             CwaffEvents.OnStatsRecalculated -= this.CheckForLichguard;
         }
         base.OnDestroy();

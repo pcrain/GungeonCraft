@@ -14,6 +14,10 @@
 - Fixed null deref caused by Alligator's projectiles trying to destroy their cables / sparks after already destroying them
 - Fixed sounds from Banana playing when GungeonCraft guns are fired as part of a Duct Tape weapon
 - Fixed (for real this time) B. B. Gun sometimes not giving player ammo back when the player catches the projectile
+- Increased Deadline's ammo from 64 to 200
+- Removed placeholder in Outbreak's ammonomicon description
+- Fixed null deref caused by damage handler not being properly deregistered when dropping Sunderbuss
+- Fixed noisy audio glitch caused by repeatedly taking 0 damage hits while under Sunderbuss or Macheening's curse
 
 ## 1.26.0 (2025-05-29)
 

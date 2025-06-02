@@ -24,7 +24,7 @@ public class Deadline : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Deadline>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 64, idleFps: 10, shootFps: 20,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 200, idleFps: 10, shootFps: 20,
             reloadFps: 30, muzzleVFX: "muzzle_deadline", muzzleFps: 20, muzzleScale: 0.4f, muzzleAnchor: Anchor.MiddleCenter,
             fireAudio: "deadline_fire_sound", reloadAudio: "deadline_reload_sound")
           .AddToShop(ModdedShopType.TimeTrader)
