@@ -47,6 +47,7 @@ public class Alyx : CwaffGun
     public override void Update()
     {
         base.Update();
+        System.Console.WriteLine($"updating alyx");
         Material m = gun.sprite.renderer.material;
         m.SetFloat(CwaffVFX._EmissivePowerId, 50f + 100f * Mathf.Abs(Mathf.Sin(BraveTime.ScaledTimeSinceStartup)));
         if (!this.PlayerOwner)

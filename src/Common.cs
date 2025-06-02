@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 public class C // constants and common variables
 {
-    public static readonly bool DEBUG_BUILD = false; // set to false for release builds (must be readonly instead of const to avoid build warnings)
+    public static readonly bool DEBUG_BUILD = true; // set to false for release builds (must be readonly instead of const to avoid build warnings)
 
     public const string MOD_NAME     = "GungeonCraft";
     public const string MOD_INT_NAME = "CwaffingTheGungy";
@@ -92,10 +92,15 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
 
 public static class Dissect // reflection helper methods for being a lazy dumdum
 {
-    public static void DumpComponents(this GameObject g)
+    public static void DumpComponents(this GameObject g, bool recursive = true, int indent=0)
     {
+        ETGModConsole.Log($"{string.Empty.PadLeft(indent)}components in {g.name}");
         foreach (var c in g.GetComponents(typeof(object)))
             ETGModConsole.Log("  "+c.GetType().Name);
+        if (!recursive)
+            return;
+        foreach (Transform child in g.transform.Children())
+            DumpComponents(child.gameObject, true, indent + 1);
     }
 
     public static void DumpFieldsAndProperties<T>(T o)

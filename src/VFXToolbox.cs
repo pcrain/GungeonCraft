@@ -885,11 +885,12 @@ public partial class CwaffVFX // public
     /// <param name="emitColorPower">Emissive color power of the VFX. Ignored if fadeOutTime is non-null.</param>
     /// <param name="spriteCol">The sprite collection to use if not passing a prefab.</param>
     /// <param name="spriteId">The sprite id to use if not passing a prefab.</param>
+    /// <param name="animator">The animator to use if not passing a prefab.</param>
     public static void Spawn(GameObject prefab = null, Vector3 position = default, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null,
         bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1,
         bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f,
-        tk2dSpriteCollectionData spriteCol = null, int spriteId = -1)
+        tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null)
     {
         CwaffVFX c = (_DespawnedVFX.Count > 0) ? _DespawnedVFX.Pop() : new();
         if (c._node == null)
@@ -917,7 +918,8 @@ public partial class CwaffVFX // public
             overrideColor   : overrideColor,
             emitColorPower  : emitColorPower,
             spriteCol       : spriteCol,
-            spriteId        : spriteId
+            spriteId        : spriteId,
+            animator        : animator
             );
     }
 
@@ -1127,7 +1129,7 @@ public partial class CwaffVFX // private
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null,
         bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null,
-        float emitColorPower = 1.55f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1)
+        float emitColorPower = 1.55f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null)
     {
         this._shouldDespawn = false;
         this._vfx.SetActive(true);
@@ -1141,6 +1143,7 @@ public partial class CwaffVFX // private
             this._anchorPos = anchorTransform.position;
 
         tk2dSprite prefabSprite = prefab ? prefab.GetComponent<tk2dSprite>() : null;
+        bool animated = true;
         if (prefab)
         {
             this._animator.defaultClipId = prefab.GetComponent<tk2dSpriteAnimator>().defaultClipId;
@@ -1149,12 +1152,22 @@ public partial class CwaffVFX // private
             this._animator.playAutomatically = true;
             this._animator.currentClip = this._animator.DefaultClip;
         }
+        else if (animator != null)
+        {
+            this._animator.defaultClipId = animator.defaultClipId;
+            this._library.clips = animator.library.clips;
+            tk2dSpriteAnimationClip defaultClip = this._animator.DefaultClip;
+            this._sprite.SetSprite(defaultClip.frames[0].spriteCollection, defaultClip.frames[0].spriteId);
+            this._animator.playAutomatically = true;
+            this._animator.currentClip = defaultClip;
+        }
         else //NOTE: both spriteCol and spriteId must be set if we don't have a prefab...we don't check because it's slow, but don't be dumb here...
         {
             this._animator.defaultClipId = 0;
             this._library.clips = null;
             this._animator.playAutomatically = false;
             this._sprite.SetSprite(spriteCol, spriteId);
+            animated = false;
         }
 
         if (startScale.HasValue)
@@ -1215,7 +1228,7 @@ public partial class CwaffVFX // private
             this._material.SetFloat(_FadeId, 1.0f);
         }
 
-        if (prefab)
+        if (animated)
         {
             if (specificFrame >= 0)
                 this._animator.PickFrame(frame: specificFrame);

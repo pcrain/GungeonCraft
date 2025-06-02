@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.26.2 (TBD)
+
+- Updated visuals for Pincushion's projectiles and reduced lag from creating them a bit
+
 ## 1.26.1 (2025-06-01)
 
 #### Balance Changes and Polish:

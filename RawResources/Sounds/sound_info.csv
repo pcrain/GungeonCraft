@@ -149,7 +149,7 @@ rc_car_launch_sound,-8.0,1,sound,0
 rc_car_engine_sound,-14.0,0,sound,0
 rc_car_crash_sound,-8.0,1,sound,0
 rc_car_reload_sound,-2.0,1,sound,0
-pincushion_fire,-15.0,1,sound,0
+pincushion_fire,0.0,1,sound,0
 breegull_shoot_sound,-8.5,1,sound,0
 breegull_reload_sound,-5.0,1,sound,0
 breegull_intro_sound,0.0,1,sound,0

@@ -13,6 +13,8 @@ public class Pincushion : CwaffGun
     internal const float _DLT_SPREAD           = _MAX_SPREAD - _MIN_SPREAD;
     internal const float _NEEDLE_DAMAGE        = 0.35f;
 
+    internal static GameObject _ImpactVFX = null;
+
     public static void Init()
     {
         Lazy.SetupGun<Pincushion>(ItemName, ShortDescription, LongDescription, Lore)
@@ -21,9 +23,11 @@ public class Pincushion : CwaffGun
           .SetReloadAudio("pincushion_reload_start_sound", 0)
           .SetReloadAudio("pincushion_reload_sound", 8, 13, 18, 23, 28, 35)
           .InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
-            damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, spawnSound: "pincushion_fire",
-            anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS, customClip: true))
-          .SetAllImpactVFX(VFX.CreatePool("microdust", fps: 30, loops: false))
+            damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, preventSparks: true,
+            anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS, customClip: true, overrideColliderPixelSizes: new IntVector2(1, 1)/*, glowAmount: 10f*/))
+          // .SetAllImpactVFX(VFX.CreatePool("microdust", fps: 30, loops: false))
+          .ClearAllImpactVFX()
+          .RemoveAnimator()
           .Attach<VeryFragileProjectile>()
           .Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
@@ -34,6 +38,14 @@ public class Pincushion : CwaffGun
             trail.BaseColor  = Color.gray;
             trail.EndColor   = Color.gray;
           });
+
+      _ImpactVFX = VFX.Create("microdust", fps: 30, loops: false);
+    }
+
+    public override void OnPostFired(PlayerController player, Gun gun)
+    {
+        base.OnPostFired(player, gun);
+        base.gameObject.Play("pincushion_fire");
     }
 
     // GetLowDiscrepancyRandom() makes projectiles not spread as randomly as they could, so override that randomness with our own spread
@@ -59,12 +71,16 @@ public class Pincushion : CwaffGun
 
 public class VeryFragileProjectile : MonoBehaviour
 {
+    private static tk2dSpriteAnimator _ImpactVfxAnimator;
+
     private Projectile _projectile = null;
     public bool breakNextCollision = false;
     public bool phasesThroughBreakables = false;
 
     private void Start()
     {
+        if (_ImpactVfxAnimator == null)
+          _ImpactVfxAnimator = Pincushion._ImpactVFX.GetComponent<tk2dSpriteAnimator>();
         this._projectile = base.GetComponent<Projectile>();
 
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
@@ -84,6 +100,17 @@ public class VeryFragileProjectile : MonoBehaviour
     private void OnCollision(CollisionData data) {
         if (this.breakNextCollision)
             this._projectile.DieInAir(suppressInAirEffects: true);
+        float xMag = UnityEngine.Random.Range(-14f, 14f);
+        float yMag = UnityEngine.Random.Range(-14f, 14f);
+        if ((data.Normal.x != 0) && ((data.Normal.x < 0) == xMag > 0))
+            xMag = -xMag;
+        if ((data.Normal.y != 0) && ((data.Normal.y < 0) == yMag > 0))
+            yMag = -yMag;
+        CwaffVFX.Spawn( //NOTE: using animator directly to avoid expensive prefab component lookups, since we're making a big mess
+          animator: _ImpactVfxAnimator,
+          position: data.Contact,
+          emissivePower: 10f,
+          velocity: new Vector2(xMag, yMag));
     }
 
     // NOTE: called by patch in CwaffPatches

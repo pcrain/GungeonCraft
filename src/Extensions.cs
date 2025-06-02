@@ -307,6 +307,31 @@ public static class Extensions
         p.SetAllImpactVFX(vfx);
   }
 
+  /// <summary>Clear a projectile's impact VFX across the board</summary>
+  public static Projectile ClearAllImpactVFX(this Projectile p)
+  {
+    p.hitEffects.alwaysUseMidair = true;
+    p.hitEffects.suppressMidairDeathVfx = true;
+    p.hitEffects.HasProjectileDeathVFX = false;
+    p.hitEffects.tileMapHorizontal.type = VFXPoolType.None;
+    p.hitEffects.tileMapVertical.type = VFXPoolType.None;
+    p.hitEffects.overrideEarlyDeathVfx = null;
+    p.hitEffects.enemy = null;
+    p.hitEffects.deathEnemy = null;
+    p.hitEffects.deathAny = null;
+    p.hitEffects.tileMapHorizontal.effects = null;
+    p.hitEffects.tileMapVertical.effects = null;
+    return p;
+  }
+
+  /// <summary>Clear a gun's impact VFX across the board</summary>
+  public static void ClearAllImpactVFX(this Gun gun)
+  {
+    foreach (ProjectileModule mod in gun.Volley.projectiles)
+      foreach (Projectile p in mod.projectiles)
+        p.ClearAllImpactVFX();
+  }
+
   /// <summary>Copy a projectile's impact VFX from another projectile's across the board</summary>
   public static Projectile CopyAllImpactVFX(this Projectile p, Projectile otherP)
   {
@@ -3446,6 +3471,23 @@ public static class Extensions
     if (PassiveItem.ActiveFlagItems.TryGetValue(pc, out var d))
       return d.TryGetValue(flag, out int count) ? count : 0;
     return 0;
+  }
+
+  /// <summary>Get all children of a transform</summary>
+  public static IEnumerable<Transform> Children(this Transform t)
+  {
+    int numChildren = t.childCount;
+    for (int i = 0; i < numChildren; ++i)
+      yield return t.GetChild(i);
+  }
+
+  /// <summary>Remove the sprite animator from a projectile that doesn't need animating.</summary>
+  public static Projectile RemoveAnimator(this Projectile proj)
+  {
+    GameObject spriteObject = proj.gameObject.GetComponentInChildren<tk2dSprite>().gameObject;
+    UnityEngine.Object.Destroy(spriteObject.GetComponent<tk2dSpriteAnimation>());
+    UnityEngine.Object.Destroy(spriteObject.GetComponent<tk2dSpriteAnimator>());
+    return proj;
   }
 }
 

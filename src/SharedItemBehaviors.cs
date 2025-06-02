@@ -380,79 +380,12 @@ public static class AnimatedBullet // stolen and modified from NN
     }
 }
 
-public class EasyTrailBullet : BraveBehaviour // stolen from NN
+public class EasyTrailBullet : BraveBehaviour // adapted from NN
 {
-    public EasyTrailBullet()
-    {
-        //=====
-        this.TrailPos = new Vector3(0, 0, 0);
-        //======
-        this.BaseColor = Color.red;
-        this.StartColor = Color.red;
-        this.EndColor = Color.white;
-        //======
-        this.LifeTime = 1f;
-        //======
-        this.StartWidth = 1;
-        this.EndWidth = 0;
+    private static readonly LinkedList<GameObject> _TrailPool = new();
+    private static readonly LinkedList<GameObject> _UsedTrails = new();
+    private static int _TrailsCreated = 0;
 
-    }
-    /// <summary>
-    /// Lets you add a trail to your projectile.
-    /// </summary>
-    /// <param name="TrailPos">Where the trail attaches its center-point to. You can input a custom Vector3 but its best to use the base preset. (Namely"projectile.transform.position;").</param>
-    /// <param name="BaseColor">The Base Color of your trail.</param>
-    /// <param name="StartColor">The Starting color of your trail.</param>
-    /// <param name="EndColor">The End color of your trail. Having it different to the StartColor will make it transition from the Starting/Base Color to its End Color during its lifetime.</param>
-    /// <param name="LifeTime">How long your trail lives for.</param>
-    /// <param name="StartWidth">The Starting Width of your Trail.</param>
-    /// <param name="EndWidth">The Ending Width of your Trail. Not sure why youd want it to be something other than 0, but the options there.</param>
-    public void Start()
-    {
-        proj = base.projectile;
-        {
-            tro = base.projectile.gameObject.AddChild("trail object");
-            tro.transform.position = base.projectile.transform.position;
-            tro.transform.localPosition = TrailPos;
-
-            tr = tro.AddComponent<TrailRenderer>();
-            tr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            tr.receiveShadows = false;
-            mat = new Material(Shader.Find("Sprites/Default"));
-            mat.mainTexture = _gradTexture;
-            tr.material = mat;
-            tr.minVertexDistance = 0.1f;
-            //======
-            mat.SetColor(CwaffVFX._ColorId, BaseColor);
-            tr.startColor = StartColor;
-            tr.endColor = EndColor;
-            //======
-            tr.time = LifeTime;
-            //======
-            tr.startWidth = StartWidth;
-            tr.endWidth = EndWidth;
-        }
-
-    }
-    public void UpdateTrail()
-    {
-        if (!tro)
-            return;
-        tro.transform.localPosition = TrailPos;
-        mat.SetColor(CwaffVFX._ColorId, BaseColor);
-        tr.startColor = StartColor;
-        tr.endColor = EndColor;
-        //======
-        tr.time = LifeTime;
-        //======
-        tr.startWidth = StartWidth;
-        tr.endWidth = EndWidth;
-    }
-
-    public void Enable() => tr.enabled = true;
-    public void Disable() => tr.enabled = false;
-
-    public Texture _gradTexture;
     private Projectile proj;
     private GameObject tro;
     private TrailRenderer tr;
@@ -465,6 +398,108 @@ public class EasyTrailBullet : BraveBehaviour // stolen from NN
     public float LifeTime;
     public float StartWidth;
     public float EndWidth;
+
+    private static GameObject Rent(GameObject parent)
+    {
+      if (_TrailPool.Count == 0)
+      {
+        //NOTE: need to immediately parent new trail object to avoid visual glitches
+        GameObject newTrail = parent.AddChild("trail object", typeof(TrailRenderer));
+        TrailRenderer newTr = newTrail.GetComponent<TrailRenderer>();
+        newTr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        newTr.receiveShadows = false;
+        newTr.minVertexDistance = 0.1f;
+        newTr.material = new Material(Shader.Find("Sprites/Default"));
+        newTr.material.mainTexture = null;
+        _TrailPool.AddLast(newTrail);
+        ++_TrailsCreated;
+      }
+
+      LinkedListNode<GameObject> node = _TrailPool.Last;
+      _TrailPool.RemoveLast();
+
+      GameObject trail = node.Value;
+      node.Value = null;
+      _UsedTrails.AddLast(node);
+
+      return trail;
+    }
+
+    private static void Return(GameObject trail)
+    {
+      trail.transform.parent = null;
+      LinkedListNode<GameObject> node = _UsedTrails.Last;
+      _UsedTrails.RemoveLast();
+      node.Value = trail;
+      _TrailPool.AddLast(node);
+      // #if DEBUG
+      // System.Console.WriteLine($"returned {_TrailPool.Count}/{_TrailsCreated} trails");
+      // #endif
+    }
+
+    private EasyTrailBullet()
+    {
+        this.TrailPos   = Vector3.zero;
+        this.BaseColor  = Color.red;
+        this.StartColor = Color.red;
+        this.EndColor   = Color.white;
+        this.LifeTime   = 1f;
+        this.StartWidth = 1;
+        this.EndWidth   = 0;
+    }
+
+    /// <summary>
+    /// Lets you add a trail to your projectile.
+    /// </summary>
+    /// <param name="TrailPos">Where the trail attaches its center-point to. You can input a custom Vector3 but its best to use the base preset. (Namely"projectile.transform.position;").</param>
+    /// <param name="BaseColor">The Base Color of your trail.</param>
+    /// <param name="StartColor">The Starting color of your trail.</param>
+    /// <param name="EndColor">The End color of your trail. Having it different to the StartColor will make it transition from the Starting/Base Color to its End Color during its lifetime.</param>
+    /// <param name="LifeTime">How long your trail lives for.</param>
+    /// <param name="StartWidth">The Starting Width of your Trail.</param>
+    /// <param name="EndWidth">The Ending Width of your Trail. Not sure why youd want it to be something other than 0, but the options there.</param>
+    private void Start()
+    {
+        proj = base.projectile;
+
+        tro = Rent(proj.gameObject);
+        tro.transform.parent = proj.gameObject.transform;
+        tro.transform.position = proj.transform.position;
+        tro.transform.localPosition = TrailPos;
+
+        tr = tro.GetComponent<TrailRenderer>();
+        mat = tr.material;
+        mat.SetColor(CwaffVFX._ColorId, BaseColor);
+        tr.startColor = StartColor;
+        tr.endColor = EndColor;
+        tr.time = LifeTime;
+        tr.startWidth = StartWidth;
+        tr.endWidth = EndWidth;
+    }
+
+    public void Enable() => tr.enabled = true;
+    public void Disable() => tr.enabled = false;
+
+    public void UpdateTrail()
+    {
+        if (!tro)
+            return;
+
+        tro.transform.localPosition = TrailPos;
+        mat.SetColor(CwaffVFX._ColorId, BaseColor);
+        tr.startColor = StartColor;
+        tr.endColor = EndColor;
+        tr.time = LifeTime;
+        tr.startWidth = StartWidth;
+        tr.endWidth = EndWidth;
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        if (tro)
+            Return(tro);
+    }
 }
 
 public static class SlashDoer // stolen from NN
