@@ -22,6 +22,7 @@
 - Fixed Helix Bullets rendering Stereoscope, Sunderbuss, and Sextant unusable
 - Fixed Sextant firing every single frame when reload time is reduced to 0 (e.g., via Cormorant)
 - Blacklisted Flakseed projectiles from being affected by Orbital Bullets (projectiles should just sprout on impact)
+- Fixed Zag's wall-following code being completely broken since 1.21.1 D:
 
 ## 1.26.0 (2025-05-29)
 

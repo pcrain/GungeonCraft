@@ -17,7 +17,8 @@ public class Zag : CwaffGun
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 0.8f, ammo: 600, shootFps: 30, reloadFps: 40,
             fireAudio: "zag_zig_sound", reloadAudio: "zag_zig_sound", muzzleFrom: Items.Heroine, loopReloadAt: 0)
           .InitProjectile(GunData.New(clipSize: 9, cooldown: 0.125f, shootStyle: ShootStyle.SemiAutomatic, electric: true, preventOrbiting: true,
-            damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter, hitEnemySound: "zag_hit_enemy_sound", customClip: true))
+            damage: 5.0f, speed: 40.0f, sprite: "zag_bullet", fps: 8, anchor: Anchor.MiddleCenter, hitEnemySound: "zag_hit_enemy_sound", customClip: true,
+            anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2)))
           .Attach<ZagProjectile>()
           .CopyAllImpactVFX(Items.ShockRifle)
           .Assign(out _ZagProjectile);
@@ -88,7 +89,6 @@ public class ZagProjectile : MonoBehaviour
         bool clockwise  = (this._wallAngle.ToAngle().RelAngleTo(this._projectile.Direction.ToAngle()) > 0f);
         Vector2 newDir = tileCollision.Normal.Rotate(clockwise ? -90f : 90f);
         PhysicsEngine.PostSliceVelocity = newDir;
-        this._body.PushAgainstWalls(this._wallAngle.ToIntVector2());
         this._blockedByWall = true;
         this._straightened = true;
         DoZigZag(newDir);
@@ -113,6 +113,7 @@ public class ZagProjectile : MonoBehaviour
         zp._blockedByWall      = true;
         zp._wallAngle          = this._wallAngle;
         zp._tileCollisionsLeft = this._tileCollisionsLeft;
+        zp.gameObject.GetComponent<SpeculativeRigidbody>().PushAgainstWalls(this._wallAngle.ToIntVector2());
     }
 
     private void DoZigZag(Vector2 newDir)
@@ -137,7 +138,7 @@ public class ZagProjectile : MonoBehaviour
     {
         if (!this._blockedByWall)
             return;
-        if (this._body.IsAgainstWall(this._wallAngle.ToIntVector2(), pixels: 8))
+        if (this._body.IsAgainstWall(this._wallAngle.ToIntVector2(), pixels: 16))
             return;
         this._blockedByWall = false;
         DoZigZag(this._wallAngle);

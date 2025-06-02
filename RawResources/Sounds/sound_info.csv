@@ -190,7 +190,7 @@ widowmaker_turret_shoot_sound,1.0,1,sound,0
 widowmaker_turret_crawl_sound,-1.5,1,sound,0
 widowmaker_reload_sound,2.0,1,sound,0
 magunet_attract_sound,-3.0,1,sound,0
-zag_zig_sound,-7.0,1,sound,0
+zag_zig_sound,-7.0,1,sound,1
 circus_music,-4.5,0,sound,0
 wall_thunk,-2.5,1,sound,0
 blackjack_card_impact_sound,7.5,1,sound,0
