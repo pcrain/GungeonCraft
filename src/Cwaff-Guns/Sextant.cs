@@ -76,7 +76,7 @@ public class Sextant : CwaffGun
         Lazy.SetupGun<Sextant>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 80, shootFps: 14, reloadFps: 4,
             muzzleFrom: Items.Mailbox, fireAudio: "sextant_shoot_sound", carryOffset: new IntVector2(6, 0))
-          .InitSpecialProjectile<PrecisionProjectile>(GunData.New(sprite: null, clipSize: 1, cooldown: 0.0f, shootStyle: ShootStyle.SemiAutomatic,
+          .InitSpecialProjectile<PrecisionProjectile>(GunData.New(sprite: null, clipSize: 1, cooldown: 0.25f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 50.0f, speed: 25f, range: 18f, force: 12f, invisibleProjectile: true, customClip: true));
 
         _MathSymbols = VFX.Create("math_symbols", loops: false);
