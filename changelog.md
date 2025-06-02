@@ -18,6 +18,8 @@
 - Removed placeholder in Outbreak's ammonomicon description
 - Fixed null deref caused by damage handler not being properly deregistered when dropping Sunderbuss
 - Fixed noisy audio glitch caused by repeatedly taking 0 damage hits while under Sunderbuss or Macheening's curse
+- Allowed Wayfarer to have multiple projectiles under its control at the same time (e.g., if firing with Scattershot or Helix Bullets)
+- Made Wayfarer projectiles created without a controlling Wayfarer (e.g., via Chance Bullets) die on impact
 
 ## 1.26.0 (2025-05-29)
 

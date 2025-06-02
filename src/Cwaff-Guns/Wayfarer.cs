@@ -9,7 +9,7 @@ public class Wayfarer : CwaffGun
 
     private const string _WAYFARER_OVERRIDE = "Wayfarer Gunlock";
 
-    private Projectile _extantProjectile = null;
+    private List<Projectile> _extantProjectiles = new();
     private PlayerController _prevOwner = null;
     private OverrideLerper _lerpyboi = null;
 
@@ -32,13 +32,14 @@ public class Wayfarer : CwaffGun
     {
         if (!player || player.CurrentGun != this.gun)
             return; // inactive, do normal firing stuff
-        if (this._extantProjectile)
+        RemoveDeadProjectiles();
+        for (int i = this._extantProjectiles.Count - 1; i >= 0; --i)
         {
           float aimAngle = player.IsKeyboardAndMouse()
-            ? (player.unadjustedAimPoint.XY() - this._extantProjectile.SafeCenter).ToAngle()
+            ? (player.unadjustedAimPoint.XY() - this._extantProjectiles[i].SafeCenter).ToAngle()
             : this.gun.gunAngle;
-          this._extantProjectile.gameObject.GetComponent<WayfarerProjectile>().Redirect(aimAngle);
-          player.SuppressThisClick = true;
+          this._extantProjectiles[i].gameObject.GetComponent<WayfarerProjectile>().Redirect(aimAngle);
+          player.SuppressThisClick = true; // suppress if we have at least one active projectile
         }
     }
 
@@ -75,13 +76,19 @@ public class Wayfarer : CwaffGun
         this.PlayerOwner.OverrideCursorCenter(null);
       if (this._lerpyboi)
         this._lerpyboi.Deactivate();
-      if (!this._extantProjectile)
-        return;
       if (this.Mastered)
-        this._extantProjectile.gameObject.GetComponent<WayfarerProjectile>().MakeAutonomous();
+      {
+        foreach (Projectile p in this._extantProjectiles)
+          if (p)
+            p.gameObject.GetComponent<WayfarerProjectile>().MakeAutonomous();
+      }
       else
-        this._extantProjectile.DieInAir();
-      this._extantProjectile = null;
+      {
+        foreach (Projectile p in this._extantProjectiles)
+          if (p)
+            p.DieInAir();
+      }
+      this._extantProjectiles.Clear();
     }
 
     public override void OnDestroy()
@@ -98,11 +105,17 @@ public class Wayfarer : CwaffGun
         if (this.PlayerOwner is not PlayerController player)
             return;
 
-        if (this._extantProjectile)
-          projectile.DieInAir();  // effectively disable scattershot and similar effects
-        else
-          this._extantProjectile = projectile;
+        this._extantProjectiles.Add(projectile);
     }
+
+    private void RemoveDeadProjectiles()
+    {
+        for (int i = this._extantProjectiles.Count - 1; i >= 0; --i)
+          if (!this._extantProjectiles[i])
+            this._extantProjectiles.RemoveAt(i);
+    }
+
+    public bool Owns(Projectile proj) => this._extantProjectiles.Contains(proj);
 
     public override void Update()
     {
@@ -112,11 +125,10 @@ public class Wayfarer : CwaffGun
         {
           if (this._prevOwner)
           {
-            if (this._extantProjectile)
-            {
-              this._extantProjectile.DieInAir();
-              this._extantProjectile = null;
-            }
+            foreach (Projectile p in this._extantProjectiles)
+              if (p)
+                p.DieInAir();
+            this._extantProjectiles.Clear();
             if (this._prevOwner.IsPrimaryPlayer)
               cc.UseOverridePlayerOnePosition = false;
             else
@@ -126,11 +138,12 @@ public class Wayfarer : CwaffGun
         }
         this._prevOwner = player;
 
-        if (this._extantProjectile)
+        RemoveDeadProjectiles();
+        if (this._extantProjectiles.Count > 0)
         {
           player.inventory.GunLocked.SetOverride(_WAYFARER_OVERRIDE, true);
           this.gun.CanBeDropped = false;
-          Vector2 curPos = this._extantProjectile.SafeCenter;
+          Vector2 curPos = this._extantProjectiles[0].SafeCenter;
           if (curPos != Vector2.zero)
           {
             this._lerpyboi.Recenter(0.5f * (player.CenterPosition + curPos), lerpFactor: 2f);
@@ -235,6 +248,7 @@ public class WayfarerProjectile : MonoBehaviour
     private Geometry _ownerRing = null;
     private float _pingTimer = 0.0f;
     private float _shootTimer = 0.0f;
+    private bool _disowned = true;
 
     public bool Autonomous {
       get { return this._autonomous; }
@@ -248,9 +262,10 @@ public class WayfarerProjectile : MonoBehaviour
         this._projectile.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
         SpriteOutlineManager.AddOutlineToSprite(this._projectile.sprite, Color.black);
         this._owner = this._projectile.Owner as PlayerController;
-        if (!this._owner)
+        if (!this._owner || this._owner.GetGun<Wayfarer>() is not Wayfarer wf || !wf.Owns(this._projectile))
           return;
 
+        this._disowned = false;
         this._projectile.BulletScriptSettings.surviveTileCollisions = true;
         this._projectile.specRigidbody.OnTileCollision += this.OnTileCollision;
         this._projectile.specRigidbody.OnRigidbodyCollision += this.OnRigidBodyCollision;
@@ -328,11 +343,14 @@ public class WayfarerProjectile : MonoBehaviour
       this._projectile.specRigidbody.CollideWithTileMap = true;
       this._projectile.specRigidbody.CollideWithOthers = true;
       this._projectile.specRigidbody.Reinitialize();
-      base.gameObject.Play("wayfarer_relaunch_sound");
+      base.gameObject.PlayUnique("wayfarer_relaunch_sound");
     }
 
     private void Update()
     {
+      if (this._disowned)
+        return;
+
       if (!this._owner || this._owner.CurrentRoom == null || this._owner.CurrentRoom != base.transform.position.GetAbsoluteRoom())
       {
         this._projectile.DieInAir();
