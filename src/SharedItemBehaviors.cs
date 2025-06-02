@@ -388,7 +388,7 @@ public class EasyTrailBullet : BraveBehaviour // adapted from NN
 
     private Projectile proj;
     private GameObject tro;
-    private TrailRenderer tr;
+    private CustomTrailRenderer tr;
     private Material mat;
 
     public Vector2 TrailPos;
@@ -404,13 +404,13 @@ public class EasyTrailBullet : BraveBehaviour // adapted from NN
       if (_TrailPool.Count == 0)
       {
         //NOTE: need to immediately parent new trail object to avoid visual glitches
-        GameObject newTrail = parent.AddChild("trail object", typeof(TrailRenderer));
-        TrailRenderer newTr = newTrail.GetComponent<TrailRenderer>();
-        newTr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        newTr.receiveShadows = false;
+        GameObject newTrail = parent.AddChild("trail object", typeof(CustomTrailRenderer));
+        CustomTrailRenderer newTr = newTrail.GetComponent<CustomTrailRenderer>();
         newTr.minVertexDistance = 0.1f;
         newTr.material = new Material(Shader.Find("Sprites/Default"));
         newTr.material.mainTexture = null;
+        newTr.colors = new Color[2];
+        newTr.widths = new float[2];
         _TrailPool.AddLast(newTrail);
         ++_TrailsCreated;
       }
@@ -418,16 +418,26 @@ public class EasyTrailBullet : BraveBehaviour // adapted from NN
       LinkedListNode<GameObject> node = _TrailPool.Last;
       _TrailPool.RemoveLast();
 
-      GameObject trail = node.Value;
+      GameObject trail = node.Value; //BUG: null when switching floors
       node.Value = null;
       _UsedTrails.AddLast(node);
 
+      trail.SetActive(true);
+      CustomTrailRenderer ctr = trail.GetComponent<CustomTrailRenderer>();
+      ctr.enabled = true;
+      ctr.Clear();
+      ctr.Reenable();
       return trail;
     }
 
     private static void Return(GameObject trail)
     {
+      CustomTrailRenderer tr = trail.GetComponent<CustomTrailRenderer>();
+      tr.Clear();
+
       trail.transform.parent = null;
+      GameObject.DontDestroyOnLoad(trail);
+      trail.SetActive(false);
       LinkedListNode<GameObject> node = _UsedTrails.Last;
       _UsedTrails.RemoveLast();
       node.Value = trail;
@@ -464,21 +474,28 @@ public class EasyTrailBullet : BraveBehaviour // adapted from NN
 
         tro = Rent(proj.gameObject);
         tro.transform.parent = proj.gameObject.transform;
+        tro.transform.rotation = Quaternion.identity;
         tro.transform.position = proj.transform.position;
         tro.transform.localPosition = TrailPos;
 
-        tr = tro.GetComponent<TrailRenderer>();
+        tr = tro.GetComponent<CustomTrailRenderer>();
         mat = tr.material;
         mat.SetColor(CwaffVFX._ColorId, BaseColor);
-        tr.startColor = StartColor;
-        tr.endColor = EndColor;
-        tr.time = LifeTime;
-        tr.startWidth = StartWidth;
-        tr.endWidth = EndWidth;
+        tr.colors[0] = StartColor;
+        tr.colors[1] = EndColor;
+        tr.widths[0] = StartWidth;
+        tr.widths[1] = EndWidth;
+        tr.lifeTime = LifeTime;
     }
 
     public void Enable() => tr.enabled = true;
     public void Disable() => tr.enabled = false;
+
+    private void LateUpdate()
+    {
+        if (tro)
+            tro.transform.rotation = Quaternion.identity; // keep trail stable even when projectile rotates
+    }
 
     public void UpdateTrail()
     {
@@ -487,11 +504,11 @@ public class EasyTrailBullet : BraveBehaviour // adapted from NN
 
         tro.transform.localPosition = TrailPos;
         mat.SetColor(CwaffVFX._ColorId, BaseColor);
-        tr.startColor = StartColor;
-        tr.endColor = EndColor;
-        tr.time = LifeTime;
-        tr.startWidth = StartWidth;
-        tr.endWidth = EndWidth;
+        tr.colors[0] = StartColor;
+        tr.colors[1] = EndColor;
+        tr.widths[0] = StartWidth;
+        tr.widths[1] = EndWidth;
+        tr.lifeTime = LifeTime;
     }
 
     public override void OnDestroy()
