@@ -1,28 +1,33 @@
 # Changelog
 
-## 1.26.1 (TBD)
+## 1.26.1 (2025-06-01)
 
-- Fixed pitch distortion on several audio clips 
-- Substantially reduced frequency of Forkbomb projectiles getting stuck inside walls
-- Bubblebeam's projectiles no longer collide with other projectiles belonging to the player until they have unbubbled something
-- Fixed Stereoscope's projectiles throwing an exception every frame when not fired from Stereoscope directly
-- Fixed Mastered Macheening's projectiles colliding with and destroying other player-owned projectiles
-- Fixed Empath's projectiles colliding with and destroying other player-owned projectiles
+#### Balance Changes and Polish:
+
+- Increased Deadline's ammo from 64 to 200
+- Bubblebeam's projectiles no longer collide with other projectiles belonging to the player until they have enbubbled something
+- Allowed Wayfarer to have multiple projectiles under its control at the same time (e.g., if firing with Scattershot or Helix Bullets)
+
+#### Bugfixes and Misc:
+
+- Fixed (for real this time) B. B. Gun sometimes not giving player ammo back when the player catches the projectile
+- Fixed Zag's wall-following code being completely broken since 1.21.1 how did this go unnoticed D:
 - Fixed null deref caused by Suncaster projectiles not spawned by Suncaster trying to refract to their non-existent gun's prisms
 - Fixed null deref caused by Racket Launcher projectiles trying to deregister themselves from their parent gun after it was destroyed
 - Fixed null deref caused by Alligator's projectiles trying to destroy their cables / sparks after already destroying them
-- Fixed sounds from Banana playing when GungeonCraft guns are fired as part of a Duct Tape weapon
-- Fixed (for real this time) B. B. Gun sometimes not giving player ammo back when the player catches the projectile
-- Increased Deadline's ammo from 64 to 200
-- Removed placeholder in Outbreak's ammonomicon description
 - Fixed null deref caused by damage handler not being properly deregistered when dropping Sunderbuss
+- Fixed pitch distortion on several audio clips 
+- Fixed sounds from Banana playing when GungeonCraft guns are fired as part of a Duct Tape combo
 - Fixed noisy audio glitch caused by repeatedly taking 0 damage hits while under Sunderbuss or Macheening's curse
-- Allowed Wayfarer to have multiple projectiles under its control at the same time (e.g., if firing with Scattershot or Helix Bullets)
-- Made Wayfarer projectiles created without a controlling Wayfarer (e.g., via Chance Bullets) die on impact
+- Fixed Stereoscope's projectiles throwing an exception every frame when not fired from Stereoscope directly
+- Fixed Mastered Macheening's projectiles colliding with and destroying other player-owned projectiles
+- Fixed Empath's projectiles colliding with and destroying other player-owned projectiles
 - Fixed Helix Bullets rendering Stereoscope, Sunderbuss, and Sextant unusable
 - Fixed Sextant firing every single frame when reload time is reduced to 0 (e.g., via Cormorant)
+- Substantially reduced frequency of Forkbomb projectiles getting stuck inside walls
 - Blacklisted Flakseed projectiles from being affected by Orbital Bullets (projectiles should just sprout on impact)
-- Fixed Zag's wall-following code being completely broken since 1.21.1 D:
+- Made Wayfarer projectiles created without a controlling Wayfarer (e.g., via Chance Bullets) die on impact
+- Removed placeholder in Outbreak's ammonomicon description
 
 ## 1.26.0 (2025-05-29)
 
