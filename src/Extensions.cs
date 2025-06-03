@@ -3476,9 +3476,13 @@ public static class Extensions
   /// <summary>Remove the sprite animator from a projectile that doesn't need animating.</summary>
   public static Projectile RemoveAnimator(this Projectile proj)
   {
-    GameObject spriteObject = proj.gameObject.GetComponentInChildren<tk2dSprite>().gameObject;
+    tk2dSprite sprite = proj.gameObject.GetComponentInChildren<tk2dSprite>();
+    GameObject spriteObject = sprite.gameObject;
+    tk2dSpriteAnimator animator = spriteObject.GetComponent<tk2dSpriteAnimator>();
+    tk2dSpriteAnimationFrame frame = animator.DefaultClip.frames[0];
+    sprite.SetSprite(frame.spriteCollection, frame.spriteId);
+    UnityEngine.Object.Destroy(animator);
     UnityEngine.Object.Destroy(spriteObject.GetComponent<tk2dSpriteAnimation>());
-    UnityEngine.Object.Destroy(spriteObject.GetComponent<tk2dSpriteAnimator>());
     return proj;
   }
 }
