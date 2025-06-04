@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - fix proxy indexoutofrange exceptions on floor load and reenable pooling across floors
-    - figure out how to reset event handlers
+    - figure out how to re-add removed transforms / components
 */
 
 [HarmonyPatch]
@@ -11,6 +11,7 @@ internal class PlayerProjectilePooler
   internal static readonly Dictionary<GameObject, PlayerProjectilePooler> _Poolers = new();
 
   private GameObject _prefab;
+  private string _name;
   private LinkedList<GameObject> _despawned = new();
   private LinkedList<GameObject> _spawned = new();
   private HashSet<Transform> _startingChildren = new();
@@ -20,6 +21,7 @@ internal class PlayerProjectilePooler
     GameObject prefab = p.gameObject;
     PlayerProjectilePooler pooler = PlayerProjectilePooler._Poolers[prefab] = new();
     pooler._prefab = prefab;
+    pooler._name = prefab.name;
   }
 
   private static void ClearPoolsForNextFloor()
@@ -27,6 +29,7 @@ internal class PlayerProjectilePooler
     Lazy.DebugLog($"cleaning up projectile pools!");
     foreach (PlayerProjectilePooler pooler in _Poolers.Values)
     {
+      Lazy.DebugLog($"  {pooler._name} pool had {pooler._spawned.Count} spawned and {pooler._despawned.Count} despawned projectiles");
       pooler._despawned.Clear();
       pooler._spawned.Clear();
     }
@@ -56,17 +59,12 @@ internal class PlayerProjectilePooler
       }
   }
 
-  [HarmonyPatch(typeof(Projectile), nameof(Projectile.ChangeTintColorShader))]
-  [HarmonyPrefix]
-  private static void ProjectileAdjustPlayerProjectileTintPatch(Projectile __instance)
-  {
-    // System.Console.WriteLine($"attempting to adjust tint!");
-    if (!__instance.sprite)
-    {
-      System.Console.WriteLine($"  but no sprite");
-      return;
-    }
-  }
+  // [HarmonyPatch(typeof(Projectile), nameof(Projectile.HandleHitEffectsTileMap))]
+  // [HarmonyPrefix]
+  // private static void DebugPatch(Projectile __instance)
+  // {
+  //   System.Console.WriteLine($"doing hit effects");
+  // }
 
   private GameObject Spawn(Vector3 position, Quaternion rotation)
   {
@@ -76,6 +74,7 @@ internal class PlayerProjectilePooler
       newInstance.AddComponent<PlayerProjectilePoolInfo>().pooler = this;
       RegisterStartingTransforms(newInstance.transform);
       this._spawned.AddLast(new LinkedListNode<GameObject>(newInstance));
+      // System.Console.WriteLine($"spawned {this._spawned.Count} of {this._name}");
       return newInstance;
     }
 
@@ -93,7 +92,7 @@ internal class PlayerProjectilePooler
     Projectile pooledProj = pooledProjObj.GetComponent<Projectile>();
     pooledProj.Owner = GameManager.Instance.PrimaryPlayer; //HACK: for testing purposes, make this more robust later with a patch
     pooledProj.RegenerateCache();
-    pooledProj.Reawaken(); //NOTE: needs to happen after RegenerateCache() so sprite is properly set up
+    pooledProj.Awake(); //NOTE: needs to happen after RegenerateCache() so sprite is properly set up -> also resets SRB delegates
     pooledProj.Start();
     pooledProj.OnSpawned();
     foreach (Component c in pooledProjObj.GetComponents<Component>())
@@ -105,11 +104,6 @@ internal class PlayerProjectilePooler
 
   private void Despawn(GameObject projInstance)
   {
-    // purge unwanted child objects
-    if (projInstance.transform != projInstance.GetComponent<Projectile>().transform)
-      System.Console.WriteLine($"wat o.o");
-    PurgeNonStartingTransforms(projInstance.transform);
-
     // purge unwanted Components
     // projInstance.SetActive(true); // activate so we can actually find the components
     foreach (Component c in projInstance.GetComponents<Component>())
@@ -127,6 +121,10 @@ internal class PlayerProjectilePooler
       System.Console.WriteLine($"  destroying {c.GetType()}");
       UnityEngine.Object.Destroy(c);
     }
+
+    // purge unwanted child objects
+    //NOTE: done after IPPPComponent checks to give them a chance to clean these up themselves
+    PurgeNonStartingTransforms(projInstance.transform);
 
     // reset default SRB settings
     SpeculativeRigidbody body = projInstance.GetComponent<SpeculativeRigidbody>();
@@ -318,13 +316,12 @@ internal class PlayerProjectilePooler
     proj.m_isExitClippingTiles = false;
     proj.m_exitClippingDistance = 0f;
 
-    //TODO: find a way to clear these out
-    // public Action<Projectile, SpeculativeRigidbody, bool> OnHitEnemy;
-    // public Action<Projectile, SpeculativeRigidbody> OnWillKillEnemy;
-    // public Action<DebrisObject> OnBecameDebris;
-    // public Action<DebrisObject> OnBecameDebrisGrounded;
-    // public Func<Vector2, Vector2> ModifyVelocity;
-    // public Action<Projectile> PreMoveModifiers;
+    proj.OnHitEnemy = null;
+    proj.OnWillKillEnemy = null;
+    proj.OnBecameDebris = null;
+    proj.OnBecameDebrisGrounded = null;
+    proj.ModifyVelocity = null;
+    proj.PreMoveModifiers = null;
   }
 
   private static void ResetSpeculativeRigidbody(SpeculativeRigidbody body, SpeculativeRigidbody baseBody)
@@ -378,23 +375,24 @@ internal class PlayerProjectilePooler
     body.m_initialized = false;
     PhysicsEngine.Instance.DeregisterWhenAvailable(body);
 
-    //TODO: find a way to clear these out
-    // public Action<SpeculativeRigidbody> OnPreMovement;
-    // public OnPreRigidbodyCollisionDelegate OnPreRigidbodyCollision;
-    // public OnPreTileCollisionDelegate OnPreTileCollision;
-    // public Action<CollisionData> OnCollision;
-    // public OnRigidbodyCollisionDelegate OnRigidbodyCollision;
-    // public OnBeamCollisionDelegate OnBeamCollision;
-    // public OnTileCollisionDelegate OnTileCollision;
-    // public OnTriggerDelegate OnEnterTrigger;
-    // public OnTriggerDelegate OnTriggerCollision;
-    // public OnTriggerExitDelegate OnExitTrigger;
-    // public Action OnPathTargetReached;
-    // public Action<SpeculativeRigidbody, Vector2, IntVector2> OnPostRigidbodyMovement;
-    // public MovementRestrictorDelegate MovementRestrictor;
-    // public Action<BasicBeamController> OnHitByBeam;
-    // public Func<Vector2, Vector2, Vector2> ReflectProjectilesNormalGenerator;
-    // public Func<Vector2, Vector2, Vector2> ReflectBeamsNormalGenerator;
+    //TODO: having trouble resetting all of these properly
+    body.OnPreMovement = null;
+    body.OnPreRigidbodyCollision = null;
+    body.OnPreTileCollision = null;
+    body.OnCollision = null;
+    body.OnRigidbodyCollision = null;
+    body.OnBeamCollision = null;
+    body.OnTileCollision = null;
+
+    body.OnEnterTrigger = null;
+    body.OnTriggerCollision = null;
+    body.OnExitTrigger = null;
+    body.OnPathTargetReached = null;
+    body.OnPostRigidbodyMovement = null;
+    body.MovementRestrictor = null;
+    body.OnHitByBeam = null;
+    body.ReflectProjectilesNormalGenerator = null;
+    body.ReflectBeamsNormalGenerator = null;
   }
 
   /// <summary>Handle spawning pooled player projectiles</summary>

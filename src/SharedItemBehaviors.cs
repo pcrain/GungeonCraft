@@ -380,7 +380,7 @@ public static class AnimatedBullet // stolen and modified from NN
     }
 }
 
-public class EasyTrailBullet : BraveBehaviour // adapted from NN
+public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
 {
     private static readonly LinkedList<GameObject> _TrailPool = new();
     private static readonly LinkedList<GameObject> _UsedTrails = new();
@@ -407,7 +407,8 @@ public class EasyTrailBullet : BraveBehaviour // adapted from NN
         GameObject newTrail = parent.AddChild("trail object", typeof(CustomTrailRenderer));
         CustomTrailRenderer newTr = newTrail.GetComponent<CustomTrailRenderer>();
         newTr.minVertexDistance = 0.1f;
-        newTr.material = new Material(Shader.Find("Sprites/Default"));
+        // newTr.material = new Material(ShaderCache.Acquire("Sprites/Default"));
+        newTr.material = new Material(ShaderCache.Acquire("Brave/PlayerShader"));
         newTr.material.mainTexture = null;
         newTr.colors = new Color[2];
         newTr.widths = new float[2];
@@ -513,9 +514,20 @@ public class EasyTrailBullet : BraveBehaviour // adapted from NN
 
     public override void OnDestroy()
     {
-        base.OnDestroy();
         if (tro)
             Return(tro);
+        base.OnDestroy();
+    }
+
+    public void PPPReset(GameObject prefab)
+    {
+        if (tro)
+            Return(tro);
+    }
+
+    public void PPPRespawn()
+    {
+        Start();
     }
 }
 

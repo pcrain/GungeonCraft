@@ -112,6 +112,7 @@ public sealed class GunData
   public float? lightRange;
   public Color? lightColor;
   public string chargeSound;
+  public bool? damagesWalls;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -213,6 +214,7 @@ public sealed class GunData
   /// <param name="lightRange">The range of the light produced by the projectile.</param>
   /// <param name="lightColor">The color of the light produced by the projectile.</param>
   /// <param name="chargeSound">The sound a charged projectile should play when its charge level has been reached.</param>
+  /// <param name="damagesWalls">Whether the projectile creates damaged wall decals on impact.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -230,7 +232,7 @@ public sealed class GunData
     int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null, float beamKnockback = -1f,
     BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
     bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, float? glowColorPower = null,
-    int beamDissipateFps = -1, float? spinRate = null, float? lightStrength = null, float? lightRange = null, Color? lightColor = null, string chargeSound = null)
+    int beamDissipateFps = -1, float? spinRate = null, float? lightStrength = null, float? lightRange = null, Color? lightColor = null, string chargeSound = null, bool? damagesWalls = null)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -331,6 +333,7 @@ public sealed class GunData
       _Instance.lightRange                        = lightRange;
       _Instance.lightColor                        = lightColor;
       _Instance.chargeSound                       = chargeSound;
+      _Instance.damagesWalls                      = damagesWalls;
       return _Instance;
   }
 }
@@ -447,6 +450,7 @@ public static class GunBuilder
     p.collidesWithProjectiles                         = b.collidesWithProjectiles    ?? p.collidesWithProjectiles;
     p.collidesOnlyWithPlayerProjectiles               = b.collidesOnlyWithPlayerProjectiles ?? p.collidesOnlyWithPlayerProjectiles;
     p.PenetratesInternalWalls                         = b.pierceInternalWalls ?? p.PenetratesInternalWalls;
+    p.damagesWalls                                    = b.damagesWalls ?? p.damagesWalls;
     if (p.specRigidbody)
       p.specRigidbody.CollideWithTileMap              = b.collidesWithTilemap ?? p.specRigidbody.CollideWithTileMap;  // doesn't work!
     if (b.recoil.HasValue && b.recoil.Value != 0f)
