@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - fix proxy indexoutofrange exceptions on floor load and reenable pooling across floors
-    - fix effects like hot / irradiated lead persisting after dropping the relevant item
+    - figure out how to reset event handlers
 */
 
 [HarmonyPatch]
@@ -12,6 +12,8 @@ internal class PlayerProjectilePooler
 
   private GameObject _prefab;
   private LinkedList<GameObject> _despawned = new();
+  private LinkedList<GameObject> _spawned = new();
+  private HashSet<Transform> _startingChildren = new();
 
   internal static void RegisterAsPoolable(Projectile p)
   {
@@ -24,21 +26,65 @@ internal class PlayerProjectilePooler
   {
     Lazy.DebugLog($"cleaning up projectile pools!");
     foreach (PlayerProjectilePooler pooler in _Poolers.Values)
+    {
       pooler._despawned.Clear();
+      pooler._spawned.Clear();
+    }
+  }
+
+  private void RegisterStartingTransforms(Transform t)
+  {
+      for (int i = t.childCount - 1; i >= 0; --i)
+      {
+        Transform child = t.GetChild(i);
+        RegisterStartingTransforms(child);
+        this._startingChildren.Add(child);
+      }
+  }
+
+  private void PurgeNonStartingTransforms(Transform t)
+  {
+      for (int i = t.childCount - 1; i >= 0; --i)
+      {
+        Transform child = t.GetChild(i);
+        PurgeNonStartingTransforms(child);
+        if (!this._startingChildren.Contains(child))
+        {
+          System.Console.WriteLine($"removing transform {child.gameObject.name}");
+          UnityEngine.Object.Destroy(child.gameObject);
+        }
+      }
+  }
+
+  [HarmonyPatch(typeof(Projectile), nameof(Projectile.ChangeTintColorShader))]
+  [HarmonyPrefix]
+  private static void ProjectileAdjustPlayerProjectileTintPatch(Projectile __instance)
+  {
+    // System.Console.WriteLine($"attempting to adjust tint!");
+    if (!__instance.sprite)
+    {
+      System.Console.WriteLine($"  but no sprite");
+      return;
+    }
   }
 
   private GameObject Spawn(Vector3 position, Quaternion rotation)
   {
-    if (_despawned.Count == 0)
+    if (this._despawned.Count == 0)
     {
       GameObject newInstance = UnityEngine.Object.Instantiate(this._prefab, position, rotation);
       newInstance.AddComponent<PlayerProjectilePoolInfo>().pooler = this;
+      RegisterStartingTransforms(newInstance.transform);
+      this._spawned.AddLast(new LinkedListNode<GameObject>(newInstance));
       return newInstance;
     }
 
     // System.Console.WriteLine($"spawning {this._prefab.name} from pool");
-    GameObject pooledProjObj = _despawned.Last.Value;
-    _despawned.RemoveLast();
+    LinkedListNode<GameObject> pooledProjNode = this._despawned.Last;
+    this._despawned.RemoveLast();
+    GameObject pooledProjObj = pooledProjNode.Value;
+    pooledProjNode.Value = null;
+    this._spawned.AddLast(pooledProjNode);
 
     pooledProjObj.transform.position = position;
     pooledProjObj.transform.rotation = rotation;
@@ -46,18 +92,24 @@ internal class PlayerProjectilePooler
 
     Projectile pooledProj = pooledProjObj.GetComponent<Projectile>();
     pooledProj.Owner = GameManager.Instance.PrimaryPlayer; //HACK: for testing purposes, make this more robust later with a patch
+    pooledProj.RegenerateCache();
+    pooledProj.Reawaken(); //NOTE: needs to happen after RegenerateCache() so sprite is properly set up
     pooledProj.Start();
     pooledProj.OnSpawned();
     foreach (Component c in pooledProjObj.GetComponents<Component>())
       if (c is IPPPComponent ippp)
         ippp.PPPRespawn();
-    pooledProj.RegenerateCache();
 
     return pooledProjObj;
   }
 
   private void Despawn(GameObject projInstance)
   {
+    // purge unwanted child objects
+    if (projInstance.transform != projInstance.GetComponent<Projectile>().transform)
+      System.Console.WriteLine($"wat o.o");
+    PurgeNonStartingTransforms(projInstance.transform);
+
     // purge unwanted Components
     // projInstance.SetActive(true); // activate so we can actually find the components
     foreach (Component c in projInstance.GetComponents<Component>())
@@ -76,8 +128,6 @@ internal class PlayerProjectilePooler
       UnityEngine.Object.Destroy(c);
     }
 
-    //TODO: reset sprite settings
-
     // reset default SRB settings
     SpeculativeRigidbody body = projInstance.GetComponent<SpeculativeRigidbody>();
     SpeculativeRigidbody baseBody = this._prefab.GetComponent<SpeculativeRigidbody>();
@@ -88,14 +138,34 @@ internal class PlayerProjectilePooler
     Projectile baseProj = this._prefab.GetComponent<Projectile>();
     ResetProjectile(proj, baseProj);
 
+    //reset to default sprite settings
+    tk2dBaseSprite sprite = proj.sprite;
+    tk2dBaseSprite baseSprite = this._prefab.GetComponentInChildren<tk2dBaseSprite>(); //TOOD: might be more than one valid sprite object
+    ResetSprite(sprite, baseSprite);
+
     // disable the projectile
     projInstance.transform.parent = null;
     projInstance.SetActive(false);
     // GameObject.DontDestroyOnLoad(projInstance); //NOTE: can't figure out how to preserve projectiles across floor loads with proxy tree corruption
 
     // return it to the pool
-    // System.Console.WriteLine($"return {this._prefab.name} to pool");
-    this._despawned.AddLast(projInstance);
+    if (this._spawned.Count == 0) //TODO: figure out how this happens
+    {
+      // System.Console.WriteLine($"how did this happen o.o");
+      this._spawned.AddLast(new LinkedListNode<GameObject>(null));
+    }
+    LinkedListNode<GameObject> pooledProjNode = this._spawned.Last;
+    this._spawned.RemoveLast();
+    pooledProjNode.Value = projInstance;
+    this._despawned.AddLast(pooledProjNode);
+  }
+
+  private static void ResetSprite(tk2dBaseSprite sprite, tk2dBaseSprite baseSprite)
+  {
+    sprite.OverrideMaterialMode = baseSprite.OverrideMaterialMode;
+    sprite.renderer.material.shader = baseSprite.renderer.material.shader;
+    sprite.renderer.material.CopyPropertiesFromMaterial(baseSprite.renderer.material);
+    //TODO: reset animator as necessary
   }
 
   private static void ResetProjectile(Projectile proj, Projectile baseProj)
@@ -195,11 +265,6 @@ internal class PlayerProjectilePooler
     // public ParticleSystem ParticleTrail;
     proj.DelayedDamageToExploders = baseProj.DelayedDamageToExploders;
 
-    //TODO: find a way to clear these out
-    // public Action<Projectile, SpeculativeRigidbody, bool> OnHitEnemy;
-    // public Action<Projectile, SpeculativeRigidbody> OnWillKillEnemy;
-    // public Action<DebrisObject> OnBecameDebris;
-    // public Action<DebrisObject> OnBecameDebrisGrounded;
 
     proj.IsBlackBullet = false; // [NonSerialized]
     proj.m_forceBlackBullet = false;
@@ -212,14 +277,9 @@ internal class PlayerProjectilePooler
     proj.m_cachedLayer = 0;
     proj.m_currentTintPriority = -1; //TODO: private and not serialized, so maybe should be 0?
 
-    //TODO: find a way to clear these out
-    // public Func<Vector2, Vector2> ModifyVelocity;
 
     proj.CurseSparks = false; // [NonSerialized]
     proj.m_lastSparksPoint = null;
-
-    //TODO: find a way to clear these out
-    // public Action<Projectile> PreMoveModifiers;
 
     proj.OverrideMotionModule = null; // [NonSerialized]
     proj.m_usesNormalMoveRegardless = false; // [NonSerialized]
@@ -257,6 +317,14 @@ internal class PlayerProjectilePooler
     proj.m_outOfBoundsCounter = 0f;
     proj.m_isExitClippingTiles = false;
     proj.m_exitClippingDistance = 0f;
+
+    //TODO: find a way to clear these out
+    // public Action<Projectile, SpeculativeRigidbody, bool> OnHitEnemy;
+    // public Action<Projectile, SpeculativeRigidbody> OnWillKillEnemy;
+    // public Action<DebrisObject> OnBecameDebris;
+    // public Action<DebrisObject> OnBecameDebrisGrounded;
+    // public Func<Vector2, Vector2> ModifyVelocity;
+    // public Action<Projectile> PreMoveModifiers;
   }
 
   private static void ResetSpeculativeRigidbody(SpeculativeRigidbody body, SpeculativeRigidbody baseBody)
@@ -278,21 +346,6 @@ internal class PlayerProjectilePooler
     body.SkipEmptyColliders = baseBody.SkipEmptyColliders;
     body.TK2DSprite = baseBody.TK2DSprite;
 
-    //TODO: find a way to clear these out
-    // public Action<SpeculativeRigidbody> OnPreMovement;
-    // public OnPreRigidbodyCollisionDelegate OnPreRigidbodyCollision;
-    // public OnPreTileCollisionDelegate OnPreTileCollision;
-    // public Action<CollisionData> OnCollision;
-    // public OnRigidbodyCollisionDelegate OnRigidbodyCollision;
-    // public OnBeamCollisionDelegate OnBeamCollision;
-    // public OnTileCollisionDelegate OnTileCollision;
-    // public OnTriggerDelegate OnEnterTrigger;
-    // public OnTriggerDelegate OnTriggerCollision;
-    // public OnTriggerExitDelegate OnExitTrigger;
-    // public Action OnPathTargetReached;
-    // public Action<SpeculativeRigidbody, Vector2, IntVector2> OnPostRigidbodyMovement;
-    // public MovementRestrictorDelegate MovementRestrictor;
-    // public Action<BasicBeamController> OnHitByBeam;
 
     body.RegenerateColliders = false; // [NonSerialized]
     body.RecheckTriggers = baseBody.RecheckTriggers;
@@ -306,10 +359,6 @@ internal class PlayerProjectilePooler
     body.SortHash = -1; // [NonSerialized]
     // body.proxyId = -1; // [NonSerialized] //NOTE: set via DeregisterWhenAvailable() below
     // body.PhysicsRegistration = SpeculativeRigidbody.RegistrationState.Deregistered; //NOTE: set via DeregisterWhenAvailable() below
-
-    //TODO: find a way to clear these out
-    // public Func<Vector2, Vector2, Vector2> ReflectProjectilesNormalGenerator;
-    // public Func<Vector2, Vector2, Vector2> ReflectBeamsNormalGenerator;
 
     body.m_cachedIsSimpleProjectile = null;
     body.PathMode = false; // [NonSerialized]
@@ -328,6 +377,24 @@ internal class PlayerProjectilePooler
     (body.m_carriedRigidbodies ??= new()).Clear(); // [NonSerialized]
     body.m_initialized = false;
     PhysicsEngine.Instance.DeregisterWhenAvailable(body);
+
+    //TODO: find a way to clear these out
+    // public Action<SpeculativeRigidbody> OnPreMovement;
+    // public OnPreRigidbodyCollisionDelegate OnPreRigidbodyCollision;
+    // public OnPreTileCollisionDelegate OnPreTileCollision;
+    // public Action<CollisionData> OnCollision;
+    // public OnRigidbodyCollisionDelegate OnRigidbodyCollision;
+    // public OnBeamCollisionDelegate OnBeamCollision;
+    // public OnTileCollisionDelegate OnTileCollision;
+    // public OnTriggerDelegate OnEnterTrigger;
+    // public OnTriggerDelegate OnTriggerCollision;
+    // public OnTriggerExitDelegate OnExitTrigger;
+    // public Action OnPathTargetReached;
+    // public Action<SpeculativeRigidbody, Vector2, IntVector2> OnPostRigidbodyMovement;
+    // public MovementRestrictorDelegate MovementRestrictor;
+    // public Action<BasicBeamController> OnHitByBeam;
+    // public Func<Vector2, Vector2, Vector2> ReflectProjectilesNormalGenerator;
+    // public Func<Vector2, Vector2, Vector2> ReflectBeamsNormalGenerator;
   }
 
   /// <summary>Handle spawning pooled player projectiles</summary>
@@ -365,6 +432,24 @@ internal class PlayerProjectilePooler
   {
     ClearPoolsForNextFloor();
   }
+
+  /// <summary>Deactivate particles systems when the projectile transform is no longer active</summary>
+  [HarmonyPatch(typeof(ParticleKiller), nameof(ParticleKiller.Update))]
+  [HarmonyILManipulator]
+  private static void ParticleKillerUpdatePatchIL(ILContext il)
+  {
+      ILCursor cursor = new ILCursor(il);
+      if (!cursor.TryGotoNext(MoveType.After,
+        instr => instr.MatchLdfld<ParticleKiller>("m_parentTransform"),
+        instr => instr.MatchCall<UnityEngine.Object>("op_Implicit")
+        ))
+        return;
+
+      cursor.Emit(OpCodes.Ldarg_0);
+      cursor.CallPrivate(typeof(PlayerProjectilePooler), nameof(IsPKParentActive));
+  }
+
+  private static bool IsPKParentActive(bool wasActive, ParticleKiller pk) => wasActive && pk.m_parentTransform.gameObject.activeSelf;
 }
 
 internal class PlayerProjectilePoolInfo : MonoBehaviour
