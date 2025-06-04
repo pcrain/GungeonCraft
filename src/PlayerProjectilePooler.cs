@@ -1,7 +1,8 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - fix proxy indexoutofrange exceptions on floor load
+    - fix proxy indexoutofrange exceptions on floor load and reenable pooling across floors
+    - fix effects like hot / irradiated lead persisting after dropping the relevant item
 */
 
 [HarmonyPatch]
@@ -19,6 +20,13 @@ internal class PlayerProjectilePooler
     pooler._prefab = prefab;
   }
 
+  private static void ClearPoolsForNextFloor()
+  {
+    Lazy.DebugLog($"cleaning up projectile pools!");
+    foreach (PlayerProjectilePooler pooler in _Poolers.Values)
+      pooler._despawned.Clear();
+  }
+
   private GameObject Spawn(Vector3 position, Quaternion rotation)
   {
     if (_despawned.Count == 0)
@@ -34,27 +42,42 @@ internal class PlayerProjectilePooler
 
     pooledProjObj.transform.position = position;
     pooledProjObj.transform.rotation = rotation;
+    pooledProjObj.SetActive(true);
 
     Projectile pooledProj = pooledProjObj.GetComponent<Projectile>();
-    if (!pooledProj.specRigidbody)
-      pooledProj.specRigidbody = pooledProjObj.GetComponent<SpeculativeRigidbody>();
+    pooledProj.Owner = GameManager.Instance.PrimaryPlayer; //HACK: for testing purposes, make this more robust later with a patch
     pooledProj.Start();
     pooledProj.OnSpawned();
-    if (pooledProj.specRigidbody)
-    {
-      // System.Console.WriteLine($"  before simple? {pooledProj.specRigidbody.IsSimpleProjectile}");
-      // System.Console.WriteLine($"  before proxy? {pooledProj.specRigidbody.proxyId}");
-      pooledProj.specRigidbody.Start();
-      // System.Console.WriteLine($"  after simple? {pooledProj.specRigidbody.IsSimpleProjectile}");
-      // System.Console.WriteLine($"  after proxy? {pooledProj.specRigidbody.proxyId}");
-    }
+    foreach (Component c in pooledProjObj.GetComponents<Component>())
+      if (c is IPPPComponent ippp)
+        ippp.PPPRespawn();
+    pooledProj.RegenerateCache();
 
-    pooledProjObj.SetActive(true);
     return pooledProjObj;
   }
 
   private void Despawn(GameObject projInstance)
   {
+    // purge unwanted Components
+    // projInstance.SetActive(true); // activate so we can actually find the components
+    foreach (Component c in projInstance.GetComponents<Component>())
+    {
+      if (c is Transform)                continue; // don't tamper with this
+      if (c is PlayerProjectilePoolInfo) continue; // don't tamper with this
+      if (c is Projectile)               continue; // handled later
+      if (c is SpeculativeRigidbody)     continue; // handled later
+      if (c is IPPPComponent ippp) // custom handler
+      {
+        ippp.PPPReset(this._prefab);
+        continue;
+      }
+      // everything else needs to be nuked
+      System.Console.WriteLine($"  destroying {c.GetType()}");
+      UnityEngine.Object.Destroy(c);
+    }
+
+    //TODO: reset sprite settings
+
     // reset default SRB settings
     SpeculativeRigidbody body = projInstance.GetComponent<SpeculativeRigidbody>();
     SpeculativeRigidbody baseBody = this._prefab.GetComponent<SpeculativeRigidbody>();
@@ -68,7 +91,7 @@ internal class PlayerProjectilePooler
     // disable the projectile
     projInstance.transform.parent = null;
     projInstance.SetActive(false);
-    GameObject.DontDestroyOnLoad(projInstance);
+    // GameObject.DontDestroyOnLoad(projInstance); //NOTE: can't figure out how to preserve projectiles across floor loads with proxy tree corruption
 
     // return it to the pool
     // System.Console.WriteLine($"return {this._prefab.name} to pool");
@@ -81,7 +104,7 @@ internal class PlayerProjectilePooler
     proj.SpawnedFromOtherPlayerProjectile = false; // [NonSerialized]
     proj.PlayerProjectileSourceGameTimeslice = -1f; // [NonSerialized]
     proj.m_owner = null; // [NonSerialized]
-    // public BulletScriptSettings BulletScriptSettings;
+    proj.BulletScriptSettings.SetAll(baseProj.BulletScriptSettings);
     proj.damageTypes = baseProj.damageTypes;
     proj.allowSelfShooting = baseProj.allowSelfShooting;
     proj.collidesWithPlayer = baseProj.collidesWithPlayer;
@@ -94,7 +117,15 @@ internal class PlayerProjectilePooler
     proj.shouldFlipHorizontally = baseProj.shouldFlipHorizontally;
     proj.ignoreDamageCaps = baseProj.ignoreDamageCaps;
     // proj.m_cachedInitialDamage = -1f; // [NonSerialized] // NOTE: called in Awake()
-    // public ProjectileData baseData;
+
+    proj.baseData.damage = baseProj.baseData.damage;
+    proj.baseData.speed = baseProj.baseData.speed;
+    proj.baseData.range = baseProj.baseData.range;
+    proj.baseData.force = baseProj.baseData.force;
+    proj.baseData.damping = baseProj.baseData.damping;
+    proj.baseData.UsesCustomAccelerationCurve = baseProj.baseData.UsesCustomAccelerationCurve;
+    proj.baseData.AccelerationCurve = baseProj.baseData.AccelerationCurve;
+    proj.baseData.CustomAccelerationCurveDuration = baseProj.baseData.CustomAccelerationCurveDuration;
 
     proj.AppliesPoison = baseProj.AppliesPoison;
     proj.PoisonApplyChance = baseProj.PoisonApplyChance;
@@ -123,7 +154,8 @@ internal class PlayerProjectilePooler
     proj.CanTransmogrify = baseProj.CanTransmogrify;
     proj.ChanceToTransmogrify = baseProj.ChanceToTransmogrify;
 
-    // public string[] TransmogrifyTargetGuids; // [EnemyIdentifier]
+    if (proj.TransmogrifyTargetGuids != null && proj.TransmogrifyTargetGuids.Length > 0) // [EnemyIdentifier]
+      Array.Resize(ref proj.TransmogrifyTargetGuids, 0);
     proj.BossDamageMultiplier = 1f; // [NonSerialized]
     proj.SpawnedFromNonChallengeItem = false; // [NonSerialized]
     proj.TreatedAsNonProjectileForChallenge = false; // [NonSerialized]
@@ -325,6 +357,14 @@ internal class PlayerProjectilePooler
     __result = true; // return true because we were pooled //TODO: double check this later
     return false;
   }
+
+  /// <summary>Clear pools between floors.</summary>
+  [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadNextLevelAsync_CR))]
+  [HarmonyPrefix]
+  private static void LoadNextLevelAsync_CRPatch(GameManager __instance)
+  {
+    ClearPoolsForNextFloor();
+  }
 }
 
 internal class PlayerProjectilePoolInfo : MonoBehaviour
@@ -339,4 +379,10 @@ internal static class PlayerProjectilePoolerHelpers
     PlayerProjectilePooler.RegisterAsPoolable(p);
     return p;
   }
+}
+
+internal interface IPPPComponent
+{
+  public void PPPReset(GameObject prefab);
+  public void PPPRespawn();
 }

@@ -71,7 +71,7 @@ public class Pincushion : CwaffGun
     }
 }
 
-public class VeryFragileProjectile : MonoBehaviour
+public class VeryFragileProjectile : MonoBehaviour, IPPPComponent
 {
     private static tk2dSpriteAnimator _ImpactVfxAnimator;
 
@@ -87,6 +87,17 @@ public class VeryFragileProjectile : MonoBehaviour
 
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         this._projectile.specRigidbody.OnCollision += this.OnCollision;
+    }
+
+    public void PPPReset(GameObject prefab)
+    {
+        this.breakNextCollision = false;
+        this.phasesThroughBreakables = false;
+    }
+
+    public void PPPRespawn()
+    {
+        // nothing to do when respawning
     }
 
     private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)
@@ -120,4 +131,6 @@ public class VeryFragileProjectile : MonoBehaviour
     {
         return p && p.GetComponent<VeryFragileProjectile>();
     }
+
+
 }

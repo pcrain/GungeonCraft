@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 /// <summary>Extensions for improved projectile handling</summary>
 [HarmonyPatch]
-public class CwaffProjectile : MonoBehaviour
+public class CwaffProjectile : MonoBehaviour, IPPPComponent
 {
     // sane defaults
     public string spawnSound         = null;
@@ -25,12 +25,16 @@ public class CwaffProjectile : MonoBehaviour
 
     private Projectile _projectile;
     private PlayerController _owner;
+    private bool _setupLight;
+    private bool _checkedPooled;
+    private bool _isPooled;
 
     private void Start()
     {
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
 
+        this._projectile.OnDestruction -= OnProjectileDestroy;
         this._projectile.OnDestruction += OnProjectileDestroy;
 
         if (becomeDebris)
@@ -46,7 +50,7 @@ public class CwaffProjectile : MonoBehaviour
         #endregion
 
         #region Light Handling
-        if (this.lightStrength > 0)
+        if (!this._setupLight && this.lightStrength > 0)
         {
           Light light = new GameObject().AddComponent<Light>();
           light.color = this.lightColor;
@@ -59,8 +63,46 @@ public class CwaffProjectile : MonoBehaviour
           light.gameObject.transform.parent = base.transform;
           light.gameObject.transform.localPosition = new Vector3(0, 0, -0.8f);
           light.gameObject.AddComponent<ObjectHeightController>().heightOffGround = -0.8f;
+          this._setupLight = true;
         }
         #endregion
+
+        if (!this._checkedPooled)
+        {
+          this._isPooled = base.gameObject.GetComponent<PlayerProjectilePoolInfo>();
+          this._checkedPooled = true;
+        }
+    }
+
+    public void PPPRespawn()
+    {
+        Start();
+    }
+
+    public void PPPReset(GameObject prefab)
+    {
+      CwaffProjectile baseCp = prefab.GetComponent<CwaffProjectile>();
+      this.spawnSound = baseCp.spawnSound;
+      this.chargeSound = baseCp.chargeSound;
+      this.stopSoundOnDeath = baseCp.stopSoundOnDeath;
+      this.uniqueSounds = baseCp.uniqueSounds;
+      this.shrapnelVFX = baseCp.shrapnelVFX;
+      this.shrapnelCount = baseCp.shrapnelCount;
+      this.shrapnelMinVelocity = baseCp.shrapnelMinVelocity;
+      this.shrapnelMaxVelocity = baseCp.shrapnelMaxVelocity;
+      this.shrapnelLifetime = baseCp.shrapnelLifetime;
+      this.preventOrbiting = baseCp.preventOrbiting;
+      this.firedForFree = baseCp.firedForFree;
+      this.becomeDebris = baseCp.becomeDebris;
+      this.preventSparks = baseCp.preventSparks;
+      this.spinRate = baseCp.spinRate;
+      this.lightStrength = baseCp.lightStrength;
+      this.lightRange = baseCp.lightRange;
+      this.lightColor = baseCp.lightColor;
+
+      this._projectile = null;
+      this._owner = null;
+      //NOTE: not resetting this._setupLight since we don't want to create it twice
     }
 
     private void Update()
@@ -88,7 +130,8 @@ public class CwaffProjectile : MonoBehaviour
           base.gameObject.Play($"{spawnSound}_stop");
       #endregion
 
-      UnityEngine.Object.Destroy(this);  // clean up after ourselves when the projectile is destroyed
+      if (!this._isPooled)
+        UnityEngine.Object.Destroy(this);  // clean up after ourselves when the projectile is destroyed
     }
 
     private void OnDestroy()
