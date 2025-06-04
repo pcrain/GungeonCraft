@@ -29,15 +29,16 @@ public class Pincushion : CwaffGun
           .ClearAllImpactVFX()
           .RemoveAnimator()
           .Attach<VeryFragileProjectile>()
-          .Attach<EasyTrailBullet>(trail => {
-            trail.TrailPos   = trail.transform.position;
-            trail.StartWidth = 0.1f;
-            trail.EndWidth   = 0f;
-            trail.LifeTime   = 0.1f;
-            trail.StartColor = Color.gray;
-            trail.BaseColor  = Color.gray;
-            trail.EndColor   = Color.gray;
-          })
+          // .Attach<EasyTrailBullet>(trail => {
+          //   trail.TrailPos   = trail.transform.position;
+          //   trail.StartWidth = 0.1f;
+          //   trail.EndWidth   = 0f;
+          //   trail.LifeTime   = 0.1f;
+          //   trail.StartColor = Color.gray;
+          //   trail.BaseColor  = Color.gray;
+          //   trail.EndColor   = Color.gray;
+          // })
+          .RegisterAsPoolable()
           ;
 
       _ImpactVFX = VFX.Create("microdust", fps: 30, loops: false);
