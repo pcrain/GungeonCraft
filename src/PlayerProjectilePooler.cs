@@ -38,6 +38,9 @@ internal class PlayerProjectilePooler
     typeof(MeshRenderer),             // required by tk2dSprite
   ];
 
+  /// <summary>List of pooled player projectiles that have been spawned in, but haven't been assigned an owner yet. Need to defer calling Start() until owner has been assigned.</summary>
+  private static readonly List<Projectile> _AwaitingNewOwner = new();
+
   internal static readonly Dictionary<GameObject, PlayerProjectilePooler> _Poolers = new();
 
   internal List<Transform> _prefabTransforms = new();
@@ -82,6 +85,22 @@ internal class PlayerProjectilePooler
   //   System.Console.WriteLine($"doing hit effects");
   // }
 
+  /// <summary>Make sure projectile is set up after its Owner has been assigned</summary>
+  [HarmonyPatch(typeof(Projectile), nameof(Projectile.Owner), MethodType.Setter)]
+  [HarmonyPatch(typeof(Projectile), nameof(Projectile.SetOwnerSafe))]
+  [HarmonyPostfix]
+  private static void OnProjectileOwnerAssignedPatch(Projectile __instance)
+  {
+    if (!_AwaitingNewOwner.Remove(__instance))
+      return;
+
+    __instance.Start(); //NOTE: this requires Owner to be set, necessitating this patch in the first place
+    __instance.OnSpawned();
+    foreach (Component c in __instance.gameObject.GetComponents<Component>())
+      if (c is IPPPComponent ippp)
+        ippp.PPPRespawn();
+  }
+
   private GameObject Spawn(Vector3 position, Quaternion rotation)
   {
     // check if we need to instantiate a brand new projectile
@@ -106,14 +125,9 @@ internal class PlayerProjectilePooler
     pooledProjObj.SetActive(true);
 
     Projectile pooledProj = pooledProjObj.GetComponent<Projectile>();
-    pooledProj.Owner = GameManager.Instance.PrimaryPlayer; //HACK: for testing purposes, make this more robust later with a patch
     pooledProj.RegenerateCache();
     pooledProj.Awake(); //NOTE: needs to happen after RegenerateCache() so sprite is properly set up -> also resets SRB delegates
-    pooledProj.Start(); //NOTE: this requires Owner to be set, necessitating the hack above for now
-    pooledProj.OnSpawned();
-    foreach (Component c in pooledProjObj.GetComponents<Component>())
-      if (c is IPPPComponent ippp)
-        ippp.PPPRespawn();
+    _AwaitingNewOwner.Add(pooledProj); // need to wait for the Owner to be assigned before finishing the respawning process
 
     return pooledProjObj;
   }
