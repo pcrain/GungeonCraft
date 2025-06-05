@@ -433,8 +433,7 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
 
     private static void Return(GameObject trail)
     {
-      CustomTrailRenderer tr = trail.GetComponent<CustomTrailRenderer>();
-      tr.Clear();
+      trail.GetComponent<CustomTrailRenderer>().Clear();
 
       trail.transform.parent = null;
       GameObject.DontDestroyOnLoad(trail);
@@ -523,6 +522,7 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
     {
         if (tro)
             Return(tro);
+        tro = null;
     }
 
     public void PPPRespawn()

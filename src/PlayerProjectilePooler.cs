@@ -5,10 +5,42 @@ namespace CwaffingTheGungy;
     - figure out how to re-add removed transforms / components
 */
 
+internal class PlayerProjectilePoolInfo : MonoBehaviour
+{
+  public PlayerProjectilePooler pooler = null;
+  public List<Transform> startingTransforms = new();
+
+  internal void Register(PlayerProjectilePooler pooler)
+  {
+    this.pooler = pooler;
+    RegisterStartingTransforms(base.gameObject.transform);
+  }
+
+  private void RegisterStartingTransforms(Transform root)
+  {
+      this.startingTransforms.Add(root);
+      // System.Console.WriteLine($"  we have {root.name} vs {this.pooler._prefabTransforms[this.startingTransforms.Count - 1].name}");
+      foreach (Transform child in root)
+        RegisterStartingTransforms(child);
+  }
+}
+
 [HarmonyPatch]
 internal class PlayerProjectilePooler
 {
+  private static readonly List<Type> _NoPurgeWhitelist = [
+    typeof(Transform),                // special
+    typeof(PlayerProjectilePoolInfo), // special
+    typeof(Projectile),               // unique handling
+    typeof(SpeculativeRigidbody),     // unique handling
+    typeof(tk2dSprite),               // unique handling
+    typeof(MeshFilter),               // required by tk2dSprite
+    typeof(MeshRenderer),             // required by tk2dSprite
+  ];
+
   internal static readonly Dictionary<GameObject, PlayerProjectilePooler> _Poolers = new();
+
+  internal List<Transform> _prefabTransforms = new();
 
   private GameObject _prefab;
   private string _name;
@@ -16,12 +48,20 @@ internal class PlayerProjectilePooler
   private LinkedList<GameObject> _spawned = new();
   private HashSet<Transform> _startingChildren = new();
 
+  private void RegisterPrefabTransforms(Transform root)
+  {
+    this._prefabTransforms.Add(root);
+    foreach (Transform child in root)
+      RegisterPrefabTransforms(child);
+  }
+
   internal static void RegisterAsPoolable(Projectile p)
   {
     GameObject prefab = p.gameObject;
     PlayerProjectilePooler pooler = PlayerProjectilePooler._Poolers[prefab] = new();
     pooler._prefab = prefab;
     pooler._name = prefab.name;
+    pooler.RegisterPrefabTransforms(prefab.transform);
   }
 
   private static void ClearPoolsForNextFloor()
@@ -35,30 +75,6 @@ internal class PlayerProjectilePooler
     }
   }
 
-  private void RegisterStartingTransforms(Transform t)
-  {
-      for (int i = t.childCount - 1; i >= 0; --i)
-      {
-        Transform child = t.GetChild(i);
-        RegisterStartingTransforms(child);
-        this._startingChildren.Add(child);
-      }
-  }
-
-  private void PurgeNonStartingTransforms(Transform t)
-  {
-      for (int i = t.childCount - 1; i >= 0; --i)
-      {
-        Transform child = t.GetChild(i);
-        PurgeNonStartingTransforms(child);
-        if (!this._startingChildren.Contains(child))
-        {
-          System.Console.WriteLine($"removing transform {child.gameObject.name}");
-          UnityEngine.Object.Destroy(child.gameObject);
-        }
-      }
-  }
-
   // [HarmonyPatch(typeof(Projectile), nameof(Projectile.HandleHitEffectsTileMap))]
   // [HarmonyPrefix]
   // private static void DebugPatch(Projectile __instance)
@@ -68,13 +84,13 @@ internal class PlayerProjectilePooler
 
   private GameObject Spawn(Vector3 position, Quaternion rotation)
   {
+    // check if we need to instantiate a brand new projectile
     if (this._despawned.Count == 0)
     {
       GameObject newInstance = UnityEngine.Object.Instantiate(this._prefab, position, rotation);
-      newInstance.AddComponent<PlayerProjectilePoolInfo>().pooler = this;
-      RegisterStartingTransforms(newInstance.transform);
+      newInstance.AddComponent<PlayerProjectilePoolInfo>().Register(this);
       this._spawned.AddLast(new LinkedListNode<GameObject>(newInstance));
-      // System.Console.WriteLine($"spawned {this._spawned.Count} of {this._name}");
+      // Lazy.DebugLog($"spawned new {this._name}, {this._spawned.Count} total");
       return newInstance;
     }
 
@@ -93,7 +109,7 @@ internal class PlayerProjectilePooler
     pooledProj.Owner = GameManager.Instance.PrimaryPlayer; //HACK: for testing purposes, make this more robust later with a patch
     pooledProj.RegenerateCache();
     pooledProj.Awake(); //NOTE: needs to happen after RegenerateCache() so sprite is properly set up -> also resets SRB delegates
-    pooledProj.Start();
+    pooledProj.Start(); //NOTE: this requires Owner to be set, necessitating the hack above for now
     pooledProj.OnSpawned();
     foreach (Component c in pooledProjObj.GetComponents<Component>())
       if (c is IPPPComponent ippp)
@@ -102,29 +118,48 @@ internal class PlayerProjectilePooler
     return pooledProjObj;
   }
 
-  private void Despawn(GameObject projInstance)
+  private void Sanitize(Transform root, PlayerProjectilePoolInfo pppi)
   {
-    // purge unwanted Components
-    // projInstance.SetActive(true); // activate so we can actually find the components
-    foreach (Component c in projInstance.GetComponents<Component>())
+    // purge unwanted Transforms
+    int ti = pppi.startingTransforms.IndexOf(root);
+    if (ti == -1)
     {
-      if (c is Transform)                continue; // don't tamper with this
-      if (c is PlayerProjectilePoolInfo) continue; // don't tamper with this
-      if (c is Projectile)               continue; // handled later
-      if (c is SpeculativeRigidbody)     continue; // handled later
-      if (c is IPPPComponent ippp) // custom handler
+      // Lazy.DebugLog($"  destroying transform {root.gameObject.name}");
+      UnityEngine.Object.Destroy(root.gameObject);
+      return;
+    }
+
+    // get our corresponding prefab object
+    Transform baseT = this._prefabTransforms[ti];
+    // Lazy.DebugLog($"  resetting {root.gameObject.name} to {baseT.gameObject.name}");
+
+    // purge unwanted Components
+    foreach (Component c in root.gameObject.GetComponents<Component>())
+    {
+      if (_NoPurgeWhitelist.Contains(c.GetType()))
+        continue;
+      if (c is IPPPComponent ippp)
       {
-        ippp.PPPReset(this._prefab);
+        ippp.PPPReset(baseT.gameObject);
         continue;
       }
       // everything else needs to be nuked
-      System.Console.WriteLine($"  destroying {c.GetType()}");
+      // Lazy.DebugLog($"  destroying component {c.GetType()}");
       UnityEngine.Object.Destroy(c);
     }
 
-    // purge unwanted child objects
-    //NOTE: done after IPPPComponent checks to give them a chance to clean these up themselves
-    PurgeNonStartingTransforms(projInstance.transform);
+    // recurse
+    foreach (Transform child in root)
+      Sanitize(child, pppi);
+  }
+
+  private void Despawn(GameObject projInstance)
+  {
+    // get PlayerProjectilePoolInfo
+    PlayerProjectilePoolInfo pppi = projInstance.GetComponent<PlayerProjectilePoolInfo>();
+
+    // purge unwanted child transforms and components
+    Sanitize(projInstance.transform, pppi);
 
     // reset default SRB settings
     SpeculativeRigidbody body = projInstance.GetComponent<SpeculativeRigidbody>();
@@ -135,6 +170,8 @@ internal class PlayerProjectilePooler
     Projectile proj = projInstance.GetComponent<Projectile>();
     Projectile baseProj = this._prefab.GetComponent<Projectile>();
     ResetProjectile(proj, baseProj);
+    StaticReferenceManager.RemoveProjectile(proj);
+    //TODO: look into Cleanup() method for basegame despawning (specifically ReturnFromBlackBullet() and baseData resetting)
 
     //reset to default sprite settings
     tk2dBaseSprite sprite = proj.sprite;
@@ -144,7 +181,7 @@ internal class PlayerProjectilePooler
     // disable the projectile
     projInstance.transform.parent = null;
     projInstance.SetActive(false);
-    // GameObject.DontDestroyOnLoad(projInstance); //NOTE: can't figure out how to preserve projectiles across floor loads with proxy tree corruption
+    // GameObject.DontDestroyOnLoad(projInstance); //WARN: can't figure out how to preserve projectiles across floor loads with proxy tree corruption
 
     // return it to the pool
     if (this._spawned.Count == 0) //TODO: figure out how this happens
@@ -163,6 +200,7 @@ internal class PlayerProjectilePooler
     sprite.OverrideMaterialMode = baseSprite.OverrideMaterialMode;
     sprite.renderer.material.shader = baseSprite.renderer.material.shader;
     sprite.renderer.material.CopyPropertiesFromMaterial(baseSprite.renderer.material);
+    sprite.SetSprite(baseSprite.collection, baseSprite.spriteId);
     //TODO: reset animator as necessary
   }
 
@@ -450,13 +488,9 @@ internal class PlayerProjectilePooler
   private static bool IsPKParentActive(bool wasActive, ParticleKiller pk) => wasActive && pk.m_parentTransform.gameObject.activeSelf;
 }
 
-internal class PlayerProjectilePoolInfo : MonoBehaviour
-{
-  public PlayerProjectilePooler pooler = null;
-}
-
 internal static class PlayerProjectilePoolerHelpers
 {
+  /// <summary>Tell the PlayerProjectilePooler that this projectile is poolable.</summary>
   public static Projectile RegisterAsPoolable(this Projectile p)
   {
     PlayerProjectilePooler.RegisterAsPoolable(p);
@@ -466,6 +500,8 @@ internal static class PlayerProjectilePoolerHelpers
 
 internal interface IPPPComponent
 {
+  // called upon despawning a pooled player projectile
   public void PPPReset(GameObject prefab);
+  // called upon respawning a pooled player projectile
   public void PPPRespawn();
 }

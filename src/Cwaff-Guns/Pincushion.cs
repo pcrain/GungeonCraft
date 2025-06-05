@@ -30,7 +30,6 @@ public class Pincushion : CwaffGun
           .RemoveAnimator()
           .Attach<VeryFragileProjectile>()
           .Attach<EasyTrailBullet>(trail => {
-            trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.1f;
             trail.EndWidth   = 0f;
             trail.LifeTime   = 0.1f;
