@@ -3481,8 +3481,8 @@ public static class Extensions
     tk2dSpriteAnimator animator = spriteObject.GetComponent<tk2dSpriteAnimator>();
     tk2dSpriteAnimationFrame frame = animator.DefaultClip.frames[0];
     sprite.SetSprite(frame.spriteCollection, frame.spriteId);
-    UnityEngine.Object.Destroy(animator);
-    UnityEngine.Object.Destroy(spriteObject.GetComponent<tk2dSpriteAnimation>());
+    UnityEngine.Object.DestroyImmediate(animator);
+    UnityEngine.Object.DestroyImmediate(spriteObject.GetComponent<tk2dSpriteAnimation>());
     return proj;
   }
 }

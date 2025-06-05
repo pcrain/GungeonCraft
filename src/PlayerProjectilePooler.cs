@@ -2,18 +2,24 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - fix proxy indexoutofrange exceptions on floor load and reenable pooling across floors
-    - figure out how to re-add removed transforms / components
+    - if a projectile is spawned when loading floors and EasyTrailBullet is still an active component, its CustomTrailRenderer will be destroyed
+    - properly reset sprites / materials / animators
 */
 
 internal class PlayerProjectilePoolInfo : MonoBehaviour
 {
   public PlayerProjectilePooler pooler = null;
+  public LinkedListNode<GameObject> node = null;
   public List<Transform> startingTransforms = new();
+  public bool spawned = false;
 
-  internal void Register(PlayerProjectilePooler pooler)
+  internal LinkedListNode<GameObject> Register(PlayerProjectilePooler pooler)
   {
     this.pooler = pooler;
+    this.node = new LinkedListNode<GameObject>(base.gameObject);
     RegisterStartingTransforms(base.gameObject.transform);
+    this.spawned = true;
+    return this.node;
   }
 
   private void RegisterStartingTransforms(Transform root)
@@ -28,61 +34,107 @@ internal class PlayerProjectilePoolInfo : MonoBehaviour
 [HarmonyPatch]
 internal class PlayerProjectilePooler
 {
-  private static readonly List<Type> _NoPurgeWhitelist = [
+  internal static readonly List<Type> _NoPurgeWhitelist = [
     typeof(Transform),                // special
     typeof(PlayerProjectilePoolInfo), // special
     typeof(Projectile),               // unique handling
     typeof(SpeculativeRigidbody),     // unique handling
     typeof(tk2dSprite),               // unique handling
-    typeof(MeshFilter),               // required by tk2dSprite
-    typeof(MeshRenderer),             // required by tk2dSprite
+    typeof(MeshFilter),               // required and handled by tk2dSprite
+    typeof(MeshRenderer),             // required and handled by tk2dSprite
   ];
 
   /// <summary>List of pooled player projectiles that have been spawned in, but haven't been assigned an owner yet. Need to defer calling Start() until owner has been assigned.</summary>
   private static readonly List<Projectile> _AwaitingNewOwner = new();
+  private static bool _DoingFloorCleanup = false;
 
+  /// <summary>Map of all poolable projectile prefabs to their pooler.</summary>
   internal static readonly Dictionary<GameObject, PlayerProjectilePooler> _Poolers = new();
-
-  internal List<Transform> _prefabTransforms = new();
 
   private GameObject _prefab;
   private string _name;
+  private List<Transform> _prefabTransforms = new();
   private LinkedList<GameObject> _despawned = new();
   private LinkedList<GameObject> _spawned = new();
-  private HashSet<Transform> _startingChildren = new();
-
-  private void RegisterPrefabTransforms(Transform root)
-  {
-    this._prefabTransforms.Add(root);
-    foreach (Transform child in root)
-      RegisterPrefabTransforms(child);
-  }
 
   internal static void RegisterAsPoolable(Projectile p)
   {
     GameObject prefab = p.gameObject;
-    PlayerProjectilePooler pooler = PlayerProjectilePooler._Poolers[prefab] = new();
+    PlayerProjectilePooler pooler = new();
     pooler._prefab = prefab;
     pooler._name = prefab.name;
-    pooler.RegisterPrefabTransforms(prefab.transform);
+    if (pooler.RegisterPrefabTransforms(prefab.transform))
+      PlayerProjectilePooler._Poolers[prefab] = pooler;
+  }
+
+  /// <summary>Returns false if this projectile cannot be pooled.</summary>
+  private bool RegisterPrefabTransforms(Transform root)
+  {
+    this._prefabTransforms.Add(root);
+    foreach (Component c in root.gameObject.GetComponents<Component>())
+    {
+      if (c is IPPPComponent || _NoPurgeWhitelist.Contains(c.GetType()))
+        continue;
+      Lazy.DebugWarn($"Attempted to register poolable projectile with non-poolable component {c.GetType().Name}.");
+      return false;
+    }
+    foreach (Transform child in root)
+      if (!RegisterPrefabTransforms(child))
+        return false;
+    return true;
   }
 
   private static void ClearPoolsForNextFloor()
   {
-    Lazy.DebugLog($"cleaning up projectile pools!");
-    foreach (PlayerProjectilePooler pooler in _Poolers.Values)
+    try
     {
-      Lazy.DebugLog($"  {pooler._name} pool had {pooler._spawned.Count} spawned and {pooler._despawned.Count} despawned projectiles");
-      pooler._despawned.Clear();
-      pooler._spawned.Clear();
+      _DoingFloorCleanup = true;
+      Lazy.DebugLog($"cleaning up projectile pools!");
+      foreach (PlayerProjectilePooler pooler in _Poolers.Values)
+      {
+        Lazy.DebugLog($"  {pooler._name} pool has {pooler._spawned.Count} spawned and {pooler._despawned.Count} despawned projectiles");
+        while (pooler._spawned.Count > 0)
+        {
+          GameObject g = pooler._spawned.Last.Value;
+          pooler.Despawn(g); // critical to make sure poolable components clean up their transforms properly (e.g., EasyTrailBullet returning its CustomTrailRenderer)
+          UnityEngine.Object.Destroy(g);
+        }
+        while (pooler._despawned.Count > 0)
+        {
+          GameObject g = pooler._despawned.Last.Value;
+          pooler._despawned.RemoveLast();
+          UnityEngine.Object.Destroy(g);
+        }
+      }
+    }
+    finally
+    {
+      _DoingFloorCleanup = false;
     }
   }
 
-  // [HarmonyPatch(typeof(Projectile), nameof(Projectile.HandleHitEffectsTileMap))]
+  #if DEBUG
+  // [HarmonyPatch(typeof(UnityEngine.Object), nameof(UnityEngine.Object.Destroy), typeof(UnityEngine.Object))]
+  // [HarmonyPrefix]
+  // private static void DebugPatch(UnityEngine.Object obj)
+  // {
+  //   if (!_DoingFloorCleanup && obj is GameObject go && go.GetComponent<PlayerProjectilePoolInfo>())
+  //   {
+  //     System.Console.WriteLine($"destroying our projectile, that doesn't seem good");
+  //     UnityEngine.Debug.LogError($"destroying our projectile, that doesn't seem good");
+  //   }
+  // }
+  #endif
+
+  // [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnDestroy))]
   // [HarmonyPrefix]
   // private static void DebugPatch(Projectile __instance)
   // {
-  //   System.Console.WriteLine($"doing hit effects");
+  //   if (__instance.gameObject.GetComponent<PlayerProjectilePoolInfo>())
+  //   {
+  //     System.Console.WriteLine($"destroying our projectile, that doesn't seem good");
+  //     UnityEngine.Debug.LogError($"destroying our projectile, that doesn't seem good");
+  //   }
   // }
 
   /// <summary>Make sure projectile is set up after its Owner has been assigned</summary>
@@ -107,8 +159,7 @@ internal class PlayerProjectilePooler
     if (this._despawned.Count == 0)
     {
       GameObject newInstance = UnityEngine.Object.Instantiate(this._prefab, position, rotation);
-      newInstance.AddComponent<PlayerProjectilePoolInfo>().Register(this);
-      this._spawned.AddLast(new LinkedListNode<GameObject>(newInstance));
+      this._spawned.AddLast(newInstance.AddComponent<PlayerProjectilePoolInfo>().Register(this));
       // Lazy.DebugLog($"spawned new {this._name}, {this._spawned.Count} total");
       return newInstance;
     }
@@ -116,10 +167,9 @@ internal class PlayerProjectilePooler
     // System.Console.WriteLine($"spawning {this._prefab.name} from pool");
     LinkedListNode<GameObject> pooledProjNode = this._despawned.Last;
     this._despawned.RemoveLast();
-    GameObject pooledProjObj = pooledProjNode.Value;
-    pooledProjNode.Value = null;
     this._spawned.AddLast(pooledProjNode);
 
+    GameObject pooledProjObj = pooledProjNode.Value;
     pooledProjObj.transform.position = position;
     pooledProjObj.transform.rotation = rotation;
     pooledProjObj.SetActive(true);
@@ -129,10 +179,17 @@ internal class PlayerProjectilePooler
     pooledProj.Awake(); //NOTE: needs to happen after RegenerateCache() so sprite is properly set up -> also resets SRB delegates
     _AwaitingNewOwner.Add(pooledProj); // need to wait for the Owner to be assigned before finishing the respawning process
 
+    PlayerProjectilePoolInfo pppi = pooledProjObj.GetComponent<PlayerProjectilePoolInfo>();
+    if (pppi.node != pooledProjNode)
+      System.Console.WriteLine($"node mismatch D: D: D:");
+    if (pppi.spawned)
+      System.Console.WriteLine($"spawning in a projectile that's already spawned D: D: D:");
+    pppi.spawned = true;
+
     return pooledProjObj;
   }
 
-  private void Sanitize(Transform root, PlayerProjectilePoolInfo pppi)
+  private void Sanitize(Transform root, PlayerProjectilePoolInfo pppi, ref int savedTransforms)
   {
     // purge unwanted Transforms
     int ti = pppi.startingTransforms.IndexOf(root);
@@ -162,18 +219,36 @@ internal class PlayerProjectilePooler
       UnityEngine.Object.Destroy(c);
     }
 
+    // count our saved transforms
+    ++savedTransforms;
+
     // recurse
     foreach (Transform child in root)
-      Sanitize(child, pppi);
+      Sanitize(child, pppi, ref savedTransforms);
   }
 
   private void Despawn(GameObject projInstance)
   {
-    // get PlayerProjectilePoolInfo
+    // get PlayerProjectilePoolInfo and sanity check it's actually spawned
     PlayerProjectilePoolInfo pppi = projInstance.GetComponent<PlayerProjectilePoolInfo>();
+    if (!pppi.spawned)
+    {
+      System.Console.WriteLine($"trying to despawn a projectile that's already despawned!");
+      return;
+    }
+    pppi.spawned = false;
 
     // purge unwanted child transforms and components
-    Sanitize(projInstance.transform, pppi);
+    int savedTransforms = 0;
+    Sanitize(projInstance.transform, pppi, ref savedTransforms);
+
+    // sanity check we have the same transforms we started with. if not, there's big issues
+    if (savedTransforms != pppi.startingTransforms.Count)
+    {
+      Lazy.DebugWarn("at least one starting transform destroyed from projectile, giving up on pooling");
+      UnityEngine.Object.Destroy(projInstance);
+      return;
+    }
 
     // reset default SRB settings
     SpeculativeRigidbody body = projInstance.GetComponent<SpeculativeRigidbody>();
@@ -195,18 +270,20 @@ internal class PlayerProjectilePooler
     // disable the projectile
     projInstance.transform.parent = null;
     projInstance.SetActive(false);
-    // GameObject.DontDestroyOnLoad(projInstance); //WARN: can't figure out how to preserve projectiles across floor loads with proxy tree corruption
+    // GameObject.DontDestroyOnLoad(projInstance); //WARN: can't figure out how to preserve projectiles across floor loads without proxy tree corruption
 
     // return it to the pool
-    if (this._spawned.Count == 0) //TODO: figure out how this happens
+    if (pppi.node == null)
+      System.Console.WriteLine($"spawn node null!");
+    else if (pppi.node.List == null)
+      System.Console.WriteLine($"spawn node list is null!");
+    else if (pppi.node.List != this._spawned)
+      System.Console.WriteLine($"spawn node not in spawned list!");
+    else
     {
-      // System.Console.WriteLine($"how did this happen o.o");
-      this._spawned.AddLast(new LinkedListNode<GameObject>(null));
+      this._spawned.Remove(pppi.node);
+      this._despawned.AddLast(pppi.node);
     }
-    LinkedListNode<GameObject> pooledProjNode = this._spawned.Last;
-    this._spawned.RemoveLast();
-    pooledProjNode.Value = projInstance;
-    this._despawned.AddLast(pooledProjNode);
   }
 
   private static void ResetSprite(tk2dBaseSprite sprite, tk2dBaseSprite baseSprite)
@@ -463,9 +540,10 @@ internal class PlayerProjectilePooler
   }
 
   /// <summary>Handle cleaning up pooled player projectiles.</summary>
+  [HarmonyPatch(typeof(SpawnManager), nameof(SpawnManager.Despawn), typeof(GameObject))]
   [HarmonyPatch(typeof(SpawnManager), nameof(SpawnManager.Despawn), typeof(GameObject), typeof(PathologicalGames.PrefabPool))]
   [HarmonyPrefix]
-  private static bool SpawnManagerDespawnPatch(GameObject instance, PathologicalGames.PrefabPool prefabPool, ref bool __result)
+  private static bool SpawnManagerDespawnPatch(GameObject instance, ref bool __result)
   {
     if (instance.GetComponent<PlayerProjectilePoolInfo>() is not PlayerProjectilePoolInfo pppInfo)
       return true; // call the original method
