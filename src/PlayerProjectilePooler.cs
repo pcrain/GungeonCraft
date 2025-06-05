@@ -1,9 +1,8 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - fix proxy indexoutofrange exceptions on floor load and reenable pooling across floors
-    - if a projectile is spawned when loading floors and EasyTrailBullet is still an active component, its CustomTrailRenderer will be destroyed
-    - properly reset sprites / materials / animators
+    - properly reset animators
+    - [maybe] fix proxy indexoutofrange exceptions on floor load and reenable pooling across floors
 */
 
 internal class PlayerProjectilePoolInfo : MonoBehaviour
@@ -93,17 +92,12 @@ internal class PlayerProjectilePooler
       foreach (PlayerProjectilePooler pooler in _Poolers.Values)
       {
         Lazy.DebugLog($"  {pooler._name} pool has {pooler._spawned.Count} spawned and {pooler._despawned.Count} despawned projectiles");
-        while (pooler._spawned.Count > 0)
-        {
-          GameObject g = pooler._spawned.Last.Value;
-          pooler.Despawn(g); // critical to make sure poolable components clean up their transforms properly (e.g., EasyTrailBullet returning its CustomTrailRenderer)
-          UnityEngine.Object.Destroy(g);
-        }
+        while (pooler._spawned.Count > 0) // critical to make sure poolable components clean up their transforms properly (e.g., EasyTrailBullet returning its CustomTrailRenderer)
+          pooler.Despawn(pooler._spawned.Last.Value, destroy: true);
         while (pooler._despawned.Count > 0)
         {
-          GameObject g = pooler._despawned.Last.Value;
+          UnityEngine.Object.Destroy(pooler._despawned.Last.Value);
           pooler._despawned.RemoveLast();
-          UnityEngine.Object.Destroy(g);
         }
       }
     }
@@ -113,6 +107,7 @@ internal class PlayerProjectilePooler
     }
   }
 
+  #region Debug patches
   #if DEBUG
   // [HarmonyPatch(typeof(UnityEngine.Object), nameof(UnityEngine.Object.Destroy), typeof(UnityEngine.Object))]
   // [HarmonyPrefix]
@@ -124,7 +119,6 @@ internal class PlayerProjectilePooler
   //     UnityEngine.Debug.LogError($"destroying our projectile, that doesn't seem good");
   //   }
   // }
-  #endif
 
   // [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnDestroy))]
   // [HarmonyPrefix]
@@ -136,6 +130,8 @@ internal class PlayerProjectilePooler
   //     UnityEngine.Debug.LogError($"destroying our projectile, that doesn't seem good");
   //   }
   // }
+  #endif
+  #endregion
 
   /// <summary>Make sure projectile is set up after its Owner has been assigned</summary>
   [HarmonyPatch(typeof(Projectile), nameof(Projectile.Owner), MethodType.Setter)]
@@ -164,7 +160,6 @@ internal class PlayerProjectilePooler
       return newInstance;
     }
 
-    // System.Console.WriteLine($"spawning {this._prefab.name} from pool");
     LinkedListNode<GameObject> pooledProjNode = this._despawned.Last;
     this._despawned.RemoveLast();
     this._spawned.AddLast(pooledProjNode);
@@ -180,10 +175,6 @@ internal class PlayerProjectilePooler
     _AwaitingNewOwner.Add(pooledProj); // need to wait for the Owner to be assigned before finishing the respawning process
 
     PlayerProjectilePoolInfo pppi = pooledProjObj.GetComponent<PlayerProjectilePoolInfo>();
-    if (pppi.node != pooledProjNode)
-      System.Console.WriteLine($"node mismatch D: D: D:");
-    if (pppi.spawned)
-      System.Console.WriteLine($"spawning in a projectile that's already spawned D: D: D:");
     pppi.spawned = true;
 
     return pooledProjObj;
@@ -191,7 +182,7 @@ internal class PlayerProjectilePooler
 
   private void Sanitize(Transform root, PlayerProjectilePoolInfo pppi, ref int savedTransforms)
   {
-    // purge unwanted Transforms
+    // purge unwanted Transforms we didn't spawn with
     int ti = pppi.startingTransforms.IndexOf(root);
     if (ti == -1)
     {
@@ -200,9 +191,8 @@ internal class PlayerProjectilePooler
       return;
     }
 
-    // get our corresponding prefab object
+    // get our corresponding prefab transform
     Transform baseT = this._prefabTransforms[ti];
-    // Lazy.DebugLog($"  resetting {root.gameObject.name} to {baseT.gameObject.name}");
 
     // purge unwanted Components
     foreach (Component c in root.gameObject.GetComponents<Component>())
@@ -214,28 +204,20 @@ internal class PlayerProjectilePooler
         ippp.PPPReset(baseT.gameObject);
         continue;
       }
-      // everything else needs to be nuked
       // Lazy.DebugLog($"  destroying component {c.GetType()}");
-      UnityEngine.Object.Destroy(c);
+      UnityEngine.Object.Destroy(c); // everything else needs to be nuked
     }
 
-    // count our saved transforms
+    // count our saved transforms and recurse
     ++savedTransforms;
-
-    // recurse
     foreach (Transform child in root)
       Sanitize(child, pppi, ref savedTransforms);
   }
 
-  private void Despawn(GameObject projInstance)
+  private void Despawn(GameObject projInstance, bool destroy = false)
   {
     // get PlayerProjectilePoolInfo and sanity check it's actually spawned
     PlayerProjectilePoolInfo pppi = projInstance.GetComponent<PlayerProjectilePoolInfo>();
-    if (!pppi.spawned)
-    {
-      System.Console.WriteLine($"trying to despawn a projectile that's already despawned!");
-      return;
-    }
     pppi.spawned = false;
 
     // purge unwanted child transforms and components
@@ -272,18 +254,12 @@ internal class PlayerProjectilePooler
     projInstance.SetActive(false);
     // GameObject.DontDestroyOnLoad(projInstance); //WARN: can't figure out how to preserve projectiles across floor loads without proxy tree corruption
 
-    // return it to the pool
-    if (pppi.node == null)
-      System.Console.WriteLine($"spawn node null!");
-    else if (pppi.node.List == null)
-      System.Console.WriteLine($"spawn node list is null!");
-    else if (pppi.node.List != this._spawned)
-      System.Console.WriteLine($"spawn node not in spawned list!");
-    else
-    {
-      this._spawned.Remove(pppi.node);
+    // return it to the pool or destroy it as necessary
+    this._spawned.Remove(pppi.node);
+    if (!destroy)
       this._despawned.AddLast(pppi.node);
-    }
+    else
+      UnityEngine.Object.Destroy(projInstance);
   }
 
   private static void ResetSprite(tk2dBaseSprite sprite, tk2dBaseSprite baseSprite)
@@ -504,7 +480,6 @@ internal class PlayerProjectilePooler
     body.m_initialized = false;
     PhysicsEngine.Instance.DeregisterWhenAvailable(body);
 
-    //TODO: having trouble resetting all of these properly
     body.OnPreMovement = null;
     body.OnPreRigidbodyCollision = null;
     body.OnPreTileCollision = null;

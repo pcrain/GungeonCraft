@@ -63,7 +63,7 @@ public class PhaseThroughInnerWallsBehavior : MonoBehaviour
         if (this._projectile.transform.position.GetAbsoluteRoom() != this._startingRoom)
             return; // left our original room
         if (!this._startingRoom.GetBoundingRect().Inset(_INSET).Contains(this._projectile.transform.position))
-            return; // outside the room
+            return; // outside the room //REFACTOR: probably better ways to do this
 
         PhysicsEngine.SkipCollision = true;
         if (this._phased)
