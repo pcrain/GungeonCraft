@@ -22,6 +22,9 @@ public class Pincushion : CwaffGun
             shootFps: 30, reloadFps: 24)
           .SetReloadAudio("pincushion_reload_start_sound", 0)
           .SetReloadAudio("pincushion_reload_sound", 8, 13, 18, 23, 28, 35)
+      #if DEBUG
+          // .Attach<DebugAmmoDisplay>()
+      #endif
           .InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
             damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, preventSparks: true, damagesWalls: false,
             anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS, customClip: true, overrideColliderPixelSizes: new IntVector2(1, 1)/*, glowAmount: 10f*/))
@@ -132,6 +135,68 @@ public class VeryFragileProjectile : MonoBehaviour, IPPPComponent
     {
         return p && p.GetComponent<VeryFragileProjectile>();
     }
-
-
 }
+
+#if DEBUG
+public class DebugAmmoDisplay : CustomAmmoDisplay
+{
+    private static StringBuilder _SB = new StringBuilder("", 1000);
+    private static int _TotalProjectiles = 0;
+    private static int _DroppedFrames = 0;
+    private static int _LagSpikes = 0;
+    private static float _LastFrameTime = 0;
+
+    private PlayerController _owner;
+
+    private void Start()
+    {
+        this._owner = base.GetComponent<Gun>().CurrentOwner as PlayerController;
+
+        _TotalProjectiles = 0;
+        _DroppedFrames = 0;
+        _LagSpikes = 0;
+        _LastFrameTime = Time.realtimeSinceStartup;
+        StaticReferenceManager.ProjectileAdded -= OnProjectileAdded;
+        StaticReferenceManager.ProjectileAdded += OnProjectileAdded;
+    }
+
+    private static void OnProjectileAdded(Projectile projectile)
+    {
+        ++_TotalProjectiles;
+    }
+
+    public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+    {
+        if (BraveTime.DeltaTime == 0f)
+            return true;
+
+        _SB.Length = 0;
+
+        _SB.Append(_TotalProjectiles);
+        _SB.Append("  Total Projectiles");
+        _SB.Append("\n");
+
+        _SB.Append(StaticReferenceManager.AllProjectiles.Count);
+        _SB.Append(" Active Projectiles");
+        _SB.Append("\n");
+
+        float dtime = BraveTime.DeltaTime;
+        if (BraveTime.DeltaTime > 1f/59f)
+            ++_DroppedFrames;
+        _SB.Append(_DroppedFrames);
+        _SB.Append(" Frames Dropped");
+        _SB.Append("\n");
+
+        float now = Time.realtimeSinceStartup;
+        if ((now - _LastFrameTime) > 1f/10f)
+            ++_LagSpikes;
+        _LastFrameTime = now;
+        _SB.Append(_LagSpikes);
+        _SB.Append(" Lag Spikes");
+        _SB.Append("\n");
+        _SB.Append(this._owner.VanillaAmmoDisplay());
+        uic.GunAmmoCountLabel.Text = _SB.ToString();
+        return true;
+    }
+}
+#endif

@@ -148,12 +148,13 @@ internal class PlayerProjectilePooler
   //   }
   // }
 
-  // [HarmonyPatch(typeof(UnityEngine.Object), nameof(UnityEngine.Object.name), MethodType.Getter)]
+  // [HarmonyPatch(typeof(BitArray2D), MethodType.Constructor, typeof(bool))]
   // [HarmonyPrefix]
   // private static void DebugPatch()
   // {
-  //   System.Console.WriteLine($"called the thing");
-  //   UnityEngine.Debug.LogError($"called the thing");
+  //   const string MSG = "new BitArray2D";
+  //   System.Console.WriteLine(MSG);
+  //   UnityEngine.Debug.LogError(MSG);
   // }
 
   #endif
