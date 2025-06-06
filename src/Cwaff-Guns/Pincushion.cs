@@ -83,9 +83,12 @@ public class VeryFragileProjectile : MonoBehaviour, IPPPComponent
         if (_ImpactVfxAnimator == null)
           _ImpactVfxAnimator = Pincushion._ImpactVFX.GetComponent<tk2dSpriteAnimator>();
         this._projectile = base.GetComponent<Projectile>();
+    }
 
-        this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-        this._projectile.specRigidbody.OnCollision += this.OnCollision;
+    public void PPPInit(PlayerProjectilePoolInfo pppi)
+    {
+        pppi.OnPreRigidbodyCollision += this.OnPreCollision;
+        pppi.OnCollision += this.OnCollision;
     }
 
     public void PPPReset(GameObject prefab)
@@ -96,8 +99,6 @@ public class VeryFragileProjectile : MonoBehaviour, IPPPComponent
 
     public void PPPRespawn()
     {
-        this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
-        this._projectile.specRigidbody.OnCollision += this.OnCollision;
     }
 
     private void OnPreCollision(SpeculativeRigidbody me, PixelCollider myPixelCollider, SpeculativeRigidbody other, PixelCollider otherPixelCollider)

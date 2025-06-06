@@ -5,12 +5,26 @@ namespace CwaffingTheGungy;
     - [maybe] fix proxy indexoutofrange exceptions on floor load and reenable pooling across floors
 */
 
-internal class PlayerProjectilePoolInfo : MonoBehaviour
+public class PlayerProjectilePoolInfo : MonoBehaviour
 {
-  public PlayerProjectilePooler pooler = null;
-  public LinkedListNode<GameObject> node = null;
-  public List<Transform> startingTransforms = new();
-  public bool spawned = false;
+  // cached starting invocation lists
+  public Action<Projectile> OnDestruction;
+  public SpeculativeRigidbody.OnPreRigidbodyCollisionDelegate OnPreRigidbodyCollision;
+  public Action<CollisionData> OnCollision;
+  public SpeculativeRigidbody.OnPreTileCollisionDelegate OnPreTileCollision;
+  public SpeculativeRigidbody.OnTileCollisionDelegate OnTileCollision;
+  public SpeculativeRigidbody.OnRigidbodyCollisionDelegate OnRigidbodyCollision;
+
+  // internal stuff
+  internal Projectile projectile = null;
+  internal PlayerProjectilePooler pooler = null;
+  internal LinkedListNode<GameObject> node = null;
+  internal List<Transform> startingTransforms = new();
+  internal bool spawned = false;
+
+  // stupid events ):<
+  private static FieldInfo _OnDestructionBackingField
+    = typeof(Projectile).GetField("OnDestruction", BindingFlags.Instance | BindingFlags.NonPublic);
 
   internal LinkedListNode<GameObject> Register(PlayerProjectilePooler pooler)
   {
@@ -19,6 +33,17 @@ internal class PlayerProjectilePoolInfo : MonoBehaviour
     RegisterStartingTransforms(base.gameObject.transform);
     this.spawned = true;
     return this.node;
+  }
+
+  internal void RestoreDelegates()
+  {
+    _OnDestructionBackingField.SetValue(this.projectile, this.OnDestruction);
+    SpeculativeRigidbody body    = this.projectile.specRigidbody;
+    body.OnPreRigidbodyCollision = this.OnPreRigidbodyCollision;
+    body.OnCollision             = this.OnCollision;
+    body.OnPreTileCollision      = this.OnPreTileCollision;
+    body.OnTileCollision         = this.OnTileCollision;
+    body.OnRigidbodyCollision    = this.OnRigidbodyCollision;
   }
 
   private void RegisterStartingTransforms(Transform root)
@@ -157,7 +182,23 @@ internal class PlayerProjectilePooler
     if (this._despawned.Count == 0)
     {
       GameObject newInstance = UnityEngine.Object.Instantiate(this._prefab, position, rotation);
-      this._spawned.AddLast(newInstance.AddComponent<PlayerProjectilePoolInfo>().Register(this));
+      PlayerProjectilePoolInfo newPppi = newInstance.AddComponent<PlayerProjectilePoolInfo>();
+
+      // set up initial SRB delegates (copied from Awake())
+      Projectile newProj = newPppi.projectile = newInstance.GetComponent<Projectile>();
+      newPppi.OnPreTileCollision += newProj.OnPreTileCollision;
+      newPppi.OnPreRigidbodyCollision += newProj.OnPreCollision;
+      newPppi.OnTileCollision += newProj.OnTileCollision;
+      newPppi.OnRigidbodyCollision += newProj.OnRigidbodyCollision;
+
+      // initialize IPPPComponents and additional delegates
+      newInstance.GetComponents<Component>(_Components);
+      //TODO: currently assuming all IPPPComponents are top level
+      foreach (Component c in _Components)
+        if (c is IPPPComponent ippp)
+          ippp.PPPInit(newPppi);
+      this._spawned.AddLast(newPppi.Register(this));
+      newPppi.RestoreDelegates();
       // Lazy.DebugLog($"spawned new {this._name}, {this._spawned.Count} total");
       return newInstance;
     }
@@ -173,11 +214,12 @@ internal class PlayerProjectilePooler
 
     Projectile pooledProj = pooledProjObj.GetComponent<Projectile>();
     // pooledProj.RegenerateCache(); //shouldn't be necessary unless we're ever swapping out particle systems
-    pooledProj.Awake(); //NOTE: needs to happen after RegenerateCache() so sprite is properly set up -> also resets SRB delegates
+    pooledProj.Reawaken();
     _AwaitingNewOwner.Add(pooledProj); // need to wait for the Owner to be assigned before finishing the respawning process
 
     PlayerProjectilePoolInfo pppi = pooledProjObj.GetComponent<PlayerProjectilePoolInfo>();
     pppi.spawned = true;
+    pppi.RestoreDelegates();
 
     return pooledProjObj;
   }
@@ -293,7 +335,7 @@ internal class PlayerProjectilePooler
     proj.shouldFlipVertically = baseProj.shouldFlipVertically;
     proj.shouldFlipHorizontally = baseProj.shouldFlipHorizontally;
     proj.ignoreDamageCaps = baseProj.ignoreDamageCaps;
-    // proj.m_cachedInitialDamage = -1f; // [NonSerialized] // NOTE: called in Awake()
+    // proj.m_cachedInitialDamage = -1f; // [NonSerialized] // can stay cached
 
     proj.baseData.damage = baseProj.baseData.damage;
     proj.baseData.speed = baseProj.baseData.speed;
@@ -378,7 +420,7 @@ internal class PlayerProjectilePooler
     (proj.statusEffectsToApply ??= new List<GameActorEffect>()).Clear(); // [NonSerialized]
 
     proj.m_initialized = false; //TODO: double check
-    // proj.m_transform = null; // NOTE: called in Awake()
+    // proj.m_transform = null; // can stay cached
     proj.m_cachedHasBeamController = null;
     proj.AdditionalScaleMultiplier = baseProj.AdditionalScaleMultiplier;
     proj.m_cachedLayer = 0;
@@ -572,6 +614,8 @@ internal static class PlayerProjectilePoolerHelpers
 
 internal interface IPPPComponent
 {
+  // called upon insantitating a pooled player projectile
+  public void PPPInit(PlayerProjectilePoolInfo pppi);
   // called upon despawning a pooled player projectile
   public void PPPReset(GameObject prefab);
   // called upon respawning a pooled player projectile

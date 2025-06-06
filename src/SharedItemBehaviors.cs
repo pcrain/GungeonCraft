@@ -518,6 +518,11 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
         base.OnDestroy();
     }
 
+    public void PPPInit(PlayerProjectilePoolInfo pppi)
+    {
+
+    }
+
     public void PPPReset(GameObject prefab)
     {
         if (tro)

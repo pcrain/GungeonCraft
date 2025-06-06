@@ -34,9 +34,6 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
 
-        this._projectile.OnDestruction -= OnProjectileDestroy;
-        this._projectile.OnDestruction += OnProjectileDestroy;
-
         if (becomeDebris)
           this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
 
@@ -72,6 +69,11 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
           this._isPooled = base.gameObject.GetComponent<PlayerProjectilePoolInfo>();
           this._checkedPooled = true;
         }
+    }
+
+    public void PPPInit(PlayerProjectilePoolInfo pppi)
+    {
+        pppi.OnDestruction += this.OnProjectileDestroy;
     }
 
     public void PPPRespawn()
