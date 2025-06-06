@@ -59,10 +59,46 @@ public static class CwaffCharacter
       tk2DSpriteAnimation2 : null,
       paradoxUsesSprites   : false
       );
-    CharacterBuilder.storedCharacters.Add(data.nameInternal.ToLower(), new(data, pc.gameObject));
+    SetupPunchoutSprites(pc, data);
+    CharacterBuilder.storedCharacters.Add(data.nameInternal, new(data, pc.gameObject));
     ETGModConsole.Characters.Add(data.nameShort.ToLowerInvariant(), data.nameShort); //Adds characters to MTGAPIs character database
 
     return pc;
+  }
+
+  private static readonly Dictionary<string, Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]>>
+    _AlexandriaPunchoutData =
+    (Dictionary<string, Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]>>)
+    typeof(Alexandria.CharacterAPI.SpriteHandler)
+      .GetField("punchoutPlayerAnimInfo", BindingFlags.Static | BindingFlags.NonPublic)
+      .GetValue(null);
+
+  private static void SetupPunchoutSprites(PlayerController pc, CustomCharacterData data)
+  {
+    PunchoutPlayerController punchoutPlayer = ResourceManager.LoadAssetBundle("enemies_base_001")
+      .LoadAsset<GameObject>("MetalGearRat").GetComponent<AIActor>().GetComponent<MetalGearRatDeathController>()
+      .PunchoutMinigamePrefab.GetComponent<PunchoutController>().Player;
+    tk2dSpriteAnimation punchoutLibray = punchoutPlayer.gameObject.GetComponent<tk2dSpriteAnimator>().Library;
+    tk2dSpriteCollectionData punchoutCol = punchoutLibray.clips[0].frames[0].spriteCollection;
+    dfAtlas punchoutAtlas = punchoutPlayer.PlayerUiSprite.Atlas;
+
+    string charName = data.nameInternal;
+    List<string> facecards = ResMap.Get($"{charName}_punchout_facecard");
+    for (int i = 0; i < facecards.Count; i++)
+      punchoutAtlas.AddNewItemToAtlas(punchoutCol.GetSpriteDefinition(facecards[i]), $"punch_player_health_{charName}_00{i + 1}");
+
+    int nextClipId = punchoutLibray.clips.Length;
+    Array.Resize(ref punchoutLibray.clips, nextClipId + _AlexandriaPunchoutData.Count);
+    foreach (var kvp in _AlexandriaPunchoutData)
+    {
+      int loopAt =
+        kvp.Value.Item1 == tk2dSpriteAnimationClip.WrapMode.LoopSection ? 7 :
+        kvp.Value.Item1 == tk2dSpriteAnimationClip.WrapMode.Once ? -1 : 0;
+      if (punchoutCol.AddAnimation(charName + kvp.Key, fps: kvp.Value.Item2, loopStart: loopAt) is tk2dSpriteAnimationClip clip)
+        punchoutLibray.clips[nextClipId++] = clip;
+      else
+        Lazy.DebugWarn($"  failed to set up punch out sprite {charName + kvp.Key}");
+    }
   }
 
   public static tk2dSpriteAnimator AddOrReplaceAnimation(this tk2dSpriteAnimator animator, string animName, string spriteName, int fps = 4, int loopStart = -1)

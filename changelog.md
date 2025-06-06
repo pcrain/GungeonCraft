@@ -4,6 +4,7 @@
 
 - Updated visuals for Pincushion's projectiles and reduced lag from creating them a bit
 - Fixed null deref when charging vanilla Railgun caused by faulty patch
+- Added placeholder Robot sprites to Rogo's punchout fight so the game doesn't softlock
 
 ## 1.26.1 (2025-06-01)
 

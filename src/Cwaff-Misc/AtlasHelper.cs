@@ -137,6 +137,7 @@ internal static class AtlasHelper
     List<tk2dSpriteDefinition> weaponSprites                    = new();
     List<tk2dSpriteDefinition> uiSprites                        = new();
     List<tk2dSpriteDefinition> characterSprites                 = new();
+    List<tk2dSpriteDefinition> punchoutSprites                  = new();
     List<tk2dSpriteDefinition> miscSprites                      = new();
     List<tk2dSpriteDefinition.AttachPoint[]> weaponAttachPoints = new();
 
@@ -194,6 +195,12 @@ internal static class AtlasHelper
           continue;
         }
 
+        if (collName == "Punchout")
+        {
+          punchoutSprites.Add(def);
+          continue;
+        }
+
         // everything from here onward only applies to weapon collection
         if (collName == "WeaponCollection")
         {
@@ -208,11 +215,18 @@ internal static class AtlasHelper
         miscSprites.Add(def);
       }
     }
+
+    var punchoutCollection = ResourceManager.LoadAssetBundle("enemies_base_001")
+      .LoadAsset<GameObject>("MetalGearRat").GetComponent<AIActor>().GetComponent<MetalGearRatDeathController>()
+      .PunchoutMinigamePrefab.GetComponent<PunchoutController>().Player.gameObject.GetComponent<tk2dSpriteAnimator>().Library
+      .clips[0].frames[0].spriteCollection;
+
     AddSpritesToCollection(newDefs: projectileSprites,  collection: ETGMod.Databases.Items.ProjectileCollection);
     AddSpritesToCollection(newDefs: ammonomiconSprites, collection: AmmonomiconController.ForceInstance.EncounterIconCollection);
     AddSpritesToCollection(newDefs: itemSprites,        collection: ETGMod.Databases.Items.ItemCollection);
     AddSpritesToCollection(newDefs: weaponSprites,      collection: ETGMod.Databases.Items.WeaponCollection, attachPoints: weaponAttachPoints);
     AddSpritesToCollection(newDefs: characterSprites,   collection: CwaffCharacter.Collection);
+    AddSpritesToCollection(newDefs: punchoutSprites,    collection: punchoutCollection);
     AddSpritesToCollection(newDefs: miscSprites,        collection: VFX.Collection); // NOTE: all miscellaneous sprites go into the VFX collection
     AddSpritesToCollection(newDefs: uiSprites,          collection: ((GameObject)ResourceCache.Acquire("ControllerButtonSprite")).GetComponent<tk2dBaseSprite>().Collection);
     AddUISpriteBatch(uiSprites);
