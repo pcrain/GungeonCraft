@@ -28,7 +28,6 @@ public class Pincushion : CwaffGun
           .InitProjectile(GunData.New(clipSize: 1000 / _SIMULTANEOUS_BULLETS, cooldown: C.FRAME, angleVariance: 0.0f, shootStyle: ShootStyle.Automatic,
             damage: 0.0f, speed: 200.0f, force: 0.0f, range: 999f, bossDamageMult: 0.65f, sprite: "needle", fps: 12, preventSparks: true, damagesWalls: false,
             anchor: Anchor.MiddleLeft, barrageSize: _SIMULTANEOUS_BULLETS, customClip: true, overrideColliderPixelSizes: new IntVector2(1, 1)/*, glowAmount: 10f*/))
-          // .SetAllImpactVFX(VFX.CreatePool("microdust", fps: 30, loops: false))
           .ClearAllImpactVFX()
           .RemoveAnimator()
           .Attach<VeryFragileProjectile>()
@@ -86,6 +85,13 @@ public class VeryFragileProjectile : MonoBehaviour, IPPPComponent
         if (_ImpactVfxAnimator == null)
           _ImpactVfxAnimator = Pincushion._ImpactVFX.GetComponent<tk2dSpriteAnimator>();
         this._projectile = base.GetComponent<Projectile>();
+        //NOTE: this check can be removed once we've fully committed to pooling this
+        if (!base.gameObject.GetComponent<PlayerProjectilePoolInfo>())
+        {
+            SpeculativeRigidbody body = this._projectile.specRigidbody;
+            body.OnPreRigidbodyCollision += this.OnPreCollision;
+            body.OnCollision += this.OnCollision;
+        }
     }
 
     public void PPPInit(PlayerProjectilePoolInfo pppi)

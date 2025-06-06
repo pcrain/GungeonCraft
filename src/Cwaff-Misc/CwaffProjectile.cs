@@ -34,6 +34,14 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
 
+        if (!this._checkedPooled)
+        {
+          this._isPooled = base.gameObject.GetComponent<PlayerProjectilePoolInfo>();
+          this._checkedPooled = true;
+        }
+        if (!this._isPooled) // only set this up here if PPPInit() is not called on our prefab
+          this._projectile.OnDestruction += this.OnProjectileDestroy;
+
         if (becomeDebris)
           this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
 
@@ -63,12 +71,6 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
           this._setupLight = true;
         }
         #endregion
-
-        if (!this._checkedPooled)
-        {
-          this._isPooled = base.gameObject.GetComponent<PlayerProjectilePoolInfo>();
-          this._checkedPooled = true;
-        }
     }
 
     public void PPPInit(PlayerProjectilePoolInfo pppi)

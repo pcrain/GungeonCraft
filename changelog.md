@@ -5,6 +5,7 @@
 - Updated visuals for Pincushion's projectiles and reduced lag from creating them a bit
 - Fixed null deref when charging vanilla Railgun caused by faulty patch
 - Added placeholder Robot sprites to Rogo's punchout fight so the game doesn't softlock
+- Fixed null deref caused by Platinum Star trying to set its animation before its animator was set up
 
 ## 1.26.1 (2025-06-01)
 

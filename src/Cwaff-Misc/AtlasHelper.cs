@@ -216,7 +216,7 @@ internal static class AtlasHelper
       }
     }
 
-    var punchoutCollection = ResourceManager.LoadAssetBundle("enemies_base_001")
+    tk2dSpriteCollectionData punchoutCollection = ResourceManager.LoadAssetBundle("enemies_base_001")
       .LoadAsset<GameObject>("MetalGearRat").GetComponent<AIActor>().GetComponent<MetalGearRatDeathController>()
       .PunchoutMinigamePrefab.GetComponent<PunchoutController>().Player.gameObject.GetComponent<tk2dSpriteAnimator>().Library
       .clips[0].frames[0].spriteCollection;

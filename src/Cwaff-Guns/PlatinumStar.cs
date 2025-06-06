@@ -66,7 +66,8 @@ public class PlatinumStar : CwaffGun
     public override void Update()
     {
         base.Update();
-        this.gun.preventRotation = (this.gun.spriteAnimator.currentClip.name == this.gun.reloadAnimation);
+        if (this.gun.spriteAnimator.currentClip is tk2dSpriteAnimationClip clip)
+            this.gun.preventRotation = (clip.name == this.gun.reloadAnimation);
     }
 }
 
