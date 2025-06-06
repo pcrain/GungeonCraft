@@ -210,7 +210,7 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
     [HarmonyPostfix]
     private static void GunHandleChargeEffectsPatch(Gun __instance, ProjectileModule.ChargeProjectile oldChargeProjectile, ProjectileModule.ChargeProjectile newChargeProjectile)
     {
-      if (newChargeProjectile == null || newChargeProjectile.Projectile.gameObject.GetComponent<CwaffProjectile>() is not CwaffProjectile cp)
+      if (newChargeProjectile == null || newChargeProjectile.Projectile is not Projectile proj || proj.gameObject.GetComponent<CwaffProjectile>() is not CwaffProjectile cp)
         return;
       if (!string.IsNullOrEmpty(cp.chargeSound))
         __instance.gameObject.Play(cp.chargeSound);
