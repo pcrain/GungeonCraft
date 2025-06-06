@@ -46,6 +46,7 @@ internal class PlayerProjectilePooler
   /// <summary>List of pooled player projectiles that have been spawned in, but haven't been assigned an owner yet. Need to defer calling Start() until owner has been assigned.</summary>
   private static readonly List<Projectile> _AwaitingNewOwner = new();
   private static bool _DoingFloorCleanup = false;
+  private static List<Component> _Components = new();
 
   /// <summary>Map of all poolable projectile prefabs to their pooler.</summary>
   internal static readonly Dictionary<GameObject, PlayerProjectilePooler> _Poolers = new();
@@ -70,15 +71,17 @@ internal class PlayerProjectilePooler
   private bool RegisterPrefabTransforms(Transform root)
   {
     this._prefabTransforms.Add(root);
-    foreach (Component c in root.gameObject.GetComponents<Component>())
+    root.gameObject.GetComponents<Component>(_Components);
+    foreach (Component c in _Components)
     {
       if (c is IPPPComponent || _NoPurgeWhitelist.Contains(c.GetType()))
         continue;
       Lazy.DebugWarn($"Attempted to register poolable projectile with non-poolable component {c.GetType().Name}.");
       return false;
     }
-    foreach (Transform child in root)
-      if (!RegisterPrefabTransforms(child))
+    int numChildren = root.childCount;
+    for (int i = 0; i < numChildren; ++i)
+      if (!RegisterPrefabTransforms(root.GetChild(i)))
         return false;
     return true;
   }
@@ -120,16 +123,14 @@ internal class PlayerProjectilePooler
   //   }
   // }
 
-  // [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnDestroy))]
+  // [HarmonyPatch(typeof(UnityEngine.Object), nameof(UnityEngine.Object.name), MethodType.Getter)]
   // [HarmonyPrefix]
-  // private static void DebugPatch(Projectile __instance)
+  // private static void DebugPatch()
   // {
-  //   if (__instance.gameObject.GetComponent<PlayerProjectilePoolInfo>())
-  //   {
-  //     System.Console.WriteLine($"destroying our projectile, that doesn't seem good");
-  //     UnityEngine.Debug.LogError($"destroying our projectile, that doesn't seem good");
-  //   }
+  //   System.Console.WriteLine($"called the thing");
+  //   UnityEngine.Debug.LogError($"called the thing");
   // }
+
   #endif
   #endregion
 
@@ -142,9 +143,10 @@ internal class PlayerProjectilePooler
     if (!_AwaitingNewOwner.Remove(__instance))
       return;
 
-    __instance.Start(); //NOTE: this requires Owner to be set, necessitating this patch in the first place
-    __instance.OnSpawned();
-    foreach (Component c in __instance.gameObject.GetComponents<Component>())
+    // __instance.Start(); // OnSpawned calls Start
+    __instance.OnSpawned(); //NOTE: this requires Owner to be set, necessitating this patch in the first place
+    __instance.gameObject.GetComponents<Component>(_Components);
+    foreach (Component c in _Components)
       if (c is IPPPComponent ippp)
         ippp.PPPRespawn();
   }
@@ -170,7 +172,7 @@ internal class PlayerProjectilePooler
     pooledProjObj.SetActive(true);
 
     Projectile pooledProj = pooledProjObj.GetComponent<Projectile>();
-    pooledProj.RegenerateCache();
+    // pooledProj.RegenerateCache(); //shouldn't be necessary unless we're ever swapping out particle systems
     pooledProj.Awake(); //NOTE: needs to happen after RegenerateCache() so sprite is properly set up -> also resets SRB delegates
     _AwaitingNewOwner.Add(pooledProj); // need to wait for the Owner to be assigned before finishing the respawning process
 
@@ -195,7 +197,8 @@ internal class PlayerProjectilePooler
     Transform baseT = this._prefabTransforms[ti];
 
     // purge unwanted Components
-    foreach (Component c in root.gameObject.GetComponents<Component>())
+    root.gameObject.GetComponents<Component>(_Components);
+    foreach (Component c in _Components)
     {
       if (_NoPurgeWhitelist.Contains(c.GetType()))
         continue;
@@ -210,8 +213,9 @@ internal class PlayerProjectilePooler
 
     // count our saved transforms and recurse
     ++savedTransforms;
-    foreach (Transform child in root)
-      Sanitize(child, pppi, ref savedTransforms);
+    int numChildren = root.childCount;
+    for (int i = 0; i < numChildren; ++i)
+      Sanitize(root.GetChild(i), pppi, ref savedTransforms);
   }
 
   private void Despawn(GameObject projInstance, bool destroy = false)
@@ -399,17 +403,18 @@ internal class PlayerProjectilePooler
     proj.m_hasDiedInAir = false;
     proj.m_hasPierced = false;
     proj.m_healthHaverHitCount = 0;
-    proj.m_cachedCollidesWithPlayer = false;
-    proj.m_cachedCollidesWithProjectiles = false;
-    proj.m_cachedCollidesWithEnemies = false;
-    proj.m_cachedDamagesWalls = false;
 
-    proj.m_cachedBaseData = null;
-    proj.m_cachedBulletScriptSettings = null;
-    proj.m_cachedCollideWithTileMap = false;
-    proj.m_cachedCollideWithOthers = false;
+    //NOTE: these are all cached and reset by OnSpawned
+    // proj.m_cachedCollidesWithPlayer = false;
+    // proj.m_cachedCollidesWithProjectiles = false;
+    // proj.m_cachedCollidesWithEnemies = false;
+    // proj.m_cachedDamagesWalls = false;
+    // proj.m_cachedBaseData = null;
+    // proj.m_cachedBulletScriptSettings = null;
+    // proj.m_cachedCollideWithTileMap = false;
+    // proj.m_cachedCollideWithOthers = false;
+    // proj.m_cachedSpriteId = -1; // private, maybe should be 0?
 
-    proj.m_cachedSpriteId = -1; // private, maybe should be 0?
     proj.m_spawnPool = null;
     proj.m_isRamping = false;
     proj.m_rampTimer = 0f;
