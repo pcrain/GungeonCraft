@@ -6,6 +6,7 @@
 - Fixed null deref when charging vanilla Railgun caused by faulty patch
 - Added placeholder Robot sprites to Rogo's punchout fight so the game doesn't softlock
 - Fixed null deref caused by Platinum Star trying to set its animation before its animator was set up
+- Reduced knockback on Seltzer Pelter's soda streams from 100 to 20
 
 ## 1.26.1 (2025-06-01)
 

@@ -42,7 +42,7 @@ public class SeltzerPelter : CwaffGun
         }
 
         //NOTE: the perfect seltzer stats, do not tweak without testing! (beam damage == DPS)
-        _BubbleBeam = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 40.0f, speed: 20.0f, force: 100.0f, range: 4.0f, preventOrbiting: true, doBeamSetup: true,
+        _BubbleBeam = Items.MarineSidearm.CloneProjectile(GunData.New(damage: 40.0f, speed: 20.0f, force: 25.0f, range: 4.0f, preventOrbiting: true, doBeamSetup: true,
             beamSprite: "bubble_stream", beamFps: 8, beamEmission: 5f, beamChargeDelay: 0f, beamSeparation: true, beamIsRigid: false,
             beamInterpolate: false, beamKnockback: 100f, beamTiling: BasicBeamController.BeamTileType.Flowing, beamEndType: BasicBeamController.BeamEndType.Persist))
           .Attach<GoopModifier>(gmod => {
