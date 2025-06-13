@@ -357,7 +357,7 @@ public class BulletThatCanKillTheFuture : CwaffActive
     {
         static void Prefix(ElevatorDepartureController __instance, tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
         {
-            if (!CwaffRunData.Instance.shouldReturnToPreviousFloor)
+            if (!CwaffRunData.Instance || !CwaffRunData.Instance.shouldReturnToPreviousFloor)
                 return;
 
             __instance.UsesOverrideTargetFloor = false;
@@ -371,6 +371,9 @@ public class BulletThatCanKillTheFuture : CwaffActive
     {
         static bool Prefix(AIActor __instance)
         {
+            if (!CwaffRunData.Instance)
+                return true;
+
             string futureless = CwaffRunData.Instance.btcktfEnemyGuid;
             if (string.IsNullOrEmpty(futureless) || __instance.EnemyGuid != futureless)
                 return true;

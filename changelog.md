@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.26.3 (TBD)
+
+- Prevented Pizza Peel event gun from randomly spawning in green chests
+- Fixed null derefs caused by [REDACTED] checking for floor / enemy data in between runs where that data is invalid
+
 ## 1.26.2 (2025-06-06)
 
 - Updated visuals for Pincushion's projectiles and reduced lag from creating them a bit
