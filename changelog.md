@@ -4,6 +4,7 @@
 
 - Prevented Pizza Peel event gun from randomly spawning in green chests
 - Fixed null derefs caused by [REDACTED] checking for floor / enemy data in between runs where that data is invalid
+- Prevented some of GungeonCraft's special event items from spawning in certain modded loot pools
 
 ## 1.26.2 (2025-06-06)
 

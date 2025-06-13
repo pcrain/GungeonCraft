@@ -97,8 +97,11 @@ public static class Lazy
         item.SetShortDescription(shortDescription);
         item.SetLongDescription($"{longDescription}\n\n{lore}");
         ETGMod.Databases.Items.Add(item);
-        if (weight != 1f)  // adjust loot pool weight if it's not the default
-            (isGun ? _GunLoot : _ItemLoot).defaultItemDrops.elements.Last().weight = weight;
+        GenericLootTable lootTable = (isGun ? _GunLoot : _ItemLoot);
+        if (item.quality == ItemQuality.SPECIAL)
+            lootTable.defaultItemDrops.elements.RemoveAt(lootTable.defaultItemDrops.elements.Count - 1);
+        else if (weight != 1f)  // adjust loot pool weight if it's not the default
+            lootTable.defaultItemDrops.elements.Last().weight = weight;
 
         if (hideFromAmmonomicon)
             item.encounterTrackable.journalData.SuppressInAmmonomicon = true;
