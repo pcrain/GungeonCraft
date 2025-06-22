@@ -214,7 +214,9 @@ public class Commands
             if (Input.GetKeyDown(KeyCode.Alpha8))
             {
                 // PrototypeDungeonRoom room = FloorPuzzleRoomController._FloorPuzzleRooms[0];
-                PrototypeDungeonRoom room = ShufflePuzzleRoomController._ShufflePuzzleRooms[0];
+                // PrototypeDungeonRoom room = ShufflePuzzleRoomController._ShufflePuzzleRooms[0];
+                WeightedRoomCollection winchesterRooms = GameManager.Instance.GlobalInjectionData.entries[0].injectionData.InjectionData[0].roomTable.includedRooms;
+                PrototypeDungeonRoom room = winchesterRooms.elements[1].room;
                 if (room != null)
                 {
                     System.Console.WriteLine($"generating debug flow with room {room.name}");
