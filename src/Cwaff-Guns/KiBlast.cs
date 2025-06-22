@@ -99,6 +99,15 @@ public class KiBlast : CwaffGun
             closestBlast.ReturnFromPlayer(player);
     }
 
+    public override void PostProcessBeam(BeamController beam)
+    {
+        base.PostProcessBeam(beam);
+        if (!this.Mastered || this.PlayerOwner is not PlayerController pc || beam.projectile is not Projectile p)
+            return;
+        if (GameManager.Instance.GetLastLoadedLevelDefinition() is GameLevelDefinition level)
+            p.baseData.damage *= level.enemyHealthMultiplier;
+    }
+
     private void UpdateIdleAnimation(string idleAnimation = null, int frame = -1)
     {
         string curClipName = this.gun.spriteAnimator.CurrentClip.name;
