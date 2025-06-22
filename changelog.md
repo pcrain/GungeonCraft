@@ -13,6 +13,7 @@
 - Fixed Domino breaking in several silly ways for characters that can't switch guns for whatever reason
 - Polished Seltzer Peltzer's seltzer goop VFX a bit
 - Reduced knockback on Seltzer Peltzer's cans from 75 to 45
+- Fixed Rogo magically changing to Pilot when reloading a midgame save
 
 ## 1.26.2 (2025-06-06)
 

@@ -266,4 +266,27 @@ public static class CwaffCharacter
           return false; // skip the original method
       }
   }
+
+  //NOTE: relocate to Alexandria at some point
+  [HarmonyPatch]
+  private static class MidgameSaveCustomCharacterLoader
+  {
+      [HarmonyPatch(typeof(MidGameSaveData), nameof(MidGameSaveData.GetPlayerOnePrefab))]
+      [HarmonyPrefix]
+      private static bool CharacterSelectControllerGetCharacterPathFromIdentityPatch(MidGameSaveData __instance, ref GameObject __result)
+      {
+        PlayableCharacters id = __instance.playerOneData.CharacterIdentity;
+        if (id <= PlayableCharacters.Gunslinger)
+          return true;
+        foreach (var tup in Alexandria.CharacterAPI.CharacterBuilder.storedCharacters.Values)
+        {
+          if (tup.Second.GetComponent<PlayerController>().characterIdentity == id)
+          {
+            __result = tup.Second;
+            return false;
+          }
+        }
+        return true;
+      }
+  }
 }
