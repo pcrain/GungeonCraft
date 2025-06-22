@@ -1,21 +1,26 @@
 # Changelog
 
-## 1.26.3 (TBD)
+## 1.26.3 (2025-06-22)
 
-- Prevented Pizza Peel event gun from randomly spawning in green chests
+#### Balance Changes and Polish:
+
+- Ignizol now has a delay between teleporting and igniting the ground under it to prevent burning the player when entering a new room
+- Damage from Ki Blast's mastery projectile now scales with the current floor's enemy health modifier
+- Bulletbot Implant now quadruples the loot weight of companions while held
+- Reduced knockback on Seltzer Peltzer's cans from 75 to 45
+- Added "Jammed" indicator to weapon title cards for weapons jammed by Chamber Jammer
+- Polished Seltzer Peltzer's seltzer goop VFX a bit
+- Cleaned up outlines on all of Bubblebeam's sprites
+- Cleaned up outlines on Blank Checks sprite
+
+#### Bugfixes and Misc:
+
+- Fixed Rogo magically changing to Pilot when reloading a midgame save
+- Fixed Domino breaking in several silly ways for characters that can't switch guns for whatever reason
+- Fixed Pizza Peel event gun randomly spawning in green chests
+- Fixed not being able to aim Ki Blast's mastery projectile when on controller
 - Fixed null derefs caused by [REDACTED] checking for floor / enemy data in between runs where that data is invalid
 - Prevented some of GungeonCraft's special event items from spawning in certain modded loot pools
-- Cleaned up outlines on Blank Checks sprite
-- Cleaned up outlines on all of Bubblebeam's sprites
-- Fixed not being able to aim Ki Blast's mastery projectile when on controller
-- Damage from Ki Blast's mastery projectile now scales with the current floor's enemy health modifier
-- Ignizol now has a delay between teleporting and igniting the ground under it to prevent burning the player when entering a new room
-- Fixed Domino breaking in several silly ways for characters that can't switch guns for whatever reason
-- Polished Seltzer Peltzer's seltzer goop VFX a bit
-- Reduced knockback on Seltzer Peltzer's cans from 75 to 45
-- Fixed Rogo magically changing to Pilot when reloading a midgame save
-- Bulletbot Implant now quadruples the loot weight of companions while held
-- Added "Jammed" indicator to weapon title cards for weapons jammed by Chamber Jammer
 - Optimized custom ammo display code a bit
 
 ## 1.26.2 (2025-06-06)
