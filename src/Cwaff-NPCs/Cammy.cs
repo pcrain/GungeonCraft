@@ -3,6 +3,8 @@ namespace CwaffingTheGungy;
 // Shop that sells companions :>
 public class Cammy
 {
+    internal static GenericLootTable _CompanionTable = null;
+
     public static void Init()
     {
         List<int> shopItems = new(){
@@ -138,6 +140,7 @@ public class Cammy
                 }
             );
 
+        _CompanionTable = shop.loot;
         shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_excited"), 10, "purchase");
         shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_sad"), 4, "denied");
         shop.AddParentedAnimationToShopFixed(ResMap.Get("cammy_sad"), 4, "stolen");

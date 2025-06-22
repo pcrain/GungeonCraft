@@ -14,6 +14,7 @@
 - Polished Seltzer Peltzer's seltzer goop VFX a bit
 - Reduced knockback on Seltzer Peltzer's cans from 75 to 45
 - Fixed Rogo magically changing to Pilot when reloading a midgame save
+- Bulletbot Implant now quadruples the loot weight of companions while held
 
 ## 1.26.2 (2025-06-06)
 
