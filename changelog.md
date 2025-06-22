@@ -11,6 +11,8 @@
 - Damage from Ki Blast's mastery projectile now scales with the current floor's enemy health modifier
 - Ignizol now has a delay between teleporting and igniting the ground under it to prevent burning the player when entering a new room
 - Fixed Domino breaking in several silly ways for characters that can't switch guns for whatever reason
+- Polished Seltzer Peltzer's seltzer goop VFX a bit
+- Reduced knockback on Seltzer Peltzer's cans from 75 to 45
 
 ## 1.26.2 (2025-06-06)
 

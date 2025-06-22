@@ -342,6 +342,7 @@ public class EnbubbledBehaviour : MonoBehaviour
             fadeOutTime      : 0.1f
           );
         base.gameObject.Play("bubble_pop_sound");
+        // BurstYourBubble(); //NOTE: this nerfs the mastery too much, so not doing this
     }
 
     private void OnDestruction(Projectile proj)

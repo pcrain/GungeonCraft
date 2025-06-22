@@ -1172,8 +1172,8 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
         SeltzerGoop = UnityEngine.Object.Instantiate<GoopDefinition>(WaterGoop);
             SeltzerGoop.CanBeElectrified = true;
             SeltzerGoop.usesAmbientGoopFX = true;
-            SeltzerGoop.ambientGoopFXChance = 0.004f;
-            SeltzerGoop.ambientGoopFX = VFX.CreatePool("seltzer_sparkles", fps: 10, loops: false, scale: 0.5f, anchor: Anchor.MiddleCenter);
+            SeltzerGoop.ambientGoopFXChance = 0.003f;
+            SeltzerGoop.ambientGoopFX = VFX.CreatePool("seltzer_sparkles", fps: 10, loops: false);
 
         //Set up mastered Seltzer Pelter goop
         SuperSeltzerGoop = UnityEngine.Object.Instantiate<GoopDefinition>(SeltzerGoop);
