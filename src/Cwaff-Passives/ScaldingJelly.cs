@@ -51,6 +51,7 @@ public class IgnizolCompanion : CwaffCompanionController
         private const string _LAUNCH_REASON = "launched";
         private const string _CARRY_REASON  = "carried";
 
+        private const float _IGNITE_DELAY         = 1.0f;
         private const float _MOVE_SPEED           = 3.5f;
         private const float _PATH_INTERVAL        = 0.25f;
         private const float _LAUNCH_RADIUS        = 4.5f;
@@ -97,6 +98,7 @@ public class IgnizolCompanion : CwaffCompanionController
         private EasyLight _light = null;
         private bool _launchSpriteFlipped = false;
         private int _lastIdleFrame = -1;
+        private float _igniteTime = 0.0f;
 
     #if DEBUG
         private Nametag _debugNameTag = null;
@@ -120,6 +122,7 @@ public class IgnizolCompanion : CwaffCompanionController
             this._jumpSprite.renderer.enabled = false;
             // ResetShadow();
 
+            this._igniteTime = _IGNITE_DELAY;
             this._light = EasyLight.Create(parent: m_aiActor.transform, color: ExtendedColours.vibrantOrange,
                 radius: _LIGHT_RADIUS_MIN, brightness: _LIGHT_BRIGHTNESS_MIN);
             this._light.gameObject.transform.localPosition = m_aiActor.sprite.GetRelativePositionFromAnchor(Anchor.UpperCenter);
@@ -144,11 +147,17 @@ public class IgnizolCompanion : CwaffCompanionController
             this.m_aiActor.gameObject.Play("ignizol_hit_sound");
         }
 
+        private void Warp(Vector2 pos)
+        {
+            m_aiActor.CompanionWarp(pos);
+            this._igniteTime = BraveTime.ScaledTimeSinceStartup + _IGNITE_DELAY; // don't burn instantly upon teleporting
+        }
+
         private void CustomPitDeathHandling(AIActor actor, ref bool suppressDamage)
         {
             ResetState();
             if (m_companionController.m_owner)
-                m_aiActor.CompanionWarp(m_companionController.m_owner.CenterPosition);
+                Warp(m_companionController.m_owner.CenterPosition);
         }
 
         private void AttemptToPickUpOrThrow(PlayerController interactor)
@@ -316,6 +325,8 @@ public class IgnizolCompanion : CwaffCompanionController
         private static DeadlyDeadlyGoopManager _FireGooper = null;
         private void SetTheWorldAblaze()
         {
+            if (this._igniteTime > BraveTime.ScaledTimeSinceStartup)
+                return;
             if (!_FireGooper)
                 _FireGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.FireDef);
             _FireGooper.AddGoopCircle(m_aiActor.specRigidbody.UnitBottomCenter, 1.5f);
@@ -479,7 +490,7 @@ public class IgnizolCompanion : CwaffCompanionController
             {
                 m_aiActor.ClearPath();
                 m_sequentialPathFails = 0;
-                m_aiActor.CompanionWarp(adjustedTarget);
+                Warp(adjustedTarget);
                 DetermineNewTarget();
             }
             else if (!m_aiActor.Path.WillReachFinalGoal && (++m_sequentialPathFails) > 3)
@@ -488,7 +499,7 @@ public class IgnizolCompanion : CwaffCompanionController
                 if (cellData2 != null && cellData2.IsPassable)
                 {
                     m_sequentialPathFails = 0;
-                    m_aiActor.CompanionWarp(adjustedTarget);
+                    Warp(adjustedTarget);
                     DetermineNewTarget();
                 }
             }
@@ -654,7 +665,7 @@ public class IgnizolCompanion : CwaffCompanionController
             UpdateStateAndTargetPosition();
             if (InDifferentRoom() && this._state != CARRY)
             {
-                m_aiActor.CompanionWarp(m_companionController.m_owner.CenterPosition);
+                Warp(m_companionController.m_owner.CenterPosition);
                 DetermineNewTarget();
             }
             else if (ReachedTarget())

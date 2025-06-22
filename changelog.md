@@ -9,6 +9,7 @@
 - Cleaned up outlines on all of Bubblebeam's sprites
 - Fixed not being able to aim Ki Blast's mastery projectile when on controller
 - Damage from Ki Blast's mastery projectile now scales with the current floor's enemy health modifier
+- Ignizol now has a delay between teleporting and igniting the ground under it to prevent burning the player when entering a new room
 
 ## 1.26.2 (2025-06-06)
 
