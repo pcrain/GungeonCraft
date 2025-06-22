@@ -15,6 +15,8 @@
 - Reduced knockback on Seltzer Peltzer's cans from 75 to 45
 - Fixed Rogo magically changing to Pilot when reloading a midgame save
 - Bulletbot Implant now quadruples the loot weight of companions while held
+- Added "Jammed" indicator to weapon title cards for weapons jammed by Chamber Jammer
+- Optimized custom ammo display code a bit
 
 ## 1.26.2 (2025-06-06)
 

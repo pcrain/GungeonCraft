@@ -285,49 +285,56 @@ static class HeartUIPatch
     }
 }
 
-//NOTE: used by gun masteries and Display Case
+//NOTE: used by gun masteries, Display Case, and Chamber Jammer
 [HarmonyPatch(typeof(EncounterTrackable), nameof(EncounterTrackable.GetModifiedDisplayName))]
 static class DisplayMasteryInGunNamePatch
 {
-    private const uint MASTERY_FLAG  = 1 << 16;
-    private const uint PRISTINE_FLAG = 1 << 17;
-    private const string PRISTINE_STRING = "[color #bbbbdd]M[/color][color #aabbdd]i[/color][color #99bbdd]n[/color][color #88bbdd]t[/color][color #77bbdd] [/color][color #66bbdd]C[/color][color #55bbdd]o[/color][color #44bbdd]n[/color][color #33bbdd]d[/color][color #22bbdd]i[/color][color #11bbdd]t[/color][color #00bbdd]i[/color][color #00aadd]o[/color][color #0099dd]n[/color]\n";
-    // private const string PRISTINE_STRING = "[color #bbbbdd]M[/color]int Condition\n";
-    private const string MASTERED_STRING = "[color #dd6666]Mastered[/color]\n";
-    private const string NORMAL_STRING = "[color #888888]Normal[/color]\n";
-    private static readonly uint[] _HashedGunId       = [uint.MaxValue, uint.MaxValue];
+    private const string JAMMED_STRING                = "[color #bb3333]J[/color][color #aa3333]a[/color][color #993333]m[/color][color #883333]m[/color][color #773333]e[/color][color #663333]d[/color]";
+    private const string PRISTINE_STRING              = "[color #bbbbdd]M[/color][color #aabbdd]i[/color][color #99bbdd]n[/color][color #88bbdd]t[/color][color #77bbdd] [/color][color #66bbdd]C[/color][color #55bbdd]o[/color][color #44bbdd]n[/color][color #33bbdd]d[/color][color #22bbdd]i[/color][color #11bbdd]t[/color][color #00bbdd]i[/color][color #00aadd]o[/color][color #0099dd]n[/color]";
+    private const string MASTERED_STRING              = "[color #dd6666]Mastered[/color]";
+    private const string NORMAL_STRING                = "[color #888888]Normal[/color]";
+    private static readonly int[] _CachedGunId        = [int.MaxValue, int.MaxValue];
     private static readonly string[] _CachedGunString = [null, null];
-    /// <summary>Add "Mastered" before mastered guns when displaying gun cards</summary>
+    private static StringBuilder _SB                  = new StringBuilder("", 1000);
+    /// <summary>Add "Mastered" and other modifiers before guns when displaying gun cards</summary>
     static void Postfix(EncounterTrackable __instance, ref string __result)
     {
         if (__instance.gameObject.GetComponent<Gun>() is not Gun gun || gun.m_owner is not PlayerController p)
-          return;
+            return;
         int pid = p.PlayerIDX;
+        if (gun.PickupObjectId == _CachedGunId[pid])
+        {
+            __result = _CachedGunString[pid];
+            return;
+        }
+        _SB.Length = 0;
         if (PassiveItem.IsFlagSetForCharacter(p, typeof(DisplayPedestal)) && __instance.gameObject.GetComponent<PristineGun>())
         {
-            uint hash = (uint)gun.PickupObjectId + PRISTINE_FLAG;
-            if (hash == _HashedGunId[pid])
-            {
-              __result = _CachedGunString[pid];
-              return;
-            }
-            _HashedGunId[pid] = hash;
-            __result = _CachedGunString[pid] = $"{PRISTINE_STRING}{__result}";
-            return;
+            if (_SB.Length > 0)
+                _SB.Append(" ");
+            _SB.Append(PRISTINE_STRING);
+        }
+        if (__instance.gameObject.GetComponent<ChamberJammedBehavior>())
+        {
+            if (_SB.Length > 0)
+                _SB.Append(" ");
+            _SB.Append(JAMMED_STRING);
         }
         if (__instance.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.CanBeMastered())
         {
-            bool mastered = cg.Mastered;
-            uint hash = (uint)gun.PickupObjectId + (mastered ? MASTERY_FLAG : 0u);
-            if (hash == _HashedGunId[pid])
-            {
-              __result = _CachedGunString[pid];
-              return;
-            }
-            _HashedGunId[pid] = hash;
-            __result = _CachedGunString[pid] = $"{(mastered ? MASTERED_STRING : NORMAL_STRING)}{__result}";
-            return;
+            if (_SB.Length > 0)
+                _SB.Append(" ");
+            _SB.Append(cg.Mastered ? MASTERED_STRING : NORMAL_STRING);
         }
+        if (_SB.Length > 0)
+        {
+            _SB.Append("\n");
+            _SB.Append(__result);
+            __result = _CachedGunString[pid] = _SB.ToString();
+        }
+        else
+            _CachedGunString[pid] = __result;
+        _CachedGunId[pid] = gun.PickupObjectId;
     }
 }
 
