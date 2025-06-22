@@ -14,6 +14,8 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action<PlayerController, PlayerController, GameManager.GameMode> OnRunStartFromAnyFloor;
     // Runs whenever any floor is started and fully loaded
     public static Action OnNewFloorFullyLoaded;
+    // Runs right before any new level is loaded
+    public static Action OnFloorEnded;
     // Runs whenever the Keep of the Lead Lord is started and fully loaded, regardless of whether it's the start of a run
     public static Action OnKeepFullyLoaded;
     // Runs whenever the first floor of a new run is started and fully loaded, regardless of whether it's actually the Keep of the Lead Lord
@@ -69,6 +71,8 @@ public static class CwaffEvents // global custom events we can listen for
                 if (reallyStartedNewRun)
                     BeforeRunStart();
             }
+            if (OnFloorEnded != null)
+                OnFloorEnded();
         }
     }
 
