@@ -7,6 +7,7 @@
 - Prevented some of GungeonCraft's special event items from spawning in certain modded loot pools
 - Cleaned up outlines on Blank Checks sprite
 - Cleaned up outlines on all of Bubblebeam's sprites
+- Fixed not being able to aim Ki Blast's mastery projectile when on controller
 
 ## 1.26.2 (2025-06-06)
 

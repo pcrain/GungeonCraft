@@ -379,19 +379,33 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   }
 
   /// <summary>Patch to prevent movement when holding a specific gun</summary>
-  [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.AdjustInputVector))]
-  private class PlayerControllerAdjustInputVectorPatch
+  [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.HandlePlayerInput))]
+  private class PlayerControllerAdjustInputVectorInHandlePlayerInputPatch
   {
-      static void Postfix(PlayerController __instance, Vector2 rawInput, float cardinalMagnetAngle, float ordinalMagnetAngle, ref Vector2 __result)
+      [HarmonyILManipulator]
+      private static void HandlePlayerInputIL(ILContext il)
       {
-          if (__instance.CurrentGun is not Gun gun)
+          ILCursor cursor = new ILCursor(il);
+          if (!cursor.TryGotoNext(MoveType.AfterLabel,
+            instr => instr.MatchLdarg(0),
+            instr => instr.MatchLdloc(0),
+            instr => instr.MatchCall<PlayerController>(nameof(PlayerController.HandleStartDodgeRoll))
+            ))
             return;
-          if (gun.GetComponent<CwaffGun>() is not CwaffGun cg)
+
+          cursor.Emit(OpCodes.Ldarg, 0); // PlayerController
+          cursor.Emit(OpCodes.Ldloca, 0); // vector (speed)
+          cursor.CallPrivate(typeof(PlayerControllerAdjustInputVectorInHandlePlayerInputPatch), nameof(AdjustMovementSpeed));
+      }
+
+      private static void AdjustMovementSpeed(PlayerController p, ref Vector2 vec)
+      {
+          if (p.CurrentGun is not Gun gun || gun.GetComponent<CwaffGun>() is not CwaffGun cg)
             return;
           if (gun.IsCharging || cg._spinupRemaining != cg.spinupTime)
-            __result = cg.percentSpeedWhileCharging * __result; // change the original result
+            vec = cg.percentSpeedWhileCharging * vec;
           else if (gun.IsFiring)
-            __result = cg.percentSpeedWhileFiring * __result; // change the original result
+            vec = cg.percentSpeedWhileFiring * vec;
       }
   }
 
