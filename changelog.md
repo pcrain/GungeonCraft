@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.26.4 (TBD)
+
+- Fixed null deref in Comfy Slippers caused by setting passive stat modifiers to null instead of empty
+
 ## 1.26.3 (2025-06-22)
 
 #### Balance Changes and Polish:

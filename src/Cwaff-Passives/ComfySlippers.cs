@@ -11,6 +11,7 @@ public class ComfySlippers : CwaffPassive
     internal const float _DODGE_BOOST                   = 0.2f;
 
     internal static StatModifier[] _ComfyBuffs          = null;
+    internal static StatModifier[] _NoBoosts            = [];
 
     private CellVisualData.CellFloorType _lastFloorType = CellVisualData.CellFloorType.Stone;
 
@@ -51,7 +52,7 @@ public class ComfySlippers : CwaffPassive
 
     private void SetComfiness(bool comfy)
     {
-        this.passiveStatModifiers = comfy ? _ComfyBuffs : null;
+        this.passiveStatModifiers = comfy ? _ComfyBuffs : _NoBoosts;
         this.Owner.stats.RecalculateStats(this.Owner);
     }
 }
