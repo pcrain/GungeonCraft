@@ -52,6 +52,7 @@ public class GlassAmmoGun : MonoBehaviour
 {
     private PlayerController _owner;
     private Gun _gun;
+    private Shader _originalShader = null;
 
     public void Setup(PlayerController owner)
     {
@@ -63,8 +64,8 @@ public class GlassAmmoGun : MonoBehaviour
         this._gun.InfiniteAmmo = true;
 
         CwaffRunData.Instance.glassGunIds[this._owner.PlayerIDX].AddUnique(this._gun.PickupObjectId);
-        this._owner.healthHaver.OnDamaged -= this.Shatter;
-        this._owner.healthHaver.OnDamaged += this.Shatter;
+        this._owner.healthHaver.OnDamaged -= this.ShatterOnDamaged;
+        this._owner.healthHaver.OnDamaged += this.ShatterOnDamaged;
         this._gun.OnDropped -= this.OnDropped;
         this._gun.OnDropped += this.OnDropped;
 
@@ -87,17 +88,39 @@ public class GlassAmmoGun : MonoBehaviour
     private void OnDropped()
     {
         this._gun.OnDropped -= this.OnDropped;
-        Shatter(dropped: true);
+        ShatterInternal(dropped: true);
     }
 
-    private void Shatter(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
+    private void LateUpdate()
     {
-        Shatter();
+        if (!this._gun || !this._gun.sprite)
+            return;
+
+        Material m = this._gun.sprite.renderer.material;
+        if (m.shader == CwaffShaders.GoldShader)
+            return;
+
+        this._originalShader = m.shader;
+        this._gun.sprite.usesOverrideMaterial = true;
+        m.shader = CwaffShaders.GoldShader;
+        m.SetColor("_GoldColor", new Color(0.5f, 1.0f, 1.0f));
+        m.SetColor("_SheenColor", new Color(0.5f, 1.0f, 1.0f));
+        m.SetFloat("_GoldNorm", 0f);
+        m.SetFloat("_SheenAngle", 0f);
+        m.SetFloat("_SheenWidth", 1.5f);
+        m.SetFloat("_SheenSpacing", 0f);
+        m.SetFloat("_SheenStrength", 0.25f);
+        m.SetFloat("_SheenEmission", 3.0f);
+        m.SetFloat("_SheenSpeed", 1.5f);
     }
 
-    private void Shatter(bool dropped = false)
+    private void ShatterOnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
     {
-        System.Console.WriteLine($"shatter check");
+        ShatterInternal(dropped: false);
+    }
+
+    private void ShatterInternal(bool dropped = false)
+    {
         if (!this._owner || (!dropped && this._owner.CurrentGun != this._gun))
             return;
 
@@ -118,9 +141,10 @@ public class GlassAmmoGun : MonoBehaviour
           );
 
         this._gun.InfiniteAmmo = false;
-        this._gun.CurrentAmmo = 0;
+        //NOTE: when used on guns with very large clip sizes (e.g., Natascha), the game can freeze if we don't clear the Ammo UI's cached shots
+        this._gun.SetAmmoImmediate(0);
         this._gun.OnDropped -= this.OnDropped;
-        this._owner.healthHaver.OnDamaged -= this.Shatter;
+        this._owner.healthHaver.OnDamaged -= this.ShatterOnDamaged;
         CwaffRunData.Instance.glassGunIds[this._owner.PlayerIDX].TryRemove(this._gun.PickupObjectId);
         UnityEngine.Object.Destroy(this);
     }
@@ -128,8 +152,12 @@ public class GlassAmmoGun : MonoBehaviour
     private void OnDestroy()
     {
         if (this._gun)
+        {
+            if (this._originalShader != null)
+                this._gun.sprite.renderer.material.shader = this._originalShader;
             this._gun.OnDropped -= this.OnDropped;
+        }
         if (this._owner && this._owner.healthHaver)
-            this._owner.healthHaver.OnDamaged -= this.Shatter;
+            this._owner.healthHaver.OnDamaged -= this.ShatterOnDamaged;
     }
 }

@@ -3485,5 +3485,16 @@ public static class Extensions
     UnityEngine.Object.DestroyImmediate(spriteObject.GetComponent<tk2dSpriteAnimation>());
     return proj;
   }
+
+  /// <summary>Immediately sets a gun's ammo to a value without playing animations on the UI</summary>
+  public static void SetAmmoImmediate(this Gun gun, int newAmmo)
+  {
+      gun.CurrentAmmo = 0;
+      if (gun.m_owner is not PlayerController pc)
+        return;
+      GameUIAmmoController uic = GameUIRoot.Instance.GetAmmoControllerForPlayerID(pc.PlayerIDX);
+      for (int i = 0; i < uic.m_cachedModuleShotsRemaining.Count; ++i)
+          uic.m_cachedModuleShotsRemaining[i] = 0;
+  }
 }
 

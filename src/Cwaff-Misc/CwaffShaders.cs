@@ -15,6 +15,7 @@ public static class CwaffShaders
     public static Shader ScreenWiggleShader = null;
     public static Shader ScreenBasicShader = null;
     public static Shader ShatterShader = null;
+    public static Shader GlassShader = null;
     public static Texture2D DigitizeTexture = null;
     public static Texture2D StarsTexture = null;
     public static Texture2D NoiseTexture = null;
@@ -64,6 +65,7 @@ public static class CwaffShaders
             ScreenBasicShader = shaderBundle.LoadAsset<Shader>("assets/screenbasicshader.shader");
             ShatterShader = shaderBundle.LoadAsset<Shader>("assets/scattershader.shader");
             // ShatterShader = shaderBundle.LoadAsset<Shader>("assets/scattershaderunlit.shader");
+            GlassShader = shaderBundle.LoadAsset<Shader>("assets/glassshader.shader");
         }
 
         CwaffEvents.OnCleanStart += ResetShaders;

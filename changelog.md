@@ -3,6 +3,9 @@
 ## 1.26.4 (TBD)
 
 - Fixed null deref in Comfy Slippers caused by setting passive stat modifiers to null instead of empty
+- Removed debug log spam from Glass Ammo Box
+- Added glass shader effect and Glass indicator for weapons on which Glass Ammo Box has been used
+- Fixed extreme lag when guns with very large clip sizes are shattered due to Glass Ammo Box's effects
 
 ## 1.26.3 (2025-06-22)
 

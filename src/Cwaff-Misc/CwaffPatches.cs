@@ -291,6 +291,7 @@ static class DisplayMasteryInGunNamePatch
 {
     private const string JAMMED_STRING                = "[color #bb3333]J[/color][color #aa3333]a[/color][color #993333]m[/color][color #883333]m[/color][color #773333]e[/color][color #663333]d[/color]";
     private const string PRISTINE_STRING              = "[color #bbbbdd]M[/color][color #aabbdd]i[/color][color #99bbdd]n[/color][color #88bbdd]t[/color][color #77bbdd] [/color][color #66bbdd]C[/color][color #55bbdd]o[/color][color #44bbdd]n[/color][color #33bbdd]d[/color][color #22bbdd]i[/color][color #11bbdd]t[/color][color #00bbdd]i[/color][color #00aadd]o[/color][color #0099dd]n[/color]";
+    private const string GLASS_STRING                 = "[color #ddddff]G[/color][color #9999dd]l[/color][color #ddddff]a[/color][color #9999dd]s[/color][color #ddddff]s[/color]";
     private const string MASTERED_STRING              = "[color #dd6666]Mastered[/color]";
     private const string NORMAL_STRING                = "[color #888888]Normal[/color]";
     private static readonly int[] _CachedGunId        = [int.MaxValue, int.MaxValue];
@@ -319,6 +320,12 @@ static class DisplayMasteryInGunNamePatch
             if (_SB.Length > 0)
                 _SB.Append(" ");
             _SB.Append(JAMMED_STRING);
+        }
+        if (__instance.gameObject.GetComponent<GlassAmmoGun>())
+        {
+            if (_SB.Length > 0)
+                _SB.Append(" ");
+            _SB.Append(GLASS_STRING);
         }
         if (__instance.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.CanBeMastered())
         {
