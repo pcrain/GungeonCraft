@@ -142,7 +142,7 @@ public class GlassAmmoGun : MonoBehaviour
 
         this._gun.InfiniteAmmo = false;
         //NOTE: when used on guns with very large clip sizes (e.g., Natascha), the game can freeze if we don't clear the Ammo UI's cached shots
-        this._gun.SetAmmoImmediate(0);
+        this._gun.SetAmmoAndClearUICache(0);
         this._gun.OnDropped -= this.OnDropped;
         this._owner.healthHaver.OnDamaged -= this.ShatterOnDamaged;
         CwaffRunData.Instance.glassGunIds[this._owner.PlayerIDX].TryRemove(this._gun.PickupObjectId);

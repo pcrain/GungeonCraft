@@ -6,6 +6,7 @@
 - Removed debug log spam from Glass Ammo Box
 - Added glass shader effect and Glass indicator for weapons on which Glass Ammo Box has been used
 - Fixed extreme lag when guns with very large clip sizes are shattered due to Glass Ammo Box's effects
+- Updated shaders and VFX for quantum enemies under the effects of Schrodinger's Gat's projectiles
 
 ## 1.26.3 (2025-06-22)
 

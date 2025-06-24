@@ -2,7 +2,6 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - make enemy projectiles flash and disappear with enemy
-    - add nicer particles and sounds for disappearance
     - use new owner detection pioneered by alien nail gun for quantum detection
 */
 
@@ -95,7 +94,7 @@ public class SchrodingersGatProjectile : MonoBehaviour
 
 public class SchrodingersStat : MonoBehaviour
 {
-    private const float _FLICKER_SPEED = 0.05f;
+    private const float _FLICKER_SPEED = 0.1f;
 
     private bool _observed = false;
     private bool _actuallyDead;
@@ -152,7 +151,7 @@ public class SchrodingersStat : MonoBehaviour
             p.DieInAir();
         }
 
-        tk2dBaseSprite edupe = this._enemy.DuplicateInWorld();
+        tk2dBaseSprite edupe = this._enemy.DuplicateInWorld(copyShader: true);
         edupe.StartCoroutine(PhaseOut(edupe, Vector2.right, 25f, 90f, 1.0f));
 
         base.gameObject.Play("schrodinger_dead_sound");
@@ -174,6 +173,16 @@ public class SchrodingersStat : MonoBehaviour
 
     private IEnumerator Quantum()
     {
+        this._enemy.sprite.usesOverrideMaterial = true;
+        Material mat = this._enemy.sprite.renderer.material;
+        Shader oShader = mat.shader;
+        mat.shader = CwaffShaders.WiggleShader;
+        if (this._enemy.optionalPalette != null)
+        {
+            mat.SetFloat("_UsePalette", 1f);
+            mat.SetTexture("_PaletteTex", this._enemy.optionalPalette);
+        }
+        SpriteOutlineManager.RemoveOutlineFromSprite(this._enemy.sprite);
         while (!this._observed)
         {
             yield return null;
@@ -181,19 +190,14 @@ public class SchrodingersStat : MonoBehaviour
             if (this._flickerTimer < _FLICKER_SPEED)
                 continue;
 
-            this._flickerTimer -= _FLICKER_SPEED;
-            this._enemyVisible     = !this._enemyVisible;
-            if (this._enemyVisible)
-                this._enemy.RegisterOverrideColor(Color.black, SchrodingersGat.ItemName);
-            else
-                this._enemy.DeregisterOverrideColor(SchrodingersGat.ItemName);
-
-            if (UnityEngine.Random.value < 0.1f)  // create an afterimage
-            {
-                tk2dBaseSprite dupe = this._enemy.DuplicateInWorld();
-                dupe.StartCoroutine(PhaseOut(dupe, Lazy.RandomVector(), 5f, 90f, 0.5f));
-            }
+            this._flickerTimer = 0f;
+            tk2dBaseSprite dupe = this._enemy.DuplicateInWorld(copyShader: true);
+            dupe.StartCoroutine(PhaseOut(dupe, Lazy.RandomVector(), 5f, 90f, 0.5f));
         }
+        if (this._enemy.sprite)
+            SpriteOutlineManager.AddOutlineToSprite(this._enemy.sprite, Color.black);
+        if (mat)
+            mat.shader = oShader;
     }
 
     private void LateUpdate()
@@ -216,11 +220,8 @@ public class SchrodingersStat : MonoBehaviour
 
     internal static IEnumerator PhaseOut(tk2dBaseSprite sprite, Vector2 direction, float amplitude, float frequency, float lifetime)
     {
-        sprite.color = Color.black;
         for (float elapsed = 0f; elapsed < lifetime; elapsed += BraveTime.DeltaTime)
         {
-            float percentDone = elapsed / lifetime;
-            sprite.renderer.SetAlpha(1f - percentDone);
             sprite.transform.position += ((amplitude * Mathf.Sin(frequency * elapsed) * BraveTime.DeltaTime) * direction).ToVector3ZUp(0f);
             yield return null;
         }

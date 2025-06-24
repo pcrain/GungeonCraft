@@ -2189,9 +2189,14 @@ public static class Extensions
   }
 
   /// <summary>Creates a GameObject with a sprite in the exact same location as an original sprite.</summary>
-  public static tk2dBaseSprite DuplicateInWorld(this tk2dBaseSprite osprite, Texture2D optionalPalette = null)
+  public static tk2dBaseSprite DuplicateInWorld(this tk2dBaseSprite osprite, Texture2D optionalPalette = null, bool copyShader = false)
   {
     tk2dBaseSprite sprite = Lazy.SpriteObject(osprite.collection, osprite.spriteId);
+    if (copyShader)
+    {
+      sprite.renderer.material.shader = osprite.renderer.material.shader;
+      sprite.renderer.material.CopyPropertiesFromMaterial(osprite.renderer.material);
+    }
     sprite.transform.localScale = osprite.transform.localScale;
     sprite.transform.rotation = osprite.transform.rotation;
     sprite.PlaceAtRotatedPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);
@@ -2214,9 +2219,9 @@ public static class Extensions
   }
 
   /// <summary>Creates a GameObject with a sprite in the exact same location as the enemy.</summary>
-  public static tk2dBaseSprite DuplicateInWorld(this AIActor actor)
+  public static tk2dBaseSprite DuplicateInWorld(this AIActor actor, bool copyShader = false)
   {
-    return actor.sprite.DuplicateInWorld(optionalPalette: actor.optionalPalette);
+    return actor.sprite.DuplicateInWorld(optionalPalette: actor.optionalPalette, copyShader: copyShader);
   }
 
   /// <summary>Creates a GameObject with a sprite in the exact same location as an original sprite, as a point mesh.</summary>
@@ -3487,7 +3492,7 @@ public static class Extensions
   }
 
   /// <summary>Immediately sets a gun's ammo to a value without playing animations on the UI</summary>
-  public static void SetAmmoImmediate(this Gun gun, int newAmmo)
+  public static void SetAmmoAndClearUICache(this Gun gun, int newAmmo)
   {
       gun.CurrentAmmo = 0;
       if (gun.m_owner is not PlayerController pc)
