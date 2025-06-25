@@ -3501,5 +3501,15 @@ public static class Extensions
       for (int i = 0; i < uic.m_cachedModuleShotsRemaining.Count; ++i)
           uic.m_cachedModuleShotsRemaining[i] = 0;
   }
+
+  public static void BanFromCoop(this PickupObject item)
+  {
+    if (item.encounterTrackable is not EncounterTrackable t)
+      return;
+    t.m_prerequisites ??= [];
+    int oldSize = t.m_prerequisites.Length;
+    Array.Resize(ref t.m_prerequisites, oldSize + 1);
+    t.m_prerequisites[oldSize] = new CwaffPrerequisite{ prerequisite = CwaffPrerequisites.NOT_COOP_MODE_PREREQUISITE };
+  }
 }
 

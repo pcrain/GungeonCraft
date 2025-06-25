@@ -6,6 +6,7 @@ public enum CwaffPrerequisites
   INSURANCE_PREREQUISITE,
   COMPANION_SHOP_PREREQUISITE,
   BARTER_SHOP_PREREQUISITE,
+  NOT_COOP_MODE_PREREQUISITE,
   TEST_PREREQUISITE,
 }
 
@@ -56,6 +57,9 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
 
   public override bool CheckConditionsFulfilled()
   {
+    if (prerequisite == CwaffPrerequisites.NOT_COOP_MODE_PREREQUISITE)
+      if (GameManager.HasInstance && GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
+        return false;
     SpawnConditions conditions = SpawnConditions[(int)prerequisite];
     // Lazy.DebugLog($"checking prereqs for {Enum.GetName(typeof(CwaffPrerequisites), prerequisite)}");
     if (prerequisite == CwaffPrerequisites.NONE || conditions == null)

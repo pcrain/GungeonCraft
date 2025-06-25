@@ -15,6 +15,7 @@ public class Domino : CwaffPassive
     {
         PassiveItem item  = Lazy.SetupPassive<Domino>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.C;
+        item.BanFromCoop();
 
         PizzaPeel.Init();
         MoneyGun.Init();

@@ -12,6 +12,7 @@
 - Added Blackjack and Ticonderogun to Library Cardtridge's free item list
 - Added dozens of modded paper- and book-adjacent items to Library Cardtridge's free item list
 - Fixed [REDACTED] not having collision before engaging in combat
+- Banned Domino from appearing in co-op mode
 
 ## 1.26.3 (2025-06-22)
 
