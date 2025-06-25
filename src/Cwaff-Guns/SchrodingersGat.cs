@@ -147,6 +147,7 @@ public class SchrodingersStat : MonoBehaviour
             if (!p || !p.sprite || p.Owner != this._enemy)
                 continue;
             tk2dBaseSprite dupe = p.sprite.DuplicateInWorld();
+            dupe.renderer.material.shader = CwaffShaders.WiggleShader;
             dupe.StartCoroutine(PhaseOut(dupe, Vector2.right, 25f, 90f, 1.0f));
             p.DieInAir();
         }
@@ -220,8 +221,10 @@ public class SchrodingersStat : MonoBehaviour
 
     internal static IEnumerator PhaseOut(tk2dBaseSprite sprite, Vector2 direction, float amplitude, float frequency, float lifetime)
     {
+        Material mat = sprite.renderer.material;
         for (float elapsed = 0f; elapsed < lifetime; elapsed += BraveTime.DeltaTime)
         {
+            mat.SetFloat("_Fade", 1f - elapsed / lifetime);
             sprite.transform.position += ((amplitude * Mathf.Sin(frequency * elapsed) * BraveTime.DeltaTime) * direction).ToVector3ZUp(0f);
             yield return null;
         }
