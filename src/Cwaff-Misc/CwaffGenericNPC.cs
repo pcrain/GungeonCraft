@@ -110,6 +110,8 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         base.aiAnimator.PlayUntilCancelled("idler");
         // base.aiAnimator.sprite.color = base.aiAnimator.sprite.color.WithAlpha(0f);
         // base.renderer.enabled = false;
+        if (base.specRigidbody is SpeculativeRigidbody body)
+            body.CollideWithOthers = true;
     }
 
     protected bool CanBeginConversation()
