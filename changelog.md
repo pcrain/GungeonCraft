@@ -7,6 +7,10 @@
 - Added glass shader effect and Glass indicator for weapons on which Glass Ammo Box has been used
 - Fixed extreme lag when guns with very large clip sizes are shattered due to Glass Ammo Box's effects
 - Updated shaders and VFX for quantum enemies under the effects of Schrodinger's Gat's projectiles
+- Added Baby Good Blob and Capture Sphere from [Kyle's Custom Item Pack](https://thunderstore.io/c/enter-the-gungeon/p/KyleTheScientist/CustomItems/) to companion shop
+- Fixed [Children of Kaliber](https://thunderstore.io/c/enter-the-gungeon/p/UnstableStrafe/ChildrenOfKaliber/)'s companions not spawning in companion shop
+- Added Blackjack and Ticonderogun to Library Cardtridge's free item list
+- Added dozens of modded paper- and book-adjacent items to Library Cardtridge's free item list
 
 ## 1.26.3 (2025-06-22)
 

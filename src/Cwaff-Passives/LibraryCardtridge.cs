@@ -14,6 +14,74 @@ public class LibraryCardtridge : CwaffPassive
     private static bool                 _DidLateInit    = false;
     private static ExplosionData        _BookExplosion  = null;
 
+    private static readonly List<string> _ModdedItemNames =
+    [
+        //KTG:
+        "ski:slide_tech_slide", // "Slide Tech Slide",
+        "ski:slide_tech_reload", // "Slide Tech Reload",
+        "ski:slide_tech_counter", // "Slide Tech Counter",
+        "ski:slide_tech_shatter", // "Slide Tech Shatter",
+        "ski:slide_tech_split", // "Slide Tech Split",
+        "ski:slide_tech_surf", // "Slide Tech Surf",
+        "ski:table_tech_amped_cover", // "Table Tech Amped Cover",
+        "ski:book_of_book", // "Book of Book",
+        "ski:manuel's_manual", // "Manuel's Manual",
+        "ski:bullet_tech_flip", // "Bullet Tech Flip",
+        "ski:chicago_typewriter", // "Chicago Typewriter",
+        //PSOG:
+        "psog:death_warrant", // "Death Warrant",
+        "psog:gun_warrant", // "Gun Warrant",
+        "psog:table_tech_devour", // "Table Tech Devour",
+        "psog:table_tech_ignition", // "Table Tech Ignition",
+        "psog:table_rwxg_telefrag", // "Table Rwxg Tekefrag",
+        "psog:hegemony_shipment_ticket", // "Hegemony Shipment Ticket",
+        "psog:scroll_of_guonification", // "Scroll of Guonification",
+        "psog:tome_of_guonmancy", // "Tome of Guonmancy",
+        //OMITB:
+        "nn:libram_of_the_chambers", // "Libram of the Chambers",
+        "nn:table_tech_table", // "Table Tech Table",
+        "nn:table_tech_speed", // "Table Tech Speed",
+        "nn:table_tech_invulnerability", // "Table Tech Invulnerability",
+        "nn:table_tech_ammo", // "Table Tech Ammo",
+        "nn:table_tech_guon", // "Table Tech Guon",
+        "nn:table_tech_spectre", // "Table Tech Spectre",
+        "nn:table_tech_astronomy", // "Table Tech Astronomy",
+        "nn:table_tech_vitality", // "Table Tech Vitality",
+        "nn:table_tech-nology", // "Table Tech-Nology",
+        "nn:uns-table_tech", // "Uns-Table Tech",
+        "nn:book_of_mimic_anatomy", // "Book of Mimic Anatomy",
+        "nn:map_fragment", // "Map Fragment",
+        "nn:tattered_map", // "Tattered Map",
+        "nn:paper_badge", // "Paper Badge",
+        "nn:chance_card", // "Chance Card",
+        "nn:organ_donor_card", // "Organ Donor Card",
+        "nn:kalibers_prayer", // "Kaliber's Prayer",
+        "nn:gunidae_solvit_haatelis", // "Gunidae solvit Haatelis",
+        "nn:coupon", // "Coupon",
+        "nn:bombinomicon", // "Bombinomicon",
+        "nn:scroll_of_exact_knowledge", // "Scroll of Exact Knowledge",
+        "nn:pencil", // "Pencil",
+        "nn:bookllet", // "Bookllet",
+        "nn:lorebook", // "Lorebook",
+        //CoK:
+        "ck:mininomocon", // "Mininomicon",
+        "ck:steam_sale", // "Steam Sale",
+        "ck:support_contract", // "Support Contract",
+        //FnGF:
+        "kp:table_tech_life", // "Table Tech Life",
+        "kp:table_tech_petrify", // "Table Tech Petrify",
+        "kp:drawn", // "Drawn",
+        //Expand:
+        "ex:table_tech_assassin", // "Table Tech Assassin",
+        //Bleaker:
+        "bb:pilot's_guide_to_pickpocketing", // "Pilot's Guide to Pickpocketing",
+        //Retrash:
+        "rtr:blank_spellbock", // "Blank Spellbook",
+        "rtr:table_tech_stealth", // "Table Tech Stealth",
+        //Kyles:
+        "kts:scroll_of_approximate_knowledge", // "Scroll of Approximate Knowledge",
+    ];
+
     public static void Init()
     {
         PassiveItem item   = Lazy.SetupPassive<LibraryCardtridge>(ItemName, ShortDescription, LongDescription, Lore);
@@ -95,7 +163,10 @@ public class LibraryCardtridge : CwaffPassive
             _BookItemIDs.Add(Lazy.PickupId<MMReloading>());
             _BookItemIDs.Add(Lazy.PickupId<MMAiming>());
             _BookItemIDs.Add(Lazy.PickupId<BlankChecks>());
-            //TODO: Add other modded items to the book items list
+            _BookItemIDs.Add(Lazy.PickupId<Ticonderogun>());
+            foreach (string s in _ModdedItemNames)
+                if (Lazy.GetModdedItem(s) is PickupObject moddedItem)
+                    _BookItemIDs.Add(moddedItem.PickupObjectId);
             _DidLateInit = true;
         }
 

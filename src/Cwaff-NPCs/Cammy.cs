@@ -25,7 +25,7 @@ public class Cammy
             (int)Items.ClownMask,
             (int)Items.ChickenFlute,
             (int)Items.Junkan,
-            (int)Items.Gunther, // not a true companion, but close enough
+            (int)Items.Gunther,
         };
 
         List<string> moddedItems = new(){
@@ -52,12 +52,15 @@ public class Cammy
             "kp:b.f.o.",
             "kp:squire",
             "kp:baby_good_cannon_kin",
+            // Children of Kaliber
+            "ck:pet_rock",
+            "ck:guunther",
             // Expand the Gungeon
             "ex:baby_good_hammer",
             "ex:baby_sitter",
-            // Children of Kaliber
-            "cel:the_prime_core",
-            "cel:pet_rock", // not a true companion, but close enough
+            // Kyle's Custom Items
+            "kts:baby_good_blob",
+            "kts:capture_sphere", // Pikachu
             // Little Guy :D
             "lg:strange_root",
             // Bleaker Item Pack
