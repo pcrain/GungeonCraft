@@ -38,7 +38,9 @@ public class CwaffTrailController : BraveBehaviour
     internal static void Return(LinkedListNode<Bone> bone)
     {
       _BonePool.AddLast(bone);
+      // #if DEBUG
       // System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
+      // #endif
     }
 
     private Bone() // can only be created by Rent

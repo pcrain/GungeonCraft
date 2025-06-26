@@ -15,6 +15,9 @@
 - Banned Domino from appearing in co-op mode
 - Fixed null deref caused by improper caching of projectile trails when loading a new level via non-standard means (e.g., console commands)
 - Fixed null deref caused by improper caching of projectile trails when loading a new level while the projectiles are still active
+- Projectiles from B. B. Gun, Blackjack, and English can now fall into pits when at rest
+- Increased Blackjack's ammo from 104 to 156 to compensate for new pitfall behavior
+- B. B. Gun's projectiles are now automatically picked up when walking near them while at rest, similar to Blackjack's projectiles
 
 ## 1.26.3 (2025-06-22)
 

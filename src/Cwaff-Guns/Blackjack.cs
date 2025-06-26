@@ -9,8 +9,8 @@ public class Blackjack : CwaffGun
 
     private const int _DECK_SIZE = 52; // need to finish up individual playing cards later
     private const int _CLIP_SIZE = 13; // 1 suit
-    private const int _NUM_DECKS = 2;
-    private const int _AMMO      = 104; // _DECK_SIZE * _NUM_DECKS //NOTE: set manually for now so wiki generation code has an easier time
+    private const int _NUM_DECKS = 3;
+    private const int _AMMO      = 156; // _DECK_SIZE * _NUM_DECKS //NOTE: set manually for now so wiki generation code has an easier time
 
     internal static tk2dSpriteAnimationClip _BulletSprite;
     internal static tk2dSpriteAnimationClip _BackSprite;
@@ -173,6 +173,7 @@ public class ThrownCard : MonoBehaviour
             tk2dBaseSprite sprite = p.sprite.DuplicateInWorld();
             PlayingCard card = sprite.gameObject.AddComponent<PlayingCard>();
             card._sprite = sprite;
+            card.gameObject.AllowFallingIntoPits();
             return card;
         }
 

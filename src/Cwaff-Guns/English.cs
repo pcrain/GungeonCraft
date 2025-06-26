@@ -531,6 +531,8 @@ public class BilliardBall : MonoBehaviour
         if (this._state == state)
             return;
 
+        if (base.gameObject.GetComponent<DebrisObject>() is DebrisObject debris)
+            UnityEngine.Object.Destroy(debris);
         this._projectile.enabled = true;
         this._body.CollideWithTileMap = true;
         this._projectile.collidesWithEnemies = true;
@@ -554,6 +556,7 @@ public class BilliardBall : MonoBehaviour
         this._projectile.collidesWithProjectiles = false;
         this._projectile.UpdateCollisionMask();
         this._projectile.enabled = false;
+        base.gameObject.AllowFallingIntoPits();
         this._state = DEACTIVATED;
     }
 }

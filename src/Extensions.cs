@@ -3502,6 +3502,7 @@ public static class Extensions
           uic.m_cachedModuleShotsRemaining[i] = 0;
   }
 
+  /// <summary>Prevent an item from spawning in coop mode</summary>
   public static void BanFromCoop(this PickupObject item)
   {
     if (item.encounterTrackable is not EncounterTrackable t)
@@ -3510,6 +3511,16 @@ public static class Extensions
     int oldSize = t.m_prerequisites.Length;
     Array.Resize(ref t.m_prerequisites, oldSize + 1);
     t.m_prerequisites[oldSize] = new CwaffPrerequisite{ prerequisite = CwaffPrerequisites.NOT_COOP_MODE_PREREQUISITE };
+  }
+
+  /// <summary>Allow a sprite object to fall into pits.</summary>
+  public static void AllowFallingIntoPits(this GameObject g)
+  {
+      DebrisObject debris = g.GetOrAddComponent<DebrisObject>();
+      debris.accurateDebris = false;
+      debris.PreventFallingInPits = false;
+      debris.animatePitFall = true;
+      debris.Trigger(Vector3.zero, 0f, 0f);
   }
 }
 

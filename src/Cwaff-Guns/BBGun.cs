@@ -1,4 +1,5 @@
 
+
 namespace CwaffingTheGungy;
 
 public class BBGun : CwaffGun
@@ -14,7 +15,7 @@ public class BBGun : CwaffGun
     internal static Projectile _PinProjectile = null;
 
     private float _lastCharge = 0.0f;
-    private readonly List<Projectile> _extantBbs = new();
+    private readonly List<TheBB> _extantBbs = new();
 
     public static void Init()
     {
@@ -78,24 +79,17 @@ public class BBGun : CwaffGun
     {
         this.gun.CurrentAmmo = this.gun.AdjustedMaxAmmo;
         this.gun.ForceImmediateReload();
-        foreach (MiniInteractable mi in TheBB._ExtantPickups)
-            if (mi)
-                UnityEngine.Object.Destroy(mi.gameObject);
-        TheBB._ExtantPickups.Clear();
-        foreach (Projectile bb in this._extantBbs)
+        foreach (TheBB bb in this._extantBbs)
             if (bb)
-            {
-                bb.gameObject.GetComponent<TheBB>()._createInteractible = false;
-                bb.DieInAir(false, false, false, true);
-            }
+                bb.EraseFromExistence();
         this._extantBbs.Clear();
     }
 
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        if (projectile.gameObject.GetComponent<TheBB>())
-            this._extantBbs.Add(projectile);
+        if (projectile.gameObject.GetComponent<TheBB>() is TheBB bb)
+            this._extantBbs.Add(bb);
     }
 
     public class PinProjectile : MonoBehaviour
@@ -186,17 +180,17 @@ public class TheBB : MonoBehaviour
     private const float _REFLECT_ANGLE_SNAP = 30f;
     private const float _DRAG = 0.9f;
 
-    internal static readonly List<MiniInteractable> _ExtantPickups = new();
-
     internal bool _createInteractible = true;
+    internal Projectile _projectile;
 
-    private Projectile _projectile;
     private PlayerController _owner;
     private float _maxSpeed = 0f;
     private float _damageMult = _BB_DAMAGE_SCALE;
     private float _knockbackMult = _BB_FORCE_SCALE;
     private bool _mastered = false;
     private bool _freebie = false;
+    private DebrisObject _debris = null;
+    private tk2dBaseSprite _sprite = null;
 
     private void Start()
     {
@@ -217,10 +211,37 @@ public class TheBB : MonoBehaviour
 
         this._freebie = this._projectile.FiredForFree();
         if (!this._freebie)
-            this._projectile.OnDestruction += MaybeCreateInteractible;
+        {
+            this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;
+            this._projectile.OnDestruction += this.BecomeDebrisImmediate;
+        }
         this._maxSpeed = this._projectile.baseData.speed;
 
         this.GetComponent<BounceProjModifier>().OnBounce += this.OnBounce;
+    }
+
+    private void BecomeDebrisImmediate(Projectile proj)
+    {
+        base.gameObject.AllowFallingIntoPits();
+        this._debris = base.gameObject.GetComponent<DebrisObject>();
+        this._sprite = base.gameObject.GetComponentInChildren<tk2dBaseSprite>();
+        if (this._sprite.spriteAnimator is tk2dSpriteAnimator animator)
+            animator.Pause();
+    }
+
+    public void EraseFromExistence()
+    {
+        if (this._debris)
+        {
+            UnityEngine.Object.Destroy(base.gameObject);
+            return;
+        }
+
+        this._createInteractible = false;
+        this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.Destroy;
+        this._projectile.OnDestruction -= this.BecomeDebrisImmediate;
+        SpawnManager.SpawnVFX(VFX.MiniPickup, this._projectile.SafeCenter, Lazy.RandomEulerZ());
+        this._projectile.DieInAir(false, false, false, true);
     }
 
     private void OnMightCollideWithPlayer(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -257,8 +278,7 @@ public class TheBB : MonoBehaviour
         otherRigidbody.gameObject.Play((speed > 20f) ? "bb_catch_sound" : "bb_impact_sound");
 
         // finish up
-        this._createInteractible = false;
-        this._projectile.DieInAir();
+        EraseFromExistence();
         PhysicsEngine.SkipCollision = true;
     }
 
@@ -318,28 +338,46 @@ public class TheBB : MonoBehaviour
         base.gameObject.Play("bb_impact_sound");
     }
 
-    private void MaybeCreateInteractible(Projectile p)
+    private void DoDebrisChecks()
     {
-        if (!this._createInteractible)
-            return;
+        const float PICKUP_RADIUS = 3f;
+        const float PICKUP_RADIUS_SQR = PICKUP_RADIUS * PICKUP_RADIUS;
 
-        MiniInteractable mi = MiniInteractable.CreateInteractableAtPosition(
-          this._projectile.sprite,
-          this._projectile.SafeCenter,
-          BBInteractScript);
-        mi.doHover = true;
-        mi.sprite.SetGlowiness(glowAmount: _BASE_EMISSION, glowColor: Color.magenta);
-        _ExtantPickups.Add(mi);
+        Vector2 pos = this._sprite ? this._sprite.WorldCenter : base.transform.position;
+        for (int i = 0; i < GameManager.Instance.AllPlayers.Length; ++i)
+        {
+            PlayerController p = GameManager.Instance.AllPlayers[i];
+            if (!p || p.IsGhost || p.healthHaver.IsDead)
+                continue;
+            if ((p.CenterPosition - pos).sqrMagnitude > PICKUP_RADIUS_SQR)
+                continue;
+            if ((p.FindBaseGun<BBGun>() is not Gun gun))
+                continue;
+            if (gun.CurrentAmmo < gun.AdjustedMaxAmmo)
+                gun.CurrentAmmo += 1;
+            p.gameObject.PlayUnique("card_pickup_sound");
+            SpawnManager.SpawnVFX(VFX.MiniPickup, pos, Lazy.RandomEulerZ());
+            UnityEngine.Object.Destroy(base.gameObject);
+            break;
+        }
     }
 
     private void Update()
     {
+        if (this._debris)
+        {
+            DoDebrisChecks();
+            return;
+        }
+
         float speed = this._projectile.m_currentSpeed;
         if (speed <= 1)
         {
             this._projectile.DieInAir(suppressInAirEffects: true);
             return;
         }
+        if (speed <= 10)
+            this._projectile.baseData.damping = 0.25f;
 
         Material m = this._projectile.sprite.renderer.material;
         m.SetFloat(CwaffVFX._EmissivePowerId, _BASE_EMISSION + _EXTRA_EMISSION * (speed / _maxSpeed));
@@ -352,19 +390,5 @@ public class TheBB : MonoBehaviour
 
         if (this._mastered)
             ReflectNearbyProjectiles();
-    }
-
-    public static IEnumerator BBInteractScript(MiniInteractable i, PlayerController p)
-    {
-        if ((p.FindBaseGun<BBGun>() is Gun gun) && (gun.CurrentAmmo < gun.AdjustedMaxAmmo))
-        {
-            gun.CurrentAmmo += 1;
-            gun.ForceImmediateReload();
-            Lazy.DoPickupAt(i.sprite.WorldCenter);
-            _ExtantPickups.TryRemove(i);
-            UnityEngine.Object.Destroy(i.gameObject);
-        }
-        i.interacting = false;
-        yield break;
     }
 }
