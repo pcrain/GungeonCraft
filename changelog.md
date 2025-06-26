@@ -13,6 +13,8 @@
 - Added dozens of modded paper- and book-adjacent items to Library Cardtridge's free item list
 - Fixed [REDACTED] not having collision before engaging in combat
 - Banned Domino from appearing in co-op mode
+- Fixed null deref caused by improper caching of projectile trails when loading a new level via non-standard means (e.g., console commands)
+- Fixed null deref caused by improper caching of projectile trails when loading a new level while the projectiles are still active
 
 ## 1.26.3 (2025-06-22)
 

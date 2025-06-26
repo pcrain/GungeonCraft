@@ -60,11 +60,16 @@ public static class CwaffEvents // global custom events we can listen for
         }
     }
 
-    [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadNextLevel))]
+    [HarmonyPatch]
     private class LoadNextLevelPatch
     {
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadNextLevel))]
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadCustomLevel))]
+        [HarmonyPatch(typeof(GameManager), nameof(GameManager.LoadCustomFlowForDebug))]
+        [HarmonyPrefix]
         static void Prefix(GameManager __instance)
         {
+            // Lazy.DebugLog($"triggering OnFloorEnded");
             if (BeforeRunStart != null && (__instance.nextLevelIndex == 1 || (GameManager.SKIP_FOYER && __instance.nextLevelIndex == 0)))
             {
                 bool reallyStartedNewRun = GameStatsManager.Instance.GetSessionStatValue(TrackedStats.TIME_PLAYED) < 0.1f;

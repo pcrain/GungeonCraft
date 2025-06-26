@@ -384,12 +384,14 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
 {
     private static readonly LinkedList<GameObject> _TrailPool = new();
     private static readonly LinkedList<GameObject> _UsedTrails = new();
+    private static readonly LinkedList<EasyTrailBullet> _ExtantTrails = new();
     private static int _TrailsCreated = 0;
 
     private Projectile proj;
     private GameObject tro;
     private CustomTrailRenderer tr;
     private Material mat;
+    private LinkedListNode<EasyTrailBullet> node;
 
     public Vector2 TrailPos;
     public Color BaseColor;
@@ -403,6 +405,8 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
     {
       if (_TrailPool.Count == 0)
       {
+        if (_TrailsCreated == 0)
+            CwaffEvents.OnFloorEnded += OnFloorEnded;
         //NOTE: need to immediately parent new trail object to avoid visual glitches
         GameObject newTrail = parent.AddChild("trail object", typeof(CustomTrailRenderer));
         CustomTrailRenderer newTr = newTrail.GetComponent<CustomTrailRenderer>();
@@ -429,6 +433,16 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
       ctr.Clear();
       ctr.Reenable();
       return trail;
+    }
+
+    private static void OnFloorEnded()
+    {
+        int numToDestroy = _ExtantTrails.Count;
+        // #if DEBUG
+        // System.Console.WriteLine($"destroying {numToDestroy} trails");
+        // #endif
+        for (int i = 0; i < numToDestroy; ++i)
+            _ExtantTrails.Last.Value.Cleanup();
     }
 
     private static void Return(GameObject trail)
@@ -486,6 +500,8 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
         tr.widths[0] = StartWidth;
         tr.widths[1] = EndWidth;
         tr.lifeTime = LifeTime;
+
+        node = _ExtantTrails.AddLast(this);
     }
 
     public void Enable() => tr.enabled = true;
@@ -511,10 +527,23 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
         tr.lifeTime = LifeTime;
     }
 
-    public override void OnDestroy()
+    private void Cleanup()
     {
         if (tro)
+        {
             Return(tro);
+            tro = null;
+        }
+        if (node != null)
+        {
+            _ExtantTrails.Remove(node);
+            node = null;
+        }
+    }
+
+    public override void OnDestroy()
+    {
+        Cleanup();
         base.OnDestroy();
     }
 
@@ -525,9 +554,7 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
 
     public void PPPReset(GameObject prefab)
     {
-        if (tro)
-            Return(tro);
-        tro = null;
+        Cleanup();
     }
 
     public void PPPRespawn()
