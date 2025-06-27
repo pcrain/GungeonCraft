@@ -46,6 +46,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   private Vector3                           _defaultBarrelOffset       = Vector3.zero; // the default barrel offset for guns with dynamic offsets
   private ModuleShootData                   _cachedShootData           = null; // cached firing data for getting info on extant beams, etc.
   private int                               _cachedMasteryTokenId      = -2;   // cached mastery token id
+  private tk2dSprite                        _masterySprite             = null; // attached sprite for mastery shader effects
 
   protected float                           _spinupRemaining           = 0.0f; // the remaining time a gun must spin up before firing
 
@@ -113,12 +114,71 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     bool wasMastered = this.Mastered;
     if (this._cachedMasteryTokenId < -1)
       this._cachedMasteryTokenId = this.gun.MasteryTokenId();
-    this.Mastered = (player && player.HasPassive(this._cachedMasteryTokenId));
-    if (wasMastered != this.Mastered)
-      OnMasteryStatusChanged();
-    // #if DEBUG
-    // ETGModConsole.Log($"is {this.gun.GetUnmodifiedDisplayName()} mastered: {this.mastered}");
-    // #endif
+    bool isMastered = this.Mastered = (player && player.HasPassive(this._cachedMasteryTokenId));
+    if (wasMastered == isMastered)
+      return;
+
+    OnMasteryStatusChanged();
+    if (isMastered)
+      SetUpMasteryShaders();
+  }
+
+  private void SetUpMasteryShaders()
+  {
+    if (this._masterySprite)
+      return;
+    if (this.gun.gameObject.transform.Find("mastery renderer") is Transform t)
+      this._masterySprite = t.gameObject.GetComponent<tk2dSprite>();
+    else
+      this._masterySprite = new GameObject("mastery renderer", typeof(tk2dSprite)).GetComponent<tk2dSprite>();
+    this.gun.sprite.AttachRenderer(this._masterySprite);
+    this._masterySprite.SetSprite(this.gun.sprite.collection, this.gun.sprite.spriteId);
+    this._masterySprite.usesOverrideMaterial = true;
+    Transform baseTransform = this.gun.sprite.transform;
+    Transform newTransform = this._masterySprite.transform;
+    newTransform.position = baseTransform.position;
+    newTransform.rotation = baseTransform.rotation;
+    newTransform.parent = baseTransform;
+    Material mat = this._masterySprite.renderer.material;
+    mat.shader = CwaffShaders.ElectricShader;
+    mat.SetColor("_ZapColor", new Color(1.0f, 0.3f, 0.0f, 1.0f));
+    mat.SetFloat("_Fade", 0.0f);
+    mat.SetFloat("_NoiseOffset", 0.75f);
+    mat.SetTexture("_ShaderTex", CwaffShaders.NoiseTexture);
+    mat.SetFloat("_Strength", 2.0f);
+    mat.SetFloat("_Size", 8.0f);
+    mat.SetFloat(CwaffVFX._EmissivePowerId, 2f);
+  }
+
+  private void UpdateMasteryShaders()
+  {
+    if (!this._masterySprite)
+      return;
+    if (!this.gun.sprite.renderer.enabled)
+    {
+      this._masterySprite.renderer.enabled = false;
+      return;
+    }
+    this._masterySprite.renderer.enabled = true;
+    this._masterySprite.SetSprite(this.gun.sprite.collection, this.gun.sprite.spriteId);
+    Transform baseTransform = this.gun.sprite.transform;
+    Transform newTransform = this._masterySprite.transform;
+    newTransform.position = baseTransform.position;
+    newTransform.rotation = baseTransform.rotation;
+    newTransform.localScale = baseTransform.localScale;
+    this._masterySprite.FlipY = this.gun.sprite.FlipY;
+  }
+
+  public override void OnDestroy()
+  {
+    base.OnDestroy();
+    if (this._masterySprite)
+    {
+      this._masterySprite.transform.parent = null;
+      if (this.gun && this.gun.sprite)
+        this.gun.sprite.DetachRenderer(this._masterySprite);
+      UnityEngine.Object.Destroy(this._masterySprite.gameObject);
+    }
   }
 
   /// <summary>Called when the player obtains or loses a mastery for the gun</summary>
@@ -202,6 +262,11 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
         this._hasReloaded = true;
     if (this._usesDynamicBarrelPosition)
       AdjustBarrelPosition();
+  }
+
+  private void LateUpdate()
+  {
+    UpdateMasteryShaders();
   }
 
   private void AdjustBarrelPosition()
@@ -649,6 +714,17 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   // see discussion in MTG discord: https://discord.com/channels/998556124250898523/1011409820617810011/1308804511770345534
   [HarmonyPatch(typeof(Gun), nameof(Gun.Reload))]
   private static class GunReloadPostfixToAppeaseTheHarmonyOverlords { public static void Postfix() { } }
+
+  /// <summary>Make sure mastery shader renderer is disabled with the gun's renderer</summary>
+  [HarmonyPatch(typeof(Gun), nameof(Gun.OnDisable))]
+  [HarmonyPostfix]
+  private static void GunOnDisablePatch(Gun __instance)
+  {
+    if (__instance.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg)
+      return;
+    if (cg._masterySprite && cg._masterySprite.renderer.enabled)
+      cg._masterySprite.renderer.enabled = false;
+  }
 }
 
 public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffItem
