@@ -1118,6 +1118,10 @@ public static class HeckedMode
         }
 
         shooter.Initialize();
+        //NOTE: prevent GungeonCraft guns from using normal fire audio since they use the Banana switch group
+        //      and we don't want that playing
+        if (shooter.CurrentGun && shooter.CurrentGun.gameObject.GetComponent<CwaffGun>())
+            shooter.CurrentGun.PreventNormalFireAudio = true;
         // ETGModConsole.Log($"after init: ");
         // shooter.AttachStats();
     }

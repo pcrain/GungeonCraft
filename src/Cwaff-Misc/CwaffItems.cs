@@ -139,7 +139,11 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     newTransform.position = baseTransform.position;
     newTransform.rotation = baseTransform.rotation;
     newTransform.parent = baseTransform;
-    Material mat = this._masterySprite.renderer.material;
+    AddMasteryShaders(this._masterySprite.renderer.material);
+  }
+
+  private static void AddMasteryShaders(Material mat)
+  {
     mat.shader = CwaffShaders.ElectricShader;
     mat.SetColor("_ZapColor", new Color(1.0f, 0.3f, 0.0f, 1.0f));
     mat.SetFloat("_Fade", 0.0f);
@@ -728,6 +732,28 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     if (cg._masterySprite && cg._masterySprite.renderer.enabled)
       cg._masterySprite.renderer.enabled = false;
   }
+
+  // NOTE: this is buggy as-is, and doing this any more robustly is just a lot of effort and headaches that's not worth it D:
+  /// <summary>Render mastery shaders over mastered guns</summary>
+  // [HarmonyPatch(typeof(AmmonomiconPokedexEntry), nameof(AmmonomiconPokedexEntry.UpdateEncounterState))]
+  // [HarmonyPatch(typeof(AmmonomiconPokedexEntry), nameof(AmmonomiconPokedexEntry.UpdateSynergyHighlights))]
+  // [HarmonyPostfix]
+  // private static void AmmonomiconPokedexEntryUpdateEncounterStatePatch(AmmonomiconPokedexEntry __instance)
+  // {
+  //   if (__instance.linkedEncounterTrackable is not EncounterDatabaseEntry entry)
+  //     return;
+  //   if (entry.pickupObjectId < 1)
+  //     return;
+  //   if (PickupObjectDatabase.GetById(entry.pickupObjectId) is not PickupObject pickup)
+  //     return;
+  //   if (pickup.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg)
+  //     return;
+  //   if (!__instance.m_childSprite)
+  //     return;
+  //   __instance.ChangeOutlineColor(Color.magenta);
+  //   // __instance.m_childSprite.usesOverrideMaterial = true;
+  //   // AddMasteryShaders(__instance.m_childSprite.renderer.material);
+  // }
 }
 
 public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffItem
