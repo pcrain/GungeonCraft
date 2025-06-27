@@ -19,6 +19,7 @@
 - Increased Blackjack's ammo from 104 to 156 to compensate for new pitfall behavior
 - B. B. Gun's projectiles are now automatically picked up when walking near them while at rest, similar to Blackjack's projectiles
 - Added shaders to mastered guns as an extra indicator of mastery status
+- Fixed rare null deref caused by spawning in a gun with dynamic barrel offsets via the console
 
 ## 1.26.3 (2025-06-22)
 

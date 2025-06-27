@@ -271,8 +271,11 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
   private void AdjustBarrelPosition()
   {
-    tk2dSpriteAnimator animator = this.gun.spriteAnimator;
-    if (this._barrelOffsets.TryGetValue(animator.currentClip.name, out List<Vector3> offsets))
+    if (!this.gun || this.gun.spriteAnimator is not tk2dSpriteAnimator animator)
+      return;
+    if (animator.currentClip is not tk2dSpriteAnimationClip clip)
+      return;
+    if (this._barrelOffsets.TryGetValue(clip.name, out List<Vector3> offsets))
       this.gun.barrelOffset.localPosition = offsets[animator.CurrentFrame];
     else
       this.gun.barrelOffset.localPosition = this._defaultBarrelOffset;
