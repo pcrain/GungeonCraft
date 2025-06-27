@@ -20,6 +20,7 @@
 - B. B. Gun's projectiles are now automatically picked up when walking near them while at rest, similar to Blackjack's projectiles
 - Added shaders to mastered guns as an extra indicator of mastery status
 - Fixed rare null deref caused by spawning in a gun with dynamic barrel offsets via the console
+- Fixed mastered Breegull losing all of its ammo if dropped while fire eggs are selected
 
 ## 1.26.3 (2025-06-22)
 

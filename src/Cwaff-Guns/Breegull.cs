@@ -21,7 +21,7 @@ public class Breegull : CwaffGun
     internal int _currentEggType = 0;
     private float _noiseTimer = 0.0f;
     private bool _altNoise = false;
-    private int _trueAmmo = 0;
+    private int _trueAmmo = -1;
 
     internal class EggData
     {
@@ -144,10 +144,10 @@ public class Breegull : CwaffGun
     {
         base.OnDroppedByPlayer(player);
         player.OnRollStarted -= this.OnDodgeRoll;
-        if (this._trueAmmo > 0)
+        if (this._trueAmmo > -1)
         {
             this.gun.CurrentAmmo = this._trueAmmo;
-            this._trueAmmo = 0;
+            this._trueAmmo = -1;
         }
     }
 
@@ -192,7 +192,8 @@ public class Breegull : CwaffGun
             }
             else
             {
-                this.gun.CurrentAmmo = this._trueAmmo;
+                if (this._trueAmmo != -1)
+                    this.gun.CurrentAmmo = this._trueAmmo;
                 this._trueAmmo = -1;
             }
         }
