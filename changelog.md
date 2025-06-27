@@ -22,6 +22,7 @@
 - Fixed rare null deref caused by spawning in a gun with dynamic barrel offsets via the console
 - Fixed mastered Breegull losing all of its ammo if dropped while fire eggs are selected
 - Fixed Banana's audio playing whenever an enemy fires a GungeonCraft gun
+- Fixed Omnidirectional Laser rendering above the player for a single frame when picking it up or switching to it
 
 ## 1.26.3 (2025-06-22)
 

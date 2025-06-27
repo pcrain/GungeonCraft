@@ -193,6 +193,7 @@ public class OmnidirectionalLaser : CwaffGun
         tk2dSpriteAnimationClip clip = gun.spriteAnimator.GetClipByName($"{gun.InternalSpriteName()}_fire");
         if (gun.spriteAnimator.currentClip != clip)
         {
+            gun.sprite.spriteId = clip.frames[0].spriteId; // prevent the "normal" idle animation from appearing for a single frame
             gun.spriteAnimator.currentClip = clip;
             gun.spriteAnimator.Play();
         }
