@@ -23,6 +23,7 @@
 - Fixed mastered Breegull losing all of its ammo if dropped while fire eggs are selected
 - Fixed Banana's audio playing whenever an enemy fires a GungeonCraft gun
 - Fixed Omnidirectional Laser rendering above the player for a single frame when picking it up or switching to it
+- Added a few more songs to the Glockarina
 
 ## 1.26.3 (2025-06-22)
 

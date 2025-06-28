@@ -18,14 +18,18 @@ public class Glockarina : CwaffGun
 
     internal enum Mode {
         DEFAULT,  // no special effects
-        STORM,    // lightning shoots from notes when close to enemies
+        STORM,    // spreads electrified water goop in transit
         TIME,     // slows down enemy bullets close to notes
         SARIA,    // homes in on nearby enemies with slightly increased damage
         EMPTY,    // killed enemies become decoys
+        BOLERO,   // spreads fire goop in transit
+        REQUIEM,  // pierces enemies
 
         DOUBLE,   // not a real mode, but song should clear room for 1/3 of max ammo
         SUN,      // not a real mode, but song should clear darkness effects
         PRELUDE,  // not a real mode, but song should warp player to shop
+        HEALING,  // not a real mode, but restores half a heart once per floor
+        WHAT,     // heh
     }
 
     private enum Note {
@@ -46,14 +50,21 @@ public class Glockarina : CwaffGun
         /* TIME    */ new(){Note.RIGHT, Note.A, Note.DOWN, Note.RIGHT, Note.A, Note.DOWN},
         /* SARIA   */ new(){Note.DOWN, Note.RIGHT, Note.LEFT, Note.DOWN, Note.RIGHT, Note.LEFT},
         /* EMPTY   */ new(){Note.RIGHT, Note.LEFT, Note.RIGHT, Note.DOWN, Note.RIGHT, Note.UP, Note.LEFT},
+        /* BOLERO  */ new(){Note.DOWN, Note.A, Note.DOWN, Note.A, Note.RIGHT, Note.DOWN, Note.RIGHT, Note.DOWN},
+        /* REQUIEM */ new(){Note.A, Note.DOWN, Note.A, Note.RIGHT, Note.DOWN, Note.A},
         /* DOUBLE  */ new(){Note.RIGHT, Note.RIGHT, Note.A, Note.A, Note.DOWN, Note.DOWN},
         /* SUN     */ new(){Note.RIGHT, Note.DOWN, Note.UP, Note.RIGHT, Note.DOWN, Note.UP},
         /* PRELUDE */ new(){Note.UP, Note.RIGHT, Note.UP, Note.RIGHT, Note.LEFT, Note.UP},
+        /* HEALING */ new(){Note.LEFT, Note.RIGHT, Note.DOWN, Note.LEFT, Note.RIGHT, Note.DOWN},
+        /* WHAT    */ new(){Note.A, Note.A, Note.UP, Note.RIGHT},
     };
 
     internal Mode _mode = Mode.DEFAULT;
     private List<Note> _lastNotes = new();
     private DamageTypeModifier _electricImmunity = null;
+
+    [SerializeField]
+    private bool _didHealThisFloor = false;
 
     public static void Init()
     {
@@ -112,19 +123,27 @@ public class Glockarina : CwaffGun
         base.OnPlayerPickup(player);
         UpdateMode();
         UpdateAmmo();
+        GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewLevelFullyLoaded;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewLevelFullyLoaded;
         base.OnDroppedByPlayer(player);
         player.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
     }
 
     public override void OnDestroy()
     {
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewLevelFullyLoaded;
         if (this.PlayerOwner)
             this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
         base.OnDestroy();
+    }
+
+    private void OnNewLevelFullyLoaded()
+    {
+        this._didHealThisFloor = false;
     }
 
     private void UpdateAmmo()
@@ -191,6 +210,16 @@ public class Glockarina : CwaffGun
                 }
                 return false;
 
+            case Mode.HEALING:
+                if (this._didHealThisFloor)
+                    return false;
+                LootEngine.SpawnHealth(player.CenterPosition, 1, null);
+                this._didHealThisFloor = true;
+                return true;
+
+            case Mode.WHAT:
+                base.gameObject.Play("sans_laugh");
+                return false;
         }
         return false;
     }
@@ -340,6 +369,21 @@ public class Glockarina : CwaffGun
             case Mode.EMPTY:
                 projectile.gameObject.AddComponent<CreateDecoyOnKill>();
                 break;
+            case Mode.BOLERO:
+                projectile.damageTypes        |= CoreDamageTypes.Fire;
+                GoopModifier firemod           = projectile.gameObject.AddComponent<GoopModifier>();
+                firemod.SpawnGoopOnCollision   = true;
+                firemod.CollisionSpawnRadius   = 1f;
+                firemod.SpawnGoopInFlight      = true;
+                firemod.InFlightSpawnRadius    = 0.4f;
+                firemod.InFlightSpawnFrequency = C.FRAME;
+                firemod.goopDefinition         = EasyGoopDefinitions.FireDef;
+                break;
+            case Mode.REQUIEM:
+                PierceProjModifier pierce = projectile.gameObject.AddComponent<PierceProjModifier>();
+                pierce.penetration = 999;
+                pierce.penetratesBreakables = true;
+                break;
         }
     }
 
@@ -390,10 +434,12 @@ public class GlockarinaAmmoDisplay : CustomAmmoDisplay
         string uiString = null;
         switch(this._glock._mode)
         {
-            case Glockarina.Mode.STORM: uiString = "glockarina_storm_ui_icon"; break;
-            case Glockarina.Mode.TIME:  uiString = "glockarina_time_ui_icon";  break;
-            case Glockarina.Mode.SARIA: uiString = "glockarina_saria_ui_icon"; break;
-            case Glockarina.Mode.EMPTY: uiString = "glockarina_empty_ui_icon"; break;
+            case Glockarina.Mode.STORM:   uiString = "glockarina_storm_ui_icon";  break;
+            case Glockarina.Mode.TIME:    uiString = "glockarina_time_ui_icon";   break;
+            case Glockarina.Mode.SARIA:   uiString = "glockarina_saria_ui_icon";  break;
+            case Glockarina.Mode.EMPTY:   uiString = "glockarina_empty_ui_icon";  break;
+            case Glockarina.Mode.BOLERO:  uiString = "glockarina_fire_ui_icon";   break;
+            case Glockarina.Mode.REQUIEM: uiString = "glockarina_spirit_ui_icon"; break;
             default:
                 uic.GunAmmoCountLabel.Text = this._owner.VanillaAmmoDisplay();
                 return true;
