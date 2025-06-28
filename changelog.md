@@ -1,31 +1,39 @@
 # Changelog
 
-## 1.26.4 (TBD)
+## 1.26.4 (2025-06-28)
 
-- Fixed null deref in Comfy Slippers caused by setting passive stat modifiers to null instead of empty
-- Removed debug log spam from Glass Ammo Box
-- Added glass shader effect and Glass indicator for weapons on which Glass Ammo Box has been used
-- Fixed extreme lag when guns with very large clip sizes are shattered due to Glass Ammo Box's effects
-- Updated shaders and VFX for quantum enemies under the effects of Schrodinger's Gat's projectiles
+#### Balance Changes:
+
 - Added Baby Good Blob and Capture Sphere from [Kyle's Custom Item Pack](https://thunderstore.io/c/enter-the-gungeon/p/KyleTheScientist/CustomItems/) to companion shop
-- Fixed [Children of Kaliber](https://thunderstore.io/c/enter-the-gungeon/p/UnstableStrafe/ChildrenOfKaliber/)'s companions not spawning in companion shop
+- Added a few more songs to the Glockarina
 - Added Blackjack and Ticonderogun to Library Cardtridge's free item list
 - Added dozens of modded paper- and book-adjacent items to Library Cardtridge's free item list
-- Fixed [REDACTED] not having collision before engaging in combat
-- Banned Domino from appearing in co-op mode
-- Fixed null deref caused by improper caching of projectile trails when loading a new level via non-standard means (e.g., console commands)
-- Fixed null deref caused by improper caching of projectile trails when loading a new level while the projectiles are still active
 - Projectiles from B. B. Gun, Blackjack, and English can now fall into pits when at rest
 - Increased Blackjack's ammo from 104 to 156 to compensate for new pitfall behavior
-- B. B. Gun's projectiles are now automatically picked up when walking near them while at rest, similar to Blackjack's projectiles
+- Banned Domino from appearing in co-op mode
+
+#### Polish:
+
 - Added shaders to mastered guns as an extra indicator of mastery status
+- Added glass shader effect and Glass indicator for weapons on which Glass Ammo Box has been used
+- Updated shaders and VFX for quantum enemies under the effects of Schrodinger's Gat's projectiles
+- B. B. Gun's projectiles are now automatically picked up when walking near them while at rest, similar to Blackjack's projectiles
+
+#### Bugfixes and Misc:
+
+- Fixed several null dereferences caused by mastered Schrodinger's Gat's projectiles observing enemies before setting up observation data
+- Fixed null deref in Comfy Slippers caused by setting passive stat modifiers to null instead of empty
+- Fixed null deref caused by improper caching of projectile trails when loading a new level via non-standard means (e.g., console commands)
+- Fixed null deref caused by improper caching of projectile trails when loading a new level while the projectiles are still active
 - Fixed rare null deref caused by spawning in a gun with dynamic barrel offsets via the console
+- Fixed [Children of Kaliber](https://thunderstore.io/c/enter-the-gungeon/p/UnstableStrafe/ChildrenOfKaliber/)'s companions not spawning in companion shop
+- Fixed extreme lag when guns with very large clip sizes are shattered due to Glass Ammo Box's effects
+- Fixed [REDACTED] not having collision before engaging in combat
 - Fixed mastered Breegull losing all of its ammo if dropped while fire eggs are selected
 - Fixed Banana's audio playing whenever an enemy fires a GungeonCraft gun
 - Fixed Omnidirectional Laser rendering above the player for a single frame when picking it up or switching to it
-- Added a few more songs to the Glockarina
-- Fixed several null dereferences caused by mastered Schrodinger's Gat's projectiles observing enemies before setting up observation data
 - Fixed Blue Shotgun kin transforming into Red Shotgun Kin when observed by Schrodinger's Gat's projectiles
+- Removed debug log spam from Glass Ammo Box
 
 ## 1.26.3 (2025-06-22)
 
