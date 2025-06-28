@@ -3522,5 +3522,22 @@ public static class Extensions
       debris.animatePitFall = true;
       debris.Trigger(Vector3.zero, 0f, 0f);
   }
+
+  /// <summary>Safely call EncounterNameOrDisplayName for a pickupObject even if it has an invalid BraveBehaviour cache</summary>
+  public static string SafeEncounterNameOrDisplayName(this PickupObject pickup)
+  {
+    if (!pickup || !pickup.gameObject)
+      return string.Empty;
+    if (pickup.gameObject.GetComponent<EncounterTrackable>() is EncounterTrackable et)
+      if (et.GetModifiedDisplayName() is string ename && !string.IsNullOrEmpty(ename))
+        return ename.Replace("\n", " ");
+    return (pickup.itemName ?? string.Empty).Replace("\n", " ");
+  }
+
+  /// <summary>Return a string or default string if the first string is null or empty</summary>
+  public static string IfNullOrEmpty(this string s, string defaultString)
+  {
+    return !string.IsNullOrEmpty(s) ? s : defaultString;
+  }
 }
 

@@ -84,7 +84,146 @@ public class Exceptional : CwaffGun
 
     private static void CauseErrors()
     {
+        DumpUsefulDataToLog();
         throw new Exception("hi C:");
+    }
+
+    private static void DumpUsefulDataToLog()
+    {
+        UnityEngine.Debug.LogWarning("Dumping run data for debugging purposes");
+        UnityEngine.Debug.LogWarning("---------------------------------------");
+        if (!GameManager.HasInstance || GameManager.Instance.AllPlayers == null)
+        {
+            UnityEngine.Debug.LogWarning("No Active Players / Game Manager!");
+            return;
+        }
+        UnityEngine.Debug.LogWarning($"Floor: {GameManager.Instance.GetLastLoadedLevelDefinition()?.dungeonSceneName.IfNullOrEmpty("[UNKNOWN]")}");
+
+        PlayerController bestPlayer = GameManager.Instance.BestActivePlayer;
+        if ((bestPlayer ? bestPlayer.CurrentRoom : null) is not RoomHandler room)
+            UnityEngine.Debug.LogWarning($"Room: [NONE]");
+        else
+        {
+            UnityEngine.Debug.LogWarning($"Room: {room.GetRoomName().IfNullOrEmpty("[NAMELESS ROOM]")}");
+            UnityEngine.Debug.LogWarning($" Active Enemies:");
+            if (room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) is List<AIActor> roomEnemies)
+            {
+                foreach (AIActor enemy in roomEnemies)
+                {
+                    if (!enemy)
+                    {
+                        UnityEngine.Debug.LogWarning($"  [INVALID ENEMY]");
+                        continue;
+                    }
+                    string name = !string.IsNullOrEmpty(enemy.EnemyGuid) ? enemy.EnemyGuid.AmmonomiconName() : string.Empty;
+                    UnityEngine.Debug.LogWarning($"  {name.IfNullOrEmpty(enemy.ActorName).IfNullOrEmpty("[UNKNOWN ENEMY]")}");
+                }
+            }
+            else
+                UnityEngine.Debug.LogWarning($"  [NO ACTIVE ENEMIES IN ROOM]");
+
+            UnityEngine.Debug.LogWarning($" Active Pickups In Room:");
+            ReadOnlyCollection<IPlayerInteractable> roomIxables = room.GetRoomInteractables();
+            bool foundPickup = false;
+            if (roomIxables != null)
+                foreach (IPlayerInteractable roomIx in roomIxables)
+                {
+                    if (roomIx is not PickupObject roomPickup)
+                        continue;
+                    UnityEngine.Debug.LogWarning($"  {roomPickup.SafeEncounterNameOrDisplayName().IfNullOrEmpty("[UNKNOWN PICKUP]")}");
+                    foundPickup = true;
+                }
+            if (!foundPickup)
+                UnityEngine.Debug.LogWarning($"  [NO PICKUPS IN ROOM]");
+        }
+
+        UnityEngine.Debug.LogWarning($"Active Pickups On Floor:");
+        List<IPlayerInteractable> floorIxables = RoomHandler.unassignedInteractableObjects;
+        bool foundFloorPickup = false;
+        if (floorIxables != null)
+            foreach (IPlayerInteractable floorIx in floorIxables)
+            {
+                if (floorIx is not PickupObject floorPickup)
+                    continue;
+                string floorIxName = floorPickup.SafeEncounterNameOrDisplayName();
+                UnityEngine.Debug.LogWarning($" {floorIxName.IfNullOrEmpty("[UNKNOWN PICKUP]")}");
+                foundFloorPickup = true;
+            }
+        if (!foundFloorPickup)
+            UnityEngine.Debug.LogWarning($" [NO PICKUPS ON FLOOR]");
+
+        string[] statNames = Enum.GetNames(typeof(PlayerStats.StatType));
+        AdvancedSynergyEntry[] allSynergies = GameManager.Instance.SynergyManager.synergies;
+        foreach (PlayerController pc in GameManager.Instance.AllPlayers)
+        {
+            if (!pc)
+            {
+                UnityEngine.Debug.LogWarning($"[INVALID PLAYER]");
+                continue;
+            }
+            UnityEngine.Debug.LogWarning($"Player {(pc.PlayerIDX + 1)}:");
+
+            UnityEngine.Debug.LogWarning($" Character: {pc.name.IfNullOrEmpty("[UNKNOWN CHARACTER]")}:");
+
+            UnityEngine.Debug.LogWarning($" Guns:");
+            if (pc.inventory == null || pc.inventory.m_guns == null || pc.inventory.m_guns.Count == 0)
+                UnityEngine.Debug.LogWarning($"  [NO GUNS]");
+            else foreach (Gun gun in pc.inventory.m_guns)
+            {
+                if (!gun)
+                    UnityEngine.Debug.LogWarning($"  [CORRUPTED GUN])");
+                else
+                    UnityEngine.Debug.LogWarning($"  {gun.SafeEncounterNameOrDisplayName().IfNullOrEmpty("[NAMELESS GUN]")}");
+            }
+
+            UnityEngine.Debug.LogWarning($" Passives:");
+            if (pc.passiveItems == null || pc.passiveItems.Count == 0)
+                UnityEngine.Debug.LogWarning($"  [NO PASSIVES]");
+            else foreach (PassiveItem passive in pc.passiveItems)
+            {
+                if (!passive)
+                    UnityEngine.Debug.LogWarning($"  [CORRUPTED PASSIVE]");
+                else
+                    UnityEngine.Debug.LogWarning($"  {passive.SafeEncounterNameOrDisplayName().IfNullOrEmpty("[NAMELESS PASSIVE]")}");
+            }
+
+            UnityEngine.Debug.LogWarning($" Actives:");
+            if (pc.activeItems == null || pc.activeItems.Count == 0)
+                UnityEngine.Debug.LogWarning($"  [NO ACTIVES]");
+            else foreach (PlayerItem active in pc.activeItems)
+            {
+                if (!active)
+                    UnityEngine.Debug.LogWarning($"  [CORRUPTED ACTIVE]");
+                else
+                    UnityEngine.Debug.LogWarning($"  {active.SafeEncounterNameOrDisplayName().IfNullOrEmpty("[NAMELESS ACTIVE]")}");
+            }
+
+            UnityEngine.Debug.LogWarning($" Synergies:");
+            if (pc.ActiveExtraSynergies == null || pc.ActiveExtraSynergies.Count == 0)
+                UnityEngine.Debug.LogWarning($"  [NO SYNERGIES]");
+            else foreach (int synergyId in pc.ActiveExtraSynergies)
+            {
+                if (synergyId >= allSynergies.Length)
+                    UnityEngine.Debug.LogWarning($"  [UNKNOWN SYNERGY]");
+                else if (allSynergies[synergyId] is not AdvancedSynergyEntry syn)
+                    UnityEngine.Debug.LogWarning($"  [MISSING SYNERGY]");
+                else
+                    UnityEngine.Debug.LogWarning($"  {syn.NameKey.IfNullOrEmpty("[NAMELESS SYNERGY]")}");
+            }
+
+            UnityEngine.Debug.LogWarning($" Stats:");
+            if (pc.stats == null || pc.stats.StatValues == null || pc.stats.StatValues.Count == 0)
+                UnityEngine.Debug.LogWarning($"  [NO STATS]");
+            else for(int i = 0; i < pc.stats.StatValues.Count; ++i)
+                UnityEngine.Debug.LogWarning($"  {((i < statNames.Length && !string.IsNullOrEmpty(statNames[i])) ? statNames[i] : $"[UNKNOWN STAT #{i}]")}: {pc.stats.StatValues[i]}");
+        }
+
+        UnityEngine.Debug.LogWarning($"Active Projectiles: {StaticReferenceManager.AllProjectiles?.Count ?? 0}");
+        UnityEngine.Debug.LogWarning($"Active Debris Objects: {StaticReferenceManager.AllDebris?.Count ?? 0}");
+        UnityEngine.Debug.LogWarning($"Active Goops: {StaticReferenceManager.AllGoops?.Count ?? 0}");
+        UnityEngine.Debug.LogWarning($"Current Run Time: {(GameStatsManager.HasInstance ? GameStatsManager.Instance.GetSessionStatValue(TrackedStats.TIME_PLAYED).ToString() : "[UNKNOWN]")} seconds");
+
+        UnityEngine.Debug.LogWarning("---------------------------------------");
     }
 
     public override void Update()
@@ -115,6 +254,14 @@ public class Exceptional : CwaffGun
         if (_Spawned)
             return;
         _Spawned = true;
+        try
+        {
+            DumpUsefulDataToLog();
+        }
+        catch
+        {
+            UnityEngine.Debug.LogError("Got an error while logging errors...RIP");
+        }
         if (GameManager.Instance.BestActivePlayer.IsInCombat)
             GameManager.Instance.BestActivePlayer.OnRoomClearEvent += SpawnErrorChestOnceCombatEnds;
         else
