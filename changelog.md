@@ -24,6 +24,8 @@
 - Fixed Banana's audio playing whenever an enemy fires a GungeonCraft gun
 - Fixed Omnidirectional Laser rendering above the player for a single frame when picking it up or switching to it
 - Added a few more songs to the Glockarina
+- Fixed several null dereferences caused by mastered Schrodinger's Gat's projectiles observing enemies before setting up observation data
+- Fixed Blue Shotgun kin transforming into Red Shotgun Kin when observed by Schrodinger's Gat's projectiles
 
 ## 1.26.3 (2025-06-22)
 

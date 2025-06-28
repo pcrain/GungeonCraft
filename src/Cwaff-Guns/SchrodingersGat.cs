@@ -103,10 +103,20 @@ public class SchrodingersStat : MonoBehaviour
     private AIActor _enemy;
     private Renderer _renderer;
     private float _flickerTimer;
-    private Coroutine _flickerCR;
+    private IEnumerator _flickerCR;
+    private bool _didSetup = false;
 
     private void Start()
     {
+        Setup();
+    }
+
+    private void Setup()
+    {
+        if (this._didSetup)
+            return;
+        this._didSetup = true;
+
         this._enemy                        = base.GetComponent<AIActor>();
         this._doneUpdating                 = false;
         this._enemyVisible                 = true;
@@ -129,12 +139,14 @@ public class SchrodingersStat : MonoBehaviour
         }
 
         this._enemy.healthHaver.OnDamaged += this.OnDamaged;
-        this._flickerCR = StartCoroutine(Quantum());
+        this._flickerCR = Quantum();
+        StartCoroutine(this._flickerCR);
         base.gameObject.Play("schrodinger_bullet_hit");
     }
 
     public void Observe()
     {
+        Setup();
         this._observed = true;
         this._enemy.healthHaver.OnDamaged -= this.OnDamaged;
         if (!this._actuallyDead)
@@ -197,8 +209,9 @@ public class SchrodingersStat : MonoBehaviour
         }
         if (this._enemy.sprite)
             SpriteOutlineManager.AddOutlineToSprite(this._enemy.sprite, Color.black);
-        if (mat)
-            mat.shader = oShader;
+        mat.shader = oShader;
+        if (this._enemy.optionalPalette != null)
+            mat.SetTexture("_PaletteTex", this._enemy.optionalPalette);
     }
 
     private void LateUpdate()
@@ -208,8 +221,12 @@ public class SchrodingersStat : MonoBehaviour
 
         this._enemy.DeregisterOverrideColor(SchrodingersGat.ItemName);
         this._renderer.enabled = true;
-        this._enemy.sprite.usesOverrideMaterial = false;
-        StopCoroutine(this._flickerCR);
+        if (this._flickerCR != null)
+        {
+            while (this._flickerCR.MoveNext())
+                continue;
+            this._flickerCR = null;
+        }
         this._doneUpdating = true;
     }
 
