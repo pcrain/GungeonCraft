@@ -184,14 +184,10 @@ public class Initialisation : BaseUnityPlugin
             #endregion
 
             #region Save API Setup (Async)
-                System.Diagnostics.Stopwatch setupSaveWatch = null;
-                Thread setupSaveThread = new Thread(() => {
-                    setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
-                    //WARNING: setup code has been modified to disable CustomHuntQuests setup, re-enable if needed later
-                    SaveAPI.SaveAPIManager.Setup(C.MOD_PREFIX);  // Needed for prerequisite checking and save serialization
-                    setupSaveWatch.Stop();
-                });
-                setupSaveThread.Start();
+                System.Diagnostics.Stopwatch setupSaveWatch = System.Diagnostics.Stopwatch.StartNew();
+                //WARNING: setup code has been modified to disable CustomHuntQuests setup, re-enable if needed later
+                SaveAPI.SaveAPIManager.Setup(C.MOD_PREFIX);  // Needed for prerequisite checking and save serialization
+                setupSaveWatch.Stop();
             #endregion
 
             #region Guns
@@ -438,11 +434,6 @@ public class Initialisation : BaseUnityPlugin
                 setupBossesWatch.Stop();
             #endregion
 
-            // Need to wait for all items and SaveAPI to be loaded before setting up synergies and shops
-            System.Diagnostics.Stopwatch awaitItemsWatch = System.Diagnostics.Stopwatch.StartNew();
-            setupSaveThread.Join();
-            awaitItemsWatch.Stop();
-
             #region Synergies (not async due to safety concerns + it's fast already)
                 System.Diagnostics.Stopwatch setupSynergiesWatch = System.Diagnostics.Stopwatch.StartNew();
                 CwaffSynergies.Init();
@@ -472,7 +463,7 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"  {setupConfigWatch.ElapsedMilliseconds,       5}ms       setupConfig      ");
                 ETGModConsole.Log($"  {setupHatsWatch.ElapsedMilliseconds,         5}ms       setupHats        ");
                 ETGModConsole.Log($"  {setupAudioWatch.ElapsedMilliseconds,        5}ms ASYNC setupAudio       ");
-                ETGModConsole.Log($"  {setupSaveWatch.ElapsedMilliseconds,         5}ms ASYNC setupSave        ");
+                ETGModConsole.Log($"  {setupSaveWatch.ElapsedMilliseconds,         5}ms       setupSave        ");
                 ETGModConsole.Log($"  {setupGunsWatch.ElapsedMilliseconds,         5}ms       setupGuns        ");
                 ETGModConsole.Log($"  {setupActivesWatch.ElapsedMilliseconds,      5}ms       setupActives     ");
                 ETGModConsole.Log($"  {setupPassivesWatch.ElapsedMilliseconds,     5}ms       setupPassives    ");

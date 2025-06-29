@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.26.5 (2025-06-28)
+
+- Removed threaded SaveAPI setup to hopefully fix loading race condition with Rogo setup
+
 ## 1.26.4 (2025-06-28)
 
 #### Balance Changes:
