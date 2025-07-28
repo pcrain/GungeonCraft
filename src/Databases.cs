@@ -1101,6 +1101,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
     public static GoopDefinition SuperCoffeeGoop;
     public static GoopDefinition HolyGoop;
     public static GoopDefinition GreenOilGoop;
+    public static GoopDefinition ToothpasteGoop;
 
     public static List<GoopDefinition> ColorGoops = new List<GoopDefinition>();
     public static List<Color> ColorGoopColors     = new List<Color>
@@ -1249,5 +1250,11 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
         //Set up Green Oil Goop
         GreenOilGoop = UnityEngine.Object.Instantiate<GoopDefinition>(OilDef);
             GreenOilGoop.UsesGreenFire = true;
+
+        //Set up Toothpaste Goop
+        ToothpasteGoop = UnityEngine.Object.Instantiate<GoopDefinition>(SeltzerGoop);
+            ToothpasteGoop.CanBeElectrified = false; // we use the electric semaphore for our own tracking, so disallow electrifying toothpaste goop
+            ToothpasteGoop.ambientGoopFXChance = 0.01f;
+            ToothpasteGoop.ambientGoopFX = VFX.CreatePool("toothpaste_bubbles", fps: 24, loops: false);
     }
 }

@@ -276,6 +276,7 @@ public class Initialisation : BaseUnityPlugin
                 Leafblower.Init();
                 Forkbomb.Init();
                 Zealot.Init();
+                Toothpaste.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
@@ -471,7 +472,6 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"  {setupCharactersWatch.ElapsedMilliseconds,   5}ms       setupCharacters  ");
                 ETGModConsole.Log($"  {setupFloorsWatch.ElapsedMilliseconds,       5}ms       setupFloors      ");
                 ETGModConsole.Log($"  {setupBossesWatch.ElapsedMilliseconds,       5}ms       setupBosses      ");
-                ETGModConsole.Log($"  {awaitItemsWatch.ElapsedMilliseconds,        5}ms       awaitItems       ");
                 ETGModConsole.Log($"  {setupSynergiesWatch.ElapsedMilliseconds,    5}ms       setupSynergies   ");
                 ETGModConsole.Log($"  {setupShopsWatch.ElapsedMilliseconds,        5}ms       setupShops       ");
                 ETGModConsole.Log($"  {awaitAsyncWatch.ElapsedMilliseconds,        5}ms       awaitAsync       ");

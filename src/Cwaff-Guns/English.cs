@@ -8,7 +8,7 @@ public class English : CwaffGun
     public static string ItemName         = "English";
     public static string ShortDescription = "Racking Up Frags";
     public static string LongDescription  = "Fires a cue ball towards a rack of billiard balls that grows as the gun is charged. Billiard balls bounce off of walls, objects, and each other, dealing damage proportional to their velocity. Grounded billiard balls can be reactivated by other billiard balls. Increases curse by 1 while in inventory.";
-    public static string Lore             = "This weapon appears to be an ordinary pool cue at first glance. The second, third, and fourth glances are much the same. The fifth glance, however, reveals a tiny spark at the tip of the cue, ready to materialize a cue ball with unforetold power and disregard for the conservation of momentum at the wielder's first intention to strike. The six glance reveals you have gone partially insane from staring at the tip of an ordinary pool cue for so long, and that it is, in fact, just an ordinary pool cue.";
+    public static string Lore             = "This weapon appears to be an ordinary pool cue at first glance. The second, third, and fourth glances are much the same. The fifth glance, however, reveals a tiny spark at the tip of the cue, ready to materialize a cue ball with unforetold power and disregard for the conservation of momentum at the wielder's first intention to strike. The sixth glance reveals you have gone partially insane from staring at the tip of an ordinary pool cue for so long, and that it is, in fact, just an ordinary pool cue.";
 
     private const float _CHARGE_PER_LEVEL = 0.4f;
     private const int _MAX_CHARGE_LEVEL   = 7;

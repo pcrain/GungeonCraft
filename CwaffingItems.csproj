@@ -156,6 +156,7 @@
     <Compile Include="src\Cwaff-Actives\Itemfinder.cs"/>
     <Compile Include="src\PlayerProjectilePooler.cs"/>
     <Compile Include="src\CwaffDebug.cs"/>
+    <Compile Include="src\Cwaff-Guns\Toothpaste.cs"/>
     <Compile Include="src\Cwaff-Guns\Lightwing.cs"/>
     <Compile Include="src\Cwaff-Guns\Forkbomb.cs"/>
     <Compile Include="src\Cwaff-Guns\Leafblower.cs"/>
