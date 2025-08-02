@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.27.0 (TBD)
+
+- Added Toothpaste (sprites thanks to Dallan!)
+- Added mastery for Toothpaste
+
 ## 1.26.5 (2025-06-28)
 
 - Removed threaded SaveAPI setup to hopefully fix loading race condition with Rogo setup

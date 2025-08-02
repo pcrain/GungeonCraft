@@ -1901,12 +1901,18 @@ public static class Extensions
   }
 
   /// <summary>Faster version of the MtG API equivalent using our ResMap()</summary>
-  public static string QuickUpdateGunAnimation(this Gun gun, string name, tk2dSpriteCollectionData collection = null, bool returnToIdle = false, int fps = -1)
+  public static string QuickUpdateGunAnimation(this Gun gun, string name, tk2dSpriteCollectionData collection = null, bool returnToIdle = false, int fps = -1, string audio = null)
   {
       collection ??= ETGMod.Databases.Items.WeaponCollection;
       string clipName = QuickUpdateAnimationAddClipsLater(gun, name, collection, returnToIdle);
+      if (string.IsNullOrEmpty(clipName))
+        return null;
+
       if (fps >= 0)
         gun.SetAnimationFPS(clipName, fps);
+      if (audio != null)
+        gun.SetGunAudio(clipName, audio);
+
       return clipName;
   }
 
@@ -3538,6 +3544,19 @@ public static class Extensions
   public static string IfNullOrEmpty(this string s, string defaultString)
   {
     return !string.IsNullOrEmpty(s) ? s : defaultString;
+  }
+
+  /// <summary>Convert a goop position to a world position</summary>
+  public static Vector2 GoopToWorldPosition(this IntVector2 goopPos)
+  {
+    float gridSize = DeadlyDeadlyGoopManager.GOOP_GRID_SIZE;
+    return goopPos.ToVector2() * gridSize + new Vector2(0.5f * gridSize, 0.5f * gridSize);
+  }
+
+  /// <summary>Convert a goop position to a world position</summary>
+  public static IntVector2 WorldToGoopPosition(this Vector2 worldPos)
+  {
+    return (worldPos / DeadlyDeadlyGoopManager.GOOP_GRID_SIZE).ToIntVector2();
   }
 }
 

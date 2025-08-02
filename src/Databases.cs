@@ -1253,6 +1253,7 @@ public static class EasyGoopDefinitions  // mostly stolen from NN
 
         //Set up Toothpaste Goop
         ToothpasteGoop = UnityEngine.Object.Instantiate<GoopDefinition>(SeltzerGoop);
+            ToothpasteGoop.lifespan = 10f; // lower than water == 15, but refreshed by toothbrush
             ToothpasteGoop.CanBeElectrified = false; // we use the electric semaphore for our own tracking, so disallow electrifying toothpaste goop
             ToothpasteGoop.ambientGoopFXChance = 0.01f;
             ToothpasteGoop.ambientGoopFX = VFX.CreatePool("toothpaste_bubbles", fps: 24, loops: false);
