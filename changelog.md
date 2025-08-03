@@ -4,6 +4,8 @@
 
 - Added Toothpaste (sprites thanks to Dallan!)
 - Added mastery for Toothpaste
+- Removed debug log spam from Alyx
+- Fixed Xelsior not being able to assimilate guns when not in a proper room (e.g., when standing in a hallway)
 
 ## 1.26.5 (2025-06-28)
 

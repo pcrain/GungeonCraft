@@ -14,7 +14,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
     - [Tremor Mod](https://tremormod.fandom.com/wiki/Weapons): Alligator (Snake Devourer), B. B. Gun (SBC), Blackjack (Party Over), Crapshooter (edited Blackhole Cannon), Empath (Corruptor Gun), Hand Cannon (Hand Cannon), Platinum Star (recolored Dragon Rafale), Subtractor Beam (Cosmic Assault Rifle), Suncaster (Volcannon), Telefragger (Phantablast), Zealot (Pandemonium)
 
-    - [Exodus Mod](https://exodusmod.fandom.com/wiki/Weapons): Aimu Hakurei (Clockwork Annihilator), Chekhov's Gun (Calitoss), Gunbrella (Neombrella), Jugglernaut (Light Grenader), Zag (Ancient Uzi), Overflow (Jolly Roger)
+    - [Exodus Mod](https://exodusmod.fandom.com/wiki/Weapons): Aimu Hakurei (Clockwork Annihilator), Chekhov's Gun (Calitoss), Gunbrella (Neombrella), Heartbreaker (Manipulator), Jugglernaut (Light Grenader), Zag (Ancient Uzi), Overflow (Jolly Roger)
 
     - [Antiaris Mod](https://antiaris.fandom.com/wiki/Weapons): Bubblebeam (recolored Boiling Point), Carpet Bomber (Royal Cannon), Seltzer Pelter (Cannon of Nightmares), Uppskeruvel (Devil Dragon), Yggdrashell (Terra Blunderbuss)
 
@@ -38,7 +38,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
 #### Original Sprites (please check out the authors' work! <3)
 
-  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Forkbomb, Maestro, Missiletoe, Oddjob, Omnidirectional Laser, Plasmarble, Starmageddon, Stereoscope, Vladimir
+  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Forkbomb, Maestro, Missiletoe, Oddjob, Omnidirectional Laser, Plasmarble, Starmageddon, Stereoscope, Toothpaste, Vladimir
 
   - [IdioticMuffin](https://www.reddit.com/r/EnterTheGungeon/comments/et316d/yet_even_more_gun_concepts_for_gungeon/): Grandmaster, [Paintball Cannon](https://www.reddit.com/r/EnterTheGungeon/comments/clkr07/splat_the_gungeon_weapon_concepts/)
 
@@ -65,6 +65,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 * Thunderstore preview icon plus several custom shopkeeper, item, clip, projectile, and miscellaneous sprites by [Lynceus](https://thunderstore.io/c/enter-the-gungeon/p/Lynceus/)
 * Most hat sprites plus various item and NPC sprites by [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)
 * Tile sprites for the floor puzzle room by [Some Bunny](https://thunderstore.io/c/enter-the-gungeon/p/TeamPlanetside/)
+* Lots of beautiful projectile and VFX sprites by [BDragon1727](https://bdragon1727.itch.io/)
 * More item sprites from various games including Knights in the Nightmare, Blaze Union, Pokemon, Dragonball Z: Buu's Fury, and Minecraft
 * [SPOILERS] boss sprites [by askywalker from Spriter's Resource](https://www.spriters-resource.com/custom_edited/undertalecustoms/sheet/126792/)
 * [SPOILERS] boss card art [by synistersyrup from DeviantArt](https://www.deviantart.com/synistersyrup/art/Sans-Uses-Flirt-665517108)

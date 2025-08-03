@@ -689,17 +689,17 @@ public static class Lazy
     }
 
     /// <summary>Determine position of the nearest enemy to position start</summary>
-    public static AIActor NearestEnemy(Vector2 start, bool useNearestAngleInsteadOfDistance = false, bool ignoreWalls = false)
+    public static AIActor NearestEnemy(Vector2 start, bool ignoreWalls = false)
     {
         return NearestEnemyWithinConeOfVision(start: start, coneAngle: 0f, maxDeviation: 360f,
-            useNearestAngleInsteadOfDistance: useNearestAngleInsteadOfDistance, ignoreWalls: ignoreWalls);
+            useNearestAngleInsteadOfDistance: false, ignoreWalls: ignoreWalls);
     }
 
     /// <summary>Determine position of the nearest enemy to position start</summary>
-    public static Vector2? NearestEnemyPos(Vector2 start, bool useNearestAngleInsteadOfDistance = false, bool ignoreWalls = false)
+    public static Vector2? NearestEnemyPos(Vector2 start, bool ignoreWalls = false)
     {
         return NearestEnemyPosWithinConeOfVision(start: start, coneAngle: 0f, maxDeviation: 360f,
-            useNearestAngleInsteadOfDistance: useNearestAngleInsteadOfDistance, ignoreWalls: ignoreWalls);
+            useNearestAngleInsteadOfDistance: false, ignoreWalls: ignoreWalls);
     }
 
     /// <summary>Determine all enemies within a radius of a point.</summary>

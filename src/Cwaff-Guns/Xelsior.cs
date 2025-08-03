@@ -148,8 +148,6 @@ public class Xelsior : CwaffGun
             return;
 
         Vector2 start = beam.Origin;
-        if (start.GetAbsoluteRoom() is not RoomHandler room)
-            return;
         Vector2 end = start + beam.Direction.normalized * beam.m_currentBeamDistance;
         Gun targetGun = null;
         foreach (var ix in RoomHandler.unassignedInteractableObjects)

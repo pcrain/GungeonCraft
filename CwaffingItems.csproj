@@ -188,6 +188,7 @@
     <Compile Include="src\Cwaff-Guns\SeltzerPelter.cs"/>
     <Compile Include="src\Cwaff-Guns\Wayfarer.cs"/>
     <Compile Include="src\Cwaff-Guns\SoulKaliber.cs"/>
+    <Compile Include="src\Cwaff-Guns\Heartbreaker.cs"/>
     <Compile Include="src\Cwaff-Guns\Missiletoe.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
     <Compile Include="src\Cwaff-Guns\PistolWhip.cs"/>

@@ -277,6 +277,7 @@ public class Initialisation : BaseUnityPlugin
                 Forkbomb.Init();
                 Zealot.Init();
                 Toothpaste.Init();
+                Heartbreaker.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

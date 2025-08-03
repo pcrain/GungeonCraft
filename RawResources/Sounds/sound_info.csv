@@ -331,3 +331,5 @@ toothpaste_squeeze_sound,-3.0,1,sound,0
 toothpaste_squirt_sound,-10.0,1,sound,0
 the_sound_of_getting_sudsed,4.0,1,sound,0
 toothpaste_suds_spread_sound,4.0,1,sound,4
+heartbreaker_fire_sound,-8.0,1,sound,2
+heartbeat_sound,12.0,1,sound,0
