@@ -1,39 +1,39 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - make heart absorption effects nicer
-    - add heart counter to ammo display
-    - add midgame save serialization
-    - animate gun
+    - add mastery (orbiting heart guon stone for every half heart missing from full health)
+    - maybe add helix projectiles compatibility (currently just ignores it)
 */
 
 public class Heartbreaker : CwaffGun
 {
     public static string ItemName         = "Heartbreaker";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "</3";
+    public static string LongDescription  = "Fires a burst of projectiles that rapidly home towards nearby enemies after a short delay. Reloading with a full clip while near a heart pickup will consume it, increasing the gun's current and max ammo, clip size, and burst size.";
     public static string Lore             = "TBD";
 
-    private const int _MAX_LEVEL = 12;
-    private const int _MIN_BULLETS = 4;
-    private const int _BULLETS_PER_LEVEL = 2;
-    private const int _BURSTS_PER_CLIP = 3;
-    private const int _BASE_MAX_AMMO = 400;
-    private const int _AMMO_PER_LEVEL = _BULLETS_PER_LEVEL * 100;
+    private const float _VFX_GLOW        = 10f;
+    private const int _MAX_LEVEL         = 26;
+    private const int _MIN_BULLETS       = 4;
+    private const int _BURSTS_PER_CLIP   = 3;
+    private const int _BASE_MAX_AMMO     = 400;
+    private const int _AMMO_PER_LEVEL    = _BASE_MAX_AMMO / _MIN_BULLETS;
+
+    internal static GameObject _AbsorbVFX = null;
 
     public int storedHalfHearts = 0;
 
     public static void Init()
     {
         Lazy.SetupGun<Heartbreaker>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.4f, ammo: _BASE_MAX_AMMO, shootFps: 16, reloadFps: 16,
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.4f, ammo: _BASE_MAX_AMMO, shootFps: 30, reloadFps: 16,
             smoothReload: 0.1f, fireAudio: "heartbreaker_fire_sound", modulesAreTiers: true)
           .SetReloadAudio("heartbeat_sound", 0, 2, 4)
           .Attach<HeartbreakerAmmoDisplay>()
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(sprite: "heartbreaker_projectile", fps: 15, clipSize: 5, cooldown: 0.25f, burstCooldown: 0.04f,
+          .InitProjectile(GunData.New(sprite: "heartbreaker_projectile", fps: 15, clipSize: 5, cooldown: 0.25f, burstCooldown: 0.04f, spawnSound: "heartbreaker_fire_sound",
             angleVariance: 30f, damage: 5.5f, speed: 25f, range: 1000f, force: 9f, shootStyle: ShootStyle.Burst, hitEnemySound: "heartbreaker_impact_sound",
-            lightStrength: 8f, lightRange: 0.75f, lightColor: ExtendedColours.vibrantOrange))
+            lightStrength: 8f, lightRange: 0.75f, lightColor: ExtendedColours.vibrantOrange, glowAmount: 30f, customClip: true))
           .SetAllImpactVFX(VFX.CreatePool("heartbreak_projectile_impact_vfx", fps: 60, loops: false, anchor: Anchor.MiddleCenter,
             emissivePower: 0.5f, emissiveColorPower: 1.5f, emissiveColour: ExtendedColours.vibrantOrange,
             lightColor: ExtendedColours.vibrantOrange, lightRange: 1.5f, lightStrength: 7.0f))
@@ -44,16 +44,18 @@ public class Heartbreaker : CwaffGun
         for (int i = 0; i <= _MAX_LEVEL; ++i)
         {
             ProjectileModule newMod = ProjectileModule.CreateClone(mod, inheritGuid: false);
-            newMod.burstShotCount = _MIN_BULLETS + i * _BULLETS_PER_LEVEL;
+            newMod.burstShotCount = _MIN_BULLETS + i;
             newMod.numberOfShotsInClip = newMod.burstShotCount * _BURSTS_PER_CLIP;
             newMod.burstCooldownTime = i switch {  // faster cooldown the more shots we have
-                < 3 => 0.04f,
-                < 6 => 0.03f,
-                < 9 => 0.02f,
-                _   => 0.01f
+                < 6  => 0.04f,
+                < 12 => 0.03f,
+                < 18 => 0.02f,
+                _    => 0.01f
             };
             gun.Volley.projectiles.Add(newMod);
         } //REFACTOR: burst builder
+
+        _AbsorbVFX = VFX.Create("hearbreaker_absorb_vfx", emissivePower: _VFX_GLOW, emissiveColour: Color.Lerp(Color.red, Color.white, 0.5f));
     }
 
     private void Start()
@@ -100,15 +102,31 @@ public class Heartbreaker : CwaffGun
 
     public override void OnFullClipReload(PlayerController player, Gun gun)
     {
-        for (int health = ConsumeNearbyHeart(player.CenterPosition); health > 0; --health)
-        {
-            if (gun.CurrentStrengthTier >= _MAX_LEVEL)
-                return;
-            ++storedHalfHearts;
-            UpdateGunStrength();
-            if ((storedHalfHearts % 2) == 0)
-                gun.GainAmmo(_AMMO_PER_LEVEL);
-        }
+        if (gun.CurrentStrengthTier >= _MAX_LEVEL)
+            return;
+        int health = ConsumeNearbyHeart(player.CenterPosition);
+        if (health == 0)
+            return;
+
+        health = Mathf.Min(health, _MAX_LEVEL - storedHalfHearts);
+        storedHalfHearts += health;
+        UpdateGunStrength();
+        gun.GainAmmo(health * _AMMO_PER_LEVEL);
+        CwaffVFX.SpawnBurst(
+            prefab           : _AbsorbVFX,
+            numToSpawn       : 30,
+            anchorTransform  : gun.sprite.transform,
+            basePosition     : gun.sprite.WorldCenter,
+            positionVariance : 5f,
+            velType          : CwaffVFX.Vel.InwardToCenter,
+            rotType          : CwaffVFX.Rot.Random,
+            lifetime         : 0.35f,
+            startScale       : 1.0f,
+            endScale         : 0.1f,
+            emissivePower    : _VFX_GLOW,
+            emitColorPower   : 1.55f,
+            emissiveColor    : Color.red
+          );
     }
 
     private int ConsumeNearbyHeart(Vector2 pos)
@@ -134,10 +152,9 @@ public class Heartbreaker : CwaffGun
 
         RoomHandler.unassignedInteractableObjects.Remove(targetIx);
         int health = Mathf.RoundToInt(2f * targetHeart.healAmount);
-        targetHeart.sprite.DuplicateInWorldAsMesh().Dissipate(time: 0.75f, amplitude: 5f, progressive: true);
+        targetHeart.sprite.DuplicateInWorldAsMesh().Dissipate(time: 0.4f, amplitude: 5f, progressive: true);
         UnityEngine.Object.Destroy(targetHeart.gameObject);
-        base.gameObject.Play("materialize_sound");
-        base.gameObject.Play("vaporized_sound");
+        base.gameObject.Play("heartbreaker_absorb_sound");
         return health;
     }
 
@@ -151,12 +168,23 @@ public class Heartbreaker : CwaffGun
 
     private void UpdateGunStrength()
     {
-        int newTier = (storedHalfHearts / 2);
-        if (gun.CurrentStrengthTier == newTier)
+        if (gun.CurrentStrengthTier == storedHalfHearts)
             return;
 
-        gun.CurrentStrengthTier = newTier;
-        gun.SetBaseMaxAmmo(_BASE_MAX_AMMO + _AMMO_PER_LEVEL * newTier);
+        gun.CurrentStrengthTier = storedHalfHearts;
+        gun.SetBaseMaxAmmo(_BASE_MAX_AMMO + _AMMO_PER_LEVEL * storedHalfHearts);
+    }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        base.MidGameSerialize(data, i);
+        data.Add(storedHalfHearts);
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+        base.MidGameDeserialize(data, ref i);
+        storedHalfHearts = ((int)data[i++]);
     }
 
     private class HeartbreakerAmmoDisplay : CustomAmmoDisplay
@@ -175,7 +203,7 @@ public class Heartbreaker : CwaffGun
             if (!this._owner)
                 return false;
 
-            uic.GunAmmoCountLabel.Text = $"{this._gun.m_currentStrengthTier}\n{this._owner.VanillaAmmoDisplay()}";
+            uic.GunAmmoCountLabel.Text = $"[sprite \"heartbreaker_heart_ui\"]x{this._gun.m_currentStrengthTier}\n{this._owner.VanillaAmmoDisplay()}";
             return true;
         }
     }

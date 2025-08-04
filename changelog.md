@@ -2,7 +2,8 @@
 
 ## 1.27.0 (TBD)
 
-- Added Toothpaste (sprites thanks to Dallan!)
+- Added Toothpaste and Heartbreaker
+	- Toothpaste sprites thanks to Dallan!
 - Added mastery for Toothpaste
 - Removed debug log spam from Alyx
 - Fixed Xelsior not being able to assimilate guns when not in a proper room (e.g., when standing in a hallway)
