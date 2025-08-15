@@ -278,6 +278,7 @@ public class Initialisation : BaseUnityPlugin
                 Zealot.Init();
                 Toothpaste.Init();
                 Heartbreaker.Init();
+                Gradius.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

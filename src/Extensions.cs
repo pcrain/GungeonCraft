@@ -3558,5 +3558,14 @@ public static class Extensions
   {
     return (worldPos / DeadlyDeadlyGoopManager.GOOP_GRID_SIZE).ToIntVector2();
   }
+
+  /// <summary>Smoothly rotate one angle to another</summary>
+  public static float SmoothRotateTo(this float oldRotation, float newRotation, float r, float t = 0.5f)
+  {
+      float angleDelta = oldRotation.RelAngleTo(newRotation);
+      if (Mathf.Abs(angleDelta) < t)
+          return newRotation;
+      return (oldRotation + Lazy.SmoothestLerp(0f, angleDelta, r)).Clamp360();
+  }
 }
 
