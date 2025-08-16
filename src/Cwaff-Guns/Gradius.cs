@@ -1,14 +1,9 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - add mechanics / visuals for upgrading ships
-    - add ammo display for current levels
-
     - add mastery
-    - fix scattershot compatibility
+    - [maybe] fix scattershot compatibility
     - [maybe] animate main gun
-    - [maybe] add custom sprite for mini missiles
-    - [maybe] add custom sprite for blasters
 */
 
 public class Gradius : CwaffGun
@@ -18,12 +13,23 @@ public class Gradius : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
+    private const float _MAX_ZIP_DIST = 20f;
+    private const float _TOTAL_ZIP_TIME = 0.4f;
+    private const float _LINEAR_ZIP_TIME = 0.2f;
+
+    internal const int _MAX_SHIP_LEVEL = 5;
+
     internal static GameObject[] _ShipPrefab  = [null, null, null, null];
     internal static string[] _ShipNames  = ["gradius_falchion", "gradius_jade", "gradius_lord", "gradius_vic"];
     internal static Projectile _RoundLaserProjectile = null;
     internal static Projectile _WeakseekerProjectile = null;
+    internal static GameObject _JadeRingImpactVFX = null;
 
-    private List<GradiusHoveringGun> _extantGuns = new();
+    private List<GradiusShip> _extantShips = new();
+    private Vector2 _basePos = default;
+    private float _relativeBarrelY = 0f;
+    private float _zipDist = 0f;
+    private float _zipTime = 0f;
 
     internal float _lerpGunAngle = 0f;
 
@@ -32,85 +38,102 @@ public class Gradius : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Gradius>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
-            fireAudio: null, reloadAudio: null, carryOffset: new IntVector2(8, 0), doesScreenShake: false, infiniteAmmo: true, canReloadNoMatterAmmo: true)
-          .Attach<GradiusAmmoDisplay>()
+          .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 1985, shootFps: 14, reloadFps: 4,
+            fireAudio: null, reloadAudio: null, carryOffset: new IntVector2(16, 0), doesScreenShake: false, infiniteAmmo: false/*, canReloadNoMatterAmmo: true*/)
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(baseProjectile: Items.HegemonyRifle.DefaultProjectile(), clipSize: -1, cooldown: 0.02f, damage: 2f,
+          .InitProjectile(GunData.New(baseProjectile: Items.HegemonyRifle.DefaultProjectile(), clipSize: -1, cooldown: 0.04f, damage: 10f,
             angleVariance: 0f, shootStyle: ShootStyle.Automatic, hideAmmo: true));
         gun.DefaultModule.projectiles = new(){ Lazy.NoProjectile() };
 
+        _JadeRingImpactVFX = VFX.Create("jade_projectile_impact_vfx", fps: 60, loops: false, anchor: Anchor.MiddleCenter,
+            emissivePower: 0.5f, emissiveColorPower: 1.5f, emissiveColour: ExtendedColours.vibrantOrange,
+            lightColor: ExtendedColours.lime, lightRange: 1.5f, lightStrength: 7.0f);
         _RoundLaserProjectile = Items._38Special.DefaultProjectile().Clone(GunData.New(damage: 25f)).ConvertToSpecialtyType<RoundLaser>();
 
         GameObject dispersalPrefab = Items.FlashRay.DefaultProjectile().GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab.ClonePrefab();
         ParticleSystem ps = dispersalPrefab.GetComponent<ParticleSystem>().SetColor(ExtendedColours.vibrantOrange);
         _WeakseekerProjectile = Items._38Special.CloneProjectile(GunData.New(speed: 300f))
+          .SetAllImpactVFX(VFX.CreatePool("lord_projectile_impact_vfx", fps: 60, loops: false, anchor: Anchor.MiddleCenter,
+            emissivePower: 0.5f, emissiveColorPower: 1.5f, emissiveColour: ExtendedColours.vibrantOrange, scale: 0.75f,
+            lightColor: ExtendedColours.vibrantOrange, lightRange: 1.5f, lightStrength: 7.0f))
           .AttachTrail("weakseeker_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 0.25f, dispersalPrefab: dispersalPrefab);
 
-        int i = 0;
-        foreach (string s in _ShipNames)
-        {
-            _ShipPrefab[i] = VFX.Create(s, emissivePower: 3f, scale: 0.5f);
-            _ShipPrefab[i].AddComponent<GradiusHoveringGun>();
-            ++i;
-        }
+        for (int i = 0; i < _ShipNames.Length; ++i)
+            _ShipPrefab[i] = VFX.Create(_ShipNames[i], emissivePower: 3f, scale: 0.5f).Attach<GradiusShip>();
     }
 
+    #if DEBUG
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
         base.OnReloadPressed(player, gun, manualReload);
-        #if DEBUG
-            if (!manualReload || this.shipLevels[0] >= 4)
-                return;
-
-            for (int i = 0; i < 4; ++i)
-                ++this.shipLevels[i];
-            base.gameObject.PlayOnce("gradius_powerup_sound");
-        #endif
+        if (!manualReload)
+            return;
+        for (int i = 0; i < shipLevels.Length; ++i)
+            UpgradeShip((GradiusShip.Ship)i);
     }
+    #endif
 
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
         CreateShips();
+        this._zipDist = _MAX_ZIP_DIST;
+        this._zipTime = _TOTAL_ZIP_TIME;
+        base.gameObject.PlayUnique("gradius_ship_spawn_sound");
+        SmoothlyMoveShips();
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)
     {
         base.OnPostFired(player, gun);
-        for (int i = this._extantGuns.Count - 1; i >= 0; --i)
-            if (this._extantGuns[i])
-                this._extantGuns[i].AttemptToFire();
+        for (int i = this._extantShips.Count - 1; i >= 0; --i)
+            if (this._extantShips[i])
+                this._extantShips[i].AttemptToFire();
     }
 
-    private static GradiusHoveringGun.Ship[] ships = [
-        GradiusHoveringGun.Ship.Vic,
-        GradiusHoveringGun.Ship.Vic,
-        GradiusHoveringGun.Ship.Falchion,
-        GradiusHoveringGun.Ship.Falchion,
-        GradiusHoveringGun.Ship.Lord,
-        GradiusHoveringGun.Ship.Lord,
-        GradiusHoveringGun.Ship.Jade,
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        CwaffEvents.OnWillPickUpMinorInteractible += DoPickupChecks;
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        CwaffEvents.OnWillPickUpMinorInteractible -= DoPickupChecks;
+        base.OnDroppedByPlayer(player);
+    }
+
+    private static GradiusShip.Ship[] ships = [
+        GradiusShip.Ship.Vic,
+        GradiusShip.Ship.Vic,
+        GradiusShip.Ship.Falchion,
+        GradiusShip.Ship.Falchion,
+        GradiusShip.Ship.Lord,
+        GradiusShip.Ship.Lord,
+        GradiusShip.Ship.Jade,
     ];
     private static Vector2[] shipOffsets = [
-        new Vector2(1.5f, -0.375f),
-        new Vector2(1.5f, 0.375f),
-        new Vector2(0.875f, -2.0f),
-        new Vector2(0.875f, 2.0f),
-        new Vector2(-0.5f, -1.125f),
-        new Vector2(-0.5f, 1.125f),
-        new Vector2(-1.25f, 0.0f),
+        new Vector2(-1f + 1.5f, -0.375f),
+        new Vector2(-1f + 1.5f, 0.375f),
+        new Vector2(-1f + 0.875f, -2.0f),
+        new Vector2(-1f + 0.875f, 2.0f),
+        new Vector2(-1f + -0.5f, -1.125f),
+        new Vector2(-1f + -0.5f, 1.125f),
+        new Vector2(-1f + -1.25f, 0.0f),
     ];
     private void CreateShips()
     {
         this._lerpGunAngle = BraveMathCollege.QuantizeFloat(this.gun.gunAngle, 90f);
-        if (this._extantGuns.Count > 0)
+        if (this._extantShips.Count > 0)
             return;
         for (int i = 0; i < ships.Length; ++i)
         {
-            GradiusHoveringGun grad = UnityEngine.Object.Instantiate(_ShipPrefab[(int)ships[i]]).GetComponent<GradiusHoveringGun>();
+            GradiusShip grad = UnityEngine.Object.Instantiate(_ShipPrefab[(int)ships[i]]).GetComponent<GradiusShip>();
             grad.Setup(this.PlayerOwner, this, shipOffsets[i], ships[i]);
-            this._extantGuns.Add(grad);
+            this._extantShips.Add(grad);
         }
     }
 
@@ -120,13 +143,25 @@ public class Gradius : CwaffGun
         DestroyShips();
     }
 
+    private void OnTriedToInitiateAttack(PlayerController player)
+    {
+        if (player && player.CurrentGun == this.gun && this._zipTime > 0f)
+            player.SuppressThisClick = true; // can't fire when our guns are fading in
+    }
+
     private void DestroyShips()
     {
-        int nguns = this._extantGuns.Count;
+        int nguns = this._extantShips.Count;
+        bool anythingDestroyed = false;
         for (int i = nguns - 1; i >= 0; --i)
-            if (this._extantGuns[i])
-                UnityEngine.Object.Destroy(this._extantGuns[i].gameObject);
-        this._extantGuns.Clear();
+            if (this._extantShips[i])
+            {
+                UnityEngine.Object.Destroy(this._extantShips[i].gameObject);
+                anythingDestroyed = true;
+            }
+        if (anythingDestroyed)
+            base.gameObject.PlayUnique("gradius_ship_destroy_sound");
+        this._extantShips.Clear();
     }
 
     public override void Update()
@@ -136,53 +171,87 @@ public class Gradius : CwaffGun
         this._lerpGunAngle = this._lerpGunAngle.SmoothRotateTo(this.gun.gunAngle, 12f);
     }
 
+    private void LateUpdate()
+    {
+        SmoothlyMoveShips();
+    }
+
+    private void SmoothlyMoveShips()
+    {
+        // smoothly relocate ship positions when our gun switches hands
+        const float ABS_DIFF = 1.125f;  // absolute horizontal distance between barrel world coordinates when facing right vs left
+        const float GUN_HEIGHT = 0.75f; // height of gun sprite in game units (<height in pixels> / 16)
+        Transform btrans = this.gun.barrelOffset.transform;
+        Vector2 bpos = btrans.position.XY();
+        float localY = btrans.localPosition.y;
+        this._relativeBarrelY = Lazy.SmoothestLerp(this._relativeBarrelY, localY, 12f);
+        Vector2 effectiveBarrelPos = new Vector2(bpos.x + ABS_DIFF * (this._relativeBarrelY - localY) / GUN_HEIGHT, bpos.y);
+        this._basePos = effectiveBarrelPos;
+
+        // smoothly transition ships in when switching to this gun
+        if (this._zipTime <= 0)
+            return;
+        this._zipTime = Mathf.Max(this._zipTime - BraveTime.DeltaTime, 0f);
+        this._zipDist = Lazy.SmoothestLerp(this._zipDist, 0f, 16f);
+        if (this._zipTime <= _LINEAR_ZIP_TIME)
+        {
+            float maxDist = _MAX_ZIP_DIST * (this._zipTime / _TOTAL_ZIP_TIME);
+            this._zipDist = Mathf.Min(this._zipDist, maxDist);
+        }
+        this._basePos += new Vector2(0f, this._zipDist);
+    }
+
+    internal Vector2 GetBasePos() => this._basePos;
+
     public override void OnDestroy()
     {
         DestroyShips();
         StopAllCoroutines();
+        CwaffEvents.OnWillPickUpMinorInteractible -= DoPickupChecks;
+        if (this.PlayerOwner is PlayerController player)
+            player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         base.OnDestroy();
+    }
+
+    private void DoPickupChecks(PlayerController player, PickupObject pickup)
+    {
+        if (pickup is KeyBulletPickup)
+            UpgradeShip(GradiusShip.Ship.Falchion);
+        else if (pickup is SilencerItem)
+            UpgradeShip(GradiusShip.Ship.Jade);
+        else if (pickup is HealthPickup)
+            UpgradeShip(GradiusShip.Ship.Lord);
+        else if (pickup is AmmoPickup)
+            UpgradeShip(GradiusShip.Ship.Vic);
+    }
+
+    private void UpgradeShip(GradiusShip.Ship shipType)
+    {
+        int idx = (int)shipType;
+        if (this.shipLevels[idx] >= Gradius._MAX_SHIP_LEVEL)
+            return;
+        ++this.shipLevels[idx];
+        foreach (GradiusShip ship in this._extantShips)
+        {
+            if (ship && ship._shipType == shipType)
+                ship.DoUpgrade();
+
+        }
+        base.gameObject.PlayUnique("gradius_powerup_sound");
     }
 
     public override void MidGameSerialize(List<object> data, int i)
     {
         base.MidGameSerialize(data, i);
-        for (int n = 0; n < 4; ++n)
+        for (int n = 0; n < Gradius._MAX_SHIP_LEVEL; ++n)
             data.Add(this.shipLevels[n]);
     }
 
     public override void MidGameDeserialize(List<object> data, ref int i)
     {
         base.MidGameDeserialize(data, ref i);
-        for (int n = 0; n < 4; ++n)
+        for (int n = 0; n < Gradius._MAX_SHIP_LEVEL; ++n)
             this.shipLevels[n] = (int)data[i++];
-    }
-
-    private class GradiusAmmoDisplay : CustomAmmoDisplay
-    {
-        private Gun _gun;
-        private Gradius _Gradius;
-        private PlayerController _owner;
-
-        private void Start()
-        {
-            this._gun = base.GetComponent<Gun>();
-            this._Gradius = this._gun.GetComponent<Gradius>();
-            this._owner = this._gun.CurrentOwner as PlayerController;
-        }
-
-        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
-        {
-            return false;
-
-            // if (!this._owner || !this._Gradius || !this._Gradius.Mastered)
-            //     return false;
-
-            // if (this._Gradius.autotarget)
-            //     uic.GunAmmoCountLabel.Text = $"[color #ff44ff]Autotarget On[/color]\n{this._owner.VanillaAmmoDisplay()}";
-            // else
-            //     uic.GunAmmoCountLabel.Text = $"[color #444444]Autotarget Off[/color]\n{this._owner.VanillaAmmoDisplay()}";
-            // return true;
-        }
     }
 
     [HarmonyPatch]
@@ -213,7 +282,7 @@ public class RoundLaser : Projectile
 {
     private const float _LIFETIME = 1.0f;
     private const float _BASE_MAX_RADIUS = 3f;
-    private const float _LVL_RADIUS = 2f;
+    private const float _LVL_RADIUS = 1.5f;
     private const float _THICKNESS = 0.25f;
     private static readonly Color _StartColor = new Color(0.5f, 1.0f, 0.6f, 1.0f);
     private static readonly Color _EndColor = new Color(0.5f, 1.0f, 0.6f, 0.0f);
@@ -250,7 +319,7 @@ public class RoundLaser : Projectile
                 UnityEngine.Object.Destroy(this._laserRing.gameObject);
                 this._laserRing = null;
             }
-            this.DieInAir();
+            this.DieInAir(suppressInAirEffects: true);
             return;
         }
 
@@ -267,8 +336,11 @@ public class RoundLaser : Projectile
             if (_hitEnemies.Contains(enemy))
                 continue;
             _hitEnemies.Add(enemy);
-            if (enemy.healthHaver is HealthHaver hh && hh.IsVulnerable)
-                hh.ApplyDamage(base.baseData.damage, (enemy.CenterPosition - pos).normalized, Gradius.ItemName);
+            if (enemy.healthHaver is not HealthHaver hh || !hh.IsVulnerable)
+                continue;
+            hh.ApplyDamage(base.baseData.damage, (enemy.CenterPosition - pos).normalized, Gradius.ItemName);
+            CwaffVFX.Spawn(Gradius._JadeRingImpactVFX, enemy.CenterPosition);
+            enemy.gameObject.Play("gradius_round_laser_impact_sound");
         }
     }
 
@@ -283,7 +355,7 @@ public class RoundLaser : Projectile
     }
 }
 
-public class GradiusHoveringGun : MonoBehaviour
+public class GradiusShip : MonoBehaviour
 {
     private const float _FREQ = 5f;
     private const float _AMP  = 0.0625f;
@@ -297,10 +369,11 @@ public class GradiusHoveringGun : MonoBehaviour
     private tk2dBaseSprite _sprite = null;
     private float _phase = 0f;
     private ParticleSystem _ps = null;
-    private Ship _ship = default;
     private int _level = 1;
     private float _cooldown = 0f;
-    private Geometry[] _levelBlips = [null, null, null, null];
+    private Geometry[] _levelBlips = [null, null, null, null, null];
+
+    internal Ship _shipType = default;
 
     public enum Ship
     {
@@ -450,24 +523,24 @@ public class GradiusHoveringGun : MonoBehaviour
             return; // NOTE: prevent firing when not axis-aligned
         rot = qzRot.EulerZ();
 
-        this._cooldown = this._owner.FireRateMult() * GetCooldown();
+        this._cooldown = GetCooldown() / this._owner.FireRateMult();
 
         Vector2 pos = this._sprite.WorldCenterRight();
-        GameObject prefab = this._ship switch {
+        GameObject prefab = this._shipType switch {
             Ship.Falchion => Lazy.GunDefaultProjectile((int)Items.Com4nd0).gameObject,
             Ship.Jade     => Gradius._RoundLaserProjectile.gameObject,
             Ship.Lord     => Gradius._WeakseekerProjectile.gameObject,
             Ship.Vic      => Lazy.GunDefaultProjectile((int)Items.HegemonyRifle).gameObject,
             _             => Lazy.GunDefaultProjectile(Lazy.PickupId<OmnidirectionalLaser>()).gameObject,
         };
-        if (this._ship == Ship.Lord && GetWeakestVisibleEnemy(pos, rot) is AIActor target)
+        if (this._shipType == Ship.Lord && GetWeakestVisibleEnemy(pos, rot) is AIActor target)
             rot = (target.CenterPosition - pos).EulerZ(); // seek towards weakest enemy
         GameObject po = SpawnManager.SpawnProjectile(prefab, pos, rot);
         Projectile proj = po.GetComponent<Projectile>();
         proj.SetOwnerAndStats(this._owner);
         this._owner.DoPostProcessProjectile(proj);
 
-        switch (this._ship)
+        switch (this._shipType)
         {
             case Ship.Falchion:
                 proj.RuntimeUpdateScale(0.5f); // mini missiles
@@ -493,13 +566,13 @@ public class GradiusHoveringGun : MonoBehaviour
         _MuzzleVFX.SpawnAtPosition(pos, zRotation: zRot);
     }
 
-    private static readonly float[] _FalchionCooldowns = [2.50f, 1.80f, 1.20f, 0.70f];
-    private static readonly float[] _JadeCooldowns     = [2.10f, 1.90f, 1.70f, 1.50f];
-    private static readonly float[] _LordCooldowns     = [3.00f, 2.00f, 1.50f, 1.10f];
-    private static readonly float[] _VicCooldowns      = [0.20f, 0.15f, 0.12f, 0.10f];
+    private static readonly float[] _FalchionCooldowns = [2.50f, 1.80f, 1.20f, 0.70f, 0.50f];
+    private static readonly float[] _JadeCooldowns     = [2.10f, 1.90f, 1.70f, 1.50f, 1.40f];
+    private static readonly float[] _LordCooldowns     = [3.00f, 2.00f, 1.50f, 1.10f, 0.90f];
+    private static readonly float[] _VicCooldowns      = [0.20f, 0.15f, 0.12f, 0.10f, 0.08f];
     private float GetCooldown()
     {
-        switch (this._ship)
+        switch (this._shipType)
         {
             case Ship.Falchion: return _FalchionCooldowns[this._level - 1];
             case Ship.Jade:     return _JadeCooldowns[this._level - 1];
@@ -511,13 +584,13 @@ public class GradiusHoveringGun : MonoBehaviour
 
     public void Setup(PlayerController owner, Gradius gun, Vector2 relPos, Ship ship)
     {
-        this._ship = ship;
+        this._shipType = ship;
         this._relPos = relPos;
         this._owner = owner;
         this._gun = gun;
         this._sprite = base.gameObject.GetComponent<tk2dBaseSprite>();
 
-        this._level = this._gun.shipLevels[(int)this._ship];
+        this._level = this._gun.shipLevels[(int)this._shipType];
         this._cooldown = this._owner.FireRateMult() * GetCooldown();
 
         this._phase = Mathf.PI * UnityEngine.Random.value;
@@ -526,7 +599,7 @@ public class GradiusHoveringGun : MonoBehaviour
         SpriteOutlineManager.AddOutlineToSprite(this._sprite, Color.black, 2.0f, 0f);
         this._sprite.UpdateZDepth();
 
-        GameObject psObj = UnityEngine.Object.Instantiate(_ShipParticleSystem[(int)this._ship]);
+        GameObject psObj = UnityEngine.Object.Instantiate(_ShipParticleSystem[(int)this._shipType]);
         psObj.transform.position = this._sprite.WorldCenterLeft();
         psObj.transform.parent   = base.gameObject.transform;
         psObj.transform.localRotation = 90f.EulerZ();
@@ -535,18 +608,35 @@ public class GradiusHoveringGun : MonoBehaviour
         this._didSetup = true;
     }
 
-    private void Update()
+    internal void DoUpgrade()
+    {
+        UpdateLevelIndicators();
+        CwaffVFX.SpawnBurst(
+            prefab           : VFX.SinglePixel,
+            numToSpawn       : 10 * this._level,
+            anchorTransform  : base.transform,
+            basePosition     : base.transform.position,
+            positionVariance : 5f,
+            velType          : CwaffVFX.Vel.InwardToCenter,
+            lifetime         : 0.5f,
+            emissivePower    : 200f,
+            overrideColor    : _ShipColors[(int)this._shipType],
+            emitColorPower   : 8f
+          );
+    }
+
+    private void LateUpdate()
     {
         if (!this._didSetup || !this._owner || !this._sprite || !this._gun || this._owner.CurrentGun != this._gun.gun)
             return;
-
-        UpdateLevelIndicators();
 
         float gunAngle = this._gun._lerpGunAngle;
         Vector2 offset = this._relPos.Rotate(gunAngle);
         Vector2 hover = new Vector2(0f, _AMP * Mathf.Sin(_FREQ * (BraveTime.ScaledTimeSinceStartup + this._phase)));
         base.transform.localRotation = gunAngle.EulerZ();
-        base.transform.position = this._gun.gun.barrelOffset.position.XY() + offset + hover;
+        base.transform.position = this._gun.GetBasePos() + offset + hover;
+
+        UpdateLevelIndicators();
 
         if (this._cooldown > 0)
             this._cooldown -= BraveTime.DeltaTime;
@@ -554,27 +644,52 @@ public class GradiusHoveringGun : MonoBehaviour
 
     private void UpdateLevelIndicators()
     {
-        int t = (int)this._ship;
+        if (!this._owner || this._owner.IsInCombat)
+        {
+            for (int i = 0; i < Gradius._MAX_SHIP_LEVEL; ++i)
+            {
+                if (this._levelBlips[i])
+                    this._levelBlips[i]._meshRenderer.enabled = false;
+            }
+            return;
+        }
+
+        int t = (int)this._shipType;
         int level = this._level = this._gun.shipLevels[t];
         Vector3 basePos = base.transform.position;
         Quaternion baseRot = base.transform.localRotation;
-        Vector3 baseOff = new Vector3(0.5625f, -0.1875f, 0f);
+
+        // if (!this._levelBlips[0])
+        //     this._levelBlips[0] = new GameObject().AddComponent<Geometry>();
+        // this._levelBlips[0].Setup(shape: Geometry.Shape.CIRCLE, color: _ShipColors[t], pos: this._sprite ? this._sprite.WorldCenter : basePos,
+        //   radius: 0.625f, radiusInner: 0.5f, arc: 90f * (level - 1), angle: baseRot.eulerAngles.z + 180f);
+
+        Vector3 baseOff = new Vector3(0.5625f, -0.25f, 0f);
         for (int i = 0; i < level; ++i)
         {
             if (!this._levelBlips[i])
                 this._levelBlips[i] = new GameObject().AddComponent<Geometry>();
             this._levelBlips[i].Setup(shape: Geometry.Shape.RING, color: _ShipColors[t], pos: basePos + (baseRot * new Vector2(baseOff.x, baseOff.y + 0.125f * i)), radius: 0.03125f, radiusInner: 0f);
         }
-        for (int i = level; i < 4; ++i)
-        {
-            if (this._levelBlips[i])
-                this._levelBlips[i]._meshRenderer.enabled = false;
-        }
     }
 
     private void OnDestroy()
     {
-        for (int i = 0; i < 4; ++i) //TODO: magic number
+        CwaffVFX.SpawnBurst(
+            prefab           : VFX.SinglePixel,
+            numToSpawn       : 10,
+            anchorTransform  : base.transform,
+            basePosition     : base.transform.position,
+            positionVariance : 1f,
+            velocityVariance : 10f,
+            velType          : CwaffVFX.Vel.AwayRadial,
+            lifetime         : 0.35f,
+            lifetimeVariance : 0.15f,
+            emissivePower    : 200f,
+            overrideColor    : _ShipColors[(int)this._shipType],
+            emitColorPower   : 8f
+          );
+        for (int i = 0; i < Gradius._MAX_SHIP_LEVEL; ++i) //TODO: magic number
         {
             if (this._levelBlips[i])
                 UnityEngine.Object.Destroy(this._levelBlips[i].gameObject);

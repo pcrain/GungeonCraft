@@ -34,6 +34,8 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action<PlayerController> OnEmptyInteract;
     // Run right before a player is about to apply roll damage
     public static Action<PlayerController, AIActor> OnWillApplyRollDamage;
+    // Run right before a player will definitively pick up armor, health, ammo, keys, or blanks
+    public static Action<PlayerController, PickupObject> OnWillPickUpMinorInteractible;
 
     internal static bool _OnFirstFloor = false;
     internal static bool _RunJustStarted = false;
@@ -259,6 +261,27 @@ public static class CwaffEvents // global custom events we can listen for
                 return;
             if (CwaffEvents.OnWillApplyRollDamage != null)
                 CwaffEvents.OnWillApplyRollDamage(__instance, actor);
+        }
+    }
+
+    [HarmonyPatch]
+    private static class PickUpMinorInteractiblePatch
+    {
+        [HarmonyPatch(typeof(AmmoPickup), nameof(AmmoPickup.Pickup))]
+        [HarmonyPatch(typeof(HealthPickup), nameof(HealthPickup.Pickup))]
+        [HarmonyPatch(typeof(KeyBulletPickup), nameof(KeyBulletPickup.Pickup))]
+        [HarmonyPatch(typeof(SilencerItem), nameof(SilencerItem.Pickup))]
+        private static void Prefix(PickupObject __instance, PlayerController player)
+        {
+            if (CwaffEvents.OnWillPickUpMinorInteractible == null)
+                return;
+            if (player.IsGhost)
+                return;
+            if (__instance is SilencerItem blank && blank.m_pickedUp)
+                return;
+            if (__instance is AmmoPickup ammo && ammo.m_pickedUp)
+                return;
+            CwaffEvents.OnWillPickUpMinorInteractible(player, __instance);
         }
     }
 }

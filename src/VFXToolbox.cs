@@ -967,10 +967,11 @@ public partial class CwaffVFX // public
     /// <param name="spread">If > 0, applies a random rotation with magnitude up to spread degress to final velocity.</param>
     /// <param name="spriteCol">The sprite collection to use if not passing a prefab.</param>
     /// <param name="spriteId">The sprite id to use if not passing a prefab.</param>
+    /// <param name="lifetimeVariance">Adds up to this much time at random to individual particles.</param>
     public static void SpawnBurst(GameObject prefab = null, int numToSpawn = 1, Vector2 basePosition = default, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false,
         bool uniform = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false,
-        Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f, float spread = 0f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1)
+        Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f, float spread = 0f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, float lifetimeVariance = 0f)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
@@ -1003,7 +1004,7 @@ public partial class CwaffVFX // public
                 position      : finalpos,
                 rotation      : rot,
                 velocity      : velocity,
-                lifetime      : lifetime,
+                lifetime      : lifetime + lifetimeVariance * UnityEngine.Random.value,
                 fadeIn        : fadeIn,
                 fadeOutTime   : fadeOutTime,
                 emissivePower : emissivePower,
