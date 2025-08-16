@@ -373,10 +373,21 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       return this._cachedShootData.beam;
   }
 
+  private static bool CheckHideAmmo(bool oldValue, Gun gun)
+  {
+    if (oldValue)
+      return true;
+    if (gun.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg)
+      return false;
+    return cg.hideAmmo;
+  }
+
   /// <summary>Completely hides a gun's ammo like blasphemy</summary>
-  [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateUIGun))]
+  [HarmonyPatch]
   private class GameUIAmmoControllerUpdateUIGunPatch
   {
+      /// <summary>Actually hide the gun's ammo</summary>
+      [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateUIGun))]
       [HarmonyILManipulator]
       private static void GameUIAmmoControllerUpdateUIGunIL(ILContext il)
       {
@@ -385,16 +396,37 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
               return;
 
           cursor.Emit(OpCodes.Ldloc_0);
-          cursor.CallPrivate(typeof(GameUIAmmoControllerUpdateUIGunPatch), nameof(CheckHideAmmo));
+          cursor.CallPrivate(typeof(CwaffGun), nameof(CheckHideAmmo));
+      }
+  }
+
+  /// <summary>Assorted patches for UpdateAmmoUIForModule</summary>
+  [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateAmmoUIForModule))]
+  private class UpdateAmmoUIForModulePatch
+  {
+      [HarmonyILManipulator]
+      private static void UpdateAmmoUIForModuleIL(ILContext il)
+      {
+          ILCursor cursor = new ILCursor(il);
+
+          /// Allow the ammo display to show more than 125 shots for non-beam weapons</summary>
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcI4(125)))
+            return;
+          cursor.Emit(OpCodes.Ldarg, 8); // load currentGun
+          cursor.CallPrivate(typeof(UpdateAmmoUIForModulePatch), nameof(CheckGun));
+
+          // Prevent VFX from playing on ammo bar while disabled and lagging the game
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<Gun>("get_IsReloading")))
+            return;
+          cursor.Emit(OpCodes.Ldarg, 8); // load currentGun
+          cursor.CallPrivate(typeof(CwaffGun), nameof(CheckHideAmmo));
       }
 
-      private static bool CheckHideAmmo(bool oldValue, Gun gun)
+      private static int CheckGun(int oldCount, Gun gun)
       {
-        if (oldValue)
-          return true;
-        if (gun.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg)
-          return false;
-        return cg.hideAmmo;
+        if (gun && gun.gameObject.GetComponent<CwaffGun>())
+          return 500;
+        return oldCount;
       }
   }
 
@@ -503,29 +535,6 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
         if (attachPlayer && attachPlayer.CurrentGun is Gun gun && gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
           return !cg.suppressReloadLabel; // skip the original method if we are suppressing reload labels
         return true;     // call the original method
-      }
-  }
-
-  /// <summary>Patch to allow the ammo display to show more than 125 shots for non-beam weapons</summary>
-  [HarmonyPatch(typeof(GameUIAmmoController), nameof(GameUIAmmoController.UpdateAmmoUIForModule))]
-  private class ShowMoreThan125ShotsPatch
-  {
-      [HarmonyILManipulator]
-      private static void ShowMoreThan125ShotsIL(ILContext il)
-      {
-          ILCursor cursor = new ILCursor(il);
-          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcI4(125)))
-            return;
-
-          cursor.Emit(OpCodes.Ldarg, 8); // load currentGun
-          cursor.CallPrivate(typeof(ShowMoreThan125ShotsPatch), nameof(CheckGun));
-      }
-
-      private static int CheckGun(int oldCount, Gun gun)
-      {
-        if (gun && gun.gameObject.GetComponent<CwaffGun>())
-          return 500;
-        return oldCount;
       }
   }
 

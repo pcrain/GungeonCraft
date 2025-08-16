@@ -7,6 +7,7 @@
 - Added mastery for Toothpaste
 - Removed debug log spam from Alyx
 - Fixed Xelsior not being able to assimilate guns when not in a proper room (e.g., when standing in a hallway)
+- Fixed lag caused by certain guns with hidden ammo displays attempting to play invisible VFX on the ammo bar and never destroying them
 
 ## 1.26.5 (2025-06-28)
 
