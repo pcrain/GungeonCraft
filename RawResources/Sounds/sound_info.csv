@@ -336,3 +336,9 @@ heartbeat_sound,15.0,1,sound,0
 heartbreaker_absorb_sound,6.0,1,sound,0
 heartbreaker_impact_sound,1.5,1,sound,0
 heartbreaker_home_sound,0.0,1,sound,2
+gradius_beam_sound,-1.0,1,sound,2
+gradius_blaster_sound,-4.0,1,sound,2
+gradius_missile_sound,-5.0,1,sound,2
+gradius_round_sound,-8.0,1,sound,2
+gradius_shield_sound,-2.5,1,sound,2
+gradius_powerup_sound,0.0,1,sound,1

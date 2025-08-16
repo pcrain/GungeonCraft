@@ -192,7 +192,6 @@
     <Compile Include="src\Cwaff-Guns\Missiletoe.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
     <Compile Include="src\Cwaff-Guns\PistolWhip.cs"/>
-    <Compile Include="src\Cwaff-Guns\Gradient.cs"/>
     <Compile Include="src\Cwaff-Guns\RCLauncher.cs"/>
     <Compile Include="src\Cwaff-Guns\Nycterian.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
@@ -212,6 +211,7 @@
     <Compile Include="src\Cwaff-Guns\Ticonderogun.cs"/>
     <Compile Include="src\Cwaff-Guns\Overflow.cs"/>
     <Compile Include="src\Cwaff-Guns\SchrodingersGat.cs"/>
+    <Compile Include="src\Cwaff-Guns\Gradius.cs"/>
     <Compile Include="src\Cwaff-Guns\KingsLaw.cs"/>
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Oddjob.cs"/>

@@ -1572,6 +1572,9 @@ public static class Extensions
   /// <summary>Get the player's current gun charge rate multiplier</summary>
   public static float ChargeMult(this PlayerController p) => p.stats.GetStatValue(StatType.ChargeAmountMultiplier);
 
+  /// <summary>Get the player's current gun fire rate multiplier</summary>
+  public static float FireRateMult(this PlayerController p) => p.stats.GetStatValue(StatType.RateOfFire);
+
   /// <summary>Get the player's current curse level</summary>
   public static float Curse(this PlayerController p) => p.stats.GetStatValue(StatType.Curse);
 
@@ -3566,6 +3569,36 @@ public static class Extensions
       if (Mathf.Abs(angleDelta) < t)
           return newRotation;
       return (oldRotation + Lazy.SmoothestLerp(0f, angleDelta, r)).Clamp360();
+  }
+
+  /// <summary>Get the defautl projectile for a gun by id</summary>
+  public static Projectile DefaultProjectile(this Items gunid)
+  {
+      return (PickupObjectDatabase.GetById((int)gunid) as Gun).DefaultModule.projectiles[0];
+  }
+
+  /// <summary>Set the colors of particles in a particle system across the board</summary>
+  public static ParticleSystem SetColor(this ParticleSystem ps, Color c)
+  {
+      ParticleSystem.MainModule main = ps.main;
+      main.startColor = c;
+
+      Gradient g = new Gradient();
+      g.SetKeys(
+          new GradientColorKey[] { new GradientColorKey(c, 0.0f), new GradientColorKey(c, 1.0f) },
+          new GradientAlphaKey[] { new GradientAlphaKey(1f, 0.0f), new GradientAlphaKey(0.5f, 0.25f), new GradientAlphaKey(0.15f, 0.5f),  new GradientAlphaKey(0.01f, 0.75f), new GradientAlphaKey(1.0f, 1.0f) }
+      );
+      ParticleSystem.ColorOverLifetimeModule colm = ps.colorOverLifetime;
+      colm.color = new ParticleSystem.MinMaxGradient(g);
+
+      ParticleSystemRenderer psr = ps.gameObject.GetComponent<ParticleSystemRenderer>();
+      psr.material.SetFloat("_InvFade", 3.0f);
+      psr.material.SetFloat("_EmissionGain", 0.1f);
+      psr.material.SetColor("_EmissionColor", c);
+      psr.material.SetColor("_DiffuseColor", c);
+      psr.sortingLayerName = "Foreground";
+
+      return ps;
   }
 }
 

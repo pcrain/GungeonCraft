@@ -571,6 +571,7 @@ public static class Lazy
     }
 
     private static List<AIActor> _TempEnemies = new();
+    private static List<AIActor> _TempNearbyEnemies = new();
     /// <summary>Determine whether any enemy is in an line between start and end (does not account for walls)</summary>
     public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
@@ -724,8 +725,8 @@ public static class Lazy
     /// <summary>Returns a list of all enemies within a radius of a point.</summary>
     public static List<AIActor> GetAllNearbyEnemies(Vector2 center, float radius = 100f, bool ignoreWalls = false)
     {
-        GetAllNearbyEnemies(ref _TempEnemies, center, radius, ignoreWalls);
-        return _TempEnemies;
+        GetAllNearbyEnemies(ref _TempNearbyEnemies, center, radius, ignoreWalls);
+        return _TempNearbyEnemies; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
     }
 
     /// <summary>Spawn a chest with a single guaranteed item inside of it</summary>
