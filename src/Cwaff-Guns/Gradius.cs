@@ -1,9 +1,7 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - add mastery
     - [maybe] fix scattershot compatibility
-    - [maybe] animate main gun
 */
 
 public class Gradius : CwaffGun
@@ -16,6 +14,8 @@ public class Gradius : CwaffGun
     private const float _MAX_ZIP_DIST = 20f;
     private const float _TOTAL_ZIP_TIME = 0.4f;
     private const float _LINEAR_ZIP_TIME = 0.2f;
+    private const int _NORMAL_SHIPS = 7;
+    private const int _MASTERED_SHIPS = 13;
 
     internal const int _MAX_SHIP_LEVEL = 5;
 
@@ -114,25 +114,40 @@ public class Gradius : CwaffGun
         GradiusShip.Ship.Lord,
         GradiusShip.Ship.Lord,
         GradiusShip.Ship.Jade,
+        // for mastery
+        GradiusShip.Ship.Vic,
+        GradiusShip.Ship.Vic,
+        GradiusShip.Ship.Falchion,
+        GradiusShip.Ship.Falchion,
+        GradiusShip.Ship.Lord,
+        GradiusShip.Ship.Lord,
     ];
     private static Vector2[] shipOffsets = [
-        new Vector2(-1f + 1.5f, -0.375f),
-        new Vector2(-1f + 1.5f, 0.375f),
-        new Vector2(-1f + 0.875f, -2.0f),
-        new Vector2(-1f + 0.875f, 2.0f),
-        new Vector2(-1f + -0.5f, -1.125f),
-        new Vector2(-1f + -0.5f, 1.125f),
-        new Vector2(-1f + -1.25f, 0.0f),
+        new Vector2(0.5f, -0.375f),
+        new Vector2(0.5f, 0.375f),
+        new Vector2(-0.125f, -2.0f),
+        new Vector2(-0.125f, 2.0f),
+        new Vector2(-1.5f, -1.125f),
+        new Vector2(-1.5f, 1.125f),
+        new Vector2(-2.25f, 0.0f),
+        // for mastery
+        new Vector2(0.875f, -0.875f),
+        new Vector2(0.875f, 0.875f),
+        new Vector2(-0.125f, -2.75f),
+        new Vector2(-0.125f, 2.75f),
+        new Vector2(-1.9375f, -1.625f),
+        new Vector2(-1.9375f, 1.625f),
     ];
     private void CreateShips()
     {
         this._lerpGunAngle = BraveMathCollege.QuantizeFloat(this.gun.gunAngle, 90f);
         if (this._extantShips.Count > 0)
             return;
-        for (int i = 0; i < ships.Length; ++i)
+        int numShips = this.Mastered ? _MASTERED_SHIPS : _NORMAL_SHIPS;
+        for (int i = 0; i < numShips; ++i)
         {
             GradiusShip grad = UnityEngine.Object.Instantiate(_ShipPrefab[(int)ships[i]]).GetComponent<GradiusShip>();
-            grad.Setup(this.PlayerOwner, this, shipOffsets[i], ships[i]);
+            grad.Setup(this.PlayerOwner, this, shipOffsets[i], ships[i], i < _NORMAL_SHIPS);
             this._extantShips.Add(grad);
         }
     }
@@ -238,6 +253,13 @@ public class Gradius : CwaffGun
 
         }
         base.gameObject.PlayUnique("gradius_powerup_sound");
+    }
+
+    internal void DelayMastered(GradiusShip.Ship shipType, bool mastered, float delay)
+    {
+        foreach (GradiusShip ship in this._extantShips)
+            if (ship && ship._shipType == shipType && ship._mastered == mastered)
+                ship._cooldown = delay;
     }
 
     public override void MidGameSerialize(List<object> data, int i)
@@ -370,9 +392,10 @@ public class GradiusShip : MonoBehaviour
     private float _phase = 0f;
     private ParticleSystem _ps = null;
     private int _level = 1;
-    private float _cooldown = 0f;
     private Geometry[] _levelBlips = [null, null, null, null, null];
 
+    internal bool _mastered = false;
+    internal float _cooldown = 0f;
     internal Ship _shipType = default;
 
     public enum Ship
@@ -524,6 +547,8 @@ public class GradiusShip : MonoBehaviour
         rot = qzRot.EulerZ();
 
         this._cooldown = GetCooldown() / this._owner.FireRateMult();
+        // NOTE: delay cooldown of ships with the opposite mastery status by half of our cooldown so we alternate fire
+        this._gun.DelayMastered(this._shipType, !this._mastered, 0.5f * this._cooldown);
 
         Vector2 pos = this._sprite.WorldCenterRight();
         GameObject prefab = this._shipType switch {
@@ -582,12 +607,13 @@ public class GradiusShip : MonoBehaviour
         return 0.5f + UnityEngine.Random.value;
     }
 
-    public void Setup(PlayerController owner, Gradius gun, Vector2 relPos, Ship ship)
+    public void Setup(PlayerController owner, Gradius gun, Vector2 relPos, Ship ship, bool mastered)
     {
         this._shipType = ship;
         this._relPos = relPos;
         this._owner = owner;
         this._gun = gun;
+        this._mastered = mastered;
         this._sprite = base.gameObject.GetComponent<tk2dBaseSprite>();
 
         this._level = this._gun.shipLevels[(int)this._shipType];

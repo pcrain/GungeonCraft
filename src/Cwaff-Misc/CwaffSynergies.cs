@@ -328,6 +328,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfZealot>(MASTERY_ZEALOT, Zealot.ItemName);
         // Toothpaste projectiles create suds in a much larger radius, and toothbrush can be swung much faster.
         NewMastery<MasteryOfToothpaste>(MASTERY_TOOTHPASTE, Toothpaste.ItemName);
+        // Gradius deploys 2 extra Vic Viper, Lord British, and Falchion Beta ships.
+        NewMastery<MasteryOfGradius>(MASTERY_GRADIUS, Gradius.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -610,6 +612,7 @@ internal class MasteryOfWayfarer             : MasteryDummyItem {}
 internal class MasteryOfForkbomb             : MasteryDummyItem {}
 internal class MasteryOfZealot               : MasteryDummyItem {}
 internal class MasteryOfToothpaste           : MasteryDummyItem {}
+internal class MasteryOfGradius              : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -754,4 +757,5 @@ public enum Synergy {
     MASTERY_FORKBOMB,
     MASTERY_ZEALOT,
     MASTERY_TOOTHPASTE,
+    MASTERY_GRADIUS,
 };
