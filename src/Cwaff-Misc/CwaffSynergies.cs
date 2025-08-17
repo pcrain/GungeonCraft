@@ -330,6 +330,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfToothpaste>(MASTERY_TOOTHPASTE, Toothpaste.ItemName);
         // Gradius deploys 2 extra Vic Viper, Lord British, and Falchion Beta ships.
         NewMastery<MasteryOfGradius>(MASTERY_GRADIUS, Gradius.ItemName);
+        // While Heartbreaker is active, each of the player's empty heart containers orbits them to block bullets.
+        NewMastery<MasteryOfHeartbreaker>(MASTERY_HEARTBREAKER, Heartbreaker.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -613,6 +615,7 @@ internal class MasteryOfForkbomb             : MasteryDummyItem {}
 internal class MasteryOfZealot               : MasteryDummyItem {}
 internal class MasteryOfToothpaste           : MasteryDummyItem {}
 internal class MasteryOfGradius              : MasteryDummyItem {}
+internal class MasteryOfHeartbreaker         : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -758,4 +761,5 @@ public enum Synergy {
     MASTERY_ZEALOT,
     MASTERY_TOOTHPASTE,
     MASTERY_GRADIUS,
+    MASTERY_HEARTBREAKER,
 };

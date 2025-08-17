@@ -1,7 +1,6 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - add mastery (orbiting heart guon stone for every half heart missing from full health)
     - maybe add helix projectiles compatibility (currently just ignores it)
 */
 
@@ -16,10 +15,13 @@ public class Heartbreaker : CwaffGun
     private const int _MAX_LEVEL         = 26;
     private const int _MIN_BULLETS       = 4;
     private const int _BURSTS_PER_CLIP   = 3;
-    private const int _BASE_MAX_AMMO     = 400;
+    private const int _BASE_MAX_AMMO     = 800;
     private const int _AMMO_PER_LEVEL    = _BASE_MAX_AMMO / _MIN_BULLETS;
 
+    private List<PlayerOrbital> _extantOrbitals = new();
+
     internal static GameObject _AbsorbVFX = null;
+    internal static GameObject _EmptyHeartGuon = null;
 
     public int storedHalfHearts = 0;
 
@@ -56,6 +58,15 @@ public class Heartbreaker : CwaffGun
         } //REFACTOR: burst builder
 
         _AbsorbVFX = VFX.Create("hearbreaker_absorb_vfx", emissivePower: _VFX_GLOW, emissiveColour: Color.Lerp(Color.red, Color.white, 0.5f));
+
+        _EmptyHeartGuon = (Items.GlassGuonStone.AsPassive() as IounStoneOrbitalItem).OrbitalPrefab.gameObject.ClonePrefab();
+        _EmptyHeartGuon.GetComponentInChildren<tk2dSprite>().SetSprite(VFX.Collection, VFX.Collection.GetSpriteIdByName("heartbreaker_shield"));
+        PixelCollider collider = _EmptyHeartGuon.GetComponent<SpeculativeRigidbody>().PixelColliders[0];
+          collider.ManualWidth = 13;
+          collider.ManualHeight = 11;
+          collider.ManualOffsetX = 6;
+          collider.ManualOffsetY = 5;
+        _EmptyHeartGuon.GetComponent<PlayerOrbital>().orbitRadius = 4f;
     }
 
     private void Start()
@@ -64,19 +75,48 @@ public class Heartbreaker : CwaffGun
         gun.sprite.SetGlowiness(glowAmount: 1f, glowColor: Color.red, glowColorPower: 2.0f, clampBrightness: false);
     }
 
+    private void UpdateOrbitals()
+    {
+        HealthHaver hh = this.PlayerOwner.healthHaver;
+        int curOrbitals = this._extantOrbitals.Count;
+        int nextOrbitals = Mathf.Max(0, Mathf.FloorToInt(hh.GetMaxHealth() - hh.GetCurrentHealth()));
+        while (this._extantOrbitals.Count < nextOrbitals)
+        {
+            PlayerOrbital newOrbital = PlayerOrbitalItem.CreateOrbital(this.PlayerOwner, _EmptyHeartGuon, false).GetComponent<PlayerOrbital>();
+            EasyLight.Create(pos: newOrbital.gameObject.GetComponentInChildren<tk2dSprite>().WorldCenter, parent: newOrbital.gameObject.transform,
+              color: Color.Lerp(ExtendedColours.vibrantOrange, Color.white, 0.35f), fadeInTime: 0.05f, fadeOutTime: 0.05f, radius: 2f, brightness: 3f);
+            this._extantOrbitals.Add(newOrbital);
+        }
+        while (this._extantOrbitals.Count > nextOrbitals)
+        {
+            int last = this._extantOrbitals.Count - 1;
+            if (this._extantOrbitals[last])
+                UnityEngine.Object.Destroy(this._extantOrbitals[last].gameObject);
+            this._extantOrbitals.RemoveAt(last);
+        }
+    }
+
+    private void DestroyOrbitals()
+    {
+        for (int i = this._extantOrbitals.Count - 1; i >=0; --i)
+            if (this._extantOrbitals[i])
+                UnityEngine.Object.Destroy(this._extantOrbitals[i].gameObject);
+        this._extantOrbitals.Clear();
+    }
+
     public override void Update()
     {
         base.Update();
         if (this.gun.IsReloading)
             return;
 
+        if (this.Mastered && this.PlayerOwner)
+            UpdateOrbitals();
+
         float phase = Mathf.Abs(Mathf.Sin(9f * BraveTime.ScaledTimeSinceStartup));
-        // this.gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, 5f + 5f * phase);
-        this.gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, 1f + 2f * phase);
-        // this.gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, 2f + 8f * phase);
-        // this.gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, 2f + 2f * phase);
-        this.gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, 2f + 8f * phase);
-        // this.gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, 1f + 0.5f * phase);
+        Material mat = this.gun.sprite.renderer.material;
+        mat.SetFloat(CwaffVFX._EmissivePowerId, 1f + 2f * phase);
+        mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 2f + 8f * phase);
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -98,6 +138,13 @@ public class Heartbreaker : CwaffGun
     {
         base.OnSwitchedAwayFromThisGun();
         this.gun.spriteAnimator.AnimationEventTriggered -= ProduceLight;
+        DestroyOrbitals();
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        DestroyOrbitals();
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnFullClipReload(PlayerController player, Gun gun)
@@ -131,14 +178,14 @@ public class Heartbreaker : CwaffGun
 
     private int ConsumeNearbyHeart(Vector2 pos)
     {
-        const float MAX_SQR_RADIUS = 10f;
+        const float MAX_SQR_RADIUS = 25f;
 
         IPlayerInteractable targetIx = null;
         HealthPickup targetHeart = null;
         float nearest = MAX_SQR_RADIUS;
         foreach (var ix in RoomHandler.unassignedInteractableObjects)
         {
-            if (ix == null || ix is not HealthPickup heart || !heart || !heart.isActiveAndEnabled || !heart.sprite)
+            if (ix == null || ix is not HealthPickup heart || !heart || !heart.isActiveAndEnabled || !heart.sprite || heart.healAmount <= 0)
                 continue;
             float dist = (pos - heart.sprite.WorldCenter).sqrMagnitude;
             if (dist > nearest)
