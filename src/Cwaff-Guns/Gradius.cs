@@ -7,8 +7,8 @@ namespace CwaffingTheGungy;
 public class Gradius : CwaffGun
 {
     public static string ItemName         = "Gradius";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Command and Conquer";
+    public static string LongDescription  = "Grants command over a fleet of spaceships. Each ship type has its own projectile, and can be upgraded by picking up various collectibles:\n\n- Blue: blaster, upgraded by picking up ammo\n\n- Orange: beam, upgraded by picking up health or armor\n\n- Pink: missile, upgrade by picking up keys\n\n- Green: pulse, upgraded by picking up blanks";
     public static string Lore             = "TBD";
 
     private const float _MAX_ZIP_DIST = 20f;
@@ -18,6 +18,7 @@ public class Gradius : CwaffGun
     private const int _MASTERED_SHIPS = 13;
 
     internal const int _MAX_SHIP_LEVEL = 5;
+    internal const int _SHIP_TYPES = 4;
 
     internal static GameObject[] _ShipPrefab  = [null, null, null, null];
     internal static string[] _ShipNames  = ["gradius_falchion", "gradius_jade", "gradius_lord", "gradius_vic"];
@@ -30,6 +31,7 @@ public class Gradius : CwaffGun
     private float _relativeBarrelY = 0f;
     private float _zipDist = 0f;
     private float _zipTime = 0f;
+    private bool _spawningShips = false;
 
     internal float _lerpGunAngle = 0f;
 
@@ -77,10 +79,6 @@ public class Gradius : CwaffGun
     {
         base.OnSwitchedToThisGun();
         CreateShips();
-        this._zipDist = _MAX_ZIP_DIST;
-        this._zipTime = _TOTAL_ZIP_TIME;
-        base.gameObject.PlayUnique("gradius_ship_spawn_sound");
-        SmoothlyMoveShips();
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)
@@ -95,12 +93,14 @@ public class Gradius : CwaffGun
     {
         base.OnPlayerPickup(player);
         CwaffEvents.OnWillPickUpMinorInteractible += DoPickupChecks;
+        GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewFloor;
         player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
         player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         CwaffEvents.OnWillPickUpMinorInteractible -= DoPickupChecks;
         base.OnDroppedByPlayer(player);
@@ -143,6 +143,7 @@ public class Gradius : CwaffGun
         this._lerpGunAngle = BraveMathCollege.QuantizeFloat(this.gun.gunAngle, 90f);
         if (this._extantShips.Count > 0)
             return;
+
         int numShips = this.Mastered ? _MASTERED_SHIPS : _NORMAL_SHIPS;
         for (int i = 0; i < numShips; ++i)
         {
@@ -150,6 +151,11 @@ public class Gradius : CwaffGun
             grad.Setup(this.PlayerOwner, this, shipOffsets[i], ships[i], i < _NORMAL_SHIPS);
             this._extantShips.Add(grad);
         }
+
+        this._zipDist = _MAX_ZIP_DIST;
+        this._zipTime = _TOTAL_ZIP_TIME;
+        base.gameObject.PlayUnique("gradius_ship_spawn_sound");
+        SmoothlyMoveShips();
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -223,13 +229,43 @@ public class Gradius : CwaffGun
         DestroyShips();
         StopAllCoroutines();
         CwaffEvents.OnWillPickUpMinorInteractible -= DoPickupChecks;
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
         if (this.PlayerOwner is PlayerController player)
             player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         base.OnDestroy();
     }
 
+    private void OnNewFloor()
+    {
+        if (!this)
+            return;
+        DestroyShips();
+        if (this.PlayerOwner && this.PlayerOwner.CurrentGun == this.gun)
+            this.PlayerOwner.StartCoroutine(SpawnShipsOnceWeCanMove());
+    }
+
+    private IEnumerator SpawnShipsOnceWeCanMove()
+    {
+        if (this._spawningShips)
+            yield break;
+        this._spawningShips = true;
+        while (this.PlayerOwner)
+        {
+            if (this.PlayerOwner.AcceptingNonMotionInput)
+                break;
+            yield return null;
+        }
+        if (!this.PlayerOwner)
+            yield break;
+
+        CreateShips();
+        this._spawningShips = false;
+    }
+
     private void DoPickupChecks(PlayerController player, PickupObject pickup)
     {
+        if (GameManager.Instance.IsLoadingLevel)
+            return;
         if (pickup is KeyBulletPickup)
             UpgradeShip(GradiusShip.Ship.Falchion);
         else if (pickup is SilencerItem)
@@ -246,11 +282,30 @@ public class Gradius : CwaffGun
         if (this.shipLevels[idx] >= Gradius._MAX_SHIP_LEVEL)
             return;
         ++this.shipLevels[idx];
-        foreach (GradiusShip ship in this._extantShips)
+        PlayerController player = this.PlayerOwner;
+        if (this.gun == player.CurrentGun)
         {
-            if (ship && ship._shipType == shipType)
-                ship.DoUpgrade();
+            foreach (GradiusShip ship in this._extantShips)
+            {
+                if (ship && ship._shipType == shipType)
+                    ship.DoUpgrade();
 
+            }
+        }
+        else
+        {
+            CwaffVFX.SpawnBurst(
+                prefab           : VFX.SinglePixel,
+                numToSpawn       : 10 * this.shipLevels[idx],
+                anchorTransform  : player.transform,
+                basePosition     : player.CenterPosition,
+                positionVariance : 5f,
+                velType          : CwaffVFX.Vel.InwardToCenter,
+                lifetime         : 0.5f,
+                emissivePower    : 200f,
+                overrideColor    : GradiusShip._ShipColors[(int)shipType],
+                emitColorPower   : 8f
+              );
         }
         base.gameObject.PlayUnique("gradius_powerup_sound");
     }
@@ -265,14 +320,14 @@ public class Gradius : CwaffGun
     public override void MidGameSerialize(List<object> data, int i)
     {
         base.MidGameSerialize(data, i);
-        for (int n = 0; n < Gradius._MAX_SHIP_LEVEL; ++n)
+        for (int n = 0; n < _SHIP_TYPES; ++n)
             data.Add(this.shipLevels[n]);
     }
 
     public override void MidGameDeserialize(List<object> data, ref int i)
     {
         base.MidGameDeserialize(data, ref i);
-        for (int n = 0; n < Gradius._MAX_SHIP_LEVEL; ++n)
+        for (int n = 0; n < _SHIP_TYPES; ++n)
             this.shipLevels[n] = (int)data[i++];
     }
 
@@ -406,7 +461,7 @@ public class GradiusShip : MonoBehaviour
         Vic, // front, normal blaster lasers dead ahead, fires as faster as the player can tap the button
     }
 
-    private static Color[] _ShipColors = [
+    internal static Color[] _ShipColors = [
         ExtendedColours.pink,
         ExtendedColours.lime,
         ExtendedColours.vibrantOrange,

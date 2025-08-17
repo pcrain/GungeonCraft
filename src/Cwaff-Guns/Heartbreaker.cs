@@ -1,3 +1,4 @@
+
 namespace CwaffingTheGungy;
 
 /* TODO:
@@ -141,10 +142,29 @@ public class Heartbreaker : CwaffGun
         DestroyOrbitals();
     }
 
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewFloor;
+    }
+
     public override void OnDroppedByPlayer(PlayerController player)
     {
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
         DestroyOrbitals();
         base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
+        base.OnDestroy();
+    }
+
+    private void OnNewFloor()
+    {
+        if (this)
+            DestroyOrbitals();
     }
 
     public override void OnFullClipReload(PlayerController player, Gun gun)

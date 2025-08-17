@@ -328,7 +328,7 @@ public static class CwaffSynergies
         NewMastery<MasteryOfZealot>(MASTERY_ZEALOT, Zealot.ItemName);
         // Toothpaste projectiles create suds in a much larger radius, and toothbrush can be swung much faster.
         NewMastery<MasteryOfToothpaste>(MASTERY_TOOTHPASTE, Toothpaste.ItemName);
-        // Gradius deploys 2 extra Vic Viper, Lord British, and Falchion Beta ships.
+        // Gradius deploys 2 extra blue, orange, and pink ships.
         NewMastery<MasteryOfGradius>(MASTERY_GRADIUS, Gradius.ItemName);
         // While Heartbreaker is active, each of the player's empty heart containers orbits them to block bullets.
         NewMastery<MasteryOfHeartbreaker>(MASTERY_HEARTBREAKER, Heartbreaker.ItemName);
