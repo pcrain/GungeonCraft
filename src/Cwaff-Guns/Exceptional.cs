@@ -222,6 +222,7 @@ public class Exceptional : CwaffGun
         UnityEngine.Debug.LogWarning($"Active Debris Objects: {StaticReferenceManager.AllDebris?.Count ?? 0}");
         UnityEngine.Debug.LogWarning($"Active Goops: {StaticReferenceManager.AllGoops?.Count ?? 0}");
         UnityEngine.Debug.LogWarning($"Current Run Time: {(GameStatsManager.HasInstance ? GameStatsManager.Instance.GetSessionStatValue(TrackedStats.TIME_PLAYED).ToString() : "[UNKNOWN]")} seconds");
+        UnityEngine.Debug.LogWarning($"Current Game Language: {StringTableManager.CurrentLanguage}");
 
         UnityEngine.Debug.LogWarning("---------------------------------------");
     }
