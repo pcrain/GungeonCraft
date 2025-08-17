@@ -172,34 +172,34 @@ def computeItemCooldown(text):
   return "Instant"
 
 def computeClipSize(text):
-  size = findPattern(text, r"""clipSize\s*:\s*(.*?)[\s,\)]""")
+  size = findPattern(text, r"""\bclipSize\s*:\s*(.*?)[\s,\)]""")
   size = resolveVariable(size, text)
   if size == -1:
     return "{{infinity}}"
   return size
 
 def computeAmmo(text):
-  infAmmo = findPattern(text, r"""infiniteAmmo\s*:\s*(.*?)(?:\.0)?f?[,\)]""") # range of pea shooter, the default gun
+  infAmmo = findPattern(text, r"""\binfiniteAmmo\s*:\s*(.*?)(?:\.0)?f?[,\)]""") # range of pea shooter, the default gun
   if infAmmo == "true":
     return "{{infinity}}"
   ammo = findPattern(text, r"""ammo\s*:\s*(.*?)[,\)]""", resolveVars = True)
   return ammo
 
 def computeRange(text):
-  gunRange = findPattern(text, r"""range\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="20") # range of pea shooter, the default gun
+  gunRange = findPattern(text, r"""\brange\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="20") # range of pea shooter, the default gun
   gunRange = resolveVariable(gunRange, text)
   if (gunRange > 1000):
     return "{{infinity}}"
   return gunRange
 
 def computeReloadTime(text):
-  reloadTime = findPattern(text, r"""reloadTime\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="1.5", resolveVars = True) # reload time of pea shooter, the default gun
+  reloadTime = findPattern(text, r"""\breloadTime\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="1.5", resolveVars = True) # reload time of pea shooter, the default gun
   if (reloadTime == 0.0):
     return "Instant"
   return reloadTime
 
 def makePrettyDescription(text):
-  return text.replace("\\n","<br/>")
+  return text.replace("\\n\\n","<br/>").replace("\\n","<br/>")
 
 def scanPassives():
   data = {}

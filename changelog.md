@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.27.0 (TBD)
+## 1.27.0 (2025-08-17)
 
 - Added Toothpaste, Heartbreaker, and Gradius
 	- Toothpaste sprites thanks to Dallan!

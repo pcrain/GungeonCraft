@@ -9,8 +9,8 @@
 
 ### Features
 
-- 153 new items, including
-	+ 81 new guns
+- 156 new items, including
+	+ 84 new guns
 	+ 48 new passive items
 	+ 24 new active items
 - Lore for all new guns and items
@@ -24,6 +24,7 @@
 - Gun mastery system
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
+- Easter eggs
 - And more!
 
 ![](previews/rogo_stumble.png)
@@ -34,14 +35,16 @@
 - **Fun New Mechanics**: most items and guns should offer their own distinct ways of interacting with the Gungeon
 - **Playstyle Variety**: defensive and strategic play should feel as rewarding as aggressive and proactive play
 
+![](previews/rotatobotato.gif)
+
 ### FAQ
 
 * Found a Bug?
 	- [Open an Issue on GitHub](https://github.com/pcrain/GungeonCraft/issues)! Please bear in mind that I work on this in my free time for fun, so I might not fix every bug, but I'll do my best to get to all of the important ones. C:
-* Where do I find the new boss?
-	- Try talking to Bello a few dozen times! He'll give you a hint eventually (dialogue is RNG and I can't find a way around it D: ).
 * Why does my gun say "Normal" above it?
 	- Try beating the new boss :>
+* Where do I find the new boss?
+	- Check behind the Hero Shrine at the start. I'm sure you can figure out the rest. C:
 
 ### Wiki
 

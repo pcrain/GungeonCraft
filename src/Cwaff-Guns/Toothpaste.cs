@@ -21,7 +21,7 @@ public class Toothpaste : CwaffGun
           .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: 300, shootFps: 16, reloadFps: 16,
             smoothReload: 0.1f, fireAudio: "toothpaste_squirt_sound", reloadAudio: "toothpaste_squeeze_sound")
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(sprite: "toothpaste_bullet", fps: 8, clipSize: 5, cooldown: 0.23f,
+          .InitProjectile(GunData.New(sprite: "toothpaste_bullet", fps: 8, clipSize: 5, cooldown: 0.23f, shootStyle: ShootStyle.SemiAutomatic,
             angleVariance: 30f, damage: 5.0f, speed: 30f, range: 1000f, force: 4f, customClip: true))
           .Attach<GoopModifier>(g => {
             g.goopDefinition         = EasyGoopDefinitions.ToothpasteGoop;
