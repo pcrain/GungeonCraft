@@ -47,6 +47,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   private ModuleShootData                   _cachedShootData           = null; // cached firing data for getting info on extant beams, etc.
   private int                               _cachedMasteryTokenId      = -2;   // cached mastery token id
   private tk2dSprite                        _masterySprite             = null; // attached sprite for mastery shader effects
+  private int                               _lastSpinupFrame           = 0;    // frame we last decremented spinup time, to avoid double-counting
 
   protected float                           _spinupRemaining           = 0.0f; // the remaining time a gun must spin up before firing
 
@@ -626,7 +627,12 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           // System.Console.WriteLine($"consuming fire");
           currentBraveInput.ConsumeButtonDown(GungeonActions.GungeonActionType.Shoot);
         }
-        cg._spinupRemaining = Mathf.Max(cg._spinupRemaining - BraveTime.DeltaTime, 0f);
+        int curFrame = Time.frameCount;
+        if (curFrame > cg._lastSpinupFrame)
+        {
+          cg._spinupRemaining = Mathf.Max(cg._spinupRemaining - BraveTime.DeltaTime, 0f);
+          cg._lastSpinupFrame = curFrame;
+        }
         if (!string.IsNullOrEmpty(cg.spinupSound))
           cg.LoopSoundIf(cg._spinupRemaining > 0, cg.spinupSound);
         // System.Console.WriteLine($"on cooldown? {cg._spinupRemaining > 0}");
