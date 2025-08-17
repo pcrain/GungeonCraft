@@ -5,7 +5,7 @@ public class Toothpaste : CwaffGun
     public static string ItemName         = "Toothpaste";
     public static string ShortDescription = "2 in 10 Dentists Recommend";
     public static string LongDescription  = "Fires globs of toothpaste that spread to consume all other adjacent goops. Reloading with a full clip swings a toothbrush that releases a damaging wave of foam that travels across nearby toothpaste goop.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "The de facto gold standard of tooth cleansing technology, packaged in a convenient easy-squeeze tube. You're truthfully not sure how basic dental hygiene equipment even remotely qualifies as weaponry, but your wishful thinking convinces you that with a bit of time and imagination, its utility will become apparent.";
 
     private const float _SWING_RATE = 0.65f;
     private const float _MASTERED_SWING_RATE = 0.4f;

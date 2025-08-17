@@ -8,8 +8,8 @@ public class Gradius : CwaffGun
 {
     public static string ItemName         = "Gradius";
     public static string ShortDescription = "Command and Conquer";
-    public static string LongDescription  = "Grants command over a fleet of spaceships. Each ship type has its own projectile, and can be upgraded by picking up various collectibles:\n\n- Blue: blaster, upgraded by picking up ammo\n\n- Orange: beam, upgraded by picking up health or armor\n\n- Pink: missile, upgrade by picking up keys\n\n- Green: pulse, upgraded by picking up blanks";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Grants command over a fleet of spaceships. Each ship type has its own projectile, and can be upgraded by picking up various collectibles:\n\n- Blue: blaster, upgraded by picking up ammo\n\n- Orange: beam, upgraded by picking up health or armor\n\n- Pink: missile, upgraded by picking up keys\n\n- Green: pulse, upgraded by picking up blanks";
+    public static string Lore             = "A child's favorite toy spaceship, lost in the Gungeon like so many other toys before it. The vivid imagination of its previous owner has evidently manifested in ludicrous amounts of miniaturized firepower. Rather inconveniently, the child's prefontal cortex was developed *just* enough to imagine the ship running out of ammo during its battles, slightly disrupting an otherwise immaculate barrage of explosions.";
 
     private const float _MAX_ZIP_DIST = 20f;
     private const float _TOTAL_ZIP_TIME = 0.4f;
@@ -40,7 +40,7 @@ public class Gradius : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Gradius>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 1985, shootFps: 14, reloadFps: 4,
+          .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1985, shootFps: 14, reloadFps: 4,
             fireAudio: null, reloadAudio: null, carryOffset: new IntVector2(16, 0), doesScreenShake: false, infiniteAmmo: false/*, canReloadNoMatterAmmo: true*/)
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(baseProjectile: Items.HegemonyRifle.DefaultProjectile(), clipSize: -1, cooldown: 0.04f, damage: 10f,

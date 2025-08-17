@@ -1,4 +1,3 @@
-
 namespace CwaffingTheGungy;
 
 /* TODO:
@@ -9,8 +8,8 @@ public class Heartbreaker : CwaffGun
 {
     public static string ItemName         = "Heartbreaker";
     public static string ShortDescription = "</3";
-    public static string LongDescription  = "Fires a burst of projectiles that rapidly home towards nearby enemies after a short delay. Reloading with a full clip while near a heart pickup will consume it, increasing the gun's current and max ammo, clip size, and burst size.";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Fires a burst of projectiles that rapidly home towards nearby enemies after a short delay. Reloading with a full clip while near a heart pickup will consume it, increasing the gun's current ammo, max ammo, clip size, and burst size.";
+    public static string Lore             = "A gun supposedly born from the spirit of a restless adventurer who found and lost love in the Gungeon. Over centuries, the spirit's longing has only grown stronger, causing the gun to latch onto the figurative and literal hearts of all those within its proximity.";
 
     private const float _VFX_GLOW        = 10f;
     private const int _MAX_LEVEL         = 26;
