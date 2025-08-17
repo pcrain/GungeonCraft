@@ -227,7 +227,7 @@ public class English : CwaffGun
             this._placeholders[i].SetActive(false);
             this._phantoms[i].SetActive(true);
             this._phantoms[i].transform.position = basePos;
-            this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(canMaterialize ? _BALL_ORDER[i % 15] : 7); // black eight ball if invalid
+            this._phantoms[i].GetComponent<tk2dSpriteAnimator>().PickFrame(canMaterialize ? _BALL_ORDER[15] : 7); // black eight ball if invalid
             tk2dSprite sprite = this._phantoms[i].GetComponent<tk2dSprite>();
             sprite.PlaceAtScaledPositionByAnchor(basePos, Anchor.MiddleCenter);
             sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, _MAX_GLOW * glow);
