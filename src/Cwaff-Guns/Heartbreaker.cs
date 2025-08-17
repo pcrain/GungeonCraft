@@ -232,6 +232,7 @@ public class Heartbreaker : CwaffGun
     {
         base.MidGameDeserialize(data, ref i);
         storedHalfHearts = ((int)data[i++]);
+        UpdateGunStrength();
     }
 
     private class HeartbreakerAmmoDisplay : CustomAmmoDisplay
