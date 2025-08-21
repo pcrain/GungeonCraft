@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.27.1 (TBD)
+
+- (Hopefully) fix null deref / softlock caused by Barter shop trying to process despawned items
+
 ## 1.27.0 (2025-08-17)
 
 - Added Toothpaste, Heartbreaker, and Gradius

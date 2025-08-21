@@ -120,7 +120,7 @@ public class Bart
         {
             if (ix is ShopItemController)
                 continue; // not ours to sell
-            if (ix is not PickupObject pickup)
+            if (ix is not PickupObject pickup || !pickup || !pickup.isActiveAndEnabled || !pickup.gameObject || !pickup.gameObject.activeInHierarchy)
                 continue; // not a pickup
             if (!pickup.CanBeSold)
                 continue; // not sellable
