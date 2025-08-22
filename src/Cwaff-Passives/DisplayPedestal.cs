@@ -139,7 +139,8 @@ public class PristineGun : MonoBehaviour
 
     private void OohShiny()
     {
-        this._gun.gameObject.Play("shiny_new_gun_sound");
+        if (!MidGameSaveData.IsInitializingPlayerData)
+            this._gun.gameObject.Play("shiny_new_gun_sound");
         CwaffVFX.SpawnBurst(prefab: AllayCompanion._AllaySparkles, numToSpawn: 20,
             basePosition: this._gun.sprite.WorldCenter, baseVelocity: new Vector2(0, 3f), positionVariance: 1f,
             minVelocity: 1f, velocityVariance: 1f, velType: CwaffVFX.Vel.AwayRadial,

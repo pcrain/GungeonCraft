@@ -1,6 +1,7 @@
 namespace CwaffingTheGungy;
 
 /// <summary>Class for saving various extra info for runs, serialized for mid-run saves</summary>
+[HarmonyPatch]
 public class CwaffRunData : FakeItem
 {
     public string btcktfEnemyGuid = string.Empty;
@@ -85,19 +86,42 @@ public class CwaffRunData : FakeItem
             glassGunIds[p] = new List<int>();
             for (int gunNum = 0; gunNum < pGlassGuns; ++gunNum)
                 glassGunIds[p].Add((int)data[i++]);
-            if (pGlassGuns > 0 && pp)
-                GlassAmmoBox.RestoreMidGameData(pp);
 
             // Display Pedestal Data
             int pPristineGuns = (int)data[i++];
             pristineGunIds[p] = new List<int>();
             for (int gunNum = 0; gunNum < pPristineGuns; ++gunNum)
                 pristineGunIds[p].Add((int)data[i++]);
-            if (pPristineGuns > 0 && pp)
-                DisplayPedestal.RestoreMidGameData(pp);
         }
 
         _Instance = this;
         this._deserialized = true;
+    }
+
+    private void FinalizeDeserialization(PlayerController p1, PlayerController p2)
+    {
+        for (int p = 0; p < 1; ++p)
+        {
+            PlayerController pp = (p == 0) ? p1 : p2;
+            if (!pp)
+                continue;
+
+            // Glass Ammo Box Data
+            if (glassGunIds[p].Count > 0)
+                GlassAmmoBox.RestoreMidGameData(pp);
+
+            // Display Pedestal Data
+            if (pristineGunIds[p].Count > 0)
+                DisplayPedestal.RestoreMidGameData(pp);
+        }
+    }
+
+    [HarmonyPatch(typeof(MidGameSaveData), nameof(MidGameSaveData.LoadDataFromMidGameSave))]
+    [HarmonyPostfix]
+    private static void MidGameSaveDataLoadDataFromMidGameSavePatch(MidGameSaveData __instance, PlayerController p1, PlayerController p2)
+    {
+        MidGameSaveData.IsInitializingPlayerData = true;
+        CwaffRunData.Instance.FinalizeDeserialization(p1, p2);
+        MidGameSaveData.IsInitializingPlayerData = false;
     }
 }

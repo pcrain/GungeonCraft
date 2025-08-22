@@ -69,7 +69,8 @@ public class GlassAmmoGun : MonoBehaviour
         this._gun.OnDropped -= this.OnDropped;
         this._gun.OnDropped += this.OnDropped;
 
-        this._owner.gameObject.Play("glass_assemble_sound");
+        if (!MidGameSaveData.IsInitializingPlayerData)
+            this._owner.gameObject.Play("glass_assemble_sound");
         CwaffVFX.SpawnBurst(
             prefab           : GlassAmmoBox._GlassVFX,
             numToSpawn       : 50,
