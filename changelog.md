@@ -2,7 +2,8 @@
 
 ## 1.27.1 (TBD)
 
-- (Hopefully) fix null deref / softlock caused by Barter shop trying to process despawned items
+- Fixed (hopefully) null deref / softlock caused by Barter shop trying to process despawned items
+- Fixed (hopefully) null deref caused by pooled projectiles being duplicated and bypassing the pooling system
 
 ## 1.27.0 (2025-08-17)
 

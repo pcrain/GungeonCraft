@@ -570,6 +570,15 @@ internal class PlayerProjectilePooler
   {
     if (instance.GetComponent<PlayerProjectilePoolInfo>() is not PlayerProjectilePoolInfo pppInfo)
       return true; // call the original method
+    if (pppInfo.pooler == null)
+    {
+      //NOTE: this can apparently be null if the projectile has been cloned via Instantiate(),
+      // which shouldn't happen...but evidently does. log an error, nuke the poolinfo, and defer to the original method.
+      // if this still doesn't fix things, i should consider conceding that attempting to pool player projectiles was a mistake ._.
+      UnityEngine.Debug.LogError("Detected invalid duplication of a pooled player projectile, tell Captain Pretzel");
+      UnityEngine.Object.Destroy(pppInfo);
+      return true; // call the original method
+    }
 
     pppInfo.pooler.Despawn(instance);
     __result = true; // return true because we were pooled //TODO: double check this later
