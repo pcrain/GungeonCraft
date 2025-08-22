@@ -226,7 +226,6 @@ public class TennisBall : MonoBehaviour
         debris.spriteAnimator.Stop();
         // Destroy unused components that may interfere with rendering
         EasyTrailBullet tr = debris.GetComponent<EasyTrailBullet>();
-            tr.Disable();
             UnityEngine.GameObject.Destroy(tr);
         UnityEngine.GameObject.Destroy(debris.GetComponent<TennisBall>()); // destroy the TennisBall component
 

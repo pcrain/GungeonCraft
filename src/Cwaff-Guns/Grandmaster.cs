@@ -88,7 +88,6 @@ public abstract class ChessPiece : MonoBehaviour
             if (this._lifetime >= this._pauseTime)
             {
                 StartMoving();
-                this._trail.Enable();
                 this._projectile.collidesWithEnemies = true;
                 this._movePhase                      = 1;
                 this._lifetime                       = 0.0f;
@@ -107,7 +106,6 @@ public abstract class ChessPiece : MonoBehaviour
         else if (this._lifetime >= (this._moveTime * this._movePhase)) // double the wait time for knight moves
         {
             StopMoving();
-            this._trail.Disable();
             this._projectile.collidesWithEnemies = false;
             this._movePhase                      = 0;
             this._lifetime                       = 0.0f;

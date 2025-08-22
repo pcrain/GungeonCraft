@@ -382,6 +382,8 @@ public static class AnimatedBullet // stolen and modified from NN
 
 public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
 {
+    private const float _DEFAULT_TRAIL_DEPTH = 20f; // trails should render behind most things
+
     private static readonly LinkedList<GameObject> _TrailPool = new();
     private static readonly LinkedList<GameObject> _UsedTrails = new();
     private static readonly LinkedList<EasyTrailBullet> _ExtantTrails = new();
@@ -389,11 +391,12 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
 
     private Projectile proj;
     private GameObject tro;
+    private Transform trt;
     private CustomTrailRenderer tr;
     private Material mat;
     private LinkedListNode<EasyTrailBullet> node;
 
-    public Vector2 TrailPos;
+    public Vector3 TrailPos;
     public Color BaseColor;
     public Color StartColor;
     public Color EndColor;
@@ -463,7 +466,7 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
 
     private EasyTrailBullet()
     {
-        this.TrailPos   = Vector3.zero;
+        this.TrailPos   = new Vector3(0f, 0f, _DEFAULT_TRAIL_DEPTH);
         this.BaseColor  = Color.red;
         this.StartColor = Color.red;
         this.EndColor   = Color.white;
@@ -487,10 +490,11 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
         proj = base.projectile;
 
         tro = Rent(proj.gameObject);
-        tro.transform.parent = proj.gameObject.transform;
-        tro.transform.rotation = Quaternion.identity;
-        tro.transform.position = proj.transform.position;
-        tro.transform.localPosition = TrailPos;
+        trt = tro.transform;
+        trt.parent = proj.gameObject.transform;
+        trt.rotation = Quaternion.identity;
+        trt.position = proj.transform.position;
+        trt.localPosition = TrailPos;
 
         tr = tro.GetComponent<CustomTrailRenderer>();
         mat = tr.material;
@@ -504,13 +508,13 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
         node = _ExtantTrails.AddLast(this);
     }
 
-    public void Enable() => tr.enabled = true;
-    public void Disable() => tr.enabled = false;
-
     private void LateUpdate()
     {
-        if (tro)
-            tro.transform.rotation = Quaternion.identity; // keep trail stable even when projectile rotates
+        if (!tro)
+            return;
+        trt.rotation = Quaternion.identity; // keep trail stable even when projectile rotates
+        Vector3 pos = trt.position;
+        trt.position = pos.WithZ(pos.y + _DEFAULT_TRAIL_DEPTH);
     }
 
     public void UpdateTrail()
@@ -518,7 +522,7 @@ public class EasyTrailBullet : BraveBehaviour, IPPPComponent // adapted from NN
         if (!tro)
             return;
 
-        tro.transform.localPosition = TrailPos;
+        // tro.transform.localPosition = TrailPos.WithZ(_DEFAULT_TRAIL_DEPTH);
         mat.SetColor(CwaffVFX._ColorId, BaseColor);
         tr.colors[0] = StartColor;
         tr.colors[1] = EndColor;
