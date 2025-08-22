@@ -1,4 +1,3 @@
-
 namespace CwaffingTheGungy;
 
 public class DisplayPedestal : CwaffPassive
@@ -42,8 +41,21 @@ public class DisplayPedestal : CwaffPassive
     {
         if (!this.m_owner)
             return;
-        this.passiveStatModifiers[0].amount = this.m_owner.GetFlagCount(typeof(PristineGun));
+        this.passiveStatModifiers[0].amount = CwaffRunData.Instance.pristineGunIds[this.m_owner.PlayerIDX].Count;
+        Lazy.DebugLog($"coolness set to {this.passiveStatModifiers[0].amount} for pristine guns");
         this.m_owner.stats.RecalculateStats(this.m_owner);
+    }
+
+    internal static void RestoreMidGameData(PlayerController p)
+    {
+        int pid = p.PlayerIDX;
+        List<int> pristineGunIds = CwaffRunData.Instance.pristineGunIds[pid];
+        foreach (Gun gun in p.inventory.AllGuns)
+            if (pristineGunIds.Contains(gun.PickupObjectId))
+            {
+                Lazy.DebugLog($"restoring pristine component for gun {gun.DisplayName}");
+                gun.gameObject.AddComponent<PristineGun>();
+            }
     }
 
     [HarmonyPatch]
@@ -112,7 +124,7 @@ public class PristineGun : MonoBehaviour
         this._gun.OnDropped += Drop;
         this._gun.OnPostFired += PostFired;
         this._player.GunChanged += GunChanged;
-        PassiveItem.IncrementFlag(this._player, typeof(PristineGun));
+        CwaffRunData.Instance.pristineGunIds[this._player.PlayerIDX].AddUnique(this._gun.PickupObjectId);
         if (this._player.GetPassive<DisplayPedestal>() is DisplayPedestal dp)
             dp.UpdateStats();
         if (this._player.CurrentGun == this._gun && this._gun.sprite)
@@ -144,12 +156,12 @@ public class PristineGun : MonoBehaviour
     {
         this._gun.OnDropped -= Drop;
         this._gun.OnPostFired -= PostFired;
-        this._inInventory = false;
+        this._inInventory = false; // can't immediately remove the component since we may be trying to sell to the sell creep
         if (!this._player)
             return;
 
         this._player.GunChanged -= GunChanged;
-        PassiveItem.DecrementFlag(this._player, typeof(PristineGun));
+        CwaffRunData.Instance.pristineGunIds[this._player.PlayerIDX].TryRemove(this._gun.PickupObjectId);
         if (this._player.GetPassive<DisplayPedestal>() is DisplayPedestal dp)
             dp.UpdateStats();
     }
@@ -161,7 +173,7 @@ public class PristineGun : MonoBehaviour
         this._player.GunChanged -= GunChanged;
         if (this._inInventory)
         {
-            PassiveItem.DecrementFlag(this._player, typeof(PristineGun));
+            CwaffRunData.Instance.pristineGunIds[this._player.PlayerIDX].TryRemove(this._gun.PickupObjectId);
             if (this._player.GetPassive<DisplayPedestal>() is DisplayPedestal dp)
                 dp.UpdateStats();
         }

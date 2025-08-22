@@ -7,6 +7,7 @@ public class CwaffRunData : FakeItem
     public bool shouldReturnToPreviousFloor = false;
     public string nameOfPreviousFloor = null;
     public List<int>[] glassGunIds = [new(), new()];
+    public List<int>[] pristineGunIds = [new(), new()];
 
     private bool _deserialized = false;
 
@@ -52,13 +53,18 @@ public class CwaffRunData : FakeItem
 
         data.Add(btcktfEnemyGuid);
 
-        data.Add(glassGunIds[0].Count);
-        for (int i = 0; i < glassGunIds[0].Count; ++i)
-            data.Add(glassGunIds[0][i]);
+        for (int p = 0; p < 1; ++p)
+        {
+            // Glass Ammo Box Data
+            data.Add(glassGunIds[p].Count);
+            for (int i = 0; i < glassGunIds[p].Count; ++i)
+                data.Add(glassGunIds[p][i]);
 
-        data.Add(glassGunIds[1].Count);
-        for (int i = 0; i < glassGunIds[1].Count; ++i)
-            data.Add(glassGunIds[1][i]);
+            // Display Pedestal Data
+            data.Add(pristineGunIds[p].Count);
+            for (int i = 0; i < pristineGunIds[p].Count; ++i)
+                data.Add(pristineGunIds[p][i]);
+        }
     }
 
     public override void MidGameDeserialize(List<object> data)
@@ -71,19 +77,25 @@ public class CwaffRunData : FakeItem
         btcktfEnemyGuid = (string)data[i++];
         Lazy.DebugLog($"  memorialized enemy is {btcktfEnemyGuid}");
 
-        int p1NumGlassGuns = (int)data[i++];
-        glassGunIds[0] = new List<int>();
-        for (int gunNum = 0; gunNum < p1NumGlassGuns; ++gunNum)
-            glassGunIds[0].Add((int)data[i++]);
-        if (p1NumGlassGuns > 0 && GameManager.Instance.PrimaryPlayer is PlayerController p1)
-            GlassAmmoBox.RestoreMidGameData(p1);
+        for (int p = 0; p < 1; ++p)
+        {
+            PlayerController pp = GameManager.Instance.AllPlayers[p];
+            // Glass Ammo Box Data
+            int pGlassGuns = (int)data[i++];
+            glassGunIds[p] = new List<int>();
+            for (int gunNum = 0; gunNum < pGlassGuns; ++gunNum)
+                glassGunIds[p].Add((int)data[i++]);
+            if (pGlassGuns > 0 && pp)
+                GlassAmmoBox.RestoreMidGameData(pp);
 
-        int p2NumGlassGuns = (int)data[i++];
-        glassGunIds[1] = new List<int>();
-        for (int gunNum = 0; gunNum < p2NumGlassGuns; ++gunNum)
-            glassGunIds[1].Add((int)data[i++]);
-        if (p2NumGlassGuns > 0 && GameManager.Instance.SecondaryPlayer is PlayerController p2)
-            GlassAmmoBox.RestoreMidGameData(p2);
+            // Display Pedestal Data
+            int pPristineGuns = (int)data[i++];
+            pristineGunIds[p] = new List<int>();
+            for (int gunNum = 0; gunNum < pPristineGuns; ++gunNum)
+                pristineGunIds[p].Add((int)data[i++]);
+            if (pPristineGuns > 0 && pp)
+                DisplayPedestal.RestoreMidGameData(pp);
+        }
 
         _Instance = this;
         this._deserialized = true;

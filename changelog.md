@@ -6,6 +6,7 @@
 - Fixed (hopefully) null deref caused by pooled projectiles being duplicated and bypassing the pooling system
 - Fixed bad trail rendering on Grandmaster's projectiles
 - Fixed several projectile trails rendering above the projectiles themselves
+- Fixed mint condition status of guns picked up while carrying Display Pedestal not persisting across midgame saves
 
 ## 1.27.0 (2025-08-17)
 

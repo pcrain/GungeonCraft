@@ -42,7 +42,7 @@ public class GlassAmmoBox : CwaffActive
         foreach (Gun gun in p.inventory.AllGuns)
             if (glassGunIds.Contains(gun.PickupObjectId))
             {
-                Lazy.DebugLog($"restoring class component for gun {gun.DisplayName}");
+                Lazy.DebugLog($"restoring glass component for gun {gun.DisplayName}");
                 gun.gameObject.AddComponent<GlassAmmoGun>().Setup(p);
             }
     }
