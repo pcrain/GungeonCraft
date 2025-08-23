@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.27.1 (TBD)
+## 1.27.1 (2025-08-22)
 
 - Fixed (hopefully) null deref / softlock caused by Barter shop trying to process despawned items
 - Fixed (hopefully) null deref caused by pooled projectiles being duplicated and bypassing the pooling system
@@ -14,9 +14,14 @@
 
 ## 1.27.0 (2025-08-17)
 
+#### Features:
+
 - Added Toothpaste, Heartbreaker, and Gradius
 	- Toothpaste sprites thanks to Dallan!
 - Added masteries for Toothpaste, Heartbreaker, and Gradius
+
+#### Bugfixes and Misc:
+
 - Removed debug log spam from Alyx
 - Fixed Xelsior not being able to assimilate guns when not in a proper room (e.g., when standing in a hallway)
 - Fixed lag caused by certain guns with hidden ammo displays attempting to play invisible VFX on the ammo bar and never destroying them
