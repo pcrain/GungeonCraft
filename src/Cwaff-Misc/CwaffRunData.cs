@@ -116,6 +116,7 @@ public class CwaffRunData : FakeItem
         }
     }
 
+    //NOTE: need to finish deserialization after both players' other items / guns are loaded in
     [HarmonyPatch(typeof(MidGameSaveData), nameof(MidGameSaveData.LoadDataFromMidGameSave))]
     [HarmonyPostfix]
     private static void MidGameSaveDataLoadDataFromMidGameSavePatch(MidGameSaveData __instance, PlayerController p1, PlayerController p2)

@@ -9,6 +9,8 @@
 - Fixed mint condition status of guns picked up while carrying Display Pedestal not persisting across midgame saves
 - Fixed glass weapons created by Glass Ammo Box not persisting across midgame saves for the co-op player during co-op runs
 - Fixed audio unintentionally playing for glass weapons created by Glass Ammo Box when reloading a midgame save
+- Added dispersal particles to Femtobyte's projectile and Aimu Hakurei's beam
+- Tweaked dispersal particles on K.A.L.I.'s projectile
 
 ## 1.27.0 (2025-08-17)
 

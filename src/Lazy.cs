@@ -1387,4 +1387,15 @@ public static class Lazy
     Alexandria.DungeonAPI.StaticReferences.customPlaceables.Add($"{C.MOD_PREFIX}:{guid}", placeable); // prepend our mod's prefix to the guid for RAT
     return t;
   }
+
+  private static GameObject _BaseDispersalSystem = null;
+  /// <summary>Get a basic particle dispersal system for projectiles with trails.</summary>
+  public static GameObject DispersalParticles(Color color)
+  {
+    if (_BaseDispersalSystem == null)
+        _BaseDispersalSystem = Items.FlashRay.DefaultProjectile().GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab;
+    GameObject dispersalPrefab = _BaseDispersalSystem.ClonePrefab();
+    dispersalPrefab.GetComponent<ParticleSystem>().SetColor(color);
+    return dispersalPrefab;
+  }
 }

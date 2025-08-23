@@ -38,7 +38,7 @@ public class AimuHakurei : CwaffGun
         Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f, spawnSound: "aimu_beam_sound_2"))
           .SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false))
           .AttachTrail("aimu_beam_mid", fps: 60, startAnim: "aimu_beam_start", softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true,
-            dispersalPrefab: Items.FlashRay.AsGun().DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab);
+            dispersalPrefab: Lazy.DispersalParticles(ExtendedColours.pink));
 
         // set up tiered projectiles
         gun.Volley.projectiles = new(){

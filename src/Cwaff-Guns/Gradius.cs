@@ -51,14 +51,12 @@ public class Gradius : CwaffGun
             emissivePower: 0.5f, emissiveColorPower: 1.5f, emissiveColour: ExtendedColours.vibrantOrange,
             lightColor: ExtendedColours.lime, lightRange: 1.5f, lightStrength: 7.0f);
         _RoundLaserProjectile = Items._38Special.DefaultProjectile().Clone(GunData.New(damage: 25f)).ConvertToSpecialtyType<RoundLaser>();
-
-        GameObject dispersalPrefab = Items.FlashRay.DefaultProjectile().GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab.ClonePrefab();
-        ParticleSystem ps = dispersalPrefab.GetComponent<ParticleSystem>().SetColor(ExtendedColours.vibrantOrange);
         _WeakseekerProjectile = Items._38Special.CloneProjectile(GunData.New(speed: 300f))
           .SetAllImpactVFX(VFX.CreatePool("lord_projectile_impact_vfx", fps: 60, loops: false, anchor: Anchor.MiddleCenter,
             emissivePower: 0.5f, emissiveColorPower: 1.5f, emissiveColour: ExtendedColours.vibrantOrange, scale: 0.75f,
             lightColor: ExtendedColours.vibrantOrange, lightRange: 1.5f, lightStrength: 7.0f))
-          .AttachTrail("weakseeker_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 0.25f, dispersalPrefab: dispersalPrefab);
+          .AttachTrail("weakseeker_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 0.25f,
+            dispersalPrefab: Lazy.DispersalParticles(ExtendedColours.vibrantOrange));
 
         for (int i = 0; i < _ShipNames.Length; ++i)
             _ShipPrefab[i] = VFX.Create(_ShipNames[i], emissivePower: 3f, scale: 0.5f).Attach<GradiusShip>();

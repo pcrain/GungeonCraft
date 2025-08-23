@@ -27,7 +27,7 @@ public class KALI : CwaffGun
             clipSize: 1, sprite: "kali_projectile", shootStyle: ShootStyle.Charged, customClip: true))
           .Attach<PierceProjModifier>(pierce => { pierce.penetration = 999; pierce.penetratesBreakables = true; })
           .AttachTrail("kali_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false,
-            dispersalPrefab: Items.FlashRay.AsGun().DefaultModule.projectiles[0].GetComponentInChildren<TrailController>().DispersalParticleSystemPrefab)
+            dispersalPrefab: Lazy.DispersalParticles(Color.cyan))
           .Assign(out _KaliProjectile);
 
         ProjectileModule mod = gun.DefaultModule;
