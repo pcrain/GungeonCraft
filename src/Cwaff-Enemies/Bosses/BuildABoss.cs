@@ -736,42 +736,16 @@ public static class BH
   public static void SetDefaultColliders(this SpeculativeRigidbody self, int width, int height, int xoff = 0, int yoff = 0)
   {
     self.PixelColliders.Clear();
-    self.PixelColliders.Add(new PixelCollider
-      {
-        ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
-        CollisionLayer = CollisionLayer.EnemyCollider,
-        IsTrigger = false,
-        BagleUseFirstFrameOnly = false,
-        SpecifyBagelFrame = string.Empty,
-        BagelColliderNumber = 0,
-        ManualOffsetX = xoff,
-        ManualOffsetY = yoff,
-        ManualWidth = width,
-        ManualHeight = height,
-        ManualDiameter = 0,
-        ManualLeftX = 0,
-        ManualLeftY = 0,
-        ManualRightX = 0,
-        ManualRightY = 0
-      });
-    self.PixelColliders.Add(new PixelCollider
-      {
-        ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
-        CollisionLayer = CollisionLayer.EnemyHitBox,
-        IsTrigger = false,
-        BagleUseFirstFrameOnly = false,
-        SpecifyBagelFrame = string.Empty,
-        BagelColliderNumber = 0,
-        ManualOffsetX = xoff,
-        ManualOffsetY = yoff,
-        ManualWidth = width,
-        ManualHeight = height,
-        ManualDiameter = 0,
-        ManualLeftX = 0,
-        ManualLeftY = 0,
-        ManualRightX = 0,
-        ManualRightY = 0,
-      });
+    for (int i = 0; i < 2; ++i)
+      self.PixelColliders.Add(new PixelCollider
+        {
+          ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+          CollisionLayer = (i == 0) ? CollisionLayer.EnemyCollider : CollisionLayer.EnemyHitBox,
+          ManualOffsetX = xoff,
+          ManualOffsetY = yoff,
+          ManualWidth = width,
+          ManualHeight = height,
+        });
   }
 
   public static T AddSaneDefaultBossBehavior<T>(GameObject prefab, string name, string subtitle, string bossCardPath = "")

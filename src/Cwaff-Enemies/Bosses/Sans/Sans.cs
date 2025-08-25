@@ -5,7 +5,7 @@ public partial class SansBoss : AIActor
   public  const  string BOSS_GUID              = "Sans Boss";
   private const  string BOSS_NAME              = "Sans Gundertale";
   private const  string SUBTITLE               = "Introducing...";
-  private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/sans";
+  private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/Bosses/sans";
 
   private static GameObject _NapalmReticle      = null;
   private static AIBulletBank.Entry _BoneBullet = null;
@@ -17,8 +17,8 @@ public partial class SansBoss : AIActor
   public static void Init()
   {
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/sans_idle_1",
-      hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{SPRITE_PATH}_bosscard.png"); // Create our build-a-boss
-    bb.SetStats(health: /*C.DEBUG_BUILD ? 1 :*/ _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+      hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{C.MOD_INT_NAME}/Resources/sans_bosscard.png"); // Create our build-a-boss
+    bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:    8f, loop: true);        // Adjust some specific animations as needed
