@@ -420,6 +420,7 @@ public class Initialisation : BaseUnityPlugin
 
                 // Actual floor Initialization
                 SansDungeon.Init();
+                ArmisticeDungeon.Init();
 
                 // Modified version of Anywhere mod, further stolen and modified from Apache's version
                 FlowCommands.Install();
@@ -434,6 +435,7 @@ public class Initialisation : BaseUnityPlugin
             #region Bosses yo (not async for now due to needing to load boss card textures)
                 System.Diagnostics.Stopwatch setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
                 SansBoss.Init();
+                ArmisticeBoss.Init();
                 setupBossesWatch.Stop();
             #endregion
 

@@ -99,6 +99,9 @@
     <Compile Include="src\Cwaff-Characters\CwaffCharacterCore.cs"/>
     <Compile Include="src\Cwaff-Enemies\BulletScriptHelper.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\BuildABoss.cs"/>
+    <Compile Include="src\Cwaff-Enemies\Bosses\Armistice\ArmisticeNPC.cs"/>
+    <Compile Include="src\Cwaff-Enemies\Bosses\Armistice\ArmisticeAttacks.cs"/>
+    <Compile Include="src\Cwaff-Enemies\Bosses\Armistice\Armistice.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansNPC.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\Sans.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansAttacks.cs"/>
@@ -245,6 +248,7 @@
     <Compile Include="src\Cwaff-Flows\OneOffDebugDungeonFlow.cs"/>
     <Compile Include="src\Cwaff-Flows\SansDungeon.cs"/>
     <Compile Include="src\Cwaff-Flows\FlowPrefabs.cs"/>
+    <Compile Include="src\Cwaff-Flows\ArmisticeDungeon.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffReticle.cs"/>
@@ -281,6 +285,7 @@
     <Compile Include="src\Main.cs"/>
     <Compile Include="src\CwaffConfig.cs"/>
     <EmbeddedResource Include="Resources\cwaffshaders-macos"/>
+    <EmbeddedResource Include="Resources\armistice_bosscard.png"/>
     <EmbeddedResource Include="Resources\CwaffingTheGungy.bnk"/>
     <EmbeddedResource Include="Resources\cwaffshaders-linux"/>
     <EmbeddedResource Include="Resources\sans_bosscard.png"/>

@@ -118,7 +118,8 @@ public class Commands
         });
         ETGModConsole.Commands.AddGroup("ss", delegate (string[] args)
         {
-            GameManager.Instance.LoadCustomLevel(SansDungeon.INTERNAL_NAME);
+            // GameManager.Instance.LoadCustomLevel(SansDungeon.INTERNAL_NAME);
+            GameManager.Instance.LoadCustomLevel(ArmisticeDungeon.INTERNAL_NAME);
         });
         ETGModConsole.Commands.AddGroup("nukefloor", delegate (string[] args)
         {

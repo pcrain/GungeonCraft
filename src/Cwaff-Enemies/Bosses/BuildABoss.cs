@@ -85,7 +85,9 @@ public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
     GenericIntroDoer gid = enemy.GetComponent<GenericIntroDoer>();
     if (!string.IsNullOrEmpty(gid.preIntroAnim))
       enemy.aiAnimator.PlayUntilCancelled(gid.preIntroAnim); //HACK: forcibly play the pre-intro animation before room entry
-    enemy.healthHaver.healthHaver.ManualDeathHandling = true; // make sure we manually handle our death as necessary
+    enemy.healthHaver.ManualDeathHandling = true; // make sure we manually handle our death as necessary
+    if (gid.triggerType == GenericIntroDoer.TriggerType.BossTriggerZone)
+      enemy.healthHaver.IsVulnerable = false;
   }
 
   private void SetUpBossFight(AIActor enemy)
@@ -119,6 +121,8 @@ public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
     }
     if (this.musicId != null)
       enemy.PlayBossMusic(this.musicId, this.loopPoint, this.loopRewind);
+    if (enemy.GetComponent<GenericIntroDoer>().triggerType == GenericIntroDoer.TriggerType.BossTriggerZone)
+      enemy.healthHaver.IsVulnerable = true;
     enemy.transform.position.GetAbsoluteRoom().SealRoom();
   }
 
@@ -171,7 +175,7 @@ public class BossNPC : FancyNPC
       while(script.MoveNext())
         yield return script.Current;
 
-      if (hasPreFightDialogue)
+      // if (hasPreFightDialogue)
         enemy.transform.position.GetAbsoluteRoom().UnsealRoom();
       if (!hasPostFightDialogue)
         enemy.healthHaver.DeathAnimationComplete(null, null);
@@ -683,9 +687,9 @@ public class BuildABoss
     this.prefab.AddBossToFloorPool(bb: this, guid: this.guid, floors: floors, weight: weight);
   }
 
-  public PrototypeDungeonRoom CreateStandaloneBossRoom()
+  public PrototypeDungeonRoom CreateStandaloneBossRoom(bool exitOnBottom)
   {
-    return this.prefab.CreateStandaloneBossRoom(bb: this);
+    return this.prefab.CreateStandaloneBossRoom(bb: this, exitOnBottom: exitOnBottom);
   }
 }
 
@@ -697,9 +701,6 @@ public static class BH
 
   // Per Apache, need reference to BossManager or Unity will muck with the prefab
   private static BossManager theBossMan = null;
-
-  // Little variable for storing our generic boss room prefab for testing
-  private static PrototypeDungeonRoom genericBossRoomPrefab = null;
 
   // Regular expression for teasing apart animation names in a folder
   public static Regex rx_anim = new Regex(@"^(?:([^_]*?)_)?(.*)_([0-9]+)\.png$",
@@ -1004,27 +1005,17 @@ public static class BH
       return new WeightedRoom() { room = Room, weight = Weight, limitedCopies = LimitedCopies, maxCopies = MaxCopies, additionalPrerequisites = AdditionalPrerequisites };
   }
 
-  public static PrototypeDungeonRoom GetGenericBossRoom()
+  public static PrototypeDungeonRoom GetGenericBossRoom(bool exitOnBottom)
   {
-    // Load gatling gull's boss room as a prototype
-    if (genericBossRoomPrefab == null) //TODO: might need prefabs?
-    {
-      AssetBundle sharedAssets = ResourceManager.LoadAssetBundle("shared_auto_001");
-      GenericRoomTable bossTable = sharedAssets.LoadAsset<GenericRoomTable>("bosstable_01_gatlinggull");
-      genericBossRoomPrefab = bossTable.includedRooms.elements[0].room;
-      sharedAssets = null;
-    }
-    // Instantiate and clear out the room for our personal use
-    PrototypeDungeonRoom p = UnityEngine.Object.Instantiate(genericBossRoomPrefab);
-      p.placedObjects.Clear();
-      p.placedObjectPositions.Clear();
-      p.ClearAllObjectData();
-      p.additionalObjectLayers = new List<PrototypeRoomObjectLayer>();
-      p.eventTriggerAreas = new List<PrototypeEventTriggerArea>();
-      p.roomEvents = new List<RoomEventDefinition>();
-      p.paths = new List<SerializedPath>();
-      p.prerequisites = new List<DungeonPrerequisite>();
-      p.rectangularFeatures = new List<PrototypeRectangularFeature>();
+    // Instantiate a new boss room
+    PrototypeDungeonRoom p = Alexandria.DungeonAPI.RoomFactory.CreateEmptyRoom(38, 27);
+      p.category = PrototypeDungeonRoom.RoomCategory.BOSS;
+      if (exitOnBottom)
+      {
+        p.exitData.exits.Clear();
+        Alexandria.DungeonAPI.RoomFactory.AddExit(p, new Vector2(p.Width / 2, 0), DungeonData.Direction.SOUTH, PrototypeRoomExit.ExitType.ENTRANCE_ONLY);
+        Alexandria.DungeonAPI.RoomFactory.AddExit(p, new Vector2(p.Width / 2, p.Height), DungeonData.Direction.NORTH, PrototypeRoomExit.ExitType.EXIT_ONLY);
+      }
 
     // Make sure we don't treat the room as a room with normal enemies upon entry (mostly useful for interaction-based bosses)
       p.UseCustomMusicState = true;
@@ -1041,9 +1032,9 @@ public static class BH
     return p;
   }
 
-  public static PrototypeDungeonRoom CreateStandaloneBossRoom(this GameObject self, BuildABoss bb)
+  public static PrototypeDungeonRoom CreateStandaloneBossRoom(this GameObject self, BuildABoss bb, bool exitOnBottom)
   {
-      PrototypeDungeonRoom p = GetGenericBossRoom();
+      PrototypeDungeonRoom p = GetGenericBossRoom(exitOnBottom: exitOnBottom);
         Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
         tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
       AddObjectToRoom(p, roomCenter - anySprite.WorldTopLeft, EnemyBehaviourGuid: bb.guid);
@@ -1068,7 +1059,7 @@ public static class BH
         (GlobalDungeonData.ValidTilesets)Enum.Parse(typeof(GlobalDungeonData.ValidTilesets), floors.ToString());
 
       // Get a generic boss room and add it to the center of the room
-      PrototypeDungeonRoom p = self.CreateStandaloneBossRoom(bb);
+      PrototypeDungeonRoom p = self.CreateStandaloneBossRoom(bb, exitOnBottom: false);
 
       // Create a new table and add our new boss room
       GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();

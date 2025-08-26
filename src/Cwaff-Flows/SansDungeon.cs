@@ -11,6 +11,7 @@ public class SansDungeon
 {
     public const string INTERNAL_NAME    = "cg_sansfloor";
     public const string FLOOR_NAME       = "Odd Corridor";
+    public const string FLOOR_SUB        = "Unknown Location";
     public const string PREFAB_TEMPLATE  = "Base_ResourcefulRat";
 
     public static GameLevelDefinition FloorNameDefinition;
@@ -69,7 +70,7 @@ public class SansDungeon
         dungeon.DungeonSeed = 0;
         dungeon.DungeonFloorName = FLOOR_NAME; // what shows up At the top when floor is loaded
         dungeon.DungeonShortName = FLOOR_NAME; // no clue lol, just make it the same
-        dungeon.DungeonFloorLevelTextOverride = "Unknown Location"; // what shows up below the floorname
+        dungeon.DungeonFloorLevelTextOverride = FLOOR_SUB; // what shows up below the floorname
         dungeon.LevelOverrideType = GameManager.LevelOverrideState.NONE;
         dungeon.debugSettings = new DebugDungeonSettings()
         {
@@ -323,7 +324,7 @@ public class SansDungeonFlow {
             flow = m_CachedFlow,
         };
 
-        m_CachedFlow.name = "Simplest";
+        m_CachedFlow.name = $"{SansDungeon.INTERNAL_NAME}_flow";
         // m_CachedFlow.fallbackRoomTable = BossrushFlows.Bossrush_01_Castle.fallbackRoomTable;
         m_CachedFlow.fallbackRoomTable = CwaffDungeonPrefabs.SewersRoomTable;
         m_CachedFlow.subtypeRestrictions = new List<DungeonFlowSubtypeRestriction>(0);
