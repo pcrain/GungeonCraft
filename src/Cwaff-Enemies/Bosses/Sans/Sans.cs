@@ -53,7 +53,7 @@ public partial class SansBoss : AIActor
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:sansboss");                    // Add our boss to the enemy database
     // bb.AddBossToFloorPool(floors: Floors.CASTLEGEON, weight: 9999f);           // Add our boss to the first floor's boss pool
     // bb.AddBossToFloorPool(floors: Floors.MINEGEON, weight: 1f);                // Add our boss to the first floor's boss pool
-    SansBossRoom = bb.CreateStandaloneBossRoom(exitOnBottom: false);
+    SansBossRoom = bb.CreateStandaloneBossRoom(width: 38, height: 27, exitOnBottom: false);
     InitPrefabs();                                                             // Do miscellaneous prefab loading
   }
 
@@ -66,7 +66,7 @@ public partial class SansBoss : AIActor
     // Bone bullet
     Projectile boneBulletProjectile = Items.HegemonyRifle.CloneProjectile();
       // boneBulletProjectile.BulletScriptSettings.preventPooling = true; // prevents shenanigans with OrangeAndBlue Bullet script causing permanent collision skips
-    _BoneBullet = new AIBulletBank.Entry(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible")) {
+    _BoneBullet = new AIBulletBank.Entry(EnemyDatabase.GetOrLoadByGuid(Enemies.Chancebulon).bulletBank.GetBullet("reversible")) {
       Name               = "getboned",
       PlayAudio          = false,
       BulletObject       = boneBulletProjectile.gameObject.ClonePrefab(),

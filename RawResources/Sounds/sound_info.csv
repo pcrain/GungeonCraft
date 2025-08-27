@@ -345,4 +345,4 @@ gradius_powerup_sound,0.0,1,sound,1
 gradius_round_laser_impact_sound,-5.0,1,sound,2
 gradius_ship_spawn_sound,-5.0,1,sound,1
 gradius_ship_destroy_sound,-1.5,1,sound,1
-collapse,8.0,1,music,0
+collapse,11.0,1,music,0

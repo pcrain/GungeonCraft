@@ -101,6 +101,10 @@ public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
         npc.FinishBossFight();
       };
     }
+    else
+      enemy.healthHaver.OnPreDeath += (_) => {
+        enemy.transform.position.GetAbsoluteRoom().UnsealRoom();
+      };
     if (enemy.GetComponent<GenericIntroDoer>().triggerType == GenericIntroDoer.TriggerType.PlayerEnteredRoom)
       StartBossFight(enemy);
   }
@@ -254,7 +258,7 @@ public class BuildABoss
 
   public void SetStats(float? health = null, float? weight = null, float? speed = null, float? collisionDamage = null,
     float? collisionKnockbackStrength = null, float? hitReactChance = null, bool? healthIsNumberOfHits = null,
-    float? invulnerabilityPeriod = null)
+    float? invulnerabilityPeriod = null, bool? shareCooldowns = null)
   {
     if (health.HasValue)
     {
@@ -279,6 +283,8 @@ public class BuildABoss
       this.enemyBehavior.aiActor.healthHaver.invulnerabilityPeriod = invulnerabilityPeriod.Value;
       this.enemyBehavior.aiActor.healthHaver.usesInvulnerabilityPeriod = invulnerabilityPeriod.Value > 0.0f;
     }
+    if (shareCooldowns.HasValue)
+      this.enemyBehavior.behaviorSpeculator.AttackBehaviorGroup.ShareCooldowns = shareCooldowns.Value;
   }
 
   /// <summary>Adds custom music for a custom boss.</summary>
@@ -687,9 +693,9 @@ public class BuildABoss
     this.prefab.AddBossToFloorPool(bb: this, guid: this.guid, floors: floors, weight: weight);
   }
 
-  public PrototypeDungeonRoom CreateStandaloneBossRoom(bool exitOnBottom)
+  public PrototypeDungeonRoom CreateStandaloneBossRoom(int width, int height, bool exitOnBottom)
   {
-    return this.prefab.CreateStandaloneBossRoom(bb: this, exitOnBottom: exitOnBottom);
+    return this.prefab.CreateStandaloneBossRoom(bb: this, width: width, height: height, exitOnBottom: exitOnBottom);
   }
 }
 
@@ -1005,10 +1011,10 @@ public static class BH
       return new WeightedRoom() { room = Room, weight = Weight, limitedCopies = LimitedCopies, maxCopies = MaxCopies, additionalPrerequisites = AdditionalPrerequisites };
   }
 
-  public static PrototypeDungeonRoom GetGenericBossRoom(bool exitOnBottom)
+  public static PrototypeDungeonRoom GetGenericBossRoom(int width, int height, bool exitOnBottom)
   {
     // Instantiate a new boss room
-    PrototypeDungeonRoom p = Alexandria.DungeonAPI.RoomFactory.CreateEmptyRoom(38, 27);
+    PrototypeDungeonRoom p = Alexandria.DungeonAPI.RoomFactory.CreateEmptyRoom(width, height);
       p.category = PrototypeDungeonRoom.RoomCategory.BOSS;
       if (exitOnBottom)
       {
@@ -1032,9 +1038,9 @@ public static class BH
     return p;
   }
 
-  public static PrototypeDungeonRoom CreateStandaloneBossRoom(this GameObject self, BuildABoss bb, bool exitOnBottom)
+  public static PrototypeDungeonRoom CreateStandaloneBossRoom(this GameObject self, BuildABoss bb, int width, int height, bool exitOnBottom)
   {
-      PrototypeDungeonRoom p = GetGenericBossRoom(exitOnBottom: exitOnBottom);
+      PrototypeDungeonRoom p = GetGenericBossRoom(width: width, height: height, exitOnBottom: exitOnBottom);
         Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
         tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
       AddObjectToRoom(p, roomCenter - anySprite.WorldTopLeft, EnemyBehaviourGuid: bb.guid);
@@ -1059,7 +1065,7 @@ public static class BH
         (GlobalDungeonData.ValidTilesets)Enum.Parse(typeof(GlobalDungeonData.ValidTilesets), floors.ToString());
 
       // Get a generic boss room and add it to the center of the room
-      PrototypeDungeonRoom p = self.CreateStandaloneBossRoom(bb, exitOnBottom: false);
+      PrototypeDungeonRoom p = self.CreateStandaloneBossRoom(bb, width: 38, height: 27, exitOnBottom: false);
 
       // Create a new table and add our new boss room
       GenericRoomTable theRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();

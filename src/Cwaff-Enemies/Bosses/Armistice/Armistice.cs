@@ -19,7 +19,7 @@ public partial class ArmisticeBoss : AIActor
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/armistice_idle_1",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{C.MOD_INT_NAME}/Resources/armistice_bosscard.png"); // Create our build-a-boss
     bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
-      healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
+      healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f, shareCooldowns: false); // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:    8f, loop: true);        // Adjust some specific animations as needed
       bb.AdjustAnimation(name: "idle_glance",  fps:    8f, loop: true);
@@ -37,23 +37,22 @@ public partial class ArmisticeBoss : AIActor
     bb.AddCustomIntro<ArmisticeIntro>();                                       // Add custom animation to the generic intro doer
     // bb.MakeInteractible<ArmisticeNPC>(preFight: true, postFight: true) ;       // Add some pre-fight and post-fight dialogue
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
-    bb.AddCustomMusic(name: "collapse", loopAt: 225251, rewind: 129926);       // Add custom music for our boss
+    bb.AddCustomMusic(name: "collapse", loopAt: 320576, rewind: 225251);       // Add custom music for our boss
     // bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
-    bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
-      goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 0.26f, attackCooldown: 0.15f, probability: 3f);
-    bb.CreateBulletAttack<CeilingBulletsScript>    (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<OrbitBulletScript>       (fireAnim: "throw_up",    cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down",  cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<SquareBulletScript>      (fireAnim: "throw_left",  cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<ChainBulletScript>       (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WallSlamScript>          (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);  //TODO: refactor to use CreateSequentialAttack and CustomTeleportBehavior
-    bb.CreateBulletAttack<SineWaveScript>          (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<OrangeAndBlueScript>     (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
-    bb.CreateBulletAttack<WiggleWaveScript>        (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
+    // bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
+    //   goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 4.26f, attackCooldown: 0.15f, probability: 3f);
+    bb.CreateBulletAttack<CrossBulletsScript>    (fireAnim: "laugh",       cooldown: 2.0f, attackCooldown: 2.0f);
+    // bb.CreateBulletAttack<CeilingBulletsScript>    (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
+    // bb.CreateBulletAttack<OrbitBulletScript>       (fireAnim: "throw_up",    cooldown: 0.25f, attackCooldown: 0.15f);
+    // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down",  cooldown: 0.25f, attackCooldown: 0.15f);
+    // bb.CreateBulletAttack<SquareBulletScript>      (fireAnim: "throw_left",  cooldown: 0.25f, attackCooldown: 0.15f);
+    // bb.CreateBulletAttack<ChainBulletScript>       (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
+    // bb.CreateBulletAttack<WallSlamScript>          (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);  //TODO: refactor to use CreateSequentialAttack and CustomTeleportBehavior
+    // bb.CreateBulletAttack<SineWaveScript>          (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
+    // bb.CreateBulletAttack<OrangeAndBlueScript>     (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
+    // bb.CreateBulletAttack<WiggleWaveScript>        (fireAnim: "throw_right", cooldown: 0.25f, attackCooldown: 0.15f);
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
-    // bb.AddBossToFloorPool(floors: Floors.CASTLEGEON, weight: 9999f);           // Add our boss to the first floor's boss pool
-    // bb.AddBossToFloorPool(floors: Floors.MINEGEON, weight: 1f);                // Add our boss to the first floor's boss pool
-    ArmisticeBossRoom = bb.CreateStandaloneBossRoom(exitOnBottom: true);
+    ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
     InitPrefabs();                                                             // Do miscellaneous prefab loading
   }
 
@@ -64,12 +63,10 @@ public partial class ArmisticeBoss : AIActor
       _NapalmReticle.GetComponent<tk2dSlicedSprite>().SetSprite(VFX.Collection, VFX.Collection.GetSpriteIdByName("reticle_white"));
       UnityEngine.Object.Destroy(_NapalmReticle.GetComponent<ReticleRiserEffect>());  // delete risers for use with DoomZoneGrowth component later
     // Bone bullet
-    Projectile boneBulletProjectile = Items.HegemonyRifle.CloneProjectile();
-      // boneBulletProjectile.BulletScriptSettings.preventPooling = true; // prevents shenanigans with OrangeAndBlue Bullet script causing permanent collision skips
-    _BoneBullet = new AIBulletBank.Entry(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible")) {
+    _BoneBullet = new AIBulletBank.Entry(EnemyDatabase.GetOrLoadByGuid(Enemies.Chancebulon).bulletBank.GetBullet("reversible")) {
       Name               = "getboned",
       PlayAudio          = false,
-      BulletObject       = boneBulletProjectile.gameObject.ClonePrefab(),
+      // BulletObject       = boneBulletProjectile.gameObject.ClonePrefab(),
       MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
     };
   }
@@ -141,7 +138,7 @@ public partial class ArmisticeBoss : AIActor
         return; // don't do anything else if we're pre-intro or post-fight
 
       base.sprite.transform.localPosition += Vector3.zero.WithY(Mathf.CeilToInt(4f*Mathf.Sin(4f*BraveTime.ScaledTimeSinceStartup))/C.PIXELS_PER_TILE);
-      base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around
+      // base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around
       if (Lazy.CoinFlip())
         SpawnDust(base.specRigidbody.UnitCenter + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f))); // spawn dust particles
     }
@@ -185,6 +182,14 @@ public partial class ArmisticeBoss : AIActor
           tb.roomMin            = roomTeleportBounds.min;
           tb.roomMax            = roomTeleportBounds.max;
       }
+      CameraController mainCameraController = GameManager.Instance.MainCameraController;
+      mainCameraController.OverrideZoomScale = 0.5f;
+      mainCameraController.LockToRoom = true;
+      mainCameraController.UseOverridePlayerOnePosition = true;
+      mainCameraController.OverridePlayerOnePosition = roomTeleportBounds.center;
+      mainCameraController.UseOverridePlayerTwoPosition = true;
+      mainCameraController.OverridePlayerTwoPosition = roomTeleportBounds.center;
+      // mainCameraController.AddFocusPoint(head.gameObject);
     }
 
     public override void EndIntro()

@@ -147,6 +147,8 @@ public class PathRect : PathShape
     { return new PathLine(this.rect.xMax,this.rect.yMin,this.rect.xMax,this.rect.yMax); }
   public override Vector2 At(float t)
     { return this.rect.PointOnPerimeter(t); }
+  public Vector2 At(float x, float y)
+    { return new Vector2(this.rect.xMin + x * this.rect.width, this.rect.yMin + y * this.rect.height); }
 }
 
 public class PathArc : PathShape
