@@ -41,7 +41,8 @@ public partial class ArmisticeBoss : AIActor
     // bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
     // bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
     //   goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 4.26f, attackCooldown: 0.15f, probability: 3f);
-    bb.CreateBulletAttack<CrossBulletsScript>    (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    // bb.CreateBulletAttack<CrossBulletsScript>    (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<ClocksTickingScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
     // bb.CreateBulletAttack<CeilingBulletsScript>    (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
     // bb.CreateBulletAttack<OrbitBulletScript>       (fireAnim: "throw_up",    cooldown: 0.25f, attackCooldown: 0.15f);
     // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down",  cooldown: 0.25f, attackCooldown: 0.15f);
@@ -68,7 +69,9 @@ public partial class ArmisticeBoss : AIActor
       PlayAudio          = false,
       // BulletObject       = boneBulletProjectile.gameObject.ClonePrefab(),
       MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
+      // MuzzleFlashEffects = null,
     };
+    _BoneBullet.MuzzleFlashEffects.type = VFXPoolType.None;
   }
 
   private static void SpawnDust(Vector2 where)

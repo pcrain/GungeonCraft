@@ -139,11 +139,11 @@ public partial class ArmisticeBoss : AIActor
     private const float STRIKESPEED = 100f;
     private const int   SHOTDELAY   = 3;
 
-    private PathRect slamBoundsPath;
+    private PathRect bounds;
 
     protected override List<FluidBulletInfo> BuildChain()
     {
-      this.slamBoundsPath = new PathRect(base.roomSlamBounds);
+      this.bounds = new PathRect(base.roomSlamBounds);
 
       return
          Run(SprayBullets(new Vector2(0.5f, 1f)))
@@ -153,7 +153,7 @@ public partial class ArmisticeBoss : AIActor
 
     private IEnumerator SprayBullets(Vector2 startDir)
     {
-      Vector2 target = this.slamBoundsPath.At(0.5f, 0.2f); // near bottom of room
+      Vector2 target = this.bounds.At(0.5f, 0.2f); // near bottom of room
 
       Vector2 gravity = new Vector2(0, -GRAVITY);
       Speed s = new Speed(BASESPEED, SpeedType.Absolute);
@@ -171,4 +171,158 @@ public partial class ArmisticeBoss : AIActor
     }
   }
 
+  private class ClocksTickingScript : SecretBulletScript
+  {
+    private const float _LIFETIME = 6f;
+    private const float _GAP = 1.4f;
+
+    private float _time = 0f;
+
+    internal class ClocksTickingBullet : SecretBullet
+    {
+
+      private ClocksTickingScript _parent = null;
+      private Vector2 _spawnCenter        = default;
+      private float _spawnTime            = 0f;
+      private float _spawnRadius          = 0f;
+      private float _spawnAngle           = 0f;
+      private float _rps                  = 0f;
+      private bool  _flood                = false;
+
+      public ClocksTickingBullet(ClocksTickingScript parent, Vector2 spawnCenter, float spawnTime, float spawnRadius, float spawnAngle, float rps, bool flood) : base()
+      {
+        this._parent      = parent;
+        this._spawnCenter = spawnCenter;
+        this._spawnTime   = spawnTime;
+        this._spawnRadius = spawnRadius;
+        this._spawnAngle  = spawnAngle;
+        this._rps         = rps;
+        this._flood       = flood;
+
+        base.ManualControl = true;
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+        if (this._flood)
+        {
+          SpeculativeRigidbody srb = this.Projectile.specRigidbody;
+          srb.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+          srb.CollideWithTileMap = false;
+        }
+      }
+
+      private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+      {
+          if (!otherRigidbody || !otherRigidbody.gameObject.GetComponent<PlayerController>())
+            PhysicsEngine.SkipCollision = true;
+      }
+
+      public override IEnumerator Top()
+      {
+        while (true)
+        {
+            float elapsed = BraveTime.ScaledTimeSinceStartup - this._spawnTime;
+            if (elapsed > _LIFETIME)
+              break;
+            // if (!this._flood)
+            {
+              float rot = 360f * elapsed * this._rps;
+              base.Position = this._spawnCenter + (this._spawnAngle + rot).ToVector(this._spawnRadius);
+            }
+            yield return Wait(1);
+        }
+        Vanish();
+        yield break;
+      }
+    }
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return
+         Run(Attack(radius:  8f, rps: -0.300f, offAngle: 110f))
+        .And(Attack(radius: 11f, rps: -0.625f, offAngle:  90f))
+        .And(Attack(radius: 14f, rps: -0.850f, offAngle:  70f))
+        .And( Flood(radius: 14f, rps:  0.150f, offAngle: -90f, spawnRps: 0.75f))
+        .Finish();
+    }
+
+    private IEnumerator Flood(float radius, float rps, float offAngle, float spawnRps)
+    {
+      const float MAX_RADIUS = 26f; // 28 is definitely enough
+      const int BANDS = 40;
+      const int BANDSIZE = 360 / BANDS;
+
+      int iStart = Mathf.FloorToInt(radius / _GAP);
+      int iEnd = Mathf.FloorToInt(MAX_RADIUS / _GAP);
+
+      float start = BraveTime.ScaledTimeSinceStartup;
+      Vector2 center = this.roomFullBounds.center;
+      float baseAngle = ((center - GameManager.Instance.BestActivePlayer.CenterPosition).ToAngle() + offAngle).Clamp360();
+      int curBand = 0;
+      while (curBand < BANDS)
+      {
+        this._time = BraveTime.ScaledTimeSinceStartup;
+        float trueRot = 360f * (this._time - start) * rps;
+        int band = Mathf.CeilToInt(BANDS * (this._time - start) * spawnRps);
+        if (curBand >= band)
+        {
+          yield return Wait(1);
+          continue;
+        }
+        ++curBand;
+        float quantRot = curBand * BANDSIZE;
+        for (int i = iStart; i <= iEnd; ++i)
+        {
+          float trueRadius = i * _GAP;
+          Vector2 pos = center + (baseAngle + quantRot + trueRot).ToVector(trueRadius); //NOTE: deliberately need to offset by rot twice
+          this.Fire(Offset.OverridePosition(pos), new Direction(0f, DirectionType.Absolute), new Speed(0f),
+            new ClocksTickingBullet(
+              parent      : this,
+              spawnCenter : center,
+              spawnTime   : start,
+              spawnRadius : trueRadius,
+              spawnAngle  : baseAngle + quantRot,
+              rps         : rps,
+              flood       : true
+              ));
+        }
+      }
+      yield break;
+    }
+
+    private IEnumerator Attack(float radius, float rps, float offAngle)
+    {
+      float start = BraveTime.ScaledTimeSinceStartup;
+      int count = Mathf.FloorToInt(radius / _GAP);
+      Vector2 center = this.roomFullBounds.center;
+      float baseAngle = ((center - GameManager.Instance.BestActivePlayer.CenterPosition).ToAngle() + offAngle).Clamp360();
+      for (int i = 1; i <= count; ++i)
+      {
+        this._time = BraveTime.ScaledTimeSinceStartup;
+        float trueRadius = _GAP * i;
+        float rot = 360f * (this._time - start) * rps;
+        this.Fire(Offset.OverridePosition(center + (baseAngle + rot).ToVector(trueRadius)), new Direction(0f, DirectionType.Absolute), new Speed(0f),
+          new ClocksTickingBullet(
+            parent      : this,
+            spawnCenter : center,
+            spawnTime   : start,
+            spawnRadius : trueRadius,
+            spawnAngle  : baseAngle,
+            rps         : rps,
+            flood       : false
+            ));
+        yield return Wait(3);
+      }
+      float endTime = start + _LIFETIME;
+      while (this._time < endTime)
+      {
+        yield return Wait(1);
+        this._time = BraveTime.ScaledTimeSinceStartup;
+      }
+      yield break;
+    }
+
+  }
 }
