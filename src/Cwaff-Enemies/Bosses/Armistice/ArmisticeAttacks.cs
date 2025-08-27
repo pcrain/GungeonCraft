@@ -158,7 +158,7 @@ public partial class ArmisticeBoss : AIActor
       Vector2 gravity = new Vector2(0, -GRAVITY);
       Speed s = new Speed(BASESPEED, SpeedType.Absolute);
       Offset o = Offset.OverridePosition(theBoss.CenterPosition);
-      theBoss.gameObject.Play("sans_laugh");
+      theBoss.gameObject.Play("armistice_laugh_2");
       int b = 0;
       for(int i = 0; i < COUNT; ++i)
       {

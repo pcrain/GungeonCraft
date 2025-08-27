@@ -16,21 +16,21 @@ public partial class ArmisticeBoss : AIActor
 
   public static void Init()
   {
-    BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/armistice_idle_1",
+    BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/armistice_idle_001",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{C.MOD_INT_NAME}/Resources/armistice_bosscard.png"); // Create our build-a-boss
     bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f, shareCooldowns: false); // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:    8f, loop: true);        // Adjust some specific animations as needed
-      bb.AdjustAnimation(name: "idle_glance",  fps:    8f, loop: true);
-      bb.AdjustAnimation(name: "idle_empty",   fps:    8f, loop: true);
-      bb.AdjustAnimation(name: "shrug",        fps:    8f, loop: true);
-      bb.AdjustAnimation(name: "shrug_calm",   fps:    8f, loop: true);
-      bb.AdjustAnimation(name: "shrug_glance", fps:    8f, loop: true);
-      bb.AdjustAnimation(name: "idle_cloak",   fps:   12f, loop: true);
-      bb.AdjustAnimation(name: "decloak",      fps:    6f, loop: false);
-      bb.AdjustAnimation(name: "teleport_in",  fps:   60f, loop: false);
-      bb.AdjustAnimation(name: "teleport_out", fps:   60f, loop: false);
+      // bb.AdjustAnimation(name: "idle_glance",  fps:    8f, loop: true);
+      // bb.AdjustAnimation(name: "idle_empty",   fps:    8f, loop: true);
+      // bb.AdjustAnimation(name: "shrug",        fps:    8f, loop: true);
+      // bb.AdjustAnimation(name: "shrug_calm",   fps:    8f, loop: true);
+      // bb.AdjustAnimation(name: "shrug_glance", fps:    8f, loop: true);
+      // bb.AdjustAnimation(name: "idle_cloak",   fps:   12f, loop: true);
+      // bb.AdjustAnimation(name: "decloak",      fps:    6f, loop: false);
+      // bb.AdjustAnimation(name: "teleport_in",  fps:   60f, loop: false);
+      // bb.AdjustAnimation(name: "teleport_out", fps:   60f, loop: false);
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
       // bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 15, height: 30, xoff: 24, yoff: 2);          // Set our default pixel colliders
@@ -41,7 +41,7 @@ public partial class ArmisticeBoss : AIActor
     // bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
     // bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
     //   goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 4.26f, attackCooldown: 0.15f, probability: 3f);
-    bb.CreateBulletAttack<CrossBulletsScript>    (fireAnim: "laugh",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<CrossBulletsScript>    (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
     // bb.CreateBulletAttack<CeilingBulletsScript>    (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
     // bb.CreateBulletAttack<OrbitBulletScript>       (fireAnim: "throw_up",    cooldown: 0.25f, attackCooldown: 0.15f);
     // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down",  cooldown: 0.25f, attackCooldown: 0.15f);
@@ -112,11 +112,20 @@ public partial class ArmisticeBoss : AIActor
       this.aiActor.bulletBank.Bullets.Add(_BoneBullet);
       base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
       base.aiActor.healthHaver.OnPreDeath += OnPreDeath;
+
+      // base.aiActor.sprite.SetGlowiness(30f, glowColor: Color.cyan);
+      tk2dBaseSprite sprite = base.aiActor.sprite;
+      sprite.usesOverrideMaterial = true;
+      Material mat = sprite.renderer.material;
+      mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+      mat.SetFloat(CwaffVFX._EmissivePowerId, 100f);
+      mat.SetColor(CwaffVFX._EmissiveColorId, new Color(0f, 227f / 255f, 1f));
+      mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 15.0f);
     }
 
     private void OnPreDeath(Vector2 _)
     {
-      FlipSpriteIfNecessary(overrideFlip: false);
+      UpdateSpriteIfNecessary();
       GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
       if (aura && aura.gameObject)
         UnityEngine.Object.Destroy(aura.gameObject);
@@ -133,27 +142,27 @@ public partial class ArmisticeBoss : AIActor
       if (BraveTime.DeltaTime == 0)
         return; // don't do anything if we're paused
 
-      FlipSpriteIfNecessary();
-      if (aura == null)
-        return; // don't do anything else if we're pre-intro or post-fight
+      UpdateSpriteIfNecessary();
 
-      base.sprite.transform.localPosition += Vector3.zero.WithY(Mathf.CeilToInt(4f*Mathf.Sin(4f*BraveTime.ScaledTimeSinceStartup))/C.PIXELS_PER_TILE);
+      float yOff = Mathf.CeilToInt(4f*Mathf.Sin(4f*BraveTime.ScaledTimeSinceStartup)) / C.PIXELS_PER_TILE;
+      base.sprite.transform.localPosition += Vector3.zero.WithY(yOff);
+      base.sprite.transform.position = base.sprite.transform.position.Quantize(C.PIXEL_SIZE);
       // base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around
-      if (Lazy.CoinFlip())
-        SpawnDust(base.specRigidbody.UnitCenter + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f))); // spawn dust particles
+      // if (Lazy.CoinFlip())
+      //   SpawnDust(base.specRigidbody.UnitCenter + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f))); // spawn dust particles
     }
 
-    private void FlipSpriteIfNecessary(bool? overrideFlip = null)
+    private void UpdateSpriteIfNecessary()
     {
       if (!base.sprite || !base.specRigidbody || GameManager.Instance.BestActivePlayer is not PlayerController pc)
         return;
-      base.sprite.FlipX  = overrideFlip ?? (pc.CenterPosition.x < base.specRigidbody.UnitBottomCenter.x);
+      // base.sprite.FlipX  = overrideFlip ?? (pc.CenterPosition.x < base.specRigidbody.UnitBottomCenter.x);
       Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
       Vector2 offset     = new Vector2(spriteSize.x / (base.sprite.FlipX ? 2f : -2f), 0f);
       base.sprite.transform.localPosition = (base.specRigidbody.UnitBottomCenter.Quantize(C.PIXEL_SIZE) + offset).ToVector3ZisY(0f);
       base.sprite.UpdateZDepth();
       if (aura != null)
-        aura.transform.localPosition = new Vector3(-offset.x ,spriteSize.y / 2,0);
+        aura.transform.localPosition = new Vector3(-offset.x, spriteSize.y / 2, 0);
     }
 
     public void FinishedIntro()
@@ -169,6 +178,7 @@ public partial class ArmisticeBoss : AIActor
 
   private class ArmisticeIntro : SpecificIntroDoer
   {
+
     public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
     {
       // Set up room specific attacks

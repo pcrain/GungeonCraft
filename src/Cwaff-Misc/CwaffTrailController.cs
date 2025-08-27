@@ -5,12 +5,12 @@ public class CwaffTrailController : BraveBehaviour
 {
   private class Bone
   {
+    public Vector2 pos;
     public float posX;
     public Vector2 normal;
     public bool IsAnimating;
     public float AnimationTimer;
     public bool Hide;
-    public Vector2 pos;
 
     private static int _BonesCreated = 0;
     private static readonly LinkedList<Bone> _BonePool = new();
@@ -213,9 +213,11 @@ public class CwaffTrailController : BraveBehaviour
       base.transform.rotation = Quaternion.identity;
     }
     // base.transform.parent = SpawnManager.Instance.VFX; //NOTE: need to be parented to our projectiles so we get destroyed properly
-    if (this.body && this.body.projectile && this.body.projectile.Owner is PlayerController pc)
+    if (this.body && this.body.projectile)
     {
-      m_projectileScale = pc.BulletScaleModifier;
+      if (this.body.projectile.Owner is PlayerController pc)
+        m_projectileScale = pc.BulletScaleModifier;
+      this.body.projectile.OverrideTrailPoint = null; // NOTE: fixes wonky trail offsets after pooled bullets collide with a player once
       this.body.projectile.OnDestruction += this.OnProjectileDestruction;
     }
     base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("FG_Critical"));
