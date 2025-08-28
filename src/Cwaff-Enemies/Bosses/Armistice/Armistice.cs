@@ -45,7 +45,8 @@ public partial class ArmisticeBoss : AIActor
     // bb.CreateBulletAttack<ClocksTickingScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
     // bb.CreateBulletAttack<WalledInScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
     // bb.CreateBulletAttack<BoneTunnelScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<DanceMonkeyScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    // bb.CreateBulletAttack<DanceMonkeyScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<PendulumScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
     InitPrefabs();                                                             // Do miscellaneous prefab loading

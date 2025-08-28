@@ -537,4 +537,131 @@ public partial class ArmisticeBoss : AIActor
     }
 
   }
+
+  private class PendulumScript : ArmisticeBulletScript
+  {
+
+    internal class PendulumBullet : SecretBullet
+    {
+
+      private PendulumScript _parent;
+      private Vector2 _relPos;
+
+      public PendulumBullet(PendulumScript parent, Vector2 relPos) : base()
+      {
+        this._parent = parent;
+        this._relPos = relPos;
+
+        base.ManualControl = true;
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+        SpeculativeRigidbody srb = this.Projectile.specRigidbody;
+        srb.CollideWithTileMap = false;
+      }
+
+      public override IEnumerator Top()
+      {
+        while (this._parent != null && this._parent._active)
+        {
+          base.Position = this._parent._ballCenter + this._relPos;
+          yield return Wait(1);
+        }
+        Vanish();
+        yield break;
+      }
+
+    }
+
+    private Vector2 _ballCenter;
+    private bool _active;
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(Attack()).Finish();
+    }
+
+    private IEnumerator Attack()
+    {
+      const float BALL_RADIUS    = 2f;
+      const int BALL_DENSITY     = 5;
+      const int RING_SIZE        = 5;
+      const int RING_GROWTH      = 4;
+      const int NUM_SWINGS       = 11;
+      const int SWING_FRAMES_MAX = 60;
+      const int SWING_FRAMES_MIN = 30;
+      const int SWING_FRAMES_DLT = (SWING_FRAMES_MAX - SWING_FRAMES_MIN) / (NUM_SWINGS - 1);
+      const int HOLD_FRAMES      = 5;
+      const float SWING_DEPTH    = -10f;
+      const int CRASH_SPEED_MIN  = 5;
+      const int CRASH_SPEED_MAX  = 25;
+      const int CRASH_SPEED_DLT  = (CRASH_SPEED_MAX - CRASH_SPEED_MIN) / (NUM_SWINGS - 1);
+      const int CRASH_SIZE       = 20;
+      const float CRASH_GAP      = 180f / CRASH_SIZE;
+
+      PlayerController pc = GameManager.Instance.BestActivePlayer;
+      Vector2 roomCenter = this.roomFullBounds.center;
+      bool backswing = pc.CenterPosition.x < roomCenter.x;
+      bool onTop = pc.CenterPosition.y < roomCenter.y;
+
+      PathRect roomRect = new PathRect(this.roomFullBounds.Inset(BALL_RADIUS, 0f));
+      Vector2 left  = roomRect.At(0f, 0.5f);
+      Vector2 right = roomRect.At(1f, 0.5f);
+      float ybase = right.y;
+      float width = right.x - left.x;
+
+      this._ballCenter = backswing ? right : left;
+
+      this._active = true;
+      for (int d = 0; d < BALL_DENSITY; ++d)
+      {
+        float radius = (float)(d + 1) * (BALL_RADIUS / BALL_DENSITY);
+        int ringSize = RING_SIZE + d * RING_GROWTH;
+        for (int n = 0; n < ringSize; ++n)
+        {
+          float angle = (360f / ringSize) * n;
+          Vector2 relPos = angle.ToVector(radius);
+          PendulumBullet b = new PendulumBullet(this, relPos);
+          this.Fire(Offset.OverridePosition(this._ballCenter + relPos), b);
+        }
+      }
+
+      for (int i = 0; i < NUM_SWINGS; ++i)
+      {
+        Speed crashSpeed = new Speed(CRASH_SPEED_MIN + CRASH_SPEED_DLT * i);
+        int swingFrames = SWING_FRAMES_MAX - SWING_FRAMES_DLT * i;
+
+        for (int j = 0; j <= swingFrames; ++j)
+        {
+          float swingPos = Ease.InCubic((float)j / swingFrames);
+          float xoff = Mathf.Sin(0.5f * Mathf.PI * swingPos);
+          float yoff = (onTop ? -1f : 1f) *  SWING_DEPTH * Mathf.Sin(Mathf.PI * xoff);
+          if (backswing)
+            this._ballCenter = new Vector2(right.x - xoff * width, ybase + yoff);
+          else
+            this._ballCenter = new Vector2(left.x + xoff * width, ybase + yoff);
+          yield return Wait(1);
+        }
+
+        this._ballCenter = backswing ? left : right;
+        float baseAngle = (backswing ? 270f : 90f) + (0.5f * CRASH_GAP * UnityEngine.Random.value);
+        for (int k = 0; k < CRASH_SIZE; ++k)
+        {
+          float angle = baseAngle + k * CRASH_GAP;
+          this.Fire(Offset.OverridePosition(this._ballCenter + angle.ToVector(BALL_RADIUS)),
+            new Direction(angle), crashSpeed, new SecretBullet());
+        }
+
+        backswing = !backswing;
+        yield return Wait(HOLD_FRAMES);
+      }
+
+      this._active = false;
+
+      yield break;
+    }
+
+  }
 }
