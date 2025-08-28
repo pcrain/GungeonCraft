@@ -1,4 +1,3 @@
-
 namespace CwaffingTheGungy;
 
 public partial class ArmisticeBoss : AIActor
@@ -10,18 +9,25 @@ public partial class ArmisticeBoss : AIActor
 
   private class SecretBullet : Bullet
   {
-      private Color? tint = null;
-      public SecretBullet(Color? tint = null) : base("getboned")
+      private static readonly Color _DefaultTint = new Color(1.0f,0.5f,0.5f,0.5f);
+
+      private Color? _tint = null;
+      private float _emission;
+      private float _emitColorPower;
+
+      public SecretBullet(Color? tint = null, float emission = 10f, float emitColorPower = 1.5f) : base("getboned")
       {
-        this.tint = tint;
+        this._tint = tint;
+        this._emission = emission;
+        this._emitColorPower = emitColorPower;
       }
 
       public override void Initialize()
       {
-        this.Projectile.ChangeTintColorShader(0f,tint ?? new Color(1.0f,0.5f,0.5f,0.5f));
+        this.Projectile.ChangeTintColorShader(0f, this._tint ?? _DefaultTint);
         Material mat = this.Projectile.sprite.renderer.material;
-        mat.SetFloat(CwaffVFX._EmissivePowerId, 10f);
-        mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 1.5f);
+        mat.SetFloat(CwaffVFX._EmissivePowerId, this._emission);
+        mat.SetFloat(CwaffVFX._EmissiveColorPowerId, this._emitColorPower);
         base.Initialize();
       }
   }
@@ -320,6 +326,55 @@ public partial class ArmisticeBoss : AIActor
       {
         yield return Wait(1);
         this._time = BraveTime.ScaledTimeSinceStartup;
+      }
+      yield break;
+    }
+  }
+
+  private class WalledInScript : SecretBulletScript
+  {
+    private const int _STREAMS = 50;
+    private const int _WALLSIZE = 25;
+    private const int _ITERS   = (_STREAMS / 2);
+    private const float _FRAMES = 180;
+    private const float _MINSPEED = 50f;
+    private const float _MAXSPEED = 100f;
+    private const float _DLTSPEED = _MAXSPEED - _MINSPEED;
+
+    private PathLine _bounds;
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      this._bounds = new PathRect(base.roomFullBounds.Inset(2f, 1f)).Top();
+      FluidBulletInfo fbi = Run(Attack(0, speed: _MINSPEED));
+      for (int i = 1; i <= _ITERS; ++i)
+      {
+        float ease = Ease.OutQuad((float)i / _STREAMS);
+        fbi = fbi.And(Attack(i, speed: _MINSPEED + _DLTSPEED * ease), withDelay: (int)(ease * _FRAMES));
+      }
+      for (int i = _ITERS - 1; i >= 1; --i)
+      {
+        float ease = Ease.OutQuad((float)(_STREAMS - i) / _STREAMS);
+        fbi = fbi.And(Attack(i, speed: _MINSPEED + _DLTSPEED * ease), withDelay: (int)(ease * _FRAMES));
+      }
+      return fbi.Finish();
+    }
+
+    private IEnumerator Attack(int end, float speed)
+    {
+      base.BulletBank.aiActor.gameObject.Play("gradius_blaster_sound");
+      Direction dir = new Direction(270f);
+      Speed sspeed = new Speed(speed);
+      int start = Mathf.Max(end - _WALLSIZE, 0);
+      float now = BraveTime.ScaledTimeSinceStartup;
+      Color c = Color.HSVToRGB(now - (int)now, 1f, 1f)/*.WithAlpha(1.0f)*/;
+      for (int k = start; k <= end; ++k)
+      {
+        float off = (float)k / _STREAMS;
+        this.Fire(Offset.OverridePosition(this._bounds.At(off)), dir, sspeed,
+          new SecretBullet(tint: c, emission: 100f, emitColorPower: 0.5f));
+        this.Fire(Offset.OverridePosition(this._bounds.At(1f - off)), dir, sspeed,
+          new SecretBullet(tint: c, emission: 100f, emitColorPower: 0.5f));
       }
       yield break;
     }

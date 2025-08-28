@@ -4,7 +4,7 @@ public partial class ArmisticeBoss : AIActor
 {
   public  const  string BOSS_GUID              = "Armistice";
   private const  string BOSS_NAME              = "Armistice";
-  private const  string SUBTITLE               = "...";
+  private const  string SUBTITLE               = "";
   private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/Bosses/armistice";
 
   private static GameObject _NapalmReticle      = null;
@@ -42,7 +42,8 @@ public partial class ArmisticeBoss : AIActor
     // bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
     //   goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 4.26f, attackCooldown: 0.15f, probability: 3f);
     // bb.CreateBulletAttack<CrossBulletsScript>    (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<ClocksTickingScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    // bb.CreateBulletAttack<ClocksTickingScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<WalledInScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
     // bb.CreateBulletAttack<CeilingBulletsScript>    (fireAnim: "laugh",       cooldown: 0.25f, attackCooldown: 0.15f);
     // bb.CreateBulletAttack<OrbitBulletScript>       (fireAnim: "throw_up",    cooldown: 0.25f, attackCooldown: 0.15f);
     // bb.CreateBulletAttack<HesitantBulletWallScript>(fireAnim: "throw_down",  cooldown: 0.25f, attackCooldown: 0.15f);
