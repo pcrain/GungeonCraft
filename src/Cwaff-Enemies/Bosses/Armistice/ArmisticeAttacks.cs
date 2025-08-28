@@ -15,11 +15,29 @@ public partial class ArmisticeBoss : AIActor
       private float _emission;
       private float _emitColorPower;
 
+      protected int originalLayer = -1;
+      protected GameObject _trail = null;
+
       public SecretBullet(Color? tint = null, float emission = 10f, float emitColorPower = 1.5f) : base("getboned")
       {
         this._tint = tint;
         this._emission = emission;
         this._emitColorPower = emitColorPower;
+      }
+
+      protected void OnBaseDestruction(Projectile projectile)
+      {
+        if (this._trail)
+        {
+          UnityEngine.Object.Destroy(this._trail);
+          this._trail = null;
+        }
+        if (this.originalLayer > -1)
+        {
+          projectile.gameObject.SetLayerRecursively(this.originalLayer);
+          this.originalLayer = -1;
+        }
+        projectile.OnDestruction -= this.OnBaseDestruction;
       }
 
       public override void Initialize()
@@ -62,8 +80,6 @@ public partial class ArmisticeBoss : AIActor
       private       Vector2 target         = Vector2.zero;
       private       Rect    roomFullBounds;
       private       bool    snapped = false;
-      private       GameObject trail = null;
-      private       int originalLayer = -1;
 
       public CrossBullet(Vector2 velocity, Vector2 gravity, Vector2 target, Rect roomFullBounds) : base()
       {
@@ -71,21 +87,6 @@ public partial class ArmisticeBoss : AIActor
         this.startVelocity  = velocity;
         this.target         = target;
         this.roomFullBounds = roomFullBounds;
-      }
-
-      private void OnDestruction(Projectile projectile)
-      {
-        if (this.trail)
-        {
-          UnityEngine.Object.Destroy(this.trail);
-          this.trail = null;
-        }
-        if (this.originalLayer > -1)
-        {
-          projectile.gameObject.SetLayerRecursively(this.originalLayer);
-          this.originalLayer = -1;
-        }
-        projectile.OnDestruction -= this.OnDestruction;
       }
 
       public override void Initialize()
@@ -98,7 +99,7 @@ public partial class ArmisticeBoss : AIActor
       public override IEnumerator Top()
       {
         // this.Projectile.gameObject.Play(SOUND_SHOOT);
-        this.Projectile.OnDestruction += this.OnDestruction;
+        this.Projectile.OnDestruction += this.OnBaseDestruction;
         this.originalLayer = this.Projectile.gameObject.layer;
         this.Projectile.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
         Vector2 newVelocity = this.startVelocity;
@@ -122,8 +123,8 @@ public partial class ArmisticeBoss : AIActor
             this.Projectile.gameObject.PlayUnique("subtractor_beam_fire_sound");
             this.snapped = true;
             yield return Wait(1);
-            this.trail = this.Projectile.AddTrail(SubtractorBeam._RedTrailPrefab).gameObject;
-            this.trail.SetGlowiness(100f);
+            this._trail = this.Projectile.AddTrail(SubtractorBeam._RedTrailPrefab).gameObject;
+            this._trail.SetGlowiness(100f);
             continue;
           }
           newVelocity += gravity * BraveTime.DeltaTime;
@@ -428,6 +429,111 @@ public partial class ArmisticeBoss : AIActor
           gapPos += (Lazy.CoinFlip() ? 1 : -1);
         yield return Wait(RATE);
       }
+    }
+
+  }
+
+  private class DanceMonkeyScript : ArmisticeBulletScript
+  {
+
+    internal class DanceMonkeyBullet : SecretBullet
+    {
+      private const float LERP_FACTOR = 10f;
+
+      private float _startAngle;
+      private float _radius;
+
+      private Vector2 _center;
+      private float _holdRadius;
+      private int _holdFrames;
+      private float _rps;
+      private float _spawnTime;
+
+      public DanceMonkeyBullet(Vector2 center, float holdRadius, int holdFrames, float rps, float spawnTime) : base()
+      {
+        this._center     = center;
+        this._holdRadius = holdRadius;
+        this._holdFrames   = holdFrames;
+        this._rps        = rps;
+        this._spawnTime  = spawnTime;
+
+        base.ManualControl = true;
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+      }
+
+      public override IEnumerator Top()
+      {
+        Vector2 startPos = base.Position;
+        Vector2 startVec = (base.Position - this._center);
+        this._startAngle = startVec.ToAngle();
+        this._radius = startVec.magnitude;
+
+        this.Projectile.specRigidbody.CollideWithTileMap = false;
+        this.Projectile.OnDestruction += this.OnBaseDestruction;
+
+        for (int i = 0; i < this._holdFrames; ++i)
+        {
+          float now = BraveTime.ScaledTimeSinceStartup;
+          float lifetime = now - this._spawnTime;
+          float angle = (this._startAngle + lifetime * 360f * this._rps);
+          if (Mathf.Abs(this._radius - this._holdRadius) > 0.0125f)
+            this._radius = Lazy.SmoothestLerp(this._radius, this._holdRadius, LERP_FACTOR);
+          else
+            this._radius = this._holdRadius;
+          base.Position = this._center + angle.ToVector(this._radius);
+          yield return Wait(1);
+        }
+
+        base.ManualControl = false;
+        this.Projectile.specRigidbody.CollideWithTileMap = true;
+        this.ChangeDirection(new Direction((this._center - base.Position).ToAngle().AddRandomSpread(12f)));
+        this.ChangeSpeed(new Speed(100f));
+
+        yield return Wait(1);
+        this._trail = this.Projectile.AddTrail(SubtractorBeam._RedTrailPrefab).gameObject;
+        this._trail.SetGlowiness(100f);
+
+        yield break;
+      }
+
+    }
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(Attack()).Finish();
+    }
+
+    private IEnumerator Attack()
+    {
+      const int CIRCLESIZE    = 17;
+      const float GAP         = 360f / CIRCLESIZE;
+      const int JUMPS         = 5;
+      const int JUMPFRAMES    = 60;
+      const float STARTRADIUS = 10f;
+      const float HOLDRADIUS  = 3f;
+      const int HOLDFRAMES    = 40;
+      const float RPS         = 3.0f;
+
+      PlayerController pc = GameManager.Instance.BestActivePlayer;
+
+      for (int i = 0; (i < JUMPS) && pc; ++i)
+      {
+        Vector2 ppos = pc.CenterPosition;
+        float now    = BraveTime.ScaledTimeSinceStartup;
+        float off    = 360f * UnityEngine.Random.value;
+
+        for (int j = 0; j < CIRCLESIZE; ++j)
+          this.Fire(Offset.OverridePosition(ppos + (off + (GAP * j)).ToVector(STARTRADIUS)),
+            new DanceMonkeyBullet(ppos, HOLDRADIUS, HOLDFRAMES, RPS, now));
+
+        yield return Wait(JUMPFRAMES);
+      }
+
+      yield break;
     }
 
   }
