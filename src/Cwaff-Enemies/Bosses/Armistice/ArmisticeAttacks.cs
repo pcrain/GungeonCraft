@@ -32,7 +32,7 @@ public partial class ArmisticeBoss : AIActor
       }
   }
 
-  private abstract class SecretBulletScript : FluidBulletScript
+  private abstract class ArmisticeBulletScript : FluidBulletScript
   {
     protected AIActor theBoss          {get; private set;}
     protected Rect    roomFullBounds   {get; private set;}
@@ -50,7 +50,7 @@ public partial class ArmisticeBoss : AIActor
   }
 
   // Shoots bullets to the top corners of the screen that violently fly down towards the bottom center after a short delay
-  private class CrossBulletsScript : SecretBulletScript
+  private class CrossBulletsScript : ArmisticeBulletScript
   {
 
     internal class CrossBullet : SecretBullet
@@ -177,7 +177,7 @@ public partial class ArmisticeBoss : AIActor
     }
   }
 
-  private class ClocksTickingScript : SecretBulletScript
+  private class ClocksTickingScript : ArmisticeBulletScript
   {
     private const float _LIFETIME = 6f;
     private const float _GAP = 1.4f;
@@ -331,7 +331,7 @@ public partial class ArmisticeBoss : AIActor
     }
   }
 
-  private class WalledInScript : SecretBulletScript
+  private class WalledInScript : ArmisticeBulletScript
   {
     private const int _STREAMS = 50;
     private const int _WALLSIZE = 25;
@@ -377,6 +377,57 @@ public partial class ArmisticeBoss : AIActor
           new SecretBullet(tint: c, emission: 100f, emitColorPower: 0.5f));
       }
       yield break;
+    }
+
+  }
+
+  private class BoneTunnelScript : ArmisticeBulletScript
+  {
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(Attack()).Finish();
+    }
+
+    private IEnumerator Attack()
+    {
+      const float SPEED = 25f;
+      const int RATE    = 5; // frames between bullets
+      const int TIME    = 60 * 5; // frames the attack lasts
+      const int GAP     = 5; // size of the path we have to navigate
+      const int ROWS    = 50; // number of rows of bullets
+      const int NOGAP   = 3; // number of columns at the end with no gap
+
+      PathRect roomRect = new PathRect(this.roomFullBounds.Inset(1f, 0.25f));
+      Speed sspeed = new Speed(SPEED);
+
+      Vector2 ppos = GameManager.Instance.BestActivePlayer.CenterPosition;
+      bool leftward = (ppos.x < this.roomFullBounds.center.x);
+      Direction dir = new Direction(leftward ? 180f : 0f);
+      PathLine wall = leftward ? roomRect.Right() : roomRect.Left();
+      float wallOff = leftward ? -2.5f : 2.5f;
+
+      int gapPos = Mathf.RoundToInt(ROWS * ((ppos.y - wall.start.y) / (wall.end.y - wall.start.y)));
+
+      for (int i = 0; i < TIME; i += RATE)
+      {
+        bool hasGap = i < (TIME - RATE * NOGAP);
+        for (int j = 0; j <= ROWS; ++j)
+        {
+          if (hasGap && Mathf.Abs(j - gapPos) < GAP)
+            continue;
+          float off = (float)j / ROWS;
+          Vector2 bpos = wall.At(off) + new Vector2(wallOff * UnityEngine.Random.value, 0f);
+          this.Fire(Offset.OverridePosition(bpos), dir, sspeed, new SecretBullet());
+        }
+        if (gapPos <= GAP)
+          ++gapPos;
+        else if (gapPos >= ROWS - GAP)
+          --gapPos;
+        else
+          gapPos += (Lazy.CoinFlip() ? 1 : -1);
+        yield return Wait(RATE);
+      }
     }
 
   }
