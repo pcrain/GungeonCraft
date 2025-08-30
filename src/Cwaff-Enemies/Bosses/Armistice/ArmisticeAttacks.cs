@@ -664,4 +664,157 @@ public partial class ArmisticeBoss : AIActor
     }
 
   }
+
+  private class BoxTrotScript : ArmisticeBulletScript
+  {
+
+    internal class BoxTrotBullet : SecretBullet
+    {
+
+      private bool _shooter = false;
+      private float _offset = 0.0f;
+
+      public BoxTrotBullet() : base()
+      {
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+      }
+
+      public override IEnumerator Top()
+      {
+        this._trail = base.Projectile.AddTrail(SubtractorBeam._RedTrailPrefab).gameObject;
+        this._trail.SetGlowiness(100f);
+        yield break;
+      }
+
+    }
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(Attack()).Finish();
+    }
+
+    private class ShootData
+    {
+      public Vector2 lastPos;
+      public float nextShootTime;
+    }
+
+    private IEnumerator Attack()
+    {
+      const int BULLETS = 60;
+      const int SHOOTERS = 2;
+      const int SPEED = 50;
+      const float LENGTH = 800;
+      const float RPS = 1f / 400f;
+      const float COOLDOWN = 0.5f;
+      const float EPSILON = 0.1f;
+
+      Rect bounds = this.roomFullBounds.Inset(1f, 1.25f, 2f, 1f);
+      Vector2 boundsCenter = bounds.center;
+      float top = bounds.yMin + EPSILON;
+      float bottom = bounds.yMax - EPSILON;
+      float midX = boundsCenter.x;
+      float midY = boundsCenter.y;
+      PathRect path = new PathRect(bounds);
+
+      List<SecretBullet> bullets = new();
+      List<SecretBullet> shooterBullets = new(SHOOTERS);
+      List<int> shooterIndices = new(SHOOTERS);
+      List<ShootData> shootData = new(SHOOTERS);
+
+      for (int i = 0; i < SHOOTERS; ++i)
+        shooterIndices.Add((int)(BULLETS * UnityEngine.Random.value));
+
+      for (int i = 0; i < BULLETS; ++i)
+      {
+        float off = (float)i / BULLETS;
+        Vector2 pos = path.At(off);
+        bool isShooter = shooterIndices.Contains(i);
+        SecretBullet bullet = new SecretBullet(tint: isShooter ? Color.cyan : null);
+        bullet.ManualControl = true;
+        bullets.Add(bullet);
+        if (isShooter)
+        {
+          shooterBullets.Add(bullet);
+          shootData.Add(new ShootData(){lastPos =  pos, nextShootTime = 0f});
+        }
+        this.Fire(Offset.OverridePosition(pos), bullet);
+      }
+
+      for (int i = 0; i < LENGTH; ++i)
+      {
+        float t = RPS * i;
+
+        for (int n = 0; n < BULLETS; ++n)
+        {
+          if (!bullets[n].Projectile)
+            continue;
+          float off = (float)n / BULLETS;
+          bullets[n].Position = path.At((t + off) % 1f);
+        }
+
+        bool oldSide;
+        bool curSide;
+        float now = BraveTime.ScaledTimeSinceStartup;
+        for (int s = 0; s < SHOOTERS; ++s)
+        {
+          SecretBullet shooter = shooterBullets[s];
+          if (!shooter.Projectile)
+            continue;
+
+          Vector2 curPos = shooter.Position;
+          if (shootData[s].nextShootTime > now)
+          {
+            shootData[s].lastPos = curPos;
+            continue;
+          }
+
+          float y = curPos.y;
+          bool horizontal = y < bottom && y > top;
+          foreach (PlayerController player in GameManager.Instance.AllPlayers)
+          {
+            Vector2 ppos = player.CenterPosition;
+            if (horizontal)
+            {
+              oldSide = ppos.y < shootData[s].lastPos.y;
+              curSide = ppos.y < curPos.y;
+            }
+            else
+            {
+              oldSide = ppos.x < shootData[s].lastPos.x;
+              curSide = ppos.x < curPos.x;
+            }
+
+            if (oldSide == curSide)
+              continue;
+
+            float angle;
+            if (horizontal)
+              angle = curPos.x < midX ? 0f : 180f;
+            else
+              angle = curPos.y < midY ? 90f : 270f;
+
+            BoxTrotBullet newBullet = new BoxTrotBullet();
+            base.Fire(Offset.OverridePosition(curPos), new Direction(angle), new Speed(SPEED), newBullet);
+            shootData[s].nextShootTime = now + COOLDOWN;
+          }
+
+          shootData[s].lastPos = curPos;
+        }
+
+        yield return Wait(1);
+      }
+
+      for (int n = 0; n < BULLETS; ++n)
+        if (bullets[n].Projectile)
+          bullets[n].Vanish();
+
+      yield break;
+    }
+
+  }
 }
