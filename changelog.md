@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.28.0 (TBD)
+
+- Fixed some sprite positioning issues during [REDACTED] boss fight
+
 ## 1.27.1 (2025-08-22)
 
 - Fixed (hopefully) null deref / softlock caused by Barter shop trying to process despawned items

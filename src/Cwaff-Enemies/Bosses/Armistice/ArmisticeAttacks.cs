@@ -727,7 +727,12 @@ public partial class ArmisticeBoss : AIActor
       List<ShootData> shootData = new(SHOOTERS);
 
       for (int i = 0; i < SHOOTERS; ++i)
-        shooterIndices.Add((int)(BULLETS * UnityEngine.Random.value));
+      {
+        int index = -1;
+        while (index < 0 || shooterIndices.Contains(index))
+          index = (int)(BULLETS * UnityEngine.Random.value);
+        shooterIndices.Add(index);
+      }
 
       for (int i = 0; i < BULLETS; ++i)
       {
@@ -763,7 +768,7 @@ public partial class ArmisticeBoss : AIActor
         for (int s = 0; s < SHOOTERS; ++s)
         {
           SecretBullet shooter = shooterBullets[s];
-          if (!shooter.Projectile)
+          if (!shooter.Projectile || shooter.Destroyed)
             continue;
 
           Vector2 curPos = shooter.Position;

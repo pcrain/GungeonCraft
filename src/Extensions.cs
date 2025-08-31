@@ -3600,5 +3600,22 @@ public static class Extensions
 
       return ps;
   }
+
+  /// <summary>Draw a debug hitbox for a specrigidbody</summary>
+  public static void DrawDebugHitbox(this SpeculativeRigidbody body, Color? color = null)
+  {
+    const string NAME = "debug hitbox rectangle";
+    if (body.gameObject.transform.Find(NAME) is not Transform box)
+    {
+      box = new GameObject(NAME, typeof(Geometry)).transform;
+      box.parent = body.gameObject.transform;
+    }
+    PixelCollider c = body.PrimaryPixelCollider;
+    box.gameObject.GetComponent<Geometry>().Setup(
+      shape: Geometry.Shape.RECTANGLE,
+      color: color ?? Color.magenta.WithAlpha(0.5f),
+      pos: c.UnitTopLeft,
+      pos2: c.UnitBottomRight);
+  }
 }
 

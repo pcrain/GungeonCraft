@@ -19,7 +19,7 @@ public partial class SansBoss : AIActor
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/sans_idle_1",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{C.MOD_INT_NAME}/Resources/sans_bosscard.png"); // Create our build-a-boss
     bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
-      healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f);                // Set our stats
+      healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f, spriteAnchor: Anchor.LowerCenter);                // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
       bb.AdjustAnimation(name: "idle",         fps:    8f, loop: true);        // Adjust some specific animations as needed
       bb.AdjustAnimation(name: "idle_glance",  fps:    8f, loop: true);
@@ -33,7 +33,7 @@ public partial class SansBoss : AIActor
       bb.AdjustAnimation(name: "teleport_out", fps:   60f, loop: false);
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
       // bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
-    bb.SetDefaultColliders(width: 15, height: 30, xoff: 24, yoff: 2);          // Set our default pixel colliders
+    bb.SetDefaultColliders(width: 15, height: 30, xoff: -7, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<SansIntro>();                                            // Add custom animation to the generic intro doer
     bb.MakeInteractible<SansNPC>(preFight: true, postFight: true) ;            // Add some pre-fight and post-fight dialogue
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
@@ -151,12 +151,8 @@ public partial class SansBoss : AIActor
       if (!base.sprite || !base.specRigidbody || GameManager.Instance.BestActivePlayer is not PlayerController pc)
         return;
       base.sprite.FlipX  = overrideFlip ?? (pc.CenterPosition.x < base.specRigidbody.UnitBottomCenter.x);
-      Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
-      Vector2 offset     = new Vector2(spriteSize.x / (base.sprite.FlipX ? 2f : -2f), 0f);
-      base.sprite.transform.localPosition = (base.specRigidbody.UnitBottomCenter.Quantize(C.PIXEL_SIZE) + offset).ToVector3ZisY(0f);
+      base.sprite.transform.localPosition = (base.specRigidbody.UnitBottomCenter.Quantize(C.PIXEL_SIZE)).ToVector3ZisY(0f);
       base.sprite.UpdateZDepth();
-      if (aura != null)
-        aura.transform.localPosition = new Vector3(-offset.x ,spriteSize.y / 2,0);
     }
 
     public void FinishedIntro()

@@ -11,6 +11,7 @@ public class Geometry : MonoBehaviour
         RING,
         DASHEDLINE,
         LINE,
+        RECTANGLE,
     }
 
     public Color color = default;
@@ -104,6 +105,12 @@ public class Geometry : MonoBehaviour
                 this._mesh.uv = new Vector2[this._vertices.Length];
                 this._mesh.SetIndices(segment, MeshTopology.Lines, 0);
                 break;
+            case Shape.RECTANGLE:
+                this._vertices = new Vector3[4];
+                this._mesh.vertices = this._vertices;
+                this._mesh.uv = new Vector2[this._vertices.Length];
+                this._mesh.SetIndices(new int[6]{0, 1, 2, 1, 2, 3}, MeshTopology.Triangles, 0);
+                break;
             default:
                 break;
         }
@@ -154,6 +161,12 @@ public class Geometry : MonoBehaviour
             case Shape.LINE:
                 this._vertices[0] = basePos;
                 this._vertices[1] = basePos + this.angle.ToVector3(this.radius);
+                break;
+            case Shape.RECTANGLE:
+                this._vertices[0] = basePos;
+                this._vertices[3] = basePos + this.angle.ToVector3(this.radius);
+                this._vertices[1] = new Vector3(this._vertices[3].x, basePos.y);
+                this._vertices[2] = new Vector3(basePos.x, this._vertices[3].y);
                 break;
             default:
                 break;

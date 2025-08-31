@@ -217,6 +217,7 @@ public class BuildABoss
   internal BossController bossController { get; private set; } = null;
   private  GameObject     defaultGunAttachPoint  = null;
   private  BraveBehaviour enemyBehavior          = null;
+  internal Anchor         spriteAnchor           = default;
 
   // Private constructor
   private BuildABoss() {}
@@ -258,7 +259,7 @@ public class BuildABoss
 
   public void SetStats(float? health = null, float? weight = null, float? speed = null, float? collisionDamage = null,
     float? collisionKnockbackStrength = null, float? hitReactChance = null, bool? healthIsNumberOfHits = null,
-    float? invulnerabilityPeriod = null, bool? shareCooldowns = null)
+    float? invulnerabilityPeriod = null, bool? shareCooldowns = null, Anchor? spriteAnchor = null)
   {
     if (health.HasValue)
     {
@@ -285,6 +286,7 @@ public class BuildABoss
     }
     if (shareCooldowns.HasValue)
       this.enemyBehavior.behaviorSpeculator.AttackBehaviorGroup.ShareCooldowns = shareCooldowns.Value;
+    this.spriteAnchor = spriteAnchor ?? Anchor.LowerLeft;
   }
 
   /// <summary>Adds custom music for a custom boss.</summary>
@@ -663,6 +665,9 @@ public class BuildABoss
   public void InitSpritesFromResourcePath(string spritePath)
   {
     this.enemyBehavior.InitSpritesFromResourcePath(spritePath);
+    if (this.spriteAnchor is Anchor anchor)
+      foreach (tk2dSpriteDefinition def in this.enemyBehavior.GetComponent<tk2dSpriteCollectionData>().spriteDefinitions)
+        def.BetterConstructOffsetsFromAnchor(anchor);
   }
 
   public void AdjustAnimation(string name, float? fps = null, bool? loop = null)
@@ -1041,9 +1046,10 @@ public static class BH
   public static PrototypeDungeonRoom CreateStandaloneBossRoom(this GameObject self, BuildABoss bb, int width, int height, bool exitOnBottom)
   {
       PrototypeDungeonRoom p = GetGenericBossRoom(width: width, height: height, exitOnBottom: exitOnBottom);
-        Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
-        tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
-      AddObjectToRoom(p, roomCenter - anySprite.WorldTopLeft, EnemyBehaviourGuid: bb.guid);
+      Vector2 roomCenter = new Vector2(0.5f*p.Width, 0.5f*p.Height);
+      tk2dBaseSprite anySprite = self.GetComponent<tk2dSpriteAnimator>().GetAnySprite();
+      Vector2 spritePos = roomCenter - 2f * anySprite.GetRelativePositionFromAnchor(bb.spriteAnchor);
+      AddObjectToRoom(p, spritePos.Quantize(C.PIXEL_SIZE), EnemyBehaviourGuid: bb.guid);
       AddObjectToRoom(p, roomCenter, NonEnemyBehaviour: bb.bossController);
       return p;
   }

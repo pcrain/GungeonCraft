@@ -19,9 +19,9 @@ public partial class ArmisticeBoss : AIActor
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/armistice_idle_001",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{C.MOD_INT_NAME}/Resources/armistice_bosscard.png"); // Create our build-a-boss
     bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
-      healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f, shareCooldowns: false); // Set our stats
+      healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f, shareCooldowns: false, spriteAnchor: Anchor.LowerCenter); // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
-      bb.AdjustAnimation(name: "idle",         fps:    8f, loop: true);        // Adjust some specific animations as needed
+      bb.AdjustAnimation(name: "idle",         fps:    16f, loop: true);        // Adjust some specific animations as needed
       // bb.AdjustAnimation(name: "idle_glance",  fps:    8f, loop: true);
       // bb.AdjustAnimation(name: "idle_empty",   fps:    8f, loop: true);
       // bb.AdjustAnimation(name: "shrug",        fps:    8f, loop: true);
@@ -33,7 +33,7 @@ public partial class ArmisticeBoss : AIActor
       // bb.AdjustAnimation(name: "teleport_out", fps:   60f, loop: false);
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
       // bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
-    bb.SetDefaultColliders(width: 15, height: 30, xoff: 24, yoff: 2);          // Set our default pixel colliders
+    bb.SetDefaultColliders(width: 30, height: 40, xoff: -15, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<ArmisticeIntro>();                                       // Add custom animation to the generic intro doer
     // bb.MakeInteractible<ArmisticeNPC>(preFight: true, postFight: true) ;       // Add some pre-fight and post-fight dialogue
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
@@ -112,14 +112,13 @@ public partial class ArmisticeBoss : AIActor
       base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
       base.aiActor.healthHaver.OnPreDeath += OnPreDeath;
 
-      // base.aiActor.sprite.SetGlowiness(30f, glowColor: Color.cyan);
-      tk2dBaseSprite sprite = base.aiActor.sprite;
-      sprite.usesOverrideMaterial = true;
-      Material mat = sprite.renderer.material;
-      mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-      mat.SetFloat(CwaffVFX._EmissivePowerId, 100f);
-      mat.SetColor(CwaffVFX._EmissiveColorId, new Color(0f, 227f / 255f, 1f));
-      mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 15.0f);
+      // tk2dBaseSprite sprite = base.aiActor.sprite;
+      // sprite.usesOverrideMaterial = true;
+      // Material mat = sprite.renderer.material;
+      // mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+      // mat.SetFloat(CwaffVFX._EmissivePowerId, 100f);
+      // mat.SetColor(CwaffVFX._EmissiveColorId, new Color(0f, 227f / 255f, 1f));
+      // mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 15.0f);
     }
 
     private void OnPreDeath(Vector2 _)
@@ -136,16 +135,22 @@ public partial class ArmisticeBoss : AIActor
         overrideChestQuality: ItemQuality.S);
     }
 
+    private Geometry _debugHitbox = null;
+
     private void LateUpdate() // movement is buggy if we use the regular Update() method
     {
       if (BraveTime.DeltaTime == 0)
         return; // don't do anything if we're paused
 
-      UpdateSpriteIfNecessary();
+      base.specRigidbody.DrawDebugHitbox();
+      DebugDraw.DrawDebugCircle(base.gameObject, base.transform.position, 0.5f, Color.green.WithAlpha(0.5f));
+      DebugDraw.DrawDebugCircle(GameManager.Instance.gameObject, base.transform.position.GetAbsoluteRoom().area.Center, 0.5f, Color.cyan.WithAlpha(0.5f));
 
-      float yOff = Mathf.CeilToInt(4f*Mathf.Sin(4f*BraveTime.ScaledTimeSinceStartup)) / C.PIXELS_PER_TILE;
-      base.sprite.transform.localPosition += Vector3.zero.WithY(yOff);
-      base.sprite.transform.position = base.sprite.transform.position.Quantize(C.PIXEL_SIZE);
+      // UpdateSpriteIfNecessary();
+
+      // float yOff = Mathf.CeilToInt(4f*Mathf.Sin(4f*BraveTime.ScaledTimeSinceStartup)) / C.PIXELS_PER_TILE;
+      // base.sprite.transform.localPosition += Vector3.zero.WithY(yOff);
+      // base.sprite.transform.position = base.sprite.transform.position.Quantize(C.PIXEL_SIZE);
       // base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around
       // if (Lazy.CoinFlip())
       //   SpawnDust(base.specRigidbody.UnitCenter + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f))); // spawn dust particles
@@ -160,18 +165,18 @@ public partial class ArmisticeBoss : AIActor
       Vector2 offset     = new Vector2(spriteSize.x / (base.sprite.FlipX ? 2f : -2f), 0f);
       base.sprite.transform.localPosition = (base.specRigidbody.UnitBottomCenter.Quantize(C.PIXEL_SIZE) + offset).ToVector3ZisY(0f);
       base.sprite.UpdateZDepth();
-      if (aura != null)
-        aura.transform.localPosition = new Vector3(-offset.x, spriteSize.y / 2, 0);
+      // if (aura != null)
+      //   aura.transform.localPosition = new Vector3(-offset.x, spriteSize.y / 2, 0);
     }
 
     public void FinishedIntro()
     {
       if (aura != null)
         return; // fix vanilla bug where SpecificIntroDoer.EndIntro() is called twice
-      aura = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), base.aiActor.CenterPosition.ToVector3ZisY(), Quaternion.identity, base.aiActor.sprite.transform)).GetComponent<HeatIndicatorController>();
-        aura.CurrentColor  = Color.white;
-        aura.IsFire        = true;
-        aura.CurrentRadius = 2f; // activate aura (from basegame AuraOnReloadModifier)
+      // aura = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), base.aiActor.CenterPosition.ToVector3ZisY(), Quaternion.identity, base.aiActor.sprite.transform)).GetComponent<HeatIndicatorController>();
+      //   aura.CurrentColor  = Color.white;
+      //   aura.IsFire        = true;
+      //   aura.CurrentRadius = 2f; // activate aura (from basegame AuraOnReloadModifier)
     }
   }
 
