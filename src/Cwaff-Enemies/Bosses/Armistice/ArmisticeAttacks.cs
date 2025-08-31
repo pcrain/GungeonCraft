@@ -25,6 +25,13 @@ public partial class ArmisticeBoss : AIActor
         this._emitColorPower = emitColorPower;
       }
 
+      public void AddTrail(CwaffTrailController trailPrefab, float glow = -1f)
+      {
+        this._trail = this.Projectile.AddTrail(trailPrefab).gameObject;
+        if (glow >= 0f)
+          this._trail.SetGlowiness(glow);
+      }
+
       protected void OnBaseDestruction(Projectile projectile)
       {
         if (this._trail)
@@ -817,6 +824,87 @@ public partial class ArmisticeBoss : AIActor
       for (int n = 0; n < BULLETS; ++n)
         if (bullets[n].Projectile)
           bullets[n].Vanish();
+
+      yield break;
+    }
+
+  }
+
+  private class LaserBarrageScript : ArmisticeBulletScript
+  {
+
+    internal class LaserBarrageBullet : SecretBullet
+    {
+
+      public LaserBarrageBullet() : base()
+      {
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+      }
+
+      public override IEnumerator Top()
+      {
+        Vanish();
+        yield break;
+      }
+
+    }
+
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      return Run(Attack()).Finish();
+    }
+
+    private IEnumerator Attack()
+    {
+      const int ITERS        = 24;
+      const float MIN_SPEED  = 10;
+      const float MAX_SPEED  = 25;
+      const float MAX_SPREAD = 70;
+      const int BARRAGE_SIZE = 23;
+      const int LASERSPEED   = 50;
+      const float DELAY_MAX  = 1.0f;
+      const float DELAY_MIN  = 0.15f;
+
+      Rect bounds = this.roomFullBounds.Inset(1f, 1.25f, 2f, 1f);
+      PlayerController pc = GameManager.Instance.BestActivePlayer;
+      bool playerOnLeft = pc.CenterPosition.x < bounds.center.x;
+      Vector2 shootPoint = new Vector2(playerOnLeft ? bounds.xMax : bounds.xMin, bounds.center.y);
+      Offset shootOff = Offset.OverridePosition(shootPoint);
+      float shootAngle = playerOnLeft ? 180f : 0f;
+
+      float nextShot = 0f;
+      float now = BraveTime.ScaledTimeSinceStartup;
+      for (int i = 0; i < ITERS; ++i)
+      {
+        float progress = (float)i / ITERS;
+        float delay = 0.5f * Mathf.Lerp(DELAY_MAX, DELAY_MIN, progress);
+
+        if (i % 2 == 0)
+        {
+          Speed curSpeed = new Speed(Mathf.Lerp(MIN_SPEED, MAX_SPEED, progress));
+          for (int n = 0; n < BARRAGE_SIZE; ++n)
+            base.Fire(shootOff, new Direction(shootAngle.AddRandomSpread(MAX_SPREAD)), curSpeed, new SecretBullet());
+        }
+        else
+        {
+          float angle = (pc.CenterPosition - shootPoint).ToAngle();
+          SecretBullet laser = new SecretBullet();
+          base.Fire(shootOff, new Direction(angle), new Speed(LASERSPEED), laser);
+          laser.AddTrail(SubtractorBeam._RedTrailPrefab, glow: 100f);
+          laser.Projectile.gameObject.PlayUnique("subtractor_beam_fire_sound");
+        }
+
+        nextShot = now + delay;
+        while (now < nextShot)
+        {
+          yield return Wait(1);
+          now = BraveTime.ScaledTimeSinceStartup;
+        }
+      }
 
       yield break;
     }

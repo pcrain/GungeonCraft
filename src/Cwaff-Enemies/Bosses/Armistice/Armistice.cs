@@ -4,7 +4,7 @@ public partial class ArmisticeBoss : AIActor
 {
   public  const  string BOSS_GUID              = "Armistice";
   private const  string BOSS_NAME              = "Armistice";
-  private const  string SUBTITLE               = "";
+  private const  string SUBTITLE               = "Trapped Gungeoneer";
   private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/Bosses/armistice";
 
   private static GameObject _NapalmReticle      = null;
@@ -47,7 +47,8 @@ public partial class ArmisticeBoss : AIActor
     // bb.CreateBulletAttack<BoneTunnelScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
     // bb.CreateBulletAttack<DanceMonkeyScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
     // bb.CreateBulletAttack<PendulumScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<BoxTrotScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    // bb.CreateBulletAttack<BoxTrotScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<LaserBarrageScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
     InitPrefabs();                                                             // Do miscellaneous prefab loading
@@ -142,9 +143,11 @@ public partial class ArmisticeBoss : AIActor
       if (BraveTime.DeltaTime == 0)
         return; // don't do anything if we're paused
 
-      base.specRigidbody.DrawDebugHitbox();
-      DebugDraw.DrawDebugCircle(base.gameObject, base.transform.position, 0.5f, Color.green.WithAlpha(0.5f));
-      DebugDraw.DrawDebugCircle(GameManager.Instance.gameObject, base.transform.position.GetAbsoluteRoom().area.Center, 0.5f, Color.cyan.WithAlpha(0.5f));
+      #if DEBUG
+      // base.specRigidbody.DrawDebugHitbox();
+      // DebugDraw.DrawDebugCircle(base.gameObject, base.transform.position, 0.5f, Color.green.WithAlpha(0.5f));
+      // DebugDraw.DrawDebugCircle(GameManager.Instance.gameObject, base.transform.position.GetAbsoluteRoom().area.Center, 0.5f, Color.cyan.WithAlpha(0.5f));
+      #endif
 
       // UpdateSpriteIfNecessary();
 
