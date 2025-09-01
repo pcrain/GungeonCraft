@@ -9,21 +9,26 @@ public partial class ArmisticeBoss : AIActor
 
   private class ArmisticeMoveAndShootBehavior : MoveAndShootBehavior
   {
-
-    private const float _RELOCATE_TIME = 0.75f;
+    private const float _MAX_RELOCATE_TIME = 0.75f;
+    private const float _MIN_RELOCATE_SPEED = 40f;
     private const float _AFTERIMAGE_RATE = 0.05f;
 
     private Rect _roomBounds;
     private Vector2 _startPos;
     private Vector2 _targetPos;
     private Vector2 _targetDelta;
+    private float _totalTravelTime;
     private float _travelTimer;
     private Transform _transform;
     private SpeculativeRigidbody _body;
     private float _nextAfterimage;
+    private PlayerController _targetPlayer;
 
     private void DetermineTarget()
     {
+      bool playerOnLeft = this._targetPlayer.CenterPosition.x < this._roomBounds.center.x;
+      bool playerOnBottom = this._targetPlayer.CenterPosition.y < this._roomBounds.center.y;
+
       string scriptType = base.BulletScript.scriptTypeName.Split('+')[1].Split(',')[0];
       // System.Console.WriteLine($"reloacting for bullet script {scriptType}");
       switch (scriptType)
@@ -31,6 +36,7 @@ public partial class ArmisticeBoss : AIActor
         case "CrossBulletsScript":
           break;
         case "ClocksTickingScript":
+          this._targetPos = new Vector2(this._roomBounds.center.x, playerOnBottom ? this._roomBounds.yMax : this._roomBounds.yMin);
           break;
         case "WalledInScript":
           break;
@@ -43,6 +49,7 @@ public partial class ArmisticeBoss : AIActor
         case "BoxTrotScript":
           break;
         case "LaserBarrageScript":
+          this._targetPos = new Vector2(playerOnLeft ? this._roomBounds.xMax : this._roomBounds.xMin, this._roomBounds.center.y);
           break;
       }
     }
@@ -50,40 +57,46 @@ public partial class ArmisticeBoss : AIActor
     /// <summary>Performs setup for calling Relocate() in future frames.</summary>
     protected override void PrepareToRelocate()
     {
-      DetermineTarget();
-
       this._transform = base.m_gameObject.transform;
       this._body = m_gameObject.GetComponent<SpeculativeRigidbody>();
       this._startPos = this._transform.position;
       this._roomBounds = this._startPos.GetAbsoluteRoom().GetBoundingRect().Inset(2f);
+      this._targetPlayer = GameManager.Instance.GetRandomActivePlayer();
       this._targetPos = new PathRect(this._roomBounds).At(UnityEngine.Random.value, UnityEngine.Random.value);
+
+      DetermineTarget();
+
       this._targetDelta = this._targetPos - this._startPos;
+      this._totalTravelTime = Mathf.Min(this._targetDelta.magnitude / _MIN_RELOCATE_SPEED, _MAX_RELOCATE_TIME);
       this._travelTimer = 0f;
-      this.m_aiAnimator.PlayUntilCancelled("run", true);
-      this.m_aiActor.sprite.FlipX = this._targetPos.x < this._startPos.x;
+      if (this._totalTravelTime >= BraveTime.DeltaTime) // don't update unless we actually have somewhere to move
+      {
+        this.m_aiAnimator.PlayUntilCancelled("run", true);
+        this.m_aiActor.sprite.FlipX = this._targetPos.x < this._startPos.x;
+      }
     }
 
     /// <summary>Returns true if we're in position to attack, false otherwise.</summary>
     protected override bool Relocate()
     {
       this._travelTimer += BraveTime.DeltaTime;
-      if (this._travelTimer >= _RELOCATE_TIME)
+      if (this._travelTimer >= this._totalTravelTime)
       {
-        this.m_aiActor.sprite.FlipX = false;
+        this.m_aiActor.sprite.FlipX = this._transform.position.x > this._roomBounds.center.x;
         this.m_aiAnimator.PlayUntilCancelled("idle", true);
         this._transform.position = this._targetPos;
         this._body.Reinitialize();
         return true;
       }
 
-      float t = this._travelTimer / _RELOCATE_TIME;
+      float t = this._travelTimer / this._totalTravelTime;
       float now = BraveTime.ScaledTimeSinceStartup;
       if (now >= this._nextAfterimage)
       {
         this.m_aiActor.sprite.SpriteAfterImage();
         this._nextAfterimage = now + _AFTERIMAGE_RATE;
       }
-      this._transform.position = this._startPos + Ease.OutCubic(t) * this._targetDelta;
+      this._transform.position = this._startPos + t * this._targetDelta;
       this._body.Reinitialize();
 
       return false;
@@ -915,35 +928,13 @@ public partial class ArmisticeBoss : AIActor
 
   private class LaserBarrageScript : ArmisticeBulletScript
   {
-
-    internal class LaserBarrageBullet : SecretBullet
-    {
-
-      public LaserBarrageBullet() : base()
-      {
-      }
-
-      public override void Initialize()
-      {
-        base.Initialize();
-      }
-
-      public override IEnumerator Top()
-      {
-        Vanish();
-        yield break;
-      }
-
-    }
-
-    protected override List<FluidBulletInfo> BuildChain()
-    {
-      return Run(Attack()).Finish();
-    }
+    protected override List<FluidBulletInfo> BuildChain() => Run(Attack()).Finish();
 
     private IEnumerator Attack()
     {
-      const int ITERS        = 24;
+      const int RAMP_ITERS   = 24;
+      const int EXTRA_ITERS  = 10;
+      const int TOTAL_ITERS  = RAMP_ITERS + EXTRA_ITERS;
       const float MIN_SPEED  = 10;
       const float MAX_SPEED  = 25;
       const float MAX_SPREAD = 70;
@@ -952,18 +943,19 @@ public partial class ArmisticeBoss : AIActor
       const float DELAY_MAX  = 1.0f;
       const float DELAY_MIN  = 0.15f;
 
-      Rect bounds = this.roomFullBounds.Inset(1f, 1.25f, 2f, 1f);
-      PlayerController pc = GameManager.Instance.BestActivePlayer;
-      bool playerOnLeft = pc.CenterPosition.x < bounds.center.x;
-      Vector2 shootPoint = new Vector2(playerOnLeft ? bounds.xMax : bounds.xMin, bounds.center.y);
+      PlayerController pc = GameManager.Instance.GetRandomActivePlayer();
+      AIActor actor = base.BulletBank.aiActor;
+      Transform t = actor.gameObject.transform;
+      bool facingLeft = t.position.x > this.roomFullBounds.center.x;
+      Vector2 shootPoint = t.position + C.PIXEL_SIZE * new Vector3(facingLeft ? -36f : 36f, 23f, 0f);
       Offset shootOff = Offset.OverridePosition(shootPoint);
-      float shootAngle = playerOnLeft ? 180f : 0f;
+      float shootAngle = facingLeft ? 180f : 0f;
 
       float nextShot = 0f;
       float now = BraveTime.ScaledTimeSinceStartup;
-      for (int i = 0; i < ITERS; ++i)
+      for (int i = 0; i < TOTAL_ITERS; ++i)
       {
-        float progress = (float)i / ITERS;
+        float progress = Mathf.Min((float)i / RAMP_ITERS, 1f);
         float delay = 0.5f * Mathf.Lerp(DELAY_MAX, DELAY_MIN, progress);
 
         if (i % 2 == 0)
@@ -971,14 +963,19 @@ public partial class ArmisticeBoss : AIActor
           Speed curSpeed = new Speed(Mathf.Lerp(MIN_SPEED, MAX_SPEED, progress));
           for (int n = 0; n < BARRAGE_SIZE; ++n)
             base.Fire(shootOff, new Direction(shootAngle.AddRandomSpread(MAX_SPREAD)), curSpeed, new SecretBullet());
+          actor.gameObject.PlayUnique("armistice_gun_sound");
+          CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: shootAngle.EulerZ(), emissivePower: 10f,
+            emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
         }
         else
         {
-          float angle = (pc.CenterPosition - shootPoint).ToAngle();
-          SecretBullet laser = new SecretBullet();
-          base.Fire(shootOff, new Direction(angle), new Speed(LASERSPEED), laser);
-          laser.AddTrail(SubtractorBeam._RedTrailPrefab, glow: 100f);
-          laser.Projectile.gameObject.PlayUnique("subtractor_beam_fire_sound");
+          float launchAngle = (pc.CenterPosition - shootPoint).ToAngle();
+          SecretBullet laser = new SecretBullet(tint: Color.cyan);
+          base.Fire(shootOff, new Direction(launchAngle), new Speed(LASERSPEED), laser);
+          laser.AddTrail(_LaserTrailPrefab, glow: 100f);
+          actor.gameObject.PlayUnique("armistice_electro_sound");
+          CwaffVFX.Spawn(prefab: _MuzzleVFXElectro, position: shootPoint, rotation: launchAngle.EulerZ(), emissivePower: 10f,
+            emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
         }
 
         nextShot = now + delay;
@@ -993,70 +990,4 @@ public partial class ArmisticeBoss : AIActor
     }
 
   }
-
-  // private class RelocateScript : BasicAttackBehavior
-  // {
-  //   private const float _RELOCATE_TIME = 0.75f;
-  //   private const float _AFTERIMAGE_RATE = 0.05f;
-
-  //   private Rect _roomBounds;
-  //   private Vector2 _startPos;
-  //   private Vector2 _targetPos;
-  //   private Vector2 _targetDelta;
-  //   private float _travelTimer;
-  //   private Transform _transform;
-  //   private SpeculativeRigidbody _body;
-  //   private float _nextAfterimage;
-
-  //   public override void Start()
-  //   {
-  //     base.Start();
-  //     this.m_updateEveryFrame = true;
-  //     this._transform = base.m_gameObject.transform;
-  //     this._body = m_gameObject.GetComponent<SpeculativeRigidbody>();
-  //   }
-
-  //   public override BehaviorResult Update()
-  //   {
-  //     base.Update();
-
-  //     this._startPos = this._transform.position;
-  //     this._roomBounds = this._startPos.GetAbsoluteRoom().GetBoundingRect().Inset(2f);
-  //     this._targetPos = new PathRect(this._roomBounds).At(UnityEngine.Random.value, UnityEngine.Random.value);
-  //     this._targetDelta = this._targetPos - this._startPos;
-  //     this._travelTimer = 0f;
-  //     this.m_aiAnimator.PlayUntilCancelled("run", true);
-  //     this.m_aiActor.sprite.FlipX = this._targetPos.x < this._startPos.x;
-  //     // base.m_gameObject.Play("teledasher");
-
-  //     return BehaviorResult.RunContinuous;
-  //   }
-
-  //   public override ContinuousBehaviorResult ContinuousUpdate()
-  //   {
-  //     base.ContinuousUpdate();
-  //     this._travelTimer += BraveTime.DeltaTime;
-  //     if (this._travelTimer >= _RELOCATE_TIME)
-  //     {
-  //       this.m_aiActor.sprite.FlipX = false;
-  //       this.m_aiAnimator.PlayUntilCancelled("idle", true);
-  //       this._transform.position = this._targetPos;
-  //       this._body.Reinitialize();
-  //       UpdateCooldowns();
-  //       return ContinuousBehaviorResult.Finished;
-  //     }
-
-  //     float t = this._travelTimer / _RELOCATE_TIME;
-  //     float now = BraveTime.ScaledTimeSinceStartup;
-  //     if (now >= this._nextAfterimage)
-  //     {
-  //       this.m_aiActor.sprite.SpriteAfterImage();
-  //       this._nextAfterimage = now + _AFTERIMAGE_RATE;
-  //     }
-  //     this._transform.position = this._startPos + Ease.OutCubic(t) * this._targetDelta;
-  //     this._body.Reinitialize();
-
-  //     return ContinuousBehaviorResult.Continue;
-  //   }
-  // }
 }

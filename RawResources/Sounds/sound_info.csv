@@ -346,3 +346,9 @@ gradius_round_laser_impact_sound,-5.0,1,sound,2
 gradius_ship_spawn_sound,-5.0,1,sound,1
 gradius_ship_destroy_sound,-1.5,1,sound,1
 collapse,11.0,1,music,0
+armistice_barrage_sound,-5.0,1,sound,1
+armistice_electro_sound,-5.0,1,sound,1
+armistice_gun_light_sound,-5.0,1,sound,1
+armistice_gun_sound,-5.0,1,sound,1
+armistice_laser_sound,-5.0,1,sound,1
+armistice_sniper_sound,-5.0,1,sound,1

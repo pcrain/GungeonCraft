@@ -54,8 +54,27 @@ public class MoveAndShootBehavior : ShootBehavior
       return base.ContinuousUpdate();
     if (m_behaviorSpeculator.TargetRigidbody)
       m_cachedTargetCenter = m_behaviorSpeculator.TargetRigidbody.GetUnitCenter(ColliderType.HitBox);
-    if (Relocate())
+    if (!Relocate())
+      return ContinuousBehaviorResult.Continue;
+
+    if (!string.IsNullOrEmpty(ChargeAnimation))
+    {
+      m_aiAnimator.PlayUntilFinished(ChargeAnimation, true);
+      state = State.WaitingForCharge;
+    }
+    else if (!string.IsNullOrEmpty(TellAnimation))
+    {
+      if (!string.IsNullOrEmpty(TellAnimation))
+        m_aiAnimator.PlayUntilCancelled(TellAnimation, true);
+      else
+        m_aiAnimator.PlayUntilFinished(TellAnimation, true);
+      state = State.WaitingForTell;
+      if (HideGun && (bool)m_aiShooter)
+        m_aiShooter.ToggleGunAndHandRenderers(false, "ShootBulletScript");
+    }
+    else
       Fire();
+
     return ContinuousBehaviorResult.Continue;
   }
 

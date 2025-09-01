@@ -10,6 +10,10 @@ public partial class ArmisticeBoss : AIActor
   private static GameObject _NapalmReticle      = null;
   private static AIBulletBank.Entry _BoneBullet = null;
 
+  internal static GameObject _MuzzleVFXBullet = null;
+  internal static GameObject _MuzzleVFXElectro = null;
+  internal static CwaffTrailController _LaserTrailPrefab;
+
   private const  int _SANS_HP = 60;
 
   public static PrototypeDungeonRoom ArmisticeBossRoom = null;
@@ -42,14 +46,14 @@ public partial class ArmisticeBoss : AIActor
     // bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
     // bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
     //   goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 4.26f, attackCooldown: 0.15f, probability: 3f);
-    bb.CreateBulletAttack<CrossBulletsScript, ArmisticeMoveAndShootBehavior>    (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<WalledInScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<DanceMonkeyScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<PendulumScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    // bb.CreateBulletAttack<CrossBulletsScript, ArmisticeMoveAndShootBehavior>  (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    // bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior> (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    // bb.CreateBulletAttack<WalledInScript, ArmisticeMoveAndShootBehavior>      (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    // bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>    (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    // bb.CreateBulletAttack<DanceMonkeyScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    // bb.CreateBulletAttack<PendulumScript, ArmisticeMoveAndShootBehavior>      (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    // bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
     // bb.CreateBasicAttack<RelocateScript>   (cooldown: 2.0f, attackCooldown: 2.0f);
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
@@ -71,6 +75,10 @@ public partial class ArmisticeBoss : AIActor
       // MuzzleFlashEffects = null,
     };
     _BoneBullet.MuzzleFlashEffects.type = VFXPoolType.None;
+
+    _MuzzleVFXBullet = VFX.Create("muzzle_armistice_bullet", fps: 60, loops: false, anchor: Anchor.MiddleLeft);
+    _MuzzleVFXElectro = VFX.Create("muzzle_armistice_electro", fps: 60, loops: false, anchor: Anchor.MiddleLeft);
+    _LaserTrailPrefab = VFX.CreateSpriteTrailObject("armistice_laser_trail", fps: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
   }
 
   private static void SpawnDust(Vector2 where)
@@ -107,8 +115,6 @@ public partial class ArmisticeBoss : AIActor
 
   private class BossBehavior : BraveBehaviour
   {
-    private HeatIndicatorController aura = null;
-
     private void Start()
     {
       this.aiActor.bulletBank.Bullets.Add(_BoneBullet);
@@ -126,11 +132,7 @@ public partial class ArmisticeBoss : AIActor
 
     private void OnPreDeath(Vector2 _)
     {
-      UpdateSpriteIfNecessary();
       GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
-      if (aura && aura.gameObject)
-        UnityEngine.Object.Destroy(aura.gameObject);
-      aura = null;
 
       Lazy.SpawnChestWithSpecificItem(
         pickup: Lazy.Pickup<GasterBlaster>(),
@@ -146,42 +148,14 @@ public partial class ArmisticeBoss : AIActor
         return; // don't do anything if we're paused
 
       #if DEBUG
-      base.specRigidbody.DrawDebugHitbox();
-      DebugDraw.DrawDebugCircle(base.gameObject, base.transform.position, 0.5f, Color.green.WithAlpha(0.5f));
-      DebugDraw.DrawDebugCircle(GameManager.Instance.gameObject, base.transform.position.GetAbsoluteRoom().area.Center, 0.5f, Color.cyan.WithAlpha(0.5f));
+      // base.specRigidbody.DrawDebugHitbox();
+      // DebugDraw.DrawDebugCircle(base.gameObject, base.transform.position, 0.5f, Color.green.WithAlpha(0.5f));
+      // DebugDraw.DrawDebugCircle(GameManager.Instance.gameObject, base.transform.position.GetAbsoluteRoom().area.Center, 0.5f, Color.cyan.WithAlpha(0.5f));
       #endif
 
-      // UpdateSpriteIfNecessary();
-
-      // float yOff = Mathf.CeilToInt(4f*Mathf.Sin(4f*BraveTime.ScaledTimeSinceStartup)) / C.PIXELS_PER_TILE;
-      // base.sprite.transform.localPosition += Vector3.zero.WithY(yOff);
-      // base.sprite.transform.position = base.sprite.transform.position.Quantize(C.PIXEL_SIZE);
       // base.aiActor.PathfindToPosition(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter); // drift around
       // if (Lazy.CoinFlip())
       //   SpawnDust(base.specRigidbody.UnitCenter + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f))); // spawn dust particles
-    }
-
-    private void UpdateSpriteIfNecessary()
-    {
-      if (!base.sprite || !base.specRigidbody || GameManager.Instance.BestActivePlayer is not PlayerController pc)
-        return;
-      // base.sprite.FlipX  = overrideFlip ?? (pc.CenterPosition.x < base.specRigidbody.UnitBottomCenter.x);
-      Vector3 spriteSize = base.sprite.GetUntrimmedBounds().size;
-      Vector2 offset     = new Vector2(spriteSize.x / (base.sprite.FlipX ? 2f : -2f), 0f);
-      base.sprite.transform.localPosition = (base.specRigidbody.UnitBottomCenter.Quantize(C.PIXEL_SIZE) + offset).ToVector3ZisY(0f);
-      base.sprite.UpdateZDepth();
-      // if (aura != null)
-      //   aura.transform.localPosition = new Vector3(-offset.x, spriteSize.y / 2, 0);
-    }
-
-    public void FinishedIntro()
-    {
-      if (aura != null)
-        return; // fix vanilla bug where SpecificIntroDoer.EndIntro() is called twice
-      // aura = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), base.aiActor.CenterPosition.ToVector3ZisY(), Quaternion.identity, base.aiActor.sprite.transform)).GetComponent<HeatIndicatorController>();
-      //   aura.CurrentColor  = Color.white;
-      //   aura.IsFire        = true;
-      //   aura.CurrentRadius = 2f; // activate aura (from basegame AuraOnReloadModifier)
     }
   }
 
@@ -211,7 +185,7 @@ public partial class ArmisticeBoss : AIActor
       // mainCameraController.AddFocusPoint(head.gameObject);
     }
 
-    public override void EndIntro()
-      { base.aiActor.GetComponent<BossBehavior>().FinishedIntro(); }
+    // public override void EndIntro()
+    //   { base.aiActor.GetComponent<BossBehavior>().FinishedIntro(); }
   }
 }
