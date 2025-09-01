@@ -315,7 +315,6 @@ public class BuildABoss
   /// <param name="minRange">Minimum range</param>
   /// <param name="range">Range</param>
   /// <param name="minWallDist">Minimum distance from a wall</param>
-
   /// <param name="shootPoint">Object to use for the relative transform of where the attack is fired from.</param>
   /// <param name="fireAnim">Named animation used when the attack is in progress.</param>
   /// <param name="tellAnim">Named animation used when the attack is being forecasted.</param>
@@ -343,6 +342,65 @@ public class BuildABoss
     string vfx = null, string fireVfx = null, string tellVfx = null, string chargeVfx = null)
     where T : Brave.BulletScript.Script
   {
+    return CreateBulletAttack<T, ShootBehavior>(add: add, cooldown: cooldown, cooldownVariance: cooldownVariance,
+        attackCooldown: attackCooldown, globalCooldown: globalCooldown, initialCooldown: initialCooldown,
+        initialCooldownVariance: initialCooldownVariance, probability: probability, maxUsages: maxUsages,
+        requiresLineOfSight: requiresLineOfSight, minHealth: minHealth, maxHealth: maxHealth,
+        healthThresholds: healthThresholds, accumulateHealthThresholds: accumulateHealthThresholds,
+        minRange: minRange, range: range, minWallDist: minWallDist, shootPoint: shootPoint, fireAnim: fireAnim,
+        tellAnim: tellAnim, chargeAnim: chargeAnim, finishAnim: finishAnim, lead: lead, chargeTime: chargeTime,
+        interruptible: interruptible, clearGoop: clearGoop, clearRadius: clearRadius, vfx: vfx, fireVfx: fireVfx,
+        tellVfx: tellVfx, chargeVfx: chargeVfx);
+  }
+
+/// <summary>Adds a new ShootBehavior attack with a custom Brave.BraveBulletScript.Script to a custom boss.</summary>
+  /// <typeparam name="T">A Brave Bullet Script or derived class thereof.</typeparam>
+  /// <typeparam name="M">A ShootBehavior or derived class thereof.</typeparam>
+  /// <param name="add">Whether to add this to our base attack pool. Set to false for attacks nested in simultaneous / sequential attacks.</param>
+  /// <param name="cooldown">Time before THIS behavior may be run again.</param>
+  /// <param name="cooldownVariance">Time variance added to the base cooldown.</param>
+  /// <param name="attackCooldown">Time before ATTACK behaviors may be run again.</param>
+  /// <param name="globalCooldown">Time before ANY behavior may be run again.</param>
+  /// <param name="initialCooldown">Time after the enemy becomes active before this attack can be used for the first time.</param>
+  /// <param name="initialCooldownVariance">Time variance added to the initial cooldown.</param>
+  /// <param name="probability">The probability of using this attack relative to other attacks.</param>
+  /// <param name="maxUsages">This attack can only be used this number of times.</param>
+  /// <param name="requiresLineOfSight">Require line of sight to target. Expensive! Use for companions.</param>
+  /// <param name="minHealth">The minimum amount of health an enemy can have and still use this attack.\n(Raising this means the enemy wont use this attack at low health)</param>
+  /// <param name="maxHealth">The maximum amount of health an enemy can have and still use this attack.\n(Lowering this means the enemy wont use this attack until they lose health)</param>
+  /// <param name="healthThresholds">The attack can only be used once each time a new health threshold is met</param>
+  /// <param name="accumulateHealthThresholds">If true, the attack can build up multiple uses by passing multiple thresholds in quick succession</param>
+  /// <param name="minRange">Minimum range</param>
+  /// <param name="range">Range</param>
+  /// <param name="minWallDist">Minimum distance from a wall</param>
+  /// <param name="shootPoint">Object to use for the relative transform of where the attack is fired from.</param>
+  /// <param name="fireAnim">Named animation used when the attack is in progress.</param>
+  /// <param name="tellAnim">Named animation used when the attack is being forecasted.</param>
+  /// <param name="chargeAnim">Named animation used when the attack is being charged.</param>
+  /// <param name="finishAnim">Named animation used when the attack is complete.</param>
+  /// <param name="lead">(Unknown) How far in front of the target the attack will be aimed / predicted.</param>
+  /// <param name="chargeTime">Amount of time the attack takes to charge.</param>
+  /// <param name="interruptible">Whether this attack is interruptible.</param>
+  /// <param name="clearGoop">Whether this attack clears goop.</param>
+  /// <param name="clearRadius">Radius around the bullets for which this attack clears goops.</param>
+  /// <param name="vfx">VFX to spawn when using this attack.</param>
+  /// <param name="fireVfx">VFX to spawn when firing this attack.</param>
+  /// <param name="tellVfx">VFX to spawn when forecasting this attack.</param>
+  /// <param name="chargeVfx">VFX to spawn when charging this attack.</param>
+  /// <returns>A ShootBehavior (of type M) with sane defaults initalized according to the parameters</returns>
+  public M CreateBulletAttack<T, M>(
+    bool add = true, float cooldown = 0f, float cooldownVariance = 0f, float attackCooldown = 0f, float globalCooldown = 0f,
+    float initialCooldown = 0.5f, float initialCooldownVariance = 0f,
+    float probability = 1f, int maxUsages = -1, bool requiresLineOfSight = false,
+    float minHealth = 0f, float maxHealth = 1f, float[] healthThresholds = null, bool accumulateHealthThresholds = true,
+    float minRange = 0f, float range = 0f, float minWallDist = 0f,
+    GameObject shootPoint = null, string fireAnim = null, string tellAnim = null,
+    string chargeAnim = null, string finishAnim = null, float lead = 0f, float chargeTime = 0f,
+    bool interruptible = false, bool clearGoop = false, float clearRadius = 2f,
+    string vfx = null, string fireVfx = null, string tellVfx = null, string chargeVfx = null)
+    where T : Brave.BulletScript.Script
+    where M : ShootBehavior, new()
+  {
     if (shootPoint == null)
       shootPoint = this.defaultGunAttachPoint;
     if (healthThresholds == null)
@@ -352,7 +410,7 @@ public class BuildABoss
       String.IsNullOrEmpty(fireVfx) &&
       String.IsNullOrEmpty(tellVfx) &&
       String.IsNullOrEmpty(chargeVfx)));
-    ShootBehavior bangbang = new ShootBehavior {
+    M bangbang = new M {
         Cooldown                   = cooldown,
         CooldownVariance           = cooldownVariance,
         AttackCooldown             = attackCooldown,

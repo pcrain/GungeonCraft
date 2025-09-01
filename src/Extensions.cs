@@ -2206,6 +2206,8 @@ public static class Extensions
       sprite.renderer.material.shader = osprite.renderer.material.shader;
       sprite.renderer.material.CopyPropertiesFromMaterial(osprite.renderer.material);
     }
+    sprite.FlipX = osprite.FlipX;
+    sprite.FlipY = osprite.FlipY;
     sprite.transform.localScale = osprite.transform.localScale;
     sprite.transform.rotation = osprite.transform.rotation;
     sprite.PlaceAtRotatedPositionByAnchor(osprite.WorldCenter, Anchor.MiddleCenter);

@@ -1277,7 +1277,12 @@ public static class AfterImageHelpers
         sprite.StartCoroutine(Fade(sprite, _LIFETIME));
     }
 
-    private static IEnumerator Fade(tk2dSprite sprite, float fadeTime, float flickerRate = 0.05f)
+    public static void SpriteAfterImage(this tk2dBaseSprite sprite)
+    {
+        sprite.StartCoroutine(Fade(sprite.DuplicateInWorld(), _LIFETIME));
+    }
+
+    private static IEnumerator Fade(tk2dBaseSprite sprite, float fadeTime, float flickerRate = 0.05f)
     {
         sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitBlendUber");
         sprite.renderer.material.SetFloat("_VertexColor", 1f);

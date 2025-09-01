@@ -20,17 +20,18 @@ public partial class ArmisticeBoss : AIActor
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{C.MOD_INT_NAME}/Resources/armistice_bosscard.png"); // Create our build-a-boss
     bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f, shareCooldowns: false, spriteAnchor: Anchor.LowerCenter); // Set our stats
-    bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH);                   // Set up our animations
-      bb.AdjustAnimation(name: "idle",         fps:    16f, loop: true);        // Adjust some specific animations as needed
-      // bb.AdjustAnimation(name: "idle_glance",  fps:    8f, loop: true);
-      // bb.AdjustAnimation(name: "idle_empty",   fps:    8f, loop: true);
-      // bb.AdjustAnimation(name: "shrug",        fps:    8f, loop: true);
-      // bb.AdjustAnimation(name: "shrug_calm",   fps:    8f, loop: true);
-      // bb.AdjustAnimation(name: "shrug_glance", fps:    8f, loop: true);
-      // bb.AdjustAnimation(name: "idle_cloak",   fps:   12f, loop: true);
-      // bb.AdjustAnimation(name: "decloak",      fps:    6f, loop: false);
-      // bb.AdjustAnimation(name: "teleport_in",  fps:   60f, loop: false);
-      // bb.AdjustAnimation(name: "teleport_out", fps:   60f, loop: false);
+    bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH); // Set up our animations
+      bb.AdjustAnimation(name: "attack_basic", fps:    16f, loop: true);
+      bb.AdjustAnimation(name: "attack_snipe", fps:    16f, loop: false);
+      bb.AdjustAnimation(name: "calm",         fps:    16f, loop: true);
+      bb.AdjustAnimation(name: "crouch",       fps:    16f, loop: false);
+      bb.AdjustAnimation(name: "idle",         fps:    16f, loop: true);
+      bb.AdjustAnimation(name: "ready",        fps:    16f, loop: false);
+      bb.AdjustAnimation(name: "reload",       fps:    16f, loop: false);
+      bb.AdjustAnimation(name: "run",          fps:    16f, loop: true);
+      bb.AdjustAnimation(name: "skyshot",      fps:    16f, loop: false);
+      bb.AdjustAnimation(name: "teleport_in",  fps:    16f, loop: false);
+      bb.AdjustAnimation(name: "teleport_out", fps:    16f, loop: false);
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
       // bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 30, height: 40, xoff: -15, yoff: 2);          // Set our default pixel colliders
@@ -41,14 +42,15 @@ public partial class ArmisticeBoss : AIActor
     // bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
     // bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
     //   goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 4.26f, attackCooldown: 0.15f, probability: 3f);
-    // bb.CreateBulletAttack<CrossBulletsScript>    (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    // bb.CreateBulletAttack<ClocksTickingScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    // bb.CreateBulletAttack<WalledInScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    // bb.CreateBulletAttack<BoneTunnelScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    // bb.CreateBulletAttack<DanceMonkeyScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    // bb.CreateBulletAttack<PendulumScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    // bb.CreateBulletAttack<BoxTrotScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
-    bb.CreateBulletAttack<LaserBarrageScript>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<CrossBulletsScript, ArmisticeMoveAndShootBehavior>    (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<WalledInScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<DanceMonkeyScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<PendulumScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle",       cooldown: 2.0f, attackCooldown: 2.0f);
+    // bb.CreateBasicAttack<RelocateScript>   (cooldown: 2.0f, attackCooldown: 2.0f);
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
     InitPrefabs();                                                             // Do miscellaneous prefab loading
@@ -144,9 +146,9 @@ public partial class ArmisticeBoss : AIActor
         return; // don't do anything if we're paused
 
       #if DEBUG
-      // base.specRigidbody.DrawDebugHitbox();
-      // DebugDraw.DrawDebugCircle(base.gameObject, base.transform.position, 0.5f, Color.green.WithAlpha(0.5f));
-      // DebugDraw.DrawDebugCircle(GameManager.Instance.gameObject, base.transform.position.GetAbsoluteRoom().area.Center, 0.5f, Color.cyan.WithAlpha(0.5f));
+      base.specRigidbody.DrawDebugHitbox();
+      DebugDraw.DrawDebugCircle(base.gameObject, base.transform.position, 0.5f, Color.green.WithAlpha(0.5f));
+      DebugDraw.DrawDebugCircle(GameManager.Instance.gameObject, base.transform.position.GetAbsoluteRoom().area.Center, 0.5f, Color.cyan.WithAlpha(0.5f));
       #endif
 
       // UpdateSpriteIfNecessary();
