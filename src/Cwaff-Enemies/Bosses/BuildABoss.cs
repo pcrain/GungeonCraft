@@ -20,6 +20,23 @@ public enum Floors // Matches GlobalDungeonData.ValidTilesets
   RATGEON       = 0x8000,
 }
 
+/// <summary>Some patches to make bosses work nicer</summary>
+[HarmonyPatch]
+internal static class BossPatches
+{
+  /// <summary>Treat a negative TimeScale as "tick every frame"</summary>
+  [HarmonyPatch(typeof(Bullet), nameof(Bullet.FrameUpdate))]
+  [HarmonyPrefix]
+  private static bool BulletFrameUpdatePatch(Bullet __instance)
+  {
+      if (__instance.TimeScale >= 0f)
+        return true; // call the original method
+
+      __instance.DoTick();
+      return false; // skip original method
+  }
+}
+
 // Helper class for loading runtime boss information
 public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
 {

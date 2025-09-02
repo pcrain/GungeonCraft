@@ -352,3 +352,13 @@ armistice_gun_light_sound,-5.0,1,sound,1
 armistice_gun_sound,-5.0,1,sound,1
 armistice_laser_sound,-5.0,1,sound,1
 armistice_sniper_sound,-5.0,1,sound,1
+armistice_clocks_ticking_sound,2.0,1,sound,1
+armistice_tick_sound,2.0,1,sound,1
+ticking_clock_1,10.0,1,sound,1
+ticking_clock_2,10.0,1,sound,1
+ticking_clock_3,10.0,1,sound,1
+ticking_clock_4,10.0,1,sound,1
+ticking_clock_5,10.0,1,sound,1
+ticking_clock_6,10.0,1,sound,1
+ticking_clock_7,10.0,1,sound,1
+ticking_clock_8,10.0,1,sound,1

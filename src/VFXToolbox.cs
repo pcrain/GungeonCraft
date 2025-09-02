@@ -1193,7 +1193,7 @@ public partial class CwaffVFX // private
         this._fadeIn       = fadeIn;
         this._velocity     = velocity.HasValue ? (1.0f / C.PIXELS_PER_CELL) * velocity.Value.ToVector3ZisY(0) : Vector3.zero;
         this._usesLifetime = lifetime > 0;
-        this._maxLifeTime  = this._usesLifetime ? lifetime : 36000f;
+        this._maxLifeTime  = this._usesLifetime ? lifetime : this._animator.currentClip.wrapMode == tk2dSpriteAnimationClip.WrapMode.Once ? this._animator.currentClip.BaseClipLength : 36000f;
         this._fadeOut      = this._usesLifetime && fadeOutTime.HasValue;
         if (this._fadeOut)
         {

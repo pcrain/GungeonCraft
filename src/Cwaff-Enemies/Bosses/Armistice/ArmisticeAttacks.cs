@@ -36,7 +36,8 @@ public partial class ArmisticeBoss : AIActor
         case "CrossBulletsScript":
           break;
         case "ClocksTickingScript":
-          this._targetPos = new Vector2(this._roomBounds.center.x, playerOnBottom ? this._roomBounds.yMax : this._roomBounds.yMin);
+          this._targetPos = this._roomBounds.center;
+          // this._targetPos = new Vector2(this._roomBounds.center.x, playerOnBottom ? this._roomBounds.yMax : this._roomBounds.yMin);
           break;
         case "WalledInScript":
           break;
@@ -110,15 +111,17 @@ public partial class ArmisticeBoss : AIActor
       private Color? _tint = null;
       private float _emission;
       private float _emitColorPower;
+      private bool _fancySpawn;
 
       protected int originalLayer = -1;
       protected GameObject _trail = null;
 
-      public SecretBullet(Color? tint = null, float emission = 10f, float emitColorPower = 1.5f) : base("getboned")
+      public SecretBullet(Color? tint = null, float emission = 10f, float emitColorPower = 1.5f, bool fancySpawn = false) : base("getboned")
       {
         this._tint = tint;
         this._emission = emission;
         this._emitColorPower = emitColorPower;
+        this._fancySpawn = fancySpawn;
       }
 
       public void AddTrail(CwaffTrailController trailPrefab, float glow = -1f)
@@ -140,12 +143,18 @@ public partial class ArmisticeBoss : AIActor
           projectile.gameObject.SetLayerRecursively(this.originalLayer);
           this.originalLayer = -1;
         }
+        if (this._fancySpawn)
+          CwaffVFX.Spawn(_BulletSpawnVFX, position: projectile.SafeCenter, startScale: 0.5f, endScale: 0.1f);
         projectile.OnDestruction -= this.OnBaseDestruction;
       }
 
       public override void Initialize()
       {
         this.Projectile.ChangeTintColorShader(0f, this._tint ?? _DefaultTint);
+        this.Projectile.OnDestruction += this.OnBaseDestruction;
+        if (this._fancySpawn)
+          CwaffVFX.Spawn(_BulletSpawnVFX, position: this.Projectile.SafeCenter, startScale: 0.1f, endScale: 1.0f,
+            anchorTransform: this.Projectile.gameObject.transform);
         Material mat = this.Projectile.sprite.renderer.material;
         mat.SetFloat(CwaffVFX._EmissivePowerId, this._emission);
         mat.SetFloat(CwaffVFX._EmissiveColorPowerId, this._emitColorPower);
@@ -202,7 +211,6 @@ public partial class ArmisticeBoss : AIActor
       public override IEnumerator Top()
       {
         // this.Projectile.gameObject.Play(SOUND_SHOOT);
-        this.Projectile.OnDestruction += this.OnBaseDestruction;
         this.originalLayer = this.Projectile.gameObject.layer;
         this.Projectile.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
         Vector2 newVelocity = this.startVelocity;
@@ -290,37 +298,42 @@ public partial class ArmisticeBoss : AIActor
 
     internal class ClocksTickingBullet : SecretBullet
     {
+      private const float _REST_TIME = 0.35f;
+      internal const float _SPAWN_RADIUS = 32f;
 
       private ClocksTickingScript _parent = null;
       private Vector2 _spawnCenter        = default;
       private float _spawnTime            = 0f;
       private float _spawnRadius          = 0f;
+      private float _restRadius           = 0f;
       private float _spawnAngle           = 0f;
       private float _rps                  = 0f;
       private bool  _flood                = false;
 
-      public ClocksTickingBullet(ClocksTickingScript parent, Vector2 spawnCenter, float spawnTime, float spawnRadius, float spawnAngle, float rps, bool flood) : base()
+      public ClocksTickingBullet(ClocksTickingScript parent, Vector2 spawnCenter, float spawnTime, float spawnRadius, float restRadius,
+        float spawnAngle, float rps, bool flood) : base(fancySpawn: true)
       {
         this._parent      = parent;
         this._spawnCenter = spawnCenter;
         this._spawnTime   = spawnTime;
         this._spawnRadius = spawnRadius;
+        this._restRadius  = restRadius;
         this._spawnAngle  = spawnAngle;
         this._rps         = rps;
         this._flood       = flood;
 
         base.ManualControl = true;
+        base.TimeScale = -1f; // tick every frame
+        // base.EndOnBlank = true;
       }
 
       public override void Initialize()
       {
         base.Initialize();
+        SpeculativeRigidbody srb = this.Projectile.specRigidbody;
+        srb.CollideWithTileMap = false;
         if (this._flood)
-        {
-          SpeculativeRigidbody srb = this.Projectile.specRigidbody;
           srb.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
-          srb.CollideWithTileMap = false;
-        }
       }
 
       private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -331,29 +344,40 @@ public partial class ArmisticeBoss : AIActor
 
       public override IEnumerator Top()
       {
+        float topTime = BraveTime.ScaledTimeSinceStartup;
         while (true)
         {
-            float elapsed = BraveTime.ScaledTimeSinceStartup - this._spawnTime;
+            float now = BraveTime.ScaledTimeSinceStartup;
+            float topElapsed = now - topTime;
+            float elapsed = now - this._spawnTime;
             if (elapsed > _LIFETIME)
               break;
+            float radius = this._restRadius;
+            if (topElapsed < _REST_TIME)
+              radius += (1f - Ease.OutCubic(topElapsed / _REST_TIME)) * (this._spawnRadius - this._restRadius);
             // if (!this._flood)
             {
               float rot = 360f * elapsed * this._rps;
-              base.Position = this._spawnCenter + (this._spawnAngle + rot).ToVector(this._spawnRadius);
+              base.Position = this._spawnCenter + (this._spawnAngle + rot).ToVector(radius);
             }
             yield return Wait(1);
         }
-        Vanish();
+        float vanishTime = BraveTime.ScaledTimeSinceStartup + 0.5f * UnityEngine.Random.value;
+        while (BraveTime.ScaledTimeSinceStartup < vanishTime)
+          yield return Wait(1);
+        Vanish(suppressInAirEffects: true);
         yield break;
       }
     }
 
     protected override List<FluidBulletInfo> BuildChain()
     {
+      base.BulletBank.aiActor.gameObject.Play("armistice_clocks_ticking_sound");
+      // base.EndOnBlank = true;
       return
-         Run(Attack(radius:  8f, rps: -0.300f, offAngle: 110f))
-        .And(Attack(radius: 11f, rps: -0.625f, offAngle:  90f))
-        .And(Attack(radius: 14f, rps: -0.850f, offAngle:  70f))
+         Run(Attack(radius:  8f, rps: -0.300f, offAngle: 110f, playSounds: true))
+        .And(Attack(radius: 11f, rps: -0.625f, offAngle:  90f, playSounds: false))
+        .And(Attack(radius: 14f, rps: -0.850f, offAngle:  70f, playSounds: false))
         .And( Flood(radius: 14f, rps:  0.150f, offAngle: -90f, spawnRps: 0.75f))
         .Finish();
     }
@@ -386,13 +410,14 @@ public partial class ArmisticeBoss : AIActor
         for (int i = iStart; i <= iEnd; ++i)
         {
           float trueRadius = i * _GAP;
-          Vector2 pos = center + (baseAngle + quantRot + trueRot).ToVector(trueRadius); //NOTE: deliberately need to offset by rot twice
+          Vector2 pos = center + (baseAngle + quantRot + trueRot).ToVector(ClocksTickingBullet._SPAWN_RADIUS); //NOTE: deliberately need to offset by rot twice
           this.Fire(Offset.OverridePosition(pos), new Direction(0f, DirectionType.Absolute), new Speed(0f),
             new ClocksTickingBullet(
               parent      : this,
               spawnCenter : center,
               spawnTime   : start,
-              spawnRadius : trueRadius,
+              spawnRadius : ClocksTickingBullet._SPAWN_RADIUS,
+              restRadius  : trueRadius,
               spawnAngle  : baseAngle + quantRot,
               rps         : rps,
               flood       : true
@@ -402,8 +427,10 @@ public partial class ArmisticeBoss : AIActor
       yield break;
     }
 
-    private IEnumerator Attack(float radius, float rps, float offAngle)
+    private IEnumerator Attack(float radius, float rps, float offAngle, bool playSounds)
     {
+      const float SOUND_RATE = 60f / 180f; // 180BPM song
+
       float start = BraveTime.ScaledTimeSinceStartup;
       int count = Mathf.FloorToInt(radius / _GAP);
       Vector2 center = this.roomFullBounds.center;
@@ -413,12 +440,13 @@ public partial class ArmisticeBoss : AIActor
         this._time = BraveTime.ScaledTimeSinceStartup;
         float trueRadius = _GAP * i;
         float rot = 360f * (this._time - start) * rps;
-        this.Fire(Offset.OverridePosition(center + (baseAngle + rot).ToVector(trueRadius)), new Direction(0f, DirectionType.Absolute), new Speed(0f),
+        this.Fire(Offset.OverridePosition(center + (baseAngle + rot).ToVector(ClocksTickingBullet._SPAWN_RADIUS)), new Direction(0f, DirectionType.Absolute), new Speed(0f),
           new ClocksTickingBullet(
             parent      : this,
             spawnCenter : center,
             spawnTime   : start,
-            spawnRadius : trueRadius,
+            spawnRadius : ClocksTickingBullet._SPAWN_RADIUS,
+            restRadius  : trueRadius,
             spawnAngle  : baseAngle,
             rps         : rps,
             flood       : false
@@ -426,10 +454,18 @@ public partial class ArmisticeBoss : AIActor
         yield return Wait(3);
       }
       float endTime = start + _LIFETIME;
+      float nextSound = this._time;
+      int c = 0;
       while (this._time < endTime)
       {
         yield return Wait(1);
         this._time = BraveTime.ScaledTimeSinceStartup;
+        if (playSounds && this._time >= nextSound)
+        {
+          nextSound += SOUND_RATE;
+          base.BulletBank.aiActor.gameObject.Play($"ticking_clock_{(c % 8) + 1}");
+          ++c;
+        }
       }
       yield break;
     }
@@ -576,7 +612,6 @@ public partial class ArmisticeBoss : AIActor
         this._radius = startVec.magnitude;
 
         this.Projectile.specRigidbody.CollideWithTileMap = false;
-        this.Projectile.OnDestruction += this.OnBaseDestruction;
 
         for (int i = 0; i < this._holdFrames; ++i)
         {
