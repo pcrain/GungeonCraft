@@ -10,12 +10,16 @@ public partial class ArmisticeBoss : AIActor
   private static GameObject _NapalmReticle      = null;
   private static AIBulletBank.Entry _MainBullet = null;
   private static AIBulletBank.Entry _TurretBullet = null;
+  private static AIBulletBank.Entry _WarheadBullet = null;
 
   internal static GameObject _BulletSpawnVFX = null;
   internal static GameObject _MuzzleVFXBullet = null;
   internal static GameObject _MuzzleVFXElectro = null;
   internal static GameObject _MuzzleVFXTurret = null;
+  internal static GameObject _ExplosionVFX = null;
+  internal static GameObject _SmokeVFX = null;
   internal static CwaffTrailController _LaserTrailPrefab;
+  internal static CwaffTrailController _WarheadTrailPrefab;
 
   private const  int _SANS_HP = 60;
 
@@ -34,9 +38,10 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "crouch",       fps:    16f, loop: false);
       bb.AdjustAnimation(name: "idle",         fps:    16f, loop: true);
       bb.AdjustAnimation(name: "ready",        fps:    16f, loop: false);
-      bb.AdjustAnimation(name: "reload",       fps:    16f, loop: false);
+      bb.AdjustAnimation(name: "reload",       fps:    16f, loop: false, eventFrames: [6, 12],
+        eventAudio: ["armistice_reload_sound_a", "armistice_reload_sound_b"]);
       bb.AdjustAnimation(name: "run",          fps:    16f, loop: true);
-      bb.AdjustAnimation(name: "skyshot",      fps:    16f, loop: false);
+      bb.AdjustAnimation(name: "skyshot",      fps:    30f, loop: false, eventFrames: [5]);
       bb.AdjustAnimation(name: "teleport_in",  fps:    16f, loop: false);
       bb.AdjustAnimation(name: "teleport_out", fps:    16f, loop: false);
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
@@ -55,8 +60,9 @@ public partial class ArmisticeBoss : AIActor
     // bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>    (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
     // bb.CreateBulletAttack<DanceMonkeyScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
     // bb.CreateBulletAttack<PendulumScript, ArmisticeMoveAndShootBehavior>      (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "ready", fireAnim: "attack_snipe", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    // bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "ready", fireAnim: "attack_snipe", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
     // bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    bb.CreateBulletAttack<MeteorShowerScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "reload", fireAnim: "skyshot", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
     InitPrefabs();                                                             // Do miscellaneous prefab loading
@@ -69,7 +75,10 @@ public partial class ArmisticeBoss : AIActor
     _MuzzleVFXBullet = VFX.Create("muzzle_armistice_bullet", fps: 60, loops: false, anchor: Anchor.MiddleLeft);
     _MuzzleVFXElectro = VFX.Create("muzzle_armistice_electro", fps: 60, loops: false, anchor: Anchor.MiddleLeft);
     _MuzzleVFXTurret = VFX.Create("muzzle_armistice_turret", fps: 60, loops: false, anchor: Anchor.MiddleLeft);
+    _ExplosionVFX = VFX.Create("armistice_warhead_explosion_vfx", fps: 30, loops: false);
+    _SmokeVFX = VFX.Create("armistice_warhead_smoke", fps: 16, loops: false, scale: 0.5f);
     _LaserTrailPrefab = VFX.CreateSpriteTrailObject("armistice_laser_trail", fps: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
+    _WarheadTrailPrefab = VFX.CreateSpriteTrailObject("armistice_warhead_smoke_trail", fps: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
 
     // Targeting reticle
     _NapalmReticle = ResourceManager.LoadAssetBundle("shared_auto_002").LoadAsset<GameObject>("NapalmStrikeReticle").ClonePrefab();
@@ -101,7 +110,16 @@ public partial class ArmisticeBoss : AIActor
       PlayAudio          = false,
       BulletObject       = turretProj.gameObject,
       MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
-      // MuzzleFlashEffects = null,
+    };
+
+    Projectile warheadProj = Items._38Special.CloneProjectile();
+    warheadProj.gameObject.name = "armistice warheadProj projectile";
+    warheadProj.AddDefaultAnimation(AnimatedBullet.Create(name: "armistice_warhead"), overwriteExisting: true);
+    _WarheadBullet = new AIBulletBank.Entry(baseBullet) {
+      Name               = "warhead",
+      PlayAudio          = false,
+      BulletObject       = warheadProj.gameObject,
+      MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
     };
   }
 
@@ -247,6 +265,7 @@ public partial class ArmisticeBoss : AIActor
     {
       base.aiActor.bulletBank.Bullets.Add(_MainBullet);
       base.aiActor.bulletBank.Bullets.Add(_TurretBullet);
+      base.aiActor.bulletBank.Bullets.Add(_WarheadBullet);
       base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
       base.aiActor.healthHaver.OnPreDeath += OnPreDeath;
 

@@ -8,9 +8,10 @@ public partial class ArmisticeBoss : AIActor
   private const string SOUND_TELEPORT    = "teledasher";
 
   private static Vector3 GunBarrelOffset(bool facingLeft)
-  {
-     return C.PIXEL_SIZE * new Vector3(facingLeft ? -36f : 36f, 23f, 0f);
-  }
+     => C.PIXEL_SIZE * new Vector3(facingLeft ? -36f : 36f, 23f, 0f);
+
+  private static Vector3 GunBarrelHighOffset(bool facingLeft)
+     => C.PIXEL_SIZE * new Vector3(facingLeft ? -15f : 15f, 48f, 0f);
 
   private class ArmisticeMoveAndShootBehavior : MoveAndShootBehavior
   {
@@ -61,6 +62,11 @@ public partial class ArmisticeBoss : AIActor
           break;
         case "LaserBarrageScript":
           this._targetPos = new Vector2(playerOnLeft ? this._roomBounds.xMax : this._roomBounds.xMin, this._roomBounds.center.y);
+          break;
+        case "MeteorShowerScript":
+          this._targetPos = new Vector2( // cross to the other side of the room
+            this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f) * this._roomBounds.width,
+            this._roomBounds.center.y + UnityEngine.Random.Range(-0.4f, -0.25f) * this._roomBounds.height);
           break;
       }
     }
@@ -122,6 +128,7 @@ public partial class ArmisticeBoss : AIActor
       private float _emission;
       private float _emitColorPower;
       private bool _fancySpawn;
+      private Shader _originalShader = null;
 
       protected int originalLayer = -1;
       protected GameObject _trail = null;
@@ -155,6 +162,13 @@ public partial class ArmisticeBoss : AIActor
         }
         if (this._fancySpawn)
           CwaffVFX.Spawn(_BulletSpawnVFX, position: projectile.SafeCenter, startScale: 0.5f, endScale: 0.1f);
+        tk2dBaseSprite sprite = projectile.sprite;
+        if (sprite && sprite.usesOverrideMaterial)
+        {
+          sprite.usesOverrideMaterial = false;
+          if (sprite.renderer && sprite.renderer.material)
+            sprite.renderer.material.shader = this._originalShader;
+        }
         projectile.OnDestruction -= this.OnBaseDestruction;
       }
 
@@ -168,6 +182,8 @@ public partial class ArmisticeBoss : AIActor
         Material mat = this.Projectile.sprite.renderer.material;
         mat.SetFloat(CwaffVFX._EmissivePowerId, this._emission);
         mat.SetFloat(CwaffVFX._EmissiveColorPowerId, this._emitColorPower);
+        this._originalShader = mat.shader;
+
         base.Initialize();
       }
   }
@@ -827,7 +843,6 @@ public partial class ArmisticeBoss : AIActor
       private GameObject _sightline = null;
       private Transform _transform;
       private float _lastAngle = 361f;
-      private Shader _oldShader;
 
       public BoxTrotTurret(PathRect path, float offset, float top, float bottom) : base(baseProj: "turret"/*, emission: 0f*/)
       {
@@ -842,7 +857,6 @@ public partial class ArmisticeBoss : AIActor
         base.Initialize();
         tk2dBaseSprite sprite = base.Projectile.sprite;
         sprite.usesOverrideMaterial = true;
-        this._oldShader = sprite.renderer.material.shader;
         sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
 
         // base.Projectile.specRigidbody.DebugColliders();
@@ -867,9 +881,6 @@ public partial class ArmisticeBoss : AIActor
           UnityEngine.Object.Destroy(this._sightline);
           this._sightline = null;
         }
-        tk2dBaseSprite sprite = projectile.sprite;
-        sprite.usesOverrideMaterial = false;
-        sprite.renderer.material.shader = this._oldShader;
       }
 
       private void ManualUpdate()
@@ -1150,6 +1161,155 @@ public partial class ArmisticeBoss : AIActor
         }
       }
 
+      yield break;
+    }
+
+  }
+
+  private class MeteorShowerScript : ArmisticeBulletScript
+  {
+
+    internal class MeteorShowerBullet : SecretBullet
+    {
+
+      private static ExplosionData _Explosion = null;
+
+      private Rect _bounds;
+      private bool _exploded;
+
+      public MeteorShowerBullet(Rect bounds) : base(baseProj: "warhead")
+      {
+        this._bounds = bounds;
+        this._exploded = false;
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+        SpeculativeRigidbody body = base.Projectile.specRigidbody;
+        body.CollideWithOthers = false;
+        body.CollideWithTileMap = false;
+        base.AddTrail(_WarheadTrailPrefab, glow: 1f);
+
+        tk2dBaseSprite sprite = base.Projectile.sprite;
+        sprite.usesOverrideMaterial = true;
+        sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
+      }
+
+      protected override void OnBaseDestruction(Projectile projectile)
+      {
+        base.OnBaseDestruction(projectile);
+        if (!this._exploded)
+          return;
+
+        if (_Explosion == null)
+        {
+          _Explosion = Explosions.ExplosiveRounds.With(damage: 0f, force: 100f, debrisForce: 10f, radius: 1.5f,
+            preventPlayerForce: false, shake: false);
+          _Explosion.doDamage = true;
+          _Explosion.damageToPlayer = 0.5f;
+          _Explosion.effect = null; // we handle the vfx ourselves
+        }
+        Exploder.Explode(position: projectile.SafeCenter, data: _Explosion, sourceNormal: Vector2.zero, ignoreQueues: true);
+        projectile.gameObject.Play("armistice_warhead_explode_sound"); //TODO: find better sound
+        CwaffVFX.Spawn(_ExplosionVFX, position: projectile.SafeCenter);
+        CwaffVFX.SpawnBurst(prefab: _SmokeVFX, numToSpawn: 20, basePosition: projectile.SafeCenter, positionVariance: 2f,
+          velocityVariance: 4f, rotType: CwaffVFX.Rot.Random, lifetime: 0.5f, fadeOutTime: 0.5f);
+      }
+
+      public override IEnumerator Top()
+      {
+        const float HEIGHT = 100f;
+        const float TIME = 0.75f;
+        const float ROTSPEED = 1080f;
+        const float WAIT = 0.5f;
+        const float VARIANCE = 0.5f;
+
+        CameraController cam = GameManager.Instance.MainCameraController;
+        while (cam.PointIsVisible(base.Position))
+          yield return Wait(1);
+
+        float wait = WAIT + UnityEngine.Random.value * VARIANCE;
+        for (float elapsed = 0f; elapsed < wait; elapsed += BraveTime.DeltaTime)
+            yield return Wait(1);
+
+        PlayerController pc = GameManager.Instance.BestActivePlayer;
+        Vector2 target = pc ? pc.CenterPosition : new PathRect(this._bounds.Inset(3f)).At(UnityEngine.Random.value, UnityEngine.Random.value);
+        if (pc) // Easeing biases the position to something closer to the player
+        {
+          target += TIME * (Ease.InCubic(UnityEngine.Random.value) * pc.Velocity) + Lazy.RandomVector(2f * Ease.InCubic(UnityEngine.Random.value));
+          if (!this._bounds.Contains(target))
+            target = BraveMathCollege.ClosestPointOnRectangle(target, this._bounds.min, this._bounds.size);
+        }
+        base.TimeScale = -1f; // update every frame
+        base.ManualControl = true;
+        base.Projectile.sprite.transform.rotation = 270f.EulerZ();
+
+        GameObject sigil = SpawnManager.SpawnVFX(VFX.MasterySigil, target, (ROTSPEED * BraveTime.ScaledTimeSinceStartup).EulerZ(), ignoresPools: true);
+        sigil.ExpireIn(TIME); // fallback in case the script gets interrupted
+        base.Projectile.gameObject.Play("armistice_warhead_fall_sound");
+
+        for (float elapsed = 0f; elapsed < TIME; elapsed += BraveTime.DeltaTime)
+        {
+            float percentLeft = 1f - elapsed / TIME;
+            base.Position = target + new Vector2(0f, percentLeft * HEIGHT);
+            sigil.transform.rotation = (ROTSPEED * BraveTime.ScaledTimeSinceStartup).EulerZ();
+            sigil.transform.localScale = percentLeft * Vector3.one;
+            yield return Wait(1);
+        }
+
+        if (sigil)
+          UnityEngine.Object.Destroy(sigil);
+
+        base.Position = target;
+        this._exploded = true;
+        Vanish(suppressInAirEffects: true);
+
+        yield break;
+      }
+    }
+
+    protected override List<FluidBulletInfo> BuildChain() => Run(Attack()).Finish();
+
+    private bool _fired = false;
+
+    private void OnFired(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
+    {
+      if (animator.CurrentFrame < 5 || !clip.name.Contains("skyshot"))
+        return;
+      animator.AnimationEventTriggered -= this.OnFired;
+      this._fired = true;
+    }
+
+    private IEnumerator Attack()
+    {
+      const int VOLLEY_SIZE = 5;
+
+      AIActor boss = base.BulletBank.aiActor;
+      Transform t = boss.gameObject.transform;
+      bool facingLeft = t.position.x > this.roomFullBounds.center.x;
+      boss.sprite.FlipX = facingLeft;
+      Vector2 shootPoint = t.position + GunBarrelHighOffset(boss.sprite.FlipX);
+      float baseShootAngle = facingLeft ? 123f : 57f;
+
+      for (int i = 0; i < 10; ++i)
+      {
+        this._fired = false;
+        boss.spriteAnimator.AnimationEventTriggered += this.OnFired;
+        boss.aiAnimator.PlayUntilFinished("skyshot");
+        while (!this._fired)
+          yield return Wait(1);
+        for (int v = 0; v < VOLLEY_SIZE; ++v)
+        {
+          float shootAngle = baseShootAngle.AddRandomSpread(10f);
+          base.Fire(Offset.OverridePosition(shootPoint), new Direction(shootAngle), new Speed(50f), new MeteorShowerBullet(this.roomFullBounds));
+        }
+        boss.gameObject.Play("armistice_gun_sound");
+        CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: baseShootAngle.EulerZ(), emissivePower: 10f,
+          emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
+        while (boss.aiAnimator.IsPlaying("skyshot"))
+          yield return Wait(1);
+      }
       yield break;
     }
 

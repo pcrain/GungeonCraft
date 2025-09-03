@@ -365,3 +365,5 @@ ticking_clock_8,10.0,1,sound,1
 armistice_launch_turret_sound,9.0,1,sound,1
 armistice_turret_fire_sound,-3.0,1,sound,1
 armistice_laser_deploy_sound,3.5,1,sound,1
+armistice_warhead_fall_sound,3.5,1,sound,1
+armistice_warhead_explode_sound,-5.5,1,sound,1

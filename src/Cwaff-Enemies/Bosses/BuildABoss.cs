@@ -745,9 +745,9 @@ public class BuildABoss
         def.BetterConstructOffsetsFromAnchor(anchor);
   }
 
-  public void AdjustAnimation(string name, float? fps = null, bool? loop = null)
+  public void AdjustAnimation(string name, float? fps = null, bool? loop = null, List<int> eventFrames = null, List<string> eventAudio = null)
   {
-    this.enemyBehavior.AdjustAnimation(name, fps, loop);
+    this.enemyBehavior.AdjustAnimation(name, fps, loop, eventFrames, eventAudio);
   }
 
   public void SetIntroAnimations(string introAnim = null, string preIntroAnim = null)
@@ -950,7 +950,8 @@ public static class BH
     }
   }
 
-  public static void AdjustAnimation(this BraveBehaviour self, string name, float? fps = null, bool? loop = null)
+  public static void AdjustAnimation(this BraveBehaviour self, string name, float? fps = null, bool? loop = null,
+    List<int> eventFrames = null, List<string> eventAudio = null)
   {
     tk2dSpriteAnimationClip clip = self.spriteAnimator.GetClipByName(name);
     if (clip == null)
@@ -965,6 +966,15 @@ public static class BH
       clip.wrapMode = loop.Value
         ? tk2dSpriteAnimationClip.WrapMode.Loop
         : tk2dSpriteAnimationClip.WrapMode.Once;
+    }
+    if (eventFrames != null)
+    {
+      for (int i = 0; i < eventFrames.Count; ++i)
+      {
+        clip.frames[eventFrames[i]].triggerEvent = true;
+        if (eventAudio != null && eventAudio.Count > i)
+          clip.frames[eventFrames[i]].eventAudio = eventAudio[i];
+      }
     }
   }
 
