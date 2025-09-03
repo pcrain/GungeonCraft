@@ -149,6 +149,8 @@ public class PathRect : PathShape
     { return this.rect.PointOnPerimeter(t); }
   public Vector2 At(float x, float y)
     { return new Vector2(this.rect.xMin + x * this.rect.width, this.rect.yMin + y * this.rect.height); }
+  public float InverseAt(Vector2 p)
+    { return this.rect.InversePointOnPerimeter(p); }
 }
 
 public class PathArc : PathShape

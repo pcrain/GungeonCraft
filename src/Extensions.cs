@@ -65,6 +65,21 @@ public static class Extensions
     return retPoint;
   }
 
+  /// <summary>Given a position, find the closest corresponding point on the perimeter of a rectangle and return an offset between 0 and 1.</summary>
+  public static float InversePointOnPerimeter(this Rect self, Vector2 p)
+  {
+    float half = self.width + self.height;
+    Vector2 rectPoint = BraveMathCollege.ClosestPointOnRectangle(p, self.min, self.size);
+    if (rectPoint.y == self.yMin) // bottom edge
+      return 0.5f * ((rectPoint.x - self.xMin) / half);
+    if (rectPoint.x == self.xMax) // right edge
+      return 0.5f * (((rectPoint.y - self.yMin) + self.width) / half);
+    if (rectPoint.y == self.yMax) // top edge
+      return 0.5f + 0.5f * ((self.xMax - rectPoint.x) / half);
+    return 0.5f + 0.5f * (((self.yMax - rectPoint.y) + self.width) / half); // left edge
+  }
+
+
   /// <summary>Given an angle and wall Rect, determine the intersection point from a ray cast from self to theWall</summary>
   public static Vector2 RaycastToWall(this Vector2 self, float angle, Rect theWall)
   {
@@ -3604,6 +3619,7 @@ public static class Extensions
   }
 
   /// <summary>Draw a debug hitbox for a specrigidbody</summary>
+  [System.Diagnostics.Conditional("DEBUG")]
   public static void DrawDebugHitbox(this SpeculativeRigidbody body, Color? color = null)
   {
     const string NAME = "debug hitbox rectangle";
@@ -3618,6 +3634,16 @@ public static class Extensions
       color: color ?? Color.magenta.WithAlpha(0.5f),
       pos: c.UnitTopLeft,
       pos2: c.UnitBottomRight);
+  }
+
+  /// <summary>Print pixel collider debug info</summary>
+  public static void DebugColliders(this SpeculativeRigidbody body)
+  {
+    for (int i = 0; i < body.PixelColliders.Count; ++i)
+    {
+      PixelCollider c = body.PixelColliders[i];
+      System.Console.WriteLine($"  collider {i} enabled {c.Enabled} | mode {c.ColliderGenerationMode} | x {c.ManualOffsetX} | y {c.ManualOffsetY} | w {c.ManualWidth} | h {c.ManualHeight}");
+    }
   }
 }
 

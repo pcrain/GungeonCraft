@@ -7,6 +7,11 @@ public partial class ArmisticeBoss : AIActor
   private const string SOUND_SHOOT       = "no_sound"; // "Play_WPN_spacerifle_shot_01";
   private const string SOUND_TELEPORT    = "teledasher";
 
+  private static Vector3 GunBarrelOffset(bool facingLeft)
+  {
+     return C.PIXEL_SIZE * new Vector3(facingLeft ? -36f : 36f, 23f, 0f);
+  }
+
   private class ArmisticeMoveAndShootBehavior : MoveAndShootBehavior
   {
     private const float _MAX_RELOCATE_TIME = 0.75f;
@@ -28,6 +33,8 @@ public partial class ArmisticeBoss : AIActor
     {
       bool playerOnLeft = this._targetPlayer.CenterPosition.x < this._roomBounds.center.x;
       bool playerOnBottom = this._targetPlayer.CenterPosition.y < this._roomBounds.center.y;
+      bool selfOnLeft = base.m_aiActor.CenterPosition.x < this._roomBounds.center.x;
+      bool selfOnBottom = base.m_aiActor.CenterPosition.y < this._roomBounds.center.y;
 
       string scriptType = base.BulletScript.scriptTypeName.Split('+')[1].Split(',')[0];
       // System.Console.WriteLine($"reloacting for bullet script {scriptType}");
@@ -48,6 +55,9 @@ public partial class ArmisticeBoss : AIActor
         case "PendulumScript":
           break;
         case "BoxTrotScript":
+          this._targetPos = new Vector2( // cross to the other side of the room
+            this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f) * this._roomBounds.width,
+            this._roomBounds.center.y + UnityEngine.Random.Range(-0.2f, 0.2f) * this._roomBounds.height);
           break;
         case "LaserBarrageScript":
           this._targetPos = new Vector2(playerOnLeft ? this._roomBounds.xMax : this._roomBounds.xMin, this._roomBounds.center.y);
@@ -116,7 +126,7 @@ public partial class ArmisticeBoss : AIActor
       protected int originalLayer = -1;
       protected GameObject _trail = null;
 
-      public SecretBullet(Color? tint = null, float emission = 10f, float emitColorPower = 1.5f, bool fancySpawn = false) : base("getboned")
+      public SecretBullet(Color? tint = null, float emission = 10f, float emitColorPower = 1.5f, bool fancySpawn = false, string baseProj = "getboned") : base(baseProj)
       {
         this._tint = tint;
         this._emission = emission;
@@ -131,7 +141,7 @@ public partial class ArmisticeBoss : AIActor
           this._trail.SetGlowiness(glow);
       }
 
-      protected void OnBaseDestruction(Projectile projectile)
+      protected virtual void OnBaseDestruction(Projectile projectile)
       {
         if (this._trail)
         {
@@ -806,153 +816,272 @@ public partial class ArmisticeBoss : AIActor
   private class BoxTrotScript : ArmisticeBulletScript
   {
 
-    internal class BoxTrotBullet : SecretBullet
+    internal class BoxTrotTurret : SecretBullet
     {
+      private const float _BEAM_TIME = 0.5f; // time it takes beam to fully grow
 
-      private bool _shooter = false;
-      private float _offset = 0.0f;
+      private PathRect _path;
+      private float _offset;
+      private float _top;
+      private float _bottom;
+      private GameObject _sightline = null;
+      private Transform _transform;
+      private float _lastAngle = 361f;
+      private Shader _oldShader;
 
-      public BoxTrotBullet() : base()
+      public BoxTrotTurret(PathRect path, float offset, float top, float bottom) : base(baseProj: "turret"/*, emission: 0f*/)
       {
+        this._path = path;
+        this._offset = offset;
+        this._top = top;
+        this._bottom = bottom;
       }
 
       public override void Initialize()
       {
         base.Initialize();
+        tk2dBaseSprite sprite = base.Projectile.sprite;
+        sprite.usesOverrideMaterial = true;
+        this._oldShader = sprite.renderer.material.shader;
+        sprite.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
+
+        // base.Projectile.specRigidbody.DebugColliders();
+        base.Projectile.specRigidbody.OnPreTileCollision += this.OnPreTileCollision;
+      }
+
+      private void OnPreTileCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, PhysicsEngine.Tile tile, PixelCollider tilePixelCollider)
+      {
+        myRigidbody.CollideWithTileMap = false;
+        PhysicsEngine.SkipCollision = true;
+        if (!base.ManualControl)
+          Deploy();
+      }
+
+      protected override void OnBaseDestruction(Projectile projectile)
+      {
+        base.OnBaseDestruction(projectile);
+        if (projectile.specRigidbody)
+          projectile.specRigidbody.OnPreTileCollision -= this.OnPreTileCollision;
+        if (this._sightline)
+        {
+          UnityEngine.Object.Destroy(this._sightline);
+          this._sightline = null;
+        }
+        tk2dBaseSprite sprite = projectile.sprite;
+        sprite.usesOverrideMaterial = false;
+        sprite.renderer.material.shader = this._oldShader;
+      }
+
+      private void ManualUpdate()
+      {
+        if (!this._path.rect.Contains(base.Position))
+          Deploy();
+      }
+
+      private void Deploy()
+      {
+        this._offset = this._path.InverseAt(base.Position);
+        base.Position = this._path.At(this._offset);
+        base.TimeScale = -1f; // update every tick
+        base.ManualControl = true; // we now control it
+        base.Projectile.gameObject.Play("armistice_laser_deploy_sound");
+      }
+
+      private void DrawBeamToWall(float startTime, Vector2 center)
+      {
+        const float SIGHT_WIDTH = 2.0f;
+
+        float beamLength = Ease.OutCubic(Mathf.Clamp01((BraveTime.ScaledTimeSinceStartup - startTime) / _BEAM_TIME));
+        float x = base.Position.x;
+        float y = base.Position.y;
+        bool horizontal = y < this._bottom && y > this._top;
+        float angle;
+        if (horizontal)
+          angle = x < center.x ? 0f : 180f;
+        else
+          angle = y < center.y ? 90f : 270f;
+
+        if (this._lastAngle > 360f)
+          this._lastAngle = angle;
+
+        float angleDelta = this._lastAngle.RelAngleTo(angle);
+        this._lastAngle = (this._lastAngle + Lazy.SmoothestLerp(0, angleDelta, 10f)) % 360f;
+
+        if (!this._sightline)
+        {
+          this._sightline = VFX.CreateLaserSight(this._transform.position, 1f, SIGHT_WIDTH, this._lastAngle, colour: Color.red, power: 50f);
+          this._sightline.transform.parent = this._transform;
+        }
+
+        int rayMask = CollisionMask.LayerToMask(CollisionLayer.HighObstacle);
+        RaycastResult result;
+        if (!PhysicsEngine.Instance.Raycast(base.Projectile.SafeCenter, this._lastAngle.ToVector(), 999f, out result, true, false, rayMask, null, false))
+        {
+            RaycastResult.Pool.Free(ref result);
+            return;
+        }
+        float length = beamLength * C.PIXELS_PER_TILE * result.Distance;
+        Vector2 target = result.Contact;
+        RaycastResult.Pool.Free(ref result);
+
+        tk2dTiledSprite sprite = this._sightline.GetComponent<tk2dTiledSprite>();
+        sprite.renderer.enabled = true;
+        sprite.dimensions = new Vector2(length, SIGHT_WIDTH);
+        this._sightline.transform.rotation = this._lastAngle.EulerZ();
+        this._sightline.transform.localPosition = Vector2.zero;
+        sprite.ForceRotationRebuild();
+        sprite.UpdateZDepth();
       }
 
       public override IEnumerator Top()
       {
+        const int SPEED = 50;
+        const float COOLDOWN = 0.5f;
+        const float RPS = 0.2f;
+
+        while (!base.ManualControl) // can't do anything until colliding with the wall
+        {
+          ManualUpdate();
+          yield return Wait(1);
+        }
+
+        float now = BraveTime.ScaledTimeSinceStartup;
+        float nextShootTime = now + _BEAM_TIME;
+        float startTime = now;
+        Vector2 lastPos = base.Position;
+        Vector2 center = this._path.At(0.5f, 0.5f);
+        bool?[] oldSideH = [null, null];
+        bool?[] oldSideV = [null, null];
+
+        this._transform = base.Projectile.gameObject.transform;
+
+        while (true)
+        {
+          yield return Wait(1);
+
+          now = BraveTime.ScaledTimeSinceStartup;
+          lastPos = base.Position;
+          float t = RPS * (now - startTime);
+          base.Position = this._path.At((this._offset + t) % 1f);
+          // base.Projectile.specRigidbody.DrawDebugHitbox();
+          DrawBeamToWall(startTime, center);
+          base.Projectile.SetRotation(this._lastAngle);
+          if (nextShootTime > now)
+            continue;
+
+          float y = base.Position.y;
+          bool horizontal = y < this._bottom && y > this._top;
+          foreach (PlayerController player in GameManager.Instance.AllPlayers)
+          {
+            int idx = player.PlayerIDX;
+            if (idx < 0 || idx > 1)
+              continue;
+
+            bool changedSides = false;
+            Vector2 ppos = player.CenterPosition;
+            if (horizontal)
+            {
+              bool curSide = ppos.y < base.Position.y;
+              changedSides = (oldSideH[idx] ?? curSide) != curSide;
+              oldSideH[idx] = curSide;
+            }
+            else
+            {
+              bool curSide = ppos.x < base.Position.x;
+              changedSides = (oldSideV[idx] ?? curSide) != curSide;
+              oldSideV[idx] = curSide;
+            }
+
+            if (!changedSides)
+              continue;
+
+            float angle;
+            if (horizontal)
+              angle = base.Position.x < center.x ? 0f : 180f;
+            else
+              angle = base.Position.y < center.y ? 90f : 270f;
+
+            base.Fire(Offset.OverridePosition(base.Position), new Direction(angle), new Speed(SPEED), new BoxTrotBullet());
+            CwaffVFX.Spawn(prefab: _MuzzleVFXTurret, position: base.Position, rotation: angle.EulerZ(),
+              emissivePower: 0.5f, emissiveColor: Color.white, startScale: 0.5f, anchorTransform: base.Projectile.transform);
+            nextShootTime = now + COOLDOWN;
+          }
+        }
+      }
+
+    }
+
+    internal class BoxTrotBullet : SecretBullet
+    {
+      public override void Initialize()
+      {
+        base.Initialize();
+        base.Projectile.gameObject.Play("armistice_turret_fire_sound");
         this._trail = base.Projectile.AddTrail(SubtractorBeam._RedTrailPrefab).gameObject;
         this._trail.SetGlowiness(100f);
-        yield break;
       }
+
+      // public override IEnumerator Top()
+      // {
+      //   yield break;
+      // }
 
     }
 
     protected override List<FluidBulletInfo> BuildChain()
     {
+      base.TimeScale = -1f;
       return Run(Attack()).Finish();
-    }
-
-    private class ShootData
-    {
-      public Vector2 lastPos;
-      public float nextShootTime;
     }
 
     private IEnumerator Attack()
     {
-      const int BULLETS = 60;
-      const int SHOOTERS = 2;
-      const int SPEED = 50;
-      const float LENGTH = 800;
-      const float RPS = 1f / 400f;
-      const float COOLDOWN = 0.5f;
-      const float EPSILON = 0.1f;
+      const int TURRETS              = 3;
+      const float LENGTH             = 6f;
+      const float EPSILON            = 0.1f;
+      const float TIME_BETWEEN_SHOTS = 0.5f;
 
-      Rect bounds = this.roomFullBounds.Inset(1f, 1.25f, 2f, 1f);
-      Vector2 boundsCenter = bounds.center;
-      float top = bounds.yMin + EPSILON;
-      float bottom = bounds.yMax - EPSILON;
-      float midX = boundsCenter.x;
-      float midY = boundsCenter.y;
-      PathRect path = new PathRect(bounds);
-
+      AIActor boss               = base.BulletBank.aiActor;
+      Rect bounds                = this.roomFullBounds.Inset(0.5f, 1.25f, 2f, 1f);
+      float top                  = bounds.yMin + EPSILON;
+      float bottom               = bounds.yMax - EPSILON;
+      PathRect path              = new PathRect(bounds);
       List<SecretBullet> bullets = new();
-      List<SecretBullet> shooterBullets = new(SHOOTERS);
-      List<int> shooterIndices = new(SHOOTERS);
-      List<ShootData> shootData = new(SHOOTERS);
 
-      for (int i = 0; i < SHOOTERS; ++i)
+      for (int i = 0; i < TURRETS; ++i)
       {
-        int index = -1;
-        while (index < 0 || shooterIndices.Contains(index))
-          index = (int)(BULLETS * UnityEngine.Random.value);
-        shooterIndices.Add(index);
-      }
+        bool facingLeft = boss.gameObject.transform.position.x > bounds.center.x;
+        boss.sprite.FlipX = facingLeft;
+        Vector2 firePos = boss.gameObject.transform.position + GunBarrelOffset(facingLeft: facingLeft);
 
-      for (int i = 0; i < BULLETS; ++i)
-      {
-        float off = (float)i / BULLETS;
-        Vector2 pos = path.At(off);
-        bool isShooter = shooterIndices.Contains(i);
-        SecretBullet bullet = new SecretBullet(tint: isShooter ? Color.cyan : null);
-        bullet.ManualControl = true;
+        //TODO: pick a different sound and muzzle later maybe
+        BoxTrotTurret bullet = new BoxTrotTurret(path, 0f, top, bottom);
         bullets.Add(bullet);
-        if (isShooter)
+        float shootDir = (facingLeft ? 180f : 0f).AddRandomSpread(15f);
+        this.Fire(Offset.OverridePosition(firePos), new Direction(shootDir), new Speed(50f), bullet);
+        boss.gameObject.Play("armistice_launch_turret_sound");
+        CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: firePos, rotation: shootDir.EulerZ(),
+          emissivePower: 10f, emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
+
+        boss.aiAnimator.PlayUntilFinished("attack_snipe");
+        while (boss.spriteAnimator.IsPlaying("attack_snipe"))
+          yield return Wait(1);
+        boss.aiAnimator.PlayUntilCancelled("idle");
+        for (float elapsed = 0f; elapsed < TIME_BETWEEN_SHOTS; elapsed += BraveTime.DeltaTime)
+          yield return Wait(1);
+        if (i < TURRETS - 1)
         {
-          shooterBullets.Add(bullet);
-          shootData.Add(new ShootData(){lastPos =  pos, nextShootTime = 0f});
+          boss.aiAnimator.PlayUntilCancelled("ready");
+          while (boss.spriteAnimator.IsPlaying("ready"))
+            yield return Wait(1);
         }
-        this.Fire(Offset.OverridePosition(pos), bullet);
       }
 
-      for (int i = 0; i < LENGTH; ++i)
-      {
-        float t = RPS * i;
-
-        for (int n = 0; n < BULLETS; ++n)
-        {
-          if (!bullets[n].Projectile)
-            continue;
-          float off = (float)n / BULLETS;
-          bullets[n].Position = path.At((t + off) % 1f);
-        }
-
-        bool oldSide;
-        bool curSide;
-        float now = BraveTime.ScaledTimeSinceStartup;
-        for (int s = 0; s < SHOOTERS; ++s)
-        {
-          SecretBullet shooter = shooterBullets[s];
-          if (!shooter.Projectile || shooter.Destroyed)
-            continue;
-
-          Vector2 curPos = shooter.Position;
-          if (shootData[s].nextShootTime > now)
-          {
-            shootData[s].lastPos = curPos;
-            continue;
-          }
-
-          float y = curPos.y;
-          bool horizontal = y < bottom && y > top;
-          foreach (PlayerController player in GameManager.Instance.AllPlayers)
-          {
-            Vector2 ppos = player.CenterPosition;
-            if (horizontal)
-            {
-              oldSide = ppos.y < shootData[s].lastPos.y;
-              curSide = ppos.y < curPos.y;
-            }
-            else
-            {
-              oldSide = ppos.x < shootData[s].lastPos.x;
-              curSide = ppos.x < curPos.x;
-            }
-
-            if (oldSide == curSide)
-              continue;
-
-            float angle;
-            if (horizontal)
-              angle = curPos.x < midX ? 0f : 180f;
-            else
-              angle = curPos.y < midY ? 90f : 270f;
-
-            BoxTrotBullet newBullet = new BoxTrotBullet();
-            base.Fire(Offset.OverridePosition(curPos), new Direction(angle), new Speed(SPEED), newBullet);
-            shootData[s].nextShootTime = now + COOLDOWN;
-          }
-
-          shootData[s].lastPos = curPos;
-        }
-
+      float endTime = BraveTime.ScaledTimeSinceStartup + LENGTH;
+      while (BraveTime.ScaledTimeSinceStartup < endTime)
         yield return Wait(1);
-      }
 
-      for (int n = 0; n < BULLETS; ++n)
+      for (int n = 0; n < TURRETS; ++n)
         if (bullets[n].Projectile)
           bullets[n].Vanish();
 
@@ -982,7 +1111,7 @@ public partial class ArmisticeBoss : AIActor
       AIActor actor = base.BulletBank.aiActor;
       Transform t = actor.gameObject.transform;
       bool facingLeft = t.position.x > this.roomFullBounds.center.x;
-      Vector2 shootPoint = t.position + C.PIXEL_SIZE * new Vector3(facingLeft ? -36f : 36f, 23f, 0f);
+      Vector2 shootPoint = t.position + GunBarrelOffset(facingLeft);
       Offset shootOff = Offset.OverridePosition(shootPoint);
       float shootAngle = facingLeft ? 180f : 0f;
 

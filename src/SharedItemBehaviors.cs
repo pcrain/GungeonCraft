@@ -327,11 +327,13 @@ public static class AnimatedBullet // stolen and modified from NN
             fixesScales: fixesScales, overrideColliderPixelSizes: overrideColliderPixelSizes, overrideColliderOffsets: overrideColliderOffsets);
     }
 
-    public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0)
+    public static void SetAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0, bool makeDefault = false)
     {
         tk2dSpriteAnimator animator = proj.sprite.spriteAnimator;
         animator.currentClip = clip;
         animator.PlayFromFrame(frame);
+        if (makeDefault)
+            animator.DefaultClipId = animator.Library.clips.Length - 1;
     }
 
     public static void AddClip(this tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, bool overwriteExisting = false)
@@ -366,7 +368,7 @@ public static class AnimatedBullet // stolen and modified from NN
     public static void AddDefaultAnimation(this Projectile proj, tk2dSpriteAnimationClip clip, int frame = 0, bool overwriteExisting = false)
     {
         proj.AddAnimation(clip, overwriteExisting: overwriteExisting);
-        proj.SetAnimation(clip, frame);
+        proj.SetAnimation(clip, frame, makeDefault: true);
     }
 
     public static void AddDefaultAnimation(this Projectile proj, GunData b, int frame = 0)
