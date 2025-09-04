@@ -50,6 +50,9 @@ public partial class ArmisticeBoss : AIActor
         case "WalledInScript":
           break;
         case "BoneTunnelScript":
+          float playerY = Mathf.Clamp(this._targetPlayer.sprite.WorldBottomCenter.y, this._roomBounds.yMin, this._roomBounds.yMax);
+          this._targetPos = new Vector2( // cross to the far side of the room opposite to the player
+            this._roomBounds.xMin + (playerOnLeft ? 1.0f : 0.0f) * this._roomBounds.width, playerY);
           break;
         case "DanceMonkeyScript":
           break;
@@ -64,7 +67,7 @@ public partial class ArmisticeBoss : AIActor
           this._targetPos = new Vector2(playerOnLeft ? this._roomBounds.xMax : this._roomBounds.xMin, this._roomBounds.center.y);
           break;
         case "MeteorShowerScript":
-          this._targetPos = new Vector2( // cross to the other side of the room
+          this._targetPos = new Vector2( // cross to the other side of the room, stand near the bottom
             this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f) * this._roomBounds.width,
             this._roomBounds.center.y + UnityEngine.Random.Range(-0.4f, -0.25f) * this._roomBounds.height);
           break;
@@ -549,6 +552,45 @@ public partial class ArmisticeBoss : AIActor
 
   private class BoneTunnelScript : ArmisticeBulletScript
   {
+    private const float _YOFFSET = 10f;
+    private const float _CONVERGE_TIME = 0.3f;
+    private const float SPEED = 25f;
+
+    internal class BoneTunnelBullet : SecretBullet
+    {
+      private float _targetY;
+      private float _startY;
+
+      public BoneTunnelBullet(float targetY) : base()
+      {
+        this._targetY = targetY;
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+        base.TimeScale = -1f;
+        this._startY = base.Position.y;
+        base.Projectile.specRigidbody.CollideWithTileMap = false;
+      }
+
+      public override IEnumerator Top()
+      {
+        float lifeTime = 0f;
+        float yOffset = this._startY - this._targetY;
+        while (lifeTime < _CONVERGE_TIME)
+        {
+          lifeTime += BraveTime.DeltaTime;
+          float t = Mathf.Clamp01(lifeTime / _CONVERGE_TIME);
+          base.Position = base.Position.WithY(this._startY - Ease.OutCubic(t) * yOffset);
+          yield return Wait(1);
+        }
+        base.Position = base.Position.WithY(this._targetY);
+        base.Projectile.specRigidbody.CollideWithTileMap = true;
+        yield break;
+      }
+
+    }
 
     protected override List<FluidBulletInfo> BuildChain()
     {
@@ -557,35 +599,43 @@ public partial class ArmisticeBoss : AIActor
 
     private IEnumerator Attack()
     {
-      const float SPEED = 25f;
-      const int RATE    = 5; // frames between bullets
-      const int TIME    = 60 * 5; // frames the attack lasts
-      const int GAP     = 5; // size of the path we have to navigate
-      const int ROWS    = 50; // number of rows of bullets
-      const int NOGAP   = 3; // number of columns at the end with no gap
+      const int RATE          = 5; // frames between bullets
+      const int WAVES         = 60; // base waves the attack lasts
+      const int WAVE_VARIANCE = 10; // max additional waves the attack lasts
+      const int GAP           = 5; // size of the path we have to navigate
+      const int ROWS          = 50; // number of rows of bullets
+      const int NOGAP         = 3; // number of columns at the end with no gap
 
-      PathRect roomRect = new PathRect(this.roomFullBounds.Inset(1f, 0.25f));
+      //TODO: sound / visual cue
+      yield return Wait(15); // wait for a quarter of a second
+
+      PathRect roomRect = new PathRect(this.roomFullBounds.Inset(0f, 0.25f));
       Speed sspeed = new Speed(SPEED);
 
       Vector2 ppos = GameManager.Instance.BestActivePlayer.CenterPosition;
-      bool leftward = (ppos.x < this.roomFullBounds.center.x);
+      // bool leftward = (ppos.x < this.roomFullBounds.center.x);
+      bool leftward = (base.BulletBank.aiActor.Position.x > this.roomFullBounds.center.x);
       Direction dir = new Direction(leftward ? 180f : 0f);
       PathLine wall = leftward ? roomRect.Right() : roomRect.Left();
       float wallOff = leftward ? -2.5f : 2.5f;
 
       int gapPos = Mathf.RoundToInt(ROWS * ((ppos.y - wall.start.y) / (wall.end.y - wall.start.y)));
 
-      for (int i = 0; i < TIME; i += RATE)
+      int numWaves = WAVES + UnityEngine.Random.Range(0, WAVE_VARIANCE);
+      for (int i = 0; i < numWaves; ++i)
       {
-        bool hasGap = i < (TIME - RATE * NOGAP);
+        bool hasGap = i < (numWaves - NOGAP);
+        float amplitude = Mathf.Clamp01(0.1f * (numWaves - i)); // the last few waves close in to prevent cheesing by standing near the edge
         for (int j = 0; j <= ROWS; ++j)
         {
           if (hasGap && Mathf.Abs(j - gapPos) < GAP)
             continue;
           float off = (float)j / ROWS;
           Vector2 bpos = wall.At(off) + new Vector2(wallOff * UnityEngine.Random.value, 0f);
-          this.Fire(Offset.OverridePosition(bpos), dir, sspeed, new SecretBullet());
+          float offset = amplitude * ((j > gapPos) ? _YOFFSET : -_YOFFSET);
+          this.Fire(Offset.OverridePosition(bpos + new Vector2(0f, offset)), dir, sspeed, new BoneTunnelBullet(targetY: bpos.y));
         }
+        base.BulletBank.aiActor.gameObject.Play($"armistice_bullet_storm_sound_{1 + (i % 4)}");
         if (gapPos <= GAP)
           ++gapPos;
         else if (gapPos >= ROWS - GAP)
