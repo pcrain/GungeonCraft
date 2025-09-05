@@ -103,6 +103,7 @@
     <Compile Include="src\Cwaff-Enemies\Bosses\Armistice\MoveAndShootBehavior.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Armistice\ArmisticeAttacks.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Armistice\Armistice.cs"/>
+    <Compile Include="src\Cwaff-Enemies\Bosses\BossShared.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansNPC.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\Sans.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Sans\SansAttacks.cs"/>

@@ -136,7 +136,7 @@ public partial class SansBoss : AIActor
       theBoss.gameObject.Play("undertale_eyeflash");
       Vector2 ppos = target.CenterPosition;
       for (float i = 1f; i <= 4f; ++i)
-        DoomZone(ppos - i*0.5f*Vector2.right, ppos + i*0.5f*Vector2.right, i, 0.5f, 1, orange ? orangeReticle : blueReticle);
+        BossShared.DoomZone(ppos - i*0.5f*Vector2.right, ppos + i*0.5f*Vector2.right, i, 0.5f, 1, orange ? orangeReticle : blueReticle);
       List<Vector2> points = new PathRect(base.roomBulletBounds).SampleUniform(COUNT);
       yield return Wait(LENIENCE);
       for(int wave = 0; wave < WAVES; ++wave)
@@ -477,7 +477,7 @@ public partial class SansBoss : AIActor
             spawnPoint = base.roomBulletBounds.RandomPointOnPerimeter();
           spawnPoints.Add(spawnPoint);
           shotAngles.Add((ppos-spawnPoint).ToAngle().Clamp180());
-          DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], base.roomFullBounds), 1f, PHASEDELAY / C.FPS, 10);
+          BossShared.DoomZone(spawnPoint, spawnPoints[s].RaycastToWall(shotAngles[s], base.roomFullBounds), 1f, PHASEDELAY / C.FPS, 10);
           target.gameObject.Play(SOUND_SPAWN);
           yield return Wait(SHOTDELAY);
         }
@@ -768,7 +768,7 @@ public partial class SansBoss : AIActor
       {
         if (warn)
         {
-          DoomZone(points[i], points[i].RaycastToWall(angle, base.roomBulletBounds), 1f, COUNT / 15.0f, 20);
+          BossShared.DoomZone(points[i], points[i].RaycastToWall(angle, base.roomBulletBounds), 1f, COUNT / 15.0f, 20);
           if (i % 2 == 0)
             theBoss.gameObject.Play(SOUND_SPAWN_QUIET);
         }

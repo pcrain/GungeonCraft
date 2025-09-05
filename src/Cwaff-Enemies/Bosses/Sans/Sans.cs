@@ -7,7 +7,6 @@ public partial class SansBoss : AIActor
   private const  string SUBTITLE               = "Introducing...";
   private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/Bosses/sans";
 
-  private static GameObject _NapalmReticle      = null;
   private static AIBulletBank.Entry _BoneBullet = null;
 
   private const  int _SANS_HP = 60;
@@ -59,10 +58,6 @@ public partial class SansBoss : AIActor
 
   private static void InitPrefabs()
   {
-    // Targeting reticle
-    _NapalmReticle = ResourceManager.LoadAssetBundle("shared_auto_002").LoadAsset<GameObject>("NapalmStrikeReticle").ClonePrefab();
-      _NapalmReticle.GetComponent<tk2dSlicedSprite>().SetSprite(VFX.Collection, VFX.Collection.GetSpriteIdByName("reticle_white"));
-      UnityEngine.Object.Destroy(_NapalmReticle.GetComponent<ReticleRiserEffect>());  // delete risers for use with DoomZoneGrowth component later
     // Bone bullet
     Projectile boneBulletProjectile = Items.HegemonyRifle.CloneProjectile();
       // boneBulletProjectile.BulletScriptSettings.preventPooling = true; // prevents shenanigans with OrangeAndBlue Bullet script causing permanent collision skips
@@ -76,35 +71,6 @@ public partial class SansBoss : AIActor
 
   private static void SpawnDust(Vector2 where)
     { SpawnManager.SpawnVFX(GameManager.Instance.Dungeon.dungeonDustups.rollLandDustup, where, Lazy.RandomEulerZ()); }
-
-  private static IEnumerator Lengthen(tk2dSlicedSprite quad, float targetLength, int numFrames)
-  {
-    float scaleFactor = C.PIXELS_PER_TILE * targetLength / numFrames;
-    for (int i = 1 ; i <= numFrames; ++i)
-    {
-      quad.dimensions = quad.dimensions.WithX(scaleFactor * i);
-      quad.UpdateZDepth();
-      yield return null;
-    }
-    quad.gameObject.AddComponent<ReticleRiserEffect>().NumRisers = 3; // restore reticle riser settings
-  }
-
-  // Creates a napalm-strike-esque danger zone
-  private static GameObject DoomZone(Vector2 start, Vector2 target, float width, float lifetime = -1f, int growthTime = 1, string sprite = null)
-  {
-    Vector2 delta         = target - start;
-    GameObject reticle    = UnityEngine.Object.Instantiate(_NapalmReticle);
-    tk2dSlicedSprite quad = reticle.GetComponent<tk2dSlicedSprite>();
-      if (sprite != null)
-        quad.SetSprite(VFX.Collection, VFX.Collection.GetSpriteIdByName(sprite));
-      quad.dimensions              = C.PIXELS_PER_TILE * (new Vector2(delta.magnitude / growthTime, width));
-      quad.transform.localRotation = delta.EulerZ();
-      quad.transform.position      = start + (0.5f * width * delta.normalized.Rotate(-90f));
-      quad.StartCoroutine(Lengthen(quad, delta.magnitude,growthTime));
-    if (lifetime > 0)
-      reticle.ExpireIn(lifetime);
-    return reticle;
-  }
 
   private class BossBehavior : BraveBehaviour
   {

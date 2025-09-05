@@ -74,7 +74,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 	
 ### Sounds
 
-* A few sounds from [OpenGameArt.org](https://opengameart.org), and the rest from various games including Paper Mario 64 / TTYD, Terraria, Super Smash Bros. Melee, The Elder Scrolls: Morrowind, Dragonball Z Budokai Tenkaichi 3, Donkey Kong 64, Kirby: Squeak Squad, Minecraft, Undertale, and The Legend of Zelda: The Minish Cap 
+* A few sounds from [OpenGameArt.org](https://opengameart.org), and the rest from various games including Paper Mario 64 / TTYD, Terraria, Super Smash Bros., The Elder Scrolls: Morrowind, Dragonball Z Budokai Tenkaichi 3, Donkey Kong 64, Kirby: Squeak Squad, Minecraft, Undertale, The Legend of Zelda: The Minish Cap, and Team Fortress 2
 	* Digital sounds by [jalastram](https://opengameart.org/content/sound-effects-sfx003)
 * [SPOILERS] boss music [by tomori](https://www.youtube.com/watch?v=pC_7lrh6mGs)
 * Circus music from [Entry of the Gladiators Commodore 64, 6581 Clown Music](https://www.youtube.com/watch?v=ZnHwPX2WxZs)

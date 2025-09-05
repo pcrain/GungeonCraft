@@ -434,6 +434,7 @@ public class Initialisation : BaseUnityPlugin
 
             #region Bosses yo (not async for now due to needing to load boss card textures)
                 System.Diagnostics.Stopwatch setupBossesWatch = System.Diagnostics.Stopwatch.StartNew();
+                BossShared.Init();
                 SansBoss.Init();
                 ArmisticeBoss.Init();
                 setupBossesWatch.Stop();

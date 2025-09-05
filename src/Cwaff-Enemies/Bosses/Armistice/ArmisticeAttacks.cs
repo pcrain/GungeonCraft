@@ -50,6 +50,7 @@ public partial class ArmisticeBoss : AIActor
         case "WalledInScript":
           break;
         case "BoneTunnelScript":
+        case "TrickshotScript":
           float playerY = Mathf.Clamp(this._targetPlayer.sprite.WorldBottomCenter.y, this._roomBounds.yMin, this._roomBounds.yMax);
           this._targetPos = new Vector2( // cross to the far side of the room opposite to the player
             this._roomBounds.xMin + (playerOnLeft ? 1.0f : 0.0f) * this._roomBounds.width, playerY);
@@ -155,7 +156,8 @@ public partial class ArmisticeBoss : AIActor
       {
         if (this._trail)
         {
-          UnityEngine.Object.Destroy(this._trail);
+          // UnityEngine.Object.Destroy(this._trail);
+          this._trail.GetComponent<CwaffTrailController>().DisconnectFromSpecRigidbody();
           this._trail = null;
         }
         if (this.originalLayer > -1)
@@ -1359,6 +1361,183 @@ public partial class ArmisticeBoss : AIActor
           emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
         while (boss.aiAnimator.IsPlaying("skyshot"))
           yield return Wait(1);
+      }
+      yield break;
+    }
+
+  }
+
+  private class TrickshotScript : ArmisticeBulletScript
+  {
+    protected override List<FluidBulletInfo> BuildChain() => Run(Attack()).Finish();
+
+    private List<Geometry> _lines = null;
+    private static readonly int _RayMask = CollisionMask.LayerToMask(CollisionLayer.HighObstacle);
+
+    private static Vector2 Contact(Vector2 pos, Vector2 dir)
+    {
+        RaycastResult result;
+        Vector2 contact = default;
+        if (PhysicsEngine.Instance.Raycast(pos, dir, 999f, out result, true, false, _RayMask))
+          contact = result.Contact;
+        RaycastResult.Pool.Free(ref result);
+        return contact;
+    }
+
+    private static readonly Color[] _Colors = [Color.cyan, Color.red, Color.green];
+
+    private IEnumerator Attack()
+    {
+      base.TimeScale = -1f; // update every frame
+
+      const int BLINKS = 3;
+      const int ATTACKS = 15;
+      const int ATTACK_MAX_RAMP = 5;
+      const int TRICKS = 5;
+      const int TRICKRATE = ATTACKS / TRICKS;
+      const float BLINKTIME = 0.125f;
+      const float MINBLINKTIME = 0.07f;
+      const float ATTACK_GAP = 0.4f;
+      const float MIN_ATTACK_GAP = 0.15f;
+
+      PlayerController pc = GameManager.Instance.BestActivePlayer;
+      Vector2 target = pc.CenterPosition;
+
+      AIActor boss = base.BulletBank.aiActor;
+      Vector2 shootPoint = boss.gameObject.transform.position + GunBarrelOffset(facingLeft: boss.sprite.FlipX);
+      tk2dSlicedSprite dangerZone = BossShared.DoomZone(shootPoint, target, width: 1f, rise: false);
+      dangerZone.TileStretchedSprites = true;
+      dangerZone.SetBorder(1/3f, 0f, 1/3f, 0f);
+      int orangeId = VFX.Collection.GetSpriteIdByName(boss.CenterPosition.x < pc.CenterPosition.x ? "reticle_caution_small" : "reticle_caution_small_inverted");
+      int blueId = VFX.Collection.GetSpriteIdByName("reticle_safe_small");
+      List<int> tricks = new List<int>(4);
+      for (int i = 0; i < TRICKS; ++i)
+        tricks.Add(UnityEngine.Random.Range(TRICKRATE * i, TRICKRATE * (i + 1)));
+
+      for (int a = 0; a < ATTACKS; ++a)
+      {
+        bool trickery = tricks.Contains(a);
+        dangerZone.SetSprite(trickery ? blueId : orangeId);
+
+        float t = 1f - Mathf.Clamp01((float)a / ATTACK_MAX_RAMP);
+
+        float blinkTime = MINBLINKTIME + (BLINKTIME - MINBLINKTIME) * t;
+        boss.aiAnimator.PlayUntilCancelled("ready");
+        for (int i = 0; i < BLINKS; ++i)
+        {
+          dangerZone.renderer.enabled = true;
+          base.BulletBank.aiActor.gameObject.Play("armistice_danger_beep_sound");
+          for (float wait = BraveTime.ScaledTimeSinceStartup + blinkTime; BraveTime.ScaledTimeSinceStartup < wait; )
+          {
+            dangerZone.Retarget(shootPoint, pc.CenterPosition);
+            yield return Wait(1);
+          }
+
+          dangerZone.renderer.enabled = false;
+          for (float wait = BraveTime.ScaledTimeSinceStartup + blinkTime; BraveTime.ScaledTimeSinceStartup < wait; )
+            yield return Wait(1);
+        }
+
+        float delay = MIN_ATTACK_GAP + (ATTACK_GAP - MIN_ATTACK_GAP) * t;
+        if (trickery)
+        {
+          bool shouldFire = false;
+          for (float wait = BraveTime.ScaledTimeSinceStartup + delay; BraveTime.ScaledTimeSinceStartup < wait; )
+          {
+            if (pc.IsDodgeRolling)
+            {
+              shouldFire = true;
+              break;
+            }
+            yield return Wait(1);
+          }
+          if (!shouldFire)
+            continue; // continue with outer loop
+          boss.gameObject.Play("armistice_laugh_2");
+          while (pc.IsDodgeRolling && !pc.healthHaver.IsVulnerable)
+            yield return Wait(1);
+        }
+
+        boss.aiAnimator.PlayUntilFinished("attack_snipe");
+        for (int x = -1; x <= 1; ++x)
+        {
+          float launchAngle = (pc.CenterPosition - shootPoint).ToAngle();
+          if (x != 0)
+          {
+            const float OFFSET = 1f;
+            Vector2 perpendicular = (launchAngle + x * 90f).ToVector(OFFSET);
+            launchAngle = (pc.CenterPosition + perpendicular - shootPoint).ToAngle();
+          }
+          SecretBullet laser = new SecretBullet(tint: Color.cyan);
+          base.Fire(Offset.OverridePosition(shootPoint), new Direction(launchAngle), new Speed(200f), laser);
+          laser.AddTrail(_TrickshotTrailPrefab, glow: 100f);
+          boss.gameObject.PlayUnique("armistice_trickshot_sound"); //TODO: add armistice_trickshot_sound
+          CwaffVFX.Spawn(prefab: _MuzzleVFXSnipe, position: shootPoint, rotation: launchAngle.EulerZ(), emissivePower: 10f,
+            emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
+        }
+
+        for (float wait = BraveTime.ScaledTimeSinceStartup + delay; BraveTime.ScaledTimeSinceStartup < wait; )
+        {
+          if (!boss.aiAnimator.IsPlaying("attack_snipe"))
+            boss.aiAnimator.PlayUntilCancelled("ready");
+          yield return Wait(1);
+        }
+      }
+
+      boss.aiAnimator.PlayUntilCancelled("idle");
+      UnityEngine.Object.Destroy(dangerZone.gameObject);
+      yield break;
+    }
+
+    //REFACTOR: factor out room bounds finding code to something shared by all scripts
+    private IEnumerator AttackOld()
+    {
+      const int BOUNCES   = 10;
+      const float EPSILON = 0.01f;
+      const int RAYS      = 1;
+      const float SPREAD  = 10f;
+
+      if (_lines == null)
+      {
+        int numLines = (BOUNCES + 1) * (RAYS * 2 + 1);
+        _lines = new List<Geometry>(numLines);
+        for (int i = 0; i <= numLines; ++i)
+          _lines.Add(new GameObject().AddComponent<Geometry>());
+      }
+
+      AIActor boss = base.BulletBank.aiActor;
+      Vector2 refPoint = this.roomFullBounds.min + 0.25f * this.roomFullBounds.size;
+      float left = Contact(refPoint, Vector2.left).x;
+      float bottom = Contact(refPoint, Vector2.down).y;
+      float right = Contact(refPoint, Vector2.right).x;
+      float top = Contact(refPoint, Vector2.up).y;
+      Rect trueBounds = new Rect(left, bottom, right - left, top - bottom);
+
+      while (this != null)
+      {
+        Vector2 pos = boss.gameObject.transform.position + GunBarrelOffset(facingLeft: boss.sprite.FlipX);
+        Vector2 ppos = GameManager.Instance.BestActivePlayer.CenterPosition;
+        Vector2 angleVec = (ppos - pos).normalized;
+        Vector2 isect = default;
+        int idx = 0;
+        for (int n = -RAYS; n <= RAYS; ++n)
+        {
+          Vector2 curAngleVec = angleVec.Rotate(n * SPREAD);
+          Vector2 curPos = pos;
+          Color c = _Colors[idx];
+          for (int i = 0; i <= BOUNCES; ++i)
+          {
+            BraveMathCollege.LineSegmentRectangleIntersection(curPos + curAngleVec / 32f, curPos + 100 * curAngleVec, trueBounds.min, trueBounds.max, ref isect);
+            this._lines[(BOUNCES + 1) * idx + i].Setup(shape: Geometry.Shape.LINE, color: c, pos: curPos, pos2: isect);
+            curPos = isect;
+            if (Mathf.Abs(isect.x - left) < EPSILON || Mathf.Abs(isect.x - right) < EPSILON)
+              curAngleVec = new Vector2(-curAngleVec.x, curAngleVec.y);
+            else
+              curAngleVec = new Vector2(curAngleVec.x, -curAngleVec.y);
+          }
+          ++idx;
+        }
+        yield return Wait(1);
       }
       yield break;
     }
