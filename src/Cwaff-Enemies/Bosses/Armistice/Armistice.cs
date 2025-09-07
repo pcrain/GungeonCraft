@@ -11,6 +11,7 @@ public partial class ArmisticeBoss : AIActor
   private static AIBulletBank.Entry _MainBullet = null;
   private static AIBulletBank.Entry _TurretBullet = null;
   private static AIBulletBank.Entry _WarheadBullet = null;
+  private static AIBulletBank.Entry _MagicMissileBullet = null;
 
   internal static GameObject _BulletSpawnVFX = null;
   internal static GameObject _MuzzleVFXBullet = null;
@@ -19,6 +20,7 @@ public partial class ArmisticeBoss : AIActor
   internal static GameObject _MuzzleVFXSnipe = null;
   internal static GameObject _ExplosionVFX = null;
   internal static GameObject _SmokeVFX = null;
+  internal static GameObject _MissileSmokeVFX = null;
   internal static CwaffTrailController _LaserTrailPrefab;
   internal static CwaffTrailController _TrickshotTrailPrefab;
   internal static CwaffTrailController _WarheadTrailPrefab;
@@ -38,7 +40,9 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "attack_snipe", fps:    16f, loop: false);
       bb.AdjustAnimation(name: "breathe",      fps:     2f, loop: true);
       bb.AdjustAnimation(name: "calm",         fps:     6f, loop: true);
-      bb.AdjustAnimation(name: "crouch",       fps:    16f, loop: false);
+      bb.AdjustAnimation(name: "crouch",       fps:    16f, loop: false, eventFrames: [4],
+        eventAudio: ["armistice_missile_launch_sound"]);
+      bb.AdjustAnimation(name: "defeat",       fps:    24f, loop: false);
       bb.AdjustAnimation(name: "idle",         fps:    16f, loop: true);
       bb.AdjustAnimation(name: "ready",        fps:    16f, loop: false);
       bb.AdjustAnimation(name: "reload",       fps:    16f, loop: false, eventFrames: [6, 12],
@@ -66,12 +70,14 @@ public partial class ArmisticeBoss : AIActor
     // bb.CreateBulletAttack<PendulumScript, ArmisticeMoveAndShootBehavior>      (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
 
     //NOTE: finished for now
-    // bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>    (tellAnim: "teleport_out", fireAnim: "breathe", finishAnim: "teleport_in", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    // bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior> (fireAnim: "calm", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    // bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "ready", fireAnim: "attack_snipe", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    // bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    // bb.CreateBulletAttack<MeteorShowerScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "skyshot", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    bb.CreateBulletAttack<TrickshotScript, ArmisticeMoveAndShootBehavior>       (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    const float CD = 0.5f;
+    // bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>    (tellAnim: "teleport_out", fireAnim: "breathe", finishAnim: "teleport_in", cooldown: CD, attackCooldown: CD, interruptible: true);
+    // bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior> (fireAnim: "calm", cooldown: CD, attackCooldown: CD, interruptible: true);
+    // bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "ready", fireAnim: "attack_snipe", cooldown: CD, attackCooldown: CD, interruptible: true);
+    // bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: CD, attackCooldown: CD, interruptible: true);
+    // bb.CreateBulletAttack<MeteorShowerScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "skyshot", cooldown: CD, attackCooldown: CD, interruptible: true);
+    // bb.CreateBulletAttack<TrickshotScript, ArmisticeMoveAndShootBehavior>     (fireAnim: "idle", cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<MagicMissileScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "crouch", cooldown: CD, attackCooldown: CD, interruptible: true);
 
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
@@ -88,6 +94,7 @@ public partial class ArmisticeBoss : AIActor
     _MuzzleVFXSnipe = VFX.Create("muzzle_armistice_snipe", fps: 60, loops: false);
     _ExplosionVFX = VFX.Create("armistice_warhead_explosion_vfx", fps: 30, loops: false);
     _SmokeVFX = VFX.Create("armistice_warhead_smoke", fps: 16, loops: false, scale: 0.5f);
+    _MissileSmokeVFX = VFX.Create("armistice_missile_smoke_vfx", fps: 60, loops: false);
     _LaserTrailPrefab = VFX.CreateSpriteTrailObject("armistice_laser_trail", fps: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
     _TrickshotTrailPrefab = VFX.CreateSpriteTrailObject("armistice_trickshot_trail_a", fps: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
     _WarheadTrailPrefab = VFX.CreateSpriteTrailObject("armistice_warhead_smoke_trail", fps: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
@@ -120,12 +127,30 @@ public partial class ArmisticeBoss : AIActor
     };
 
     Projectile warheadProj = Items._38Special.CloneProjectile();
-    warheadProj.gameObject.name = "armistice warheadProj projectile";
+    warheadProj.gameObject.name = "armistice warhead projectile";
     warheadProj.AddDefaultAnimation(AnimatedBullet.Create(name: "armistice_warhead"), overwriteExisting: true);
     _WarheadBullet = new AIBulletBank.Entry(baseBullet) {
       Name               = "warhead",
       PlayAudio          = false,
       BulletObject       = warheadProj.gameObject,
+      MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
+    };
+
+    Projectile magicMissileProj = Items._38Special.CloneProjectile();
+    magicMissileProj.gameObject.name = "armistice magic missile projectile";
+    magicMissileProj.shouldFlipHorizontally = false;
+    magicMissileProj.shouldFlipVertically = false;
+    SpeculativeRigidbody mmBody = magicMissileProj.specRigidbody;
+    mmBody.UpdateCollidersOnRotation = true;
+    mmBody.UpdateCollidersOnScale = true;
+    magicMissileProj.AddDefaultAnimation(AnimatedBullet.Create(
+        name: "armistice_magic_missile_b", fps: 30, firstFrameIsReference: true,
+        overrideColliderPixelSizes: new IntVector2(16, 7), overrideColliderOffsets: new IntVector2(8, 0), anchorsChangeColliders: false, fixesScales: false),
+      overwriteExisting: true);
+    _MagicMissileBullet = new AIBulletBank.Entry(baseBullet) {
+      Name               = "magicmissile",
+      PlayAudio          = false,
+      BulletObject       = magicMissileProj.gameObject,
       MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
     };
   }
@@ -249,6 +274,7 @@ public partial class ArmisticeBoss : AIActor
       base.aiActor.bulletBank.Bullets.Add(_MainBullet);
       base.aiActor.bulletBank.Bullets.Add(_TurretBullet);
       base.aiActor.bulletBank.Bullets.Add(_WarheadBullet);
+      base.aiActor.bulletBank.Bullets.Add(_MagicMissileBullet);
       base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
       base.aiActor.healthHaver.OnPreDeath += OnPreDeath;
 

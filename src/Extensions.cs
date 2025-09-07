@@ -1935,7 +1935,8 @@ public static class Extensions
   }
 
   /// <summary>Fixed version of Alexandria's ConstructOffsetsFromAnchor() to deal with atlas sprites correctly</summary>
-  public static void BetterConstructOffsetsFromAnchor(this tk2dSpriteDefinition def, tk2dBaseSprite.Anchor anchor, Vector2? scale = null, bool fixesScale = false, bool changesCollider = true)
+  public static void BetterConstructOffsetsFromAnchor(this tk2dSpriteDefinition def, tk2dBaseSprite.Anchor anchor, Vector2? scale = null,
+    bool fixesScale = false, bool changesCollider = true)
   {
       Vector2 scaling = scale ?? def.untrimmedBoundsDataExtents.XY();
       if (fixesScale)
@@ -3620,20 +3621,43 @@ public static class Extensions
 
   /// <summary>Draw a debug hitbox for a specrigidbody</summary>
   [System.Diagnostics.Conditional("DEBUG")]
-  public static void DrawDebugHitbox(this SpeculativeRigidbody body, Color? color = null)
+  public static void DrawDebugHitbox(this SpeculativeRigidbody body, Color? color = null, Color? color2 = null)
   {
-    const string NAME = "debug hitbox rectangle";
-    if (body.gameObject.transform.Find(NAME) is not Transform box)
+    const string BOXNAME = "debug hitbox rectangle";
+    const string HLINENAME = "debug hitbox hline";
+    const string VLINENAME = "debug hitbox vline";
+    if (body.gameObject.transform.Find(BOXNAME) is not Transform box)
     {
-      box = new GameObject(NAME, typeof(Geometry)).transform;
+      box = new GameObject(BOXNAME, typeof(Geometry)).transform;
       box.parent = body.gameObject.transform;
+    }
+    if (body.gameObject.transform.Find(HLINENAME) is not Transform hline)
+    {
+      hline = new GameObject(HLINENAME, typeof(Geometry)).transform;
+      hline.parent = body.gameObject.transform;
+    }
+    if (body.gameObject.transform.Find(VLINENAME) is not Transform vline)
+    {
+      vline = new GameObject(VLINENAME, typeof(Geometry)).transform;
+      vline.parent = body.gameObject.transform;
     }
     PixelCollider c = body.PrimaryPixelCollider;
     box.gameObject.GetComponent<Geometry>().Setup(
       shape: Geometry.Shape.RECTANGLE,
       color: color ?? Color.magenta.WithAlpha(0.5f),
-      pos: c.UnitTopLeft,
-      pos2: c.UnitBottomRight);
+      pos: c.UnitTopLeft.Quantize(C.PIXEL_SIZE, VectorConversions.Round),
+      pos2: c.UnitBottomRight.Quantize(C.PIXEL_SIZE, VectorConversions.Round));
+    Vector2 pos = box.parent.position;
+    hline.gameObject.GetComponent<Geometry>().Setup(
+      shape: Geometry.Shape.LINE,
+      color: color2 ?? Color.cyan.WithAlpha(0.5f),
+      pos: pos + Vector2.left,
+      pos2: pos + Vector2.right);
+    vline.gameObject.GetComponent<Geometry>().Setup(
+      shape: Geometry.Shape.LINE,
+      color: color2 ?? Color.cyan.WithAlpha(0.5f),
+      pos: pos + Vector2.down,
+      pos2: pos + Vector2.up);
   }
 
   /// <summary>Print pixel collider debug info</summary>

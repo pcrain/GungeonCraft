@@ -20,7 +20,7 @@ public enum Floors // Matches GlobalDungeonData.ValidTilesets
   RATGEON       = 0x8000,
 }
 
-/// <summary>Some patches to make bosses work nicer</summary>
+/// <summary>Some patches to make bosses work more nicely</summary>
 [HarmonyPatch]
 internal static class BossPatches
 {
@@ -33,6 +33,22 @@ internal static class BossPatches
         return true; // call the original method
 
       __instance.DoTick();
+      return false; // skip original method
+  }
+
+  /// <summary>Handle negative TimeScale when updating velocity</summary>
+  [HarmonyPatch(typeof(Bullet), nameof(Bullet.UpdatePosition))]
+  [HarmonyPrefix]
+  private static bool BulletUpdatePositionPatch(Bullet __instance)
+  {
+      if (__instance.TimeScale >= 0f)
+        return true; // call the original method
+
+      Vector2 position = __instance.Position;
+      float dtime = BraveTime.DeltaTime;
+      position.x += __instance.Velocity.x * dtime;
+      position.y += __instance.Velocity.y * dtime;
+      __instance.Position = position;
       return false; // skip original method
   }
 }

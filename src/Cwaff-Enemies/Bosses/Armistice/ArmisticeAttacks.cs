@@ -13,6 +13,9 @@ public partial class ArmisticeBoss : AIActor
   private static Vector3 GunBarrelHighOffset(bool facingLeft)
      => C.PIXEL_SIZE * new Vector3(facingLeft ? -15f : 15f, 48f, 0f);
 
+  private static Vector3 GunBarrelLowOffset(bool facingLeft)
+     => C.PIXEL_SIZE * new Vector3(facingLeft ? -29f : 29f, 18f, 0f);
+
   private class ArmisticeMoveAndShootBehavior : MoveAndShootBehavior
   {
     private const float _MAX_RELOCATE_TIME = 0.75f;
@@ -71,6 +74,11 @@ public partial class ArmisticeBoss : AIActor
           this._targetPos = new Vector2( // cross to the other side of the room, stand near the bottom
             this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f) * this._roomBounds.width,
             this._roomBounds.center.y + UnityEngine.Random.Range(-0.4f, -0.25f) * this._roomBounds.height);
+          break;
+        case "MagicMissileScript":
+          this._targetPos = new Vector2( // cross to the other side of the room, near the top
+            this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f) * this._roomBounds.width,
+            this._roomBounds.center.y + 0.4f * this._roomBounds.height);
           break;
       }
     }
@@ -556,7 +564,7 @@ public partial class ArmisticeBoss : AIActor
   {
     private const float _YOFFSET = 10f;
     private const float _CONVERGE_TIME = 0.3f;
-    private const float SPEED = 25f;
+    private const float SPEED = 58f;
 
     internal class BoneTunnelBullet : SecretBullet
     {
@@ -1471,7 +1479,7 @@ public partial class ArmisticeBoss : AIActor
           SecretBullet laser = new SecretBullet(tint: Color.cyan);
           base.Fire(Offset.OverridePosition(shootPoint), new Direction(launchAngle), new Speed(200f), laser);
           laser.AddTrail(_TrickshotTrailPrefab, glow: 100f);
-          boss.gameObject.PlayUnique("armistice_trickshot_sound"); //TODO: add armistice_trickshot_sound
+          boss.gameObject.PlayUnique("armistice_trickshot_sound");
           CwaffVFX.Spawn(prefab: _MuzzleVFXSnipe, position: shootPoint, rotation: launchAngle.EulerZ(), emissivePower: 10f,
             emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
         }
@@ -1539,6 +1547,310 @@ public partial class ArmisticeBoss : AIActor
         }
         yield return Wait(1);
       }
+      yield break;
+    }
+
+  }
+
+  private class MagicMissileScript : ArmisticeBulletScript
+  {
+
+    internal class MagicMissileBullet : SecretBullet
+    {
+      private static ExplosionData _Explosion = null;
+
+      private bool _orbiting = false;
+      private bool _canBeDestroyed = false;
+      private float _orbitRadius = 0f;
+      private Rect _bounds;
+      private EasyLight _light = null;
+
+      public MagicMissileBullet(float orbitRadius, Rect bounds) : base(baseProj: "magicmissile")
+      {
+        this._orbitRadius = orbitRadius;
+        this._bounds = bounds;
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+        base.Projectile.specRigidbody.CollideWithTileMap = false;
+        base.TimeScale = -1f; // update every frame
+        if (_Explosion == null)
+        {
+          _Explosion = Explosions.ExplosiveRounds.With(damage: 0f, force: 100f, debrisForce: 10f, radius: 1.5f,
+            preventPlayerForce: false, shake: false);
+          _Explosion.doDamage = true;
+          _Explosion.damageToPlayer = 0.5f;
+        }
+      }
+
+      private float _lastVFXTime = 0f;
+      private void DoVFX(float rate, Vector2? pos = null, float? dir = null)
+      {
+        float now = BraveTime.ScaledTimeSinceStartup;
+        if (this._lastVFXTime + rate > now)
+          return;
+        this._lastVFXTime = now;
+        float rot = dir ?? (base.Projectile.transform.rotation.eulerAngles.z + 180f);
+        string sound = (rate > 0f) ? "armistice_missile_smoke_sound" : "armistice_missile_smoke_sound_short";
+        if (rate > 0f)
+          base.Projectile.gameObject.PlayOnce(sound);
+        else
+          base.Projectile.LoopSoundIf(true, sound);
+        CwaffVFX.Spawn(
+          prefab        : _MissileSmokeVFX,
+          position      : pos ?? base.Projectile.sprite.WorldCenterLeft(),
+          rotation      : rot.EulerZ(),
+          velocity      : rot.ToVector(0.1f * base.Speed),
+          lifetime      : 0.25f,
+          fadeOutTime   : 0.25f
+          );
+      }
+
+      private static readonly Color[] _LightColors = [
+        Color.Lerp(Color.green, Color.white, 0.5f),
+        Color.Lerp(Color.yellow, Color.white, 0.5f),
+        Color.Lerp(ExtendedColours.orange, Color.white, 0.5f),
+        Color.Lerp(Color.red, Color.white, 0.5f),
+        Color.Lerp(Color.red, Color.white, 0.15f),
+      ];
+
+      public override IEnumerator Top()
+      {
+        // homing
+        const float MAX_ACCEL       = 20f; // max positive speed change per second
+        const float MAX_DECEL       = 60f; // max negative speed change per second
+        const float MIN_SPEED       = 2f;  // minimum speed we can travel at
+        const float MIN_SPEED_ANGLE = 90f;  // max angle from target before we travel at minimum speed
+        const float MAX_SPEED       = 60f; // maximum speed we can travel at
+        const float MIN_TURN        = 60f;  // minimum degrees per second we can turn at
+        const float MAX_TURN        = 180f;  // maximum degrees per second we can turn at
+        // const float ORBIT_RAD       = 1f;  // max distance to player before orbiting
+        // const float ORBIT_RAD_SQR   = ORBIT_RAD * ORBIT_RAD;
+
+        PlayerController pc = GameManager.Instance.BestActivePlayer;
+        Projectile proj = base.Projectile;
+        proj.collidesWithProjectiles = true;
+        proj.collidesOnlyWithPlayerProjectiles = true;
+        // proj.BulletScriptSettings.surviveRigidbodyCollisions = true;
+        proj.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+        proj.UpdateCollisionMask();
+
+        // course correct towards the player
+        Color debugGreen = Color.green.WithAlpha(0.5f);
+        while (!this._orbiting)
+        {
+          // proj.specRigidbody.DrawDebugHitbox(debugGreen);
+          // DebugDraw.DrawDebugCircle(proj.gameObject, proj.gameObject.transform.position, 0.125f, Color.cyan.WithAlpha(0.5f));
+          Vector2 ppos      = pc.CenterPosition;
+          Vector2 delta     = (ppos - base.Position);
+          float dtime       = BraveTime.DeltaTime;
+          float curSpeed    = base.Speed;
+          float curDir      = base.Direction;
+          float relAngle    = curDir.RelAngleTo(delta.ToAngle());
+          float dpsTurn     = Mathf.Lerp(MAX_TURN, MIN_TURN, Mathf.InverseLerp(MIN_SPEED, MAX_SPEED, curSpeed));
+          float frameTurn   = Mathf.Sign(relAngle) * Mathf.Min(dpsTurn * dtime, Mathf.Abs(relAngle));
+          float targetSpeed = Mathf.Lerp(MAX_SPEED, MIN_SPEED, 1f - Ease.InQuad(1f - Mathf.Min(Mathf.Abs(relAngle) / MIN_SPEED_ANGLE, 1f)) );
+          float newSpeed    = Mathf.Clamp(targetSpeed, curSpeed - MAX_DECEL * dtime, curSpeed + MAX_ACCEL * dtime);
+          float newDir      = curDir + frameTurn;
+
+          DoVFX(1f / newSpeed);
+          base.ChangeSpeed(new Speed(newSpeed));
+          base.ChangeDirection(new Direction(newDir));
+          yield return Wait(1);
+        }
+
+        // zip around player for a variable amount of time before locking on
+        const float RPS_MIN    = 1f;
+        const float RPS_MAX    = 8f;
+        const float DPS_MIN    = 360f * RPS_MIN;
+        const float DPS_MAX    = 360f * RPS_MAX;
+        const float ACCEL_TIME = 1f;
+        const float ORBIT_TIME = 0.85f;
+        const float ORBIT_VAR  = 0.10f;
+        const float DECEL_TIME = 0.25f;
+        const float ORBIT_LERP = 5f;
+        const float SMOKE_RATE = 13f;
+
+        base.ManualControl = true;
+        proj.collidesWithProjectiles = false;
+        proj.UpdateCollisionMask();
+        // bool counterClockwise = false; // TODO: be smart about this later
+        float zipStart = BraveTime.ScaledTimeSinceStartup;
+        float zipEnd = zipStart + ORBIT_TIME.AddRandomSpread(ORBIT_VAR);
+        float decelStart = zipEnd - DECEL_TIME;
+        float angleTotal = 0f;
+        float lastAngle  = (base.Position - pc.CenterPosition).ToAngle();
+        while (true)
+        {
+          float dtime       = BraveTime.DeltaTime;
+          float now         = BraveTime.ScaledTimeSinceStartup;
+          bool lastIter     = now >= zipEnd;
+          if (lastIter)
+            dtime -= (now - zipEnd);
+          Vector2 ppos      = pc.CenterPosition;
+          Vector2 delta     = (base.Position - ppos); //NOTE: inverted from above delta, we are now staying away from the player
+          float zipSpeed    = Mathf.Lerp(DPS_MIN, DPS_MAX, Mathf.Clamp01((now - zipStart) / ACCEL_TIME));
+          float decelLerp   = (now >= decelStart) ? Ease.OutQuad(Mathf.Clamp01((now - decelStart) / DECEL_TIME)) : 0f;
+          if (decelLerp > 0)
+            zipSpeed        = Mathf.Lerp(DPS_MAX, 0f, decelLerp);
+          float curAngle    = delta.ToAngle();
+          float curRad      = delta.magnitude;
+          float newRad      = Lazy.SmoothestLerp(curRad, this._orbitRadius, ORBIT_LERP);
+          float angleDelta  = dtime * zipSpeed;
+          float newAngle    = curAngle + angleDelta;
+          base.Position     = ppos + newAngle.ToVector(newRad);
+          base.Direction    = (90f + newAngle + 90f * decelLerp);
+          angleTotal       += angleDelta;
+          while (angleTotal >= SMOKE_RATE)
+          {
+            angleTotal -= SMOKE_RATE;
+            lastAngle += SMOKE_RATE;
+            DoVFX(0f, pos: ppos + lastAngle.ToVector(newRad), dir: lastAngle - 90f);
+          }
+          if (lastIter)
+            break;
+          yield return Wait(1);
+        }
+        float finalAngle  = (base.Position - pc.CenterPosition).ToAngle();
+
+        // stopping
+        const int BLINKS_PER_PHASE = 8;
+        const int BLINK_PHASES = 5;
+        const float BLINK_TIME = 0.21f;
+        const float BLINK_TIME_DEC = 0.03f;
+        base.ManualControl = false; //NOTE: collisions stop working if our speed is zero, so just make the projectile move very slowly
+        base.ChangeSpeed(new Speed(0.01f));
+        this._canBeDestroyed = true;
+        proj.collidesWithProjectiles = true;
+        proj.UpdateCollisionMask();
+        bool glow = false;
+        this._light = EasyLight.Create(parent: base.Projectile.transform, color: ExtendedColours.vibrantOrange, radius: 2f, brightness: 10.0f);
+        for (int p = 0; p < BLINK_PHASES; ++p)
+        {
+          this._light.SetColor(_LightColors[p]);
+          for (int i = 0; i < BLINKS_PER_PHASE; ++i)
+          {
+            glow = !glow;
+            if (glow)
+            {
+              base.BulletBank.aiActor.gameObject.Play("armistice_missile_beep_sound");
+              this._light.TurnOn();
+            }
+            else
+              this._light.TurnOff();
+            for (float wait = BraveTime.ScaledTimeSinceStartup + (BLINK_TIME - p * BLINK_TIME_DEC); BraveTime.ScaledTimeSinceStartup < wait; )
+            {
+              if (!this._bounds.Contains(base.Position))
+                base.Position = Lazy.SmoothestLerp(base.Position, pc.CenterPosition, 3f);
+              base.Direction = (pc.CenterPosition - base.Position).ToAngle();
+              DoVFX(1f / 5f);
+              yield return Wait(1);
+            }
+          }
+        }
+
+        CwaffTrailController.Spawn(SubtractorBeam._RedTrailPrefab, base.Position, pc.CenterPosition); //TODO: use better trail
+        Exploder.Explode(pc.CenterPosition, _Explosion, (pc.CenterPosition - base.Position).normalized, ignoreQueues: true);
+        Vanish();
+        yield break;
+      }
+
+      private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+      {
+          if (otherRigidbody.gameObject.GetComponent<Projectile>() is not Projectile p || p.Owner is not PlayerController)
+            return;
+          if (this._canBeDestroyed)
+          {
+            Exploder.Explode(base.Position, _Explosion, default, ignoreQueues: true);
+            Vanish();
+          }
+          else if (!this._orbiting)
+          {
+            this._orbiting = true;
+            PhysicsEngine.SkipCollision = true;
+            p.DieInAir();
+          }
+      }
+
+      protected override void OnBaseDestruction(Projectile projectile)
+      {
+        if (this._light)
+        {
+          this._light.gameObject.transform.parent = null;
+          UnityEngine.Object.Destroy(this._light.gameObject);
+        }
+
+        projectile.specRigidbody.OnPreRigidbodyCollision -= this.OnPreRigidbodyCollision;
+        // projectile.sprite.transform.rotation = Quaternion.identity;
+        // projectile.gameObject.transform.rotation = Quaternion.identity;
+        base.OnBaseDestruction(projectile);
+      }
+    }
+
+    protected override List<FluidBulletInfo> BuildChain() => Run(Attack()).Finish();
+
+    private bool _fired = false;
+
+    private void OnFired(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
+    {
+      if (animator.CurrentFrame < 4 || !clip.name.Contains("crouch"))
+        return;
+      animator.AnimationEventTriggered -= this.OnFired;
+      this._fired = true;
+    }
+
+    private IEnumerator Attack()
+    {
+      const int MISSILES = 4;
+      const float BASE_RADIUS = 6f;
+      const float RADIUS_GROW = 1f;
+      AIActor boss = base.BulletBank.aiActor;
+
+      List<MagicMissileBullet> mms = new(MISSILES);
+      for (int n = 0; n < MISSILES; ++n)
+      {
+        if (n > 0)
+        {
+          this._fired = false;
+          while (boss.spriteAnimator.IsPlaying("crouch"))
+            yield return Wait(1);
+          boss.aiAnimator.PlayUntilFinished("reload");
+          while (boss.spriteAnimator.IsPlaying("reload"))
+            yield return Wait(1);
+          boss.aiAnimator.PlayUntilFinished("crouch");
+        }
+        boss.spriteAnimator.AnimationEventTriggered += this.OnFired;
+        while (!this._fired)
+          yield return Wait(1);
+        Vector2 shootPoint = boss.gameObject.transform.position + GunBarrelLowOffset(boss.sprite.FlipX);
+
+        MagicMissileBullet mm = new MagicMissileBullet(BASE_RADIUS + RADIUS_GROW * n, this.roomBulletBounds);
+        mms.Add(mm);
+        bool left = boss.sprite.FlipX;
+        float angle = left ? 180f : 0f;
+        base.Fire(Offset.OverridePosition(shootPoint), new Direction(angle), new Speed(60f), mm);
+        boss.gameObject.Play("armistice_missile_launch_sound");
+        CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: angle.EulerZ(), emissivePower: 10f,
+          emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f); // TODO: add missile muzzle
+        CwaffVFX.SpawnBurst(
+          prefab           : _MissileSmokeVFX,
+          numToSpawn       : 15,
+          basePosition     : shootPoint + new Vector2(left ? -0.75f : 0.75f, 0f),
+          positionVariance : 1f,
+          baseVelocity     : new Vector2(left ? -6f : 6f, 0f),
+          velocityVariance : 3f,
+          velType          : CwaffVFX.Vel.Random,
+          rotType          : CwaffVFX.Rot.Velocity,
+          lifetime         : 0.5f,
+          fadeOutTime      : 0.5f
+          );
+      }
+
+      for (int n = 0; n < MISSILES; ++n)
+        while (!mms[n].IsEnded && !mms[n].Destroyed)
+          yield return Wait(1);
       yield break;
     }
 

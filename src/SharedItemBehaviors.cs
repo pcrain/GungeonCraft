@@ -281,8 +281,18 @@ public static class AnimatedBullet // stolen and modified from NN
 {
     private static int _ClipCounter = 0;
     private static HashSet<string> _KnownClips = new();
-    public static tk2dSpriteAnimationClip Create( string name, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true,
-        bool fixesScales = true, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null)
+    /// <summary>Create an animated projectile sprite.</summary>
+    /// <param name="name">Base name of the sprite to use for the animation.</param>
+    /// <param name="fps">FPS of the animation.</param>
+    /// <param name="anchor">Anchor of the animation.</param>
+    /// <param name="scale">Scale of the sprite.</param>
+    /// <param name="anchorsChangeColliders">If true, automatically adjusts the animations' sprites' colliderVertices if anchor is not LowerLeft.</param>
+    /// <param name="fixesScales">If true, uses trimmed rather than untrimmed bounds when adjusting sprite definition offsets.</param>
+    /// <param name="overrideColliderPixelSizes">If non-null, manually sets the radius (half-width and half-height) of the sprite's collider.</param>
+    /// <param name="overrideColliderOffsets">If non-null, manually offsets the center of the sprite's collider relative to the sprite's anchor.</param>
+    /// <param name="firstFrameIsReference">If true, all sprite definitions in the animation are offset using the same values as the first frame of the animation.</param>
+    public static tk2dSpriteAnimationClip Create(string name, int fps = 2, Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true,
+        bool fixesScales = true, IntVector2? overrideColliderPixelSizes = null, IntVector2? overrideColliderOffsets = null, bool firstFrameIsReference = false)
     {
         List<string> names = ResMap.Get(name).Base();
         if (_KnownClips.Contains(names[0]))
@@ -297,6 +307,8 @@ public static class AnimatedBullet // stolen and modified from NN
             frames   = new tk2dSpriteAnimationFrame[names.Count],
         };
         tk2dSpriteCollectionData coll = ETGMod.Databases.Items.ProjectileCollection;
+        tk2dSpriteDefinition refDef = firstFrameIsReference ? coll.inst.spriteDefinitions[coll.inst.GetSpriteIdByName(names[0])] : null;
+        Vector2 refShift = (refDef != null) ? refDef.position0 : default;
         for (int i = 0; i < names.Count; i++)
         {
             int spriteId = coll.inst.GetSpriteIdByName(names[i]);
@@ -305,7 +317,7 @@ public static class AnimatedBullet // stolen and modified from NN
             if (scale != 1.0f)
                 def.ScaleBy(scale);
             //NOTE: set up default colliders, could maybe do at atlas build time but not all sprites need it, so doing it here for now on an as-needed basis
-            def.colliderVertices = new Vector3[2]{
+            def.colliderVertices = (i > 0 && refDef != null) ? refDef.colliderVertices : new Vector3[2]{
                 overrideColliderOffsets.HasValue
                     ? C.PIXEL_SIZE * overrideColliderOffsets.Value.ToVector3()
                     : def.position0, // offset
@@ -313,7 +325,12 @@ public static class AnimatedBullet // stolen and modified from NN
                     ? (C.PIXEL_SIZE * overrideColliderPixelSizes.Value.ToVector3())
                     : def.boundsDataExtents) // radius
             };
-            def.BetterConstructOffsetsFromAnchor(anchor, fixesScales ? def.position3 : null, fixesScales, anchorsChangeColliders);
+            if (def == refDef || refDef == null)
+                def.BetterConstructOffsetsFromAnchor(anchor, fixesScales ? def.position3 : null, fixesScales, anchorsChangeColliders);
+            else
+                def.ShiftBy(refShift);
+            if (def == refDef)
+                refShift = refDef.position0.XY() - refShift;
         }
         // Lazy.DebugLog($"  created clip {clip.name} with id {clip.frames[0].spriteId}");
         _KnownClips.Add(names[0]);
