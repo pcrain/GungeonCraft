@@ -3,6 +3,7 @@
 ## 1.28.0 (TBD)
 
 - Fixed some sprite positioning issues during [REDACTED] boss fight
+- Fixed potential issue with invalid player velocity causing weird behavior with Camping Supplies
 
 ## 1.27.1 (2025-08-22)
 

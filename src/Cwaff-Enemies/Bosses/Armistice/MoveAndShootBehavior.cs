@@ -79,8 +79,8 @@ public class MoveAndShootBehavior : ShootBehavior
   }
 
   /// <summary>Performs setup for calling Relocate() in future frames.</summary>
-  protected virtual void PrepareToRelocate() {}
+  protected internal virtual void PrepareToRelocate(Vector2? overridePos = null) {}
 
   /// <summary>Returns true if we're in position to attack, false otherwise.</summary>
-  protected virtual bool Relocate() => true;
+  protected internal virtual bool Relocate() => true;
 }

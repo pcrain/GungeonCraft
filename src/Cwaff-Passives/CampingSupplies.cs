@@ -74,7 +74,7 @@ public class CampingSupplies : CwaffPassive
         base.Update();
         if (!this.Owner)
             return;
-        if (this.Owner.Velocity.magnitude <= _MOVEMENT_THRESHOLD)
+        if (this.Owner.Velocity.ZeroIfNan().magnitude <= _MOVEMENT_THRESHOLD)
         {
             if (this._campLevel > 0 && UnityEngine.Random.Range(0f, 1f) < _SODA_CAN_TOSS_CHANCE)
                 TossASodaCan();

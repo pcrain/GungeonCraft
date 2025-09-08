@@ -3669,5 +3669,11 @@ public static class Extensions
       System.Console.WriteLine($"  collider {i} enabled {c.Enabled} | mode {c.ColliderGenerationMode} | x {c.ManualOffsetX} | y {c.ManualOffsetY} | w {c.ManualWidth} | h {c.ManualHeight}");
     }
   }
+
+  /// <summary>Zeroes out a velocity if either component is NaN</summary>
+  public static Vector2 ZeroIfNan(this Vector2 v)
+  {
+    return (float.IsNaN(v.x) || float.IsNaN(v.y)) ? default : v;
+  }
 }
 

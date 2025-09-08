@@ -377,3 +377,4 @@ armistice_missile_launch_sound,2.0,1,sound,1
 armistice_missile_smoke_sound,5.0,1,sound,1
 armistice_missile_smoke_sound_short,5.0,1,sound,1
 armistice_missile_beep_sound,-2.5,1,sound,1
+armistice_gun_spread_sound,-2.0,1,sound,1

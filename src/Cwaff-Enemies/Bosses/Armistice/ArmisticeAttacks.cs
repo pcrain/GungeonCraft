@@ -2,11 +2,6 @@ namespace CwaffingTheGungy;
 
 public partial class ArmisticeBoss : AIActor
 {
-  private const string SOUND_SPAWN       = "no_sound"; // "Play_OBJ_turret_set_01";
-  private const string SOUND_SPAWN_QUIET = "no_sound"; // "undertale_pullback";
-  private const string SOUND_SHOOT       = "no_sound"; // "Play_WPN_spacerifle_shot_01";
-  private const string SOUND_TELEPORT    = "teledasher";
-
   private static Vector3 GunBarrelOffset(bool facingLeft)
      => C.PIXEL_SIZE * new Vector3(facingLeft ? -36f : 36f, 23f, 0f);
 
@@ -26,8 +21,9 @@ public partial class ArmisticeBoss : AIActor
     private Vector2 _startPos;
     private Vector2 _targetPos;
     private Vector2 _targetDelta;
-    private float _totalTravelTime;
-    private float _travelTimer;
+    private float _travelStartTime;
+    private float _travelEndTime;
+    private float _travelDeltaTime;
     private Transform _transform;
     private SpeculativeRigidbody _body;
     private float _nextAfterimage;
@@ -44,23 +40,15 @@ public partial class ArmisticeBoss : AIActor
       // System.Console.WriteLine($"reloacting for bullet script {scriptType}");
       switch (scriptType)
       {
-        case "CrossBulletsScript":
-          break;
         case "ClocksTickingScript":
           this._targetPos = this._roomBounds.center;
-          // this._targetPos = new Vector2(this._roomBounds.center.x, playerOnBottom ? this._roomBounds.yMax : this._roomBounds.yMin);
-          break;
-        case "WalledInScript":
           break;
         case "BoneTunnelScript":
         case "TrickshotScript":
+        case "SniperScript":
           float playerY = Mathf.Clamp(this._targetPlayer.sprite.WorldBottomCenter.y, this._roomBounds.yMin, this._roomBounds.yMax);
           this._targetPos = new Vector2( // cross to the far side of the room opposite to the player
             this._roomBounds.xMin + (playerOnLeft ? 1.0f : 0.0f) * this._roomBounds.width, playerY);
-          break;
-        case "DanceMonkeyScript":
-          break;
-        case "PendulumScript":
           break;
         case "BoxTrotScript":
           this._targetPos = new Vector2( // cross to the other side of the room
@@ -80,11 +68,16 @@ public partial class ArmisticeBoss : AIActor
             this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f) * this._roomBounds.width,
             this._roomBounds.center.y + 0.4f * this._roomBounds.height);
           break;
+        case "CrossBulletsScript":
+        case "WalledInScript":
+        case "DanceMonkeyScript":
+        case "PendulumScript":
+          break;
       }
     }
 
     /// <summary>Performs setup for calling Relocate() in future frames.</summary>
-    protected override void PrepareToRelocate()
+    protected internal override void PrepareToRelocate(Vector2? overridePos = null)
     {
       this._transform = base.m_gameObject.transform;
       this._body = m_gameObject.GetComponent<SpeculativeRigidbody>();
@@ -93,12 +86,16 @@ public partial class ArmisticeBoss : AIActor
       this._targetPlayer = GameManager.Instance.GetRandomActivePlayer();
       this._targetPos = new PathRect(this._roomBounds).At(UnityEngine.Random.value, UnityEngine.Random.value);
 
-      DetermineTarget();
+      if (overridePos.HasValue)
+        this._targetPos = overridePos.Value;
+      else
+        DetermineTarget();
 
       this._targetDelta = this._targetPos - this._startPos;
-      this._totalTravelTime = Mathf.Min(this._targetDelta.magnitude / _MIN_RELOCATE_SPEED, _MAX_RELOCATE_TIME);
-      this._travelTimer = 0f;
-      if (this._totalTravelTime >= BraveTime.DeltaTime) // don't update unless we actually have somewhere to move
+      this._travelStartTime = BraveTime.ScaledTimeSinceStartup;
+      this._travelDeltaTime = Mathf.Min(this._targetDelta.magnitude / _MIN_RELOCATE_SPEED, _MAX_RELOCATE_TIME);
+      this._travelEndTime = this._travelStartTime + this._travelDeltaTime;
+      if (this._travelDeltaTime >= BraveTime.DeltaTime) // don't update unless we actually have somewhere to move
       {
         this.m_aiAnimator.PlayUntilCancelled("run", true);
         this.m_aiActor.sprite.FlipX = this._targetPos.x < this._startPos.x;
@@ -106,10 +103,10 @@ public partial class ArmisticeBoss : AIActor
     }
 
     /// <summary>Returns true if we're in position to attack, false otherwise.</summary>
-    protected override bool Relocate()
+    protected internal override bool Relocate()
     {
-      this._travelTimer += BraveTime.DeltaTime;
-      if (this._travelTimer >= this._totalTravelTime)
+      float now = BraveTime.ScaledTimeSinceStartup;
+      if (now >= this._travelEndTime)
       {
         this.m_aiActor.sprite.FlipX = this._transform.position.x > this._roomBounds.center.x;
         this.m_aiAnimator.PlayUntilCancelled("idle", true);
@@ -118,13 +115,12 @@ public partial class ArmisticeBoss : AIActor
         return true;
       }
 
-      float t = this._travelTimer / this._totalTravelTime;
-      float now = BraveTime.ScaledTimeSinceStartup;
       if (now >= this._nextAfterimage)
       {
         this.m_aiActor.sprite.SpriteAfterImage();
         this._nextAfterimage = now + _AFTERIMAGE_RATE;
       }
+      float t = (now - this._travelStartTime) / this._travelDeltaTime;
       this._transform.position = this._startPos + t * this._targetDelta;
       this._body.Reinitialize();
 
@@ -215,6 +211,26 @@ public partial class ArmisticeBoss : AIActor
       this.roomFullBounds     = this.theBoss.GetAbsoluteParentRoom().GetBoundingRect();
       this.roomBulletBounds   = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       this.roomSlamBounds     = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2.5f, bottomInset: 2f, leftInset: 1.5f);
+    }
+
+    /// <summary>Hijack ArmisticeMoveAndShootBehavior's relocation logic</summary>
+    public IEnumerator Relocate(Vector2? overridePos = null)
+    {
+      if (base.BulletBank.aiActor.behaviorSpeculator.ActiveContinuousAttackBehavior is not BehaviorBase bb)
+        yield break;
+      while (bb is AttackBehaviorGroup abg && abg.CurrentBehavior != null)
+        bb = abg.CurrentBehavior;
+      if (bb is not ArmisticeMoveAndShootBehavior amb)
+        yield break;
+
+      float oldScale = base.TimeScale;
+      base.TimeScale = -1f; // update every frame while relocating
+      amb.PrepareToRelocate(overridePos: overridePos);
+      while (!amb.Relocate())
+        yield return Wait(0);
+      base.TimeScale = oldScale;
+
+      yield break;
     }
   }
 
@@ -1851,6 +1867,179 @@ public partial class ArmisticeBoss : AIActor
       for (int n = 0; n < MISSILES; ++n)
         while (!mms[n].IsEnded && !mms[n].Destroyed)
           yield return Wait(1);
+      yield break;
+    }
+
+  }
+
+  private class RunaroundScript : ArmisticeBulletScript
+  {
+    protected override List<FluidBulletInfo> BuildChain()
+    {
+      base.TimeScale = -1f; // update every frame while relocating
+
+      return Run(Relocate())
+        .Then(Relocate())
+        .Then(Relocate())
+        .Finish();
+    }
+
+    // private IEnumerator Attack()
+    // {
+    //   for (int i = 0; i < 10; ++i)
+    //   {
+    //     System.Console.WriteLine($"attempting run {i + 1}");
+    //     IEnumerator relocator = Relocate();
+    //     while (relocator.MoveNext())
+    //       yield return (int)relocator.Current;
+    //     yield return Wait(30);
+    //   }
+    //   yield break;
+    // }
+
+  }
+
+  private class SniperScript : ArmisticeBulletScript
+  {
+
+    internal class SniperBullet : SecretBullet
+    {
+
+      public SniperBullet() : base()
+      {
+      }
+
+      public override void Initialize()
+      {
+        base.Initialize();
+      }
+
+      public override IEnumerator Top()
+      {
+        yield break;
+      }
+
+    }
+
+    protected override List<FluidBulletInfo> BuildChain() => Run(Attack()).Finish();
+
+    private class VelSnapshot
+    {
+      public Vector2 velocity = default;
+      public float expireTime = default;
+    }
+
+    private const float _VEL_SMOOTH_TIME = 0.5f;
+    private const int _VEL_BUFFER_SIZE = 200;
+    private static VelSnapshot[] _Velocities = new VelSnapshot[_VEL_BUFFER_SIZE];
+
+    private IEnumerator Attack()
+    {
+      const float ATTACK_TIME = 9f;
+      const float MAX_PROJ_SPEED = 45f;
+      const float MIN_PROJ_SPEED = 15f;
+      const float MAX_FIRE_RATE = 0.5f;
+      const float MIN_FIRE_RATE = 0.06f;
+
+      for (int i = 0; i < _VEL_BUFFER_SIZE; ++i)
+        _Velocities[i] = new VelSnapshot();
+
+      #if DEBUG
+      // Geometry line = new GameObject().AddComponent<Geometry>();
+      // Geometry vline = new GameObject().AddComponent<Geometry>();
+      // Geometry shootLine = new GameObject().AddComponent<Geometry>();
+      #endif
+      //WARNING: can't use frame-perfect time scale or _VEL_BUFFER_SIZE can overflow during time slow effects
+      // base.TimeScale = -1f;
+
+      PlayerController pc = GameManager.Instance.GetRandomActivePlayer();
+      AIActor actor       = base.BulletBank.aiActor;
+      Transform tr        = actor.gameObject.transform;
+      bool facingLeft     = tr.position.x > this.roomFullBounds.center.x;
+      Vector2 shootPoint  = tr.position + GunBarrelOffset(facingLeft);
+      Offset shootOff     = Offset.OverridePosition(shootPoint);
+
+      float aimAngle;
+      float time;
+      Vector2 accumVel = default;
+
+      float startTime = BraveTime.ScaledTimeSinceStartup;
+      float endTime = startTime + ATTACK_TIME;
+      float prevTime = startTime;
+      float lastFireTime = startTime;
+
+      int firstValidVel = 0;
+      int nextValidVel = 0;
+
+      actor.aiAnimator.PlayUntilCancelled("attack_basic");
+      tk2dSpriteAnimator spriteAnim = actor.spriteAnimator;
+      for (float now = startTime; now < endTime; now = BraveTime.ScaledTimeSinceStartup)
+      {
+        // update sliding average velocity window
+        Vector2 frameVel = (now - prevTime) * pc.Velocity.ZeroIfNan();
+        accumVel += frameVel;
+        _Velocities[nextValidVel].velocity = frameVel;
+        _Velocities[nextValidVel].expireTime = now + _VEL_SMOOTH_TIME;
+        nextValidVel = (nextValidVel + 1) % _VEL_BUFFER_SIZE;
+        for (int v = firstValidVel; v != nextValidVel; v = ((v + 1) % _VEL_BUFFER_SIZE))
+        {
+          firstValidVel = v;
+          if (_Velocities[v].expireTime > now)
+            break;
+          accumVel -= _Velocities[v].velocity;
+        }
+        prevTime = now;
+        Vector2 avgVelocity = (1f / _VEL_SMOOTH_TIME) * accumVel;
+
+        // determine fire rate stats
+        float t = (now - startTime) / ATTACK_TIME;
+        float fireRate = Mathf.Lerp(MAX_FIRE_RATE, MIN_FIRE_RATE, Ease.OutCubic(t));
+        float projSpeed = Mathf.Lerp(MAX_PROJ_SPEED, MIN_PROJ_SPEED, Ease.OutCubic(t));
+        spriteAnim.ClipFps = 4f / fireRate; // 4 frames at 16fps == 0.25s per loop
+        bool valid = Lazy.DeterminePerfectAngleToShootAt(shootPoint, pc.CenterPosition, avgVelocity, projSpeed, out aimAngle, out time, adjustForTurboMode: true);
+
+        #if DEBUG
+        // line.Setup(shape: Geometry.Shape.LINE, color: valid ? Color.green : Color.red, pos: shootPoint, pos2: pc.CenterPosition + time * avgVelocity);
+        // vline.Setup(shape: Geometry.Shape.LINE, color: Color.yellow, pos: pc.CenterPosition, pos2: pc.CenterPosition + time * avgVelocity);
+        #endif
+
+        // figure out if we actually need to fire
+        if (now >= (lastFireTime + fireRate))
+        {
+          lastFireTime = now;
+          #if DEBUG
+          // shootLine.Setup(shape: Geometry.Shape.LINE, color: Color.cyan, pos: shootPoint, pos2: pc.CenterPosition + time * avgVelocity);
+          #endif
+          actor.gameObject.PlayUnique("armistice_gun_spread_sound");
+          for (int i = -3; i <= 3; ++i)
+            base.Fire(shootOff, new Direction(aimAngle + 5f * i), new Speed(projSpeed), new SniperBullet());
+          CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: ((facingLeft ? 180f : 0f).AddRandomSpread(10f)).EulerZ(), emissivePower: 10f,
+            emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
+          CwaffVFX.SpawnBurst(
+            prefab           : _MissileSmokeVFX,
+            numToSpawn       : 5,
+            basePosition     : shootPoint + new Vector2(facingLeft ? -1f : 1f, 0f),
+            positionVariance : 1f,
+            baseVelocity     : new Vector2(facingLeft ? -3f : 3f, 0f),
+            velocityVariance : 1.5f,
+            velType          : CwaffVFX.Vel.Random,
+            rotType          : CwaffVFX.Rot.Velocity,
+            lifetime         : 0.6f,
+            fadeOutTime      : 0.6f
+            );
+        }
+        yield return Wait(1);
+      }
+
+      spriteAnim.ClipFps = 0f;
+      actor.aiAnimator.PlayUntilCancelled("idle");
+
+      #if DEBUG
+      // UnityEngine.Object.Destroy(line.gameObject);
+      // UnityEngine.Object.Destroy(vline.gameObject);
+      // UnityEngine.Object.Destroy(shootLine.gameObject);
+      #endif
+
       yield break;
     }
 

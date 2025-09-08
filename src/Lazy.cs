@@ -1398,4 +1398,69 @@ public static class Lazy
     dispersalPrefab.GetComponent<ParticleSystem>().SetColor(color);
     return dispersalPrefab;
   }
+
+  /// <summary>
+  /// Given a point to shoot from, a target and its velocity, and the speed of a projectile, determine the angle a projectile must be shot at to hit its target.
+  /// Returns false if no angle can be found.
+  /// </summary>
+  /*
+  ---------
+    Let:
+      - shooter position s (vector),
+      - target position p (vector),
+      - target velocity v (vector),
+      - projectile speed u (scalar, constant; projectile travels at speed u in straight line).
+    Need to solve for the intercept where the target's position relative to the shoot
+     point at time t is equal the projectile's speed multiplied by time:
+      - (p + v*t - s).magnitude == u * t
+    Let r = p -s (delta from shoot point to target). Shuffle around terms until we have a quadratic in t:
+      - (v^2 - u^2) t^2 + 2 (r·v) t + r^2 = 0
+    Solve the quadratic above for t. Add t*v to the target's position, take the angle to that
+     position from s, and that's the angle we need to shoot at!
+  ---------
+  */
+  public static bool DeterminePerfectAngleToShootAt(Vector2 shootPoint, Vector2 targetPoint, Vector2 targetVelocity, float projectileSpeed,
+    out float shootAngle, out float t, bool adjustForTurboMode = true)
+  {
+    const float EPSILON = 0.0001f;
+
+    shootAngle = -361f;
+    t = -1f;
+
+    Vector2 s = shootPoint;
+    Vector2 p = targetPoint;
+    Vector2 v = targetVelocity;
+    float   u = projectileSpeed;
+    if (adjustForTurboMode && GameManager.IsTurboMode)
+      u *= TurboModeController.sEnemyBulletSpeedMultiplier;
+    Vector2 r = p - s;
+
+    // calculate coefficients for the quadratic and solve it
+    float a = Vector2.Dot(v, v) - u * u;
+    float b = 2f * Vector2.Dot(r, v);
+    float c = Vector2.Dot(r, r);
+    if (Mathf.Abs(a) > EPSILON)
+    {
+      float disc  = (b * b) - (4f * a * c);
+      float dRoot = Mathf.Sqrt(disc);
+      float t1    = (-b + dRoot) / (2f * a);
+      float t2    = (-b - dRoot) / (2f * a);
+      if (t1 <= 0 && t2 <= 0)
+        return false; // negative time, therefore no solution
+      t = (t2 < 0) ? t1 : (t1 < 0) ? t2 : Mathf.Min(t1, t2); // smallest positive root
+    }
+    else // target and projectile have equal speeds
+    {
+      if (Mathf.Abs(b) < EPSILON)
+        return false; // no movement, therefore no solution
+      t = -c / b;
+      if (t < 0)
+        return false; // negative time, therefore no solution
+    }
+    Vector2 targetFuturePos = targetPoint + t * targetVelocity;
+    shootAngle = (targetFuturePos - shootPoint).ToAngle();
+    if (float.IsNaN(shootAngle))
+      return false; // NaN angle, therefore no solution
+    return true;
+  }
 }

@@ -68,6 +68,7 @@ public partial class ArmisticeBoss : AIActor
     // bb.CreateBulletAttack<WalledInScript, ArmisticeMoveAndShootBehavior>      (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
     // bb.CreateBulletAttack<DanceMonkeyScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
     // bb.CreateBulletAttack<PendulumScript, ArmisticeMoveAndShootBehavior>      (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
+    // bb.CreateBulletAttack<RunaroundScript, ArmisticeMoveAndShootBehavior>     (fireAnim: "crouch", cooldown: CD, attackCooldown: CD, interruptible: true);
 
     //NOTE: finished for now
     const float CD = 0.5f;
@@ -77,7 +78,8 @@ public partial class ArmisticeBoss : AIActor
     // bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: CD, attackCooldown: CD, interruptible: true);
     // bb.CreateBulletAttack<MeteorShowerScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "skyshot", cooldown: CD, attackCooldown: CD, interruptible: true);
     // bb.CreateBulletAttack<TrickshotScript, ArmisticeMoveAndShootBehavior>     (fireAnim: "idle", cooldown: CD, attackCooldown: CD, interruptible: true);
-    bb.CreateBulletAttack<MagicMissileScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "crouch", cooldown: CD, attackCooldown: CD, interruptible: true);
+    // bb.CreateBulletAttack<MagicMissileScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "crouch", cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<SniperScript, ArmisticeMoveAndShootBehavior>     (cooldown: CD, attackCooldown: CD, interruptible: true);
 
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
