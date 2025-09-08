@@ -363,10 +363,9 @@ public partial class ArmisticeBoss : AIActor
       private float _restRadius           = 0f;
       private float _spawnAngle           = 0f;
       private float _rps                  = 0f;
-      private bool  _flood                = false;
 
       public ClocksTickingBullet(ClocksTickingScript parent, Vector2 spawnCenter, float spawnTime, float spawnRadius, float restRadius,
-        float spawnAngle, float rps, bool flood) : base(fancySpawn: true)
+        float spawnAngle, float rps) : base(fancySpawn: true)
       {
         this._parent      = parent;
         this._spawnCenter = spawnCenter;
@@ -375,7 +374,6 @@ public partial class ArmisticeBoss : AIActor
         this._restRadius  = restRadius;
         this._spawnAngle  = spawnAngle;
         this._rps         = rps;
-        this._flood       = flood;
 
         base.ManualControl = true;
         base.TimeScale = -1f; // tick every frame
@@ -387,8 +385,7 @@ public partial class ArmisticeBoss : AIActor
         base.Initialize();
         SpeculativeRigidbody srb = this.Projectile.specRigidbody;
         srb.CollideWithTileMap = false;
-        if (this._flood)
-          srb.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+        srb.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
       }
 
       private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -474,8 +471,7 @@ public partial class ArmisticeBoss : AIActor
               spawnRadius : ClocksTickingBullet._SPAWN_RADIUS,
               restRadius  : trueRadius,
               spawnAngle  : baseAngle + quantRot,
-              rps         : rps,
-              flood       : true
+              rps         : rps
               ));
         }
       }
@@ -503,8 +499,7 @@ public partial class ArmisticeBoss : AIActor
             spawnRadius : ClocksTickingBullet._SPAWN_RADIUS,
             restRadius  : trueRadius,
             spawnAngle  : baseAngle,
-            rps         : rps,
-            flood       : false
+            rps         : rps
             ));
         yield return Wait(3);
       }
