@@ -57,7 +57,6 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "teleport_in",  fps:     9f, loop: false);
       bb.AdjustAnimation(name: "teleport_out", fps:     9f, loop: false);
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
-      // bb.SetIntroAnimations(introAnim: "decloak", preIntroAnim: "idle_cloak"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 30, height: 40, xoff: -15, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<ArmisticeIntro>();                                       // Add custom animation to the generic intro doer
     // bb.MakeInteractible<ArmisticeNPC>(preFight: true, postFight: true) ;       // Add some pre-fight and post-fight dialogue
@@ -66,13 +65,6 @@ public partial class ArmisticeBoss : AIActor
     // bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
     // bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
     //   goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 4.26f, attackCooldown: 0.15f, probability: 3f);
-
-    //NOTE: unfinished attacks
-    // bb.CreateBulletAttack<CrossBulletsScript, ArmisticeMoveAndShootBehavior>  (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    // bb.CreateBulletAttack<WalledInScript, ArmisticeMoveAndShootBehavior>      (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    // bb.CreateBulletAttack<DanceMonkeyScript, ArmisticeMoveAndShootBehavior>   (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    // bb.CreateBulletAttack<PendulumScript, ArmisticeMoveAndShootBehavior>      (fireAnim: "idle", cooldown: 2.0f, attackCooldown: 2.0f, interruptible: true);
-    // bb.CreateBulletAttack<RunaroundScript, ArmisticeMoveAndShootBehavior>     (fireAnim: "crouch", cooldown: CD, attackCooldown: CD, interruptible: true);
 
     //NOTE: finished for now
     const float CD = 0.5f;

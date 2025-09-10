@@ -378,6 +378,7 @@ public partial class ArmisticeBoss : AIActor
 
         base.ManualControl = true;
         base.TimeScale = -1f; // tick every frame
+        base.EndOnBlank = true;
         // base.EndOnBlank = true;
       }
 
@@ -426,7 +427,7 @@ public partial class ArmisticeBoss : AIActor
     protected override List<FluidBulletInfo> BuildChain()
     {
       base.BulletBank.aiActor.gameObject.Play("armistice_clocks_ticking_sound");
-      // base.EndOnBlank = true;
+      base.EndOnBlank = true;
       return
          Run(Attack(radius:  8f, rps: -0.300f, offAngle: 110f, playSounds: true))
         .And(Attack(radius: 11f, rps: -0.625f, offAngle:  90f, playSounds: false))
@@ -1162,7 +1163,15 @@ public partial class ArmisticeBoss : AIActor
 
       float endTime = BraveTime.ScaledTimeSinceStartup + LENGTH;
       while (BraveTime.ScaledTimeSinceStartup < endTime)
+      {
+        bool allTurretsGone = true;
+        for (int n = 0; n < TURRETS; ++n)
+          if (bullets[n].Projectile && !bullets[n].IsEnded && !bullets[n].Destroyed)
+            allTurretsGone = false;
+        if (allTurretsGone)
+          break;
         yield return Wait(1);
+      }
 
       for (int n = 0; n < TURRETS; ++n)
         if (bullets[n].Projectile)
