@@ -40,9 +40,11 @@ public partial class ArmisticeBoss : AIActor
       // System.Console.WriteLine($"reloacting for bullet script {scriptType}");
       switch (scriptType)
       {
+        // center of room
         case "ClocksTickingScript":
           this._targetPos = this._roomBounds.center;
           break;
+        // same Y as player on opposite wall of room as player
         case "BoneTunnelScript":
         case "TrickshotScript":
         case "SniperScript":
@@ -50,28 +52,27 @@ public partial class ArmisticeBoss : AIActor
           this._targetPos = new Vector2( // cross to the far side of the room opposite to the player
             this._roomBounds.xMin + (playerOnLeft ? 1.0f : 0.0f) * this._roomBounds.width, playerY);
           break;
+        // semirandom Y at semirandom X offset between center of room and opposite wall
         case "BoxTrotScript":
-          this._targetPos = new Vector2( // cross to the other side of the room
-            this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f) * this._roomBounds.width,
+          this._targetPos = new Vector2(
+            this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f).AddRandomSpread(0.1f) * this._roomBounds.width,
             this._roomBounds.center.y + UnityEngine.Random.Range(-0.2f, 0.2f) * this._roomBounds.height);
           break;
+        // centered Y on opposite wall of room as player
         case "LaserBarrageScript":
           this._targetPos = new Vector2(playerOnLeft ? this._roomBounds.xMax : this._roomBounds.xMin, this._roomBounds.center.y);
           break;
+        // near bottom of room at midpoint X between center of room and opposite wall
         case "MeteorShowerScript":
           this._targetPos = new Vector2( // cross to the other side of the room, stand near the bottom
             this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f) * this._roomBounds.width,
-            this._roomBounds.center.y + UnityEngine.Random.Range(-0.4f, -0.25f) * this._roomBounds.height);
+            this._roomBounds.center.y + UnityEngine.Random.Range(-0.4f, -0.3f) * this._roomBounds.height);
           break;
+        // near top of room at midpoint X between center of room and opposite wall
         case "MagicMissileScript":
           this._targetPos = new Vector2( // cross to the other side of the room, near the top
             this._roomBounds.xMin + (selfOnLeft ? 0.75f : 0.25f) * this._roomBounds.width,
             this._roomBounds.center.y + 0.4f * this._roomBounds.height);
-          break;
-        case "CrossBulletsScript":
-        case "WalledInScript":
-        case "DanceMonkeyScript":
-        case "PendulumScript":
           break;
       }
     }
@@ -1363,6 +1364,7 @@ public partial class ArmisticeBoss : AIActor
       Vector2 shootPoint = t.position + GunBarrelHighOffset(boss.sprite.FlipX);
       float baseShootAngle = facingLeft ? 123f : 57f;
 
+      MeteorShowerBullet lastBulletFired = null;
       for (int i = 0; i < 10; ++i)
       {
         this._fired = false;
@@ -1373,7 +1375,8 @@ public partial class ArmisticeBoss : AIActor
         for (int v = 0; v < VOLLEY_SIZE; ++v)
         {
           float shootAngle = baseShootAngle.AddRandomSpread(10f);
-          base.Fire(Offset.OverridePosition(shootPoint), new Direction(shootAngle), new Speed(50f), new MeteorShowerBullet(this.roomFullBounds));
+          lastBulletFired = new MeteorShowerBullet(this.roomFullBounds);
+          base.Fire(Offset.OverridePosition(shootPoint), new Direction(shootAngle), new Speed(50f), lastBulletFired);
         }
         boss.gameObject.Play("armistice_gun_sound");
         CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: baseShootAngle.EulerZ(), emissivePower: 10f,
@@ -1381,6 +1384,10 @@ public partial class ArmisticeBoss : AIActor
         while (boss.aiAnimator.IsPlaying("skyshot"))
           yield return Wait(1);
       }
+
+      while (lastBulletFired != null && !lastBulletFired.IsEnded && !lastBulletFired.Destroyed)
+          yield return Wait(1);
+
       yield break;
     }
 
@@ -1390,6 +1397,7 @@ public partial class ArmisticeBoss : AIActor
   {
     protected override List<FluidBulletInfo> BuildChain() => Run(Attack()).Finish();
 
+    private tk2dSlicedSprite _dangerZone = null;
     private List<Geometry> _lines = null;
     private static readonly int _RayMask = CollisionMask.LayerToMask(CollisionLayer.HighObstacle);
 
@@ -1404,6 +1412,16 @@ public partial class ArmisticeBoss : AIActor
     }
 
     private static readonly Color[] _Colors = [Color.cyan, Color.red, Color.green];
+
+    public override void OnForceEnded()
+    {
+        base.OnForceEnded();
+        if (this._dangerZone)
+        {
+          UnityEngine.Object.Destroy(this._dangerZone.gameObject);
+          this._dangerZone = null;
+        }
+    }
 
     private IEnumerator Attack()
     {
@@ -1424,9 +1442,9 @@ public partial class ArmisticeBoss : AIActor
 
       AIActor boss = base.BulletBank.aiActor;
       Vector2 shootPoint = boss.gameObject.transform.position + GunBarrelOffset(facingLeft: boss.sprite.FlipX);
-      tk2dSlicedSprite dangerZone = BossShared.DoomZone(shootPoint, target, width: 1f, rise: false);
-      dangerZone.TileStretchedSprites = true;
-      dangerZone.SetBorder(1/3f, 0f, 1/3f, 0f);
+      _dangerZone = BossShared.DoomZone(shootPoint, target, width: 1f, rise: false);
+      _dangerZone.TileStretchedSprites = true;
+      _dangerZone.SetBorder(1/3f, 0f, 1/3f, 0f);
       int orangeId = VFX.Collection.GetSpriteIdByName(boss.CenterPosition.x < pc.CenterPosition.x ? "reticle_caution_small" : "reticle_caution_small_inverted");
       int blueId = VFX.Collection.GetSpriteIdByName("reticle_safe_small");
       List<int> tricks = new List<int>(4);
@@ -1436,7 +1454,7 @@ public partial class ArmisticeBoss : AIActor
       for (int a = 0; a < ATTACKS; ++a)
       {
         bool trickery = tricks.Contains(a);
-        dangerZone.SetSprite(trickery ? blueId : orangeId);
+        _dangerZone.SetSprite(trickery ? blueId : orangeId);
 
         float t = 1f - Mathf.Clamp01((float)a / ATTACK_MAX_RAMP);
 
@@ -1444,15 +1462,15 @@ public partial class ArmisticeBoss : AIActor
         boss.aiAnimator.PlayUntilCancelled("ready");
         for (int i = 0; i < BLINKS; ++i)
         {
-          dangerZone.renderer.enabled = true;
+          _dangerZone.renderer.enabled = true;
           base.BulletBank.aiActor.gameObject.Play("armistice_danger_beep_sound");
           for (float wait = BraveTime.ScaledTimeSinceStartup + blinkTime; BraveTime.ScaledTimeSinceStartup < wait; )
           {
-            dangerZone.Retarget(shootPoint, pc.CenterPosition);
+            _dangerZone.Retarget(shootPoint, pc.CenterPosition);
             yield return Wait(1);
           }
 
-          dangerZone.renderer.enabled = false;
+          _dangerZone.renderer.enabled = false;
           for (float wait = BraveTime.ScaledTimeSinceStartup + blinkTime; BraveTime.ScaledTimeSinceStartup < wait; )
             yield return Wait(1);
         }
@@ -1504,7 +1522,8 @@ public partial class ArmisticeBoss : AIActor
       }
 
       boss.aiAnimator.PlayUntilCancelled("idle");
-      UnityEngine.Object.Destroy(dangerZone.gameObject);
+      UnityEngine.Object.Destroy(this._dangerZone.gameObject);
+      this._dangerZone = null;
       yield break;
     }
 
@@ -1627,6 +1646,42 @@ public partial class ArmisticeBoss : AIActor
         Color.Lerp(Color.red, Color.white, 0.15f),
       ];
 
+      private IEnumerator BeepBeep()
+      {
+        // self-destruct data
+        const int BLINKS_PER_PHASE = 8;
+        const int BLINK_PHASES = 5;
+        const float BLINK_TIME = 0.21f;
+        const float BLINK_TIME_DEC = 0.03f;
+
+        bool glow = false;
+        this._light = EasyLight.Create(parent: base.Projectile.transform, color: ExtendedColours.vibrantOrange, radius: 2f, brightness: 10.0f);
+        for (int p = 0; p < BLINK_PHASES; ++p)
+        {
+          this._light.SetColor(_LightColors[p]);
+          for (int i = 0; i < BLINKS_PER_PHASE; ++i)
+          {
+            glow = !glow;
+            if (glow)
+            {
+              base.BulletBank.aiActor.gameObject.Play("armistice_missile_beep_sound");
+              this._light.TurnOn();
+            }
+            else
+              this._light.TurnOff();
+            for (float wait = BraveTime.ScaledTimeSinceStartup + (BLINK_TIME - p * BLINK_TIME_DEC); BraveTime.ScaledTimeSinceStartup < wait; )
+            {
+              DoVFX(1f / 5f);
+              yield return true;
+            }
+          }
+        }
+
+        yield break;
+      }
+
+      private PlayerController pc;
+
       public override IEnumerator Top()
       {
         // homing
@@ -1640,13 +1695,16 @@ public partial class ArmisticeBoss : AIActor
         // const float ORBIT_RAD       = 1f;  // max distance to player before orbiting
         // const float ORBIT_RAD_SQR   = ORBIT_RAD * ORBIT_RAD;
 
-        PlayerController pc = GameManager.Instance.BestActivePlayer;
+        pc = GameManager.Instance.BestActivePlayer;
         Projectile proj = base.Projectile;
         proj.collidesWithProjectiles = true;
         proj.collidesOnlyWithPlayerProjectiles = true;
         // proj.BulletScriptSettings.surviveRigidbodyCollisions = true;
         proj.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
         proj.UpdateCollisionMask();
+
+        bool doneBeeping = false;
+        IEnumerator beepCr = BeepBeep();
 
         // course correct towards the player
         Color debugGreen = Color.green.WithAlpha(0.5f);
@@ -1669,6 +1727,11 @@ public partial class ArmisticeBoss : AIActor
           DoVFX(1f / newSpeed);
           base.ChangeSpeed(new Speed(newSpeed));
           base.ChangeDirection(new Direction(newDir));
+          if (!beepCr.MoveNext())
+          {
+            doneBeeping = true;
+            break;
+          }
           yield return Wait(1);
         }
 
@@ -1693,7 +1756,7 @@ public partial class ArmisticeBoss : AIActor
         float decelStart = zipEnd - DECEL_TIME;
         float angleTotal = 0f;
         float lastAngle  = (base.Position - pc.CenterPosition).ToAngle();
-        while (true)
+        while (!doneBeeping) //NOTE: the coroutine intentionally never actually updates in this loop
         {
           float dtime       = BraveTime.DeltaTime;
           float now         = BraveTime.ScaledTimeSinceStartup;
@@ -1727,39 +1790,18 @@ public partial class ArmisticeBoss : AIActor
         float finalAngle  = (base.Position - pc.CenterPosition).ToAngle();
 
         // stopping
-        const int BLINKS_PER_PHASE = 8;
-        const int BLINK_PHASES = 5;
-        const float BLINK_TIME = 0.21f;
-        const float BLINK_TIME_DEC = 0.03f;
         base.ManualControl = false; //NOTE: collisions stop working if our speed is zero, so just make the projectile move very slowly
         base.ChangeSpeed(new Speed(0.01f));
         this._canBeDestroyed = true;
         proj.collidesWithProjectiles = true;
         proj.UpdateCollisionMask();
-        bool glow = false;
-        this._light = EasyLight.Create(parent: base.Projectile.transform, color: ExtendedColours.vibrantOrange, radius: 2f, brightness: 10.0f);
-        for (int p = 0; p < BLINK_PHASES; ++p)
+
+        while (!doneBeeping && beepCr.MoveNext())
         {
-          this._light.SetColor(_LightColors[p]);
-          for (int i = 0; i < BLINKS_PER_PHASE; ++i)
-          {
-            glow = !glow;
-            if (glow)
-            {
-              base.BulletBank.aiActor.gameObject.Play("armistice_missile_beep_sound");
-              this._light.TurnOn();
-            }
-            else
-              this._light.TurnOff();
-            for (float wait = BraveTime.ScaledTimeSinceStartup + (BLINK_TIME - p * BLINK_TIME_DEC); BraveTime.ScaledTimeSinceStartup < wait; )
-            {
-              if (!this._bounds.Contains(base.Position))
-                base.Position = Lazy.SmoothestLerp(base.Position, pc.CenterPosition, 3f);
-              base.Direction = (pc.CenterPosition - base.Position).ToAngle();
-              DoVFX(1f / 5f);
-              yield return Wait(1);
-            }
-          }
+          if (!this._bounds.Contains(base.Position))
+            base.Position = Lazy.SmoothestLerp(base.Position, pc.CenterPosition, 3f);
+          base.Direction = (pc.CenterPosition - base.Position).ToAngle();
+          yield return Wait(1);
         }
 
         CwaffTrailController.Spawn(SubtractorBeam._RedTrailPrefab, base.Position, pc.CenterPosition); //TODO: use better trail

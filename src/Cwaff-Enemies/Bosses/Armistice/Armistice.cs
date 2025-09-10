@@ -25,7 +25,11 @@ public partial class ArmisticeBoss : AIActor
   internal static CwaffTrailController _TrickshotTrailPrefab;
   internal static CwaffTrailController _WarheadTrailPrefab;
 
-  private const  int _SANS_HP = 60;
+  #if DEBUG
+  private const  int _ARMISTICE_HP = 5;
+  #else
+  private const  int _ARMISTICE_HP = 60;
+  #endif
 
   public static PrototypeDungeonRoom ArmisticeBossRoom = null;
 
@@ -33,7 +37,7 @@ public partial class ArmisticeBoss : AIActor
   {
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/armistice_idle_001",
       hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{C.MOD_INT_NAME}/Resources/armistice_bosscard.png"); // Create our build-a-boss
-    bb.SetStats(health: _SANS_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
+    bb.SetStats(health: _ARMISTICE_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f, shareCooldowns: false, spriteAnchor: Anchor.LowerCenter); // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH); // Set up our animations
       bb.AdjustAnimation(name: "attack_basic", fps:    16f, loop: true);
@@ -42,7 +46,7 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "calm",         fps:     6f, loop: true);
       bb.AdjustAnimation(name: "crouch",       fps:    16f, loop: false, eventFrames: [4],
         eventAudio: ["armistice_missile_launch_sound"]);
-      bb.AdjustAnimation(name: "defeat",       fps:    24f, loop: false);
+      bb.AdjustAnimation(name: "defeat",       fps:     3f, loop: true, loopFrame: 4);
       bb.AdjustAnimation(name: "idle",         fps:    16f, loop: true);
       bb.AdjustAnimation(name: "ready",        fps:    16f, loop: false);
       bb.AdjustAnimation(name: "reload",       fps:    16f, loop: false, eventFrames: [6, 12],
@@ -73,13 +77,13 @@ public partial class ArmisticeBoss : AIActor
     //NOTE: finished for now
     const float CD = 0.5f;
     bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>    (tellAnim: "teleport_out", fireAnim: "breathe", finishAnim: "teleport_in", cooldown: CD, attackCooldown: CD, interruptible: true);
-    bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior> (fireAnim: "calm", cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior> (fireAnim: "calm", cooldown: CD, attackCooldown: CD, interruptible: true, initialCooldown: 5.0f);
     bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "ready", fireAnim: "attack_snipe", cooldown: CD, attackCooldown: CD, interruptible: true);
     bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: CD, attackCooldown: CD, interruptible: true);
     bb.CreateBulletAttack<MeteorShowerScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "skyshot", cooldown: CD, attackCooldown: CD, interruptible: true);
     bb.CreateBulletAttack<TrickshotScript, ArmisticeMoveAndShootBehavior>     (fireAnim: "idle", cooldown: CD, attackCooldown: CD, interruptible: true);
     bb.CreateBulletAttack<MagicMissileScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "crouch", cooldown: CD, attackCooldown: CD, interruptible: true);
-    bb.CreateBulletAttack<SniperScript, ArmisticeMoveAndShootBehavior>        (cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<SniperScript, ArmisticeMoveAndShootBehavior>        (tellAnim: "reload", cooldown: CD, attackCooldown: CD, interruptible: true);
 
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
@@ -178,6 +182,7 @@ public partial class ArmisticeBoss : AIActor
         float arcSpeed = 2f;
 
         ParticleSystem.MainModule main = ps.main;
+        main.playOnAwake             = false;
         main.duration                = 3600f;
         main.startLifetime           = 1.0f; // slightly higher than one rotation
         // main.startSpeed              = 6.0f;
@@ -288,24 +293,19 @@ public partial class ArmisticeBoss : AIActor
       psObj.transform.localRotation = Quaternion.identity;
       this._ps = psObj.GetComponent<ParticleSystem>();
       this._ps.Stop();
-
-      // tk2dBaseSprite sprite = base.aiActor.sprite;
-      // sprite.usesOverrideMaterial = true;
-      // Material mat = sprite.renderer.material;
-      // mat.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-      // mat.SetFloat(CwaffVFX._EmissivePowerId, 100f);
-      // mat.SetColor(CwaffVFX._EmissiveColorId, new Color(0f, 227f / 255f, 1f));
-      // mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 15.0f);
+      this._ps.Clear();
     }
 
     private void OnPreDeath(Vector2 _)
     {
       GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
+      base.aiActor.aiAnimator.PlayUntilCancelled("defeat");
 
-      Lazy.SpawnChestWithSpecificItem(
-        pickup: Lazy.Pickup<GasterBlaster>(),
-        position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success),
-        overrideChestQuality: ItemQuality.S);
+      CameraController mainCameraController = GameManager.Instance.MainCameraController;
+      mainCameraController.OverrideZoomScale = 1.0f;
+      mainCameraController.LockToRoom = false;
+      mainCameraController.UseOverridePlayerOnePosition = false;
+      mainCameraController.UseOverridePlayerTwoPosition = false;
     }
 
     private Geometry _debugHitbox = null;
@@ -315,7 +315,11 @@ public partial class ArmisticeBoss : AIActor
       if (!colorMaybe.HasValue)
       {
         if (this._ps.isPlaying)
+        {
           this._ps.Stop();
+          if (!this._lastParticleColor.HasValue)
+            this._ps.Clear(); //HACK: fixes a bug where a singular particle plays right after the fight starts
+        }
         return;
       }
 
@@ -350,7 +354,13 @@ public partial class ArmisticeBoss : AIActor
       // DebugDraw.DrawDebugCircle(GameManager.Instance.gameObject, base.transform.position.GetAbsoluteRoom().area.Center, 0.5f, Color.cyan.WithAlpha(0.5f));
       #endif
 
-      SetParticleColor(base.spriteAnimator.CurrentClip.name switch {
+      tk2dSpriteAnimator anim = base.spriteAnimator;
+      tk2dSpriteAnimationClip clip = anim.CurrentClip;
+      if (clip.name == "defeat" && anim.CurrentFrame < 4)
+        anim.ClipFps = 24; // first part of defeat animation should have a higher fps
+      else
+        anim.ClipFps = 0;
+      SetParticleColor(clip.name switch {
         "calm"    => _CalmRed,
         "breathe" => _CalmBlue,
         _         => null

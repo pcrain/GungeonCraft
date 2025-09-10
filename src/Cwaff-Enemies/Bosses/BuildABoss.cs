@@ -761,9 +761,9 @@ public class BuildABoss
         def.BetterConstructOffsetsFromAnchor(anchor);
   }
 
-  public void AdjustAnimation(string name, float? fps = null, bool? loop = null, List<int> eventFrames = null, List<string> eventAudio = null)
+  public void AdjustAnimation(string name, float? fps = null, bool? loop = null, List<int> eventFrames = null, List<string> eventAudio = null, int loopFrame = 0)
   {
-    this.enemyBehavior.AdjustAnimation(name, fps, loop, eventFrames, eventAudio);
+    this.enemyBehavior.AdjustAnimation(name, fps, loop, eventFrames, eventAudio, loopFrame);
   }
 
   public void SetIntroAnimations(string introAnim = null, string preIntroAnim = null)
@@ -967,7 +967,7 @@ public static class BH
   }
 
   public static void AdjustAnimation(this BraveBehaviour self, string name, float? fps = null, bool? loop = null,
-    List<int> eventFrames = null, List<string> eventAudio = null)
+    List<int> eventFrames = null, List<string> eventAudio = null, int loopFrame = 0)
   {
     tk2dSpriteAnimationClip clip = self.spriteAnimator.GetClipByName(name);
     if (clip == null)
@@ -979,9 +979,11 @@ public static class BH
       clip.fps = fps.Value;
     if (loop.HasValue)
     {
-      clip.wrapMode = loop.Value
-        ? tk2dSpriteAnimationClip.WrapMode.Loop
-        : tk2dSpriteAnimationClip.WrapMode.Once;
+      clip.wrapMode = !loop.Value
+        ? tk2dSpriteAnimationClip.WrapMode.Once : (loopFrame > 0)
+        ? tk2dSpriteAnimationClip.WrapMode.LoopSection
+        : tk2dSpriteAnimationClip.WrapMode.Loop;
+      clip.loopStart = loopFrame;
     }
     if (eventFrames != null)
     {
