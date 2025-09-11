@@ -128,7 +128,7 @@ public class SunderbussProjectile : Projectile
         Exploder.DoRadialMinorBreakableBreak(pos, RADIUS);
         Exploder.DoRadialMajorBreakableDamage(proj.baseData.damage, pos, RADIUS);
         Exploder.DoRadialPush(pos, 100f, RADIUS);
-        ScorchGroundAt(pos);
+        Lazy.ScorchGroundAt(pos);
         GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f,6f,0.5f,0f), pos);
         for (int i = 1; i <= RADIUS; ++i)
             CwaffVFX.SpawnBurst(
@@ -167,12 +167,6 @@ public class SunderbussProjectile : Projectile
               .Setup(Sunderbuss._SHOCKWAVE_DAMAGE, proj.transform.right.XY().ToAngle(), 25f, 20f, 2f);
 
         DieInAir();
-    }
-
-    private static void ScorchGroundAt(Vector2 pos)
-    {
-        UnityEngine.Object.Instantiate(Sunderbuss._ScorchMark, pos, Quaternion.identity)
-          .SetLayerRecursively(LayerMask.NameToLayer("BG_Critical"));
     }
 
     private void ProcessEnemy(AIActor a, float b)

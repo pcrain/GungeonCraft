@@ -17,6 +17,7 @@ internal static class BossShared
   {
     Vector2 delta         = target - start;
     GameObject reticle    = UnityEngine.Object.Instantiate(_NapalmReticle);
+    reticle.SetLayerRecursively(LayerMask.NameToLayer("FG_Critical"));
     tk2dSlicedSprite quad = reticle.GetComponent<tk2dSlicedSprite>();
       if (sprite != null)
         quad.SetSprite(VFX.Collection, VFX.Collection.GetSpriteIdByName(sprite));
@@ -45,11 +46,15 @@ internal static class BossShared
   /// <summary>Retarget a sliced sprite reticle.</summary>
   internal static void Retarget(this tk2dSlicedSprite quad, Vector2 start, Vector2 target)
   {
+    bool overrideMat = quad.usesOverrideMaterial;
+    Material mat = overrideMat ? quad.renderer.material : null;
     Vector2 delta                = target - start;
     quad.dimensions              = quad.dimensions.WithX(C.PIXELS_PER_TILE * delta.magnitude);
     quad.transform.localRotation = delta.EulerZ();
     float width                  = quad.dimensions.y / C.PIXELS_PER_TILE;
     quad.transform.position      = start + (0.5f * width * delta.normalized.Rotate(-90f));
     quad.UpdateZDepth();
+    if (overrideMat) //NOTE: make sure emissive properties don't get reset
+      quad.renderer.material = mat;
   }
 }

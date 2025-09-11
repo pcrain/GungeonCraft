@@ -107,7 +107,7 @@ public static class VFX
             defaultDef.colliderVertices = new Vector3[]{Vector3.zero, defaultDef.position3}; //NOTE: the original code for this was wrong and probably unused
         sprite.SetSprite(Collection, spriteId);
 
-        tk2dSpriteAnimationClip clip = vfxEffect.NewAnimation(animName: "start", spritePaths: spritePaths, fps: fps, loops: loops, loopStart: loopStart,
+        tk2dSpriteAnimationClip clip = vfxEffect.NewAnimation(animName: name, spritePaths: spritePaths, fps: fps, loops: loops, loopStart: loopStart,
             anchor: anchor, emissivePower: emissivePower, emissiveColour: emissiveColour);
         if (emissivePower > 0) {
             sprite.renderer.material.shader = ShaderCache.Acquire(unlit
@@ -975,7 +975,6 @@ public partial class CwaffVFX // public
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
-        lifetime = Mathf.Max(lifetime, 0.01f);
         for (int i = 0; i < numToSpawn; ++i)
         {
             float posOffsetAngle = uniform ? (baseAngle + 360f * ((float)i / numToSpawn)).Clamp360() : Lazy.RandomAngle();
@@ -987,7 +986,7 @@ public partial class CwaffVFX // public
                 Vel.Radial       => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
                 Vel.Away         => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
                 Vel.AwayRadial   => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
-                Vel.InwardToCenter => realBaseVelocity - (finalpos - basePosition) / lifetime,
+                Vel.InwardToCenter => realBaseVelocity - (finalpos - basePosition) / Mathf.Max(lifetime, 0.01f),
                 // Vel.InwardRadial => realBaseVelocity - posOffsetAngle.ToVector(minVelocity + velocityVariance),
                 _                => realBaseVelocity,
             };

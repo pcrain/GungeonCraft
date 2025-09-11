@@ -1464,6 +1464,7 @@ public static class Lazy
     return true;
   }
 
+  /// <summary>Create an easy DebrisObject for reuse later.</summary>
   public static GameObject EasyDebris(string basePath)
   {
     GameObject debrisObject = Items.Ak47.AsGun().shellCasing.ClonePrefab();
@@ -1489,5 +1490,13 @@ public static class Lazy
     tk2dSpriteAnimation library = debrisSprite.GetOrAddComponent<tk2dSpriteAnimator>().library = debrisSprite.GetOrAddComponent<tk2dSpriteAnimation>();
     library.clips = [clip];
     return debrisObject;
+  }
+
+  //TODO: remove dependency on Sunderbuss' prefabs
+  /// <summary>Create a scorch effect at the given position.</summary>
+  public static void ScorchGroundAt(Vector2 pos)
+  {
+      UnityEngine.Object.Instantiate(Sunderbuss._ScorchMark, pos, Quaternion.identity)
+        .SetLayerRecursively(LayerMask.NameToLayer("BG_Critical"));
   }
 }

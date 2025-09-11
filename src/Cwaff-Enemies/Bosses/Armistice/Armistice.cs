@@ -22,6 +22,8 @@ public partial class ArmisticeBoss : AIActor
   internal static GameObject _SmokeVFX = null;
   internal static GameObject _MissileSmokeVFX = null;
   internal static GameObject _MissileFlak = null;
+  internal static GameObject _BasicFlak = null;
+  internal static GameObject _LaserFlakVFX = null;
   internal static CwaffTrailController _LaserTrailPrefab;
   internal static CwaffTrailController _TrickshotTrailPrefab;
   internal static CwaffTrailController _WarheadTrailPrefab;
@@ -70,14 +72,14 @@ public partial class ArmisticeBoss : AIActor
 
     //NOTE: finished for now
     const float CD = 0.5f;
-    // bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>    (tellAnim: "teleport_out", fireAnim: "breathe", finishAnim: "teleport_in", cooldown: CD, attackCooldown: CD, interruptible: true);
-    // bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior> (fireAnim: "calm", cooldown: CD, attackCooldown: CD, interruptible: true, initialCooldown: 5.0f);
-    // bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "ready", fireAnim: "attack_snipe", cooldown: CD, attackCooldown: CD, interruptible: true);
-    // bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: CD, attackCooldown: CD, interruptible: true);
-    // bb.CreateBulletAttack<MeteorShowerScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "skyshot", cooldown: CD, attackCooldown: CD, interruptible: true);
-    // bb.CreateBulletAttack<TrickshotScript, ArmisticeMoveAndShootBehavior>     (fireAnim: "idle", cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>    (tellAnim: "teleport_out", fireAnim: "breathe", finishAnim: "teleport_in", cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior> (fireAnim: "calm", cooldown: CD, attackCooldown: CD, interruptible: true, initialCooldown: 5.0f);
+    bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "ready", fireAnim: "attack_snipe", cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<MeteorShowerScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "skyshot", cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<TrickshotScript, ArmisticeMoveAndShootBehavior>     (fireAnim: "idle", cooldown: CD, attackCooldown: CD, interruptible: true);
     bb.CreateBulletAttack<MagicMissileScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "crouch", cooldown: CD, attackCooldown: CD, interruptible: true);
-    // bb.CreateBulletAttack<SniperScript, ArmisticeMoveAndShootBehavior>        (tellAnim: "reload", cooldown: CD, attackCooldown: CD, interruptible: true);
+    bb.CreateBulletAttack<SniperScript, ArmisticeMoveAndShootBehavior>        (tellAnim: "reload", cooldown: CD, attackCooldown: CD, interruptible: true);
 
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
@@ -94,6 +96,7 @@ public partial class ArmisticeBoss : AIActor
     _MuzzleVFXSnipe = VFX.Create("muzzle_armistice_snipe", fps: 60, loops: false);
     _ExplosionVFX = VFX.Create("armistice_warhead_explosion_vfx", fps: 30, loops: false);
     _SmokeVFX = VFX.Create("armistice_warhead_smoke", fps: 16, loops: false, scale: 0.5f);
+    _LaserFlakVFX = VFX.Create("armistice_laser_flak", fps: 30, loops: false);
     _MissileSmokeVFX = VFX.Create("armistice_missile_smoke_vfx", fps: 60, loops: false);
     _LaserTrailPrefab = VFX.CreateSpriteTrailObject("armistice_laser_trail", fps: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
     _TrickshotTrailPrefab = VFX.CreateSpriteTrailObject("armistice_trickshot_trail_a", fps: 60, softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true);
@@ -154,6 +157,7 @@ public partial class ArmisticeBoss : AIActor
       MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
     };
     _MissileFlak = Lazy.EasyDebris("armistice_missile_flak");
+    _BasicFlak = Lazy.EasyDebris("armistice_basic_flak");
   }
 
   private static void SpawnDust(Vector2 where)
@@ -270,6 +274,7 @@ public partial class ArmisticeBoss : AIActor
     private static readonly Color _CalmBlue = Color.Lerp(Color.cyan, Color.white, 0.15f);
 
     private Color? _lastParticleColor = null;
+    private int _lastDustFrame = -1;
 
     private void Start()
     {
@@ -351,6 +356,11 @@ public partial class ArmisticeBoss : AIActor
 
       tk2dSpriteAnimator anim = base.spriteAnimator;
       tk2dSpriteAnimationClip clip = anim.CurrentClip;
+      if (clip.name == "run" && anim.CurrentFrame != this._lastDustFrame)
+      {
+        SpawnDust(base.transform.position);
+        this._lastDustFrame = anim.CurrentFrame;
+      }
       if (clip.name == "defeat" && anim.CurrentFrame < 4)
         anim.ClipFps = 24; // first part of defeat animation should have a higher fps
       else

@@ -1104,12 +1104,6 @@ public partial class ArmisticeBoss : AIActor
         this._trail = base.Projectile.AddTrail(SubtractorBeam._RedTrailPrefab).gameObject;
         this._trail.SetGlowiness(100f);
       }
-
-      // public override IEnumerator Top()
-      // {
-      //   yield break;
-      // }
-
     }
 
     protected override List<FluidBulletInfo> BuildChain()
@@ -1216,9 +1210,16 @@ public partial class ArmisticeBoss : AIActor
 
         if (i % 2 == 0)
         {
-          Speed curSpeed = new Speed(Mathf.Lerp(MIN_SPEED, MAX_SPEED, progress));
+          float speed = Mathf.Lerp(MIN_SPEED, MAX_SPEED, progress);
+          Speed curSpeed = new Speed(speed);
           for (int n = 0; n < BARRAGE_SIZE; ++n)
-            base.Fire(shootOff, new Direction(shootAngle.AddRandomSpread(MAX_SPREAD)), curSpeed, new SecretBullet());
+          {
+            float projAngle = shootAngle.AddRandomSpread(MAX_SPREAD);
+            base.Fire(shootOff, new Direction(projAngle), curSpeed, new SecretBullet());
+            if (n % 3 == 0)
+              CwaffVFX.SpawnDebris(prefab: _BasicFlak, position: shootPoint, rotation: projAngle.AddRandomSpread(8f),
+                anchorTransform: t, minForce: 0.3f * speed, maxForce: 0.6f * speed, randomFrame: true, gravity: 20f);
+          }
           actor.gameObject.PlayUnique("armistice_gun_sound");
           CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: shootAngle.EulerZ(), emissivePower: 10f,
             emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
@@ -1232,6 +1233,10 @@ public partial class ArmisticeBoss : AIActor
           actor.gameObject.PlayUnique("armistice_electro_sound");
           CwaffVFX.Spawn(prefab: _MuzzleVFXElectro, position: shootPoint, rotation: launchAngle.EulerZ(), emissivePower: 10f,
             emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
+          CwaffVFX.SpawnBurst(prefab: _LaserFlakVFX, numToSpawn: 3, basePosition: shootPoint,
+            positionVariance: 0.5f, baseVelocity: launchAngle.AddRandomSpread(3f).ToVector(12f),
+            velocityVariance: 8f, velType: CwaffVFX.Vel.Away, rotType: CwaffVFX.Rot.Random,
+            emissivePower: 400f);
         }
 
         nextShot = now + delay;
@@ -1292,6 +1297,7 @@ public partial class ArmisticeBoss : AIActor
           _Explosion.effect = null; // we handle the vfx ourselves
         }
         Exploder.Explode(position: projectile.SafeCenter, data: _Explosion, sourceNormal: Vector2.zero, ignoreQueues: true);
+        Lazy.ScorchGroundAt(projectile.SafeCenter);
         projectile.gameObject.Play("armistice_warhead_explode_sound"); //TODO: find better sound
         CwaffVFX.Spawn(_ExplosionVFX, position: projectile.SafeCenter);
         CwaffVFX.SpawnBurst(prefab: _SmokeVFX, numToSpawn: 20, basePosition: projectile.SafeCenter, positionVariance: 2f,
@@ -1386,6 +1392,8 @@ public partial class ArmisticeBoss : AIActor
           float shootAngle = baseShootAngle.AddRandomSpread(10f);
           lastBulletFired = new MeteorShowerBullet(this.roomFullBounds);
           base.Fire(Offset.OverridePosition(shootPoint), new Direction(shootAngle), new Speed(50f), lastBulletFired);
+          CwaffVFX.SpawnDebris(prefab: _MissileFlak, position: shootPoint, rotation: shootAngle.AddRandomSpread(35f),
+            anchorTransform: boss.gameObject.transform, minForce: 6f, maxForce: 15f, randomFrame: true, gravity: 20f);
         }
         boss.gameObject.Play("armistice_gun_sound");
         CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: baseShootAngle.EulerZ(), emissivePower: 10f,
@@ -1463,7 +1471,9 @@ public partial class ArmisticeBoss : AIActor
       for (int a = 0; a < ATTACKS; ++a)
       {
         bool trickery = tricks.Contains(a);
+        _dangerZone.renderer.enabled = true;
         _dangerZone.SetSprite(trickery ? blueId : orangeId);
+        _dangerZone.SetGlowiness(100f);
 
         float t = 1f - Mathf.Clamp01((float)a / ATTACK_MAX_RAMP);
 
@@ -1520,6 +1530,10 @@ public partial class ArmisticeBoss : AIActor
           boss.gameObject.PlayUnique("armistice_trickshot_sound");
           CwaffVFX.Spawn(prefab: _MuzzleVFXSnipe, position: shootPoint, rotation: launchAngle.EulerZ(), emissivePower: 10f,
             emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
+          CwaffVFX.SpawnBurst(prefab: _LaserFlakVFX, numToSpawn: 3, basePosition: shootPoint,
+            positionVariance: 0.5f, baseVelocity: launchAngle.AddRandomSpread(3f).ToVector(16f),
+            velocityVariance: 12f, velType: CwaffVFX.Vel.Away, rotType: CwaffVFX.Rot.Random,
+            emissivePower: 400f);
         }
 
         for (float wait = BraveTime.ScaledTimeSinceStartup + delay; BraveTime.ScaledTimeSinceStartup < wait; )
@@ -1596,7 +1610,8 @@ public partial class ArmisticeBoss : AIActor
 
     internal class MagicMissileBullet : SecretBullet
     {
-      private static ExplosionData _Explosion = null;
+      private static ExplosionData _SmallExplosion = null;
+      private static ExplosionData _LargeExplosion = null;
 
       private bool _orbiting = false;
       private bool _canBeDestroyed = false;
@@ -1615,12 +1630,14 @@ public partial class ArmisticeBoss : AIActor
         base.Initialize();
         base.Projectile.specRigidbody.CollideWithTileMap = false;
         base.TimeScale = -1f; // update every frame
-        if (_Explosion == null)
+        if (_SmallExplosion == null)
         {
-          _Explosion = Explosions.ExplosiveRounds.With(damage: 0f, force: 100f, debrisForce: 10f, radius: 1.5f,
+          _SmallExplosion = Explosions.ExplosiveRounds.With(damage: 0f, force: 40f, debrisForce: 10f, radius: 1.5f,
             preventPlayerForce: false, shake: false);
-          _Explosion.doDamage = true;
-          _Explosion.damageToPlayer = 0.5f;
+          _LargeExplosion = Explosions.DefaultLarge.With(damage: 0f, force: 200f, debrisForce: 30f, radius: 3.0f,
+            preventPlayerForce: false, shake: true);
+          _LargeExplosion.doDamage = true;
+          _LargeExplosion.damageToPlayer = 0.5f;
         }
       }
 
@@ -1813,8 +1830,9 @@ public partial class ArmisticeBoss : AIActor
           yield return Wait(1);
         }
 
-        CwaffTrailController.Spawn(SubtractorBeam._RedTrailPrefab, base.Position, pc.CenterPosition); //TODO: use better trail
-        Exploder.Explode(pc.CenterPosition, _Explosion, (pc.CenterPosition - base.Position).normalized, ignoreQueues: true);
+        CwaffTrailController.Spawn(_WarheadTrailPrefab, base.Position, pc.CenterPosition);
+        Exploder.Explode(pc.CenterPosition, _LargeExplosion, (pc.CenterPosition - base.Position).normalized, ignoreQueues: true);
+        Lazy.ScorchGroundAt(pc.CenterPosition);
         Vanish();
         yield break;
       }
@@ -1825,7 +1843,7 @@ public partial class ArmisticeBoss : AIActor
             return;
           if (this._canBeDestroyed)
           {
-            Exploder.Explode(base.Position, _Explosion, default, ignoreQueues: true);
+            Exploder.Explode(base.Position, _SmallExplosion, default, ignoreQueues: true);
             Vanish();
           }
           else if (!this._orbiting)
@@ -1900,7 +1918,7 @@ public partial class ArmisticeBoss : AIActor
             anchorTransform: boss.gameObject.transform, minForce: 3f, maxForce: 9f, specificFrame: i, gravity: 20f);
         }
         CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: angle.EulerZ(), emissivePower: 10f,
-          emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f); // TODO: add missile muzzle
+          emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
         CwaffVFX.SpawnBurst(
           prefab           : _MissileSmokeVFX,
           numToSpawn       : 15,
@@ -1952,26 +1970,6 @@ public partial class ArmisticeBoss : AIActor
 
   private class SniperScript : ArmisticeBulletScript
   {
-
-    internal class SniperBullet : SecretBullet
-    {
-
-      public SniperBullet() : base()
-      {
-      }
-
-      public override void Initialize()
-      {
-        base.Initialize();
-      }
-
-      public override IEnumerator Top()
-      {
-        yield break;
-      }
-
-    }
-
     protected override List<FluidBulletInfo> BuildChain() => Run(Attack()).Finish();
 
     private class VelSnapshot
@@ -2063,7 +2061,12 @@ public partial class ArmisticeBoss : AIActor
           #endif
           actor.gameObject.PlayUnique("armistice_gun_spread_sound");
           for (int i = -3; i <= 3; ++i)
-            base.Fire(shootOff, new Direction(aimAngle + 5f * i), new Speed(projSpeed), new SniperBullet());
+          {
+            base.Fire(shootOff, new Direction(aimAngle + 5f * i), new Speed(projSpeed), new SecretBullet());
+            if (i % 2 == 0)
+              CwaffVFX.SpawnDebris(prefab: _BasicFlak, position: shootPoint, rotation: aimAngle.AddRandomSpread(4f),
+                anchorTransform: actor.gameObject.transform, minForce: 0.3f * projSpeed, maxForce: 0.6f * projSpeed, randomFrame: true, gravity: 20f);
+          }
           CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: ((facingLeft ? 180f : 0f).AddRandomSpread(10f)).EulerZ(), emissivePower: 10f,
             emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f);
           CwaffVFX.SpawnBurst(
