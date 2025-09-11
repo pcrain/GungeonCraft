@@ -1463,4 +1463,31 @@ public static class Lazy
       return false; // NaN angle, therefore no solution
     return true;
   }
+
+  public static GameObject EasyDebris(string basePath)
+  {
+    GameObject debrisObject = Items.Ak47.AsGun().shellCasing.ClonePrefab();
+    DebrisObject debris = debrisObject.GetComponent<DebrisObject>();
+    debris.name = $"{basePath} debris";
+    // debris.bounceCount
+    // debris.decayOnBounce
+    // debris.angularVelocity
+    // debris.angularVelocityVariance
+    // debris.canRotate
+    // debris.doesDecay
+    // debris.inertialMass
+    // debris.usesLifespan
+    // debris.lifespanMin
+    // debris.lifespanMax
+    // debris.motionMultiplier
+    // debris.optionalBounceVFX
+    // debris.shouldUseSRBMotion
+    tk2dSprite debrisSprite = debrisObject.GetComponent<tk2dSprite>();
+    List<string> paths = ResMap.Get(basePath);
+    debrisSprite.SetSprite(VFX.Collection, VFX.Collection.GetSpriteIdByName(paths[0]));
+    tk2dSpriteAnimationClip clip = debrisObject.NewAnimation(animName: "animation", spritePaths: paths);
+    tk2dSpriteAnimation library = debrisSprite.GetOrAddComponent<tk2dSpriteAnimator>().library = debrisSprite.GetOrAddComponent<tk2dSpriteAnimation>();
+    library.clips = [clip];
+    return debrisObject;
+  }
 }

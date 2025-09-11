@@ -1894,6 +1894,11 @@ public partial class ArmisticeBoss : AIActor
         float angle = left ? 180f : 0f;
         base.Fire(Offset.OverridePosition(shootPoint), new Direction(angle), new Speed(60f), mm);
         boss.gameObject.Play("armistice_missile_launch_sound");
+        for (int i = 0; i < 6; ++i)
+        {
+          CwaffVFX.SpawnDebris(prefab: _MissileFlak, position: shootPoint, rotation: angle.AddRandomSpread(35f),
+            anchorTransform: boss.gameObject.transform, minForce: 3f, maxForce: 9f, specificFrame: i, gravity: 20f);
+        }
         CwaffVFX.Spawn(prefab: _MuzzleVFXBullet, position: shootPoint, rotation: angle.EulerZ(), emissivePower: 10f,
           emissiveColor: ExtendedColours.vibrantOrange, emitColorPower: 8f); // TODO: add missile muzzle
         CwaffVFX.SpawnBurst(

@@ -1022,6 +1022,35 @@ public partial class CwaffVFX // public
                 );
         }
     }
+
+    /// <summary>Easily spawn in some debris. Most arguments are currently unused</summary>
+    /// <param name="prefab">Debris prefab to instantiate.</param>
+    /// <param name="position">Where the debris spawns from.</param>
+    /// <param name="rotation">The angle at which the debris is launched.</param>
+    /// <param name="minForce">The minimium force with which the debris is launched.</param>
+    /// <param name="maxForce">The maximium force with which the debris is launched.</param>
+    /// <param name="startingHeight">The base height at which the debris is launched.</param>
+    /// <param name="anchorTransform">The transform relative to which the height is determined.</param>
+    /// <param name="randomFrame">If the debris is animated, whether a random single frame from the animation should be selected.</param>
+    /// <param name="specificFrame">If the debris is animated, which frame specifically should be selected.</param>
+    /// <param name="gravity">The gravity applied to the debris.</param>
+    public static void SpawnDebris(GameObject prefab = null, Vector3 position = default, float rotation = 0f, float minForce = 1f, float maxForce = 4f, float? startingHeight = null, Transform anchorTransform = null,
+        bool randomFrame = false, int specificFrame = -1, float gravity = -1f/*, float emissivePower = 0, Color? emissiveColor = null, Color? overrideColor = null, float emitColorPower = 1.55f*/)
+    {
+        GameObject debrisObject = SpawnManager.SpawnDebris(prefab, position, rotation.EulerZ());
+        if (debrisObject.GetComponent<ShellCasing>() is ShellCasing shellCasing)
+            shellCasing.Trigger();
+        if (debrisObject.GetComponent<DebrisObject>() is not DebrisObject debris)
+            return;
+        if ((randomFrame || specificFrame >= 0) && debrisObject.GetComponent<tk2dSpriteAnimator>() is tk2dSpriteAnimator animator)
+            animator.PickFrame(specificFrame);
+        Vector3 lauchVec = rotation.ToVector(UnityEngine.Random.Range(minForce, maxForce));
+        float height = startingHeight ??= UnityEngine.Random.value * 0.5f;
+        debris.additionalHeightBoost = position.y - ((anchorTransform != null) ? anchorTransform.position.y : 0f) + 0.2f - height;
+        if (gravity >= 0f)
+            debris.GravityOverride = gravity;
+        debris.Trigger(new Vector3(lauchVec.x, lauchVec.y, UnityEngine.Random.Range(minForce, maxForce)), height);
+    }
 }
 
 public partial class CwaffVFX // private
