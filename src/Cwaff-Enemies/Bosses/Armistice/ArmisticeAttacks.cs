@@ -450,9 +450,9 @@ public partial class ArmisticeBoss : AIActor
       base.EndOnBlank = true;
       int phase = GetPhase();
       FluidBulletInfo fbi = Run(Attack(radius: 14f, rps: -0.850f, offAngle:  70f, playSounds: false));
-      if (phase >= 2)
+      if (phase >= 1)
         fbi = fbi.And(Attack(radius: 11f, rps: -0.625f, offAngle:  90f, playSounds: false));
-      if (phase >= 3)
+      if (phase >= 2)
         fbi = fbi.And(Attack(radius:  8f, rps: -0.300f, offAngle: 110f, playSounds: true));
       return fbi.And( Flood(radius: 14f, rps:  0.150f, offAngle: -90f, spawnRps: 0.75f)).Finish();
     }

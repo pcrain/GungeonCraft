@@ -32,10 +32,10 @@ public partial class ArmisticeBoss : AIActor
   internal static CwaffTrailController _WarheadTrailPrefab;
 
   #if DEBUG
-  // private const  int _ARMISTICE_HP = 5;
-  private const  int _ARMISTICE_HP = 9;
+  // private const  int _ARMISTICE_HP = 9;
+  private const  int _ARMISTICE_HP = 150;
   #else
-  private const  int _ARMISTICE_HP = 90;
+  private const  int _ARMISTICE_HP = 150;
   #endif
 
   public static PrototypeDungeonRoom ArmisticeBossRoom = null;
