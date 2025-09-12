@@ -7,6 +7,9 @@ public partial class ArmisticeBoss : AIActor
   private const  string SUBTITLE               = "Trapped Gungeoneer";
   private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/Bosses/armistice";
 
+  internal const float TIRED_THRES = 0.67f;
+  internal const float EXHAUSTED_THRES = 0.34f;
+
   private static GameObject _NapalmReticle      = null;
   private static AIBulletBank.Entry _MainBullet = null;
   private static AIBulletBank.Entry _TurretBullet = null;
@@ -30,7 +33,7 @@ public partial class ArmisticeBoss : AIActor
 
   #if DEBUG
   // private const  int _ARMISTICE_HP = 5;
-  private const  int _ARMISTICE_HP = 90;
+  private const  int _ARMISTICE_HP = 9;
   #else
   private const  int _ARMISTICE_HP = 90;
   #endif
@@ -51,6 +54,7 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "crouch",       fps:    16f, loop: false, eventFrames: [4],
         eventAudio: ["armistice_missile_launch_sound"]);
       bb.AdjustAnimation(name: "defeat",       fps:     3f, loop: true, loopFrame: 4);
+      bb.AdjustAnimation(name: "exhausted",    fps:     4f, loop: true);
       bb.AdjustAnimation(name: "idle",         fps:    16f, loop: true);
       bb.AdjustAnimation(name: "ready",        fps:    16f, loop: false);
       bb.AdjustAnimation(name: "reload",       fps:    16f, loop: false, eventFrames: [6, 12],
@@ -60,6 +64,7 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "skyshot",      fps:    30f, loop: false, eventFrames: [5]);
       bb.AdjustAnimation(name: "teleport_in",  fps:     9f, loop: false);
       bb.AdjustAnimation(name: "teleport_out", fps:     9f, loop: false);
+      bb.AdjustAnimation(name: "tired",        fps:     6f, loop: true);
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 30, height: 40, xoff: -15, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<ArmisticeIntro>();                                       // Add custom animation to the generic intro doer
@@ -70,19 +75,27 @@ public partial class ArmisticeBoss : AIActor
     // bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
     //   goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 4.26f, attackCooldown: 0.15f, probability: 3f);
 
-    //NOTE: finished for now
-    const float CD = 0.5f;
-    bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>    (tellAnim: "teleport_out", fireAnim: "breathe", finishAnim: "teleport_in", cooldown: CD, attackCooldown: CD, interruptible: true);
-    bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior> (fireAnim: "calm", cooldown: CD, attackCooldown: CD, interruptible: true, initialCooldown: 5.0f);
-    bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "ready", fireAnim: "attack_snipe", cooldown: CD, attackCooldown: CD, interruptible: true);
-    bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: CD, attackCooldown: CD, interruptible: true);
-    bb.CreateBulletAttack<MeteorShowerScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "skyshot", cooldown: CD, attackCooldown: CD, interruptible: true);
-    bb.CreateBulletAttack<TrickshotScript, ArmisticeMoveAndShootBehavior>     (fireAnim: "idle", cooldown: CD, attackCooldown: CD, interruptible: true);
-    bb.CreateBulletAttack<MagicMissileScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "crouch", cooldown: CD, attackCooldown: CD, interruptible: true);
-    bb.CreateBulletAttack<SniperScript, ArmisticeMoveAndShootBehavior>        (tellAnim: "reload", cooldown: CD, attackCooldown: CD, interruptible: true);
+    const float CD = 3.0f;
+    const float ACD = 0.5f;
+    bb.CreateBulletAttack<BoneTunnelScript, ArmisticeMoveAndShootBehavior>    (tellAnim: "teleport_out", fireAnim: "breathe", finishAnim: "teleport_in", cooldown: CD, attackCooldown: ACD, interruptible: true);
+    bb.CreateBulletAttack<ClocksTickingScript, ArmisticeMoveAndShootBehavior> (fireAnim: "calm", cooldown: CD, attackCooldown: ACD, interruptible: true, initialCooldown: 5.0f);
+    bb.CreateBulletAttack<BoxTrotScript, ArmisticeMoveAndShootBehavior>       (tellAnim: "ready", fireAnim: "attack_snipe", cooldown: CD, attackCooldown: ACD, interruptible: true);
+    bb.CreateBulletAttack<LaserBarrageScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "ready", fireAnim: "attack_basic", cooldown: CD, attackCooldown: ACD, interruptible: true);
+    bb.CreateBulletAttack<MeteorShowerScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "skyshot", cooldown: CD, attackCooldown: ACD, interruptible: true);
+    bb.CreateBulletAttack<TrickshotScript, ArmisticeMoveAndShootBehavior>     (fireAnim: "idle", cooldown: CD, attackCooldown: ACD, interruptible: true);
+    bb.CreateBulletAttack<MagicMissileScript, ArmisticeMoveAndShootBehavior>  (tellAnim: "reload", fireAnim: "crouch", cooldown: CD, attackCooldown: ACD, interruptible: true);
+    bb.CreateBulletAttack<SniperScript, ArmisticeMoveAndShootBehavior>        (tellAnim: "reload", cooldown: CD, attackCooldown: ACD, interruptible: true);
 
     bb.AddBossToGameEnemies(name: $"{C.MOD_PREFIX}:armisticeboss");               // Add our boss to the enemy database
     ArmisticeBossRoom = bb.CreateStandaloneBossRoom(width: 40, height: 30, exitOnBottom: true);
+
+    // fix up the lights a bit
+    ArmisticeBossRoom.usesProceduralDecoration = false;
+    ArmisticeBossRoom.usesProceduralLighting = false;
+    foreach (int y in (int[])[0, 10, 19, 29])
+      foreach (int x in (int[])[4, 14, 25, 35])
+        ArmisticeBossRoom.FullCellData[x + y * 40].containsManuallyPlacedLight = true;
+
     InitPrefabs();                                                             // Do miscellaneous prefab loading
   }
 
@@ -275,6 +288,7 @@ public partial class ArmisticeBoss : AIActor
 
     private Color? _lastParticleColor = null;
     private int _lastDustFrame = -1;
+    private HealthHaver _hh = null;
 
     private void Start()
     {
@@ -283,6 +297,7 @@ public partial class ArmisticeBoss : AIActor
       base.aiActor.bulletBank.Bullets.Add(_WarheadBullet);
       base.aiActor.bulletBank.Bullets.Add(_MagicMissileBullet);
       base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
+      this._hh = base.aiActor.healthHaver;
       base.aiActor.healthHaver.OnPreDeath += OnPreDeath;
 
       if (_ParticleSystem == null)
@@ -353,6 +368,18 @@ public partial class ArmisticeBoss : AIActor
       // DebugDraw.DrawDebugCircle(base.gameObject, base.transform.position, 0.5f, Color.green.WithAlpha(0.5f));
       // DebugDraw.DrawDebugCircle(GameManager.Instance.gameObject, base.transform.position.GetAbsoluteRoom().area.Center, 0.5f, Color.cyan.WithAlpha(0.5f));
       #endif
+
+      float healthRatio = this._hh.currentHealth / this._hh.maximumHealth;
+      if (healthRatio < EXHAUSTED_THRES)
+      {
+        if (base.aiActor.aiAnimator.OverrideIdleAnimation != "exhausted")
+          base.aiActor.aiAnimator.OverrideIdleAnimation = "exhausted";
+      }
+      else if (healthRatio < TIRED_THRES)
+      {
+        if (base.aiActor.aiAnimator.OverrideIdleAnimation != "tired")
+          base.aiActor.aiAnimator.OverrideIdleAnimation = "tired";
+      }
 
       tk2dSpriteAnimator anim = base.spriteAnimator;
       tk2dSpriteAnimationClip clip = anim.CurrentClip;

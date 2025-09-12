@@ -201,6 +201,7 @@ public partial class ArmisticeBoss : AIActor
   private abstract class ArmisticeBulletScript : FluidBulletScript
   {
     protected AIActor theBoss          {get; private set;}
+    protected HealthHaver hh           {get; private set;}
     protected Rect    roomFullBounds   {get; private set;}
     protected Rect    roomBulletBounds {get; private set;}
     protected Rect    roomSlamBounds   {get; private set;}
@@ -209,6 +210,7 @@ public partial class ArmisticeBoss : AIActor
     {
       base.Initialize();
       this.theBoss            = this.BulletBank.aiActor;
+      this.hh                 = this.theBoss.healthHaver;
       this.roomFullBounds     = this.theBoss.GetAbsoluteParentRoom().GetBoundingRect();
       this.roomBulletBounds   = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2f, bottomInset: 4f, leftInset: 2f);
       this.roomSlamBounds     = this.roomFullBounds.Inset(topInset: 2f, rightInset: 2.5f, bottomInset: 2f, leftInset: 1.5f);
@@ -233,6 +235,24 @@ public partial class ArmisticeBoss : AIActor
 
       yield break;
     }
+
+    public int GetPhase()
+    {
+      return (this.hh.currentHealth / this.hh.maximumHealth) switch {
+        > TIRED_THRES     => 0,
+        > EXHAUSTED_THRES => 1,
+        _                 => 2
+      };
+    }
+
+    private static readonly string[] _IdleAnims = new string[]{ "idle", "tired", "exhausted" };
+    public string IdleForPhase() => _IdleAnims[GetPhase()];
+
+    /// <summary>Get an integer based on the boss' current phase.</summary>
+    public int IntForPhase(int[] ints) => ints[Mathf.Min(GetPhase(), ints.Length - 1)];
+
+    /// <summary>Get a float based on the boss' current phase.</summary>
+    public float FloatForPhase(float[] floats) => floats[Mathf.Min(GetPhase(), floats.Length - 1)];
   }
 
   // Shoots bullets to the top corners of the screen that violently fly down towards the bottom center after a short delay
@@ -428,12 +448,13 @@ public partial class ArmisticeBoss : AIActor
     {
       base.BulletBank.aiActor.gameObject.Play("armistice_clocks_ticking_sound");
       base.EndOnBlank = true;
-      return
-         Run(Attack(radius:  8f, rps: -0.300f, offAngle: 110f, playSounds: true))
-        .And(Attack(radius: 11f, rps: -0.625f, offAngle:  90f, playSounds: false))
-        .And(Attack(radius: 14f, rps: -0.850f, offAngle:  70f, playSounds: false))
-        .And( Flood(radius: 14f, rps:  0.150f, offAngle: -90f, spawnRps: 0.75f))
-        .Finish();
+      int phase = GetPhase();
+      FluidBulletInfo fbi = Run(Attack(radius: 14f, rps: -0.850f, offAngle:  70f, playSounds: false));
+      if (phase >= 2)
+        fbi = fbi.And(Attack(radius: 11f, rps: -0.625f, offAngle:  90f, playSounds: false));
+      if (phase >= 3)
+        fbi = fbi.And(Attack(radius:  8f, rps: -0.300f, offAngle: 110f, playSounds: true));
+      return fbi.And( Flood(radius: 14f, rps:  0.150f, offAngle: -90f, spawnRps: 0.75f)).Finish();
     }
 
     private IEnumerator Flood(float radius, float rps, float offAngle, float spawnRps)
@@ -625,9 +646,10 @@ public partial class ArmisticeBoss : AIActor
       const int RATE          = 5; // frames between bullets
       const int WAVES         = 60; // base waves the attack lasts
       const int WAVE_VARIANCE = 10; // max additional waves the attack lasts
-      const int GAP           = 5; // size of the path we have to navigate
       const int ROWS          = 50; // number of rows of bullets
-      const int NOGAP         = 3; // number of columns at the end with no gap
+
+      int gap = IntForPhase([6, 5, 4]); // size of the path we have to navigate
+      int noGap = IntForPhase([2, 3, 4]); // number of columns at the end with no gap
 
       //TODO: sound / visual cue
       yield return Wait(15); // wait for a quarter of a second
@@ -636,7 +658,6 @@ public partial class ArmisticeBoss : AIActor
       Speed sspeed = new Speed(SPEED);
 
       Vector2 ppos = GameManager.Instance.BestActivePlayer.CenterPosition;
-      // bool leftward = (ppos.x < this.roomFullBounds.center.x);
       bool leftward = (base.BulletBank.aiActor.Position.x > this.roomFullBounds.center.x);
       Direction dir = new Direction(leftward ? 180f : 0f);
       PathLine wall = leftward ? roomRect.Right() : roomRect.Left();
@@ -647,11 +668,11 @@ public partial class ArmisticeBoss : AIActor
       int numWaves = WAVES + UnityEngine.Random.Range(0, WAVE_VARIANCE);
       for (int i = 0; i < numWaves; ++i)
       {
-        bool hasGap = i < (numWaves - NOGAP);
+        bool hasGap = i < (numWaves - noGap);
         float amplitude = Mathf.Clamp01(0.1f * (numWaves - i)); // the last few waves close in to prevent cheesing by standing near the edge
         for (int j = 0; j <= ROWS; ++j)
         {
-          if (hasGap && Mathf.Abs(j - gapPos) < GAP)
+          if (hasGap && Mathf.Abs(j - gapPos) < gap)
             continue;
           float off = (float)j / ROWS;
           Vector2 bpos = wall.At(off) + new Vector2(wallOff * UnityEngine.Random.value, 0f);
@@ -659,9 +680,9 @@ public partial class ArmisticeBoss : AIActor
           this.Fire(Offset.OverridePosition(bpos + new Vector2(0f, offset)), dir, sspeed, new BoneTunnelBullet(targetY: bpos.y));
         }
         base.BulletBank.aiActor.gameObject.Play($"armistice_bullet_storm_sound_{1 + (i % 4)}");
-        if (gapPos <= GAP)
+        if (gapPos <= gap)
           ++gapPos;
-        else if (gapPos >= ROWS - GAP)
+        else if (gapPos >= ROWS - gap)
           --gapPos;
         else
           gapPos += (Lazy.CoinFlip() ? 1 : -1);
@@ -1114,10 +1135,11 @@ public partial class ArmisticeBoss : AIActor
 
     private IEnumerator Attack()
     {
-      const int TURRETS              = 3;
       const float LENGTH             = 6f;
       const float EPSILON            = 0.1f;
-      const float TIME_BETWEEN_SHOTS = 0.5f;
+
+      int numTurrets = IntForPhase([3, 4, 5]);
+      float timeBetweenShots = FloatForPhase([0.5f, 0.35f, 0.2f]);
 
       AIActor boss               = base.BulletBank.aiActor;
       Rect bounds                = this.roomFullBounds.Inset(0.5f, 1.25f, 2f, 1f);
@@ -1126,7 +1148,7 @@ public partial class ArmisticeBoss : AIActor
       PathRect path              = new PathRect(bounds);
       List<SecretBullet> bullets = new();
 
-      for (int i = 0; i < TURRETS; ++i)
+      for (int i = 0; i < numTurrets; ++i)
       {
         bool facingLeft = boss.gameObject.transform.position.x > bounds.center.x;
         boss.sprite.FlipX = facingLeft;
@@ -1144,10 +1166,10 @@ public partial class ArmisticeBoss : AIActor
         boss.aiAnimator.PlayUntilFinished("attack_snipe");
         while (boss.spriteAnimator.IsPlaying("attack_snipe"))
           yield return Wait(1);
-        boss.aiAnimator.PlayUntilCancelled("idle");
-        for (float elapsed = 0f; elapsed < TIME_BETWEEN_SHOTS; elapsed += BraveTime.DeltaTime)
+        boss.aiAnimator.PlayUntilCancelled(IdleForPhase());
+        for (float elapsed = 0f; elapsed < timeBetweenShots; elapsed += BraveTime.DeltaTime)
           yield return Wait(1);
-        if (i < TURRETS - 1)
+        if (i < numTurrets - 1)
         {
           boss.aiAnimator.PlayUntilCancelled("ready");
           while (boss.spriteAnimator.IsPlaying("ready"))
@@ -1159,7 +1181,7 @@ public partial class ArmisticeBoss : AIActor
       while (BraveTime.ScaledTimeSinceStartup < endTime)
       {
         bool allTurretsGone = true;
-        for (int n = 0; n < TURRETS; ++n)
+        for (int n = 0; n < numTurrets; ++n)
           if (bullets[n].Projectile && !bullets[n].IsEnded && !bullets[n].Destroyed)
             allTurretsGone = false;
         if (allTurretsGone)
@@ -1167,7 +1189,7 @@ public partial class ArmisticeBoss : AIActor
         yield return Wait(1);
       }
 
-      for (int n = 0; n < TURRETS; ++n)
+      for (int n = 0; n < numTurrets; ++n)
         if (bullets[n].Projectile)
           bullets[n].Vanish();
 
@@ -1183,8 +1205,6 @@ public partial class ArmisticeBoss : AIActor
     private IEnumerator Attack()
     {
       const int RAMP_ITERS   = 24;
-      const int EXTRA_ITERS  = 10;
-      const int TOTAL_ITERS  = RAMP_ITERS + EXTRA_ITERS;
       const float MIN_SPEED  = 10;
       const float MAX_SPEED  = 25;
       const float MAX_SPREAD = 70;
@@ -1192,6 +1212,9 @@ public partial class ArmisticeBoss : AIActor
       const int LASERSPEED   = 50;
       const float DELAY_MAX  = 1.0f;
       const float DELAY_MIN  = 0.15f;
+
+      int extraIters  = IntForPhase([5, 10, 15]);
+      int totalIters  = RAMP_ITERS + extraIters;
 
       PlayerController pc = GameManager.Instance.GetRandomActivePlayer();
       AIActor actor = base.BulletBank.aiActor;
@@ -1203,7 +1226,7 @@ public partial class ArmisticeBoss : AIActor
 
       float nextShot = 0f;
       float now = BraveTime.ScaledTimeSinceStartup;
-      for (int i = 0; i < TOTAL_ITERS; ++i)
+      for (int i = 0; i < totalIters; ++i)
       {
         float progress = Mathf.Min((float)i / RAMP_ITERS, 1f);
         float delay = 0.5f * Mathf.Lerp(DELAY_MAX, DELAY_MIN, progress);
@@ -1307,10 +1330,11 @@ public partial class ArmisticeBoss : AIActor
       public override IEnumerator Top()
       {
         const float HEIGHT = 100f;
-        const float TIME = 0.75f;
         const float ROTSPEED = 1080f;
         const float WAIT = 0.5f;
         const float VARIANCE = 0.5f;
+
+        float fallTime = GameManager.IsTurboMode ? 0.75f : 0.975f;
 
         CameraController cam = GameManager.Instance.MainCameraController;
         while (cam.PointIsVisible(base.Position))
@@ -1324,7 +1348,7 @@ public partial class ArmisticeBoss : AIActor
         Vector2 target = pc ? pc.CenterPosition : new PathRect(this._bounds.Inset(3f)).At(UnityEngine.Random.value, UnityEngine.Random.value);
         if (pc) // Easeing biases the position to something closer to the player
         {
-          target += TIME * (Ease.InCubic(UnityEngine.Random.value) * pc.Velocity) + Lazy.RandomVector(2f * Ease.InCubic(UnityEngine.Random.value));
+          target += fallTime * (Ease.InCubic(UnityEngine.Random.value) * pc.Velocity) + Lazy.RandomVector(2f * Ease.InCubic(UnityEngine.Random.value));
           if (!this._bounds.Contains(target))
             target = BraveMathCollege.ClosestPointOnRectangle(target, this._bounds.min, this._bounds.size);
         }
@@ -1333,12 +1357,12 @@ public partial class ArmisticeBoss : AIActor
         base.Projectile.sprite.transform.rotation = 270f.EulerZ();
 
         GameObject sigil = SpawnManager.SpawnVFX(VFX.MasterySigil, target, (ROTSPEED * BraveTime.ScaledTimeSinceStartup).EulerZ(), ignoresPools: true);
-        sigil.ExpireIn(TIME); // fallback in case the script gets interrupted
+        sigil.ExpireIn(fallTime); // fallback in case the script gets interrupted
         base.Projectile.gameObject.Play("armistice_warhead_fall_sound");
 
-        for (float elapsed = 0f; elapsed < TIME; elapsed += BraveTime.DeltaTime)
+        for (float elapsed = 0f; elapsed < fallTime; elapsed += BraveTime.DeltaTime)
         {
-            float percentLeft = 1f - elapsed / TIME;
+            float percentLeft = 1f - elapsed / fallTime;
             base.Position = target + new Vector2(0f, percentLeft * HEIGHT);
             sigil.transform.rotation = (ROTSPEED * BraveTime.ScaledTimeSinceStartup).EulerZ();
             sigil.transform.localScale = percentLeft * Vector3.one;
@@ -1370,7 +1394,7 @@ public partial class ArmisticeBoss : AIActor
 
     private IEnumerator Attack()
     {
-      const int VOLLEY_SIZE = 5;
+      int volleySize = IntForPhase([5, 7, 9]);
 
       AIActor boss = base.BulletBank.aiActor;
       Transform t = boss.gameObject.transform;
@@ -1387,9 +1411,9 @@ public partial class ArmisticeBoss : AIActor
         boss.aiAnimator.PlayUntilFinished("skyshot");
         while (!this._fired)
           yield return Wait(1);
-        for (int v = 0; v < VOLLEY_SIZE; ++v)
+        for (int v = 0; v < volleySize; ++v)
         {
-          float shootAngle = baseShootAngle.AddRandomSpread(10f);
+          float shootAngle = baseShootAngle.AddRandomSpread(2f * volleySize);
           lastBulletFired = new MeteorShowerBullet(this.roomFullBounds);
           base.Fire(Offset.OverridePosition(shootPoint), new Direction(shootAngle), new Speed(50f), lastBulletFired);
           CwaffVFX.SpawnDebris(prefab: _MissileFlak, position: shootPoint, rotation: shootAngle.AddRandomSpread(35f),
@@ -1445,14 +1469,16 @@ public partial class ArmisticeBoss : AIActor
       base.TimeScale = -1f; // update every frame
 
       const int BLINKS = 3;
-      const int ATTACKS = 15;
       const int ATTACK_MAX_RAMP = 5;
-      const int TRICKS = 5;
-      const int TRICKRATE = ATTACKS / TRICKS;
+      const int TRICKRATE = 3;
       const float BLINKTIME = 0.125f;
-      const float MINBLINKTIME = 0.07f;
-      const float ATTACK_GAP = 0.4f;
-      const float MIN_ATTACK_GAP = 0.15f;
+
+      int numAttacks = IntForPhase([12, 15, 18]) + (GameManager.IsTurboMode ? TRICKRATE : 0);
+      int numTricks = numAttacks / TRICKRATE;
+
+      float minBlinkTime = FloatForPhase([0.07f, 0.06f, 0.05f]);
+      float attackGap = FloatForPhase([0.4f, 0.35f, 0.30f]);
+      float minAttackGap = FloatForPhase([0.15f, 0.1375f, 0.125f]) + (GameManager.IsTurboMode ? 0f : 0.1f);
 
       PlayerController pc = GameManager.Instance.BestActivePlayer;
       Vector2 target = pc.CenterPosition;
@@ -1465,10 +1491,10 @@ public partial class ArmisticeBoss : AIActor
       int orangeId = VFX.Collection.GetSpriteIdByName(boss.CenterPosition.x < pc.CenterPosition.x ? "reticle_caution_small" : "reticle_caution_small_inverted");
       int blueId = VFX.Collection.GetSpriteIdByName("reticle_safe_small");
       List<int> tricks = new List<int>(4);
-      for (int i = 0; i < TRICKS; ++i)
+      for (int i = 0; i < numTricks; ++i)
         tricks.Add(UnityEngine.Random.Range(TRICKRATE * i, TRICKRATE * (i + 1)));
 
-      for (int a = 0; a < ATTACKS; ++a)
+      for (int a = 0; a < numAttacks; ++a)
       {
         bool trickery = tricks.Contains(a);
         _dangerZone.renderer.enabled = true;
@@ -1477,30 +1503,39 @@ public partial class ArmisticeBoss : AIActor
 
         float t = 1f - Mathf.Clamp01((float)a / ATTACK_MAX_RAMP);
 
-        float blinkTime = MINBLINKTIME + (BLINKTIME - MINBLINKTIME) * t;
+        float blinkTime = minBlinkTime + (BLINKTIME - minBlinkTime) * t;
         boss.aiAnimator.PlayUntilCancelled("ready");
+        bool preRolled = pc.IsDodgeRolling;
         for (int i = 0; i < BLINKS; ++i)
         {
           _dangerZone.renderer.enabled = true;
           base.BulletBank.aiActor.gameObject.Play("armistice_danger_beep_sound");
           for (float wait = BraveTime.ScaledTimeSinceStartup + blinkTime; BraveTime.ScaledTimeSinceStartup < wait; )
           {
+            if (!pc.IsDodgeRolling)
+              preRolled = false;
             _dangerZone.Retarget(shootPoint, pc.CenterPosition);
             yield return Wait(1);
           }
 
           _dangerZone.renderer.enabled = false;
           for (float wait = BraveTime.ScaledTimeSinceStartup + blinkTime; BraveTime.ScaledTimeSinceStartup < wait; )
+          {
+            if (!pc.IsDodgeRolling)
+              preRolled = false;
             yield return Wait(1);
+          }
         }
 
-        float delay = MIN_ATTACK_GAP + (ATTACK_GAP - MIN_ATTACK_GAP) * t;
+        float delay = minAttackGap + (attackGap - minAttackGap) * t;
         if (trickery)
         {
           bool shouldFire = false;
           for (float wait = BraveTime.ScaledTimeSinceStartup + delay; BraveTime.ScaledTimeSinceStartup < wait; )
           {
-            if (pc.IsDodgeRolling)
+            if (preRolled && !pc.IsDodgeRolling)
+              preRolled = false;
+            if (!preRolled && pc.IsDodgeRolling)
             {
               shouldFire = true;
               break;
@@ -1544,7 +1579,7 @@ public partial class ArmisticeBoss : AIActor
         }
       }
 
-      boss.aiAnimator.PlayUntilCancelled("idle");
+      boss.aiAnimator.PlayUntilCancelled(IdleForPhase());
       UnityEngine.Object.Destroy(this._dangerZone.gameObject);
       this._dangerZone = null;
       yield break;
@@ -1883,22 +1918,24 @@ public partial class ArmisticeBoss : AIActor
 
     private IEnumerator Attack()
     {
-      const int MISSILES = 4;
       const float BASE_RADIUS = 6f;
       const float RADIUS_GROW = 1f;
       AIActor boss = base.BulletBank.aiActor;
 
-      List<MagicMissileBullet> mms = new(MISSILES);
-      for (int n = 0; n < MISSILES; ++n)
+      int numMissiles = IntForPhase([4, 5, 6]);
+      List<MagicMissileBullet> mms = new(numMissiles);
+      for (int n = 0; n < numMissiles; ++n)
       {
         if (n > 0)
         {
           this._fired = false;
           while (boss.spriteAnimator.IsPlaying("crouch"))
             yield return Wait(1);
+          boss.spriteAnimator.ClipFps = FloatForPhase([16f, 24f, 32f]);
           boss.aiAnimator.PlayUntilFinished("reload");
           while (boss.spriteAnimator.IsPlaying("reload"))
             yield return Wait(1);
+          boss.spriteAnimator.ClipFps = 0f;
           boss.aiAnimator.PlayUntilFinished("crouch");
         }
         boss.spriteAnimator.AnimationEventTriggered += this.OnFired;
@@ -1933,7 +1970,8 @@ public partial class ArmisticeBoss : AIActor
           );
       }
 
-      for (int n = 0; n < MISSILES; ++n)
+      boss.spriteAnimator.ClipFps = 0f;
+      for (int n = 0; n < numMissiles; ++n)
         while (!mms[n].IsEnded && !mms[n].Destroyed)
           yield return Wait(1);
       yield break;
@@ -2019,6 +2057,7 @@ public partial class ArmisticeBoss : AIActor
 
       int firstValidVel = 0;
       int nextValidVel = 0;
+      int spread = IntForPhase([2, 3, 4]);
 
       actor.aiAnimator.PlayUntilCancelled("attack_basic");
       tk2dSpriteAnimator spriteAnim = actor.spriteAnimator;
@@ -2060,7 +2099,7 @@ public partial class ArmisticeBoss : AIActor
           // shootLine.Setup(shape: Geometry.Shape.LINE, color: Color.cyan, pos: shootPoint, pos2: pc.CenterPosition + time * avgVelocity);
           #endif
           actor.gameObject.PlayUnique("armistice_gun_spread_sound");
-          for (int i = -3; i <= 3; ++i)
+          for (int i = -spread; i <= spread; ++i)
           {
             base.Fire(shootOff, new Direction(aimAngle + 5f * i), new Speed(projSpeed), new SecretBullet());
             if (i % 2 == 0)
@@ -2086,7 +2125,7 @@ public partial class ArmisticeBoss : AIActor
       }
 
       spriteAnim.ClipFps = 0f;
-      actor.aiAnimator.PlayUntilCancelled("idle");
+      actor.aiAnimator.PlayUntilCancelled(IdleForPhase());
 
       #if DEBUG
       // UnityEngine.Object.Destroy(line.gameObject);

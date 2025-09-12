@@ -951,19 +951,17 @@ public static class BH
       ? tk2dSpriteAnimationClip.WrapMode.Loop
       : tk2dSpriteAnimationClip.WrapMode.Once;
     SpriteBuilder.AddAnimation(self.spriteAnimator, collection, ids, name, loopMode).fps = fps;
-    if (direction != DirectionalAnimation.DirectionType.None)
+    DirectionalAnimation dirAnim = new DirectionalAnimation
     {
-      if (name == "idle")
-      {
-        self.aiAnimator.IdleAnimation = new DirectionalAnimation
-        {
-          Type = direction,
-          Prefix = name,
-          AnimNames = new string[1], // TODO: this might not be one if our directional type is not single
-          Flipped = new DirectionalAnimation.FlipType[1]
-        };
-      }
-    }
+      Type = direction,
+      Prefix = name,
+      AnimNames = new string[1], // TODO: this might not be one if our directional type is not single
+      Flipped = new DirectionalAnimation.FlipType[1]
+    };
+    if (name == "idle")
+      self.aiAnimator.IdleAnimation = dirAnim;
+    else
+      (self.aiAnimator.OtherAnimations ??= new()).Add(new(){name = name, anim = dirAnim});
   }
 
   public static void AdjustAnimation(this BraveBehaviour self, string name, float? fps = null, bool? loop = null,
@@ -1056,10 +1054,10 @@ public static class BH
       AtlasHelper.AddSpritesToCollection(newSprites, bossSprites); //TODO: this could feasibly be hoisted to the outer loop
       lastAnim += newSprites.Count;
       DirectionalAnimation.DirectionType dir;
-      if (entry.Key == "idle")
+      // if (entry.Key == "idle")
         dir = DirectionalAnimation.DirectionType.Single;
-      else
-        dir = DirectionalAnimation.DirectionType.None;
+      // else
+      //   dir = DirectionalAnimation.DirectionType.None;
       // ETGModConsole.Log($"calling self.AddAnimation(bossSprites, BH.Range({firstAnim}, {lastAnim-1}), \"{entry.Key}\", {defaultFps}, {true}, {dir});");
       self.AddAnimation(bossSprites, BH.Range(firstAnim, lastAnim-1), entry.Key, defaultFps, true, dir);
     }
