@@ -433,3 +433,36 @@ public partial class ArmisticeBoss : AIActor
     //   { base.aiActor.GetComponent<BossBehavior>().FinishedIntro(); }
   }
 }
+
+
+[HarmonyPatch]
+internal static class BulletThatCanKillThePastPickupPatcher
+{
+  [HarmonyPatch(typeof(BulletThatCanKillThePast), nameof(BulletThatCanKillThePast.Pickup))]
+  [HarmonyPrefix]
+  private static void BulletThatCanKillThePastPickupPatch(BulletThatCanKillThePast __instance, PlayerController player)
+  {
+    if (__instance.m_pickedUp)
+      return;
+    if (player.CurrentRoom is not RoomHandler room)
+      return;
+    foreach (var ix in room.GetRoomInteractables())
+    {
+      if (ix is not TalkDoerLite talker || !talker)
+        continue;
+      if (talker.name != "NPC_Blacksmith")
+        continue;
+
+      talker.AddNewDialogState("custom",
+        dialogue     : new(){"good morning little robot", "do you like your new toy?"},
+        yesPrompt    : "definitely!",
+        yesState     : "affirmative",
+        noPrompt     : "not really...",
+        noState      : "negative",
+        isStartState : true);
+      talker.AddNewDialogState("affirmative", new(){"oh", "well that's great"});
+      talker.AddNewDialogState("negative", new(){"oh", "well too bad"});
+      talker.StartDialog("custom");
+    }
+  }
+}

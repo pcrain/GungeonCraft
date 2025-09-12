@@ -23,7 +23,9 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     protected bool m_canUse = true;
     protected PlayerController m_interactor;
     protected Vector3 talkPointOffset;
-    protected GameObject talkPointObject;
+
+    private bool didSetup = false;
+    private bool existingNpc = false;
 
     protected int PromptResult()
     {
@@ -96,15 +98,26 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
 
     protected virtual void Start()
     {
+        Setup();
+    }
+
+    public void Setup()
+    {
+        if (this.didSetup)
+            return;
+
+        this.didSetup = true;
         this.canInteract = true;
         this.m_canUse = true;
-        this.talkPointObject = new GameObject();
-        this.talkPointObject.transform.position = base.transform.position;
-        this.talkPoint = this.talkPointObject.transform;
-        // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("talk"));
+        if (base.gameObject.GetComponent<TalkDoerLite>() is TalkDoerLite talker)
+        {
+            this.existingNpc = true;
+            this.talkPoint = talker.speakPoint;
+            return;
+        }
+        this.talkPoint = new GameObject().transform;
+        this.talkPoint.position = base.transform.position;
         Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
-        // base.sprite.SetSprite(base.sprite.GetSpriteIdByName("idle"));
-        // this.talkPointOffset = new Vector3(size.x / 2, size.y, 0) + this.talkPointAdjustment;
         this.talkPointOffset = new Vector3(0, size.y, 0) + this.talkPointAdjustment;
         // SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
         base.aiAnimator.PlayUntilCancelled("idler");
@@ -184,7 +197,8 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
 
         // Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
         // this.talkPointOffset = new Vector3(base.sprite.FlipX ? -size.x/2 : size.x/2, size.y, 0) + this.talkPointAdjustment;
-        this.talkPointObject.transform.position = base.sprite.WorldTopCenter;
+        if (!this.existingNpc)
+            this.talkPoint.position = base.sprite.WorldTopCenter;
 
         TextBoxManager.ShowTextBox(
             this.talkPoint.position,
@@ -220,7 +234,8 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
             yield return script.Current;
 
         // Tear down input overrides and letterboxing
-        base.aiAnimator.PlayUntilCancelled("idler");
+        if (!this.existingNpc)
+            base.aiAnimator.PlayUntilCancelled("idler");
         EndConversation();
     }
 

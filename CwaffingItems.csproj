@@ -272,6 +272,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffBezierMesh.cs"/>
     <Compile Include="src\Cwaff-Misc\Hotfixes.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffHats.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffDialog.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTrailController.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffPatches.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedMode.cs"/>
