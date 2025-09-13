@@ -434,7 +434,6 @@ public partial class ArmisticeBoss : AIActor
   }
 }
 
-
 [HarmonyPatch]
 internal static class BulletThatCanKillThePastPickupPatcher
 {
@@ -442,6 +441,8 @@ internal static class BulletThatCanKillThePastPickupPatcher
   [HarmonyPrefix]
   private static void BulletThatCanKillThePastPickupPatch(BulletThatCanKillThePast __instance, PlayerController player)
   {
+    if (!GameStatsManager.Instance.GetCharacterSpecificFlag(CharacterSpecificGungeonFlags.KILLED_PAST))
+      return;
     if (__instance.m_pickedUp)
       return;
     if (player.CurrentRoom is not RoomHandler room)
@@ -453,16 +454,83 @@ internal static class BulletThatCanKillThePastPickupPatcher
       if (talker.name != "NPC_Blacksmith")
         continue;
 
-      talker.AddNewDialogState("custom",
-        dialogue     : new(){"good morning little robot", "do you like your new toy?"},
-        yesPrompt    : "definitely!",
-        yesState     : "affirmative",
-        noPrompt     : "not really...",
-        noState      : "negative",
-        isStartState : true);
-      talker.AddNewDialogState("affirmative", new(){"oh", "well that's great"});
-      talker.AddNewDialogState("negative", new(){"oh", "well too bad"});
-      talker.StartDialog("custom");
+      talker.AddNewDialogState("pastRegrets",
+        dialogue: new(){
+          "...hey... ",
+          "You've already killed your past, right?",
+          "Why do you need this bullet?",
+          "Do you still have lingering regrets?"
+          },
+        yesPrompt : "A few.",
+        yesState  : "affirmative",
+        noPrompt  : "None at all.",
+        noState   : "negative");
+      talker.AddNewDialogState("affirmative", new(){"I see.", "Off you go then."});
+      talker.AddNewDialogState("negative", customAction: () => {
+        CwaffRunData.Instance.noPastRegrets = true; System.Console.WriteLine($"CwaffRunData.Instance.noPastRegrets = {CwaffRunData.Instance.noPastRegrets}"); },
+        dialogue: new(){
+          "Interesting... ",
+          "The {wj}gun{w} and {wj}bullet{w} give those with regrets a chance to change their past.",
+          "If you truly no longer have regrets, what will happen to you when you fire the {wj}gun{w}?",
+          "... ",
+          "Off you go then.",
+        });
+      talker.StartDialog("pastRegrets");
     }
+  }
+
+  [HarmonyPatch(typeof(ArkController), nameof(ArkController.HandleClockhair), MethodType.Enumerator)]
+  [HarmonyILManipulator]
+  private static void ArkControllerHandleClockhairPatchIL(ILContext il, MethodBase original)
+  {
+      ILCursor cursor = new ILCursor(il);
+
+      FieldInfo didShootHellTrigger = original.DeclaringType.GetEnumeratorField("didShootHellTrigger");
+      if (!cursor.TryGotoNext(MoveType.After,
+        instr => instr.MatchLdarg(0),
+        instr => instr.MatchLdarg(0),
+        instr => instr.MatchLdfld(original.DeclaringType.FullName, didShootHellTrigger.Name)
+        ))
+        return;
+
+      // do quick fadeout if we are going to the secret area
+      cursor.CallPrivate(typeof(BulletThatCanKillThePastPickupPatcher), nameof(NoPastRegrets));
+
+      // add new branch to go to our new floor
+      ILLabel nextPastCheck = null;
+      ILLabel afterAllPastChecks = null;
+      if (!cursor.TryGotoNext(MoveType.Before,
+        instr => instr.MatchBr(out afterAllPastChecks),
+        instr => instr.MatchLdarg(0),
+        instr => instr.MatchLdfld(original.DeclaringType.FullName, original.DeclaringType.GetEnumeratorField("shotPlayer").Name),
+        instr => instr.MatchLdfld<PlayerController>("characterIdentity"),
+        instr => instr.MatchLdcI4((int)PlayableCharacters.CoopCultist),
+        instr => instr.MatchBneUn(out nextPastCheck)
+        ))
+        return;
+
+      if (!cursor.TryGotoNext(MoveType.AfterLabel, instr => instr.MatchLdarg(0)))
+        return;
+
+      cursor.Emit(OpCodes.Ldarg_0); // load enumerator type
+      cursor.Emit(OpCodes.Ldfld, original.DeclaringType.GetEnumeratorField("$this")); // load actual "$this" field
+      cursor.CallPrivate(typeof(BulletThatCanKillThePastPickupPatcher), nameof(CheckIfShouldGoToNoRegretsPast));
+      cursor.Emit(OpCodes.Brtrue, afterAllPastChecks);
+  }
+
+  private static bool NoPastRegrets(bool oldValue) => oldValue || CwaffRunData.Instance.noPastRegrets;
+
+  private static bool CheckIfShouldGoToNoRegretsPast(ArkController ark)
+  {
+      if (!CwaffRunData.Instance.noPastRegrets)
+        return false;
+
+      #if DEBUG
+      System.Console.WriteLine($"  secrets O:");
+      #endif
+      ark.ResetPlayers();
+      GameManager.Instance.LoadCustomLevel(ArmisticeDungeon.INTERNAL_NAME);
+      GameUIRoot.Instance.ToggleUICamera(false);
+      return true;
   }
 }
