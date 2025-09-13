@@ -20,6 +20,14 @@ public class ArmisticeNPC : BossNPC
   {
     GameManager.Instance.MainCameraController.OverridePosition = this.sprite.transform.localPosition;
     GameManager.Instance.MainCameraController.SetManualControl(true, true);
+
+    CustomTrackedStats.ENCOUNTERED_ARMI.Increment();
+    int encounters = (int)CustomTrackedStats.ENCOUNTERED_ARMI.Get();
+
+    #if DEBUG
+    System.Console.WriteLine($"handling encounter number {encounters}");
+    #endif
+
     if (!this._talkedOnce)
     {
       yield return Converse("hey kid, how'd you manage to find me?",

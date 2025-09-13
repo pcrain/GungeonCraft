@@ -2,8 +2,8 @@ namespace CwaffingTheGungy;
 
 public partial class SansBoss : AIActor
 {
-  public  const  string BOSS_GUID              = "Sans Boss";
-  private const  string BOSS_NAME              = "Sans Gundertale";
+  public const   string BOSS_GUID              = "Sans Boss";
+  internal const string BOSS_NAME              = "Sans Gundertale";
   private const  string SUBTITLE               = "Introducing...";
   private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/Bosses/sans";
 
@@ -95,6 +95,9 @@ public partial class SansBoss : AIActor
         pickup: Lazy.Pickup<GasterBlaster>(),
         position: GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success),
         overrideChestQuality: ItemQuality.S);
+
+      CustomTrackedStats.DEFEATED_SKEL.Increment();
+      CustomDungeonFlags.HAS_DEFEATED_SKEL.Set();
     }
 
     private void LateUpdate() // movement is buggy if we use the regular Update() method
@@ -134,6 +137,8 @@ public partial class SansBoss : AIActor
 
   private class SansIntro : SpecificIntroDoer
   {
+    private bool _processedEncounter = false;
+
     public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
     {
       // Set up room specific attacks
@@ -150,6 +155,13 @@ public partial class SansBoss : AIActor
     }
 
     public override void EndIntro()
-      { base.aiActor.GetComponent<BossBehavior>().FinishedIntro(); }
+    {
+      if (!this._processedEncounter)
+      {
+        this._processedEncounter = true;
+        CustomTrackedStats.ENCOUNTERED_SKEL.Increment();
+      }
+      base.aiActor.GetComponent<BossBehavior>().FinishedIntro();
+    }
   }
 }

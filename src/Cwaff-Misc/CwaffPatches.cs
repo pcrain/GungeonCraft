@@ -2,6 +2,22 @@ namespace CwaffingTheGungy;
 
 // Class for harmony patches that need to be shared by multiple classes (e.g., functions that are patched multiple times)
 
+[HarmonyPatch]
+internal static class StatPatches
+{
+    // Tracks deaths to our bosses
+    [HarmonyPatch(typeof(GameManager), nameof(GameManager.DoGameOver))]
+    [HarmonyPrefix]
+    private static void GameManagerDoGameOverPatch(GameManager __instance, string gameOverSource)
+    {
+        if (gameOverSource == SansBoss.BOSS_NAME)
+            CustomTrackedStats.DIED_TO_SKEL.Increment();
+        if (gameOverSource == ArmisticeBoss.BOSS_NAME)
+            CustomTrackedStats.DIED_TO_ARMI.Increment();
+    }
+}
+
+
 [HarmonyPatch(typeof(MinorBreakable), nameof(MinorBreakable.OnPreCollision))]
 static class MinorBreakablePrecollisionPatches
 {

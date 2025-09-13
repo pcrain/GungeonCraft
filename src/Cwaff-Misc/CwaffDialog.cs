@@ -1,5 +1,6 @@
 namespace CwaffingTheGungy;
 
+/// <summary>Helper class for integrating new dialog lines into existing TalkDoerLites' FSMs</summary>
 public static class CwaffDialog
 {
   public static void AddNewDialogState(this TalkDoerLite talker, string stateName, List<string> dialogue, bool replaceExisting = false, string yesPrompt = null, string yesState = null, string noPrompt = null, string noState = null, Action customAction = null)

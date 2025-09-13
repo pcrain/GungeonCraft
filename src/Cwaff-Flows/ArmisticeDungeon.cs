@@ -208,7 +208,7 @@ public class ArmisticeDungeon
         dungeon.PlayerLightRadius = 4;
         dungeon.PrefabsToAutoSpawn = new GameObject[0];
 
-        //include this for custom floor audio (we need to prevent music from playing manually se our hook can properly loop it)
+        //include this for custom floor audio (we need to prevent music from playing manually so our hook can properly loop it)
         dungeon.musicEventName = "fakedummymusiceventthatdoesntexist";
 
         CatacombsPrefab = null;

@@ -2,8 +2,8 @@ namespace CwaffingTheGungy;
 
 public partial class ArmisticeBoss : AIActor
 {
-  public  const  string BOSS_GUID              = "Armistice";
-  private const  string BOSS_NAME              = "Armistice";
+  public const   string BOSS_GUID              = "Armistice";
+  internal const string BOSS_NAME              = "Armistice";
   private const  string SUBTITLE               = "Trapped Gungeoneer";
   private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/Bosses/armistice";
 
@@ -31,12 +31,7 @@ public partial class ArmisticeBoss : AIActor
   internal static CwaffTrailController _TrickshotTrailPrefab;
   internal static CwaffTrailController _WarheadTrailPrefab;
 
-  #if DEBUG
-  // private const  int _ARMISTICE_HP = 9;
   private const  int _ARMISTICE_HP = 150;
-  #else
-  private const  int _ARMISTICE_HP = 150;
-  #endif
 
   public static PrototypeDungeonRoom ArmisticeBossRoom = null;
 
@@ -68,12 +63,9 @@ public partial class ArmisticeBoss : AIActor
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 30, height: 40, xoff: -15, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<ArmisticeIntro>();                                       // Add custom animation to the generic intro doer
-    // bb.MakeInteractible<ArmisticeNPC>(preFight: true, postFight: true) ;       // Add some pre-fight and post-fight dialogue
+    bb.MakeInteractible<ArmisticeNPC>(preFight: true, postFight: true) ;       // Add some pre-fight and post-fight dialogue
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
     bb.AddCustomMusic(name: "collapse", loopAt: 320576, rewind: 225251);       // Add custom music for our boss
-    // bb.AddNamedVFX(pool: VFX.vfxpool["Tornado"], name: "mytornado");           // Add some named vfx pools to our bank of VFX
-    // bb.CreateTeleportAttack<CustomTeleportBehavior>(                           // Add some attacks
-    //   goneTime: 0.25f, outAnim: "teleport_out", inAnim: "teleport_in", cooldown: 4.26f, attackCooldown: 0.15f, probability: 3f);
 
     const float CD = 3.0f;
     const float ACD = 0.5f;
@@ -321,6 +313,9 @@ public partial class ArmisticeBoss : AIActor
       mainCameraController.LockToRoom = false;
       mainCameraController.UseOverridePlayerOnePosition = false;
       mainCameraController.UseOverridePlayerTwoPosition = false;
+
+      CustomTrackedStats.DEFEATED_ARMI.Increment();
+      CustomDungeonFlags.HAS_DEFEATED_ARMI.Set();
     }
 
     private Geometry _debugHitbox = null;
@@ -404,6 +399,8 @@ public partial class ArmisticeBoss : AIActor
 
   private class ArmisticeIntro : SpecificIntroDoer
   {
+    private bool _processedEncounter = false;
+
     public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
     {
       // Set up room specific attacks
@@ -429,19 +426,31 @@ public partial class ArmisticeBoss : AIActor
       // mainCameraController.AddFocusPoint(head.gameObject);
     }
 
-    // public override void EndIntro()
-    //   { base.aiActor.GetComponent<BossBehavior>().FinishedIntro(); }
+    public override void EndIntro()
+    {
+      if (!this._processedEncounter)
+      {
+        this._processedEncounter = true;
+        CustomTrackedStats.ENCOUNTERED_ARMI.Increment();
+      }
+    }
   }
 }
 
 [HarmonyPatch]
 internal static class BulletThatCanKillThePastPickupPatcher
 {
+
+  /// <summary>Add dynamic dialog to Blacksmith if preconditions are met.</summary>
   [HarmonyPatch(typeof(BulletThatCanKillThePast), nameof(BulletThatCanKillThePast.Pickup))]
   [HarmonyPrefix]
   private static void BulletThatCanKillThePastPickupPatch(BulletThatCanKillThePast __instance, PlayerController player)
   {
-    if (!GameStatsManager.Instance.GetCharacterSpecificFlag(CharacterSpecificGungeonFlags.KILLED_PAST))
+    if (!GungeonFlags.BOSSKILLED_LICH.Get())
+      return;
+    if (!GungeonFlags.HAS_ATTEMPTED_RESOURCEFUL_RAT.Get())
+      return;
+    if (!CharacterSpecificGungeonFlags.KILLED_PAST.Get())
       return;
     if (__instance.m_pickedUp)
       return;
@@ -476,9 +485,11 @@ internal static class BulletThatCanKillThePastPickupPatcher
           "Off you go then.",
         });
       talker.StartDialog("pastRegrets");
+      break;
     }
   }
 
+  /// <summary>Allow the GTCKTP to take us to the secret area</summary>
   [HarmonyPatch(typeof(ArkController), nameof(ArkController.HandleClockhair), MethodType.Enumerator)]
   [HarmonyILManipulator]
   private static void ArkControllerHandleClockhairPatchIL(ILContext il, MethodBase original)

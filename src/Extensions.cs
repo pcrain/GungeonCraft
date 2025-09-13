@@ -3675,5 +3675,23 @@ public static class Extensions
   {
     return (float.IsNaN(v.x) || float.IsNaN(v.y)) ? default : v;
   }
+
+  /// <summary>Set a global  save flag.</summary>
+  public static void Set(this GungeonFlags flag) => GameStatsManager.Instance.SetFlag(flag, true);
+
+  /// <summary>Unset a global  save flag.</summary>
+  public static void Unset(this GungeonFlags flag) => GameStatsManager.Instance.SetFlag(flag, false);
+
+  /// <summary>Check whether a global  save flag is set.</summary>
+  public static bool Get(this GungeonFlags flag) => GameStatsManager.Instance.GetFlag(flag);
+
+  /// <summary>Set a character specific save flag.</summary>
+  public static void Set(this CharacterSpecificGungeonFlags flag) => GameStatsManager.Instance.SetCharacterSpecificFlag(flag, true);
+
+  /// <summary>Unset a character specific save flag.</summary>
+  public static void Unset(this CharacterSpecificGungeonFlags flag) => GameStatsManager.Instance.SetCharacterSpecificFlag(flag, false);
+
+  /// <summary>Check whether a character specific save flag is set.</summary>
+  public static bool Get(this CharacterSpecificGungeonFlags flag) => GameStatsManager.Instance.GetCharacterSpecificFlag(flag);
 }
 
