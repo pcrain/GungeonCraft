@@ -347,6 +347,7 @@ public partial class ArmisticeBoss : AIActor
       CwaffRunData.Instance.scrambledBulletHell = true; // going to bullet hell this run scrambles it
 
       new GameObject("birth shader handler", typeof(BirthShaderHandler));
+      CwaffDungeons.PlayCustomFloorMusicDelayed(0.5f); //HACK: temporary hack to get past Modular bug
     }
 
     internal void FinishedIntro()

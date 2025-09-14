@@ -103,21 +103,43 @@ public class CwaffDungeons
         return assetBundle.LoadAsset<GameObject>(name).GetComponent<Dungeon>();
     }
 
-    [HarmonyPatch(typeof(DungeonFloorMusicController), nameof(DungeonFloorMusicController.ResetForNewFloor))]
-    private class ForceCustomMusicPatch
+    //HACK: temporary workaround for Modular ResetForNewFloor() hook conflict
+    internal static string _LastCustomMusic = null;
+    internal static uint _LastCustomMusicId = 0;
+    internal static void PlayCustomFloorMusicDelayed(float delay = 0.0f)
     {
-        static void Postfix(Dungeon d)
+        GameManager.Instance.DungeonMusicController.StartCoroutine(PlayCustomFloorMusicDelayedCR(delay));
+        IEnumerator PlayCustomFloorMusicDelayedCR(float delay = 0.0f)
         {
-            foreach (CwaffDungeons cd in Flows.Values)
-            {
-                if (d.DungeonFloorName != cd.floorName)
-                    continue;
-                if (!string.IsNullOrEmpty(cd.floorMusic))
-                    GameManager.Instance.DungeonMusicController.LoopMusic(
-                        musicName: cd.floorMusic, loopPoint: cd.loopPoint, rewindAmount: cd.rewindAmount);
-                break;
-            }
+            yield return new WaitForSeconds(delay);
+            PlayCustomFloorMusic();
         }
+    }
+
+    //HACK: uncomment once Modular bug is fixed
+    // [HarmonyPatch(typeof(DungeonFloorMusicController), nameof(DungeonFloorMusicController.ResetForNewFloor))]
+    // private static class ForceCustomMusicPatch
+    // { private static void Postfix(Dungeon d) => PlayCustomFloorMusic(d); }
+
+    private static bool IsMusicPlaying(uint id)
+    {
+        return AkSoundEngine.GetSourcePlayPosition(id, out int pos) == AKRESULT.AK_Success;
+    }
+
+    internal static void PlayCustomFloorMusic()
+    {
+        Dungeon d = GameManager.Instance.Dungeon;
+        foreach (CwaffDungeons cd in Flows.Values)
+        {
+            if (d.DungeonFloorName != cd.floorName)
+                continue;
+            if (!string.IsNullOrEmpty(cd.floorMusic) && (cd.floorMusic != _LastCustomMusic || !IsMusicPlaying(_LastCustomMusicId)))
+                _LastCustomMusicId = GameManager.Instance.DungeonMusicController.LoopMusic(
+                    musicName: cd.floorMusic, loopPoint: cd.loopPoint, rewindAmount: cd.rewindAmount);
+            _LastCustomMusic = cd.floorMusic;
+            return;
+        }
+        _LastCustomMusic = null;
     }
 
     [HarmonyPatch(typeof(FlowDatabase), nameof(FlowDatabase.GetOrLoadByName))]

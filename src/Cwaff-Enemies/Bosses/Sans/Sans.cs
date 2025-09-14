@@ -81,6 +81,8 @@ public partial class SansBoss : AIActor
       this.aiActor.bulletBank.Bullets.Add(_BoneBullet);
       base.aiActor.healthHaver.forcePreventVictoryMusic = true; // prevent default floor theme from playing on death
       base.aiActor.healthHaver.OnPreDeath += OnPreDeath;
+
+      CwaffDungeons.PlayCustomFloorMusicDelayed(0.5f); //HACK: temporary hack to get past Modular bug
     }
 
     private void OnPreDeath(Vector2 _)
