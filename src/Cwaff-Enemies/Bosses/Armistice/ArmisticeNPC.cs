@@ -64,7 +64,8 @@ public class ArmisticeNPC : BossNPC
       yield return Prompt("Where does the elevator lead?");
 
       yield return Converse("Straight to Bullet Hell, the birthplace of the Gundead.");
-      yield return Converse("It probably looks exactly how you're accustomed to seeing it.");
+      yield return Converse("It's a lot more crowded there now than it is in the present day.");
+      yield return Converse("A lot harder to fight through as well.");
       yield return Prompt("...and you mentioned dying?");
 
       yield return Converse("It's as temporary as ever, and very effective for leaving this place.");

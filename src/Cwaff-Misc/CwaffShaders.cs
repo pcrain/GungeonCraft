@@ -17,6 +17,7 @@ public static class CwaffShaders
     public static Shader ShatterShader = null;
     public static Shader GlassShader = null;
     public static Shader BirthShader = null;
+    public static Shader HellShader = null;
     public static Texture2D DigitizeTexture = null;
     public static Texture2D StarsTexture = null;
     public static Texture2D NoiseTexture = null;
@@ -70,10 +71,12 @@ public static class CwaffShaders
             GlassShader = shaderBundle.LoadAsset<Shader>("assets/glassshader.shader");
             StarNoiseTexture = shaderBundle.LoadAsset<Texture2D>("assets/starnoise.png");
             BirthShader = shaderBundle.LoadAsset<Shader>("assets/screenbirthshader.shader");
+            HellShader = shaderBundle.LoadAsset<Shader>("assets/screenhellshader.shader");
         }
 
         CwaffEvents.OnCleanStart += ResetShaders;
         CwaffEvents.OnStatsRecalculated += CheckShaders;
+        CwaffEvents.OnNewFloorFullyLoaded += CheckShouldEnableHellShaders;
     }
 
     internal static void CheckShaders(PlayerController player)
@@ -107,11 +110,52 @@ public static class CwaffShaders
             return;
         }
         _WiggleMat ??= new Material(CwaffShaders.ScreenWiggleShader);
-        _WiggleMat.SetFloat("_Amplitude", 0.0008f * GameManager.Instance.PrimaryPlayer.spiceCount);
+        _WiggleMat.SetFloat("_Amplitude", 0.0008f * Mathf.Min(GameManager.Instance.PrimaryPlayer.spiceCount, 4));
         if (Pixelator.HasInstance)
             Pixelator.Instance.RegisterAdditionalRenderPass(_WiggleMat);
         // GameManager.Instance.PrimaryPlayer.ToggleShadowVisiblity(false);
         // SpriteOutlineManager.ToggleOutlineRenderers(GameManager.Instance.PrimaryPlayer.sprite, false);
+    }
+
+    private static void CheckShouldEnableHellShaders()
+    {
+        if (GameManager.Instance.Dungeon.tileIndices.tilesetId != GlobalDungeonData.ValidTilesets.HELLGEON)
+            return;
+        if (!CwaffRunData.Instance.scrambledBulletHell)
+            return;
+        new GameObject("hell shader handler", typeof(HellShaderHandler));
+    }
+
+    private class HellShaderHandler : MonoBehaviour
+    {
+        private Material mat;
+        private int coordsId;
+
+        private void Start()
+        {
+            mat = new Material(CwaffShaders.HellShader);
+            mat.SetTexture("_NoiseTex", CwaffShaders.NoiseTexture);
+            mat.SetFloat("_FogSpeed", 0.085f);
+            mat.SetFloat("_MorphSpeed", 0.068f);
+            mat.SetFloat("_FogSize", 0.31f);
+            mat.SetFloat("_FogThickness", 1.0f);
+            mat.SetFloat("_FogStrength", 0.675f); // NOTE: range is 0.5 to 1.0
+            coordsId = Shader.PropertyToID("_CamXYWH");
+            Update();
+            TurnOn();
+        }
+
+        private void Update()
+        {
+            CameraController cam = GameManager.Instance.MainCameraController;
+            Vector2 camMin = cam.MinVisiblePoint;
+            Vector2 camMax = cam.MaxVisiblePoint;
+            Vector2 camSize = camMax - camMin;
+            mat.SetVector(coordsId, new Vector4(0.0625f * camMin.x, 0.0625f * camMin.y, camSize.x, camSize.y));
+        }
+
+        internal void TurnOn() => Pixelator.Instance.RegisterAdditionalRenderPass(mat);
+        internal void TurnOff() => Pixelator.Instance.DeregisterAdditionalRenderPass(mat);
     }
 
     [HarmonyPatch(typeof(SpiceItem), nameof(SpiceItem.DoEffect))]

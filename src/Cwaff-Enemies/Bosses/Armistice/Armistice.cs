@@ -187,8 +187,8 @@ public partial class ArmisticeBoss : AIActor
       mat = new Material(CwaffShaders.BirthShader);
       mat.SetTexture("_NoiseTex", CwaffShaders.StarNoiseTexture);
       mat.SetFloat("_Emission", 300f);
-      mat.SetFloat("_FlashSpeed", 0.2f);
-      mat.SetFloat("_Density", 0.085f);
+      mat.SetFloat("_FlashSpeed", 0.02f);
+      mat.SetFloat("_Density", 0.02f);
       coordsId = Shader.PropertyToID("_CamXYWH");
       Update();
       TurnOn();
