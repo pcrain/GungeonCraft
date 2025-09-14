@@ -61,7 +61,9 @@ public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
   public int loopPoint  = -1;
   public int loopRewind = -1;
 
+  private AIActor theBoss = null;
   private bool bossFightStarted = false;
+  private RoomHandler bossRoom = null;
 
   private BossController() {} // default constructor is private
 
@@ -76,7 +78,6 @@ public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
 
   public void ConfigureOnPlacement(RoomHandler room)
   {
-    AIActor theBoss = null;
     foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
       if (enemy.EnemyGuid == this.enemyGuid)
       {
@@ -89,9 +90,14 @@ public class BossController : DungeonPlaceableBehaviour, IPlaceConfigurable
       return;
     }
     SetUpBossRoom(theBoss);
-    room.Entered += (_) => {
-      SetUpBossFight(theBoss);
-    };
+    bossRoom = room;
+    bossRoom.Entered += OnBossRoomEntered;
+  }
+
+  private void OnBossRoomEntered(PlayerController p)
+  {
+    bossRoom.Entered -= OnBossRoomEntered;
+    SetUpBossFight(theBoss);
   }
 
   public void SetMusic(string musicName, int loopPoint = -1, int rewindAmount = -1)

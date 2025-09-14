@@ -8,6 +8,8 @@ public class ArmisticeNPC : BossNPC
   {
     // this.defaultAudioEvent = "sans_laugh";
     this.audioTag = "Lady";
+    this.defaultTalkAnimation = "talk";
+    this.defaultPauseAnimation = "calm";
 
     GameManager.Instance.MainCameraController.OverridePosition = this.sprite.transform.localPosition + new Vector3(0f, 2f, 0f);
     GameManager.Instance.MainCameraController.SetManualControl(true, true);

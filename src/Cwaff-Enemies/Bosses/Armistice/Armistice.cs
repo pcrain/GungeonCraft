@@ -31,13 +31,13 @@ public partial class ArmisticeBoss : AIActor
   internal static CwaffTrailController _TrickshotTrailPrefab;
   internal static CwaffTrailController _WarheadTrailPrefab;
 
-  #if DEBUG
-  private const  int _ARMISTICE_HP = 3;
-  #else
-  private const  int _ARMISTICE_HP = 150;
-  #endif
-
+  // #if DEBUG
+  // private const  int _ARMISTICE_HP = 3;
+  // #else
   // private const  int _ARMISTICE_HP = 150;
+  // #endif
+
+  private const  int _ARMISTICE_HP = 150;
 
   public static PrototypeDungeonRoom ArmisticeBossRoom = null;
 
@@ -51,7 +51,7 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "attack_basic", fps:    16f, loop: true);
       bb.AdjustAnimation(name: "attack_snipe", fps:    16f, loop: false);
       bb.AdjustAnimation(name: "breathe",      fps:     2f, loop: true);
-      bb.AdjustAnimation(name: "calm",         fps:     4f, loop: true);
+      bb.AdjustAnimation(name: "calm",         fps:     8f, loop: true);
       bb.AdjustAnimation(name: "crouch",       fps:    16f, loop: false, eventFrames: [4],
         eventAudio: ["armistice_missile_launch_sound"]);
       bb.AdjustAnimation(name: "death",        fps:    15f, loop: false);
@@ -64,6 +64,7 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "run",          fps:    40f, loop: true,  eventFrames: [4, 8],
         eventAudio: ["armistice_step_sound", "armistice_step_sound"]);
       bb.AdjustAnimation(name: "skyshot",      fps:    30f, loop: false, eventFrames: [5]);
+      bb.AdjustAnimation(name: "talk",         fps:     8f, loop: true);
       bb.AdjustAnimation(name: "teleport_in",  fps:     9f, loop: false);
       bb.AdjustAnimation(name: "teleport_out", fps:     9f, loop: false);
       bb.AdjustAnimation(name: "tired",        fps:     6f, loop: true);
@@ -343,6 +344,8 @@ public partial class ArmisticeBoss : AIActor
 
       base.aiActor.aiAnimator.PlayUntilCancelled("calm");
 
+      CwaffRunData.Instance.scrambledBulletHell = true; // going to bullet hell this run scrambles it
+
       new GameObject("birth shader handler", typeof(BirthShaderHandler));
     }
 
@@ -476,125 +479,5 @@ public partial class ArmisticeBoss : AIActor
     {
       base.aiActor.GetComponent<BossBehavior>().FinishedIntro();
     }
-  }
-}
-
-[HarmonyPatch]
-internal static class BulletThatCanKillThePastPickupPatcher
-{
-
-  /// <summary>Add dynamic dialog to Blacksmith if preconditions are met.</summary>
-  [HarmonyPatch(typeof(BulletThatCanKillThePast), nameof(BulletThatCanKillThePast.Pickup))]
-  [HarmonyPrefix]
-  private static void BulletThatCanKillThePastPickupPatch(BulletThatCanKillThePast __instance, PlayerController player)
-  {
-    if (!GungeonFlags.BOSSKILLED_LICH.Get())
-      return;
-    // if (!GungeonFlags.HAS_ATTEMPTED_RESOURCEFUL_RAT.Get())
-    //   return;
-    if (!CharacterSpecificGungeonFlags.KILLED_PAST.Get())
-      return;
-    if (__instance.m_pickedUp)
-      return;
-    if (player.CurrentRoom is not RoomHandler room)
-      return;
-    foreach (var ix in room.GetRoomInteractables())
-    {
-      if (ix is not TalkDoerLite talker || !talker)
-        continue;
-      if (talker.name != "NPC_Blacksmith")
-        continue;
-
-      talker.AddNewDialogState("pastRegrets",
-        dialogue: new(){
-          "...hey... ",
-          "You've already killed your past, right?",
-          "Why do you need this bullet?",
-          "Do you still have lingering regrets?"
-          },
-        yesPrompt : "A few.",
-        yesState  : "affirmative",
-        noPrompt  : "None at all.",
-        noState   : "negative");
-      talker.AddNewDialogState("affirmative", new(){"I see.", "Off you go then."});
-      talker.AddNewDialogState("negative", customAction: () => {
-        CwaffRunData.Instance.noPastRegrets = true; System.Console.WriteLine($"CwaffRunData.Instance.noPastRegrets = {CwaffRunData.Instance.noPastRegrets}"); },
-        dialogue: new(){
-          "Interesting... ",
-          "The {wj}gun{w} and {wj}bullet{w} give those with regrets a chance to change their past.",
-          "If you truly no longer have regrets, what will happen to you when you fire the {wj}gun{w}?",
-          "... ",
-          "Off you go then.",
-        });
-      talker.StartDialog("pastRegrets");
-      break;
-    }
-  }
-
-  /// <summary>Allow the GTCKTP to take us to the secret area</summary>
-  [HarmonyPatch(typeof(ArkController), nameof(ArkController.HandleClockhair), MethodType.Enumerator)]
-  [HarmonyILManipulator]
-  private static void ArkControllerHandleClockhairPatchIL(ILContext il, MethodBase original)
-  {
-      ILCursor cursor = new ILCursor(il);
-
-      FieldInfo didShootHellTrigger = original.DeclaringType.GetEnumeratorField("didShootHellTrigger");
-      if (!cursor.TryGotoNext(MoveType.After,
-        instr => instr.MatchLdarg(0),
-        instr => instr.MatchLdarg(0),
-        instr => instr.MatchLdfld(original.DeclaringType.FullName, didShootHellTrigger.Name)
-        ))
-        return;
-
-      // do quick fadeout if we are going to the secret area
-      cursor.CallPrivate(typeof(BulletThatCanKillThePastPickupPatcher), nameof(NoPastRegrets));
-
-      // add new branch to go to our new floor
-      ILLabel nextPastCheck = null;
-      ILLabel afterAllPastChecks = null;
-      if (!cursor.TryGotoNext(MoveType.Before,
-        instr => instr.MatchBr(out afterAllPastChecks),
-        instr => instr.MatchLdarg(0),
-        instr => instr.MatchLdfld(original.DeclaringType.FullName, original.DeclaringType.GetEnumeratorField("shotPlayer").Name),
-        instr => instr.MatchLdfld<PlayerController>("characterIdentity"),
-        instr => instr.MatchLdcI4((int)PlayableCharacters.CoopCultist),
-        instr => instr.MatchBneUn(out nextPastCheck)
-        ))
-        return;
-
-      if (!cursor.TryGotoNext(MoveType.AfterLabel, instr => instr.MatchLdarg(0)))
-        return;
-
-      cursor.Emit(OpCodes.Ldarg_0); // load enumerator type
-      cursor.Emit(OpCodes.Ldfld, original.DeclaringType.GetEnumeratorField("$this")); // load actual "$this" field
-      cursor.CallPrivate(typeof(BulletThatCanKillThePastPickupPatcher), nameof(CheckIfShouldGoToNoRegretsPast));
-      cursor.Emit(OpCodes.Brtrue, afterAllPastChecks);
-  }
-
-  private static bool NoPastRegrets(bool oldValue) => oldValue || CwaffRunData.Instance.noPastRegrets;
-
-  private static bool CheckIfShouldGoToNoRegretsPast(ArkController ark)
-  {
-      if (!CwaffRunData.Instance.noPastRegrets)
-        return false;
-
-      #if DEBUG
-      System.Console.WriteLine($"  secrets O:");
-      #endif
-
-      for (int i = 0; i < GameManager.Instance.AllPlayers.Length; i++)
-      {
-        PlayerController pc = GameManager.Instance.AllPlayers[i];
-        if (!pc.healthHaver.IsAlive)
-          continue;
-
-        pc.IsVisible = true;
-        pc.ClearInputOverride("ark");
-        pc.ClearAllInputOverrides();
-      }
-
-      GameManager.Instance.LoadCustomLevel(ArmisticeDungeon.INTERNAL_NAME);
-      GameUIRoot.Instance.ToggleUICamera(false);
-      return true;
   }
 }

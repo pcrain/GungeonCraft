@@ -21,6 +21,8 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     public bool noOutlines = false;
     public string defaultAudioEvent = null;
     public string audioTag = string.Empty;
+    public string defaultTalkAnimation = null;
+    public string defaultPauseAnimation = null;
 
     protected bool canInteract;
     protected bool m_canUse = true;
@@ -262,6 +264,8 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
             TextBoxManager.ClearTextBox(this.talkPoint);
             if (talkAnimation != null)
                 base.aiAnimator.PlayUntilCancelled(talkAnimation);
+            else if (defaultTalkAnimation != null)
+                base.aiAnimator.PlayUntilCancelled(defaultTalkAnimation);
             this.ShowText(dialogue[ci]);
             float timer = 0;
             bool playingTalkingAnimation = true;
@@ -278,11 +282,15 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
                     playingTalkingAnimation = false;
                     if (pauseAnimation != null)
                         base.aiAnimator.PlayUntilCancelled(pauseAnimation);
+                    else if (defaultPauseAnimation != null)
+                        base.aiAnimator.PlayUntilCancelled(defaultPauseAnimation);
                 }
                 yield return null;
             }
             if (pauseAnimation != null)
                 base.aiAnimator.PlayUntilCancelled(pauseAnimation);
+            else if (defaultPauseAnimation != null)
+                base.aiAnimator.PlayUntilCancelled(defaultPauseAnimation);
         }
         TextBoxManager.ClearTextBox(this.talkPoint);
         yield break;

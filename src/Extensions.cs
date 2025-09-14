@@ -1502,6 +1502,16 @@ public static class Extensions
     return 0;
   }
 
+  /// <summary>Select an item from a weighted list of (T, weight) pairs</summary>
+  public static T WeightedRandom<T>(this List<Tuple<T, int>> weights)
+  {
+    int targetWeight = UnityEngine.Random.Range(0, weights.Sum(item => item.Second));
+    foreach (Tuple<T, int> weight in weights)
+      if ((targetWeight -= weight.Second) < 0)
+        return weight.First;
+    return weights[0].First;
+  }
+
   /// <summary>Get the first element of a list if possible, returning null otherwise</summary>
   public static T SafeFirst<T>(this List<T> c)
   {

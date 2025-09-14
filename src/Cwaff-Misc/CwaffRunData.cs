@@ -7,6 +7,7 @@ public class CwaffRunData : FakeItem
     public string btcktfEnemyGuid = string.Empty;
     public bool shouldReturnToPreviousFloor = false;
     public bool noPastRegrets = false;
+    public bool scrambledBulletHell = false;
     public string nameOfPreviousFloor = null;
     public List<int>[] glassGunIds = [new(), new()];
     public List<int>[] pristineGunIds = [new(), new()];
@@ -54,6 +55,7 @@ public class CwaffRunData : FakeItem
         base.MidGameSerialize(data);
 
         data.Add(noPastRegrets);
+        data.Add(scrambledBulletHell);
         data.Add(btcktfEnemyGuid);
 
         for (int p = 0; p < 1; ++p)
@@ -78,6 +80,7 @@ public class CwaffRunData : FakeItem
         int i = 0;
 
         noPastRegrets = (bool)data[i++];
+        scrambledBulletHell = (bool)data[i++];
         btcktfEnemyGuid = (string)data[i++];
         Lazy.DebugLog($"  memorialized enemy is {btcktfEnemyGuid}");
 
