@@ -714,7 +714,7 @@ public class BuildABoss
     return t;
   }
 
-  public void MakeInteractible<T>(bool preFight = true, bool postFight = false) where T : BossNPC
+  public void MakeInteractible<T>(bool preFight = true, bool postFight = false, bool noOutlines = false, Vector2 talkPointOffset = default) where T : BossNPC
   {
     // WARNING: if this were ever actually attached to a proper BossTriggerZone, this could cause null dereferences
     // in the vanilla BossTriggerZone.cs -> OnTriggerCollision() method. See discussion on Gungeon Modding Discord 2023-11-05
@@ -724,6 +724,8 @@ public class BuildABoss
       npc.hasPreFightDialogue  = preFight;
       npc.hasPostFightDialogue = postFight;
       npc.autoFlipSprite       = false;
+      npc.noOutlines = noOutlines;
+      npc.talkPointAdjustment = talkPointOffset;
   }
 
   public void AddNamedVFX(VFXObject vfxobj, string name, Transform transformAnchor = null)

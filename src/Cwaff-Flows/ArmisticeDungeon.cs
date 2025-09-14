@@ -1,17 +1,10 @@
 namespace CwaffingTheGungy;
 
-/*
-    Valid level names:
-        tt_castle    // Keep of the Lead Lord
-        tt_catacombs
-    GameManager.Instance.InjectedLevelName =
-*/
-
 public class ArmisticeDungeon
 {
     public const string INTERNAL_NAME    = "cg_armisticefloor";
-    public const string FLOOR_NAME       = "???";
-    public const string FLOOR_SUB        = "???";
+    public const string FLOOR_NAME       = "Abbey of the True Gun?";
+    public const string FLOOR_SUB        = "A Timeless Place";
     public const string PREFAB_TEMPLATE  = "Base_Cathedral";
 
     public static GameLevelDefinition FloorNameDefinition;
@@ -34,7 +27,7 @@ public class ArmisticeDungeon
         };
 
         CwaffDungeons.Register(
-            internalName: INTERNAL_NAME, floorName: FLOOR_NAME, floorMusic: "sans", loopPoint: 48800, rewindAmount: 48800,
+            internalName: INTERNAL_NAME, floorName: FLOOR_NAME, floorMusic: "clocktowers", loopPoint: 210239, rewindAmount: 182080,
             dungeonGenerator: ArmisticeGeon, dungeonPrefabTemplate: PREFAB_TEMPLATE, gameLevelDefinition: FloorNameDefinition);
     }
 

@@ -18,6 +18,9 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     public Transform talkPoint;
     public Vector3 talkPointAdjustment;
     public bool autoFlipSprite = true;
+    public bool noOutlines = false;
+    public string defaultAudioEvent = null;
+    public string audioTag = string.Empty;
 
     protected bool canInteract;
     protected bool m_canUse = true;
@@ -141,7 +144,10 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     protected void BeginConversation(PlayerController interactor)
     {
         this.m_interactor = interactor;
-        SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
+        if (this.noOutlines)
+            SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite);
+        else
+            SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
         this.m_interactor.SetInputOverride("npcConversation");
         Pixelator.Instance.LerpToLetterbox(0.35f, 0.25f);
     }
@@ -198,14 +204,14 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         // Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
         // this.talkPointOffset = new Vector3(base.sprite.FlipX ? -size.x/2 : size.x/2, size.y, 0) + this.talkPointAdjustment;
         if (!this.existingNpc)
-            this.talkPoint.position = base.sprite.WorldTopCenter;
+            this.talkPoint.position = base.sprite.WorldTopCenter + this.talkPointAdjustment.XY();
 
         TextBoxManager.ShowTextBox(
             this.talkPoint.position,
             this.talkPoint,
             autoContinueTimer,
             convoLine,
-            audioTag: "",
+            audioTag: this.audioTag,
             // this.m_interactor.characterAudioSpeechTag,
             instant: false,
             showContinueText: true
@@ -261,6 +267,8 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
             bool playingTalkingAnimation = true;
             if (!string.IsNullOrEmpty(audioEvent))
                 base.gameObject.PlayUnique(audioEvent);
+            else if (!string.IsNullOrEmpty(defaultAudioEvent))
+                base.gameObject.PlayUnique(defaultAudioEvent);
             while (!BraveInput.GetInstanceForPlayer(this.m_interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < MIN_TEXTBOX_TIME)
             {
                 timer += BraveTime.DeltaTime;
@@ -280,7 +288,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         yield break;
     }
 
-    public Coroutine Prompt(string optionA, string optionB)
+    public Coroutine Prompt(string optionA, string optionB = null)
     {
         return StartCoroutine(Prompt_CR(optionA, optionB));
 
@@ -342,7 +350,10 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
 
     public void OnExitRange(PlayerController interactor)
     {
-        SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
+        if (this.noOutlines)
+            SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite);
+        else
+            SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
     }
 
     public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)

@@ -20,54 +20,56 @@ public class SansNPC : BossNPC
   {
     GameManager.Instance.MainCameraController.OverridePosition = this.sprite.transform.localPosition;
     GameManager.Instance.MainCameraController.SetManualControl(true, true);
+    this.defaultAudioEvent = "sans_laugh";
+
     if (!this._talkedOnce)
     {
       yield return Converse("hey kid, how'd you manage to find me?",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
       yield return Converse("this place ain't exactly easy to get to",
-        "idle_glance", "idle_glance", "sans_laugh");
+        "idle_glance", "idle_glance");
       yield return Converse("that bello guy tip you off, or you just get here by luck?",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
       yield return Converse("...eh, doesn't matter",
-        "shrug_glance", "shrug_glance", "sans_laugh");
+        "shrug_glance", "shrug_glance");
       yield return Converse("seems like you have some cool toys on you",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
       yield return Converse("since you're here, wanna try my little test?",
-        "idle_glance", "idle_glance", "sans_laugh");
+        "idle_glance", "idle_glance");
       yield return Converse("if you can manage to land a few hits on me, i'll tell you a secret",
-        "shrug", "shrug", "sans_laugh");
+        "shrug", "shrug");
       yield return Converse("i don't have any guns on me, but i'll try to make it interesting",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
       yield return Converse("and don't feel the need to hold back, i can handle myself",
-        "shrug", "shrug", "sans_laugh");
+        "shrug", "shrug");
       yield return Converse("whaddaya say, kid?",
-        "idle_glance", "idle_glance", "sans_laugh");
+        "idle_glance", "idle_glance");
       this._talkedOnce = true;
     }
     else
     {
       yield return Converse("hey kid, change your mind?",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
     }
     SetAnimation("idle");
     yield return Prompt("let's go!", "not right now");
     if (PromptResult() == 0)
     {
       yield return Converse("alright, show me what you got kid",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
       yield return Converse("and remember, don't hold back",
-        "shrug", "shrug", "sans_laugh");
+        "shrug", "shrug");
       yield return Converse("...cause I won't be",
-        "idle_empty", "idle_empty", "sans_laugh");
+        "idle_empty", "idle_empty");
       base.aiActor.gameObject.Play("sans_stop_all");
       StartBossFight(); // accept
     }
     else
     {
       yield return Converse("alright, suit yourself",
-        "shrug_calm", "shrug_calm", "sans_laugh");
+        "shrug_calm", "shrug_calm");
       yield return Converse("i'll be here if you change your mind",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
       SetAnimation("idle");
     }
   }
@@ -86,29 +88,29 @@ public class SansNPC : BossNPC
     GameManager.Instance.MainCameraController.OverridePosition = this.sprite.transform.localPosition;
     GameManager.Instance.MainCameraController.SetManualControl(true, true);
     yield return Converse("you really got me, kid",
-      "shrug", "shrug", "sans_laugh");
+      "shrug", "shrug");
     yield return Converse("the item in that chest is all yours",
-      "idle", "idle", "sans_laugh");
+      "idle", "idle");
     yield return Converse("as for that secret...",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
     yield return Converse("have you ever come across a {wj}Normal{w} gun?",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
     yield return Converse("i don't mean a standard or ordinary gun, but a {wj}Normal{w} gun",
-        "shrug_calm", "shrug_calm", "sans_laugh");
+        "shrug_calm", "shrug_calm");
     yield return Converse("i've heard if you drop a {wj}Normal{w} gun inside a triangle of 3 other guns...",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
     yield return Converse("something cool might happen depending on the combined strength of the guns",
-        "idle_glance", "idle_glance", "sans_laugh");
+        "idle_glance", "idle_glance");
     yield return Converse("if something cool DOES happen, try using a blank",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
     yield return Converse("and if nothing happens, maybe try dropping some stronger guns",
-        "shrug", "shrug", "sans_laugh");
+        "shrug", "shrug");
     yield return Converse("what, you think i'm making all of this up?",
-        "idle", "idle", "sans_laugh");
+        "idle", "idle");
     yield return Converse("eh, could be",
-        "idle_glance", "idle_glance", "sans_laugh");
+        "idle_glance", "idle_glance");
     yield return Converse("let's do this again some time",
-      "shrug", "shrug", "sans_laugh");
+      "shrug", "shrug");
     SetAnimation("idle");
   }
 }

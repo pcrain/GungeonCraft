@@ -4,7 +4,7 @@ public partial class ArmisticeBoss : AIActor
 {
   public const   string BOSS_GUID              = "Armistice";
   internal const string BOSS_NAME              = "Armistice";
-  private const  string SUBTITLE               = "Trapped Gungeoneer";
+  private const  string SUBTITLE               = "Tranquil Juggernaut";
   private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/Bosses/armistice";
 
   internal const float TIRED_THRES = 0.67f;
@@ -31,7 +31,11 @@ public partial class ArmisticeBoss : AIActor
   internal static CwaffTrailController _TrickshotTrailPrefab;
   internal static CwaffTrailController _WarheadTrailPrefab;
 
+  // #if DEBUG
+  // private const  int _ARMISTICE_HP = 3;
+  // #else
   private const  int _ARMISTICE_HP = 150;
+  // #endif
 
   public static PrototypeDungeonRoom ArmisticeBossRoom = null;
 
@@ -45,7 +49,7 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "attack_basic", fps:    16f, loop: true);
       bb.AdjustAnimation(name: "attack_snipe", fps:    16f, loop: false);
       bb.AdjustAnimation(name: "breathe",      fps:     2f, loop: true);
-      bb.AdjustAnimation(name: "calm",         fps:     6f, loop: true);
+      bb.AdjustAnimation(name: "calm",         fps:     4f, loop: true);
       bb.AdjustAnimation(name: "crouch",       fps:    16f, loop: false, eventFrames: [4],
         eventAudio: ["armistice_missile_launch_sound"]);
       bb.AdjustAnimation(name: "defeat",       fps:     3f, loop: true, loopFrame: 4);
@@ -63,7 +67,8 @@ public partial class ArmisticeBoss : AIActor
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 30, height: 40, xoff: -15, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<ArmisticeIntro>();                                       // Add custom animation to the generic intro doer
-    bb.MakeInteractible<ArmisticeNPC>(preFight: true, postFight: true) ;       // Add some pre-fight and post-fight dialogue
+    //BUG: without a postFight script, the boss "dies" and spawns a synergy chest + reward pedestal due to technically being in the Abbey
+    bb.MakeInteractible<ArmisticeNPC>(preFight: true, postFight: true, noOutlines: true, talkPointOffset: new Vector2(-0.375f, 0.25f)); // Add some pre-fight and post-fight dialogue
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
     bb.AddCustomMusic(name: "collapse", loopAt: 320576, rewind: 225251);       // Add custom music for our boss
 
@@ -281,6 +286,7 @@ public partial class ArmisticeBoss : AIActor
     private Color? _lastParticleColor = null;
     private int _lastDustFrame = -1;
     private HealthHaver _hh = null;
+    private bool _inCombat = false;
 
     private void Start()
     {
@@ -301,11 +307,20 @@ public partial class ArmisticeBoss : AIActor
       this._ps = psObj.GetComponent<ParticleSystem>();
       this._ps.Stop();
       this._ps.Clear();
+
+      base.aiActor.aiAnimator.PlayUntilCancelled("calm");
+    }
+
+    internal void FinishedIntro()
+    {
+      this._inCombat = true;
     }
 
     private void OnPreDeath(Vector2 _)
     {
-      GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "sans", loopPoint: 48800, rewindAmount: 48800);
+      this._inCombat = false;
+
+      GameManager.Instance.DungeonMusicController.LoopMusic(musicName: "clocktowers", loopPoint: 210239, rewindAmount: 182080);
       base.aiActor.aiAnimator.PlayUntilCancelled("defeat");
 
       CameraController mainCameraController = GameManager.Instance.MainCameraController;
@@ -355,8 +370,8 @@ public partial class ArmisticeBoss : AIActor
 
     private void LateUpdate() // movement is buggy if we use the regular Update() method
     {
-      if (BraveTime.DeltaTime == 0)
-        return; // don't do anything if we're paused
+      if (BraveTime.DeltaTime == 0 || !this._inCombat)
+        return; // don't do anything if we're paused or pre-intro
 
       #if DEBUG
       // base.specRigidbody.DrawDebugHitbox();
@@ -392,15 +407,11 @@ public partial class ArmisticeBoss : AIActor
         "breathe" => _CalmBlue,
         _         => null
       });
-      // if (Lazy.CoinFlip())
-      //   SpawnDust(base.specRigidbody.UnitCenter + Lazy.RandomVector(UnityEngine.Random.Range(0.3f,1.25f))); // spawn dust particles
     }
   }
 
   private class ArmisticeIntro : SpecificIntroDoer
   {
-    private bool _processedEncounter = false;
-
     public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
     {
       // Set up room specific attacks
@@ -428,11 +439,7 @@ public partial class ArmisticeBoss : AIActor
 
     public override void EndIntro()
     {
-      if (!this._processedEncounter)
-      {
-        this._processedEncounter = true;
-        CustomTrackedStats.ENCOUNTERED_ARMI.Increment();
-      }
+      base.aiActor.GetComponent<BossBehavior>().FinishedIntro();
     }
   }
 }
@@ -448,8 +455,8 @@ internal static class BulletThatCanKillThePastPickupPatcher
   {
     if (!GungeonFlags.BOSSKILLED_LICH.Get())
       return;
-    if (!GungeonFlags.HAS_ATTEMPTED_RESOURCEFUL_RAT.Get())
-      return;
+    // if (!GungeonFlags.HAS_ATTEMPTED_RESOURCEFUL_RAT.Get())
+    //   return;
     if (!CharacterSpecificGungeonFlags.KILLED_PAST.Get())
       return;
     if (__instance.m_pickedUp)
@@ -539,7 +546,18 @@ internal static class BulletThatCanKillThePastPickupPatcher
       #if DEBUG
       System.Console.WriteLine($"  secrets O:");
       #endif
-      ark.ResetPlayers();
+
+      for (int i = 0; i < GameManager.Instance.AllPlayers.Length; i++)
+      {
+        PlayerController pc = GameManager.Instance.AllPlayers[i];
+        if (!pc.healthHaver.IsAlive)
+          continue;
+
+        pc.IsVisible = true;
+        pc.ClearInputOverride("ark");
+        pc.ClearAllInputOverrides();
+      }
+
       GameManager.Instance.LoadCustomLevel(ArmisticeDungeon.INTERNAL_NAME);
       GameUIRoot.Instance.ToggleUICamera(false);
       return true;
