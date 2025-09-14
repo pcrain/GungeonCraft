@@ -1346,7 +1346,7 @@ public partial class ArmisticeBoss : AIActor
 
         PlayerController pc = GameManager.Instance.BestActivePlayer;
         Vector2 target = pc ? pc.CenterPosition : new PathRect(this._bounds.Inset(3f)).At(UnityEngine.Random.value, UnityEngine.Random.value);
-        if (pc) // Easeing biases the position to something closer to the player
+        if (pc) // Easing biases the position to something closer to the player
         {
           target += fallTime * (Ease.InCubic(UnityEngine.Random.value) * pc.Velocity) + Lazy.RandomVector(2f * Ease.InCubic(UnityEngine.Random.value));
           if (!this._bounds.Contains(target))
@@ -1360,12 +1360,15 @@ public partial class ArmisticeBoss : AIActor
         sigil.ExpireIn(fallTime); // fallback in case the script gets interrupted
         base.Projectile.gameObject.Play("armistice_warhead_fall_sound");
 
-        for (float elapsed = 0f; elapsed < fallTime; elapsed += BraveTime.DeltaTime)
+        for (float elapsed = 0f; elapsed < fallTime && !base.IsEnded && !base.Destroyed; elapsed += BraveTime.DeltaTime)
         {
             float percentLeft = 1f - elapsed / fallTime;
             base.Position = target + new Vector2(0f, percentLeft * HEIGHT);
-            sigil.transform.rotation = (ROTSPEED * BraveTime.ScaledTimeSinceStartup).EulerZ();
-            sigil.transform.localScale = percentLeft * Vector3.one;
+            if (sigil)
+            {
+              sigil.transform.rotation = (ROTSPEED * BraveTime.ScaledTimeSinceStartup).EulerZ();
+              sigil.transform.localScale = percentLeft * Vector3.one;
+            }
             yield return Wait(1);
         }
 
@@ -1476,7 +1479,7 @@ public partial class ArmisticeBoss : AIActor
       int numAttacks = IntForPhase([12, 15, 18]) + (GameManager.IsTurboMode ? TRICKRATE : 0);
       int numTricks = numAttacks / TRICKRATE;
 
-      float minBlinkTime = FloatForPhase([0.07f, 0.06f, 0.05f]);
+      float minBlinkTime = FloatForPhase([0.07f, 0.06f, 0.05f]) + (GameManager.IsTurboMode ? 0f : 0.01f);
       float attackGap = FloatForPhase([0.4f, 0.35f, 0.30f]);
       float minAttackGap = FloatForPhase([0.15f, 0.1375f, 0.125f]) + (GameManager.IsTurboMode ? 0f : 0.1f);
 
@@ -2023,7 +2026,7 @@ public partial class ArmisticeBoss : AIActor
     private IEnumerator Attack()
     {
       const float ATTACK_TIME = 9f;
-      const float MAX_PROJ_SPEED = 45f;
+      const float MAX_PROJ_SPEED = 40f;
       const float MIN_PROJ_SPEED = 15f;
       const float MAX_FIRE_RATE = 0.5f;
       const float MIN_FIRE_RATE = 0.06f;

@@ -4,7 +4,7 @@ public partial class ArmisticeBoss : AIActor
 {
   public const   string BOSS_GUID              = "Armistice";
   internal const string BOSS_NAME              = "Armistice";
-  private const  string SUBTITLE               = "Tranquil Juggernaut";
+  private const  string SUBTITLE               = "Tranquil Gungeoneer";
   private const  string SPRITE_PATH            = $"{C.MOD_INT_NAME}/Resources/Bosses/armistice";
 
   internal const float TIRED_THRES = 0.67f;
@@ -31,11 +31,13 @@ public partial class ArmisticeBoss : AIActor
   internal static CwaffTrailController _TrickshotTrailPrefab;
   internal static CwaffTrailController _WarheadTrailPrefab;
 
-  // #if DEBUG
-  // private const  int _ARMISTICE_HP = 3;
-  // #else
+  #if DEBUG
+  private const  int _ARMISTICE_HP = 3;
+  #else
   private const  int _ARMISTICE_HP = 150;
-  // #endif
+  #endif
+
+  // private const  int _ARMISTICE_HP = 150;
 
   public static PrototypeDungeonRoom ArmisticeBossRoom = null;
 
@@ -52,6 +54,7 @@ public partial class ArmisticeBoss : AIActor
       bb.AdjustAnimation(name: "calm",         fps:     4f, loop: true);
       bb.AdjustAnimation(name: "crouch",       fps:    16f, loop: false, eventFrames: [4],
         eventAudio: ["armistice_missile_launch_sound"]);
+      bb.AdjustAnimation(name: "death",        fps:    15f, loop: false);
       bb.AdjustAnimation(name: "defeat",       fps:     3f, loop: true, loopFrame: 4);
       bb.AdjustAnimation(name: "exhausted",    fps:     4f, loop: true);
       bb.AdjustAnimation(name: "idle",         fps:    16f, loop: true);
@@ -67,7 +70,7 @@ public partial class ArmisticeBoss : AIActor
       bb.SetIntroAnimations(introAnim: "idle", preIntroAnim: "idle"); // Set up our intro animations (TODO: pre-intro not working???)
     bb.SetDefaultColliders(width: 30, height: 40, xoff: -15, yoff: 2);          // Set our default pixel colliders
     bb.AddCustomIntro<ArmisticeIntro>();                                       // Add custom animation to the generic intro doer
-    //BUG: without a postFight script, the boss "dies" and spawns a synergy chest + reward pedestal due to technically being in the Abbey
+    //BUG: without a postFight script, the boss "dies" and spawns a synergy chest + reward pedestal due to technically being in the Abbey. we manually handle this in the post-fight script for now
     bb.MakeInteractible<ArmisticeNPC>(preFight: true, postFight: true, noOutlines: true, talkPointOffset: new Vector2(-0.375f, 0.25f)); // Add some pre-fight and post-fight dialogue
     bb.TargetPlayer();                                                         // Set up the boss's targeting scripts
     bb.AddCustomMusic(name: "collapse", loopAt: 320576, rewind: 225251);       // Add custom music for our boss
@@ -172,6 +175,36 @@ public partial class ArmisticeBoss : AIActor
 
   private static void SpawnDust(Vector2 where)
     { SpawnManager.SpawnVFX(GameManager.Instance.Dungeon.dungeonDustups.rollLandDustup, where, Lazy.RandomEulerZ()); }
+
+  private class BirthShaderHandler : MonoBehaviour
+  {
+    private Material mat;
+    private int coordsId;
+
+    private void Start()
+    {
+      mat = new Material(CwaffShaders.BirthShader);
+      mat.SetTexture("_NoiseTex", CwaffShaders.StarNoiseTexture);
+      mat.SetFloat("_Emission", 300f);
+      mat.SetFloat("_FlashSpeed", 0.2f);
+      mat.SetFloat("_Density", 0.085f);
+      coordsId = Shader.PropertyToID("_CamXYWH");
+      Update();
+      TurnOn();
+    }
+
+    private void Update()
+    {
+      CameraController cam = GameManager.Instance.MainCameraController;
+      Vector2 camMin = cam.MinVisiblePoint;
+      Vector2 camMax = cam.MaxVisiblePoint;
+      Vector2 camSize = camMax - camMin;
+      mat.SetVector(coordsId, new Vector4(0.0625f * camMin.x, 0.0625f * camMin.y, camSize.x, camSize.y));
+    }
+
+    internal void TurnOn() => Pixelator.Instance.RegisterAdditionalRenderPass(mat);
+    internal void TurnOff() => Pixelator.Instance.DeregisterAdditionalRenderPass(mat);
+  }
 
   private class BossBehavior : BraveBehaviour
   {
@@ -309,6 +342,8 @@ public partial class ArmisticeBoss : AIActor
       this._ps.Clear();
 
       base.aiActor.aiAnimator.PlayUntilCancelled("calm");
+
+      new GameObject("birth shader handler", typeof(BirthShaderHandler));
     }
 
     internal void FinishedIntro()

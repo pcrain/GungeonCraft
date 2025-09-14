@@ -4,6 +4,7 @@ public class ArmisticeDungeon
 {
     public const string INTERNAL_NAME    = "cg_armisticefloor";
     public const string FLOOR_NAME       = "Abbey of the True Gun?";
+    public const string FLOOR_SHORT_NAME = "Abbey?";
     public const string FLOOR_SUB        = "A Timeless Place";
     public const string PREFAB_TEMPLATE  = "Base_Cathedral";
 
@@ -63,7 +64,7 @@ public class ArmisticeDungeon
         dungeon.contentSource = ContentSource.CONTENT_UPDATE_03;
         dungeon.DungeonSeed = 0;
         dungeon.DungeonFloorName = FLOOR_NAME; // what shows up At the top when floor is loaded
-        dungeon.DungeonShortName = FLOOR_NAME; // no clue lol, just make it the same
+        dungeon.DungeonShortName = FLOOR_SHORT_NAME; // no clue lol, just make it the same
         dungeon.DungeonFloorLevelTextOverride = FLOOR_SUB; // what shows up below the floorname
         dungeon.LevelOverrideType = GameManager.LevelOverrideState.NONE;
         dungeon.debugSettings = new DebugDungeonSettings()
