@@ -34,7 +34,7 @@ public class Sunderbuss : CwaffGun
             shootStyle: ShootStyle.Charged, damage: 50.0f, speed: 1.0f, range: 0.01f, sprite: "sunderbuss_projectile", fps: 30,
             anchor: Anchor.MiddleCenter, chargeTime: _CHARGE_TIME, hideAmmo: true));
 
-        _ScorchMark = Explosions.EmergencyCrate.effect.transform.Find("scorch").gameObject;
+        _ScorchMark = Explosions.EmergencyCrate.effect.transform.Find("scorch").gameObject.ClonePrefab();
         for (int i = 0; i < 7; ++i)
             _ShatterDebris[i] = BreakableAPIToolbox.GenerateDebrisObject(
                 shardSpritePath         : $"sunderbuss_debris_{_ColorNames[i]}",

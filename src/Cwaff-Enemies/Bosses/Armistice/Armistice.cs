@@ -125,10 +125,8 @@ public partial class ArmisticeBoss : AIActor
       Name               = "getboned",
       PlayAudio          = false,
       BulletObject       = baseProj.gameObject,
-      MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
-      // MuzzleFlashEffects = null,
+      MuzzleFlashEffects = VFX.VFXPoolNone(),
     };
-    _MainBullet.MuzzleFlashEffects.type = VFXPoolType.None;
 
     //WARNING: enemy projectiles use bagel colliders, which don't work well with new sprites. clone a player projectile as a base instead
     // Projectile turretProj = baseBullet.BulletObject.ClonePrefab().GetComponent<Projectile>();
@@ -140,7 +138,7 @@ public partial class ArmisticeBoss : AIActor
       Name               = "turret",
       PlayAudio          = false,
       BulletObject       = turretProj.gameObject,
-      MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
+      MuzzleFlashEffects = VFX.VFXPoolNone(),
     };
 
     Projectile warheadProj = Items._38Special.CloneProjectile();
@@ -150,7 +148,7 @@ public partial class ArmisticeBoss : AIActor
       Name               = "warhead",
       PlayAudio          = false,
       BulletObject       = warheadProj.gameObject,
-      MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
+      MuzzleFlashEffects = VFX.VFXPoolNone(),
     };
 
     Projectile magicMissileProj = Items._38Special.CloneProjectile();
@@ -168,7 +166,7 @@ public partial class ArmisticeBoss : AIActor
       Name               = "magicmissile",
       PlayAudio          = false,
       BulletObject       = magicMissileProj.gameObject,
-      MuzzleFlashEffects = VFX.CreatePoolFromVFXGameObject(Lazy.GunDefaultProjectile(29).hitEffects.overrideMidairDeathVFX),
+      MuzzleFlashEffects = VFX.VFXPoolNone(),
     };
     _MissileFlak = Lazy.EasyDebris("armistice_missile_flak");
     _BasicFlak = Lazy.EasyDebris("armistice_basic_flak");

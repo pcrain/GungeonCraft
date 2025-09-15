@@ -305,6 +305,12 @@ public static class VFX
         SpawnVFXPool(CreatePoolFromVFXGameObject(vfx), position, above, degAngle, relativeTo);
     }
 
+    private static VFXPool _None = null;
+    public static VFXPool VFXPoolNone()
+    {
+        return _None ??= new VFXPool(){type = VFXPoolType.None};
+    }
+
     public static VFXPool CreatePoolFromVFXGameObject(GameObject vfx)
     {
         if (!(vfxObjectToPoolMap.ContainsKey(vfx)))
