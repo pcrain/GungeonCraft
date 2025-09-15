@@ -59,7 +59,7 @@ public static class OneOffDebugDungeonFlow {
             overrideExactRoom = CwaffDungeonPrefabs.exit_room_basic,
         }.Sanitize();
 
-        flow.fallbackRoomTable   = CwaffDungeonPrefabs.SewersRoomTable;
+        flow.fallbackRoomTable   = null;
         flow.subtypeRestrictions = new();
         flow.flowInjectionData   = new();
         flow.sharedInjectionData = new();

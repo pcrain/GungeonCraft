@@ -48,6 +48,8 @@ public class Yggdrashell : CwaffGun
     {
         static void Postfix(GameUIHeartController __instance, PlayerController associatedPlayer)
         {
+            if (!associatedPlayer || associatedPlayer.inventory == null || associatedPlayer.inventory.AllGuns == null)
+                return;
             if (associatedPlayer.GetGun<Yggdrashell>() is not Yggdrashell y)
                 return;
             if (!y._protectionActive)

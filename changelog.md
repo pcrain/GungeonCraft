@@ -4,6 +4,7 @@
 
 - Fixed some sprite positioning issues during [REDACTED] boss fight
 - Fixed potential issue with invalid player velocity causing weird behavior with Camping Supplies
+- Fixed null deref caused by Yggdrashell trying to update the UI for a non-existent player
 
 ## 1.27.1 (2025-08-22)
 
