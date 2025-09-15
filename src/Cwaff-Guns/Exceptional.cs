@@ -46,6 +46,10 @@ public class Exceptional : CwaffGun
         _PickupId = gun.PickupObjectId;
 
         Application.logMessageReceived += Exceptionalizationizer;
+
+        #if DEBUG
+        Commands._OnDebugKeyPressed += SpawnErrorChestImmediately;
+        #endif
     }
 
     /// <summary>Manually initialize some Harmony patches at runtime if the gun ever gets instantiated, since they're a bit heavy-handed</summary>
@@ -283,6 +287,64 @@ public class Exceptional : CwaffGun
           overrideChestQuality: ItemQuality.S,
           overrideJunk: true);
         chest.MimicGuid = null;
+        chest.sprite.usesOverrideMaterial = true;
+        chest.sprite.renderer.material.shader = CwaffShaders.CorruptShader;
+        chest.gameObject.AddComponent<ExplodeWhenOpened>();
+    }
+
+    private class ExplodeWhenOpened : MonoBehaviour
+    {
+        private Chest chest = null;
+        private float ExplodeTime = float.MaxValue;
+        private bool didOpen = false;
+
+        private static readonly ExplosionData _Explosion = new ExplosionData(){
+          forceUseThisRadius     = true,
+          pushRadius             = 3f,
+          damageRadius           = 3f,
+          damageToPlayer         = 0f,
+          doDamage               = true,
+          damage                 = 9001f,
+          doDestroyProjectiles   = false,
+          doForce                = false,
+          force                  = 0f,
+          debrisForce            = 0f,
+          preventPlayerForce     = true,
+          explosionDelay         = 0.01f,
+          usesComprehensiveDelay = false,
+          doScreenShake          = false,
+          playDefaultSFX         = true,
+          ignoreList             = new(),
+          effect                 = Explosions.DefaultLarge.effect,
+          ss                     = Explosions.DefaultLarge.ss,
+        };
+
+        private void Start()
+        {
+            this.chest = base.gameObject.GetComponent<Chest>();
+        }
+
+        private void Update()
+        {
+            if (!this.chest || !this.chest.sprite)
+            {
+                UnityEngine.Object.Destroy(this);
+                return;
+            }
+            if (BraveTime.ScaledTimeSinceStartup >= ExplodeTime)
+            {
+                this.chest.sprite.usesOverrideMaterial = false;
+                Exploder.Explode(this.chest.sprite.WorldCenter, _Explosion, default, ignoreQueues: true);
+                UnityEngine.Object.Destroy(this.chest.gameObject);
+                return;
+            }
+            if (!this.didOpen && this.chest.IsOpen)
+            {
+                this.didOpen = true;
+                ExplodeTime = BraveTime.ScaledTimeSinceStartup + 1f;
+            }
+
+        }
     }
 
     public class ExceptionalAmmoDisplay : CustomAmmoDisplay
