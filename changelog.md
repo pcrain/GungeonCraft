@@ -6,6 +6,7 @@
 - Fixed potential issue with invalid player velocity causing weird behavior with Camping Supplies
 - Fixed null deref caused by Yggdrashell trying to update the UI for a non-existent player
 - Fixed some bad particle placements and coloring when firing Gradius
+- Fixed some screen shaders causing black splotches to occasionally appear above everything else
 
 ## 1.27.1 (2025-08-22)
 
