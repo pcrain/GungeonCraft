@@ -27,9 +27,18 @@ public static class CwaffShaders
 
     private static string GetShaderBundleNameForPlatform()
     {
+        #pragma warning disable 0618 //disable deprecation warnings for a bit
         string platform =
+            SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.OpenGLCore ? "linux" :
+            SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.OpenGLES2 ? "linux" :
+            SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.OpenGLES3 ? "linux" :
+            SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Metal ? "macos" :
+            SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Direct3D9 ? "windows" :
+            SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Direct3D11 ? "windows" :
+            SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Direct3D12 ? "windows" :
             Application.platform == RuntimePlatform.LinuxPlayer ? "linux" :
             Application.platform == RuntimePlatform.OSXPlayer ? "macos" : "windows";
+        #pragma warning restore 0618
         return $"{C.MOD_INT_NAME}.Resources.cwaffshaders-{platform}";
     }
 

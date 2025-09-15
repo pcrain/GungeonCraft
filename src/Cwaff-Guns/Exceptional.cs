@@ -47,9 +47,9 @@ public class Exceptional : CwaffGun
 
         Application.logMessageReceived += Exceptionalizationizer;
 
-        #if DEBUG
-        Commands._OnDebugKeyPressed += SpawnErrorChestImmediately;
-        #endif
+        // #if DEBUG
+        // Commands._OnDebugKeyPressed += SpawnErrorChestImmediately;
+        // #endif
     }
 
     /// <summary>Manually initialize some Harmony patches at runtime if the gun ever gets instantiated, since they're a bit heavy-handed</summary>

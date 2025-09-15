@@ -7,6 +7,7 @@
 - Fixed null deref caused by Yggdrashell trying to update the UI for a non-existent player
 - Fixed some bad particle placements and coloring when firing Gradius
 - Fixed some screen shaders causing black splotches to occasionally appear above everything else
+- Updated shader loading code to prioritize checking the graphics driver over the OS to support less common OS / graphics combinations
 
 ## 1.27.1 (2025-08-22)
 
