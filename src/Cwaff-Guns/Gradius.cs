@@ -381,6 +381,8 @@ public class RoundLaser : Projectile
             sprite.renderer.enabled = false;
         this.UpdateCollisionMask();
 
+        base.damageTypes &= (~CoreDamageTypes.Electric); // remove robot's electric damage type from the projectile
+
         this._laserRing = new GameObject().AddComponent<Geometry>();
     }
 
@@ -519,7 +521,7 @@ public class GradiusShip : MonoBehaviour
         Gradient g = new Gradient();
         g.SetKeys(
             new GradientColorKey[] { new GradientColorKey(particleColor, 0.0f), new GradientColorKey(particleColor, 1.0f) },
-            new GradientAlphaKey[] { new GradientAlphaKey(1f, 0.0f), new GradientAlphaKey(0.5f, 0.25f), new GradientAlphaKey(0.15f, 0.5f),  new GradientAlphaKey(0.01f, 0.75f), new GradientAlphaKey(1.0f, 1.0f) }
+            new GradientAlphaKey[] { new GradientAlphaKey(1f, 0.0f), new GradientAlphaKey(0.5f, 0.25f), new GradientAlphaKey(0.15f, 0.5f),  new GradientAlphaKey(0.01f, 0.75f), new GradientAlphaKey(0.01f, 1.0f) }
         );
         ParticleSystem.ColorOverLifetimeModule colm = ps.colorOverLifetime;
         colm.color = new ParticleSystem.MinMaxGradient(g); // looks jank

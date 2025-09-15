@@ -564,6 +564,7 @@ public static class Lazy
             _NullProjectilePrefab.damageTypes         = CoreDamageTypes.None;
             _NullProjectilePrefab.collidesWithEnemies = false;
             _NullProjectilePrefab.collidesWithPlayer  = false;
+            UnityEngine.Object.Destroy(_NullProjectilePrefab.gameObject.GetComponent<tk2dBaseSprite>());
             _NullProjectilePrefab.gameObject.AddComponent<ProjectileExpiration>().expirationTimer = 0f;
             _NullProjectilePrefab.gameObject.AddComponent<FakeProjectileComponent>();
         }

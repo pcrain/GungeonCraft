@@ -7,7 +7,8 @@ public class FakeProjectileComponent : MonoBehaviour
     private void Start()
     {
         Projectile p = base.GetComponent<Projectile>();
-        p.sprite.renderer.enabled = false;
+        if (p.sprite)
+            p.sprite.renderer.enabled = false;
         p.damageTypes &= (~CoreDamageTypes.Electric);
         p.collidesWithEnemies = false;
         p.collidesWithProjectiles = false;
@@ -22,19 +23,26 @@ public class ProjectileExpiration : MonoBehaviour
     private void Start()
     {
         if (expirationTimer > 0)
-        {
             StartCoroutine(Expire(expirationTimer));
-            return;
-        }
-        if (base.gameObject.GetComponent<Projectile>() is Projectile p)
-            p.DieInAir(true,false,false,true);
+        else
+            Die();
     }
 
     private IEnumerator Expire(float expirationTimer)
     {
         yield return new WaitForSeconds(expirationTimer);
-        if (base.gameObject.GetComponent<Projectile>() is Projectile p)
-            p.DieInAir(true,false,false,true);
+        Die();
+    }
+
+    private void Die()
+    {
+        if (base.gameObject.GetComponent<Projectile>() is not Projectile p)
+            return;
+
+        // disable some sparks to avoid visual weirdness with robot / cursed items
+        p.damageTypes &= (~CoreDamageTypes.Electric);
+        p.CurseSparks = false;
+        p.DieInAir(true,false,false,true);
     }
 }
 
