@@ -386,7 +386,7 @@ public class TheBB : MonoBehaviour
         this._projectile.baseData.damage        = this._damageMult * speed;
         this._projectile.baseData.force         = this._knockbackMult * speed;
         this._projectile.spriteAnimator.ClipFps = Mathf.Min(_BASE_ANIM_SPEED * speed, 60f);
-        Lazy.PlaySoundUntilDeathOrTimeout("bb_rolling", this._projectile.gameObject, 0.1f);
+        this._projectile.LoopSoundIf(true, "bb_rolling");
 
         if (this._mastered)
             ReflectNearbyProjectiles();

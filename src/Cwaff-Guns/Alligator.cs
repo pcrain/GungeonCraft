@@ -210,6 +210,7 @@ public class AlligatorCableHandler : MonoBehaviour
     private const float _MIN_DROP_SPEED    = 5f;
     private const float _MAX_DROP_SPEED    = 20f;
     private const float _DROP_FRICTION     = 0.9f;
+    private const float _SPARK_DAMAGE      = 1.5f;
 
     private MeshFilter _stringFilter;
     private Transform _startTransform;
@@ -445,7 +446,7 @@ public class AlligatorCableHandler : MonoBehaviour
             float percentDone = (curTime - _extantSpawnTimes[i]) / _SPARK_TRAVEL_TIME;
             if (percentDone > 1f)
             {
-                this._enemy.healthHaver.ApplyDamage(1f, Vector2.zero, Alligator.ItemName, CoreDamageTypes.Electric, DamageCategory.Normal);
+                this._enemy.healthHaver.ApplyDamage(_SPARK_DAMAGE, Vector2.zero, Alligator.ItemName, CoreDamageTypes.Electric, DamageCategory.Normal);
                 base.gameObject.PlayUnique("electrocution_sound");
                 UnityEngine.Object.Destroy(_extantSparks[i]);
                 this._extantSparks.RemoveAt(i);

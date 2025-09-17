@@ -32,7 +32,7 @@ public class KingsLaw : CwaffGun
             reloadAudio: "knife_gun_reload", attacksThroughWalls: true)
           .AddToShop(ModdedShopType.TimeTrader)
           .InitProjectile(GunData.New(clipSize: 20, shootStyle: ShootStyle.Automatic, damage: 7.5f, speed: 40.0f, range: 999999f, force: 9f, customClip: true,
-            cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, spawnSound: "snd_undynedis", hitSound: "knife_gun_hit",
+            cooldown: _SPAWN_RATE, sprite: "kings_law_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter, hitSound: "knife_gun_hit",
             useDummyChargeModule: true, shouldRotate: false))
           .Attach<KingsLawBullets>();
 
@@ -75,6 +75,12 @@ public class KingsLaw : CwaffGun
         _RuneLarge  = VFX.Create("law_rune_large", fps: 2);
         _RuneSmall  = VFX.Create("law_rune_small", fps: 2);
         _RuneMuzzle = VFX.Create("muzzle_kings_law", fps: 10);
+    }
+
+    public override void OnPostFired(PlayerController player, Gun gun)
+    {
+        base.OnPostFired(player, gun);
+        base.gameObject.Play("snd_undynedis");
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)

@@ -2,12 +2,21 @@
 
 ## 1.28.0 (TBD)
 
+- Added some postgame content C:
 - Fixed some sprite positioning issues during [REDACTED] boss fight
 - Fixed potential issue with invalid player velocity causing weird behavior with Camping Supplies
 - Fixed null deref caused by Yggdrashell trying to update the UI for a non-existent player
 - Fixed some bad particle placements and coloring when firing Gradius
 - Fixed some screen shaders causing black splotches to occasionally appear above everything else
 - Updated shader loading code to prioritize checking the graphics driver over the OS to support less common OS / graphics combinations
+- Increased Itemfinder detection radius from 3 tiles to 5 tiles
+- Toned down projectile spawning sounds on King's Law
+- Holy Water Gun now deals 8x damage to jammed enemies instead of 4x damage
+- Increase base damage of Alligator's sparks from 1 to 1.5
+- Fixed B. B. Gun's projectiles playing audio even while the game is paused
+- Pistol Whip's melee hit now automatically shortens to hit enemies within its reach (similar to its mastery form)
+- Pistol Whip's mastery form deals double damage to Jammed enemies
+- Flakseed's flowers now intelligently target enemies based on their velocity
 
 ## 1.27.1 (2025-08-22)
 

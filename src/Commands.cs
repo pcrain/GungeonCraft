@@ -212,6 +212,24 @@ public class Commands
                     _OnDebugKeyPressed();
             }
 
+            if (Input.GetKeyDown(KeyCode.Alpha9)) // toggle HUD
+            {
+                if (!GameUIRoot.Instance.CoreUIHidden.HasOverride("CG_DEBUG"))
+                {
+                    GameUIRoot.Instance.HideCoreUI("CG_DEBUG");
+                    GameUIRoot.Instance.ToggleLowerPanels(false, false, "CG_DEBUG");
+                    Minimap.Instance.ToggleMinimap(false);
+                    GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().ForceHideMetaCurrencyPanel();
+                }
+                else
+                {
+                    GameUIRoot.Instance.ShowCoreUI("CG_DEBUG");
+                    GameUIRoot.Instance.ToggleLowerPanels(true, false, "CG_DEBUG");
+                    Minimap.Instance.ToggleMinimap(false);
+                    GameUIRoot.Instance.PauseMenuPanel.GetComponent<PauseMenuController>().ForceRevealMetaCurrencyPanel();
+                }
+            }
+
             if (Input.GetKeyDown(KeyCode.Alpha8))
             {
                 // PrototypeDungeonRoom room = FloorPuzzleRoomController._FloorPuzzleRooms[0];

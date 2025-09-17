@@ -230,14 +230,11 @@ public class WhipChainStart : MonoBehaviour
         bool spawnProjectile = false;
         float whipRange = _WHIP_RANGE;
         bool mastered = this._owner.HasSynergy(Synergy.MASTERY_PISTOL_WHIP);
-        if (mastered)
-        {
-            Vector2 start  = this._owner.primaryHand.transform.position;
-            Vector2 end    = start + whipRange * this._owner.m_currentGunAngle.ToVector();
-            AIActor target = Lazy.NearestEnemyInLineOfSight(start: start, end: end, canBeNeutral: true);
-            if (target)
-                whipRange = Mathf.Max(1f, (target.CenterPosition - start).magnitude - 1.0f);
-        }
+        Vector2 start  = this._owner.primaryHand.transform.position;
+        Vector2 end    = start + whipRange * this._owner.m_currentGunAngle.ToVector();
+        AIActor target = Lazy.NearestEnemyInLineOfSight(start: start, end: end, canBeNeutral: true);
+        if (target)
+            whipRange = Mathf.Max(1f, (target.CenterPosition - start).magnitude - 1.0f);
         for (float elapsed = 0f; elapsed < TOTAL_TIME; elapsed += BraveTime.DeltaTime)
         {
             if (elapsed > TIMES[phase])
@@ -292,6 +289,8 @@ public class WhipChainStart : MonoBehaviour
 
                 if (mastered && this._whip)
                 {
+                    proj.BlackPhantomDamageMultiplier *= 2f;
+                    proj2.BlackPhantomDamageMultiplier *= 2f;
                     proj.OnWillKillEnemy += this._whip.ReplenishMiniBlanks;
                     proj2.OnWillKillEnemy += this._whip.ReplenishMiniBlanks;
                     this._whip.MaybeDoMiniBlank(pos);

@@ -1,3 +1,4 @@
+
 namespace CwaffingTheGungy;
 
 public class Itemfinder : CwaffActive
@@ -12,7 +13,7 @@ public class Itemfinder : CwaffActive
     // Chance each individual treasure is at least D, C, B, A, or S tier
     internal readonly float[] _QUALITY_CHANCES  = {1.00f, 0.60f, 0.27f, 0.09f, 0.03f};
 
-    internal const float _CLOSE_DISTANCE = 3f; // Distance in tiles from an item location to be considered "close"
+    internal const float _CLOSE_DISTANCE = 5f; // Distance in tiles from an item location to be considered "close"
     internal const float _CLOSE_DISTANCE_SQR = _CLOSE_DISTANCE * _CLOSE_DISTANCE;
     internal const int   _MAX_CELL_DIST = 5;   // Max number of cells to look when looking for a good hiding location
 
@@ -41,10 +42,32 @@ public class Itemfinder : CwaffActive
 
     public override void Pickup(PlayerController player)
     {
+        #if DEBUG
+        CwaffEvents.OnChangedRooms -= NotifyRoomHasTreasure;
+        CwaffEvents.OnChangedRooms += NotifyRoomHasTreasure;
+        #endif
+
         GameManager.Instance.OnNewLevelFullyLoaded -= InitializeTreasureForFloor; //TODO: look into whether this is necessary or not
         GameManager.Instance.OnNewLevelFullyLoaded += InitializeTreasureForFloor;
         base.Pickup(player);
     }
+
+    #if DEBUG
+    private static void NotifyRoomHasTreasure(PlayerController controller, RoomHandler oldRoom, RoomHandler newRoom)
+    {
+        if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel || newRoom == null)
+            return;
+        if (_RoomsOnFloor == null || _Treasure == null)
+            return;
+        foreach (TreasureLocation t in _Treasure)
+            if (t.location.GetAbsoluteRoom() == newRoom)
+            {
+                System.Console.WriteLine($"treasure in current room {newRoom.GetRoomName()}");
+                return;
+            }
+        System.Console.WriteLine($"no treasure in current room {newRoom.GetRoomName()}");
+    }
+    #endif
 
     public override void OnPreDrop(PlayerController player)
     {

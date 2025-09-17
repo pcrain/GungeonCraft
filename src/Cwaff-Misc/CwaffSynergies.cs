@@ -182,7 +182,7 @@ public static class CwaffSynergies
         NewMastery<MasteryOfGunbrella>(MASTERY_GUNBRELLA, Gunbrella.ItemName);
         // Alyx decays four times slower and passively grants poison immunity.
         NewMastery<MasteryOfAlyx>(MASTERY_ALYX, Alyx.ItemName);
-        // Pistol Whip can hit enemies closer than its max range, and after killing an enemy, will trigger a mini blank for the next 3 attacks.
+        // Pistol Whip deals double damage to jammed enemies, and after killing any enemy, will trigger a mini blank for the next 3 attacks.
         NewMastery<MasteryOfPistolWhip>(MASTERY_PISTOL_WHIP, PistolWhip.ItemName);
         // Femtobyte gains the ability to digitze enemies and respawn them as allies later.
         NewMastery<MasteryOfFemtobyte>(MASTERY_FEMTOBYTE, Femtobyte.ItemName);

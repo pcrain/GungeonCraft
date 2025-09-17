@@ -317,11 +317,24 @@ public class FlakseedFlower : MonoBehaviour
         {
             this._fireTimer = 0;
             this._nextFireRate = _MIN_FIRE_RATE + _FIRE_RATE_VARIANCE * UnityEngine.Random.value;
-            Vector2 targetPos = Lazy.NearestEnemyPos(this._firePos) ?? (this._firePos + Lazy.RandomVector());
+            GameActor nearestEnemy = Lazy.NearestEnemy(this._firePos);
+            if (!nearestEnemy)
+                nearestEnemy = this._owner;
+            Vector2 targetPos = nearestEnemy ? nearestEnemy.CenterPosition : (this._firePos + Lazy.RandomVector());
+            float shootAngle = Lazy.RandomAngle();
+            if (nearestEnemy)
+                Lazy.DeterminePerfectAngleToShootAt(
+                    this._firePos,
+                    nearestEnemy.CenterPosition,
+                    nearestEnemy.specRigidbody ? nearestEnemy.specRigidbody.Velocity : default,
+                    Flakseed._FlakFlowerProjectile.baseData.speed * this._owner.ProjSpeedMult(),
+                    out shootAngle,
+                    out float t,
+                    adjustForTurboMode: false);
             Projectile proj = SpawnManager.SpawnProjectile(
                 prefab   : Flakseed._FlakFlowerProjectile.gameObject,
                 position : this._firePos,
-                rotation : (targetPos - this._firePos).EulerZ()).GetComponent<Projectile>();
+                rotation : shootAngle.EulerZ()).GetComponent<Projectile>();
             proj.SetOwnerAndStats(this._owner);
             this._owner.DoPostProcessProjectile(proj);
             proj.gameObject.Play("flak_flower_shoot_sound");
