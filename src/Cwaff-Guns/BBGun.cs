@@ -245,6 +245,15 @@ public class TheBB : MonoBehaviour
         this._projectile.DieInAir(false, false, false, true);
     }
 
+    private void ReturnToGun(Gun gun)
+    {
+        gun.CanGainAmmo = true;
+        gun.GainAmmo(1); // temporarily allow gaining ammo normally to take advantage of OnAmmoChanged callbacks
+        gun.CanGainAmmo = false;
+        gun.ForceImmediateReload();
+        gun.UnprepGunForThrow();
+    }
+
     private void OnMightCollideWithPlayer(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
         if (!this._owner || this._owner.specRigidbody != otherRigidbody)
@@ -254,12 +263,8 @@ public class TheBB : MonoBehaviour
             return;
         }
         if (this._owner.FindBaseGun<BBGun>() is Gun gun)
-        {
-            gun.CanGainAmmo = true;
-            gun.GainAmmo(1); // temporarily allow gaining ammo normally to take advantage of OnAmmoChanged callbacks
-            gun.CanGainAmmo = false;
-            gun.ForceImmediateReload();
-        }
+            ReturnToGun(gun);
+
         // don't do knockback if player is behind us
         Vector2 center = myRigidbody.UnitCenter;
         float angleToPlayer = (this._owner.CenterPosition - center).ToAngle();
@@ -355,8 +360,7 @@ public class TheBB : MonoBehaviour
                 continue;
             if ((p.FindBaseGun<BBGun>() is not Gun gun))
                 continue;
-            if (gun.CurrentAmmo < gun.AdjustedMaxAmmo)
-                gun.CurrentAmmo += 1;
+            ReturnToGun(gun);
             p.gameObject.PlayUnique("card_pickup_sound");
             SpawnManager.SpawnVFX(VFX.MiniPickup, pos, Lazy.RandomEulerZ());
             UnityEngine.Object.Destroy(base.gameObject);

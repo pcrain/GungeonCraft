@@ -22,6 +22,8 @@
 - Fixed null deref caused by King's Law trying to update a non-existent rune on its muzzle
 - Fixed null deref caused by B. B. Gun's destroyed projectiles checking if they're colliding with the player
 - Fixed null deref caused by B. B. Gun's destroyed pins trying to modify their non-existent colliders
+- Made Suncaster unthrowable
+- Fixed preparing to throw an empty B. B. Gun not being cancelled by picking up B. B. Gun's projectile
 
 ## 1.27.1 (2025-08-22)
 

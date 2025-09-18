@@ -33,6 +33,7 @@ public class Suncaster : CwaffGun
         Lazy.SetupGun<Suncaster>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.FIRE, reloadTime: 0.0f, ammo: 30,
             canReloadNoMatterAmmo: true, canGainAmmo: false, doesScreenShake: false, shootFps: 30, reloadFps: 40)
+          .Attach<Unthrowable>() // this gun shouldn't ever be able to permanently run out of ammo, so prevent throwing it
           .Attach<SuncasterAmmoDisplay>()
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Charged, pierceBreakables: true, pierceInternalWalls: true,
