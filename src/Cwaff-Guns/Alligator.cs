@@ -210,7 +210,7 @@ public class AlligatorCableHandler : MonoBehaviour
     private const float _MIN_DROP_SPEED    = 5f;
     private const float _MAX_DROP_SPEED    = 20f;
     private const float _DROP_FRICTION     = 0.9f;
-    private const float _SPARK_DAMAGE      = 1.5f;
+    private const float _SPARK_DAMAGE      = 2.0f;
 
     private MeshFilter _stringFilter;
     private Transform _startTransform;

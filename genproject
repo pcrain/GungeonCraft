@@ -46,7 +46,7 @@ manifesttemplate=`cat <<HERE
     "MtG_API-Mod_the_Gungeon_API-$(cat 'src/Main.cs' | grep 'ETGModMainBehaviour.GUID' | cut -f 2 -d '"')",
     "Alexandria-Alexandria-$(cat 'src/Main.cs' | grep 'Alexandria.Alexandria.GUID' | cut -f 2 -d '"')",
     "CaptainPretzel-Gunfig-$(cat 'src/Main.cs' | grep 'Gunfiguration.C.MOD_GUID' | cut -f 2 -d '"')",
-    "CaptainPretzel-Gungeon_Go_Vroom-1.0.0"
+    "CaptainPretzel-Gungeon_Go_Vroom-1.5.3"
   ]
 }
 HERE`

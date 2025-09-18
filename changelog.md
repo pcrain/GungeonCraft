@@ -1,31 +1,41 @@
 # Changelog
 
-## 1.28.0 (TBD)
+## 1.28.0 (2025-09-17)
+
+#### Features:
 
 - Added some postgame content C:
-- Fixed some sprite positioning issues during [REDACTED] boss fight
-- Fixed potential issue with invalid player velocity causing weird behavior with Camping Supplies
-- Fixed null deref caused by Yggdrashell trying to update the UI for a non-existent player
-- Fixed some bad particle placements and coloring when firing Gradius
-- Fixed some screen shaders causing black splotches to occasionally appear above everything else
-- Updated shader loading code to prioritize checking the graphics driver over the OS to support less common OS / graphics combinations
+
+#### Balance Changes and Polish:
+
 - Increased Itemfinder detection radius from 3 tiles to 5 tiles
-- Toned down projectile spawning sounds on King's Law
 - Holy Water Gun now deals 8x damage to jammed enemies instead of 4x damage
-- Increase base damage of Alligator's sparks from 1 to 1.5
-- Fixed B. B. Gun's projectiles playing audio even while the game is paused
-- Pistol Whip's melee hit now automatically shortens to hit enemies within its reach (similar to its mastery form)
+- Increased base damage of Alligator's sparks from 1 to 2
+- Pistol Whip's melee hit now automatically shortens to hit enemies within its reach in its normal form, not just its mastery form
 - Pistol Whip's mastery form deals double damage to Jammed enemies
 - Flakseed's flowers now intelligently target enemies based on their velocity
+- Made Suncaster unthrowable
+- Made Jugglernaut's ammo clip sprites a little smaller to fit better on the screen
+- Toned down projectile spawning sounds on King's Law
+- Toned down the sound of Toothpaste's suds spreading around
+- Updated shader loading code to prioritize checking the graphics driver over the OS to support less common OS / graphics combinations
+
+#### Bugfixes and Misc:
+
 - Fixed null deref caused by Femtobyte checking whether a stored object can be materialized over a destroyed object
 - Fixed null deref caused by Alligator's clips trying to detach from a non-existent attachment point
 - Fixed null deref caused by King's Law trying to update a non-existent rune on its muzzle
 - Fixed null deref caused by B. B. Gun's destroyed projectiles checking if they're colliding with the player
 - Fixed null deref caused by B. B. Gun's destroyed pins trying to modify their non-existent colliders
-- Made Suncaster unthrowable
+- Fixed some sprite positioning issues during [REDACTED] boss fight
+- Fixed potential issue with invalid player velocity causing weird behavior with Camping Supplies
+- Fixed null deref caused by Yggdrashell trying to update the UI for a non-existent player
+- Fixed some bad particle placements and coloring when firing Gradius
+- Fixed some screen shaders causing black splotches to occasionally appear above everything else
+- Fixed B. B. Gun's projectiles playing audio even while the game is paused
 - Fixed preparing to throw an empty B. B. Gun not being cancelled by picking up B. B. Gun's projectile
-- Toned down the sound of Toothpaste's suds spreading around
-- Made Jugglernaut's ammo clip sprites a little smaller to fit better on the screen
+- Updated required Alexandria version to 0.4.25 for some necessary patches
+- Updated required Gungeon Go Vroom version to 1.5.3 for stability
 
 ## 1.27.1 (2025-08-22)
 

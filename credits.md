@@ -69,6 +69,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 * More item sprites from various games including Knights in the Nightmare, Blaze Union, Pokemon, Dragonball Z: Buu's Fury, and Minecraft
 * [SPOILERS] boss sprites [by askywalker from Spriter's Resource](https://www.spriters-resource.com/custom_edited/undertalecustoms/sheet/126792/)
 * [SPOILERS] boss card art [by synistersyrup from DeviantArt](https://www.deviantart.com/synistersyrup/art/Sans-Uses-Flirt-665517108)
+* [MORE SPOILERS] boss sprites and boss card art from Metal Slug Attack
 * Rogo character concept, boss card art, and facecard art from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/)
 * Other item and effect sprites from various games on [Spriter's Resource](https://www.spriters-resource.com/) and from [OpenGameArt.org](https://opengameart.org)
 	
@@ -79,6 +80,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 * [SPOILERS] boss music [by tomori](https://www.youtube.com/watch?v=pC_7lrh6mGs)
 * Circus music from [Entry of the Gladiators Commodore 64, 6581 Clown Music](https://www.youtube.com/watch?v=ZnHwPX2WxZs)
 * It's Pizza Time! 8-bit cover [by TheFunnyDude](https://www.youtube.com/watch?v=lRFWKvmOGXY)
+* Trailer music [by Mannol](https://www.youtube.com/watch?v=8JUBS7ukJH0)
 
 ## Special Thanks
 

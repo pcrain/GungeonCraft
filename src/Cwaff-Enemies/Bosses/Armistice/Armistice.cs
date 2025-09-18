@@ -44,7 +44,7 @@ public partial class ArmisticeBoss : AIActor
   public static void Init()
   {
     BuildABoss bb = BuildABoss.LetsMakeABoss<BossBehavior>(bossname: BOSS_NAME, guid: BOSS_GUID, defaultSprite: $"{SPRITE_PATH}/armistice_idle_001",
-      hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{C.MOD_INT_NAME}/Resources/armistice_bosscard.png"); // Create our build-a-boss
+      hitboxSize: new IntVector2(8, 9), subtitle: SUBTITLE, bossCardPath: $"{C.MOD_INT_NAME}/Resources/armistice_bosscard_alt.png"); // Create our build-a-boss
     bb.SetStats(health: _ARMISTICE_HP, weight: 200f, speed: 0.4f, collisionDamage: 0f, hitReactChance: 0.05f, collisionKnockbackStrength: 0f,
       healthIsNumberOfHits: true, invulnerabilityPeriod: 1.0f, shareCooldowns: false, spriteAnchor: Anchor.LowerCenter); // Set our stats
     bb.InitSpritesFromResourcePath(spritePath: SPRITE_PATH); // Set up our animations

@@ -20,12 +20,13 @@
 - Barter Shop: trades 3 random D-A tier items for any higher-tiered item
 - Insurance Shop: sells insurance policies that let you carry items over to the next run
 - Hecked Mode: randomize enemies' guns for a truly hecked playing experience (enabled via the Mod Config menu)
-- A new secret boss
+- A new secret boss or two
 - Gun mastery system
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
 - Easter eggs
-- And more!
+- And more! 
+- Check out the [official trailer](https://youtu.be/5DJ5meM842w)
 
 ![](previews/rogo_stumble.png)
 
@@ -45,6 +46,8 @@
 	- Try beating the new boss :>
 * Where do I find the new boss?
 	- Check behind the Hero Shrine at the start. I'm sure you can figure out the rest. C:
+* Where do I find the *other* new boss?
+	- Watch the trailer. C:
 
 ### Wiki
 
