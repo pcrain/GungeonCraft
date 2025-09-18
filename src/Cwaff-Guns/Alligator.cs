@@ -399,7 +399,7 @@ public class AlligatorCableHandler : MonoBehaviour
             UnityEngine.Object.Destroy(this._clippyboi);
         if (this._stringFilter)
             UnityEngine.Object.Destroy(this._stringFilter.gameObject);
-        if (this._fallen)
+        if (this._fallen && this._endTransform)
             UnityEngine.Object.Destroy(this._endTransform.gameObject);
     }
 

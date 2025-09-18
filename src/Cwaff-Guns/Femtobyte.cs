@@ -352,7 +352,7 @@ public class Femtobyte : CwaffGun
         {
             if (collidable is not SpeculativeRigidbody body)
                 return false;  // tile, no good
-            if (body.gameObject is not GameObject go)
+            if (!body || body.gameObject is not GameObject go)
                 continue; // invalid game object, continue
             if (go.GetComponent<MajorBreakable>())
                 return false;

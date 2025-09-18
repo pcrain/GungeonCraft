@@ -145,7 +145,10 @@ public class BBGun : CwaffGun
 
         private void OnRigidbodyCollision(CollisionData rigidbodyCollision)
         {
-            this._proj.specRigidbody.OnRigidbodyCollision -= this.OnRigidbodyCollision;
+            if (!this._proj)
+                return;
+            if (this._proj.specRigidbody)
+                this._proj.specRigidbody.OnRigidbodyCollision -= this.OnRigidbodyCollision;
             this._proj.OnDestruction -= this.OnProjectileDestroyed;
             BecomeDebris(force: 0.5f * this._proj.baseData.speed * rigidbodyCollision.Normal, angularVelocity: 8f * this._proj.baseData.speed);
         }
@@ -180,7 +183,6 @@ public class TheBB : MonoBehaviour
     private const float _REFLECT_ANGLE_SNAP = 30f;
     private const float _DRAG = 0.9f;
 
-    internal bool _createInteractible = true;
     internal Projectile _projectile;
 
     private PlayerController _owner;
@@ -237,7 +239,6 @@ public class TheBB : MonoBehaviour
             return;
         }
 
-        this._createInteractible = false;
         this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.Destroy;
         this._projectile.OnDestruction -= this.BecomeDebrisImmediate;
         SpawnManager.SpawnVFX(VFX.MiniPickup, this._projectile.SafeCenter, Lazy.RandomEulerZ());
@@ -260,7 +261,8 @@ public class TheBB : MonoBehaviour
             gun.ForceImmediateReload();
         }
         // don't do knockback if player is behind us
-        float angleToPlayer = (this._owner.CenterPosition - this._projectile.SafeCenter).ToAngle();
+        Vector2 center = myRigidbody.UnitCenter;
+        float angleToPlayer = (this._owner.CenterPosition - center).ToAngle();
         float knockbackAngle = this._projectile.specRigidbody.Velocity.ToAngle();
         if (angleToPlayer.AbsAngleTo(knockbackAngle) < 85f)
             otherRigidbody.gameObject.GetComponent<KnockbackDoer>().ApplyKnockback(this._projectile.specRigidbody.Velocity, this._projectile.baseData.force);
@@ -270,8 +272,8 @@ public class TheBB : MonoBehaviour
         if (speed > 10f)
         {
             if (speed > 20f)
-                GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.01f * speed, 6f, 0.1f, 0f), this._projectile.SafeCenter);
-            CwaffVFX.SpawnBurst(prefab: Groundhog._EarthClod, numToSpawn: 10, basePosition: this._projectile.SafeCenter, positionVariance: 1f,
+                GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.01f * speed, 6f, 0.1f, 0f), center);
+            CwaffVFX.SpawnBurst(prefab: Groundhog._EarthClod, numToSpawn: 10, basePosition: center, positionVariance: 1f,
               velType: CwaffVFX.Vel.AwayRadial, velocityVariance: 0.1f * speed, lifetime: 0.5f, fadeOutTime: 0.25f,
               startScale: 1.0f,  endScale: 0.1f, uniform: true, randomFrame: true);
         }

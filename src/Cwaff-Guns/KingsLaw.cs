@@ -162,7 +162,8 @@ public class KingsLaw : CwaffGun
             this.gun.Reload(); // force reload while we're not at max clip capacity
 
         this._muzzleRuneAlpha = Mathf.Max(0f, this._muzzleRuneAlpha - 4f * BraveTime.DeltaTime);
-        this._extantMuzzleRune.SetAlpha(Mathf.Clamp01(this._muzzleRuneAlpha));
+        if (this._extantMuzzleRune)
+            this._extantMuzzleRune.SetAlpha(Mathf.Clamp01(this._muzzleRuneAlpha));
 
         Reset(clearVfx: false);
         // Synchronize ammo clips between projectile modules as necessary

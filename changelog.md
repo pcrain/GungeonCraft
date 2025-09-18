@@ -17,6 +17,11 @@
 - Pistol Whip's melee hit now automatically shortens to hit enemies within its reach (similar to its mastery form)
 - Pistol Whip's mastery form deals double damage to Jammed enemies
 - Flakseed's flowers now intelligently target enemies based on their velocity
+- Fixed null deref caused by Femtobyte checking whether a stored object can be materialized over a destroyed object
+- Fixed null deref caused by Alligator's clips trying to detach from a non-existent attachment point
+- Fixed null deref caused by King's Law trying to update a non-existent rune on its muzzle
+- Fixed null deref caused by B. B. Gun's destroyed projectiles checking if they're colliding with the player
+- Fixed null deref caused by B. B. Gun's destroyed pins trying to modify their non-existent colliders
 
 ## 1.27.1 (2025-08-22)
 
