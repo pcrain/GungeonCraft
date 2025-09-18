@@ -24,6 +24,8 @@
 - Fixed null deref caused by B. B. Gun's destroyed pins trying to modify their non-existent colliders
 - Made Suncaster unthrowable
 - Fixed preparing to throw an empty B. B. Gun not being cancelled by picking up B. B. Gun's projectile
+- Toned down the sound of Toothpaste's suds spreading around
+- Made Jugglernaut's ammo clip sprites a little smaller to fit better on the screen
 
 ## 1.27.1 (2025-08-22)
 
