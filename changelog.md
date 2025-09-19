@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.28.1 (TBD)
+
+- Fixed patch conflict with Expand preventing [REDACTED] elevator from returning to the previous floor
+
 ## 1.28.0 (2025-09-17)
 
 #### Features:

@@ -349,21 +349,9 @@ public class BulletThatCanKillTheFuture : CwaffActive
     private static void ForceElevatorToReturnToPreviousFloor()
     {
         GameManager.Instance.OnNewLevelFullyLoaded -= ForceElevatorToReturnToPreviousFloor;
-        CwaffRunData.Instance.shouldReturnToPreviousFloor = true;
-    }
-
-    [HarmonyPatch(typeof(ElevatorDepartureController), nameof(ElevatorDepartureController.TransitionToDepart))]
-    private class TransitionToDepartPatch
-    {
-        static void Prefix(ElevatorDepartureController __instance, tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)
-        {
-            if (!CwaffRunData.Instance || !CwaffRunData.Instance.shouldReturnToPreviousFloor)
-                return;
-
-            __instance.UsesOverrideTargetFloor = false;
-            GameManager.Instance.InjectedLevelName = CwaffRunData.Instance.nameOfPreviousFloor;
-            CwaffRunData.Instance.shouldReturnToPreviousFloor = false;
-        }
+        foreach (ElevatorDepartureController depart in FindObjectsOfType<ElevatorDepartureController>())
+            depart.UsesOverrideTargetFloor = false;
+        GameManager.Instance.InjectedLevelName = CwaffRunData.Instance.nameOfPreviousFloor;
     }
 
     [HarmonyPatch(typeof(AIActor), nameof(AIActor.Start))]

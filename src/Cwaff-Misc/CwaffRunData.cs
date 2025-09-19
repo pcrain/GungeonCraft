@@ -5,7 +5,6 @@ namespace CwaffingTheGungy;
 public class CwaffRunData : FakeItem
 {
     public string btcktfEnemyGuid = string.Empty;
-    public bool shouldReturnToPreviousFloor = false;
     public bool noPastRegrets = false;
     public bool scrambledBulletHell = false;
     public string nameOfPreviousFloor = null;
