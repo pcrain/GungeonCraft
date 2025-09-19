@@ -187,5 +187,36 @@ public static class CwaffTweaks
             }
         }
     }
+
+    [HarmonyPatch]
+    private static class FoyerPreloaderAwakePatcher
+    {
+        private static bool did = false;
+        [HarmonyPatch(typeof(FoyerPreloader), nameof(FoyerPreloader.Awake))]
+        [HarmonyPostfix]
+        private static void FoyerPreloaderAwakePatch(FoyerPreloader __instance)
+        {
+            if (UnityEngine.Random.value <= 0.001f)
+                ReplaceLoadingScreenAnimation(__instance, "hdgwombus", new(32f, 32f));
+        }
+
+        private static void ReplaceLoadingScreenAnimation(FoyerPreloader loader, string anim, Vector2 size)
+        {
+            dfSprite oldThrobber = loader.Throbber;
+            loader.Throbber = UnityEngine.Object.Instantiate(loader.Throbber.gameObject).GetComponent<dfSprite>();
+            loader.Throbber.gameObject.transform.parent = oldThrobber.gameObject.transform.parent;
+            loader.Throbber.Position = oldThrobber.Position;
+            oldThrobber.IsVisible = false;
+            List<string> frames = ResMap.Get(anim).Base();
+            loader.Throbber.SpriteName = frames[0];
+            loader.Throbber.Size = size;
+            loader.Throbber.Atlas = CwaffCharacter.UIAtlas;
+            dfAnimationClip clip = loader.Throbber.gameObject.GetComponent<dfSpriteAnimation>().clip
+                = new GameObject("temp_loading_anim_clip", typeof(dfAnimationClip)).GetComponent<dfAnimationClip>();
+            clip.atlas = CwaffCharacter.UIAtlas;
+            clip.sprites = frames;
+        }
+    }
+
 }
 

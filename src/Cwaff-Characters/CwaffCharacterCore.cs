@@ -6,7 +6,7 @@ public static class CwaffCharacter
   private static readonly Dictionary<CustomCharacterData, GameObject> _OverheadPrefabs = new();
   private static readonly Vector3 BASEGAME_FACECARD_POSITION = new Vector3(0, 1.687546f, 0.2250061f);
   private static readonly tk2dSpriteCollectionData UICollection = ((GameObject)ResourceCache.Acquire("ControllerButtonSprite")).GetComponent<tk2dBaseSprite>().Collection;
-  private static readonly dfAtlas UIAtlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
+  internal static readonly dfAtlas UIAtlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
 
   public static readonly tk2dSpriteCollectionData Collection =
      SpriteBuilder.ConstructCollection(new GameObject().RegisterPrefab(false, false, true), $"{C.MOD_NAME}_Character_Collection");
