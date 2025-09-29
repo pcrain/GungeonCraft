@@ -200,6 +200,8 @@ public class Maestro : CwaffGun
     public override void Update()
     {
         base.Update();
+        if (GameManager.Instance.IsLoadingLevel)
+            return;
         if (!this.PlayerOwner)
             return;
         if (!this.PlayerOwner.AcceptingNonMotionInput)

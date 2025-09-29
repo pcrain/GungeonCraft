@@ -3,6 +3,7 @@
 ## 1.28.1 (TBD)
 
 - Fixed patch conflict with Expand preventing [REDACTED] elevator from returning to the previous floor
+- Fixed null deref caused by Maestro looking for projectiles while the game is loading a level
 
 ## 1.28.0 (2025-09-17)
 
