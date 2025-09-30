@@ -380,3 +380,4 @@ armistice_missile_beep_sound,-2.5,1,sound,1
 armistice_gun_spread_sound,-2.0,1,sound,1
 clocktowers,3.0,0,music,0
 armistice_defeat_teleport_sound,-3.0,1,sound,1
+trample_sound,2.5,1,sound,2

@@ -5,6 +5,10 @@
 - Fixed patch conflict with Expand preventing [REDACTED] elevator from returning to the previous floor
 - Fixed null deref caused by Maestro looking for projectiles while the game is loading a level
 - Added nicer impact VFX for individual colors of Jugglernaut projectiles
+- Increased base damage of Alien Nailgun's projectiles from 2 to 5
+- Decreased Flakseed's flower base growth time from 6 seconds to 3 seconds
+- Removed mechanic where Flakseed's flowers would compete for nutritents and wither faster when closer together since that was convoluted and unfun
+- Added sound and visual effects for when Flakseed's flower sprouts are trampled by enemies
 
 ## 1.28.0 (2025-09-17)
 
