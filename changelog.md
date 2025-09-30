@@ -4,6 +4,7 @@
 
 - Fixed patch conflict with Expand preventing [REDACTED] elevator from returning to the previous floor
 - Fixed null deref caused by Maestro looking for projectiles while the game is loading a level
+- Added nicer impact VFX for individual colors of Jugglernaut projectiles
 
 ## 1.28.0 (2025-09-17)
 

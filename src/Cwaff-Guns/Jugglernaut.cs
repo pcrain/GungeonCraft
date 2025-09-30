@@ -34,6 +34,14 @@ public class Jugglernaut : CwaffGun
         new Color(0.627f, 0.125f, 0.941f),
         new Color(1.0f, 0.647f, 0.0f, 1.0f),
     };
+    internal static List<VFXPool> _ImpactVFX = new(){
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+    };
     internal static List<int> _ColorIndices = new(){
         0, 2, 0, 5, 0, 0,
         0, 3, 0, 1, 0, 4,
@@ -79,6 +87,13 @@ public class Jugglernaut : CwaffGun
 
         _JugglingBallProjectile = Items.Ak47.CloneProjectile(GunData.New(
             sprite: "jugglernaut_ball_gray_projectile", damage: 2.0f, speed: 50.0f, force: 2.0f, range: 80.0f, glowAmount: _DEBRIS_GLOW));
+
+        _ImpactVFX[0] = VFX.CreatePool("jugglernaut_impact_vfx_red", fps: 60, loops: false, emissivePower: 1.5f);
+        _ImpactVFX[1] = VFX.CreatePool("jugglernaut_impact_vfx_blue", fps: 60, loops: false, emissivePower: 1.5f);
+        _ImpactVFX[2] = VFX.CreatePool("jugglernaut_impact_vfx_yellow", fps: 60, loops: false, emissivePower: 1.5f);
+        _ImpactVFX[3] = VFX.CreatePool("jugglernaut_impact_vfx_green", fps: 60, loops: false, emissivePower: 1.5f);
+        _ImpactVFX[4] = VFX.CreatePool("jugglernaut_impact_vfx_purple", fps: 60, loops: false, emissivePower: 1.5f);
+        _ImpactVFX[5] = VFX.CreatePool("jugglernaut_impact_vfx_orange", fps: 60, loops: false, emissivePower: 1.5f);
     }
 
     /// <summary>Make sure Jugglernaut appears correctly in the weapons panel</summary>
@@ -222,6 +237,7 @@ public class Jugglernaut : CwaffGun
         base.PostProcessProjectile(projectile);
         int spriteId = UnityEngine.Random.Range(0, 1 + this._juggleLevel);
         projectile.gameObject.AddComponent<JugglernautProjectile>().Setup(this, spriteId);
+        projectile.SetAllImpactVFX(_ImpactVFX[spriteId]);
         projectile.baseData.damage *= (1f + this._juggleLevel);
         projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
     }
