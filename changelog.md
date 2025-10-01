@@ -13,6 +13,7 @@
 - Decreased delay between reloading Iron Maid and retargeting projectiles from 0.5 seconds to 0.1 seconds
 - Added visual indicators while Stereoscope is active to indicate enemies' resonant frequencies
 - Slightly increased volume of Stereoscope's music
+- Slightly improved shader rendering on enemies hit by Schrodinger's Gat's projectiles
 
 ## 1.28.0 (2025-09-17)
 

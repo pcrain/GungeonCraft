@@ -184,17 +184,18 @@ public class SchrodingersStat : MonoBehaviour
         return this._actuallyDead;
     }
 
+    private static void Quantumize(tk2dBaseSprite sprite)
+    {
+        sprite.usesOverrideMaterial = true;
+        sprite.renderer.material.shader = CwaffShaders.WiggleShader;
+    }
+
     private IEnumerator Quantum()
     {
         this._enemy.sprite.usesOverrideMaterial = true;
         Material mat = this._enemy.sprite.renderer.material;
         Shader oShader = mat.shader;
-        mat.shader = CwaffShaders.WiggleShader;
-        if (this._enemy.optionalPalette != null)
-        {
-            mat.SetFloat("_UsePalette", 1f);
-            mat.SetTexture("_PaletteTex", this._enemy.optionalPalette);
-        }
+        this._enemy.ApplyShader(Quantumize); //NOTE: don't apply to gun, it looks bad facing left
         SpriteOutlineManager.RemoveOutlineFromSprite(this._enemy.sprite);
         while (!this._observed)
         {
@@ -209,9 +210,7 @@ public class SchrodingersStat : MonoBehaviour
         }
         if (this._enemy.sprite)
             SpriteOutlineManager.AddOutlineToSprite(this._enemy.sprite, Color.black);
-        mat.shader = oShader;
-        if (this._enemy.optionalPalette != null)
-            mat.SetTexture("_PaletteTex", this._enemy.optionalPalette);
+        this._enemy.ApplyShader((tk2dBaseSprite s) => s.renderer.material.shader = oShader);
     }
 
     private void LateUpdate()

@@ -2818,11 +2818,10 @@ public static class Extensions
     if (enemy.optionalPalette != null)
     {
         Material mat = enemy.sprite.renderer.material;
-        if (mat.HasProperty("_PaletteTex"))
-        {
+        if (mat.HasProperty("_UsePalette"))
           mat.SetFloat("_UsePalette", 1f);
+        if (mat.HasProperty("_PaletteTex"))
           mat.SetTexture("_PaletteTex", enemy.optionalPalette);
-        }
     }
   }
 
