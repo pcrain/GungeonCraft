@@ -129,8 +129,10 @@ public class Geometry : MonoBehaviour
         {
             case Shape.FILLEDCIRCLE:
                 this._vertices[0] = basePos;
+                float startF = (this.angle - 0.5f * this.arc).Clamp360();
+                float gapF = this.arc / (_CIRCLE_SEGMENTS - 1);
                 for (int i = 0; i <= _CIRCLE_SEGMENTS; ++i)
-                    this._vertices[i + 1] = basePos + (i * (360f / _CIRCLE_SEGMENTS)).ToVector3(this.radius);
+                    this._vertices[i + 1] = basePos + (startF + i * gapF).ToVector3(this.radius);
                 break;
             case Shape.RING:
                 for (int i = 0; i <= _CIRCLE_SEGMENTS; ++i)

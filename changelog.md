@@ -2,13 +2,17 @@
 
 ## 1.28.1 (TBD)
 
-- Fixed patch conflict with Expand preventing [REDACTED] elevator from returning to the previous floor
+- Fixed patch conflict with Expand the Gungeon preventing [REDACTED] elevator from returning to the previous floor
 - Fixed null deref caused by Maestro looking for projectiles while the game is loading a level
 - Added nicer impact VFX for individual colors of Jugglernaut projectiles
 - Increased base damage of Alien Nailgun's projectiles from 2 to 5
 - Decreased Flakseed's flower base growth time from 6 seconds to 3 seconds
 - Removed mechanic where Flakseed's flowers would compete for nutritents and wither faster when closer together since that was convoluted and unfun
 - Added sound and visual effects for when Flakseed's flower sprouts are trampled by enemies
+- Increased movement speed when charging Sunderbuss from 35% to 65% of normal movement speed
+- Decreased delay between reloading Iron Maid and retargeting projectiles from 0.5 seconds to 0.1 seconds
+- Added visual indicators while Stereoscope is active to indicate enemies' resonant frequencies
+- Slightly increased volume of Stereoscope's music
 
 ## 1.28.0 (2025-09-17)
 

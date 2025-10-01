@@ -16,7 +16,7 @@ public class Sunderbuss : CwaffGun
     internal const float _SHOCKWAVE_DAMAGE = 50f;
 
     private const int  _IDLE_FPS = 6;
-    private const float _RUN_SPEED_WHEN_CHARGING = 0.35f;
+    private const float _RUN_SPEED_WHEN_CHARGING = 0.65f;
     private const int _CHARGE_FPS = 12;
     private const float _CHARGE_TIME = 1.5f;
     private const float _COOLDOWN = 1.0f;

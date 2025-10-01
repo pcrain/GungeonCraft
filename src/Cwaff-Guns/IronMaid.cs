@@ -154,7 +154,7 @@ public class IronMaid : CwaffGun
 public class IronMaidBullets : MonoBehaviour
 {
     private const float _TIME_BEFORE_STASIS     = 0.2f;
-    private const float _GLOW_TIME              = 0.5f;
+    private const float _GLOW_TIME              = 0.1f;
     private const float _GLOW_MAX               = 10f;
     private const float _LAUNCH_DELAY           = 0.04f;
     private const float _LAUNCH_SPEED           = 50f;

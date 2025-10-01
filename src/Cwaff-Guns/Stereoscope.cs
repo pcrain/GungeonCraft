@@ -1,5 +1,3 @@
-
-
 namespace CwaffingTheGungy;
 
 public class Stereoscope : CwaffGun
@@ -20,6 +18,9 @@ public class Stereoscope : CwaffGun
     private static ResonantProjectile _StereoscopeProjectile  = null;
     private static Dictionary<string, int> _FrequencyMap      = new();
     private static uint[] _PlayingIds                         = new uint[_MAX_SOUNDS];
+    private static Color[] _FreqColors                        = new Color[12];
+    private static readonly LinkedList<Geometry>[] _PooledIcons = [new(), new()];
+    private static readonly LinkedList<Geometry>[] _ActiveIcons = [new(), new()];
 
     private int _frequency                  = 0;
     private int _lastSoundPos               = 0;
@@ -38,6 +39,8 @@ public class Stereoscope : CwaffGun
 
         _ResonancePrefab = VFX.Create("resonance_vfx");
         _StereoPrefab = VFX.Create("stereoscope_stereo", fps: 19).Attach<StereoscopeStereo>();
+        for (int i = 0; i < 12; ++i)
+            _FreqColors[i] = Color.HSVToRGB(((8 + i) % 12) / 12f, 1f, 1f);
     }
 
     private void Resonate(Vector2 pos, int freq)
@@ -65,6 +68,7 @@ public class Stereoscope : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
+        ClearIcons();
         CleanUpStereos();
         gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.StopAndResetFrameToDefault();
@@ -84,9 +88,23 @@ public class Stereoscope : CwaffGun
         Lazy.DoSmokeAt(player.CenterPosition);
     }
 
+    private void ClearIcons()
+    {
+        for (int i = 0; i < 2; ++i)
+            while (_ActiveIcons[i].Last is LinkedListNode<Geometry> current)
+            {
+                _ActiveIcons[i].RemoveLast();
+                if (current.Value is not Geometry g)
+                    continue;
+                g._meshRenderer.enabled = false;
+                _PooledIcons[i].AddLast(current);
+            }
+    }
+
     public override void OnSwitchedAwayFromThisGun()
     {
         base.OnSwitchedAwayFromThisGun();
+        ClearIcons();
         if (this._extantStereo)
             this._extantStereo.linked = false;
     }
@@ -101,6 +119,7 @@ public class Stereoscope : CwaffGun
     public override void OnDestroy()
     {
         CleanUpStereos();
+        ClearIcons();
         CwaffEvents.OnChangedRooms -= OnChangedRooms;
         base.OnDestroy();
     }
@@ -142,6 +161,25 @@ public class Stereoscope : CwaffGun
         return Mathf.FloorToInt(player.m_currentGunAngle.Clamp360() / 30f) - 6;
     }
 
+
+    internal static float MiddleAngleFromFrequency(int freq)
+    {
+        return 30f * (freq + 6) + 15f;
+    }
+
+    private static Geometry RentIcon(Geometry.Shape shape)
+    {
+        int i = shape == Geometry.Shape.FILLEDCIRCLE ? 0 : 1; //NOTE: separate pools for different shapes since the shape itself can't be changed
+        if (_PooledIcons[i].Count == 0)
+            _PooledIcons[i].AddLast(new GameObject().AddComponent<Geometry>());
+        LinkedListNode<Geometry> current = _PooledIcons[i].Last;
+        _PooledIcons[i].RemoveLast();
+        _ActiveIcons[i].AddLast(current);
+        if (current.Value is not Geometry icon)
+            icon = current.Value = new GameObject().AddComponent<Geometry>();
+        return icon;
+    }
+
     public void HandleAudioChecks()
     {
         if (!this.PlayerOwner)
@@ -173,6 +211,7 @@ public class Stereoscope : CwaffGun
         }
 
         RoomHandler room = this.PlayerOwner.CurrentRoom;
+        float alpha = Mathf.Max(0.75f * GetAccuracy(twoWay: false), 0.1f);
         foreach(AIActor enemy in room.SafeGetEnemiesInRoom())
         {
             if (!enemy || enemy.IsGone)
@@ -184,6 +223,19 @@ public class Stereoscope : CwaffGun
                 continue;
             if (!_FrequencyMap.TryGetValue(guid, out int resonantFrequency))
                 _FrequencyMap[guid] = resonantFrequency = UnityEngine.Random.Range(-6, 6);
+
+            if (enemy.specRigidbody is SpeculativeRigidbody body)
+            {
+                RentIcon(Geometry.Shape.FILLEDCIRCLE).Setup(shape: Geometry.Shape.FILLEDCIRCLE,
+                    color: _FreqColors[resonantFrequency + 6].WithAlpha(alpha),
+                    pos: body.UnitBottomCenter + new Vector2(0, -0.375f), radius: 0.25f,
+                    angle: MiddleAngleFromFrequency(resonantFrequency), arc: 30f);
+                RentIcon(Geometry.Shape.CIRCLE).Setup(shape: Geometry.Shape.CIRCLE,
+                    color: _FreqColors[resonantFrequency + 6].WithAlpha(alpha),
+                    pos: body.UnitBottomCenter + new Vector2(0, -0.375f), radius: 0.25f,
+                    angle: MiddleAngleFromFrequency(resonantFrequency), arc: 360f);
+            }
+
             if (resonantFrequency != this._frequency && (!this._extantStereo || resonantFrequency != this._extantStereo.freq))
                 continue;
             if (!bs.ImmuneToStun)
@@ -198,10 +250,19 @@ public class Stereoscope : CwaffGun
         base.Update();
         if (GameManager.Instance.IsLoadingLevel || GameManager.Instance.IsPaused || BraveTime.DeltaTime == 0.0f)
             return;
+
+        ClearIcons();
         if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
             return;
 
         HandleAudioChecks();
+    }
+
+    // get distance from sound loop point as timing accuracy
+    private float GetAccuracy(bool twoWay = true)
+    {
+        float distance = twoWay ? Mathf.Min(this._lastSoundPos, _SOUND_MS - this._lastSoundPos) : this._lastSoundPos;
+        return Mathf.Clamp01(1f - (2f * (distance / (float)_SOUND_MS)));
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -210,7 +271,7 @@ public class Stereoscope : CwaffGun
         if (projectile is not ResonantProjectile res)
             return;
         // get distance from sound loop point as timing accuracy
-        float accuracy = 1f - (2f * (Mathf.Min(this._lastSoundPos, _SOUND_MS - this._lastSoundPos) / (float)_SOUND_MS));
+        float accuracy = GetAccuracy();
         int damage = Mathf.RoundToInt(8f * accuracy * accuracy); // square power falloff
 
         res.frequency = this._frequency;

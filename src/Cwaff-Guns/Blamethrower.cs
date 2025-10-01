@@ -222,7 +222,6 @@ internal class EnemyBlamedBehavior : MonoBehaviour
         "I'm so sorry!",
         "My apologies!",
         "Please excuse me!",
-        // "Don't tell my parents!",
         "Don't tell my boss!",
         "I confess!",
         "I have no excuse!",
@@ -230,7 +229,6 @@ internal class EnemyBlamedBehavior : MonoBehaviour
         "I'm in so much trouble!",
         "My mistake!",
         "What have I done?!",
-        // "That's on me!",
         "I slipped up!",
     };
 
