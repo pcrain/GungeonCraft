@@ -1,10 +1,5 @@
 ﻿namespace CwaffingTheGungy;
 
-/*
-   TODO
-    - add extra pointer mechanics maybe
-*/
-
 public class OmnidirectionalLaser : CwaffGun
 {
     public static string ItemName         = "Omnidirectional Laser";
@@ -13,13 +8,13 @@ public class OmnidirectionalLaser : CwaffGun
     public static string Lore             = "Initially designed with hundreds of AI-guided lasers around its perimeter, budget cuts during production led to replacing the hundreds of lasers with a single laser that circled around the weapon's perimeter. Further budget cuts let to the removal of the AI targeting system, resulting in a final product that, while potent, is incredibly inconvenient to aim.";
 
     private const int _BASE_FPS          = 8;
-    private const int _MAX_FPS           = 32;
+    private const int _MAX_FPS           = 24;
     private const int _FPS_STEP          = 1;
     private const float _FPS_RESET_TIME  = 1.0f; // how long after firing we start slowing the reticle down
     private const float _FPS_RESET_SPEED = 0.125f; // time increment between stepping down the reticle's speed
-    private const float _LOCKON_FACTOR   = 2f; // if we fire a laser within this many (FPS * _LOCKON_FACTOR) degrees of an enemy, snap to the enemy
     private const int _NUM_MASTERY_PROJ  = 4; // additional projectiles for mastery
     private const float _MASTERY_GAP     = 360f / (1f + _NUM_MASTERY_PROJ);
+    private const float _SNAP_DEVIATION  = 30f;
 
     internal static CwaffTrailController _OmniTrailPrefab  = null;
     internal static CwaffTrailController _OmniTrailMasteredPrefab  = null;
@@ -223,14 +218,19 @@ public class OmnidirectionalLaser : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
-        Vector2? targetPos = Lazy.NearestEnemyPosWithinConeOfVision(
+        AIActor actor = Lazy.NearestEnemyWithinConeOfVision(
             start                            : this.gun.barrelOffset.position,
             coneAngle                        : projectile.OriginalDirection(),
-            maxDeviation                     : _LOCKON_FACTOR * this._currentFps, // between 16 and 64 degrees of lock-on
+            maxDeviation                     : _SNAP_DEVIATION, // between 16 and 64 degrees of lock-on
             useNearestAngleInsteadOfDistance : true,
             ignoreWalls                      : false);
-        if (targetPos.HasValue)
-            projectile.SendInDirection((targetPos.Value - this.gun.barrelOffset.position.XY()), true, true);
+        if (actor)
+        {
+            if (Lazy.DeterminePerfectAngleToShootAt(this.gun.barrelOffset.position,
+              actor.CenterPosition, actor.specRigidbody ? actor.specRigidbody.Velocity : default,
+              projectile.baseData.speed, out float shootAngle, out float t, adjustForTurboMode: false))
+                projectile.SendInDirection(shootAngle.ToVector(), true, true);
+        }
         if (projectile.gameObject.GetComponent<OmnidirectionalProjectile>() is OmnidirectionalProjectile o)
             projectile.AddTrail(o.mastered ?  _OmniTrailMasteredPrefab : _OmniTrailPrefab).gameObject.SetGlowiness(10f);
     }

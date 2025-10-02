@@ -12,7 +12,7 @@ public class Leafblower : CwaffGun
     private const float _MIN_REACH        =  3.00f; // how far (in tiles) the leafblower blows at max power
     private const float _SPREAD           =    30f; // radius (in degrees) of gust cone at the end of our reach
     private const float _DEBRIS_FORCE     =   2.0f; // force with which debris is blown around
-    private const float _ACTOR_FORCE      =  20.0f; // force with which enemies are blown around
+    private const float _ACTOR_FORCE      =  40.0f; // force with which enemies are blown around
     private const float _PROJ_FORCE       = 120.0f; // force with which projectiles are blown around
 
     private const float _SQR_MAX_REACH = _MAX_REACH * _MAX_REACH;

@@ -1,9 +1,5 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - nothing for now :D
-*/
-
 public class AlienNailgun : CwaffGun
 {
     public static string ItemName         = "Alien Nailgun";
@@ -12,7 +8,7 @@ public class AlienNailgun : CwaffGun
     public static string Lore             = "Having arrived on Earth en masse in a strange meteorite, this gadget launches fingers that quickly retract on impact to physically scrape data off of recently-deceased life forms. Unbeknownst to Gungeoneers, the meteorite was actually an intergalactic standard wastebin, and this eons-old prototype was discarded after its inventors discovered light-based replicators were cheaper, faster, less convoluted, and ultimately less weird.";
 
     private const float _RECONSTRUCT_DELAY   = 0.2f;
-    private const float _RECONSTRUCT_TIME    = 1.3f;
+    private const float _RECONSTRUCT_TIME    = 0.8f;
     private const int   _RECONSTRUCT_COST    = 16;
     private const float _FRAGMENT_SPAWN_TIME = 0.3f;
     private const float _PREVIEW_TIME        = 0.8f;

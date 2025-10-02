@@ -297,7 +297,7 @@ public static class CwaffSynergies
             .MultReload(0.65f);
         // Firing uncharged shots no longer consumes ammo, and every active prism fires a parallel beam of light in unison with Suncaster.
         NewMastery<MasteryOfSuncaster>(MASTERY_SUNCASTER, Suncaster.ItemName);
-        // Projectiles home towards nearby enemies on each bounce and gain unlimited piercing with no damage loss.
+        // Projectiles home more strongly towards nearby enemies when bouncing, and gain unlimited piercing with no damage loss.
         NewMastery<MasteryOfBouncer>(MASTERY_BOUNCER, Bouncer.ItemName);
         // Sub Machine Gun restores all hearts when consumed, and is automatically consumed upon taking otherwise fatal damage.
         NewMastery<MasteryOfSubMachineGun>(MASTERY_SUB_MACHINE_GUN, SubMachineGun.ItemName);

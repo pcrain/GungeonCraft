@@ -14,6 +14,16 @@
 - Added visual indicators while Stereoscope is active to indicate enemies' resonant frequencies
 - Slightly increased volume of Stereoscope's music
 - Slightly improved shader rendering on enemies hit by Schrodinger's Gat's projectiles
+- Reduced Alien Nailgun's replicant construction time from 1.5 seconds to 1.0 seconds
+- Fixed mastered Bouncer potentially having multiple separate piercing components instead of stacking them together
+- Fixed damage of mastered Bouncer's projectiles decaying after every pierce until bouncing
+- Gave Bouncer's projectiles slight homing and movement prediction when bouncing to make actually hitting enemies slightly easier
+- Reduced Bouncer's projectile explosion damage from 10 to 5 and explosion force from 100 to 30
+- Bouncer's projectiles now explode when impacting enemies
+- Increased Leafblower's push force on enemies from 20 to 40
+- Gave Omnidirectional Laser's projectiles movement prediction to make actually hitting enemies slightly easier
+- Reduced Omnidirectional Laser's reticle's max rotations per second from 4 to 3
+- Fixed Omnidirectional Laser's completely nonfunctional angle snapping to make actually hitting enemies slightly easier
 
 ## 1.28.0 (2025-09-17)
 

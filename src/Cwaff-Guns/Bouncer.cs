@@ -30,15 +30,16 @@ public class Bouncer : CwaffGun
             bounce.onlyBounceOffTiles = true; })
           .Attach<HarmlessUntilBounce>();
 
-        _MiniExplosion = Explosions.DefaultSmall.With(damage: 10f, force: 100f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false);
+        _MiniExplosion = Explosions.DefaultSmall.With(damage: 5f, force: 30f, debrisForce: 10f, radius: 0.5f, preventPlayerForce: true, shake: false);
     }
 }
 
 public class HarmlessUntilBounce : MonoBehaviour
 {
-    private const float _MIN_SOUND_GAP     = 0.25f;
-    private const float _MAX_HOMING_SPREAD = 60f;
-    private const float _BOUNCE_TIME       = 0.1f; // frames for half a bounce
+    private const float _MIN_SOUND_GAP          = 0.25f;
+    private const float _MASTERED_HOMING_SPREAD = 60f;
+    private const float _HOMING_SPREAD          = 20f;
+    private const float _BOUNCE_TIME            = 0.1f; // frames for half a bounce
 
     private static float _LastBouncePlayed = 0;
 
@@ -66,7 +67,7 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._mastered = this._projectile.Mastered<Bouncer>();
         if (this._mastered)
         {
-            PierceProjModifier ppm   = this._projectile.gameObject.AddComponent<PierceProjModifier>();
+            PierceProjModifier ppm   = this._projectile.gameObject.GetOrAddComponent<PierceProjModifier>();
             ppm.penetration          = 99;
             ppm.penetratesBreakables = true;
         }
@@ -84,12 +85,13 @@ public class HarmlessUntilBounce : MonoBehaviour
 
     private void OnDestruction(Projectile p)
     {
-        if (this._currentBounces == this._maxBounces) // explode only on final bounce
-            Exploder.Explode(p.SafeCenter, Bouncer._MiniExplosion, p.Direction);
+        Exploder.Explode(p.SafeCenter, Bouncer._MiniExplosion, p.Direction);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
     {
+        if (this._mastered && this._projectile)
+            this._projectile.ResetPiercing();
         if (this._bounceFinished)
             return;
 
@@ -119,7 +121,6 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._projectile.m_usesNormalMoveRegardless = true; // temporarily disable Helix Projectile shenanigans
         this._bounceStarted = true;
         this._projectile.StartCoroutine(DoElasticBounce());
-        this._projectile.ResetPiercing();
     }
 
     private IEnumerator DoElasticBounce()
@@ -160,9 +161,14 @@ public class HarmlessUntilBounce : MonoBehaviour
         this._projectile.spriteAnimator.transform.localScale = oldScale;
 
         this._projectile.SetSpeed(oldSpeed);
-        if (this._mastered)
-            if (Lazy.NearestEnemyPosWithinConeOfVision(this._projectile.SafeCenter, this._projectile.Direction.ToAngle(), _MAX_HOMING_SPREAD) is Vector2 target)
-                this._projectile.SendInDirection(target - this._projectile.SafeCenter, true);
+        if (Lazy.NearestEnemyWithinConeOfVision(this._projectile.SafeCenter, this._projectile.Direction.ToAngle(),
+          this._mastered ? _MASTERED_HOMING_SPREAD : _HOMING_SPREAD) is AIActor actor)
+        {
+            if (Lazy.DeterminePerfectAngleToShootAt(this._projectile.SafeCenter,
+              actor.CenterPosition, actor.specRigidbody ? actor.specRigidbody.Velocity : default,
+              oldSpeed, out float shootAngle, out float t, adjustForTurboMode: false))
+                this._projectile.SendInDirection(shootAngle.ToVector(), true);
+        }
         this._projectile.specRigidbody.Reinitialize();
 
         this._bounceFinished = true;
