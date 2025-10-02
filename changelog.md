@@ -1,29 +1,37 @@
 # Changelog
 
-## 1.28.1 (TBD)
+## 1.28.1 (2025-10-01)
 
-- Fixed patch conflict with Expand the Gungeon preventing [REDACTED] elevator from returning to the previous floor
-- Fixed null deref caused by Maestro looking for projectiles while the game is loading a level
-- Added nicer impact VFX for individual colors of Jugglernaut projectiles
+#### Balance Changes:
+
 - Increased base damage of Alien Nailgun's projectiles from 2 to 5
 - Decreased Flakseed's flower base growth time from 6 seconds to 3 seconds
 - Removed mechanic where Flakseed's flowers would compete for nutritents and wither faster when closer together since that was convoluted and unfun
-- Added sound and visual effects for when Flakseed's flower sprouts are trampled by enemies
 - Increased movement speed when charging Sunderbuss from 35% to 65% of normal movement speed
 - Decreased delay between reloading Iron Maid and retargeting projectiles from 0.5 seconds to 0.1 seconds
-- Added visual indicators while Stereoscope is active to indicate enemies' resonant frequencies
-- Slightly increased volume of Stereoscope's music
-- Slightly improved shader rendering on enemies hit by Schrodinger's Gat's projectiles
 - Reduced Alien Nailgun's replicant construction time from 1.5 seconds to 1.0 seconds
-- Fixed mastered Bouncer potentially having multiple separate piercing components instead of stacking them together
-- Fixed damage of mastered Bouncer's projectiles decaying after every pierce until bouncing
 - Gave Bouncer's projectiles slight homing and movement prediction when bouncing to make actually hitting enemies slightly easier
 - Reduced Bouncer's projectile explosion damage from 10 to 5 and explosion force from 100 to 30
 - Bouncer's projectiles now explode when impacting enemies
 - Increased Leafblower's push force on enemies from 20 to 40
 - Gave Omnidirectional Laser's projectiles movement prediction to make actually hitting enemies slightly easier
 - Reduced Omnidirectional Laser's reticle's max rotations per second from 4 to 3
-- Fixed Omnidirectional Laser's completely nonfunctional angle snapping to make actually hitting enemies slightly easier
+
+#### Polish:
+
+- Added visual indicators while Stereoscope is active to indicate enemies' resonant frequencies
+- Slightly increased volume of Stereoscope's music
+- Added nicer impact VFX for individual colors of Jugglernaut's projectiles
+- Added sound and visual effects for when Flakseed's flower sprouts are trampled by enemies
+- Slightly improved shader rendering on enemies hit by Schrodinger's Gat's projectiles
+
+#### Bugfixes and Misc:
+
+- Fixed patch conflict with Expand the Gungeon preventing [REDACTED] elevator from returning to the previous floor
+- Fixed null deref caused by Maestro looking for projectiles while the game is loading a level
+- Fixed mastered Bouncer potentially having multiple separate piercing components instead of stacking them together
+- Fixed damage of mastered Bouncer's projectiles decaying after every pierce when it was never supposed to decay
+- Fixed Omnidirectional Laser's completely nonfunctional angle snapping so that it actually snaps to enemies now
 
 ## 1.28.0 (2025-09-17)
 
