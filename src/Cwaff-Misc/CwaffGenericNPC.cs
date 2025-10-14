@@ -124,7 +124,8 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         this.talkPoint.position = base.transform.position;
         Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
         this.talkPointOffset = new Vector3(0, size.y, 0) + this.talkPointAdjustment;
-        // SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
+        if (!this.noOutlines)
+            SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
         base.aiAnimator.PlayUntilCancelled("idler");
         // base.aiAnimator.sprite.color = base.aiAnimator.sprite.color.WithAlpha(0f);
         // base.renderer.enabled = false;
