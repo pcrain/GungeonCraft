@@ -78,15 +78,16 @@ public class ArmisticeNPC : BossNPC
       }
       else
       {
-        yield return Converse("I'm very confident I could. I have more than enough equipment and experience for the task.");
-        yield return Converse("But that's besides the point. I come here to get away from all of the fighting the rest of the Gungeon usually demands.");
+        yield return Converse("There's no need for hostility. It's a moot point in any case.");
+        yield return Converse("I come here to get away from all of the fighting the rest of the Gungeon usually demands.");
       }
 
-      yield return Converse("And I'm more than happy to share the space with you, should you desire to stay for a while.");
-      yield return Converse("If I'm being quite honest, I'd prefer not to fight.");
-      yield return Converse("Admittedly...dueling sounds a lot more entertaining for both of us than fighting through Bullet Hell.");
-      yield return Converse("It's not like dying here is permanent for either of us.");
-      yield return Converse("So...why not, we can fight if you really want to.");
+      yield return Converse("And I'm more than happy to share this space with you, should you desire to stay for a while.");
+      yield return Converse("I'd truthfully prefer not to fight another Gungeoneer.");
+      yield return Converse("...");
+      yield return Converse("Admittedly...your alternative way out of here isn't particularly pleasant for you.");
+      yield return Converse("It's not as if dying here is permanent either.");
+      yield return Converse("So...why not, I suppose we could fight if you'd prefer not going through Bullet Hell.");
       yield return Prompt("Not right now.", "Let's do it!");
 
       if (PromptResult() == 0)

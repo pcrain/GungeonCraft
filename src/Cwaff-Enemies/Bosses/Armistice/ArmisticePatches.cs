@@ -92,7 +92,24 @@ internal static class ArmisticePatches
       cursor.Emit(OpCodes.Brtrue, afterAllPastChecks);
   }
 
-  private static bool NoPastRegrets(bool oldValue) => oldValue || CwaffRunData.Instance.noPastRegrets;
+  private static bool ForceAllowArmisticeAccess(this PlayerController player)
+  {
+    if (player.characterIdentity == PlayableCharacters.Gunslinger)
+      return false; // Gunslinger cannot access Armistice for lore reasons
+    if (player.characterIdentity == PlayableCharacters.Eevee)
+      return GungeonFlags.GUNSLINGER_UNLOCKED.Get(); // Paradox can access Armistice if Gunslinger is unlocked
+    if ((int)player.characterIdentity < (int)PlayableCharacters.Eevee)
+      return false; // vanilla characters with pasts have to pick up the BTCKTP with no regrets
+    if (player.gameObject.GetComponent<CustomCharacterData>() is not CustomCharacterData ccd)
+      return true; // non CharAPI custom characters without custom pasts get free access
+    return !ccd.hasPast; // only CharAPI characters without custom pasts get free access, all others require the BTCKTP route
+  }
+
+  private static bool NoPastRegrets(bool oldValue) {
+    if (!CwaffRunData.Instance.noPastRegrets && GameManager.Instance.PrimaryPlayer) // assign directly to noPastRegrets so CheckIfShouldGoToNoRegretsPast() below works correctly
+      CwaffRunData.Instance.noPastRegrets = GameManager.Instance.PrimaryPlayer.ForceAllowArmisticeAccess(); // allow players without a past to access Armistice
+    return oldValue || CwaffRunData.Instance.noPastRegrets;
+  }
 
   private static bool CheckIfShouldGoToNoRegretsPast(ArkController ark)
   {

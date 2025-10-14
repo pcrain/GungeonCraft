@@ -9,6 +9,8 @@
 - Increased the size of Stereoscope's visual indicators and added extra wedge showing current aim direction for increased clarity
 - Fixed null derefs caused by certain guns trying to call update methods in the Breach when given via Expand the Gungeon's gunball machine
 - Fixed [REDACTED] not having outlines before initial interaction
+- Allowed most characters without pasts to access [REDACTED]
+- Tweaked [REDACTED]'s dialog a bit
 
 ## 1.28.1 (2025-10-01)
 
