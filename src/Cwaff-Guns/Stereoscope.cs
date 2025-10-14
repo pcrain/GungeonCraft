@@ -211,7 +211,9 @@ public class Stereoscope : CwaffGun
         }
 
         RoomHandler room = this.PlayerOwner.CurrentRoom;
-        float alpha = Mathf.Max(0.75f * GetAccuracy(twoWay: false), 0.1f);
+        float alpha = 0.35f + Mathf.Max(0.5f * GetAccuracy(twoWay: false), 0.0f);
+        Vector2 iconOffset = new Vector2(0, -0.375f);
+        float iconRadius = 0.375f;
         foreach(AIActor enemy in room.SafeGetEnemiesInRoom())
         {
             if (!enemy || enemy.IsGone)
@@ -228,11 +230,15 @@ public class Stereoscope : CwaffGun
             {
                 RentIcon(Geometry.Shape.FILLEDCIRCLE).Setup(shape: Geometry.Shape.FILLEDCIRCLE,
                     color: _FreqColors[resonantFrequency + 6].WithAlpha(alpha),
-                    pos: body.UnitBottomCenter + new Vector2(0, -0.375f), radius: 0.25f,
+                    pos: body.UnitBottomCenter + iconOffset, radius: iconRadius,
                     angle: MiddleAngleFromFrequency(resonantFrequency), arc: 30f);
+                RentIcon(Geometry.Shape.FILLEDCIRCLE).Setup(shape: Geometry.Shape.FILLEDCIRCLE,
+                    color: Color.white.WithAlpha(alpha),
+                    pos: body.UnitBottomCenter + iconOffset, radius: iconRadius,
+                    angle: this.PlayerOwner.m_currentGunAngle.Clamp360(), arc: 12f);
                 RentIcon(Geometry.Shape.CIRCLE).Setup(shape: Geometry.Shape.CIRCLE,
                     color: _FreqColors[resonantFrequency + 6].WithAlpha(alpha),
-                    pos: body.UnitBottomCenter + new Vector2(0, -0.375f), radius: 0.25f,
+                    pos: body.UnitBottomCenter + iconOffset, radius: iconRadius,
                     angle: MiddleAngleFromFrequency(resonantFrequency), arc: 360f);
             }
 

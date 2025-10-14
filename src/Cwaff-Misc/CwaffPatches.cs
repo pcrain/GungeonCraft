@@ -201,7 +201,6 @@ internal static class ShootSingleProjectilePatch
             instr => instr.MatchCallOrCallvirt<Gun>(nameof(Gun.ApplyCustomAmmunitionsToProjectile))
             ))
         {
-            System.Console.WriteLine($"got id {projectileVarId}");
             cursor.Emit(OpCodes.Ldloc_S, (byte)projectileVarId);  // V_10 == our projectile
             cursor.Emit(OpCodes.Ldarg_0);  // load Gun
             cursor.Emit(OpCodes.Ldarg_1);  // load ProjectileModule

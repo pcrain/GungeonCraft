@@ -6,6 +6,7 @@
 - Fixed null deref caused by Display Pedestal trying to update the status of a gun that no longer exists
 - Fixed null deref caused by Paintball Cannon trying to apply its affects to certain non-Paintball Cannon projectiles
 - Added some temporary patches to fix a handful of compatibility issues with JuneLib until it gets properly updated
+- Increased the size of Stereoscope's visual indicators and added extra wedge showing current aim direction for increased clarity
 
 ## 1.28.1 (2025-10-01)
 
