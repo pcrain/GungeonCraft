@@ -386,7 +386,7 @@ internal static class AtlasHelper
   /// <summary>Manually initialize some Harmony patches we need very early on to enable threaded setup</summary>
   internal static void InitSetupPatches(Harmony harmony)
   {
-      BindingFlags anyFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+      const BindingFlags anyFlags = BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
       // Load sprites from our own atlases
       _TemporaryPatches.Add(new(harmony,

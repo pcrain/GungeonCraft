@@ -92,6 +92,7 @@ public class Initialisation : BaseUnityPlugin
             #region Set up Early Harmony Patches (needs to be synchronous due to call to AmmonomiconController.ForceInstance)
                 System.Diagnostics.Stopwatch setupEarlyHarmonyWatch = System.Diagnostics.Stopwatch.StartNew();
                 AtlasHelper.InitSetupPatches(_Harmony);
+                CompatibilityPatches.Init(_Harmony);
                 setupEarlyHarmonyWatch.Stop();
             #endregion
 

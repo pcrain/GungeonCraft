@@ -138,11 +138,14 @@ static class ProjectileOnTileCollisionPatches
 }
 
 [HarmonyPatch(typeof(Gun), nameof(Gun.ShootSingleProjectile))]
-static class ShootSingleProjectilePatch
-{ //REFACTOR: the accuracy modifiers can all be consolidated
+internal static class ShootSingleProjectilePatch
+{
+    //REFACTOR: the accuracy modifiers can all be consolidated
+    //HACK: these are all internal for now for JuneLib compatibility until its full method override for ShootSingleProjectile gets replaced by ILManipulators
+
     // NOTE: used by MMAiming to increase reload speed while standing still
     [HarmonyILManipulator]
-    private static void ReduceSpreadWhenIdleIL(ILContext il, MethodBase original)
+    internal static void ReduceSpreadWhenIdleIL(ILContext il, MethodBase original)
     {
         ILCursor cursor = new ILCursor(il);
 
@@ -157,7 +160,7 @@ static class ShootSingleProjectilePatch
 
     // NOTE: used by Bionic Finger synergy to reduce spread while firing semiautomatic weapons
     [HarmonyILManipulator]
-    private static void AimBotZeroSpreadIL(ILContext il, MethodBase original)
+    internal static void AimBotZeroSpreadIL(ILContext il, MethodBase original)
     {
         ILCursor cursor = new ILCursor(il);
 
@@ -172,7 +175,7 @@ static class ShootSingleProjectilePatch
 
     // NOTE: used by CwaffGun to dynamically adjust spread
     [HarmonyILManipulator]
-    private static void DynamicAccuracyIL(ILContext il, MethodBase original)
+    internal static void DynamicAccuracyIL(ILContext il, MethodBase original)
     {
         ILCursor cursor = new ILCursor(il);
 
@@ -187,18 +190,23 @@ static class ShootSingleProjectilePatch
 
     // NOTE: used by CwaffProjectile to determine if a projectile was fired for free
     [HarmonyILManipulator]
-    private static void CheckFreebieIL(ILContext il, MethodBase original)
+    internal static void CheckFreebieIL(ILContext il, MethodBase original)
     {
         ILCursor cursor = new ILCursor(il);
 
-        if (!cursor.TryGotoNext(MoveType.After,
-            instr => instr.MatchCall<Gun>(nameof(Gun.ApplyCustomAmmunitionsToProjectile))))
-            return;
-
-        cursor.Emit(OpCodes.Ldloc_S, (byte)10);  // V_10 == our projectile
-        cursor.Emit(OpCodes.Ldarg_0);  // load Gun
-        cursor.Emit(OpCodes.Ldarg_1);  // load ProjectileModule
-        cursor.CallPrivate(typeof(CwaffProjectile), nameof(CwaffProjectile.DetermineIfFiredForFree));
+        int projectileVarId = -1;
+        //NOTE: 2nd occurrence handles mirrored projectile modules, but might end up overcounting projectiles...check on this later
+        while (cursor.TryGotoNext(MoveType.After,
+            instr => instr.MatchLdloc(out projectileVarId),
+            instr => instr.MatchCallOrCallvirt<Gun>(nameof(Gun.ApplyCustomAmmunitionsToProjectile))
+            ))
+        {
+            System.Console.WriteLine($"got id {projectileVarId}");
+            cursor.Emit(OpCodes.Ldloc_S, (byte)projectileVarId);  // V_10 == our projectile
+            cursor.Emit(OpCodes.Ldarg_0);  // load Gun
+            cursor.Emit(OpCodes.Ldarg_1);  // load ProjectileModule
+            cursor.CallPrivate(typeof(CwaffProjectile), nameof(CwaffProjectile.DetermineIfFiredForFree));
+        }
     }
 }
 

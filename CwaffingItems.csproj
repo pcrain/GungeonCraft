@@ -254,6 +254,7 @@
     <Compile Include="src\Cwaff-Flows\ArmisticeDungeon.cs"/>
     <Compile Include="src\Databases.cs"/>
     <Compile Include="src\SharedItemBehaviors.cs"/>
+    <Compile Include="src\Cwaff-Misc\CompatibilityPatches.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffReticle.cs"/>
     <Compile Include="src\Cwaff-Misc\ModdedShopItemAdder.cs"/>
     <Compile Include="src\Cwaff-Misc\FancyShopBuilder.cs"/>
