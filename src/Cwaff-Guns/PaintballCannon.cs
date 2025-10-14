@@ -29,8 +29,10 @@ public class PaintballCannon : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
         base.PostProcessProjectile(projectile);
+        if (projectile.GetComponent<PaintballColorizer>() is not PaintballColorizer pbc)
+            return;
         if (this.Mastered)
-            projectile.GetComponent<PaintballColorizer>().mastered = true;
+            pbc.mastered = true;
         if (this.PlayerOwner is not PlayerController player)
             return;
         if (player.GetActive((int)Items.PotionOfLeadSkin) is not ReflectShieldPlayerItem leadSkin)
@@ -39,7 +41,7 @@ public class PaintballCannon : CwaffGun
             return;
         if (!player.HasSynergy(Synergy.LEAD_PAINT))
             return;
-        projectile.GetComponent<PaintballColorizer>().reflectsProjectiles = true;
+        pbc.reflectsProjectiles = true;
     }
 }
 

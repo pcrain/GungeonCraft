@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.28.2 (2025-10-14)
+
+- Fixed null deref caused by Echo Chamber trying to spawn invalid projectiles due to an invalid base projectile or invalid player owner
+- Fixed null deref caused by Display Pedestal trying to update the status of a gun that no longer exists
+- Fixed null deref caused by Paintball Cannon trying to apply its affects to certain non-Paintball Cannon projectiles
+
 ## 1.28.1 (2025-10-01)
 
 #### Balance Changes:

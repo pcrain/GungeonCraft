@@ -169,10 +169,14 @@ public class PristineGun : MonoBehaviour
 
     internal void NoLongerPristine()
     {
-        this._gun.OnDropped -= Drop;
-        this._gun.OnPostFired -= PostFired;
-        this._player.GunChanged -= GunChanged;
-        if (this._inInventory)
+        if (this._gun)
+        {
+            this._gun.OnDropped -= Drop;
+            this._gun.OnPostFired -= PostFired;
+        }
+        if (this._player)
+            this._player.GunChanged -= GunChanged;
+        if (this._inInventory && this._gun && this._player)
         {
             CwaffRunData.Instance.pristineGunIds[this._player.PlayerIDX].TryRemove(this._gun.PickupObjectId);
             if (this._player.GetPassive<DisplayPedestal>() is DisplayPedestal dp)

@@ -158,6 +158,9 @@ public class EchoingProjectile : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._owner      = this._projectile.Owner as PlayerController;
 
+        if (!this._projectile || !this._owner)
+            return; // failed to set the projectile up for whatever reason
+
         GameObject g = UnityEngine.Object.Instantiate(new GameObject(), this._projectile.SafeCenter,
             this._projectile.sprite ? this._projectile.sprite.transform.rotation : Quaternion.identity);
         this._spawner = g.AddComponent<EchoProjectileSpawner>();
