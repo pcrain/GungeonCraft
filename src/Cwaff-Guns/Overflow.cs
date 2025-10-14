@@ -202,6 +202,8 @@ public class Overflow : CwaffGun
     public override void OwnedUpdatePlayer(PlayerController player, GunInventory inventory)
     {
         base.OwnedUpdatePlayer(player, inventory);
+        if (!this.gun)
+            return; // can happen with Paradox in Breach or via Expand's gunball machine
         if (this.Mastered && !this._cable)
             HandleGoopOverflow();
     }

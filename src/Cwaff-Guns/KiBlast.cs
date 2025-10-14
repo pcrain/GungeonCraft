@@ -177,6 +177,8 @@ public class KiBlast : CwaffGun
     public override void OwnedUpdatePlayer(PlayerController owner, GunInventory inventory)
     {
         base.OwnedUpdatePlayer(owner, inventory);
+        if (!this.gun)
+            return; // can happen with Paradox in Breach or via Expand's gunball machine
         if (this.gun.CurrentAmmo >= this.gun.AdjustedMaxAmmo)
             return;
         this._rechargeTimer += BraveTime.DeltaTime;
