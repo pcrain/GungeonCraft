@@ -2,15 +2,21 @@
 
 ## 1.28.2 (2025-10-14)
 
-- Fixed null deref caused by Echo Chamber trying to spawn invalid projectiles due to an invalid base projectile or invalid player owner
-- Fixed null deref caused by Display Pedestal trying to update the status of a gun that no longer exists
-- Fixed null deref caused by Paintball Cannon trying to apply its affects to certain non-Paintball Cannon projectiles
-- Added some temporary patches to fix a handful of compatibility issues with JuneLib until it gets properly updated
-- Increased the size of Stereoscope's visual indicators and added extra wedge showing current aim direction for increased clarity
-- Fixed null derefs caused by certain guns trying to call update methods in the Breach when given via Expand the Gungeon's gunball machine
-- Fixed [REDACTED] not having outlines before initial interaction
+#### Balance Changes and Polish:
+
 - Allowed most characters without pasts to access [REDACTED]
 - Tweaked [REDACTED]'s dialog a bit
+- Increased the size of Stereoscope's resonance indicators
+- Added an extra wedge to Stereoscope's indicators showing current aim direction for increased clarity
+
+#### Bugfixes and Misc:
+
+- Added some temporary patches to fix a handful of compatibility issues with JuneLib until it gets properly updated
+- Fixed null deref caused by Echo Chamber trying to spawn invalid projectiles from an invalid base projectile or invalid player
+- Fixed null deref caused by Display Pedestal trying to update the status of a gun that no longer exists
+- Fixed null deref caused by Paintball Cannon trying to apply its effects to certain non-Paintball Cannon projectiles
+- Fixed null derefs caused by certain guns trying to call update methods in the Breach when given via Expand the Gungeon's gunball machine
+- Fixed [REDACTED] not having outlines before initial interaction
 
 ## 1.28.1 (2025-10-01)
 
