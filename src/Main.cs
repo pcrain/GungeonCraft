@@ -30,7 +30,6 @@
     global using Alexandria.ItemAPI;
     global using Alexandria.EnemyAPI;
     global using Alexandria.Misc;
-    global using Alexandria.NPCAPI;
     global using Alexandria.cAPI;
     global using Alexandria.CustomDodgeRollAPI;
     global using Brave.BulletScript;
