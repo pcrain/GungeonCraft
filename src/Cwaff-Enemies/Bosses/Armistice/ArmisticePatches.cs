@@ -94,6 +94,8 @@ internal static class ArmisticePatches
 
   private static bool ForceAllowArmisticeAccess(this PlayerController player)
   {
+    if (!GungeonFlags.BOSSKILLED_LICH.Get())
+      return false; // nobody should be able to access Armistice until the Lich has been defeated
     if (player.characterIdentity == PlayableCharacters.Gunslinger)
       return false; // Gunslinger cannot access Armistice for lore reasons
     if (player.characterIdentity == PlayableCharacters.Eevee)

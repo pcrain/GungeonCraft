@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.28.3 (TBD)
+
+- Fixed characters with no past being able to access [REDACTED] before beating the Lich
+
 ## 1.28.2 (2025-10-14)
 
 #### Balance Changes and Polish:
