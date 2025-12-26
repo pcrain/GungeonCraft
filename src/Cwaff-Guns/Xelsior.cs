@@ -152,7 +152,7 @@ public class Xelsior : CwaffGun
         Gun targetGun = null;
         foreach (var ix in RoomHandler.unassignedInteractableObjects)
         {
-            if (ix is not Gun gun || !gun.isActiveAndEnabled || !gun.sprite)
+            if (ix is not Gun gun || !gun || !gun.isActiveAndEnabled || !gun.sprite)
                 continue;
             Vector2 v = default;
             if (!BraveMathCollege.LineSegmentRectangleIntersection(start, end, gun.sprite.WorldBottomLeft, gun.sprite.WorldTopRight, ref v))
@@ -163,10 +163,15 @@ public class Xelsior : CwaffGun
         if (!targetGun)
             return;
 
-        RoomHandler.unassignedInteractableObjects.Remove(targetGun);
+        if (RoomHandler.unassignedInteractableObjects.Contains(targetGun))
+            RoomHandler.unassignedInteractableObjects.Remove(targetGun);
         int quality = Mathf.Max(targetGun.QualityGrade(), 1);
-        targetGun.sprite.DuplicateInWorldAsMesh().Dissipate(time: 3.5f, amplitude: 5f, progressive: true);
-        UnityEngine.Object.Destroy(targetGun.gameObject);
+        if (targetGun.sprite)
+            targetGun.sprite.DuplicateInWorldAsMesh().Dissipate(time: 3.5f, amplitude: 5f, progressive: true);
+        if (targetGun.gameObject.GetComponentInParent<DebrisObject>())
+            UnityEngine.Object.Destroy(targetGun.gameObject.transform.parent.gameObject);
+        else
+            UnityEngine.Object.Destroy(targetGun.gameObject);
         for (int i = 0; i < quality; ++i)
             AddNewGun();
         base.gameObject.Play("materialize_sound");
