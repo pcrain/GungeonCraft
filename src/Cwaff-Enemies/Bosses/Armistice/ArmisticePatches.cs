@@ -102,9 +102,9 @@ internal static class ArmisticePatches
       return GungeonFlags.GUNSLINGER_UNLOCKED.Get(); // Paradox can access Armistice if Gunslinger is unlocked
     if ((int)player.characterIdentity < (int)PlayableCharacters.Eevee)
       return false; // vanilla characters with pasts have to pick up the BTCKTP with no regrets
-    if (player.gameObject.GetComponent<CustomCharacterData>() is not CustomCharacterData ccd)
+    if (player.gameObject.GetComponent<CustomCharacter>() is not CustomCharacter cc)
       return true; // non CharAPI custom characters without custom pasts get free access
-    return !ccd.hasPast; // only CharAPI characters without custom pasts get free access, all others require the BTCKTP route
+    return !cc.hasPast; // only CharAPI characters without custom pasts get free access, all others require the BTCKTP route
   }
 
   private static bool NoPastRegrets(bool oldValue) {

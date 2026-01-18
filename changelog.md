@@ -5,6 +5,7 @@
 - Fixed characters with no past being able to access [REDACTED] before beating the Lich
 - Fixed null deref caused by Xelsior trying to obtain properties of non-existent guns on the floor
 - Fixed Xelsior not properly destroying other items when absorbing guns dropped from Rainbow Chests in Rainbow Mode (thanks Ski for the fix!)
+- Fixed custom characters with pasts not being able to access their pasts due to automatically being taken to [REDACTED]
 
 ## 1.28.2 (2025-10-14)
 
