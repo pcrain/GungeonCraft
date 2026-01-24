@@ -6,6 +6,7 @@
 - Fixed null deref caused by Xelsior trying to obtain properties of non-existent guns on the floor
 - Fixed Xelsior not properly destroying other items when absorbing guns dropped from Rainbow Chests in Rainbow Mode (thanks Ski for the fix!)
 - Fixed custom characters with pasts not being able to access their pasts due to automatically being taken to [REDACTED]
+- Fixed placeholder typo in Hatchling Gun's description
 
 ## 1.28.2 (2025-10-14)
 
