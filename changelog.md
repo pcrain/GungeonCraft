@@ -4,9 +4,10 @@
 
 - Fixed characters with no past being able to access [REDACTED] before beating the Lich
 - Fixed null deref caused by Xelsior trying to obtain properties of non-existent guns on the floor
-- Fixed Xelsior not properly destroying other items when absorbing guns dropped from Rainbow Chests in Rainbow Mode (thanks Ski for the fix!)
+- Fixed Xelsior not properly destroying other items when absorbing guns dropped from Rainbow Chests in Rainbow Mode (thanks to [Skilotar](https://thunderstore.io/c/enter-the-gungeon/p/Skilotar/) for the fix!)
 - Fixed custom characters with pasts not being able to access their pasts due to automatically being taken to [REDACTED]
 - Fixed placeholder typo in Hatchling Gun's description
+- Fixed Credit Card effectively granting certain weapons infinite fire rate in combination with certain items (thanks to [Silstrom](https://thunderstore.io/c/enter-the-gungeon/p/Silstrom/) for finding and diagnosing the issue!)
 
 ## 1.28.2 (2025-10-14)
 

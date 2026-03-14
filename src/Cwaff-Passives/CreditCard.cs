@@ -80,10 +80,12 @@ public class CreditCard : CwaffPassive
         if (oldCurrency == newCurrency)
             return;
 
+        oldCurrency = newCurrency;
+
         this.CanBeDropped = (newCurrency >= _BASE_CREDIT);
         curseMod.amount   = (newCurrency > _BASE_CREDIT) ? 0 : ((_BASE_CREDIT - newCurrency) / _CREDIT_DELTA);
         coolMod.amount    = (newCurrency < _BASE_CREDIT) ? 0 : ((newCurrency - _BASE_CREDIT) / _CREDIT_DELTA);
-        this.Owner.stats.RecalculateStats(this.Owner);
+        this.Owner.stats.RecalculateStatsWithoutRebuildingGunVolleys(this.Owner);
     }
 
     [HarmonyPatch(typeof(GameUIRoot), nameof(GameUIRoot.UpdatePlayerConsumables))]
