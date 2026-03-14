@@ -277,8 +277,24 @@ public class Femtobyte : CwaffGun
             }
     }
 
+    private bool IsUsedMuncher(SpeculativeRigidbody body)
+    {
+        if (!body || body.gameObject.GetComponent<GunberMuncherController>() is not GunberMuncherController muncher)
+            return false;
+        if (muncher.m_first != null)
+            return true;
+        if (muncher.m_second != null)
+            return true;
+        if (muncher.GetComponent<PlayMakerFSM>() is PlayMakerFSM fsm)
+            if (!fsm.FsmVariables.FindFsmBool("canBeUsed").Value)
+                return true;
+        return false;
+    }
+
     private bool DigitizeSpecial(SpeculativeRigidbody body, PrefabData data)
     {
+        if (IsUsedMuncher(body))
+            return false;
         if (data.prefab != null)
             SetCurrentSlot(new(){
                 type      = SPECIAL,
