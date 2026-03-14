@@ -8,6 +8,7 @@
 - Fixed custom characters with pasts not being able to access their pasts due to automatically being taken to [REDACTED]
 - Fixed placeholder typo in Hatchling Gun's description
 - Fixed Credit Card effectively granting certain weapons infinite fire rate in combination with certain items (thanks to [Silstrom](https://thunderstore.io/c/enter-the-gungeon/p/Silstrom/) for finding and diagnosing the issue!)
+- Fixed lighting and crawling animations (that I apparently never added in the first place) on Widowmaker drones
 
 ## 1.28.2 (2025-10-14)
 

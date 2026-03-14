@@ -23,8 +23,12 @@ public class Widowmaker : CwaffGun
             sprite: "widowmaker_projectile", fps: 12, scale: _SCALE, anchor: Anchor.MiddleLeft, preventOrbiting: true, customClip: true))
           .Attach<WidowmakerProjectile>();
 
-        _WidowmakerPrefab = VFX.Create("spider_turret", fps: 16, scale: _SCALE, emissivePower: 1f);
-        _WidowmakerPrefab.AddAnimation("deploy", "widowmaker_deploy_vfx", fps: 12, loops: false, emissivePower: 1f);
+        _WidowmakerPrefab = VFX.Create("spider_turret", fps: 16, scale: _SCALE, emissivePower: 0f);
+        _WidowmakerPrefab.AddAnimation("deploy", "widowmaker_deploy_vfx", fps: 12, loops: false, emissivePower: 0f);
+        _WidowmakerPrefab.AddAnimation("crawl", "widowmaker_crawl_vfx", fps: 12, loops: true, emissivePower: 0f);
+        // offset the sprites a bit to prevent them from crawling on thin air when on lower walls
+        foreach (var clip in _WidowmakerPrefab.GetComponent<tk2dSpriteAnimation>().clips)
+            clip.OffsetAllFrames(new Vector2(-0.25f, 0f));
         _WidowmakerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
         _WidowmakerPrefab.AddComponent<Crawlyboi>();
 
@@ -147,7 +151,7 @@ public class Crawlyboi : MonoBehaviour
         {
             if (base.GetComponent<tk2dSpriteAnimator>().IsPlaying("deploy"))
                 return;
-            base.GetComponent<tk2dSpriteAnimator>().Play("start");
+            base.GetComponent<tk2dSpriteAnimator>().Play("crawl");
             this._body.Velocity = _CRAWL_SPEED * this._velocity;
             this._deployed = true;
         }

@@ -3702,5 +3702,12 @@ public static class Extensions
 
   /// <summary>Check whether a character specific save flag is set.</summary>
   public static bool Get(this CharacterSpecificGungeonFlags flag) => GameStatsManager.Instance.GetCharacterSpecificFlag(flag);
+
+  /// <summary>Offset all sprite definitions in an animation clip by a specified amount.</summary>
+  public static void OffsetAllFrames(this tk2dSpriteAnimationClip clip, Vector2 offset)
+  {
+      foreach (var frame in clip.frames)
+          frame.spriteCollection.spriteDefinitions[frame.spriteId].ShiftBy(offset);
+  }
 }
 
