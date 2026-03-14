@@ -227,9 +227,11 @@ public class LibraryCardtridge : CwaffPassive
     {
         foreach (BaseShopController shop in StaticReferenceManager.AllShops)
         {
+            if (shop.m_itemControllers == null)
+                continue;
             foreach(ShopItemController shopItem in shop.m_itemControllers)
             {
-                if (shopItem.gameObject.GetComponent<DiscountBooks>() is not DiscountBooks discount)
+                if (!shopItem || shopItem.gameObject.GetComponent<DiscountBooks>() is not DiscountBooks discount)
                     continue;
 
                 if (!discount.isDiscounted)
