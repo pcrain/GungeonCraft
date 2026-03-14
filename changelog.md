@@ -9,6 +9,7 @@
 - Fixed placeholder typo in Hatchling Gun's description
 - Fixed Credit Card effectively granting certain weapons infinite fire rate in combination with certain items (thanks to [Silstrom](https://thunderstore.io/c/enter-the-gungeon/p/Silstrom/) for finding and diagnosing the issue!)
 - Fixed lighting and crawling animations (that I apparently never added in the first place) on Widowmaker drones
+- Fixed null derefs caused by Subtract Beam attempting to reuse stale health labels after switching floors
 
 ## 1.28.2 (2025-10-14)
 

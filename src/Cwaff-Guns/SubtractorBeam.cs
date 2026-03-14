@@ -12,6 +12,7 @@ public class SubtractorBeam : CwaffGun
     internal static GameObject _HitEffects;
     private static readonly LinkedList<dfLabel> _PooledNametags = new();
     private static readonly LinkedList<dfLabel> _ActiveNametags = new();
+    private static bool _EverPickedUp = false;
 
     internal HealthHaver _lastHitEnemy = null;
 
@@ -58,6 +59,8 @@ public class SubtractorBeam : CwaffGun
     {
         base.Update();
         ClearNametags();
+        if (GameManager.Instance.IsLoadingLevel || GameManager.Instance.IsPaused || BraveTime.DeltaTime == 0.0f)
+            return;
         if (this.PlayerOwner is PlayerController player && player.healthHaver && player.healthHaver.IsAlive)
             YouShallKnowTheirNames();
     }
@@ -74,11 +77,21 @@ public class SubtractorBeam : CwaffGun
         }
     }
 
+    private static void OnNewFloorReached()
+    {
+        _PooledNametags.Clear();
+    }
+
     private void YouShallKnowTheirNames()
     {
+        if (!_EverPickedUp)
+        {
+            _EverPickedUp = true;
+            CwaffEvents.OnNewFloorFullyLoaded += OnNewFloorReached;
+        }
         foreach (AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
         {
-            if (!enemy.IsHostile(canBeNeutral: true) || !enemy.sprite)
+            if (!enemy || !enemy.IsHostile(canBeNeutral: true) || !enemy.sprite)
                 continue;
             if (_PooledNametags.Count == 0)
                 _PooledNametags.AddLast(CwaffLabel.MakeNewLabel(unicode: false, outline: true));
