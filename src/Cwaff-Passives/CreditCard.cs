@@ -79,7 +79,9 @@ public class CreditCard : CwaffPassive
         int newCurrency = GameManager.Instance.PrimaryPlayer.carriedConsumables.Currency;
         if (oldCurrency == newCurrency)
             return;
-
+            
+        oldCurrency = newCurrency;
+        
         this.CanBeDropped = (newCurrency >= _BASE_CREDIT);
         curseMod.amount   = (newCurrency > _BASE_CREDIT) ? 0 : ((_BASE_CREDIT - newCurrency) / _CREDIT_DELTA);
         coolMod.amount    = (newCurrency < _BASE_CREDIT) ? 0 : ((newCurrency - _BASE_CREDIT) / _CREDIT_DELTA);
