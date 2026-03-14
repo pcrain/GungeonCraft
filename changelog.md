@@ -11,6 +11,7 @@
 - Fixed lighting and crawling animations (that I apparently never added in the first place) on Widowmaker drones
 - Fixed null derefs caused by Subtract Beam attempting to reuse stale health labels after switching floors
 - Fixed null deref caused by Library Cardtridge trying to read items from nonexistent shops when dropped
+- Fixed player being able to use Emergency Siren after firing beam weapons
 
 ## 1.28.2 (2025-10-14)
 

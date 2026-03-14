@@ -33,11 +33,13 @@ public class EmergencySiren : CwaffActive
         this._owner = player;
         player.OnEnteredCombat += this.OnEnteredCombat;
         player.PostProcessProjectile += this.OnFired;
+        player.PostProcessBeam += this.OnBeamFired;
     }
 
     public override void OnPreDrop(PlayerController player)
     {
         player.PostProcessProjectile -= this.OnFired;
+        player.PostProcessBeam -= this.OnBeamFired;
         player.OnEnteredCombat -= this.OnEnteredCombat;
         this._owner = null;
         base.OnPreDrop(player);
@@ -48,12 +50,18 @@ public class EmergencySiren : CwaffActive
         if (this._owner)
         {
             this._owner.PostProcessProjectile -= this.OnFired;
+            this._owner.PostProcessBeam -= this.OnBeamFired;
             this._owner.OnEnteredCombat -= this.OnEnteredCombat;
         }
         base.OnDestroy();
     }
 
     private void OnFired(Projectile p, float f)
+    {
+        this._anyGunFiredInRoom = true;
+    }
+
+    private void OnBeamFired(BeamController beam)
     {
         this._anyGunFiredInRoom = true;
     }
@@ -69,6 +77,13 @@ public class EmergencySiren : CwaffActive
         this._anyGunFiredInRoom = false;
         foreach (AIActor enemy in Lazy.CurrentRoom().SafeGetEnemiesInRoom())
             enemy.healthHaver.OnPreDeath += OnEnemyKilled;
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        if (this._owner && this._owner.IsFiring)
+            this._anyGunFiredInRoom = true;
     }
 
     public override bool CanBeUsed(PlayerController user)
