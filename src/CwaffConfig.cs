@@ -8,6 +8,7 @@ public static class CwaffConfig
   internal const string _SHOP_KEY = "Shop Spawning Behaviour";
   internal const string _SECONDARY_RELOAD = "Secondary Reload Button";
   internal const string _SPICE_SHADERS = "Enable Spice Shaders";
+  internal const string _BULLET_HELL_SHADERS = "Enable Bullet Hell Shaders";
 
   public enum SecondaryReloadKey { None, Left, Right }
   internal static SecondaryReloadKey _SecondaryReload = SecondaryReloadKey.None;
@@ -68,6 +69,7 @@ public static class CwaffConfig
       );
 
     _Gunfig.AddToggle(_SPICE_SHADERS, enabled: true, callback: OnSpiceShadersChanged); //BUG: gunfig doesn't set the new value until AFTER the callback is called
+    _Gunfig.AddToggle(_BULLET_HELL_SHADERS, enabled: true, callback: OnBulletHellShadersChanged); //BUG: gunfig doesn't set the new value until AFTER the callback is called
 
     // Make sure our initial keybind preferences are set up for seconday reload button
     OnSecondaryReloadChange(_SECONDARY_RELOAD, _Gunfig.Value(_SECONDARY_RELOAD));
@@ -76,6 +78,11 @@ public static class CwaffConfig
   private static void OnSpiceShadersChanged(string key, string value)
   {
     CwaffShaders.CheckSpiceShaders(enabled: value == "1");
+  }
+
+  private static void OnBulletHellShadersChanged(string key, string value)
+  {
+    CwaffShaders.CheckBulletHellShaders(enabled: value == "1");
   }
 
   private static void OnSecondaryReloadChange(string key, string value)

@@ -85,7 +85,7 @@ public static class CwaffShaders
 
         CwaffEvents.OnCleanStart += ResetShaders;
         CwaffEvents.OnStatsRecalculated += CheckShaders;
-        CwaffEvents.OnNewFloorFullyLoaded += CheckShouldEnableHellShaders;
+        CwaffEvents.OnNewFloorFullyLoaded += CheckBulletHellShadersForFloor;
     }
 
     internal static void CheckShaders(PlayerController player)
@@ -126,16 +126,25 @@ public static class CwaffShaders
         // SpriteOutlineManager.ToggleOutlineRenderers(GameManager.Instance.PrimaryPlayer.sprite, false);
     }
 
-    private static void CheckShouldEnableHellShaders()
+    internal static void CheckBulletHellShadersForFloor()
     {
-        if (GameManager.Instance.Dungeon.tileIndices.tilesetId != GlobalDungeonData.ValidTilesets.HELLGEON)
-            return;
-        if (!CwaffRunData.Instance.scrambledBulletHell)
-            return;
-        new GameObject("hell shader handler", typeof(HellShaderHandler));
+        CheckBulletHellShaders(CwaffConfig._Gunfig.Enabled(CwaffConfig._BULLET_HELL_SHADERS));
     }
 
-    private class HellShaderHandler : MonoBehaviour
+    internal static void CheckBulletHellShaders(bool enabled)
+    {
+        if (GameManager.Instance.Dungeon.tileIndices.tilesetId != GlobalDungeonData.ValidTilesets.HELLGEON)
+            enabled = false;
+        if (!CwaffRunData.Instance || !CwaffRunData.Instance.scrambledBulletHell)
+            enabled = false;
+        if (enabled && _HellShaderHandler == null)
+            _HellShaderHandler = new GameObject("hell shader handler", typeof(HellShaderHandler)).GetComponent<HellShaderHandler>();
+        else if (!enabled && _HellShaderHandler != null)
+            UnityEngine.Object.Destroy(_HellShaderHandler.gameObject);
+    }
+
+    internal static HellShaderHandler _HellShaderHandler = null;
+    internal class HellShaderHandler : MonoBehaviour
     {
         private Material mat;
         private int coordsId;
@@ -161,6 +170,11 @@ public static class CwaffShaders
             Vector2 camMax = cam.MaxVisiblePoint;
             Vector2 camSize = camMax - camMin;
             mat.SetVector(coordsId, new Vector4(0.0625f * camMin.x, 0.0625f * camMin.y, camSize.x, camSize.y));
+        }
+
+        private void OnDestroy()
+        {
+            TurnOff();
         }
 
         internal void TurnOn() => Pixelator.Instance.RegisterAdditionalRenderPass(mat);
