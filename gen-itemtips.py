@@ -72,7 +72,8 @@ def main():
         if sline.startswith("NewSynergy"):
           comment = lastline.replace("// ","").replace("//","")
           name = sline.split('"')[1]
-          synergies[name] = {"notes" : comment }
+          sid = "#"+name.upper().replace("\n", "").replace("\\", "").replace("\"", "").replace(" ", "_").replace(".", "").replace("-", "")
+          synergies[sid] = {"name": name, "notes" : comment }
         lastline = sline
     except StopIteration:
       pass
