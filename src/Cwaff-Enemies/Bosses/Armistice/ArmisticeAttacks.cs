@@ -290,6 +290,7 @@ public partial class ArmisticeBoss : AIActor
         this.originalLayer = this.Projectile.gameObject.layer;
         this.Projectile.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
         Vector2 newVelocity = this.startVelocity;
+        float prevTime = BraveTime.ScaledTimeSinceStartup;
         for (int i = 0; i < VANISHTIME; ++i)
         {
           if (i >= LIFETIME && this.roomFullBounds.Contains(this.Position))
@@ -314,7 +315,8 @@ public partial class ArmisticeBoss : AIActor
             this._trail.SetGlowiness(100f);
             continue;
           }
-          newVelocity += gravity * BraveTime.DeltaTime;
+          newVelocity += gravity * (BraveTime.ScaledTimeSinceStartup - prevTime);
+          prevTime = BraveTime.ScaledTimeSinceStartup;
           this.ChangeDirection(new Direction(newVelocity.ToAngle(), DirectionType.Absolute));
           this.ChangeSpeed(new Speed(newVelocity.magnitude, SpeedType.Absolute));
           yield return Wait(1);
@@ -622,9 +624,11 @@ public partial class ArmisticeBoss : AIActor
       {
         float lifeTime = 0f;
         float yOffset = this._startY - this._targetY;
+        float prevTime = BraveTime.ScaledTimeSinceStartup;
         while (lifeTime < _CONVERGE_TIME)
         {
-          lifeTime += BraveTime.DeltaTime;
+          lifeTime += (BraveTime.ScaledTimeSinceStartup - prevTime);
+          prevTime = BraveTime.ScaledTimeSinceStartup;
           float t = Mathf.Clamp01(lifeTime / _CONVERGE_TIME);
           base.Position = base.Position.WithY(this._startY - Ease.OutCubic(t) * yOffset);
           yield return Wait(1);
@@ -1167,7 +1171,8 @@ public partial class ArmisticeBoss : AIActor
         while (boss.spriteAnimator.IsPlaying("attack_snipe"))
           yield return Wait(1);
         boss.aiAnimator.PlayUntilCancelled(IdleForPhase());
-        for (float elapsed = 0f; elapsed < timeBetweenShots; elapsed += BraveTime.DeltaTime)
+        float nextShot = BraveTime.ScaledTimeSinceStartup + timeBetweenShots;
+        while (BraveTime.ScaledTimeSinceStartup < nextShot)
           yield return Wait(1);
         if (i < numTurrets - 1)
         {
@@ -1341,7 +1346,8 @@ public partial class ArmisticeBoss : AIActor
           yield return Wait(1);
 
         float wait = WAIT + UnityEngine.Random.value * VARIANCE;
-        for (float elapsed = 0f; elapsed < wait; elapsed += BraveTime.DeltaTime)
+        float waitEnd = BraveTime.ScaledTimeSinceStartup + wait;
+        while (BraveTime.ScaledTimeSinceStartup < waitEnd)
             yield return Wait(1);
 
         PlayerController pc = GameManager.Instance.BestActivePlayer;
@@ -1360,9 +1366,11 @@ public partial class ArmisticeBoss : AIActor
         sigil.ExpireIn(fallTime); // fallback in case the script gets interrupted
         base.Projectile.gameObject.Play("armistice_warhead_fall_sound");
 
-        for (float elapsed = 0f; elapsed < fallTime && !base.IsEnded && !base.Destroyed; elapsed += BraveTime.DeltaTime)
+        float fallStart = BraveTime.ScaledTimeSinceStartup;
+        float fallEnd = fallStart + fallTime;
+        while (BraveTime.ScaledTimeSinceStartup < fallEnd && !base.IsEnded && !base.Destroyed)
         {
-            float percentLeft = 1f - elapsed / fallTime;
+            float percentLeft = 1f - (BraveTime.ScaledTimeSinceStartup - fallStart) / fallTime;
             base.Position = target + new Vector2(0f, percentLeft * HEIGHT);
             if (sigil)
             {
@@ -1772,13 +1780,14 @@ public partial class ArmisticeBoss : AIActor
 
         // course correct towards the player
         Color debugGreen = Color.green.WithAlpha(0.5f);
+        float prevTime = BraveTime.ScaledTimeSinceStartup;
         while (!this._orbiting)
         {
           // proj.specRigidbody.DrawDebugHitbox(debugGreen);
           // DebugDraw.DrawDebugCircle(proj.gameObject, proj.gameObject.transform.position, 0.125f, Color.cyan.WithAlpha(0.5f));
           Vector2 ppos      = pc.CenterPosition;
           Vector2 delta     = (ppos - base.Position);
-          float dtime       = BraveTime.DeltaTime;
+          float dtime       = BraveTime.ScaledTimeSinceStartup - prevTime;
           float curSpeed    = base.Speed;
           float curDir      = base.Direction;
           float relAngle    = curDir.RelAngleTo(delta.ToAngle());
@@ -1796,6 +1805,7 @@ public partial class ArmisticeBoss : AIActor
             doneBeeping = true;
             break;
           }
+          prevTime = BraveTime.ScaledTimeSinceStartup;
           yield return Wait(1);
         }
 
@@ -1820,10 +1830,11 @@ public partial class ArmisticeBoss : AIActor
         float decelStart = zipEnd - DECEL_TIME;
         float angleTotal = 0f;
         float lastAngle  = (base.Position - pc.CenterPosition).ToAngle();
+        float now        = BraveTime.ScaledTimeSinceStartup;
         while (!doneBeeping) //NOTE: the coroutine intentionally never actually updates in this loop
         {
-          float dtime       = BraveTime.DeltaTime;
-          float now         = BraveTime.ScaledTimeSinceStartup;
+          float dtime       = BraveTime.ScaledTimeSinceStartup - now;
+          now               = BraveTime.ScaledTimeSinceStartup;
           bool lastIter     = now >= zipEnd;
           if (lastIter)
             dtime -= (now - zipEnd);

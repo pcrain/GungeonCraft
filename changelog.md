@@ -13,6 +13,7 @@
 - Fixed null deref caused by Library Cardtridge trying to read items from nonexistent shops when dropped
 - Fixed player being able to use Emergency Siren after firing beam weapons
 - Fixed Femtobyte being able to pick up used Gun Munchers
+- Fixed several of [REDACTED]'s attacks being FPS-dependent
 
 ## 1.28.2 (2025-10-14)
 
