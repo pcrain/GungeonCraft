@@ -141,6 +141,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     newTransform.rotation = baseTransform.rotation;
     newTransform.parent = baseTransform;
     AddMasteryShaders(this._masterySprite.renderer.material);
+    UpdateMasteryShaders();
   }
 
   private static void AddMasteryShaders(Material mat)
@@ -267,10 +268,6 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
         this._hasReloaded = true;
     if (this._usesDynamicBarrelPosition)
       AdjustBarrelPosition();
-  }
-
-  private void LateUpdate()
-  {
     UpdateMasteryShaders();
   }
 

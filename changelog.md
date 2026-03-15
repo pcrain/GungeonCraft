@@ -16,6 +16,7 @@
 - Fixed several of [REDACTED]'s attacks being FPS-dependent
 - Fixed HeartBreaker being unable to pick up hearts in secret rooms
 - Allowed Femtobyte to pick up Heart Dispensers
+- Fixed silhouette of mastered Ki Blast being visible when picked up
 
 ## 1.28.2 (2025-10-14)
 
