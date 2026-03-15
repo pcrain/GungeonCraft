@@ -59,7 +59,7 @@ public static class Lazy
             GameObject go          = UnityEngine.Object.Instantiate(prefabGun);
             prefabGun.SetActive(true);
             go.name                = baseItemName;
-            ammonomiconSprite      = $"{baseItemName}_ammonomicon";
+            ammonomiconSprite      = $"{C.MOD_PREFIX}_{baseItemName}_ammonomicon";
 
             Gun gun                = go.GetComponent<Gun>();
             gun.barrelOffset.transform.localScale = Vector3.one; //NOTE: Pea Shooter has a scale of 0.9, 0.9, 0.9, which messes up trails

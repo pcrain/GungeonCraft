@@ -17,6 +17,7 @@
 - Fixed HeartBreaker being unable to pick up hearts in secret rooms
 - Allowed Femtobyte to pick up Heart Dispensers
 - Fixed silhouette of mastered Ki Blast being visible when picked up
+- Add mod prefix to all gun ammonomicon sprites to prevent conflicts with other mods
 
 ## 1.28.2 (2025-10-14)
 
