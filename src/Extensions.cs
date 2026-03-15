@@ -970,6 +970,7 @@ public static class Extensions
   /// <param name="percentSpeedWhileFiring">Speed multiplier to apply to the player while the gun is firing.</param>
   /// <param name="smoothReload">If non-negative, automatically adjusts the speed of the gun's reload animation to finish smoothReload seconds before the reload itself finishes.</param>
   /// <param name="canAttackWhileRolling">If true, the gun can be fired while dodge rolling.</param>
+  /// <param name="isStarterGun">If true, the gun is marked as a starter gun for Paradox / achievement purposes.</param>
   public static Gun SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
@@ -978,7 +979,8 @@ public static class Extensions
     float muzzleLightRange = 0f, Color? muzzleLightColor = null, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
-    bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f, bool canAttackWhileRolling = false)
+    bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f, bool canAttackWhileRolling = false,
+    bool isStarterGun = false)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -998,6 +1000,7 @@ public static class Extensions
     gun.GainsRateOfFireAsContinueAttack = rampUpFireRate;
     gun.CanAttackThroughObjects = attacksThroughWalls;
     gun.OnlyUsesIdleInWeaponBox = onlyUsesIdleInWeaponBox;
+    gun.StarterGunForAchievement = isStarterGun;
     if (rampUpFireRate)
       gun.RateOfFireMultiplierAdditionPerSecond = rampUpFactor;
 

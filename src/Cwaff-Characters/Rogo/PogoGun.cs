@@ -20,7 +20,7 @@ public class PogoGun : CwaffGun
     {
         Lazy.SetupGun<PogoGun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.EXCLUDED, gunClass: GunClass.RIFLE, reloadTime: 1.5f, ammo: 1000, infiniteAmmo: true, shootFps: 30,
-            muzzleFrom: Items.Mailbox, fireAudio: "pogo_gun_shoot_sound", smoothReload: 0.1f)
+            muzzleFrom: Items.Mailbox, fireAudio: "pogo_gun_shoot_sound", smoothReload: 0.1f, isStarterGun: true)
           .SetReloadAudio("rogo_dodge_sound", 3, 6, 9)
           .SetReloadAudio("pogo_gun_reload_sound", 18)
           .AssignGun(out Gun gun)

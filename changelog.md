@@ -18,6 +18,7 @@
 - Allowed Femtobyte to pick up Heart Dispensers
 - Fixed silhouette of mastered Ki Blast being visible when picked up
 - Add mod prefix to all gun ammonomicon sprites to prevent conflicts with other mods
+- Marked Rogo's Pogo Stick gun as a starter gun for Paradox and achievement purposes
 
 ## 1.28.2 (2025-10-14)
 
