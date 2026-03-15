@@ -170,7 +170,7 @@ public class Heartbreaker : CwaffGun
     {
         if (gun.CurrentStrengthTier >= _MAX_LEVEL)
             return;
-        int health = ConsumeNearbyHeart(player.CenterPosition);
+        int health = ConsumeNearbyHeart(player, player.CenterPosition);
         if (health == 0)
             return;
 
@@ -195,28 +195,38 @@ public class Heartbreaker : CwaffGun
           );
     }
 
-    private int ConsumeNearbyHeart(Vector2 pos)
+    private static void CheckIfNearestHeart(IPlayerInteractable ix, Vector2 pos, ref IPlayerInteractable targetIx, ref HealthPickup targetHeart, ref float nearest)
+    {
+        if (ix == null || ix is not HealthPickup heart || !heart || !heart.isActiveAndEnabled || !heart.sprite || heart.healAmount <= 0)
+            return;
+        float dist = (pos - heart.sprite.WorldCenter).sqrMagnitude;
+        if (dist > nearest)
+            return;
+        targetIx = ix;
+        targetHeart = heart;
+        nearest = dist;
+    }
+
+    private int ConsumeNearbyHeart(PlayerController player, Vector2 pos)
     {
         const float MAX_SQR_RADIUS = 25f;
 
         IPlayerInteractable targetIx = null;
         HealthPickup targetHeart = null;
         float nearest = MAX_SQR_RADIUS;
+        // check floor-wide interactables
         foreach (var ix in RoomHandler.unassignedInteractableObjects)
-        {
-            if (ix == null || ix is not HealthPickup heart || !heart || !heart.isActiveAndEnabled || !heart.sprite || heart.healAmount <= 0)
-                continue;
-            float dist = (pos - heart.sprite.WorldCenter).sqrMagnitude;
-            if (dist > nearest)
-                continue;
-            targetIx = ix;
-            targetHeart = heart;
-            nearest = dist;
-        }
+            CheckIfNearestHeart(ix, pos, ref targetIx, ref targetHeart, ref nearest);
+        // check interactables inside current room
+        if (player.CurrentRoom is RoomHandler room)
+            foreach (var ix in room.interactableObjects)
+                CheckIfNearestHeart(ix, pos, ref targetIx, ref targetHeart, ref nearest);
         if (!targetHeart)
             return 0;
 
-        RoomHandler.unassignedInteractableObjects.Remove(targetIx);
+        RoomHandler.unassignedInteractableObjects.TryRemove(targetIx);
+        if (player.CurrentRoom != null && player.CurrentRoom.IsRegistered(targetIx))
+            player.CurrentRoom.DeregisterInteractable(targetIx);
         int health = Mathf.RoundToInt(2f * targetHeart.healAmount);
         targetHeart.sprite.DuplicateInWorldAsMesh().Dissipate(time: 0.4f, amplitude: 5f, progressive: true);
         UnityEngine.Object.Destroy(targetHeart.gameObject);
