@@ -100,7 +100,7 @@ public class Glockarina : CwaffGun
     {
         if (_GlockarinaPickupID < 0)
             _GlockarinaPickupID = Lazy.PickupId<Glockarina>();
-        if (Lazy.AnyoneHasGun(_GlockarinaPickupID))
+        if (Lazy.AnyoneHasGun(_GlockarinaPickupID) || CwaffConfig._Gunfig.Enabled(CwaffConfig._FUN_CHEST_SOUNDS))
             GameManager.Instance.gameObject.Play("zelda_chest_sound");
     }
 

@@ -20,7 +20,8 @@
 - Add mod prefix to all gun ammonomicon sprites to prevent conflicts with other mods
 - Marked Rogo's Pogo Stick gun as a starter gun for Paradox and achievement purposes
 - Fixed synergy support for [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips/?utm_source=discord) (thanks to [Ricky](https://thunderstore.io/c/enter-the-gungeon/p/Ricky2148/) and [SomeBunny](https://thunderstore.io/c/enter-the-gungeon/p/TeamPlanetside/) for help figuring this out!)
-- Added toggle for Bullet Hell shaders
+- Added config toggle for Bullet Hell shaders
+- Added config toggle for fun chest sounds
 
 ## 1.28.2 (2025-10-14)
 

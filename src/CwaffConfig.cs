@@ -9,6 +9,7 @@ public static class CwaffConfig
   internal const string _SECONDARY_RELOAD = "Secondary Reload Button";
   internal const string _SPICE_SHADERS = "Enable Spice Shaders";
   internal const string _BULLET_HELL_SHADERS = "Enable Bullet Hell Shaders";
+  internal const string _FUN_CHEST_SOUNDS = "Enable Fun Chest Sounds";
 
   public enum SecondaryReloadKey { None, Left, Right }
   internal static SecondaryReloadKey _SecondaryReload = SecondaryReloadKey.None;
@@ -70,6 +71,7 @@ public static class CwaffConfig
 
     _Gunfig.AddToggle(_SPICE_SHADERS, enabled: true, callback: OnSpiceShadersChanged); //BUG: gunfig doesn't set the new value until AFTER the callback is called
     _Gunfig.AddToggle(_BULLET_HELL_SHADERS, enabled: true, callback: OnBulletHellShadersChanged); //BUG: gunfig doesn't set the new value until AFTER the callback is called
+    _Gunfig.AddToggle(_FUN_CHEST_SOUNDS, enabled: false);
 
     // Make sure our initial keybind preferences are set up for seconday reload button
     OnSecondaryReloadChange(_SECONDARY_RELOAD, _Gunfig.Value(_SECONDARY_RELOAD));
