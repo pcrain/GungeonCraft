@@ -15,6 +15,7 @@
 - Fixed Femtobyte being able to pick up used Gun Munchers
 - Fixed several of [REDACTED]'s attacks being FPS-dependent
 - Fixed HeartBreaker being unable to pick up hearts in secret rooms
+- Allowed Femtobyte to pick up Heart Dispensers
 
 ## 1.28.2 (2025-10-14)
 

@@ -94,6 +94,8 @@ public class Femtobyte : CwaffGun
                                                      .AttachedInjectionData[2].InjectionData[0].exactRoom.placedObjects[11].nonenemyBehaviour.gameObject) },
         {"npc_gunbermuncher_evil",                 new("npc_gunbermuncher_evil", "Evil Muncher", GameManager.Instance.GlobalInjectionData.entries[3]
                                                      .injectionData.InjectionData[5].exactRoom.placedObjects[0].nonenemyBehaviour.gameObject) },
+        {"heartdispenser",                         new("heartdispenser", "Heart Dispenser", DungeonDatabase.GetOrLoadByName("base_castle").PatternSettings.flows[0]
+                                                     .m_nodes[3].overrideExactRoom.placedObjects[2].nonenemyBehaviour.gameObject) },
 
         // Traps
         {"trap_sawblade_omni_gungeon_2x2",         new("trap_sawblade_omni_gungeon_2x2", "Sawblade", ExoticObjects.SawBlade) },
