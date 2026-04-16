@@ -892,11 +892,12 @@ public partial class CwaffVFX // public
     /// <param name="spriteCol">The sprite collection to use if not passing a prefab.</param>
     /// <param name="spriteId">The sprite id to use if not passing a prefab.</param>
     /// <param name="animator">The animator to use if not passing a prefab.</param>
+    /// <param name="unoccluded">If true, sprite is rendered on the unoccluded layer.</param>
     public static void Spawn(GameObject prefab = null, Vector3 position = default, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null,
         bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1,
         bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f,
-        tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null)
+        tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null, bool unoccluded = false)
     {
         if (_DespawnedVFX.Count == 0)
         {
@@ -930,7 +931,8 @@ public partial class CwaffVFX // public
             emitColorPower  : emitColorPower,
             spriteCol       : spriteCol,
             spriteId        : spriteId,
-            animator        : animator
+            animator        : animator,
+            unoccluded      : unoccluded
             );
     }
 
@@ -974,19 +976,27 @@ public partial class CwaffVFX // public
     /// <param name="spriteCol">The sprite collection to use if not passing a prefab.</param>
     /// <param name="spriteId">The sprite id to use if not passing a prefab.</param>
     /// <param name="lifetimeVariance">Adds up to this much time at random to individual particles.</param>
+    /// <param name="minVariance">If positionVariance is set, positionVariance will be at least minVariance.</param>
+    /// <param name="unoccluded">If true, sprite is rendered on the unoccluded layer.</param>
     public static void SpawnBurst(GameObject prefab = null, int numToSpawn = 1, Vector2 basePosition = default, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false,
         bool uniform = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false,
-        Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f, float spread = 0f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, float lifetimeVariance = 0f)
+        Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f, float spread = 0f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, float lifetimeVariance = 0f,
+        float minVariance = 0f, bool unoccluded = false)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
         for (int i = 0; i < numToSpawn; ++i)
         {
             float posOffsetAngle = uniform ? (baseAngle + 360f * ((float)i / numToSpawn)).Clamp360() : Lazy.RandomAngle();
-            Vector2 finalpos = (positionVariance > 0)
-                ? basePosition + posOffsetAngle.ToVector((uniform ? 1f : UnityEngine.Random.value) * positionVariance)
-                : basePosition;
+            Vector2 finalpos = basePosition;
+            if (positionVariance > 0)
+            {
+                if (uniform) // REFACTOR: uniform currently affects both angle and position -> refactor position uniformity to just use minVariance
+                    finalpos += posOffsetAngle.ToVector(positionVariance);
+                else
+                    finalpos += posOffsetAngle.ToVector(UnityEngine.Random.Range(minVariance, positionVariance));
+            }
             Vector2 velocity = velType switch {
                 Vel.Random       => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
                 Vel.Radial       => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
@@ -1005,25 +1015,26 @@ public partial class CwaffVFX // public
                 _            => Quaternion.identity,
                 };
             CwaffVFX.Spawn(
-                prefab        : prefab,
-                position      : finalpos,
-                rotation      : rot,
-                velocity      : velocity,
-                lifetime      : lifetime + lifetimeVariance * UnityEngine.Random.value,
-                fadeIn        : fadeIn,
-                fadeOutTime   : fadeOutTime,
-                emissivePower : emissivePower,
-                emissiveColor : emissiveColor,
-                startScale    : startScale,
-                endScale      : endScale,
-                height        : height,
-                randomFrame   : randomFrame,
-                specificFrame : specificFrame,
-                anchorTransform: anchorTransform,
-                overrideColor : overrideColor,
-                emitColorPower : emitColorPower,
+                prefab          : prefab,
+                position        : finalpos,
+                rotation        : rot,
+                velocity        : velocity,
+                lifetime        : lifetime + lifetimeVariance * UnityEngine.Random.value,
+                fadeIn          : fadeIn,
+                fadeOutTime     : fadeOutTime,
+                emissivePower   : emissivePower,
+                emissiveColor   : emissiveColor,
+                startScale      : startScale,
+                endScale        : endScale,
+                height          : height,
+                randomFrame     : randomFrame,
+                specificFrame   : specificFrame,
+                anchorTransform : anchorTransform,
+                overrideColor   : overrideColor,
+                emitColorPower  : emitColorPower,
                 spriteCol       : spriteCol,
-                spriteId        : spriteId
+                spriteId        : spriteId,
+                unoccluded      : unoccluded
                 );
         }
     }
@@ -1169,10 +1180,15 @@ public partial class CwaffVFX // private
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null,
         bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null,
-        float emitColorPower = 1.55f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null)
+        float emitColorPower = 1.55f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null, bool unoccluded = false)
     {
         this._shouldDespawn = false;
         this._vfx.SetActive(true);
+
+        if (unoccluded)
+            this._vfx.SetLayerRecursively(23); // unoccluded
+        else
+            this._vfx.SetLayerRecursively(22); // FG_CRITICAL
 
         Transform t = this._vfx.transform;
         t.position = position;

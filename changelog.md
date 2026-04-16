@@ -9,7 +9,7 @@
 - Added config toggle for Bullet Hell shaders
 - Added config toggle for fun chest sounds
 - Added mod prefix to all gun ammonomicon sprites to prevent conflicts with other mods
-- 
+
 #### Bugfixes and Misc:
 
 - Fixed synergy support for [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips/?utm_source=discord) (thanks to [Ricky](https://thunderstore.io/c/enter-the-gungeon/p/Ricky2148/) and [SomeBunny](https://thunderstore.io/c/enter-the-gungeon/p/TeamPlanetside/) for help figuring this out!)
@@ -18,13 +18,13 @@
 - Fixed custom characters with pasts not being able to access their pasts due to automatically being taken to [REDACTED]
 - Fixed characters with no past being able to access [REDACTED] before beating the Lich
 - Fixed several of [REDACTED]'s attacks being FPS-dependent
-- Fixed null derefs caused by Subtract Beam attempting to reuse stale health labels after switching floors
+- Fixed null derefs caused by Subtractor Beam attempting to reuse stale health labels after switching floors
 - Fixed null deref caused by Xelsior trying to obtain properties of non-existent guns on the floor
 - Fixed null deref caused by Library Cardtridge trying to read items from nonexistent shops when dropped
 - Fixed lighting and crawling animations (that I apparently never added in the first place) on Widowmaker's spider drones
 - Fixed player being able to use Emergency Siren after firing beam weapons
 - Fixed Femtobyte being able to pick up used Gun Munchers
-- Fixed HeartBreaker being unable to pick up hearts in secret rooms
+- Fixed Heartbreaker being unable to pick up hearts in secret rooms
 - Fixed silhouette of mastered Ki Blast being visible when picked up
 - Fixed placeholder typo in Hatchling Gun's description
 
