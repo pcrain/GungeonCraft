@@ -382,4 +382,5 @@ clocktowers,3.0,0,music,0
 armistice_defeat_teleport_sound,-3.0,1,sound,1
 trample_sound,2.5,1,sound,2
 mana_detonate,10.0,1,sound,0
-entropynnium_charge_sound,5.0,1,sound,0
+entropynnium_charge_sound,3.0,1,sound,0
+mana_gather,-4.0,1,sound,0

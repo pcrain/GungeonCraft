@@ -3712,5 +3712,31 @@ public static class Extensions
       foreach (var frame in clip.frames)
           frame.spriteCollection.spriteDefinitions[frame.spriteId].ShiftBy(offset);
   }
+
+  /// <summary>Gradually fade out a sprite object over time</summary>
+  public static IEnumerator PhaseOut(this tk2dBaseSprite sprite, Vector2 direction, float amplitude, float frequency, float lifetime)
+  {
+      Material mat = sprite.renderer.material;
+      for (float elapsed = 0f; elapsed < lifetime; elapsed += BraveTime.DeltaTime)
+      {
+          mat.SetFloat("_Fade", 1f - elapsed / lifetime);
+          sprite.transform.position += ((amplitude * Mathf.Sin(frequency * elapsed) * BraveTime.DeltaTime) * direction).ToVector3ZUp(0f);
+          yield return null;
+      }
+      UnityEngine.Object.Destroy(sprite.gameObject);
+      yield break;
+  }
+
+  /// <summary>Apply a shader to a sprite with a given optional palette</summary>
+  public static void ApplyShader(this tk2dBaseSprite sprite, Shader shader, Texture2D optionalPalette = null)
+  {
+      sprite.usesOverrideMaterial = true;
+      Material mat = sprite.renderer.material;
+      mat.shader = shader;
+      bool havePalette = optionalPalette != null;
+      mat.SetFloat("_UsePalette", havePalette ? 1f : 0f);
+      if (havePalette)
+        mat.SetTexture("_PaletteTex", optionalPalette);
+  }
 }
 

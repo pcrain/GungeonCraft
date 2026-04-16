@@ -1,91 +1,91 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - handle mana / ammo banking from explosions
-    - handle mana particle effects from absorbing explosions
-    - prevent explosion re-entrancy when detonating entropynnium's own explosions
-    - make enemies glow / shimmer when being targeted for a detonation
-    - make damage force and radius scale with mana reserves
-    - make damage force and radius scale inversely with number of enemies hit
-    - add proper gun sprites
-    - add proper muzzle flash
-    - add custom ammo clip
-    - fix ammo display
-    - tweak sound volumes
-*/
-
 public class Entropynnium : CwaffGun
 {
     public static string ItemName         = "Entropynnium";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Applied Botanics";
+    public static string LongDescription  = "Passively gathers mana from explosions. Can be charged to consume mana and detonate enemies around the player. Longer charges result in a larger detonation range and more potent detonations, but consume dramatically more mana.";
+    public static string Lore             = ""; // TODO:
 
     private const int   _MAX_MANA            = 10000;
-    private const float _MAX_RADIUS          = 16;
     private const float _CHARGE_TIME         = 5;
     private const float _THICKNESS           = 0.5f;
     private const float _PARTICLE_TIMER      = 0.1f;
     private const float _SOUND_TIMER         = 0.75f;
 
+    internal const float _MAX_RADIUS         = 16;
+    internal const float _MANA_ROI           = 0.25f; // mana return on investment for detonating explosions
+    internal const float _MANA_DRAIN         = 10f; // mana drain rate, scaled by square of radius
+
     internal static GameObject _ManaParticlePrefab = null;
+    internal static GameObject _ExplosionManaPrefab = null;
     internal static ExplosionData _SmallManaExplosion = null;
 
     [SerializeField]
     private int _storedMana = 0;
 
-    [SerializeField]
-    private bool _gatheringMana = false;
-
     private float _manaRadius = 0f;
     private float _nextParticleTime = 0f;
     private float _nextSoundTime = 0f;
+    private int _manaDrainedThisCharge = 0;
 
     private Geometry _extantManaRing = null;
 
     public static void Init()
     {
         Lazy.SetupGun<Entropynnium>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.EXPLOSIVE, reloadTime: 1.5f, ammo: 720, shootFps: 30, reloadFps: 20,
-            chargeFps: 10, muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, fireAudio: "carpet_bomber_shoot_sound", smoothReload: 0.1f,
-            attacksThroughWalls: true, canGainAmmo: false, canReloadNoMatterAmmo: true)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.EXPLOSIVE, reloadTime: 0.0f, ammo: 720, shootFps: 20,
+            chargeFps: 20, muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter,
+            attacksThroughWalls: true, canGainAmmo: false, canReloadNoMatterAmmo: true, infiniteAmmo: true)
           .Attach<EntropynniumAmmoDisplay>()
           .AssignGun(out Gun gun)
-          .InitSpecialProjectile<ManaExplosionProjectile>(GunData.New(clipSize: -1, cooldown: 0.15f, damage: 20f,
-            shootStyle: ShootStyle.Charged, range: 9999f, sequenceStyle: ProjectileSequenceStyle.Ordered, invisibleProjectile: true)) //TODO: add custom ammo clip
+          .InitSpecialProjectile<ManaExplosionProjectile>(GunData.New(clipSize: -1, cooldown: 0.15f, damage: 25f, hideAmmo: true,
+            shootStyle: ShootStyle.Charged, range: 9999f, sequenceStyle: ProjectileSequenceStyle.Ordered, invisibleProjectile: true))
           .SetupChargeProjectiles(gun.DefaultModule, 1, (i, p) => new() {
             Projectile = p.Clone(GunData.New(speed: 40f + 20f * i)),
-            ChargeTime = 1.0f });
+            ChargeTime = 0.5f });
 
         _ManaParticlePrefab = VFX.Create("mana_particle", fps: 30);
 
         _SmallManaExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData.Clone();
         _SmallManaExplosion.damageToPlayer = 0f;
+
+        _ExplosionManaPrefab = _ManaParticlePrefab.ClonePrefab();
+        _ExplosionManaPrefab.AddComponent<ExplosionMana>();
     }
 
     public override void Update()
     {
         base.Update();
+        gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, 5f + 10f * Mathf.Abs(Mathf.Sin(BraveTime.ScaledTimeSinceStartup)));
         UpdateDetonationRing();
     }
 
-    private void GatherManaFromExplosion(Vector3 position, ExplosionData data, Vector2 sourceNormal)
+    internal void UpdateMana(int mana)
     {
-        //TODO: call from patch
+        this._storedMana = Mathf.Min(this._storedMana + mana, _MAX_MANA);
     }
 
     private void UpdateDetonationRing()
     {
-        if (!this.gun.IsCharging)
+        const float MIN_MANA_COST = _THICKNESS * _THICKNESS * _MANA_DRAIN;
+        if (!this.gun.IsCharging || (this._manaDrainedThisCharge == 0 && this._storedMana < MIN_MANA_COST))
         {
             DestroyDetonationRing();
+            this._manaDrainedThisCharge = 0;
             return;
         }
-        this._manaRadius += (_MAX_RADIUS / _CHARGE_TIME) * BraveTime.DeltaTime;
+        float dtime = BraveTime.DeltaTime;
+        float newRadius = Mathf.Min(this._manaRadius + (_MAX_RADIUS / _CHARGE_TIME) * dtime, _MAX_RADIUS);
+        int manaCost = Mathf.CeilToInt(newRadius * newRadius * _MANA_DRAIN) - this._manaDrainedThisCharge;
+        if (manaCost <= this._storedMana)
+        {
+            this._storedMana -= manaCost;
+            this._manaDrainedThisCharge += manaCost;
+            this._manaRadius = newRadius;
+        }
         if (this._manaRadius < _THICKNESS)
             return;
-        if (this._manaRadius > _MAX_RADIUS)
-            this._manaRadius = _MAX_RADIUS;
 
         if (!this._extantManaRing)
             this._extantManaRing = new GameObject("mana_ring").AddComponent<Geometry>();
@@ -105,15 +105,18 @@ public class Entropynnium : CwaffGun
         if (this._nextParticleTime < now)
         {
             this._nextParticleTime = now + _PARTICLE_TIMER;
+            float particleLifetime = 0.25f * Mathf.Sqrt(this._manaRadius);
+            // float effectiveRadius = FancyMathSoParticlesAreSynedWithRing(this._manaRadius - _THICKNESS, particleLifetime);
+            float effectiveRadius = this._manaRadius + (_MAX_RADIUS / _CHARGE_TIME) * particleLifetime;
             CwaffVFX.SpawnBurst(
                 prefab           : _ManaParticlePrefab,
                 numToSpawn       : 16,
                 basePosition     : ppos,
-                positionVariance : this._manaRadius,
-                minVariance      : this._manaRadius - _THICKNESS,
-                velType          : CwaffVFX.Vel.InwardToCenter,
+                positionVariance : effectiveRadius,
+                minVariance      : effectiveRadius - _THICKNESS,
+                velType          : CwaffVFX.Vel.OutwardFromCenter,
                 rotType          : CwaffVFX.Rot.Random,
-                lifetime         : 0.25f * Mathf.Sqrt(this._manaRadius),
+                lifetime         : particleLifetime,
                 startScale       : 0.6f,
                 endScale         : 0.2f,
                 emissivePower    : 100f,
@@ -121,6 +124,14 @@ public class Entropynnium : CwaffGun
                 anchorTransform  : gunTransform,
                 unoccluded       : true
               );
+            foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(ppos, this._manaRadius, ignoreWalls: true))
+            {
+                if (!enemy || !enemy.isActiveAndEnabled || enemy.healthHaver is not HealthHaver hh || !hh.IsAlive)
+                    continue;
+                tk2dBaseSprite dupe = enemy.DuplicateInWorld(copyShader: false);
+                dupe.ApplyShader(CwaffShaders.WiggleShader, enemy.optionalPalette);
+                dupe.StartCoroutine(dupe.PhaseOut(Lazy.RandomVector(), 32f, 200f, 0.75f));
+            }
         }
     }
 
@@ -139,14 +150,22 @@ public class Entropynnium : CwaffGun
         DestroyDetonationRing();
     }
 
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        CustomActions.OnExplosionComplex += HandleExplosion;
+    }
+
     public override void OnDroppedByPlayer(PlayerController player)
     {
-        base.OnDroppedByPlayer(player);
+        CustomActions.OnExplosionComplex -= HandleExplosion;
         DestroyDetonationRing();
+        base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
+        CustomActions.OnExplosionComplex -= HandleExplosion;
         DestroyDetonationRing();
         base.OnDestroy();
     }
@@ -156,31 +175,16 @@ public class Entropynnium : CwaffGun
         base.PostProcessProjectile(projectile);
         if (projectile is not ManaExplosionProjectile mep)
             return;
-        mep.Setup(radius: this._manaRadius, damageMult: Mathf.Sqrt(this._manaRadius), forceMult: 1f);
+        mep.Setup(radius: this._manaRadius, forceMult: 1f);
         DestroyDetonationRing();
-    }
-
-    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
-    {
-        base.OnReloadPressed(player, gun, manualReload);
-        if (!player.IsDodgeRolling && player.AcceptingNonMotionInput)
-            ToggleManaGathering();
-    }
-
-    private void ToggleManaGathering()
-    {
-        this._gatheringMana = !this._gatheringMana;
-    }
-
-    private void DetonateMana()
-    {
-
     }
 
     private class EntropynniumAmmoDisplay : CustomAmmoDisplay
     {
         private Entropynnium _ent;
         private PlayerController _owner;
+
+        private static readonly Color _AmmoLabelColor = Color.Lerp(ExtendedColours.purple, Color.white, 0.5f);
 
         private void Start()
         {
@@ -194,24 +198,146 @@ public class Entropynnium : CwaffGun
             if (!this._owner)
                 return false;
 
-            uic.GunAmmoCountLabel.Text = $"[sprite \"vacuum_debris_ui\"]x{this._ent._storedMana}";
+            uic.SetAmmoCountLabelColor(_AmmoLabelColor);
+            uic.GunAmmoCountLabel.Text = $"[sprite \"mana_ui\"]{this._ent._storedMana}";
             return true;
         }
+    }
+
+    private void HandleExplosion(Vector3 position, ExplosionData data, Vector2 dir, Action onbegin, bool ignoreQueues, CoreDamageTypes damagetypes, bool ignoreDamageCaps)
+    {
+        const float MANA_PARTICLE_SPEED = 15f;
+        if (this.PlayerOwner is not PlayerController player)
+            return;
+
+        float damage = data.damage;
+        float radius = data.GetDefinedDamageRadius();
+        int mana = Mathf.CeilToInt(_MANA_ROI * damage * radius * radius);
+        while (mana > 0)
+        {
+            ExplosionMana manaParticle = UnityEngine.Object.Instantiate(_ExplosionManaPrefab, position, Quaternion.identity).GetComponent<ExplosionMana>();
+            if (mana > 25)
+            {
+                mana -= 25;
+                manaParticle.Setup(this, player, 25, 1.0f, Lazy.RandomVector(MANA_PARTICLE_SPEED));
+            }
+            else if (mana > 5)
+            {
+                mana -= 5;
+                manaParticle.Setup(this, player, 5, 0.5f, Lazy.RandomVector(MANA_PARTICLE_SPEED));
+            }
+            else
+            {
+                mana -= 1;
+                manaParticle.Setup(this, player, 1, 0.25f, Lazy.RandomVector(MANA_PARTICLE_SPEED));
+            }
+        }
+    }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+        base.MidGameSerialize(data, i);
+        data.Add(this._storedMana);
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+        base.MidGameDeserialize(data, ref i);
+        this._storedMana = ((int)data[i++]);
+    }
+}
+
+public class ExplosionMana : MonoBehaviour
+{
+    private const float _MAX_RADIUS     = 1f;
+    private const float _MAX_SQR_RADIUS = _MAX_RADIUS * _MAX_RADIUS;
+    private const float _MAX_SPEED      = 50f;
+    private const float _MAX_SPEED_SQR  = _MAX_SPEED * _MAX_SPEED;
+    private const float _BOB_SPEED      = 2f;
+    private const float _BOB_HEIGHT     = 0.30f;
+    private const float _HOME_ACCEL     = 4.0f;
+    private  const float _FRICTION      = 0.96f;
+
+    private Entropynnium _gun       = null;
+    private PlayerController _owner = null;
+    private int _mana               = 1;
+    private float _homeStrength     = 0f;
+    private bool _setup             = false;
+    private Vector2 _velocity       = default;
+    private Vector3 _basePos        = default;
+
+    public void Setup(Entropynnium gun, PlayerController owner, int mana, float scale, Vector2 velocity)
+    {
+        this._gun      = gun;
+        this._owner    = owner;
+        this._mana     = mana;
+        this._setup    = true;
+        this._velocity = velocity;
+        this._basePos  = base.transform.position;
+        tk2dBaseSprite sprite = base.gameObject.GetComponent<tk2dBaseSprite>();
+        sprite.scale = new Vector3(scale, scale, 1f);
+        sprite.SetGlowiness(100f, glowColor: ExtendedColours.purple);
+    }
+
+    private void Update()
+    {
+        if (!this._setup)
+            return;
+        if (!this._owner)
+        {
+            UnityEngine.Object.Destroy(base.gameObject);
+            return;
+        }
+        Vector2 pos = base.transform.position;
+        Vector2 opos = this._owner.CenterPosition;
+        Vector2 pdelta = (opos - pos);
+        float sqrMag = pdelta.sqrMagnitude;
+        if (sqrMag < _MAX_SQR_RADIUS)
+        {
+            if (this._gun)
+            {
+                this._gun.UpdateMana(this._mana);
+                this._gun.gameObject.PlayOnce("mana_gather");
+            }
+            CwaffVFX.SpawnBurst(
+                prefab           : Entropynnium._ManaParticlePrefab,
+                numToSpawn       : 4,
+                basePosition     : opos,
+                positionVariance : 1.0f,
+                minVariance      : 0.5f,
+                minVelocity      : 2f,
+                velocityVariance : 2f,
+                velType          : CwaffVFX.Vel.AwayRadial,
+                rotType          : CwaffVFX.Rot.Random,
+                lifetime         : 0.2f,
+                startScale       : 0.5f,
+                endScale         : 0.2f,
+                emissivePower    : 100f,
+                emissiveColor    : ExtendedColours.purple
+              );
+            UnityEngine.Object.Destroy(base.gameObject);
+            return;
+        }
+
+        float dtime = BraveTime.DeltaTime;
+        Vector2 deltaNorm = pdelta.normalized;
+        this._homeStrength += _HOME_ACCEL * dtime;
+        this._velocity = Lazy.SmoothestLerp(this._velocity, Mathf.Clamp(sqrMag, 10f * this._homeStrength, 50f) * deltaNorm, _homeStrength);
+        this._basePos += (this._velocity * dtime).ToVector3ZUp();
+        base.transform.position = this._basePos.HoverAt(amplitude: _BOB_HEIGHT, frequency: _BOB_SPEED);
     }
 }
 
 public class ManaExplosionProjectile : Projectile
 {
     private float _radius = 0f;
-    private float _damageMult = 0f;
     private float _forceMult = 0f;
 
     internal static GameObject _ExplosionPrefab = null;
 
-    public void Setup(float radius, float damageMult, float forceMult)
+    public void Setup(float radius, float forceMult)
     {
         this._radius = radius;
-        this._damageMult = damageMult;
         this._forceMult = forceMult;
     }
 
@@ -230,12 +356,11 @@ public class ManaExplosionProjectile : Projectile
 
     private void Detonate()
     {
-        if (this._damageMult == 0f || this._radius == 0f)
-            return; // nothing to do, just die instantly
-        if (this.Owner is not PlayerController player)
+        if (this._radius == 0f || this.Owner is not PlayerController player)
             return; // nothing to do, just die instantly
 
-        float damage = this.baseData.damage * this._damageMult;
+        float potency = Mathf.Min(this._radius / (0.67f * Entropynnium._MAX_RADIUS), 1f); // allow it to reach max potency at 2/3 max radius
+        float damage = this.baseData.damage * Mathf.Sqrt(this._radius);
         float force = damage * this._forceMult;
         Vector2 ppos = this.m_transform.position;
 
@@ -243,36 +368,36 @@ public class ManaExplosionProjectile : Projectile
         boom.damage = damage;
         boom.force = force;
 
-        // Lazy.DebugLog($"TODO: detonating with radius {this._radius}, damage {damage}, force {force}");
         bool anythingDetonated = false;
         foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(ppos, this._radius, ignoreWalls: true))
         {
-            if (enemy && enemy.isActiveAndEnabled && enemy.healthHaver is HealthHaver hh && hh.IsAlive)
-            {
-                Exploder.Explode(
-                    position     : enemy.CenterPosition,
-                    data         : boom,
-                    sourceNormal : Vector2.zero,
-                    ignoreQueues : true);
-                CwaffVFX.SpawnBurst(
-                    prefab           : Entropynnium._ManaParticlePrefab,
-                    numToSpawn       : 32,
-                    basePosition     : enemy.CenterPosition,
-                    positionVariance : 1.0f,
-                    minVariance      : 0.5f,
-                    minVelocity      : 8f,
-                    velocityVariance : 4f,
-                    velType          : CwaffVFX.Vel.AwayRadial,
-                    rotType          : CwaffVFX.Rot.Random,
-                    lifetime         : 0.4f,
-                    startScale       : 0.6f,
-                    endScale         : 0.2f,
-                    emissivePower    : 100f,
-                    emissiveColor    : ExtendedColours.purple,
-                    height           : 8f
-                  );
-                anythingDetonated = true;
-            }
+            if (!enemy || !enemy.isActiveAndEnabled || enemy.healthHaver is not HealthHaver hh || !hh.IsAlive)
+                continue;
+            boom.damage = Mathf.Max(damage, hh.AdjustedMaxHealth * potency * ((hh.IsBoss || hh.IsSubboss) ? 0.5f : 1.0f));
+            Exploder.Explode(
+                position         : enemy.CenterPosition,
+                data             : boom,
+                sourceNormal     : Vector2.zero,
+                ignoreQueues     : true,
+                ignoreDamageCaps : true);
+            CwaffVFX.SpawnBurst(
+                prefab           : Entropynnium._ManaParticlePrefab,
+                numToSpawn       : 32,
+                basePosition     : enemy.CenterPosition,
+                positionVariance : 1.0f,
+                minVariance      : 0.5f,
+                minVelocity      : 8f,
+                velocityVariance : 4f,
+                velType          : CwaffVFX.Vel.AwayRadial,
+                rotType          : CwaffVFX.Rot.Random,
+                lifetime         : 0.4f,
+                startScale       : 0.6f,
+                endScale         : 0.2f,
+                emissivePower    : 100f,
+                emissiveColor    : ExtendedColours.purple,
+                height           : 8f
+              );
+            anythingDetonated = true;
         }
         if (anythingDetonated)
             base.gameObject.Play("mana_detonate");

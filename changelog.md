@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.29.0 (TBD)
+
+- Added Entropynnium
+
 ## 1.28.3 (2026-03-15)
 
 #### Balance Changes and Polish:

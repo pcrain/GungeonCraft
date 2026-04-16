@@ -206,7 +206,7 @@ public class SchrodingersStat : MonoBehaviour
 
             this._flickerTimer = 0f;
             tk2dBaseSprite dupe = this._enemy.DuplicateInWorld(copyShader: true);
-            dupe.StartCoroutine(PhaseOut(dupe, Lazy.RandomVector(), 5f, 90f, 0.5f));
+            dupe.StartCoroutine(dupe.PhaseOut(Lazy.RandomVector(), 5f, 90f, 0.5f));
         }
         if (this._enemy.sprite)
             SpriteOutlineManager.AddOutlineToSprite(this._enemy.sprite, Color.black);

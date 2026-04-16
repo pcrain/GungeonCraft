@@ -865,8 +865,10 @@ public partial class CwaffVFX // public
         Away,
         ///<summary>Base velocity is augmented by a vector away from position with magnitude of exactly velocityVariance.</summary>
         AwayRadial,
-        ///<summary>Base velocity is augmented by a vector towards position with magnitude of exactly velocityVariance.</summary>
+        ///<summary>Base velocity is augmented by a vector towards position with magnitude computed from positionVariance.</summary>
         InwardToCenter,
+        ///<summary>Base velocity is augmented by a vector away from basePosition with magnitude computed from positionVariance.</summary>
+        OutwardFromCenter,
     }
 
     /// <summary>Spawn a single FancyVFX from a normal SpawnManager.SpawnVFX</summary>
@@ -998,16 +1000,19 @@ public partial class CwaffVFX // public
                     finalpos += posOffsetAngle.ToVector(UnityEngine.Random.Range(minVariance, positionVariance));
             }
             Vector2 velocity = velType switch {
-                Vel.Random       => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
-                Vel.Radial       => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
-                Vel.Away         => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
-                Vel.AwayRadial   => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
-                Vel.InwardToCenter => realBaseVelocity - (finalpos - basePosition) / Mathf.Max(lifetime, 0.01f),
-                // Vel.InwardRadial => realBaseVelocity - posOffsetAngle.ToVector(minVelocity + velocityVariance),
-                _                => realBaseVelocity,
+                Vel.Random            => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                Vel.Radial            => realBaseVelocity + Lazy.RandomAngle().ToVector(minVelocity + velocityVariance),
+                Vel.Away              => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + UnityEngine.Random.value * velocityVariance),
+                Vel.AwayRadial        => realBaseVelocity + posOffsetAngle.ToVector(minVelocity + velocityVariance),
+                Vel.InwardToCenter    => realBaseVelocity - (finalpos - basePosition) / Mathf.Max(lifetime, 0.01f),
+                Vel.OutwardFromCenter => realBaseVelocity - (basePosition - finalpos) / Mathf.Max(lifetime, 0.01f),
+                // Vel.InwardRadial   => realBaseVelocity - posOffsetAngle.ToVector(minVelocity + velocityVariance),
+                _                     => realBaseVelocity,
             };
             if (spread > 0f)
                 velocity = 0f.AddRandomSpread(spread).EulerZ() * velocity;
+            if (velType == Vel.OutwardFromCenter)
+                finalpos = basePosition; // if we're spreading outwards, we need to start at basePosition
             Quaternion rot = rotType switch {
                 Rot.Random   => UnityEngine.Random.Range(0f,360f).EulerZ(),
                 Rot.Position => posOffsetAngle.EulerZ(),
@@ -1309,7 +1314,7 @@ public partial class CwaffVFX // private
 
         this._curLifeTime += BraveTime.DeltaTime;
         float percentDone = this._curLifeTime / this._maxLifeTime;
-        if ((this._usesLifetime && percentDone >= 1.0f)
+        if ((this._usesLifetime && percentDone > 1.0f)
             || (!this._usesLifetime && !this._animator.Paused && !this._animator.Playing))
         {
             Despawn(this); // despawn if we've lived past our liftime, or if our animator has reached the end of its animation
