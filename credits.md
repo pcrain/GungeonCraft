@@ -4,7 +4,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
 ### Code
 
-- Mostly my own, some helper classes and functions taken from [Apache Thunder](https://github.com/ApacheThunder/ExpandTheGungeon/tree/BepInEx), [Nevernamed](https://github.com/Nevernamed22/OnceMoreIntoTheBreach/tree/master), [Neighborino](https://github.com/Neighborin0/FrostAndGunfire), [Skilotar_](https://github.com/Skilotar/Knife_to_a_Gunfight/), [Some Bunny](https://github.com/Some-Bunny/Planetside), and [SpecialAPI](https://github.com/SpecialAPI/ModTheGungeonAPI).
+- Mostly my own, some helper classes and functions taken from [Apache Thunder](https://github.com/ApacheThunder/ExpandTheGungeon/tree/BepInEx), [Nevernamed](https://github.com/Nevernamed22/OnceMoreIntoTheBreach/tree/master), [Neighborino](https://github.com/Neighborin0/FrostAndGunfire), [Skilotar_](https://github.com/Skilotar/Knife_to_a_Gunfight/), [Some Bunny](https://github.com/Some-Bunny/Planetside), and [SpecialAPI](https://github.com/SpecialAPI).
 
 ### Base Gun Sprites
 
@@ -56,7 +56,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - Misc. edits combined from several sources by me: Breegull, Ki Blast, Racket Launcher, Sub Machine Gun, Ticonderogun
   
-  - Original sprites by me: Chroma, Macheening, Sunderbuss
+  - Original sprites by me: Chroma, Entropynnium, Macheening, Sunderbuss
 
   - Most gun animations are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
 
@@ -87,5 +87,5 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 - [Lynceus](https://thunderstore.io/c/enter-the-gungeon/p/Lynceus/), for generously donating time and effort to making a bunch of beautiful custom shopkeeper, clip, and projectile sprites, in addition to helping write some of the shopkeeper dialogue, beta test the mod, find a few bugs, and make the Thunderstore mod icon
 - [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/), for making [Once More Into the Breach](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/Once_More_Into_The_Breach/) and providing a very useful code base to reference as I was learning to mod Enter the Gungeon, as well as providing sprites for a few guns
 - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/), for allowing me use an absurd amount of his wonderful pixel art for most of the mod's hats as well as several guns and items
-- [ApacheThunder](https://thunderstore.io/c/enter-the-gungeon/p/ApacheThunder/), [SpecialAPI](https://thunderstore.io/c/enter-the-gungeon/p/SpecialAPI/), and [Some Bunny](https://thunderstore.io/c/enter-the-gungeon/p/TeamPlanetside/) for answering a lot of questions and troubleshooting a lot of issues related to Gungeon modding and Unity in general
+- [ApacheThunder](https://thunderstore.io/c/enter-the-gungeon/p/ApacheThunder/), [SpecialAPI](https://github.com/SpecialAPI), and [Some Bunny](https://thunderstore.io/c/enter-the-gungeon/p/TeamPlanetside/) for answering a lot of questions and troubleshooting a lot of issues related to Gungeon modding and Unity in general
 - Everyone in the Mod the Gungeon Discord, for general help, friendly chat, and moral support. You are all beautiful people and I love you all <3 :D

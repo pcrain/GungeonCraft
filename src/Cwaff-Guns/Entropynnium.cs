@@ -199,7 +199,7 @@ public class Entropynnium : CwaffGun
                 return false;
 
             uic.SetAmmoCountLabelColor(_AmmoLabelColor);
-            uic.GunAmmoCountLabel.Text = $"[sprite \"mana_ui\"]{this._ent._storedMana}";
+            uic.GunAmmoCountLabel.Text = $"{this._ent._storedMana}[sprite \"mana_ui\"]";
             return true;
         }
     }

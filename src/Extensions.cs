@@ -3738,5 +3738,25 @@ public static class Extensions
       if (havePalette)
         mat.SetTexture("_PaletteTex", optionalPalette);
   }
+
+  /// <summary>Quantize an IntVector by a given scale factor</summary>
+  public static IntVector2 QuantizeRound(this IntVector2 v, int scale)
+  {
+    return new IntVector2(
+      Mathf.RoundToInt(v.x / scale) * scale,
+      Mathf.RoundToInt(v.y / scale) * scale);
+  }
+
+  /// <summary>Quantize a Vector to a position on the tile map w.r.t. a given scale factor</summary>
+  public static IntVector2 QuantizeTileRound(this Vector2 v, int scale)
+  {
+    return v.FloorToInt().ToIntVector2().QuantizeRound(scale);
+  }
+
+  /// <summary>Invert a color componentwise, besides alpha</summary>
+  public static Color Invert(this Color c)
+  {
+    return new Color(1f - c.r, 1f - c.g, 1f - c.b, c.a);
+  }
 }
 

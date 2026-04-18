@@ -280,6 +280,7 @@ public class Initialisation : BaseUnityPlugin
                 Heartbreaker.Init();
                 Gradius.Init();
                 Entropynnium.Init();
+                Cleansweep.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
