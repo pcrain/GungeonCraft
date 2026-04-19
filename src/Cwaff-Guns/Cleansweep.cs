@@ -1,15 +1,10 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - gun animations
-    - gun sounds
-*/
-
 public class Cleansweep : CwaffGun
 {
     public static string ItemName         = "Cleansweep";
-    public static string ShortDescription = "Mine Craft";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Mine Craft?";
+    public static string LongDescription  = "First shot in every combat room deploys a Minesweeper grid for 20 ammo. Mines can be tripped by enemies, players, or Cleansweep's projectiles. Reloading with a full clip deploys a new grid for 40 ammo.";
     public static string Lore             = "TBD";
 
     private const float _MINE_EXPLOSION_DAMAGE = 100f;
@@ -20,18 +15,50 @@ public class Cleansweep : CwaffGun
     internal static ExplosionData _MineExplosion = null;
     private static float _NextResetTime = 0.0f;
 
+    private static readonly List<string> _IdleAnimations = new();
+    private static readonly List<string> _FireAnimations = new();
+
     public static void Init()
     {
         Lazy.SetupGun<Cleansweep>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 480,
-            fireAudio: "cleansweeper_shoot_sound")
-          .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.0f,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 1.05f, ammo: 440, smoothReload: 0.1f,
+            fireAudio: "cleansweep_shoot_sound")
+          .AssignGun(out Gun gun)
+          .InitProjectile(GunData.New(clipSize: 7, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.0f, customClip: true,
             sprite: "cleansweeper_projectile", fps: 12, shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false))
           .Attach<SweepProjectile>();
+
+        for (int i = 0; i < 9; ++i)
+            _IdleAnimations.Add(gun.QuickUpdateGunAnimation($"{i}_idle"));
+        for (int i = 0; i <= 6; ++i)
+        {
+            _FireAnimations.Add(gun.QuickUpdateGunAnimation($"{(i+2)}_fire", fps: 10, returnToIdle: true));
+            gun.SetGunAudio(_FireAnimations[i], "cleansweep_shoot_sound");
+        }
+        gun.SetReloadAudio("cleansweep_reload_sound", 4, 9, 14, 19, 24, 29, 34);
 
         _MineExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData.Clone();
         _MineExplosion.damage = _MINE_EXPLOSION_DAMAGE;
         _MineExplosion.damageRadius *= 0.65f;
+    }
+
+    // NOTE: called BEFORE depleting clip
+    public override void OverrideShootAnimation(ref string overrideAnimation)
+    {
+        overrideAnimation = _FireAnimations[7 - Mathf.Clamp(this.gun.ClipShotsRemaining, 1, 7)];
+    }
+
+    private void LateUpdate()
+    {
+        if (!gun.m_anim || _FireAnimations.Contains(gun.m_anim.currentClip.name))
+            return;
+
+        int clipShots = this.gun.ClipShotsRemaining;
+        gun.idleAnimation = _IdleAnimations[8 - Mathf.Min(clipShots, 7)];
+        if (gun.IsReloading)
+            gun.idleAnimation = _IdleAnimations[1];
+        else
+            gun.PlayIfExists(gun.idleAnimation, restartIfPlaying: true);
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -601,10 +628,9 @@ public class MinesweeperGame : MonoBehaviour
         }
 
         // update targeted tile
-        IntVector2 curTile = this._player.SpriteBottomCenter.XY().FloorToInt().ToIntVector2().QuantizeRound(_TS);
-        bool validTile = this._tileMap.TryGetValue(curTile, out MinesweeperTile standingTile);
-        if (validTile && !standingTile.IsFlagged) // don't reveal flagged tiles so we can safely walk over them
-            this._revealQueue.Enqueue(standingTile);
+        HandlePlayerReveals(this._player);
+        if (GameManager.Instance.GetOtherPlayer(this._player) is PlayerController otherPlayer)
+            HandlePlayerReveals(otherPlayer);
 
         int numToReveal = this._revealQueue.Count;
         float now = BraveTime.ScaledTimeSinceStartup;
@@ -616,6 +642,14 @@ public class MinesweeperGame : MonoBehaviour
         }
 
         // HandleTargetedTile(curTile); // NOTE: scrapped mechanic, projectiles now sweep tiles and tiles can no longer be flagged
+    }
+
+    private void HandlePlayerReveals(PlayerController player)
+    {
+        IntVector2 curTile = player.SpriteBottomCenter.XY().FloorToInt().ToIntVector2().QuantizeRound(_TS);
+        bool validTile = this._tileMap.TryGetValue(curTile, out MinesweeperTile standingTile);
+        if (validTile && !standingTile.IsFlagged) // don't reveal flagged tiles so we can safely walk over them
+            this._revealQueue.Enqueue(standingTile);
     }
 
     private void HandleTargetedTile(IntVector2 curTile)

@@ -198,6 +198,11 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     return true;
   }
 
+  /// <summary>Called when determining what to play for the shoot animation</summary>
+  public virtual void OverrideShootAnimation(ref string overrideAnimation)
+  {
+  }
+
   /// <summary>Called any time a gun is picked up by a player during a run</summary>
   public override void OnPlayerPickup(PlayerController player)
   {
@@ -689,7 +694,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   }
 
   //REFACTOR: i think i reinvented Gun::usesContinuousFireAnimation here ...but why???
-  /// <summary>Allow guns to not reset their shooting animation with every bullet fired</summary>
+  /// <summary>Allow guns to not reset their shooting animation with every bullet fired, and to have custom shoot animations</summary>
   [HarmonyPatch]
   private class GunShootAnimationPatch
   {
@@ -697,11 +702,19 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       [HarmonyILManipulator]
       private static void GunShootAnimationIL(ILContext il)
       {
+          // Patch 1: check for continuous fire animation
           ILCursor cursor = new ILCursor(il);
           if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcI4(1)))
             return;
           cursor.Emit(OpCodes.Ldarg_0);
           cursor.CallPrivate(typeof(GunShootAnimationPatch), nameof(CheckShouldRestartShootAnimation));
+
+          // Patch 2: allow custom shoot animations
+          cursor.Index = 0;
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdloc(0)))
+            return;
+          cursor.Emit(OpCodes.Ldarg_0);
+          cursor.CallPrivate(typeof(GunShootAnimationPatch), nameof(HandleCustomShootAnimation));
       }
 
       private static bool CheckShouldRestartShootAnimation(bool shouldRestart, Gun gun)
@@ -709,6 +722,13 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           if (gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
             return !cg.continuousFireAnimation;
           return shouldRestart;
+      }
+
+      private static string HandleCustomShootAnimation(string overrideAnimation, Gun gun)
+      {
+          if (gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
+            cg.OverrideShootAnimation(ref overrideAnimation);
+          return overrideAnimation;
       }
   }
 

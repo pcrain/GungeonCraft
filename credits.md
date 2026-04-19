@@ -54,6 +54,8 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - [Lynceus](https://thunderstore.io/c/enter-the-gungeon/p/Lynceus/): Alien Nailgun
 
+  - [SpecialAPI](https://github.com/SpecialAPI): Cleansweep
+
   - Misc. edits combined from several sources by me: Breegull, Ki Blast, Racket Launcher, Sub Machine Gun, Ticonderogun
   
   - Original sprites by me: Chroma, Entropynnium, Macheening, Sunderbuss
