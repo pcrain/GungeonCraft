@@ -102,6 +102,35 @@ public class Cleansweep : CwaffGun
         gun.LoseAmmo(_RESTART_AMMO_COST);
         MinesweeperGame.StartGame(player);
     }
+
+    [HarmonyPatch]
+    private static class CleansweepDeathPageEasterEggPatch
+    {
+        [HarmonyPatch(typeof(AmmonomiconPageRenderer), nameof(AmmonomiconPageRenderer.InitializeDeathPageRight))]
+        [HarmonyILManipulator]
+        private static void AmmonomiconPageRendererInitializeDeathPageRightPatchIL(ILContext il)
+        {
+            ILCursor cursor = new ILCursor(il);
+            if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<Gun>("get_DefaultSpriteID")))
+                return;
+
+            cursor.Emit(OpCodes.Ldloc_S, (byte)8); // Gun
+            cursor.Emit(OpCodes.Ldarg_0); // AmmonomiconPageRenderer
+            cursor.CallPrivate(typeof(CleansweepDeathPageEasterEggPatch), nameof(CleanSweepEasterEggSprite));
+        }
+
+        private static int CleanSweepEasterEggSprite(int curSpriteId, Gun gun, AmmonomiconPageRenderer apr)
+        {
+            if (gun.gameObject.GetComponent<Cleansweep>() is not Cleansweep cs)
+                return curSpriteId;
+            if (!apr.guiManager || apr.guiManager.GetComponent<AmmonomiconDeathPageController>() is not AmmonomiconDeathPageController adpc)
+                return curSpriteId;
+            if (adpc.isVictoryPage)
+                return gun.GetSprite().Collection.spriteNameLookupDict["cleansweep_special_victory"];
+            else
+                return gun.GetSprite().Collection.spriteNameLookupDict["cleansweep_special_defeat"];
+        }
+    }
 }
 
 public class SweepProjectile : MonoBehaviour
