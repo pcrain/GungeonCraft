@@ -1,9 +1,6 @@
-﻿namespace CwaffingTheGungy;
+namespace CwaffingTheGungy;
 
 /* TODO:
-    - make projectiles reveal unrevealed tiles and explode when revealing mines
-
-    - better actual projectiles
     - gun animations
     - gun sounds
 */
@@ -15,9 +12,10 @@ public class Cleansweep : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
-    private const float _MINE_EXPLOSION_DAMAGE = 250f;
-    private const int _GAME_AMMO_COST = 20;
-    private const float _RESET_DELAY = 1.0f; // minimum time between being allowed to reset the minesweeper grid in a room
+    private const float _MINE_EXPLOSION_DAMAGE = 100f;
+    private const int _GAME_AMMO_COST          = 20;
+    private const int _RESTART_AMMO_COST       = 40;
+    private const float _RESET_DELAY           = 1.0f; // minimum time between being allowed to reset the minesweeper grid in a room
 
     internal static ExplosionData _MineExplosion = null;
     private static float _NextResetTime = 0.0f;
@@ -25,12 +23,15 @@ public class Cleansweep : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Cleansweep>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 480)
-          // .Attach<CleansweepAmmoDisplay>()
-          .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.0f));
+          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 480,
+            fireAudio: "cleansweeper_shoot_sound")
+          .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.28f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.0f,
+            sprite: "cleansweeper_projectile", fps: 12, shouldRotate: false, shouldFlipHorizontally: false, shouldFlipVertically: false))
+          .Attach<SweepProjectile>();
 
         _MineExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData.Clone();
         _MineExplosion.damage = _MINE_EXPLOSION_DAMAGE;
+        _MineExplosion.damageRadius *= 0.65f;
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -54,32 +55,49 @@ public class Cleansweep : CwaffGun
 
     private void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (!player || player.CurrentGun != this.gun)
+        if (!player || !player.IsInCombat || player.CurrentGun != gun || gun.CurrentAmmo < _GAME_AMMO_COST || MinesweeperGame.IsGameActive)
             return; // inactive, do normal firing stuff
-        if (!MinesweeperGame.IsGameActive)
-        {
-            if (player.IsInCombat && gun.CurrentAmmo >= _GAME_AMMO_COST)
-            {
-                gun.LoseAmmo(_GAME_AMMO_COST);
-                MinesweeperGame.StartGame(player); // activate the Minesweeper game
-                player.SuppressThisClick = true;
-            }
-            return; // inactive, do normal firing stuff
-        }
-        if (MinesweeperGame.FlagTarget())
-            player.SuppressThisClick = true;
+
+        gun.LoseAmmo(_GAME_AMMO_COST);
+        MinesweeperGame.StartGame(player); // activate the Minesweeper game
+        _NextResetTime = BraveTime.ScaledTimeSinceStartup + _RESET_DELAY;
+        player.SuppressThisClick = true;
     }
 
     public override void OnFullClipReload(PlayerController player, Gun gun)
     {
-        if (!MinesweeperGame.IsGameActive || !player.IsInCombat || gun.CurrentAmmo < _GAME_AMMO_COST)
+        if (!MinesweeperGame.IsGameActive || !player.IsInCombat || gun.CurrentAmmo < _RESTART_AMMO_COST)
             return;
         float now = BraveTime.ScaledTimeSinceStartup;
         if (now < _NextResetTime)
             return;
         _NextResetTime = now + _RESET_DELAY;
-        gun.LoseAmmo(_GAME_AMMO_COST);
+        gun.LoseAmmo(_RESTART_AMMO_COST);
         MinesweeperGame.StartGame(player);
+    }
+}
+
+public class SweepProjectile : MonoBehaviour
+{
+    private Projectile _projectile;
+    private PlayerController _owner;
+    private void Start()
+    {
+        this._projectile = base.GetComponent<Projectile>();
+        this._owner = this._projectile.Owner as PlayerController;
+    }
+
+    private void Update()
+    {
+        if (!this._projectile)
+            return;
+        if (MinesweeperGame.TileAtPosition(this._projectile.SafeCenter) is not MinesweeperTile tile)
+            return;
+        if (tile.IsRevealed)
+            return;
+        tile.Reveal(detonateMines: true, playSounds: true);
+        if (tile.IsMine)
+            this._projectile.DieInAir();
     }
 }
 
@@ -136,10 +154,51 @@ public class MinesweeperTile : MonoBehaviour
         base.gameObject.PlayOnce("minesweeper_place_sound");
     }
 
+    private static LinkedList<MinesweeperTile> _InactiveTiles = new();
+    private static LinkedList<MinesweeperTile> _ActiveTiles = new();
+    // private static int _Counter = 0;
+
+    private static MinesweeperTile Rent()
+    {
+        if (_InactiveTiles.Count == 0)
+            _InactiveTiles.AddLast(new LinkedListNode<MinesweeperTile>(null));
+        LinkedListNode<MinesweeperTile> node = _InactiveTiles.Last;
+        _InactiveTiles.RemoveLast();
+        if (!node.Value)
+        {
+            MinesweeperTile newTile = new GameObject("minesweeper tile").AddComponent<MinesweeperTile>();
+            newTile._square         = new GameObject("minesweeper tile square").AddComponent<Geometry>();
+            newTile._numberLabel    = CwaffLabel.MakeNewLabel(unicode: false, outline: false);
+            node.Value              = newTile;
+            // Lazy.DebugLog($"created node number {(++_Counter)}");
+        }
+        MinesweeperTile tile = node.Value;
+        node.Value = null;
+        _ActiveTiles.AddLast(node);
+        return tile;
+    }
+
+    public void Return()
+    {
+        this._setup = false;
+        if (this._numberLabel)
+        {
+            this._numberLabel.IsVisible = false;
+            this._numberLabel.Opacity = 0.0f;
+        }
+        LinkedListNode<MinesweeperTile> node = _ActiveTiles.Last;
+        _ActiveTiles.RemoveLast();
+        node.Value = this;
+        _InactiveTiles.AddLast(node);
+    }
+
     public static MinesweeperTile Setup(IntVector2 pos, int number)
     {
-        MinesweeperTile tile                = new GameObject("minesweeper tile").AddComponent<MinesweeperTile>();
-        tile._square                        = new GameObject("minesweeper tile square").AddComponent<Geometry>();
+        MinesweeperTile tile                = Rent();
+        tile._lifetime                      = 0.0f;
+        tile._isTargeted                    = false;
+        tile._revealed                      = false;
+        tile._flagged                       = false;
         tile._pos                           = pos;
         tile._tl                            = pos.ToVector2();
         tile._center                        = tile._tl + new Vector2(0.5f * _TS, 0.5f * _TS);
@@ -147,9 +206,8 @@ public class MinesweeperTile : MonoBehaviour
         tile._labelPos                      = tile._tl + new Vector2(_TS * 0.6f, _TS * 0.3f);
         tile._color                         = (number < 0) ? Color.red : _NumberColors[0];
         tile._number                        = number;
-        tile._numberLabel                   = CwaffLabel.MakeNewLabel(unicode: false, outline: false);
         tile._numberLabel.Text              = (number <= 0) ? string.Empty : $"{number}";
-        tile._numberLabel.TextScale         = tile._numberLabel.TextScale * _TS;
+        tile._numberLabel.TextScale         = 0.5f * _TS;
         tile._numberLabel.Color             = (number < 0) ? Color.magenta : _NumberColors[number];
         tile._numberLabel.Opacity           = 0.0f;
         tile._numberLabel.TextAlignment     = TextAlignment.Center; // NOTE: seems to have no effect ):
@@ -228,8 +286,8 @@ public class MinesweeperGame : MonoBehaviour
     private const int _SAFETY_BUFFER = 2;
     private const float SPAWN_DELAY  = 0.10f;
     private const float SETUP_DELAY  = 0.05f;
-    private const float _MINE_CHANCE = 0.2f;
-    private const int ITER_DELAY     = 4; // number of iterations to delay revealing tiles after initial population
+    private const float _MINE_CHANCE = 0.16f;
+    private const int ITER_DELAY     = 5; // number of iterations to delay revealing tiles after initial population
     private const float DISMISS_TIME = 1.0f;
 
     internal const int _TS           = 2; // tile scale -> number of game tiles per side corresponding to one minesweeper tile
@@ -321,7 +379,7 @@ public class MinesweeperGame : MonoBehaviour
         for (int i = this._tiles.Count - 1; i >= 0; --i)
         {
             if (this._tiles[i])
-                UnityEngine.Object.Destroy(this._tiles[i].gameObject);
+                this._tiles[i].Return();
         }
         this._tiles.Clear();
         if (this._spawner != null)
@@ -488,6 +546,15 @@ public class MinesweeperGame : MonoBehaviour
         }
     }
 
+    public static MinesweeperTile TileAtPosition(Vector2 pos)
+    {
+        if (!_Game || _Game._tileMap == null)
+            return null;
+        if (_Game._tileMap.TryGetValue(pos.QuantizeTileRound(_TS), out MinesweeperTile tile))
+            return tile;
+        return null;
+    }
+
     private void LateUpdate()
     {
         if (!this._setup)
@@ -548,6 +615,11 @@ public class MinesweeperGame : MonoBehaviour
             this._nextRevealTime = now + SPAWN_DELAY;
         }
 
+        // HandleTargetedTile(curTile); // NOTE: scrapped mechanic, projectiles now sweep tiles and tiles can no longer be flagged
+    }
+
+    private void HandleTargetedTile(IntVector2 curTile)
+    {
         float aimAngle;
         if (!this._player.IsKeyboardAndMouse())  //WARNING: this has caused a null dereference, but not sure how
           aimAngle = this._player.m_activeActions.Aim.Vector.ToAngle();

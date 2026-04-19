@@ -385,3 +385,4 @@ mana_detonate,10.0,1,sound,0
 entropynnium_charge_sound,3.0,1,sound,0
 mana_gather,-4.0,1,sound,0
 minesweeper_place_sound,5.0,1,sound,0
+cleansweeper_shoot_sound,2.0,1,sound,0
