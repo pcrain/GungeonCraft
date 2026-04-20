@@ -281,6 +281,7 @@ public class Initialisation : BaseUnityPlugin
                 Gradius.Init();
                 Entropynnium.Init();
                 Cleansweep.Init();
+                FluxFist.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

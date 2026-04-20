@@ -2,7 +2,7 @@
 
 ## 1.29.0 (TBD)
 
-- Added Entropynnium and Cleansweep
+- Added Entropynnium, Cleansweep, and Flux Fist
 	- Cleansweep sprite thanks to [SpecialAPI](https://github.com/SpecialAPI)!
 
 ## 1.28.3 (2026-03-15)

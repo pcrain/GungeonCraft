@@ -709,11 +709,23 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           cursor.Emit(OpCodes.Ldarg_0);
           cursor.CallPrivate(typeof(GunShootAnimationPatch), nameof(CheckShouldRestartShootAnimation));
 
-          // Patch 2: allow custom shoot animations
+          // Patch 2: allow custom shoot animations for normal projectiles
           cursor.Index = 0;
           if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdloc(0)))
             return;
-          cursor.Emit(OpCodes.Ldarg_0);
+          cursor.Emit(OpCodes.Ldarg_0); // gun
+          cursor.CallPrivate(typeof(GunShootAnimationPatch), nameof(HandleCustomShootAnimation));
+      }
+
+      [HarmonyPatch(typeof(Gun), nameof(Gun.HandleSpecificInitialGunShoot))]
+      [HarmonyILManipulator]
+      private static void GunHandleSpecificInitialGunShootIL(ILContext il)
+      {
+          // Patch 1: allow custom shoot animations for beam projectiles
+          ILCursor cursor = new ILCursor(il);
+          if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<Gun>("shootAnimation")))
+            return;
+          cursor.Emit(OpCodes.Ldarg_0); // gun
           cursor.CallPrivate(typeof(GunShootAnimationPatch), nameof(HandleCustomShootAnimation));
       }
 

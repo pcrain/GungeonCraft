@@ -164,6 +164,7 @@
     <Compile Include="src\CwaffDebug.cs"/>
     <Compile Include="src\Cwaff-Guns\Toothpaste.cs"/>
     <Compile Include="src\Cwaff-Guns\Lightwing.cs"/>
+    <Compile Include="src\Cwaff-Guns\FluxFist.cs"/>
     <Compile Include="src\Cwaff-Guns\Forkbomb.cs"/>
     <Compile Include="src\Cwaff-Guns\Leafblower.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>

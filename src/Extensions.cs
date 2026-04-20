@@ -3758,5 +3758,36 @@ public static class Extensions
   {
     return new Color(1f - c.r, 1f - c.g, 1f - c.b, c.a);
   }
+
+  //REFACTOR: use this for Leafblower
+  /// <summary>Apply knockback to a KnockbackDoer from a continuous, known source (e.g., Leafblower or Fluxfist)</summary>
+  public static void ApplyContinuousSourcedKnockback(this AIActor enemy, GameObject source, Dictionary<AIActor, ActiveKnockbackData> activeKbs, Vector2 velocity)
+  {
+    float force = velocity.magnitude;
+    KnockbackDoer kb = enemy.knockbackDoer;
+    if (!kb)
+      return;
+    if (kb.ApplySourcedKnockback(velocity, force, source) is ActiveKnockbackData data)
+        activeKbs[enemy] = data;
+    else if (activeKbs.TryGetValue(enemy, out ActiveKnockbackData previousData))
+    {
+        // fancy logic for replacing the old knockback
+        previousData.knockback = Lazy.MaxMagnitude(previousData.knockback, velocity.normalized * (force / (kb.weight / 10f)));
+        previousData.initialKnockback = previousData.knockback;
+        previousData.elapsedTime = 0.0f;
+    }
+  }
+
+  /// <summary>Detach a sprite from that of its SpeculativeRigidBody so its transform can be independently modified</summary>
+  public static tk2dSprite DecoupleSprite(this SpeculativeRigidbody body)
+  {
+    tk2dSprite oldSprite = body.gameObject.GetComponent<tk2dSprite>();
+    tk2dSprite newSprite = new GameObject("decoupled sprite").AddComponent<tk2dSprite>();
+    newSprite.SetSprite(oldSprite.collection, oldSprite.spriteId);
+    oldSprite.renderer.enabled = false;
+    newSprite.transform.position = oldSprite.transform.position;
+    newSprite.transform.parent = oldSprite.transform;
+    return newSprite;
+  }
 }
 

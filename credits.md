@@ -58,7 +58,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - Misc. edits combined from several sources by me: Breegull, Ki Blast, Racket Launcher, Sub Machine Gun, Ticonderogun
   
-  - Original sprites by me: Chroma, Entropynnium, Macheening, Sunderbuss
+  - Original sprites by me: Chroma, Entropynnium, Flux Fist, Macheening, Sunderbuss
 
   - Most gun animations are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
 
