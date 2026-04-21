@@ -573,7 +573,7 @@ public static class Lazy
 
     private static List<AIActor> _TempEnemies = new();
     private static List<AIActor> _TempNearbyEnemies = new();
-    /// <summary>Determine whether any enemy is in an line between start and end (does not account for walls)</summary>
+    /// <summary>Determine whether any enemy is in an line between start and end</summary>
     public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
         start.SafeGetEnemiesInRoom(ref _TempEnemies);
@@ -620,6 +620,63 @@ public static class Lazy
     public static AIActor NearestEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
         return NearestEnemyInLineOfSight(out _, start, end, canBeNeutral, accountForWalls);
+    }
+
+    private static List<Tuple<float, AIActor>> _ActorDistances = new();
+    /// <summary>Determine which enemies are in a line between start and end</summary>
+    public static void AllEnemiesInLineOfSight(ref List<AIActor> enemies, Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
+    {
+        start.SafeGetEnemiesInRoom(ref _TempEnemies);
+        enemies.Clear();
+        _ActorDistances.Clear();
+        foreach (AIActor enemy in _TempEnemies)
+        {
+            if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
+                continue;
+            PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
+            if (accountForWalls && !start.HasLineOfSight(collider.UnitCenter))
+                continue;
+            if (BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
+              _ActorDistances.Add(new((intersection - start).sqrMagnitude, enemy));
+        }
+        if (sort)
+          _ActorDistances.Sort((x, y) => x.First.CompareTo(y.First));
+        foreach (var pair in _ActorDistances)
+          enemies.Add(pair.Second);
+    }
+
+    /// <summary>Returns a list of enemies in the player's direct line of sight</summary>
+    public static void AllEnemiesInLineOfSight(this PlayerController player, ref List<AIActor> enemies, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
+    {
+      if (!player)
+        return;
+      enemies.Clear();
+      Vector2 ppos = player.CenterPosition;
+      AllEnemiesInLineOfSight(ref enemies, ppos, ppos + player.m_currentGunAngle.ToVector(100f), canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
+    }
+
+    /// <summary>Returns a list of enemies in the player's direct line of sight</summary>
+    public static List<AIActor> AllEnemiesInLineOfSight(this PlayerController player, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
+    {
+      player.AllEnemiesInLineOfSight(ref _TempNearbyEnemies, canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
+      return _TempNearbyEnemies;
+    }
+
+    /// <summary>Returns a list of enemies in a gun's direct line of sight</summary>
+    public static void AllEnemiesInLineOfSight(this Gun gun, ref List<AIActor> enemies, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
+    {
+      if (!gun)
+        return;
+      enemies.Clear();
+      Vector2 gpos = gun.barrelOffset.transform.position.XY();
+      AllEnemiesInLineOfSight(ref enemies, gpos, gpos + gun.CurrentAngle.ToVector(100f), canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
+    }
+
+    /// <summary>Returns a list of enemies in a gun's direct line of sight</summary>
+    public static List<AIActor> AllEnemiesInLineOfSight(this Gun gun, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
+    {
+      gun.AllEnemiesInLineOfSight(ref _TempNearbyEnemies, canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
+      return _TempNearbyEnemies;
     }
 
     /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
@@ -1319,13 +1376,16 @@ public static class Lazy
 
     /// <summary>Dissipate a mesh sprite object over a period of time.</summary>
     public static void Dissipate(this tk2dMeshSprite ms, float time, float amplitudeStart = 0f, float amplitudeEnd = -1f, bool progressive = false,
-      float emissionStart = 0f, float emissionEnd = -1f, Func<float, float> easeEmit = null, Func<float, float> easeAmp = null, Func<float, float> easeFade = null)
+      float emissionStart = 0f, float emissionEnd = -1f, Func<float, float> easeEmit = null, Func<float, float> easeAmp = null, Func<float, float> easeFade = null,
+      string sound = null, float soundTime = 0.0f)
     {
         ms.StartCoroutine(Dissipate_CR(ms: ms, time: time, amplitudeStart: amplitudeStart, amplitudeEnd: amplitudeEnd,
-          emissionStart: emissionStart, emissionEnd: emissionEnd, progressive: progressive, easeEmit: easeEmit, easeAmp: easeAmp, easeFade: easeFade));
+          emissionStart: emissionStart, emissionEnd: emissionEnd, progressive: progressive, easeEmit: easeEmit, easeAmp: easeAmp, easeFade: easeFade,
+          sound: sound, soundTime: soundTime));
 
         static IEnumerator Dissipate_CR(tk2dMeshSprite ms, float time, float amplitudeStart = 0f, float amplitudeEnd = -1f, bool progressive = false,
-          float emissionStart = 0f, float emissionEnd = -1f, Func<float, float> easeEmit = null, Func<float, float> easeAmp = null, Func<float, float> easeFade = null)
+          float emissionStart = 0f, float emissionEnd = -1f, Func<float, float> easeEmit = null, Func<float, float> easeAmp = null, Func<float, float> easeFade = null,
+          string sound = null, float soundTime = 0.0f)
         {
             if (easeEmit == null)
               easeEmit = Ease.OutQuad;
@@ -1345,8 +1405,14 @@ public static class Lazy
                 mat.SetTexture("_PaletteTex", ms.optionalPalette);
             }
 
+            bool playedSound = sound == null;
             for (float elapsed = 0f; elapsed < time; elapsed += BraveTime.DeltaTime)
             {
+                if (!playedSound && elapsed >= soundTime)
+                {
+                  ms.gameObject.Play(sound);
+                  playedSound = true;
+                }
                 float percentDone = elapsed / time;
                 mat.SetFloat(CwaffVFX._FadeId, easeFade(percentDone));
                 if (emissionEnd >= 0)

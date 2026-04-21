@@ -179,14 +179,20 @@ public class Geometry : MonoBehaviour
             this._mesh.RecalculateNormals();
     }
 
-    public void Setup(Shape shape, Color? color = null, Vector2? pos = null, float? radius = null, float? angle = null, float? arc = null, Vector2? pos2 = null, float? radiusInner = null)
+    public Geometry Setup(Shape shape = Shape.NONE, Color? color = null, Vector2? pos = null, float? radius = null, float? angle = null, float? arc = null, Vector2? pos2 = null, float? radiusInner = null)
     {
-        if (shape == Shape.NONE || (this._shape != Shape.NONE && this._shape != shape))
+        if (this._shape == Shape.NONE && shape == Shape.NONE)
+        {
+            Lazy.DebugLog($"must set shape of mesh!");
+            return this;
+        }
+        if (this._shape != Shape.NONE && shape != Shape.NONE && this._shape != shape)
         {
             Lazy.DebugLog($"can't change shape of mesh!");
-            return;
+            return this;
         }
-        this._shape = shape;
+        if (shape != Shape.NONE)
+          this._shape = shape;
         if (!this._didSetup)
             CreateMesh();
 
@@ -212,6 +218,7 @@ public class Geometry : MonoBehaviour
             RebuildMeshes();
         this._didSetup = true;
         this._meshRenderer.enabled = true;
+        return this;
     }
 
     private void OnDestroy()

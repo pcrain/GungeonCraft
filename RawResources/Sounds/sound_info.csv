@@ -390,3 +390,4 @@ cleansweep_reload_sound,-7.5,1,sound,0
 flux_fist_attract_sound,5.0,1,sound,4
 flux_fist_repel_sound,5.0,1,sound,4
 magnet_ball_attract_sound,-2.5,1,sound,2
+retina_impact_burst_sound,3.0,1,sound,2
