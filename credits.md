@@ -42,7 +42,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - [IdioticMuffin](https://www.reddit.com/r/EnterTheGungeon/comments/et316d/yet_even_more_gun_concepts_for_gungeon/): Grandmaster, [Paintball Cannon](https://www.reddit.com/r/EnterTheGungeon/comments/clkr07/splat_the_gungeon_weapon_concepts/)
 
-  - [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/): Derail Gun, Gunflower
+  - [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/): Derail Gun, Gunflower, Retina
 
   - [ChaosMiles07](https://www.spriters-resource.com/custom_edited/thelegendofzeldacustoms/sheet/66258/): Glockarina
 

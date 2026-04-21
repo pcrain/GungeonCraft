@@ -223,6 +223,7 @@
     <Compile Include="src\Cwaff-Guns\Cleansweep.cs"/>
     <Compile Include="src\Cwaff-Guns\BBGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Oddjob.cs"/>
+    <Compile Include="src\Cwaff-Guns\Retina.cs"/>
     <Compile Include="src\Cwaff-Guns\OmnidirectionalLaser.cs"/>
     <Compile Include="src\Cwaff-Guns\Zealot.cs"/>
     <Compile Include="src\Cwaff-Guns\Sextant.cs"/>
@@ -245,7 +246,6 @@
     <Compile Include="src\Cwaff-Guns\Alligator.cs"/>
     <Compile Include="src\Cwaff-Guns\HolyWaterGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Gunflower.cs"/>
-    <Compile Include="src\Cwaff-Guns\Sulok.cs"/>
     <Compile Include="src\Cwaff-Guns\Entropynnium.cs"/>
     <Compile Include="src\Cwaff-Guns\Starmageddon.cs"/>
     <Compile Include="src\Cwaff-Guns\Uppskeruvel.cs"/>

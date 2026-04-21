@@ -80,7 +80,7 @@ public static class VFX
     public static void RegisterVFX(string name, List<string> spritePaths, float fps = 2, bool loops = true, int loopStart = -1,
         float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0,
         bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, float emissiveColorPower = -1f, Color? emissiveColour = null,
-        bool orphaned = false, bool attached = true, bool unlit = false, float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null)
+        bool orphaned = false, bool attached = true, bool unlit = false, float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float lightFadeTime = 0f)
     {
         if (animations.ContainsKey(name))
         {
@@ -151,6 +151,8 @@ public static class VFX
             light.gameObject.transform.parent = vfxEffect.transform;
             light.gameObject.transform.localPosition = new Vector3(0, 0, -0.8f);
             light.gameObject.AddComponent<ObjectHeightController>().heightOffGround = -0.8f;
+            // if (lightFadeTime > 0) // WARNING: doesn't work properly after first time VFX spawns due to pooling
+            //   light.gameObject.AddComponent<LightFader>().Setup(lightFadeTime);
         }
 
         VFXObject vfxObject = new(){
@@ -177,7 +179,7 @@ public static class VFX
     public static GameObject Create(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter,
         IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
         float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
-        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f)
+        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f)
     {
         RegisterVFX(
             name           : name,
@@ -200,7 +202,8 @@ public static class VFX
             lightStrength  : lightStrength,
             lightRange     : lightRange,
             lightColor     : lightColor,
-            emissiveColorPower: emissiveColorPower
+            emissiveColorPower: emissiveColorPower,
+            lightFadeTime: lightFadeTime
             );
         return animations[name];
     }
@@ -211,7 +214,7 @@ public static class VFX
     public static VFXPool CreatePool(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter,
         IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
         float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
-        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f)
+        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f)
     {
         RegisterVFX(
             name           : name,
@@ -234,7 +237,8 @@ public static class VFX
             lightStrength  : lightStrength,
             lightRange     : lightRange,
             lightColor     : lightColor,
-            emissiveColorPower: emissiveColorPower
+            emissiveColorPower: emissiveColorPower,
+            lightFadeTime: lightFadeTime
             );
         return vfxpool[name];
     }
@@ -245,7 +249,7 @@ public static class VFX
     public static VFXComplex CreateComplex(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter,
         IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
         float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
-        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f)
+        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f)
     {
         RegisterVFX(
             name           : name,
@@ -268,7 +272,8 @@ public static class VFX
             lightStrength  : lightStrength,
             lightRange     : lightRange,
             lightColor     : lightColor,
-            emissiveColorPower: emissiveColorPower
+            emissiveColorPower: emissiveColorPower,
+            lightFadeTime: lightFadeTime
             );
         return vfxcomplex[name];
     }
@@ -564,7 +569,7 @@ public static class VFX
           //Trail Variables
           if (softMaxLength > 0) { trail.usesSoftMaxLength = true; trail.softMaxLength = softMaxLength; }
           if (cascadeTimer > 0) { trail.usesCascadeTimer = true; trail.cascadeTimer = cascadeTimer; }
-          if (timeTillAnimStart > 0) { trail.usesGlobalTimer = true; trail.globalTimer = timeTillAnimStart; }
+          if (timeTillAnimStart >= 0) { trail.usesGlobalTimer = true; trail.globalTimer = timeTillAnimStart; }
           trail.destroyOnEmpty = destroyOnEmpty;
           return trail;
       }
@@ -1545,4 +1550,50 @@ public class GlowAndFadeOut : MonoBehaviour //NOTE: can't be used with pooled VF
             base.gameObject.SetAlpha(1f);
         yield break;
     }
+}
+
+// Helper class for fading out a light attached to a VFX object over time
+public class LightFader : MonoBehaviour
+{
+  [SerializeField]
+  private float _fadeTime;
+  [SerializeField]
+  private float _startRange;
+  [SerializeField]
+  private Light _light;
+  [SerializeField]
+  private float _timeLeft;
+
+  public void Setup(float fadeTime)
+  {
+    this._light = base.gameObject.GetComponent<Light>();
+    if (!this._light)
+      return;
+
+    this._fadeTime = fadeTime;
+    this._timeLeft = fadeTime;
+    this._startRange = this._light.range;
+  }
+
+  private void OnEnabled()
+  {
+    System.Console.WriteLine($"light enabled");
+  }
+
+  private void Update()
+  {
+    if (!this._light)
+    {
+      UnityEngine.Object.Destroy(this);
+      return;
+    }
+
+    this._timeLeft -= BraveTime.DeltaTime;
+    this._light.range = this._startRange * (this._timeLeft / this._fadeTime);
+    if (this._light.range <= 0f)
+    {
+      UnityEngine.Object.Destroy(this._light);
+      UnityEngine.Object.Destroy(this);
+    }
+  }
 }
