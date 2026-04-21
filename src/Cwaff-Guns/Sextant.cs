@@ -734,7 +734,7 @@ public class PrecisionProjectile : Projectile
                         target.CenterPosition - base.transform.position.XY(), "Sextant", ignoreDamageCaps: true);
                 else
                 {
-                    target.DuplicateInWorldAsMesh().Dissipate(time: 1.5f, amplitude: 5f, progressive: true);
+                    target.DuplicateInWorldAsMesh().Dissipate(time: 1.5f, amplitudeEnd: 5f, progressive: true);
                     target.EraseFromExistenceWithRewards();
                 }
                 base.gameObject.Play("sextant_critical_hit_sound");

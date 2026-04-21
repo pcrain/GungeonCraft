@@ -415,7 +415,7 @@ public class MasteryRitualComponent : MonoBehaviour
       else
         RoomHandler.unassignedInteractableObjects.TryRemove(gun);
 
-      gun.sprite.DuplicateInWorldAsMesh().Dissipate(time: 2.5f, amplitude: 5f, progressive: true);
+      gun.sprite.DuplicateInWorldAsMesh().Dissipate(time: 2.5f, amplitudeEnd: 5f, progressive: true);
     }
 
     // Destroy our gun component

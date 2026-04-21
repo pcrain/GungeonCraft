@@ -282,6 +282,7 @@ public class Initialisation : BaseUnityPlugin
                 Entropynnium.Init();
                 Cleansweep.Init();
                 FluxFist.Init();
+                Sulok.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

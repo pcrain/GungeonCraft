@@ -1318,16 +1318,26 @@ public static class Lazy
     }
 
     /// <summary>Dissipate a mesh sprite object over a period of time.</summary>
-    public static void Dissipate(this tk2dMeshSprite ms, float time, float amplitude = 10f, bool progressive = false)
+    public static void Dissipate(this tk2dMeshSprite ms, float time, float amplitudeStart = 0f, float amplitudeEnd = -1f, bool progressive = false,
+      float emissionStart = 0f, float emissionEnd = -1f, Func<float, float> easeEmit = null, Func<float, float> easeAmp = null, Func<float, float> easeFade = null)
     {
-        ms.StartCoroutine(Dissipate_CR(ms: ms, time: time, amplitude: amplitude, progressive: progressive));
+        ms.StartCoroutine(Dissipate_CR(ms: ms, time: time, amplitudeStart: amplitudeStart, amplitudeEnd: amplitudeEnd,
+          emissionStart: emissionStart, emissionEnd: emissionEnd, progressive: progressive, easeEmit: easeEmit, easeAmp: easeAmp, easeFade: easeFade));
 
-        static IEnumerator Dissipate_CR(tk2dMeshSprite ms, float time, float amplitude = 10f, bool progressive = false)
+        static IEnumerator Dissipate_CR(tk2dMeshSprite ms, float time, float amplitudeStart = 0f, float amplitudeEnd = -1f, bool progressive = false,
+          float emissionStart = 0f, float emissionEnd = -1f, Func<float, float> easeEmit = null, Func<float, float> easeAmp = null, Func<float, float> easeFade = null)
         {
+            if (easeEmit == null)
+              easeEmit = Ease.OutQuad;
+            if (easeAmp == null)
+              easeAmp = Ease.OutQuad;
+            if (easeFade == null)
+              easeFade = Ease.OutQuad;
             Material mat = ms.renderer.material;
             mat.shader = CwaffShaders.ShatterShader;
+            mat.SetFloat("_Emission", emissionStart);
             mat.SetFloat("_Progressive", progressive ? 1f : 0f);
-            mat.SetFloat("_Amplitude", amplitude);
+            mat.SetFloat("_Amplitude", amplitudeStart);
             mat.SetFloat("_RandomSeed", UnityEngine.Random.value);
             if (ms.optionalPalette != null)
             {
@@ -1337,8 +1347,12 @@ public static class Lazy
 
             for (float elapsed = 0f; elapsed < time; elapsed += BraveTime.DeltaTime)
             {
-                float percentLeft = 1f - elapsed / time;
-                mat.SetFloat(CwaffVFX._FadeId, 1f - percentLeft * percentLeft);
+                float percentDone = elapsed / time;
+                mat.SetFloat(CwaffVFX._FadeId, easeFade(percentDone));
+                if (emissionEnd >= 0)
+                    mat.SetFloat("_Emission", Mathf.Lerp(emissionStart, emissionEnd, easeEmit(percentDone)));
+                if (amplitudeEnd >= 0)
+                    mat.SetFloat("_Amplitude", Mathf.Lerp(amplitudeStart, amplitudeEnd, easeAmp(percentDone)));
                 yield return null;
             }
             UnityEngine.Object.Destroy(ms.gameObject);

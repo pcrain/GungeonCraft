@@ -167,7 +167,7 @@ public class Xelsior : CwaffGun
             RoomHandler.unassignedInteractableObjects.Remove(targetGun);
         int quality = Mathf.Max(targetGun.QualityGrade(), 1);
         if (targetGun.sprite)
-            targetGun.sprite.DuplicateInWorldAsMesh().Dissipate(time: 3.5f, amplitude: 5f, progressive: true);
+            targetGun.sprite.DuplicateInWorldAsMesh().Dissipate(time: 3.5f, amplitudeEnd: 5f, progressive: true);
         if (targetGun.gameObject.GetComponentInParent<DebrisObject>())
             UnityEngine.Object.Destroy(targetGun.gameObject.transform.parent.gameObject);
         else
@@ -389,7 +389,7 @@ public class XelsiorHoveringGun : MonoBehaviour
         this._mesh.renderer.material.shader = CwaffShaders.ShatterShader;
         this._mesh.renderer.material.SetFloat("_Progressive", 1f);
         this._mesh.renderer.material.SetFloat(CwaffVFX._FadeId, 1f);
-        this._mesh.renderer.material.SetFloat("_Amplitude", 4f);
+        this._mesh.renderer.material.SetFloat("_Amplitude", 0f);
         this._mesh.renderer.material.SetFloat("_RandomSeed", UnityEngine.Random.value);
         this.StartCoroutine(DoMaterialize(this, this._mesh, _MATERIALIZE_TIME));
 
@@ -572,7 +572,7 @@ public class XelsiorHoveringGun : MonoBehaviour
 
         tk2dMeshSprite ms = Lazy.CreateMeshSpriteObject(this.sprite, this.sprite.WorldCenter, pointMesh: true);
         ms.gameObject.transform.rotation = base.transform.rotation;
-        ms.Dissipate(time: 0.5f, amplitude: 10f, progressive: false);
+        ms.Dissipate(time: 0.5f, amplitudeEnd: 10f, progressive: false);
     }
 
     public static IEnumerator DoMaterialize(XelsiorHoveringGun xg, tk2dMeshSprite ms, float v)
@@ -585,6 +585,7 @@ public class XelsiorHoveringGun : MonoBehaviour
             ms.FlipY = xg.sprite.FlipY;
             float percentLeft = 1f - elapsed / v;
             mat.SetFloat(CwaffVFX._FadeId, percentLeft);
+            mat.SetFloat("_Amplitude", 1f - percentLeft * percentLeft);
             yield return null;
         }
         UnityEngine.Object.Destroy(xg._mesh.gameObject);

@@ -228,7 +228,7 @@ public class Heartbreaker : CwaffGun
         if (player.CurrentRoom != null && player.CurrentRoom.IsRegistered(targetIx))
             player.CurrentRoom.DeregisterInteractable(targetIx);
         int health = Mathf.RoundToInt(2f * targetHeart.healAmount);
-        targetHeart.sprite.DuplicateInWorldAsMesh().Dissipate(time: 0.4f, amplitude: 5f, progressive: true);
+        targetHeart.sprite.DuplicateInWorldAsMesh().Dissipate(time: 0.4f, amplitudeEnd: 5f, progressive: true);
         UnityEngine.Object.Destroy(targetHeart.gameObject);
         base.gameObject.Play("heartbreaker_absorb_sound");
         return health;
