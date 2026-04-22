@@ -1,22 +1,11 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - better dispersal particles
-    - fix memory leaks on floor transitions
-
-    - targeting sightlines
-    - dissipate non-enemy game objects
-    - gun animations
-    - impact splash damage / explosion / goop
-    - custom clip
-*/
-
 public class Retina : CwaffGun
 {
     public static string ItemName         = "Retina";
     public static string ShortDescription = "Breach of Covenant";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Shoots lethal piercing directed energy blasts. Press fire once to scope in, and again to shoot. Scope out by shooting, dodging, reloading, or taking damage.";
+    public static string Lore             = "\n\n\n\nTBD";
 
     private RetinaHUD _hud = null;
 
@@ -25,7 +14,7 @@ public class Retina : CwaffGun
         Lazy.SetupGun<Retina>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.RIFLE, reloadTime: 2.50f, ammo: 50, idleFps: 10, shootFps: 24, reloadFps: 30,
             smoothReload: 0.1f, reloadAudio: "retina_reload_sound", fireAudio: "retina_fire_sound")
-          .InitProjectile(GunData.New(sprite: "retina_projectile", clipSize: 4, cooldown: 1.25f, angleVariance: 1.0f, shootStyle: ShootStyle.SemiAutomatic,
+          .InitProjectile(GunData.New(sprite: "retina_projectile", clipSize: 4, cooldown: 1.25f, angleVariance: 1.0f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
             damage: 300.0f, speed: 900.0f, force: 10.0f, range: 1000.0f, pierceBreakables: true, hitSound: "retina_impact_sound", bossDamageMult: 0.6f))
           .AttachTrail("retina_beam", fps: 60, timeTillAnimStart: 0.00f,
             destroyOnEmpty: true, dispersalPrefab: Lazy.DispersalParticles(ExtendedColours.vibrantOrange))
@@ -214,6 +203,14 @@ public class RetinaHUD : MonoBehaviour
     this._vulnHeader            = Lab(color: Color.cyan);
     this._vulnLabel             = Lab(color: Color.cyan);
 
+    System.Console.WriteLine($" old size was {this._nameLabel.Size.x}, {this._nameLabel.Size.y}, autosize {this._nameLabel.AutoSize}, autoheight {this._nameLabel.AutoHeight}, wrap {this._nameLabel.WordWrap}");
+    this._nameLabel.AutoSize = false;
+    this._nameLabel.AutoHeight = false;
+    this._nameLabel.WordWrap = true;
+    this._nameLabel.VerticalAlignment = dfVerticalAlignment.Top;
+    this._nameLabel.Anchor = dfAnchorStyle.Top | dfAnchorStyle.CenterHorizontal;
+    this._nameLabel.Size = new Vector2(160f, 48f); // split long names onto multiple lines
+
     this._extraTargetSprites = new();
     for (int i = 0; i < MAX_TARGETS; ++i)
     {
@@ -249,7 +246,7 @@ public class RetinaHUD : MonoBehaviour
       return g;
   }
 
-  private dfLabel Lab(Color? color = null, TextAlignment align = TextAlignment.Left)
+  private dfLabel Lab(Color? color = null, TextAlignment align = TextAlignment.Center)
   {
     dfLabel label = CwaffLabel.MakeNewLabel(unicode: false, outline: false);
     label.Color = color ?? Color.white;
@@ -466,7 +463,7 @@ public class RetinaHUD : MonoBehaviour
     // Place(this._base, Vector2.zero, Vector2.one);
     Place(this._targetInfoRectangle, Vector2.zero, new Vector2(_PANEL_SIZE_X, _PANEL_SIZE_Y), newColor: ExtendedColours.vibrantOrange.WithAlpha(0.2f * ease));
     Place(this._nameHeader,        "Species",     new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
-    Place(this._nameLabel,         targetName,    new Vector2(infoPos, GetNextLine(ref linePos, 1.25f)), newColor: _LabelColor);
+    Place(this._nameLabel,         targetName,    new Vector2(infoPos, GetNextLine(ref linePos, 2.25f) - 0.03f), newColor: _LabelColor); // NOTE: 0.03 fudge factor for multiline text
     Place(this._rangeHeader,       "Range",       new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
     Place(this._rangeLabel,        range,         new Vector2(infoPos, GetNextLine(ref linePos, 1.25f)), newColor: _LabelColor);
     Place(this._collateralHeader,  "Collateral",  new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
@@ -522,21 +519,26 @@ public class RetinaHUD : MonoBehaviour
 
   private void OnDestroy()
   {
-    GameManager.Instance.MainCameraController.OnFinishedFrame -= this.OnFinishedFrame;
+    if (GameManager.HasInstance && GameManager.Instance.MainCameraController)
+      GameManager.Instance.MainCameraController.OnFinishedFrame -= this.OnFinishedFrame;
+
     if (!this._setup)
       return;
 
-    for (int i = this._geometry.Count - 1; i >= 0; --i)
-      if (this._geometry[i])
-        UnityEngine.Object.Destroy(this._geometry[i].gameObject);
+    if (this._geometry != null)
+      for (int i = this._geometry.Count - 1; i >= 0; --i)
+        if (this._geometry[i])
+          UnityEngine.Object.Destroy(this._geometry[i].gameObject);
 
-    for (int i = this._labels.Count - 1; i >= 0; --i)
-      if (this._labels[i])
-        UnityEngine.Object.Destroy(this._labels[i].gameObject);
+    if (this._labels != null)
+      for (int i = this._labels.Count - 1; i >= 0; --i)
+        if (this._labels[i])
+          UnityEngine.Object.Destroy(this._labels[i].gameObject);
 
-    for (int i = 0; i < this._extraTargetSprites.Count; ++i)
-      if (this._extraTargetSprites[i])
-        UnityEngine.Object.Destroy(this._extraTargetSprites[i].gameObject);
+    if (this._extraTargetSprites != null)
+      for (int i = 0; i < this._extraTargetSprites.Count; ++i)
+        if (this._extraTargetSprites[i])
+          UnityEngine.Object.Destroy(this._extraTargetSprites[i].gameObject);
   }
 
   public void Toggle()
