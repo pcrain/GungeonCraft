@@ -371,6 +371,7 @@ public class Initialisation : BaseUnityPlugin
                 DisplayPedestal.Init();
                 GoopStabilizer.Init();
                 CombatLeotard.Init();
+                NewtonsApple.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

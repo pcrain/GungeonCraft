@@ -2,8 +2,8 @@
 
 ## 1.29.0 (TBD)
 
-- Added Entropynnium, Cleansweep, Flux Fist, and Retina
-	- Cleansweep sprite thanks to [SpecialAPI](https://github.com/SpecialAPI)!
+- Added Entropynnium, Cleansweep, Flux Fist, Retina, and Newton's Apple
+	- Cleansweep and Newton's Apple sprites thanks to [SpecialAPI](https://github.com/SpecialAPI)!
 	- Retina sprite thanks to [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)
 
 ## 1.28.3 (2026-03-15)
