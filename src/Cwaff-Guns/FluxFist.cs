@@ -9,7 +9,7 @@ public class FluxFist : CwaffGun
     public static string ItemName         = "Flux Fist";
     public static string ShortDescription = "Pole to Pole";
     public static string LongDescription  = "Alternates between firing north and south polarity beams that magnetize enemies. Reload to toss or dismiss a north-polarized ball that damages and repels / attracts nearby magnetized enemies.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A repurposed greave retrofitted with a proprietary piezomagnetic mechanism, capable of generating strong magnetic fields with a clench of the fist. It was originally conceived as a consumer product for retrieving one's dropped keys from underneath the fridge. Sadly, it was recalled hours after hitting store shelves due to a common issue with entire fridges crashing into users.";
 
     private const float _BALL_LAUNCH_SPEED = 20f;
     private const float _SOUND_TIMER       = 0.25f;

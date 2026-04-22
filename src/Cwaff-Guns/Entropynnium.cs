@@ -5,7 +5,7 @@ public class Entropynnium : CwaffGun
     public static string ItemName         = "Entropynnium";
     public static string ShortDescription = "Applied Botanics";
     public static string LongDescription  = "Passively gathers mana from explosions. Can be charged to consume mana and detonate enemies around the player. Longer charges result in a larger detonation range and more potent detonations, but consume dramatically more mana.";
-    public static string Lore             = ""; // TODO:
+    public static string Lore             = "A flower from another dimension where the nutritional needs of plants are significantly more complicated than soil, water, and sunlight. This particular specimen draws its nutrients from ambient explosions in its environment, a trait powerful in its natural habitat and even more so in the Gungeon. If only Gungeoneers had the same diet....";
 
     private const int   _MAX_MANA            = 10000;
     private const float _CHARGE_TIME         = 5;
