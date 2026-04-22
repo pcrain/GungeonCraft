@@ -314,6 +314,12 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   {
   }
 
+  /// <summary>Called when the player attempts to manually initiate a reload</summary>
+  public virtual bool OnManualReloadAttempted(PlayerController player)
+  {
+    return true; // true -> allow reload | false -> prevent reload
+  }
+
   /// <summary>Determines the fire rate of the gun.</summary>
   public virtual float GetDynamicFireRate() => 1.0f;
 
@@ -741,6 +747,20 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           if (gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg)
             cg.OverrideShootAnimation(ref overrideAnimation);
           return overrideAnimation;
+      }
+
+      /// <summary>Check if we should prevent next reload</summary>
+      [HarmonyPatch(typeof(Gun), nameof(Gun.Reload))]
+      [HarmonyPrefix]
+      private static bool GunReloadPatch(Gun __instance)
+      {
+          if (__instance.GunPlayerOwner() is not PlayerController player)
+            return true; // non-player
+          if (player.m_activeActions == null || !player.m_activeActions.ReloadAction.WasPressed)
+            return true; // automatic reload
+          if (__instance.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg)
+            return true; // no override
+          return cg.OnManualReloadAttempted(player);
       }
   }
 

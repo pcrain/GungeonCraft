@@ -151,6 +151,7 @@ public static class VFX
             light.gameObject.transform.parent = vfxEffect.transform;
             light.gameObject.transform.localPosition = new Vector3(0, 0, -0.8f);
             light.gameObject.AddComponent<ObjectHeightController>().heightOffGround = -0.8f;
+            // NOTE: this actually WILL work properly because we call OnSpawned() instead of OnEnabled() now...look into putting this back in
             // if (lightFadeTime > 0) // WARNING: doesn't work properly after first time VFX spawns due to pooling
             //   light.gameObject.AddComponent<LightFader>().Setup(lightFadeTime);
         }
@@ -1575,7 +1576,7 @@ public class LightFader : MonoBehaviour
     this._startRange = this._light.range;
   }
 
-  private void OnEnabled()
+  private void OnSpawned()
   {
     System.Console.WriteLine($"light enabled");
   }

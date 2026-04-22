@@ -1585,6 +1585,9 @@ public static class Extensions
   /// <summary>Get the player's current damage multiplier</summary>
   public static float DamageMult(this PlayerController p) => p.stats.GetStatValue(StatType.Damage);
 
+  /// <summary>Get the player's current boss damage multiplier</summary>
+  public static float BossDamageMult(this PlayerController p) => p.stats.GetStatValue(StatType.DamageToBosses);
+
   /// <summary>Get the player's current accuracy (spread) multiplier</summary>
   public static float AccuracyMult(this PlayerController p) => p.stats.GetStatValue(StatType.Accuracy);
 

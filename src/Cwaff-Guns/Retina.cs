@@ -1,15 +1,6 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - make entire HUD
-      - orange visor
-      - enemy diorama
-      - health bar readout
-      - range readout
-      - enemy type readout
-      - enemy count readout
-      - obstruction readout
-
     - better dispersal particles
     - fix memory leaks on floor transitions
 
@@ -35,44 +26,99 @@ public class Retina : CwaffGun
           .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.RIFLE, reloadTime: 2.50f, ammo: 50, idleFps: 10, shootFps: 24, reloadFps: 30,
             smoothReload: 0.1f, reloadAudio: "retina_reload_sound", fireAudio: "retina_fire_sound")
           .InitProjectile(GunData.New(sprite: "retina_projectile", clipSize: 4, cooldown: 1.25f, angleVariance: 1.0f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 300.0f, speed: 300.0f, force: 10.0f, range: 1000.0f, pierceBreakables: true, hitSound: "retina_impact_sound", bossDamageMult: 0.6f))
-          .SetAllImpactVFX(VFX.CreatePool("retina_impact_vfx", fps: 30, loops: false, emissivePower: 1f/*, lightColor: ExtendedColours.vibrantOrange, lightRange: 7.0f, lightStrength: 20.0f*/))
+            damage: 300.0f, speed: 900.0f, force: 10.0f, range: 1000.0f, pierceBreakables: true, hitSound: "retina_impact_sound", bossDamageMult: 0.6f))
           .AttachTrail("retina_beam", fps: 60, timeTillAnimStart: 0.00f,
             destroyOnEmpty: true, dispersalPrefab: Lazy.DispersalParticles(ExtendedColours.vibrantOrange))
           .Attach<PierceProjModifier>(pierce => {
             pierce.penetration          = 999;
             pierce.penetratesBreakables = true; })
-          .Attach<RetinaProjectile>();
+          .Attach<RetinaProjectile>()
+          .Assign(out Projectile proj);
+
+        VFXPool impactPool = VFX.CreatePool("retina_impact_vfx", fps: 30, loops: false, emissivePower: 1f);
+        impactPool.effects[0].effects[0].effect.AddComponent<RetinaLightburstDoer>();
+        proj.SetAllImpactVFX(impactPool);
+    }
+
+    private void RegisterEvents(PlayerController player)
+    {
+        if (!player)
+          return;
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
+        player.OnReceivedDamage -= this.OnReceivedDamage;
+        player.OnReceivedDamage += this.OnReceivedDamage;
+    }
+
+    private void OnReceivedDamage(PlayerController player)
+    {
+      DismissHUD();
+    }
+
+    private void DeregisterEvents(PlayerController player)
+    {
+        if (!player)
+          return;
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        player.OnReceivedDamage -= this.OnReceivedDamage;
     }
 
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
         CreateHUDIfNecessary();
+        RegisterEvents(this.PlayerOwner);
+    }
+
+    private void OnTriedToInitiateAttack(PlayerController player)
+    {
+        if (!player || player.IsDodgeRolling || player.CurrentInputState != PlayerInputState.AllInput)
+            return; // inactive, do normal firing stuff
+        if (player.CurrentGun != this.gun || this.gun.IsReloading || this.gun.ClipShotsRemaining == 0 || this.gun.CurrentAmmo == 0)
+            return; // inactive, do normal firing stuff
+        CreateHUDIfNecessary();
+        if (!this._hud || this._hud.Active)
+          return; // no HUD or HUD already active
+
+        player.SuppressThisClick = true;
+        if (!this.gun.m_moduleData[this.gun.DefaultModule].onCooldown) // don't toggle HUD while the weapon is on cooldown
+          this._hud.Toggle();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         DismissHUD();
+        DeregisterEvents(player);
         base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
         DismissHUD();
+        DeregisterEvents(this.PlayerOwner);
         base.OnDestroy();
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
         DismissHUD();
+        DeregisterEvents(this.PlayerOwner);
         base.OnSwitchedAwayFromThisGun();
     }
 
-    public override void OnFullClipReload(PlayerController player, Gun gun)
+    public override bool OnManualReloadAttempted(PlayerController player)
     {
-        CreateHUDIfNecessary();
-        this._hud.Toggle();
+        if (!this._hud || !this._hud.Active)
+            return true;
+        this._hud.Dismiss();
+        return false;
+    }
+
+    public override void OnPostFired(PlayerController player, Gun gun)
+    {
+        base.OnPostFired(player, gun);
+        if (this._hud)
+          this._hud.Dismiss();
     }
 
     private void CreateHUDIfNecessary()
@@ -87,7 +133,7 @@ public class Retina : CwaffGun
     {
       if (!this._hud)
         return;
-      this._hud.Dismiss();
+      this._hud.Dismiss(deactivate: true);
       this._hud = null;
     }
 }
@@ -95,65 +141,78 @@ public class Retina : CwaffGun
 public class RetinaHUD : MonoBehaviour
 {
   private const float _SHWOOP_TIME = 0.25f;
-  private const int MAX_TARGETS = 5;
+  private const float _FADE_TIME   = 0.125f;
+  private const float _ENGAGE_TIME = _SHWOOP_TIME + _FADE_TIME;
+  private const int MAX_TARGETS = 4;
+  private const float _FIRST_TEXT_LINE       = 0.05f;
+  private const float _TARGET_SPRITE_MAIN_X  = 0.175f;
+  private const float _TARGET_SPRITE_EXTRA_X = 0.3f;
+  private const float _TARGET_SPRITE_MIN_Y   = 0.01f;
+  private const float _TARGET_SPACING        = 0.13f;
+  private const float _INFO_LABEL_X          = 0.075f;
+  private const float _HEALTH_W              = 0.075f;
+  private const float _HEALTH_LEFT           = _INFO_LABEL_X - 0.5f * _HEALTH_W;
+  private const float _PANEL_SIZE_X          = 0.35f;
+  private const float _PANEL_SIZE_Y          = 0.4f;
+  private const float MIN_TIMESCALE = 0.25f;
+
+  private static readonly Color _HeaderColor         = Color.Lerp(Color.green, Color.black, 0.60f);
+  private static readonly Color _LabelColor          = Color.Lerp(Color.green, Color.black, 0.35f);
+  private static readonly string[] _CollateralLabels = ["Low", "Medium", "High", "Extreme"];
 
   private bool _setup              = false;   // whether we're set up
   private bool _active             = false;   // whether we're active
   private Retina _gun              = null;    // gun we're attache dto
   private Vector2 _center          = default; // center of the HUD (corresponds to view center)
   private Vector2 _topLeft         = default; // top left of the HUD, as determined by _center and _scale
-  private float _scale             = 0.0f;    // percent of HUD that's visible
+  private float _shwoop             = 0.0f;    // percent of HUD that's visible
   private List<Geometry> _geometry = new();   // all shapes rendered by the HUD
   private List<dfLabel> _labels    = new();   // all labels rendered by the HUD
+  private List<AIActor> _targetedEnemies = new();
 
   private CameraController _camera;
   private Vector2 _worldBottomLeft;
   private Vector2 _worldTopRight;
+  private Vector2 _basePos;
 
   private Geometry _base;                     // backdrop of the HUD
   private Geometry _targetInfoRectangle;      // rectangular area where target information is drawn
-  private Geometry _targetSpriteRectangle;    // subarea where target sprite is drawn and animated
   private Geometry _healthbarBack;            // backdrop for health bar
   private Geometry _healthbarHurt;            // foreground for health bar, projected health after shooting
   private Geometry _healthbarFore;            // foreground for health bar, current health
 
   private dfLabel _nameHeader;
   private dfLabel _nameLabel;
-  private dfLabel _obstructionHeader;
-  private dfLabel _obstructionLabel;
+  private dfLabel _collateralHeader;
+  private dfLabel _collateralLabel;
   private dfLabel _rangeHeader;
   private dfLabel _rangeLabel;
-  private dfLabel _angleHeader;
-  private dfLabel _angleLabel;
   private dfLabel _vulnHeader;
   private dfLabel _vulnLabel;
-  private dfLabel _counterLabel;              // counter for additional enemies that are in line of sight
 
   private tk2dSprite _targetSprite;           // copy of the sprite for the current target
   private List<tk2dSprite> _extraTargetSprites; // copy of the sprite for the current extra targets
+
+  public bool Active => this._active;
 
   public void Setup()
   {
     this._gun = this.gameObject.GetComponent<Retina>();
 
-    this._base                  = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: ExtendedColours.vibrantOrange.WithAlpha(0.25f));
-    this._targetInfoRectangle   = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: Color.yellow.WithAlpha(0.5f));
-    this._targetSpriteRectangle = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: Color.black.WithAlpha(0.85f));
+    this._base                  = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: ExtendedColours.vibrantOrange.WithAlpha(0.1f));
+    this._targetInfoRectangle   = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: ExtendedColours.vibrantOrange.WithAlpha(0.2f));
     this._healthbarBack         = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: Color.black);
     this._healthbarHurt         = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: Color.green.WithAlpha(0.85f));
     this._healthbarFore         = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: Color.red.WithAlpha(0.85f));
 
     this._nameHeader            = Lab(color: Color.cyan);
     this._nameLabel             = Lab(color: Color.cyan);
-    this._obstructionHeader     = Lab(color: Color.cyan);
-    this._obstructionLabel      = Lab(color: Color.cyan);
+    this._collateralHeader      = Lab(color: Color.cyan);
+    this._collateralLabel       = Lab(color: Color.cyan);
     this._rangeHeader           = Lab(color: Color.cyan);
     this._rangeLabel            = Lab(color: Color.cyan);
-    this._angleHeader           = Lab(color: Color.cyan);
-    this._angleLabel            = Lab(color: Color.cyan);
     this._vulnHeader            = Lab(color: Color.cyan);
     this._vulnLabel             = Lab(color: Color.cyan);
-    this._counterLabel          = Lab(color: Color.cyan);
 
     this._extraTargetSprites = new();
     for (int i = 0; i < MAX_TARGETS; ++i)
@@ -178,7 +237,6 @@ public class RetinaHUD : MonoBehaviour
   {
       tk2dSprite extraTarget = new GameObject($"retina target preview {(i + 1)}").AddComponent<tk2dSprite>();
       extraTarget.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
-      extraTarget.renderer.material.shader = ShaderCache.Acquire("Brave/PlayerShader");
       extraTarget.renderer.enabled = false;
       return extraTarget;
   }
@@ -205,13 +263,15 @@ public class RetinaHUD : MonoBehaviour
   {
     if (!this._setup)
       return;
-    if (!this._camera)
+    if (!this._camera || !this._gun || this._gun.gun is not Gun gun || this._gun.PlayerOwner is not PlayerController player)
     {
       Dismiss(deactivate: true);
       UnityEngine.Object.Destroy(this);
     }
     else if (GameManager.Instance.IsPaused)
       Dismiss(deactivate: false);
+    else if (player.IsDodgeRolling || gun.IsReloading || player.CurrentInputState != PlayerInputState.AllInput)
+      Dismiss(deactivate: true);
   }
 
   // TODO: actually check if UI size has changed
@@ -233,13 +293,6 @@ public class RetinaHUD : MonoBehaviour
 
     Engage();
     UpdateLabelsForUISize();
-
-    if (this._active && this._scale < 1.0f)
-      // this._scale = Mathf.Min(this._scale + (BraveTime.DeltaTime / _SHWOOP_TIME), 1f);
-      this._scale = 1.0f;
-    else if (!this._active && this._scale > 0.0f)
-      this._scale = Mathf.Max(this._scale - (BraveTime.DeltaTime / _SHWOOP_TIME), 0f);
-
     if (this._active)
       PlaceHUDElements();
   }
@@ -247,37 +300,40 @@ public class RetinaHUD : MonoBehaviour
   private void Place(Geometry g, Vector2 topLeft, Vector2 bottomRight, Color? newColor = null)
   {
     Vector2 pos = new Vector2(
-      Mathf.Lerp(this._worldBottomLeft.x, this._worldTopRight.x, topLeft.x),
-      Mathf.Lerp(this._worldBottomLeft.y, this._worldTopRight.y, topLeft.y));
+      Mathf.Lerp(this._worldBottomLeft.x, this._worldTopRight.x, this._basePos.x + topLeft.x),
+      Mathf.Lerp(this._worldBottomLeft.y, this._worldTopRight.y, this._basePos.y + topLeft.y));
     Vector2 pos2 = new Vector2(
-      Mathf.Lerp(this._worldBottomLeft.x, this._worldTopRight.x, bottomRight.x),
-      Mathf.Lerp(this._worldBottomLeft.y, this._worldTopRight.y, bottomRight.y));
+      Mathf.Lerp(this._worldBottomLeft.x, this._worldTopRight.x, this._basePos.x + bottomRight.x),
+      Mathf.Lerp(this._worldBottomLeft.y, this._worldTopRight.y, this._basePos.y + bottomRight.y));
     g.Setup(pos: pos, pos2: pos2, color: newColor);
   }
 
   private void Place(dfLabel d, string text, Vector2 screenPos, Color? newColor = null)
   {
     Vector2 pos = new Vector2(
-      Mathf.Lerp(this._worldBottomLeft.x, this._worldTopRight.x, screenPos.x),
-      Mathf.Lerp(this._worldBottomLeft.y, this._worldTopRight.y, screenPos.y));
+      Mathf.Lerp(this._worldBottomLeft.x, this._worldTopRight.x, this._basePos.x + screenPos.x),
+      Mathf.Lerp(this._worldBottomLeft.y, this._worldTopRight.y, this._basePos.y + screenPos.y));
     if (newColor is Color c)
-    {
       d.Color   = c.WithAlpha(1f);
-      d.Opacity = c.a;
-    }
+    d.Opacity = Mathf.Clamp01((this._shwoop - _SHWOOP_TIME) / _FADE_TIME);
     d.Text = text;
     d.Place(pos);
   }
 
-  private void Place(tk2dSprite sprite, Vector2 screenPos, float scale = 1.0f, bool outline = false)
+  private void Place(tk2dSprite sprite, Vector2 screenPos, float scale = 1.0f, bool outline = false, Anchor anchor = Anchor.LowerCenter, Texture2D palette = null)
   {
     Vector2 pos = new Vector2(
-      Mathf.Lerp(this._worldBottomLeft.x, this._worldTopRight.x, screenPos.x),
-      Mathf.Lerp(this._worldBottomLeft.y, this._worldTopRight.y, screenPos.y));
-    Vector3 extents = sprite.GetBounds().extents;
-    float maxSpriteSide = 2f * C.PIXELS_PER_TILE * Mathf.Max(extents.x, extents.y);
+      Mathf.Lerp(this._worldBottomLeft.x, this._worldTopRight.x, this._basePos.x + screenPos.x),
+      Mathf.Lerp(this._worldBottomLeft.y, this._worldTopRight.y, this._basePos.y + screenPos.y));
+
+    Material mat = sprite.renderer.material;
+    mat.shader = ShaderCache.Acquire((palette == null) ? "Brave/PlayerShader" : "Brave/LitCutoutUber");
+    mat.SetFloat("_UsePalette", (palette == null) ? 0f : 1f);
+    mat.SetFloat("_EmissivePower", 10f);
+    mat.SetTexture("_PaletteTex", palette);
+
     sprite.scale = new Vector3(scale, scale, 1f);
-    sprite.PlaceAtScaledPositionByAnchor(pos, Anchor.LowerCenter);
+    sprite.PlaceAtScaledPositionByAnchor(pos, anchor);
     sprite.UpdateZDepth();
     if (outline)
     {
@@ -291,8 +347,8 @@ public class RetinaHUD : MonoBehaviour
   private static Dictionary<string, float> _EnemyScales = new();
   private static float GetScaleForEnemy(AIActor enemy)
   {
-    string enemyName = enemy.AmmonomiconName();
-    if (_EnemyScales.TryGetValue(enemyName, out float scale))
+    string enemyGuid = enemy.EnemyGuid;
+    if (_EnemyScales.TryGetValue(enemyGuid, out float scale))
       return scale;
 
     scale = 1f;
@@ -301,9 +357,11 @@ public class RetinaHUD : MonoBehaviour
       tk2dSpriteDefinition idleDef = enemy.sprite.collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(enemy)];
       Vector3 extents = idleDef.boundsDataExtents;
       float maxSpriteSide = C.PIXELS_PER_TILE * Mathf.Max(extents.x, extents.y);
-      scale = (maxSpriteSide < 30f) ? 2f : (maxSpriteSide < 60f) ? 1f : 0.5f;
+      scale = (maxSpriteSide < 40f) ? 2f : (maxSpriteSide < 80f) ? 1f : 0.5f;
     }
-    return _EnemyScales[enemyName] = scale;
+    if (enemy.healthHaver is HealthHaver hh && (hh.IsBoss || hh.IsSubboss))
+      scale = Mathf.Min(scale, 1f);
+    return _EnemyScales[enemyGuid] = scale;
   }
 
   private static float GetNextLine(ref float y, float skip = 1.0f)
@@ -314,112 +372,116 @@ public class RetinaHUD : MonoBehaviour
     return oldY;
   }
 
-  private static string Status(AIActor target)
+  private string Status(AIActor target, out float projectedDamage)
   {
+    projectedDamage = 0f;
     if (!target)
-      return "------";
+      return string.Empty;
     if (target.healthHaver is not HealthHaver hh)
-      return "No";
-    if (target.IsGone)
-      return "No";
-    if (!hh.IsVulnerable)
-      return "No";
-    return "Yes";
+      return "Immortal";
+    if (hh.IsDead)
+      return "Deceased";
+    if (target.IsGone || !hh.IsVulnerable || hh.PreventAllDamage || hh.OnlyAllowSpecialBossDamage)
+      return "Invulnerable";
+    if (hh.healthIsNumberOfHits)
+    {
+      if (hh.GetCurrentHealth() <= 1f)
+        return "Faltering";
+      return "Steeled";
+    }
+
+    Projectile projectedProjectile = this._gun.gun.DefaultModule.projectiles[0].projectile;
+    projectedDamage = projectedProjectile.baseData.damage;
+    if (this._gun.PlayerOwner is PlayerController owner)
+    {
+      projectedDamage *= this._gun.PlayerOwner.DamageMult();
+      if (hh.IsBoss)
+        projectedDamage *= this._gun.PlayerOwner.BossDamageMult();
+    }
+    projectedDamage *= hh.AllDamageMultiplier;
+    if (hh.IsBoss)
+      projectedDamage *= projectedProjectile.BossDamageMultiplier;
+    bool capped = false;
+    if (projectedDamage <= 999f && !projectedProjectile.ignoreDamageCaps)
+    {
+      float uncappedDamage = projectedDamage;
+      if (hh.m_damageCap > 0f)
+        projectedDamage = Mathf.Min(hh.m_damageCap, projectedDamage);
+      if (hh.m_bossDpsCap > 0f)
+        projectedDamage = Mathf.Min(projectedDamage, hh.m_bossDpsCap * 3f - hh.m_recentBossDps);
+      capped = projectedDamage < uncappedDamage;
+    }
+    if (projectedDamage >= hh.GetCurrentHealth())
+      return "Threatened";
+    if (capped)
+      return "Resistant";
+    return "Vulnerable";
   }
 
-  private void SetUpTargetSprite(int ti)
-  {
-    AIActor target = (_TargetedEnemies.Count > ti) ? _TargetedEnemies[ti] : null;
-    if (target && target.sprite is tk2dSprite enemySprite)
-    {
-      this._extraTargetSprites[ti].renderer.enabled = true;
-      this._extraTargetSprites[ti].SetSprite(enemySprite.collection, enemySprite.spriteId);
-      if (ti == 0)
-        Place(this._extraTargetSprites[ti], new Vector2(0.85f, 0.55f), scale: GetScaleForEnemy(target), outline: true);
-      else
-      {
-        float y = 0.45f + 0.10f * ti;
-        Place(this._extraTargetSprites[ti], new Vector2(0.95f, y), scale: 0.25f * GetScaleForEnemy(target), outline: true);
-      }
-    }
-    else
-    {
-      if (SpriteOutlineManager.HasOutline(this._extraTargetSprites[ti]))
-        SpriteOutlineManager.RemoveOutlineFromSprite(this._extraTargetSprites[ti]);
-      this._extraTargetSprites[ti].renderer.enabled = false;
-    }
-  }
-
-  private List<AIActor> _TargetedEnemies = new();
   private void PlaceHUDElements()
   {
-    // recompute camera pos
-    this._worldBottomLeft = this._camera.MinVisiblePoint;
-    this._worldTopRight = this._camera.MaxVisiblePoint;
-
-    // determine target
     PlayerController player = this._gun.PlayerOwner;
-    AIActor target = null;
-    Vector2 bpos;
-    float gunAngle;
-    if (player && player.CurrentGun == this._gun.gun)
+    if (!player || player.CurrentGun != this._gun.gun)
     {
-      bpos = this._gun.gun.barrelOffset.position.XY();
-      gunAngle = this._gun.gun.CurrentAngle;
-      // TODO: this should return all enemies in direct sight unobstructed by a wall, sorted by closes first
-      this._gun.gun.AllEnemiesInLineOfSight(ref _TargetedEnemies, accountForWalls: true, sort: true);
-      target = (_TargetedEnemies.Count > 0) ? _TargetedEnemies[0] : null;
-    }
-    else
-    {
-      bpos = Vector2.zero;
-      gunAngle = 0f;
+      Dismiss();
+      return;
     }
 
-    // if (target && target.sprite is tk2dSprite enemySprite)
-    // {
-    //   this._targetSprite.renderer.enabled = true;
-    //   this._targetSprite.SetSprite(enemySprite.collection, enemySprite.spriteId);
-    //   Place(this._targetSprite, new Vector2(0.9f, 0.55f), scale: GetScaleForEnemy(target), outline: true);
-    // }
-    // else
-    // {
-    //   if (SpriteOutlineManager.HasOutline(this._targetSprite))
-    //     SpriteOutlineManager.RemoveOutlineFromSprite(this._targetSprite);
-    //   this._targetSprite.renderer.enabled = false;
-    // }
+    // recompute camera and HUD pos
+    float dtime      = Time.deltaTime;
+    this._shwoop     = this._shwoop + dtime;
+    float ease       = Ease.OutQuad(Mathf.Clamp01(this._shwoop / _SHWOOP_TIME));
+    bool panelOnLeft = Mathf.Abs(player.m_currentGunAngle.Clamp180()) < 90f;
+    float panelX     = panelOnLeft ? (_PANEL_SIZE_X * (ease - 1.0f)) : (1.0f - ease * _PANEL_SIZE_X);
+    this._basePos    = new Vector2(panelX, 0.5f - (0.5f * _PANEL_SIZE_Y));
+    this._worldBottomLeft = this._camera.MinVisiblePoint;
+    this._worldTopRight   = this._camera.MaxVisiblePoint;
+    float linePos         = _PANEL_SIZE_Y - _FIRST_TEXT_LINE;
+    float infoPos         = panelOnLeft ? _INFO_LABEL_X : (_PANEL_SIZE_X - _INFO_LABEL_X);
+    float healthPos       = panelOnLeft ? _HEALTH_LEFT : (_PANEL_SIZE_X - _HEALTH_LEFT);
+    float healthW         = panelOnLeft ? _HEALTH_W : -_HEALTH_W;
+    bool fullyShwooped = this._shwoop > _SHWOOP_TIME;
 
-    // compute some HUD parameters
-    float now = BraveTime.ScaledTimeSinceStartup;
-    float linePos     = 0.91f;
-    string targetName = target ? target.AmmonomiconName() : "<none>";
+    // set time scale
+    BraveTime.SetTimeScaleMultiplier(Mathf.Lerp(1.0f, MIN_TIMESCALE, ease), base.gameObject);
+
+    // determine target and compute some HUD parameters
+    this._gun.gun.AllEnemiesInLineOfSight(ref _targetedEnemies, accountForWalls: true, sort: true);
+    float now         = Time.realtimeSinceStartup;
+    Vector2 bpos      = this._gun.gun.barrelOffset.position.XY();
+    float gunAngle    = this._gun.gun.CurrentAngle;
+    AIActor target    = (_targetedEnemies.Count > 0) ? _targetedEnemies[0] : null;
+    string targetName = target ? target.AmmonomiconName() : string.Empty;
     Vector2 delta     = target ? target.CenterPosition - bpos : Vector2.right;
     int dAngle        = Mathf.RoundToInt(delta.ToAngle().AbsAngleTo(gunAngle));
-    string range      = target ? $"{Mathf.RoundToInt(16f * delta.magnitude)} cm" : "------";
-    string angle      = target ? $"{dAngle}deg" : "------";
-    Color healthColor = Color.Lerp(Color.green, Color.red, Mathf.Abs(Mathf.Sin(9f * now))).WithAlpha(0.85f);
-    bool shotWillKill = false;
+    string range      = target ? $"{(Mathf.RoundToInt(10f * delta.magnitude) / 10.0f):0.0}m" : string.Empty;
+    // string angle      = target ? $"{dAngle}deg" : "------";
 
-    // place indivual elements in screen space
-    Place(this._base, new Vector2(0.0f, 0.0f), new Vector2(1.0f, 1.0f));
-    Place(this._targetInfoRectangle, new Vector2(0.5f, 0.5f), new Vector2(1.0f, 1.0f));
-    Place(this._targetSpriteRectangle, new Vector2(0.8f, 0.5f), new Vector2(1.0f, 1.0f));
+    float healthAlpha = 0.85f * Mathf.Clamp01((this._shwoop - _SHWOOP_TIME) / _FADE_TIME);
+    Color healthColor = Color.Lerp(Color.green, Color.red, Mathf.Abs(Mathf.Sin(9f * now))).WithAlpha(healthAlpha);
+    string status     = Status(target, out float projectedDamage);
+    string collateral = target ? _CollateralLabels[Mathf.Clamp(_targetedEnemies.Count - 1, 0, _CollateralLabels.Length - 1)] : string.Empty;
 
-    Place(this._nameHeader,        "Specimen",         new Vector2(0.6f, GetNextLine(ref linePos, 1.0f)), newColor: Color.cyan);
-    Place(this._nameLabel,         targetName,         new Vector2(0.6f, GetNextLine(ref linePos, 1.0f)), newColor: ExtendedColours.pink);
+    // place individual elements in screen space
+    // Place(this._base, Vector2.zero, Vector2.one);
+    Place(this._targetInfoRectangle, Vector2.zero, new Vector2(_PANEL_SIZE_X, _PANEL_SIZE_Y), newColor: ExtendedColours.vibrantOrange.WithAlpha(0.2f * ease));
+    Place(this._nameHeader,        "Species",     new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
+    Place(this._nameLabel,         targetName,    new Vector2(infoPos, GetNextLine(ref linePos, 1.25f)), newColor: _LabelColor);
+    Place(this._rangeHeader,       "Range",       new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
+    Place(this._rangeLabel,        range,         new Vector2(infoPos, GetNextLine(ref linePos, 1.25f)), newColor: _LabelColor);
+    Place(this._collateralHeader,  "Collateral",  new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
+    Place(this._collateralLabel,   collateral,    new Vector2(infoPos, GetNextLine(ref linePos, 1.25f)), newColor: _LabelColor);
+    Place(this._vulnHeader,        "Status",      new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
+    Place(this._vulnLabel,         status,        new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _LabelColor);
     float healthTopY = GetNextLine(ref linePos, 1.0f);
-    float healthBotY = GetNextLine(ref linePos, 1.5f);
-    const float healthLeft = 0.55f;
-    const float healthW = 0.10f;
+    float healthBotY = GetNextLine(ref linePos, 1.0f);
     if (target && target.healthHaver is HealthHaver hh)
     {
-      float projectedDamage = this._gun.gun.DefaultModule.projectiles[0].projectile.baseData.damage * player.DamageMult();
       float hpPre  = hh.GetCurrentHealthPercentage();
       float hpPost = Mathf.Max(hh.GetCurrentHealth() - projectedDamage, 0f) / hh.GetMaxHealth();
-      shotWillKill = hpPost <= 0.0f;
-      Place(this._healthbarHurt, new Vector2(healthLeft, healthBotY), new Vector2(healthLeft + hpPost * healthW, healthTopY));
-      Place(this._healthbarFore, new Vector2(healthLeft + hpPost * healthW, healthBotY), new Vector2(healthLeft + hpPre * healthW, healthTopY), newColor: healthColor);
-      Place(this._healthbarBack, new Vector2(healthLeft + hpPre * healthW, healthBotY), new Vector2(healthLeft + healthW, healthTopY));
+      Place(this._healthbarHurt, new Vector2(healthPos, healthBotY), new Vector2(healthPos + hpPost * healthW, healthTopY), newColor: Color.green.WithAlpha(healthAlpha));
+      Place(this._healthbarFore, new Vector2(healthPos + hpPost * healthW, healthBotY), new Vector2(healthPos + hpPre * healthW, healthTopY), newColor: healthColor);
+      Place(this._healthbarBack, new Vector2(healthPos + hpPre * healthW, healthBotY), new Vector2(healthPos + healthW, healthTopY), newColor: Color.black.WithAlpha(healthAlpha));
     }
     else
     {
@@ -428,19 +490,34 @@ public class RetinaHUD : MonoBehaviour
       this._healthbarFore._meshRenderer.enabled = false;
     }
 
-    Place(this._obstructionHeader, "Obstruction", new Vector2(0.6f, GetNextLine(ref linePos, 1.0f)), newColor: Color.cyan);
-    Place(this._obstructionLabel,  "No",          new Vector2(0.6f, GetNextLine(ref linePos, 1.5f)), newColor: ExtendedColours.pink);
-    Place(this._rangeHeader,       "Range",       new Vector2(0.6f, GetNextLine(ref linePos, 1.0f)), newColor: Color.cyan);
-    Place(this._rangeLabel,        range,         new Vector2(0.6f, GetNextLine(ref linePos, 1.5f)), newColor: ExtendedColours.pink);
-    Place(this._angleHeader,       "Angle",       new Vector2(0.6f, GetNextLine(ref linePos, 1.0f)), newColor: Color.cyan);
-    Place(this._angleLabel,        angle,         new Vector2(0.6f, GetNextLine(ref linePos, 1.5f)), newColor: ExtendedColours.pink);
-    Place(this._vulnHeader,        "Status",      new Vector2(0.6f, GetNextLine(ref linePos, 1.0f)), newColor: Color.cyan);
-    Place(this._vulnLabel,         Status(target),new Vector2(0.6f, GetNextLine(ref linePos, 1.5f)), newColor: ExtendedColours.pink);
-    Place(this._counterLabel,      "",            new Vector2(0.6f, GetNextLine(ref linePos, 1.0f)), newColor: Color.cyan);
-
-    // handle additional targets
-    for (int i = 0; i < MAX_TARGETS; ++i)
-      SetUpTargetSprite(i);
+    // handle additional target renders
+    for (int ti = 0; ti < MAX_TARGETS; ++ti)
+    {
+      AIActor extraTarget = (_targetedEnemies.Count > ti) ? _targetedEnemies[ti] : null;
+      if (fullyShwooped && extraTarget && extraTarget.sprite is tk2dSprite enemySprite)
+      {
+        this._extraTargetSprites[ti].renderer.enabled = true;
+        this._extraTargetSprites[ti].SetSprite(enemySprite.collection, enemySprite.spriteId);
+        if (ti == 0)
+        {
+          float spriteX = panelOnLeft ? _TARGET_SPRITE_MAIN_X : (_PANEL_SIZE_X - _TARGET_SPRITE_MAIN_X);
+          Anchor anchor = panelOnLeft ? Anchor.LowerLeft : Anchor.LowerRight;
+          Place(this._extraTargetSprites[ti], new Vector2(spriteX, _TARGET_SPRITE_MIN_Y), scale: GetScaleForEnemy(extraTarget), outline: true, palette: extraTarget.optionalPalette);
+        }
+        else
+        {
+          float spriteX = panelOnLeft ? _TARGET_SPRITE_EXTRA_X : (_PANEL_SIZE_X - _TARGET_SPRITE_EXTRA_X);
+          float y = _TARGET_SPRITE_MIN_Y + _TARGET_SPACING * (ti - 1);
+          Place(this._extraTargetSprites[ti], new Vector2(spriteX, y), scale: 0.5f * GetScaleForEnemy(extraTarget), outline: true, anchor: Anchor.LowerCenter, palette: extraTarget.optionalPalette);
+        }
+      }
+      else
+      {
+        if (SpriteOutlineManager.HasOutline(this._extraTargetSprites[ti]))
+          SpriteOutlineManager.RemoveOutlineFromSprite(this._extraTargetSprites[ti]);
+        this._extraTargetSprites[ti].renderer.enabled = false;
+      }
+    }
   }
 
   private void OnDestroy()
@@ -475,8 +552,9 @@ public class RetinaHUD : MonoBehaviour
     if (this._active)
       return;
 
-    this._scale = 0.0f;
+    this._shwoop = 0.0f;
     this._active = true;
+    base.gameObject.Play("retina_hud_engage_sound");
   }
 
   public void Dismiss(bool force = false, bool deactivate = true)
@@ -496,42 +574,42 @@ public class RetinaHUD : MonoBehaviour
       label.IsVisible = false;
     }
 
+    foreach (tk2dSprite sprite in this._extraTargetSprites)
+      if (sprite)
+      {
+        if (SpriteOutlineManager.HasOutline(sprite))
+          SpriteOutlineManager.RemoveOutlineFromSprite(sprite);
+        sprite.renderer.enabled = false;
+      }
+
     if (deactivate)
+    {
+      // base.gameObject.Play("retina_hud_dismiss_sound");
       this._active = false;
+      BraveTime.ClearMultiplier(base.gameObject);
+    }
   }
 }
 
-// [HarmonyPatch]
+public class RetinaLightburstDoer : MonoBehaviour
+{
+  private void OnSpawned()
+  {
+    EasyLight.Create(pos: base.transform.position, color: ExtendedColours.vibrantOrange, radius: 4f, grownIn: true, brightness: 10.0f, fadeInTime: 0.2f, fadeOutTime: 0.2f, maxLifeTime: 0.5f);
+  }
+}
+
 public class RetinaProjectile : MonoBehaviour
 {
     private Projectile _projectile;
     private PlayerController _owner;
     private bool _killedEnemy;
-    private Vector2? collisionPoint;
-
-    // [HarmonyPatch(typeof(VFXPool), nameof(VFXPool.SpawnAtPosition), typeof(Vector3), typeof(float), typeof(Transform), typeof(Vector2?), typeof(Vector2?), typeof(float?), typeof(bool), typeof(VFXComplex.SpawnMethod), typeof(tk2dBaseSprite), typeof(bool))]
-    // [HarmonyPrefix]
-    // private static void ProjectileHandleHitEffectsEnemyPatch(VFXPool __instance)
-    // {
-    //   if (__instance.effects.Length > 0 && __instance.effects[0].effects.Length > 0)
-    //     System.Console.WriteLine($"spawning {__instance.effects[0].effects[0].effect.name}");
-    // }
-
-    // [HarmonyPatch(typeof(SpawnManager), nameof(SpawnManager.Spawn), typeof(GameObject), typeof(Vector3), typeof(Quaternion), typeof(Transform), typeof(bool))]
-    // [HarmonyPrefix]
-    // private static void SpawnManagerSpawnPatch(SpawnManager __instance, GameObject prefab, Vector3 position, Quaternion rotation, Transform parent, bool ignoresPools)
-    // {
-    //     if (!prefab || !prefab.name.Contains("retina"))
-    //       return;
-    //     System.Console.WriteLine($"spawning object {prefab.name} at {position.x},{position.y},{position.z} with ignorePools {ignoresPools} and parent {(parent == null ? "null" : parent.gameObject.name)}");
-    // }
 
     private void Start()
     {
       this._projectile = base.GetComponent<Projectile>();
       this._projectile.OnWillKillEnemy += this.OnWillKillEnemy;
       this._projectile.specRigidbody.OnRigidbodyCollision += this.OnRigidbodyCollision;
-      this._projectile.specRigidbody.OnTileCollision += this.OnTileCollision;
       this._owner = this._projectile.Owner as PlayerController;
       if (base.GetComponentInChildren<CwaffTrailController>() is CwaffTrailController tc)
         tc.gameObject.GetComponent<tk2dBaseSprite>().SetGlowiness(100f);
@@ -553,28 +631,11 @@ public class RetinaProjectile : MonoBehaviour
     private void OnRigidbodyCollision(CollisionData collision)
     {
       this._projectile.ResetPiercing();
-      collisionPoint = collision.Contact;
       if (this._killedEnemy) //NOTE: need to spawn hit effects manually due to EraseFromExistenceWithRewards
       {
         this._killedEnemy = false;
         SpawnManager.SpawnVFX(this._projectile.hitEffects.enemy.effects[0].effects[0].effect, collision.Contact, Quaternion.identity, ignoresPools: true);
       }
-    }
-
-    private void OnTileCollision(CollisionData tileCollision)
-    {
-      collisionPoint = tileCollision.Contact;
-    }
-
-    private static void DoLightBurst(Vector2 lightPoint)
-    {
-      EasyLight.Create(pos: lightPoint, color: ExtendedColours.vibrantOrange, radius: 4f, grownIn: true, brightness: 10.0f, fadeInTime: 0.2f, fadeOutTime: 0.2f, maxLifeTime: 0.5f);
-    }
-
-    private void OnDestroy()
-    {
-      Vector2 lightPoint = collisionPoint ?? (this._projectile ? this._projectile.SafeCenter : base.transform.position);
-      DoLightBurst(lightPoint);
     }
 
     private static float RetinaEmit(float t)
