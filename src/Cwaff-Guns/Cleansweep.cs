@@ -399,6 +399,7 @@ public class MinesweeperGame : MonoBehaviour
         this._gameRoom   = this._player.CurrentRoom;
         this._gameRoom.OnEnemiesCleared += this.OnRoomCleared;
         this._spawner    = StartCoroutine(PopulateGrid());
+        RegisterEvents();
         this._setup      = true;
     }
 
@@ -429,6 +430,7 @@ public class MinesweeperGame : MonoBehaviour
 
     public void Teardown(bool calledFromDestroy = false)
     {
+        DeregisterEvents();
         if (this._gameRoom != null)
             this._gameRoom.OnEnemiesCleared -= this.OnRoomCleared;
         MinesweeperTile.SetTarget(null);
@@ -611,7 +613,7 @@ public class MinesweeperGame : MonoBehaviour
         return null;
     }
 
-    private void LateUpdate()
+    private void OnFinishedFrame()
     {
         if (!this._setup)
             return;
@@ -704,6 +706,21 @@ public class MinesweeperGame : MonoBehaviour
         bool validTarget = this._tileMap.TryGetValue(aimTile, out MinesweeperTile targetTile);
         this._targetTile = (validTarget && playerGun && playerGun.gameObject.GetComponent<Cleansweep>()) ? targetTile : null;
         MinesweeperTile.SetTarget(this._targetTile);
+    }
+
+    private void RegisterEvents()
+    {
+        if (GameManager.Instance.MainCameraController is CameraController cc)
+        {
+          cc.OnFinishedFrame -= this.OnFinishedFrame;
+          cc.OnFinishedFrame += this.OnFinishedFrame;
+        }
+    }
+
+    private void DeregisterEvents()
+    {
+        if (GameManager.Instance.MainCameraController is CameraController cc)
+          cc.OnFinishedFrame -= this.OnFinishedFrame;
     }
 
     private void OnDestroy()
