@@ -3763,7 +3763,7 @@ public static class Extensions
   }
 
   //REFACTOR: use this for Leafblower
-  /// <summary>Apply knockback to a KnockbackDoer from a continuous, known source (e.g., Leafblower or Fluxfist)</summary>
+  /// <summary>Apply knockback to a KnockbackDoer from a continuous, known source (used by, e.g., Leafblower, Fluxfist, Newton's Apple)</summary>
   public static void ApplyContinuousSourcedKnockback(this AIActor enemy, GameObject source, Dictionary<AIActor, ActiveKnockbackData> activeKbs, Vector2 velocity)
   {
     float force = velocity.magnitude;
@@ -3779,6 +3779,18 @@ public static class Extensions
         previousData.initialKnockback = previousData.knockback;
         previousData.elapsedTime = 0.0f;
     }
+  }
+
+  private static List<AIActor> _DeadKeys = new();
+  /// <summary>Removes destroyed enemies from a knockback dict used by ApplyContinuousSourcedKnockback()</summary>
+  public static void CleanupKnockbackData(this Dictionary<AIActor, ActiveKnockbackData> kbDict)
+  {
+      foreach (var kvp in kbDict)
+        if (!kvp.Key)
+          _DeadKeys.Add(kvp.Key);
+      foreach (AIActor deadActor in _DeadKeys)
+        kbDict.Remove(deadActor);
+      _DeadKeys.Clear();
   }
 
   /// <summary>Detach a sprite from that of its SpeculativeRigidBody so its transform can be independently modified</summary>
