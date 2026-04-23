@@ -28,7 +28,7 @@
 - And more! 
 - Check out the [official trailer](https://youtu.be/5DJ5meM842w)
 
-![](previews/rogo_stumble.png)
+![](previews/rogo_stumble.gif)
 
 ### Goals
 

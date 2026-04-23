@@ -203,7 +203,6 @@ public class RetinaHUD : MonoBehaviour
     this._vulnHeader            = Lab(color: Color.cyan);
     this._vulnLabel             = Lab(color: Color.cyan);
 
-    System.Console.WriteLine($" old size was {this._nameLabel.Size.x}, {this._nameLabel.Size.y}, autosize {this._nameLabel.AutoSize}, autoheight {this._nameLabel.AutoHeight}, wrap {this._nameLabel.WordWrap}");
     this._nameLabel.AutoSize = false;
     this._nameLabel.AutoHeight = false;
     this._nameLabel.WordWrap = true;
