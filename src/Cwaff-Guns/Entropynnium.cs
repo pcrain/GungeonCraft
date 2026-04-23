@@ -77,7 +77,7 @@ public class Entropynnium : CwaffGun
         }
         float dtime = BraveTime.DeltaTime;
         float newRadius = Mathf.Min(this._manaRadius + (_MAX_RADIUS / _CHARGE_TIME) * dtime, _MAX_RADIUS);
-        int manaCost = Mathf.CeilToInt(newRadius * newRadius * _MANA_DRAIN) - this._manaDrainedThisCharge;
+        int manaCost = Mathf.CeilToInt((this.Mastered ? 0.5f : 1.0f) * newRadius * newRadius * _MANA_DRAIN) - this._manaDrainedThisCharge;
         if (manaCost <= this._storedMana)
         {
             this._storedMana -= manaCost;
@@ -175,6 +175,8 @@ public class Entropynnium : CwaffGun
         base.PostProcessProjectile(projectile);
         if (projectile is not ManaExplosionProjectile mep)
             return;
+        if (this._manaRadius == _MAX_RADIUS && this.Mastered && this.PlayerOwner is PlayerController player)
+          player.ForceBlank();
         mep.Setup(radius: this._manaRadius, forceMult: 1f);
         DestroyDetonationRing();
     }

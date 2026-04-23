@@ -336,6 +336,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfCleansweep>(MASTERY_CLEANSWEEP, Cleansweep.ItemName);
         // Double kills refund ammo, triple kills drop an armor piece, and quad kills completely refill Retina's ammo.
         NewMastery<MasteryOfRetina>(MASTERY_RETINA, Retina.ItemName);
+        // Mana costs are halved and max power detonations trigger a blank effect.
+        NewMastery<MasteryOfEntropynnium>(MASTERY_ENTROPYNNIUM, Entropynnium.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -622,6 +624,7 @@ internal class MasteryOfGradius              : MasteryDummyItem {}
 internal class MasteryOfHeartbreaker         : MasteryDummyItem {}
 internal class MasteryOfCleansweep           : MasteryDummyItem {}
 internal class MasteryOfRetina               : MasteryDummyItem {}
+internal class MasteryOfEntropynnium         : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -770,4 +773,5 @@ public enum Synergy {
     MASTERY_HEARTBREAKER,
     MASTERY_CLEANSWEEP,
     MASTERY_RETINA,
+    MASTERY_ENTROPYNNIUM,
 };
