@@ -178,20 +178,21 @@ public class MinesweeperTile : MonoBehaviour
 
     private static MinesweeperTile _Target = null;
 
-    internal bool _setup           = false;
-    internal IntVector2 _pos       = default;
-    internal Vector2 _tl           = default;
-    internal Vector2 _br           = default;
-    internal Vector2 _center       = default;
-    internal Vector2 _labelPos     = default;
-    internal float _lifetime       = 0.0f;
-    internal Geometry _square      = null;
-    internal int  _number          = 0;
-    internal dfLabel  _numberLabel = null;
-    internal Color _color          = default;
-    internal bool _revealed        = false;
-    internal bool _flagged         = false;
-    internal float _lastAlpha      = 0.0f;
+    internal bool _setup             = false;
+    internal IntVector2 _pos         = default;
+    internal Vector2 _tl             = default;
+    internal Vector2 _br             = default;
+    internal Vector2 _center         = default;
+    internal Vector2 _labelPos       = default;
+    internal float _lifetime         = 0.0f;
+    internal Geometry _square        = null;
+    internal int  _number            = 0;
+    internal dfLabel  _numberLabel   = null;
+    internal Transform _numberLabelT = null;
+    internal Color _color            = default;
+    internal bool _revealed          = false;
+    internal bool _flagged           = false;
+    internal float _lastAlpha        = 0.0f;
 
     public bool IsRevealed => this._revealed;
     public bool IsFlagged => this._flagged;
@@ -222,6 +223,7 @@ public class MinesweeperTile : MonoBehaviour
             MinesweeperTile newTile = new GameObject("minesweeper tile").AddComponent<MinesweeperTile>();
             newTile._square         = new GameObject("minesweeper tile square").AddComponent<Geometry>();
             newTile._numberLabel    = CwaffLabel.MakeNewLabel(unicode: false, outline: false);
+            newTile._numberLabelT   = newTile._numberLabel.transform;
             node.Value              = newTile;
             // Lazy.DebugLog($"created node number {(++_Counter)}");
         }
@@ -576,9 +578,9 @@ public class MinesweeperGame : MonoBehaviour
 
     public MinesweeperTile TileAtPosition(Vector2 pos)
     {
-        if (!_Game || _Game._tileMap == null)
+        if (this._tileMap == null || this._dismissing)
             return null;
-        if (_Game._tileMap.TryGetValue(pos.QuantizeTileRound(this._tileSize), out MinesweeperTile tile))
+        if (this._tileMap.TryGetValue(pos.QuantizeTileRound(this._tileSize), out MinesweeperTile tile))
             return tile;
         return null;
     }
@@ -608,13 +610,10 @@ public class MinesweeperGame : MonoBehaviour
             }
         }
 
-        bool profile = false;
         float now = BraveTime.ScaledTimeSinceStartup;
-        if (now > _NextProfile)
-        {
-          _NextProfile = now + _PROFILE_RATE;
-          profile = true;
-        }
+        // bool profile = now > _NextProfile;
+        // if (profile)
+        //   _NextProfile = now + _PROFILE_RATE;
 
         float uiScale              = Pixelator.Instance.ScaleTileScale / Pixelator.Instance.CurrentTileScale; // 1.33, usually
         float alpha                = this._dismissing ? this._dismissTime : 1.0f;
@@ -628,7 +627,7 @@ public class MinesweeperGame : MonoBehaviour
         Matrix4x4 outVP            = renderCam.projectionMatrix * renderCam.worldToCameraMatrix;
         Matrix4x4 conversionMatrix = outVP.inverse * inVP;
 
-        int labelUpdates = 0;
+        // int labelUpdates = 0;
         if (GameManager.Instance.IsPaused)
           foreach (MinesweeperTile tile in this._tiles)
             tile._numberLabel.IsVisible = false;
@@ -654,22 +653,22 @@ public class MinesweeperGame : MonoBehaviour
             // update tile label
             if (tile._number > 0) // optimization: don't draw the label if it's empty
             {
-              if (tile._revealed && alpha > 0 && mcc.PointIsVisible(tile._labelPos, offscreenPercent))
+              if (tile._revealed && alpha > 0 && mcc.PointIsVisible(tile._labelPos/*, offscreenPercent*/))
               {
                 // fast matrix conversion
                 tile._numberLabel.IsVisible = true;
                 tile._numberLabel.Opacity = alpha * _NUM_OPACITY;
                 Vector4 v = conversionMatrix * new Vector4(tile._labelPos.x, tile._labelPos.y, 0f, 1f);
-                tile._numberLabel.transform.position = new Vector3(v.x, v.y, 0f);
-                ++labelUpdates;
+                tile._numberLabelT.position = new Vector3(v.x, v.y, 0f);
+                // ++labelUpdates;
               }
               else
                 tile._numberLabel.IsVisible = false;
             }
         }
 
-        if (profile)
-          Lazy.DebugConsoleLog($"rendered {labelUpdates,4} out of {this._tiles.Count,4} labels {((100f * labelUpdates) / this._tiles.Count):F2}%");
+        // if (profile)
+        //   Lazy.DebugConsoleLog($"rendered {labelUpdates,4} out of {this._tiles.Count,4} labels {((100f * labelUpdates) / this._tiles.Count):F2}%");
 
         if (this._dismissing || !this._populated || this._player.IsGhost || !this._player.CurrentGun || GameManager.Instance.IsPaused)
             return;
