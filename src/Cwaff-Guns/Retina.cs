@@ -605,6 +605,7 @@ public class RetinaProjectile : MonoBehaviour
     private Projectile _projectile;
     private PlayerController _owner;
     private bool _killedEnemy;
+    private int _killTracker = 0;
 
     private void Start()
     {
@@ -627,6 +628,7 @@ public class RetinaProjectile : MonoBehaviour
           easeEmit: RetinaEmit, easeFade: RetinaFade, easeAmp: RetinaAmp, sound: "retina_impact_burst_sound", soundTime: 0.4f);
       actor.EraseFromExistenceWithRewards(true); // NOTE: this suppresses hit effects, so we need to spawn them manually
       this._killedEnemy = true;
+      ++this._killTracker;
     }
 
     private void OnRigidbodyCollision(CollisionData collision)
@@ -637,6 +639,43 @@ public class RetinaProjectile : MonoBehaviour
         this._killedEnemy = false;
         SpawnManager.SpawnVFX(this._projectile.hitEffects.enemy.effects[0].effects[0].effect, collision.Contact, Quaternion.identity, ignoresPools: true);
       }
+    }
+
+    private void OnDestroy()
+    {
+      if (this._killTracker < 2 || !this._owner || !this._owner.HasSynergy(Synergy.MASTERY_RETINA))
+        return;
+      if (this._owner.CurrentGun is not Gun gun || gun.gameObject.GetComponent<Retina>() is not Retina retina)
+        return;
+
+      // double kill -> refund shot
+      gun.MoveBulletsIntoClip(1);
+      gun.GainAmmo(1);
+      if (this._killTracker < 3)
+      {
+        gun.gameObject.Play("halo_double_kill_sound");
+        return;
+      }
+
+      // triple kill -> spawn armor piece
+      Vector2 armorSpot = this._owner.CenterPosition;
+      if (this._owner.CurrentRoom is RoomHandler room)
+      {
+        Vector2 betterSpot = room.GetCenteredVisibleClearSpot(2, 2, out bool success).ToVector2();
+        if (success)
+          armorSpot = betterSpot;
+      }
+      LootEngine.SpawnItem(ItemHelper.Get(Items.Armor).gameObject, armorSpot, Vector2.zero, 0f, true, true, false);
+      if (this._killTracker < 4)
+      {
+        gun.gameObject.Play("halo_triple_kill_sound");
+        return;
+      }
+
+      // quad kill -> fully restore ammo
+      gun.GainAmmo(gun.AdjustedMaxAmmo);
+      gun.MoveBulletsIntoClip(gun.DefaultModule.numberOfShotsInClip);
+      gun.gameObject.Play("halo_overkill_sound");
     }
 
     private static float RetinaEmit(float t)
