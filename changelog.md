@@ -8,6 +8,7 @@
 - Updated Ignizol's sprites to match those in [Ignizol Combusts Literally Everything](https://captainpretzel.itch.io/ignizol-combusts-literally-everything)
 - Fixed bug with Ignizol teleporting for a single frame when turning around while carrying him
 - Fixed (maybe???) issue on Windows with screen shaders causing lighting artifacts
+- Changed mastery ritual to use the center of gun sprites instead of gun transforms so positioning is more intuitive
 
 ## 1.28.3 (2026-03-15)
 

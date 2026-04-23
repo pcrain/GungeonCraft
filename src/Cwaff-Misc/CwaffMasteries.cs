@@ -68,6 +68,7 @@ public class MasteryRitualComponent : MonoBehaviour
   internal static List<MasteryRitualComponent> _RitualGuns = new();
 
   private Gun _gun = null;
+  private tk2dBaseSprite _sprite = null;
   private ParticleSystem _ps = null;
   private GameObject _sigil = null;
   private float _spinSpeed = 1.0f;
@@ -99,10 +100,18 @@ public class MasteryRitualComponent : MonoBehaviour
     }
 
     // Requirement #3: 3 of the guns must form a triangle, and the 4th gun must be inside that triangle
-    Vector2 p0 = roomGuns[0].gameObject.transform.position.XY();
-    Vector2 p1 = roomGuns[1].gameObject.transform.position.XY();
-    Vector2 p2 = roomGuns[2].gameObject.transform.position.XY();
-    Vector2 p3 = roomGuns[3].gameObject.transform.position.XY();
+    for (int i = 0; i < 4; ++i)
+    {
+      if (roomGuns[i]._sprite)
+        continue;
+      roomGuns[i]._sprite = roomGuns[i].gameObject.GetComponent<tk2dBaseSprite>();
+      if (!roomGuns[i]._sprite)
+        return false;
+    }
+    Vector2 p0 = roomGuns[0]._sprite.WorldCenter;
+    Vector2 p1 = roomGuns[1]._sprite.WorldCenter;
+    Vector2 p2 = roomGuns[2]._sprite.WorldCenter;
+    Vector2 p3 = roomGuns[3]._sprite.WorldCenter;
     MasteryRitualComponent centerGun = null;
     if (PointInTriangle(p0, p1, p2, p3))
       centerGun = roomGuns[0];
@@ -329,8 +338,12 @@ public class MasteryRitualComponent : MonoBehaviour
         this.enabled = true;
       }
       if (!this._gun)
+      {
         this._gun = base.GetComponent<Gun>();
-      if (!this._gun || !this._gun.sprite)
+        if (!this._sprite)
+          this._sprite = this._gun.sprite;
+      }
+      if (!this._gun || !this._sprite)
         return;
 
       _CatalystNiceParticleSytem ??= MakeNiceParticleSystem(new Color(0.75f, 0.75f, 0.5f), arcSpeed: _PARTICLE_SPIN_SPEED);
