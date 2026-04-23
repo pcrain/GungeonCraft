@@ -582,8 +582,8 @@ public class IgnizolCompanion : CwaffCompanionController
                         bool flipped = this._carrier.sprite.FlipX;
                         if (UpdateSecondaryRenderer() || this._launchSpriteFlipped != flipped)
                         {
+                            this._jumpSprite.transform.parent = this._carrier.transform;
                             this._jumpSprite.transform.position = carryPos;
-                            this._jumpSprite.transform.parent = this._carrier.sprite.transform;
                             this._launchSpriteFlipped = flipped;
                         }
                         this._jumpSprite.transform.position = this._jumpSprite.transform.position.WithY(this._carrier.sprite.WorldTopCenter.y);

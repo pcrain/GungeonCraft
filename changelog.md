@@ -5,6 +5,8 @@
 - Added Entropynnium, Cleansweep, Flux Fist, Retina, and Newton's Apple
 	- Cleansweep and Newton's Apple sprites thanks to [SpecialAPI](https://github.com/SpecialAPI)!
 	- Retina sprite thanks to [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)
+- Updated Ignizol's sprites to match those in [Ignizol Combusts Literally Everything](https://captainpretzel.itch.io/ignizol-combusts-literally-everything)
+- Fixed bug with Ignizol teleporting for a single frame when turning around while carrying him
 
 ## 1.28.3 (2026-03-15)
 
