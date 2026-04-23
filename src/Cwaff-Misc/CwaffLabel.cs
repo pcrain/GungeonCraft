@@ -36,10 +36,10 @@ public static class CwaffLabel
       rot = rot.Clamp180();
       Vector2 finalPos = pos;
       float uiScale = Pixelator.Instance.ScaleTileScale / Pixelator.Instance.CurrentTileScale; // 1.33, usually
-      float fontSizeToPixels = uiScale / C.PIXELS_PER_CELL;
       float adj = label.PixelsToUnits() / uiScale; // PixelsToUnits() == 1 / 303.75 == 16/9 * 2/1080
       if (Mathf.Abs(rot) > 90f)
       {
+          float fontSizeToPixels = uiScale / C.PIXELS_PER_CELL;
           rot = (rot + 180f).Clamp180();
           //NOTE: need to adjust position of bottom-aligned text
           //HACK: 0.5 seems to be the magic number for this font size here, idk how to arrive at this answer computationally though...
@@ -50,8 +50,7 @@ public static class CwaffLabel
       label.transform.position = dfFollowObject.ConvertWorldSpaces(
           finalPos,
           GameManager.Instance.MainCameraController.Camera,
-          GameUIRoot.Instance.m_manager.RenderCamera).WithZ(0f);
-      label.transform.position = label.transform.position.QuantizeFloor(adj);
+          GameUIRoot.Instance.m_manager.RenderCamera).WithZ(0f).QuantizeFloor(adj);
       label.transform.localRotation = rot.EulerZ();
       label.IsVisible = true;
       LabelExt le = label.gameObject.GetComponent<LabelExt>();

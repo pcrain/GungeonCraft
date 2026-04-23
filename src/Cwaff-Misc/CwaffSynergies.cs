@@ -332,6 +332,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfGradius>(MASTERY_GRADIUS, Gradius.ItemName);
         // While Heartbreaker is active, each of the player's empty heart containers orbits them to block bullets.
         NewMastery<MasteryOfHeartbreaker>(MASTERY_HEARTBREAKER, Heartbreaker.ItemName);
+        // Minesweeper grids have smaller cells and contain four times as many mines
+        NewMastery<MasteryOfCleansweep>(MASTERY_CLEANSWEEP, Cleansweep.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -616,6 +618,7 @@ internal class MasteryOfZealot               : MasteryDummyItem {}
 internal class MasteryOfToothpaste           : MasteryDummyItem {}
 internal class MasteryOfGradius              : MasteryDummyItem {}
 internal class MasteryOfHeartbreaker         : MasteryDummyItem {}
+internal class MasteryOfCleansweep           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -762,4 +765,5 @@ public enum Synergy {
     MASTERY_TOOTHPASTE,
     MASTERY_GRADIUS,
     MASTERY_HEARTBREAKER,
+    MASTERY_CLEANSWEEP,
 };

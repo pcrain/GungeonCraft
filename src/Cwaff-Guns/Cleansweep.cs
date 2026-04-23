@@ -40,6 +40,7 @@ public class Cleansweep : CwaffGun
         _MineExplosion = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultExplosionData.Clone();
         _MineExplosion.damage = _MINE_EXPLOSION_DAMAGE;
         _MineExplosion.damageRadius *= 0.65f;
+        _MineExplosion.doScreenShake = false;
     }
 
     // NOTE: called BEFORE depleting clip
@@ -86,7 +87,7 @@ public class Cleansweep : CwaffGun
             return; // inactive, do normal firing stuff
 
         gun.LoseAmmo(_GAME_AMMO_COST);
-        MinesweeperGame.StartGame(player); // activate the Minesweeper game
+        MinesweeperGame.StartGame(player, this.Mastered); // activate the Minesweeper game
         _NextResetTime = BraveTime.ScaledTimeSinceStartup + _RESET_DELAY;
         player.SuppressThisClick = true;
     }
@@ -100,7 +101,7 @@ public class Cleansweep : CwaffGun
             return;
         _NextResetTime = now + _RESET_DELAY;
         gun.LoseAmmo(_RESTART_AMMO_COST);
-        MinesweeperGame.StartGame(player);
+        MinesweeperGame.StartGame(player, this.Mastered);
     }
 
     [HarmonyPatch]
@@ -147,7 +148,9 @@ public class SweepProjectile : MonoBehaviour
     {
         if (!this._projectile)
             return;
-        if (MinesweeperGame.TileAtPosition(this._projectile.SafeCenter) is not MinesweeperTile tile)
+        if (!MinesweeperGame.IsGameActive)
+            return;
+        if (MinesweeperGame.ActiveGame.TileAtPosition(this._projectile.SafeCenter) is not MinesweeperTile tile)
             return;
         if (tile.IsRevealed)
             return;
@@ -159,10 +162,7 @@ public class SweepProjectile : MonoBehaviour
 
 public class MinesweeperTile : MonoBehaviour
 {
-    private const float _SHWOOP_TIME = 0.18f;
-    private const float _MINE_CHANCE = 0.125f;
-    private const float _TS          = MinesweeperGame._TS;
-    private const float _NUM_OPACITY = 0.85f;
+    internal const float _MINE_CHANCE = 0.125f;
 
     private static readonly Color[] _NumberColors = [
         new Color(0.75f, 0.75f, 0.75f), // 0 (safe)
@@ -176,25 +176,22 @@ public class MinesweeperTile : MonoBehaviour
         new Color(0.50f, 0.50f, 0.50f), // 8
     ];
 
-    private static readonly Color _UnknownColor = new Color(0.15f, 0.25f, 0.65f);
-    private static readonly Color _FlaggedColor = new Color(0.55f, 0.95f, 0.65f);
-
     private static MinesweeperTile _Target = null;
 
-    private bool _setup           = false;
-    private IntVector2 _pos       = default;
-    private Vector2 _tl           = default;
-    private Vector2 _br           = default;
-    private Vector2 _center       = default;
-    private Vector2 _labelPos     = default;
-    private float _lifetime       = 0.0f;
-    private Geometry _square      = null;
-    private int  _number          = 0;
-    private dfLabel  _numberLabel = null;
-    private Color _color          = default;
-    private bool _isTargeted      = false;
-    private bool _revealed        = false;
-    private bool _flagged         = false;
+    internal bool _setup           = false;
+    internal IntVector2 _pos       = default;
+    internal Vector2 _tl           = default;
+    internal Vector2 _br           = default;
+    internal Vector2 _center       = default;
+    internal Vector2 _labelPos     = default;
+    internal float _lifetime       = 0.0f;
+    internal Geometry _square      = null;
+    internal int  _number          = 0;
+    internal dfLabel  _numberLabel = null;
+    internal Color _color          = default;
+    internal bool _revealed        = false;
+    internal bool _flagged         = false;
+    internal float _lastAlpha      = 0.0f;
 
     public bool IsRevealed => this._revealed;
     public bool IsFlagged => this._flagged;
@@ -242,30 +239,32 @@ public class MinesweeperTile : MonoBehaviour
             this._numberLabel.IsVisible = false;
             this._numberLabel.Opacity = 0.0f;
         }
+        if (this._square)
+          this._square._meshRenderer.enabled = false;
         LinkedListNode<MinesweeperTile> node = _ActiveTiles.Last;
         _ActiveTiles.RemoveLast();
         node.Value = this;
         _InactiveTiles.AddLast(node);
     }
 
-    public static MinesweeperTile Setup(IntVector2 pos, int number)
+    public static MinesweeperTile Setup(IntVector2 pos, int number, int tileSize)
     {
         MinesweeperTile tile                = Rent();
         tile._lifetime                      = 0.0f;
-        tile._isTargeted                    = false;
         tile._revealed                      = false;
         tile._flagged                       = false;
         tile._pos                           = pos;
         tile._tl                            = pos.ToVector2();
-        tile._center                        = tile._tl + new Vector2(0.5f * _TS, 0.5f * _TS);
-        tile._br                            = tile._tl + new Vector2(_TS, _TS);
-        tile._labelPos                      = tile._tl + new Vector2(_TS * 0.6f, _TS * 0.3f);
+        tile._center                        = tile._tl + new Vector2(0.5f * tileSize, 0.5f * tileSize);
+        tile._br                            = tile._tl + new Vector2(tileSize, tileSize);
+        tile._labelPos                      = tile._tl + new Vector2(tileSize * 0.6f, tileSize * 0.3f);
         tile._color                         = (number < 0) ? Color.red : _NumberColors[0];
         tile._number                        = number;
         tile._numberLabel.Text              = (number <= 0) ? string.Empty : $"{number}";
-        tile._numberLabel.TextScale         = 0.5f * _TS;
+        tile._numberLabel.TextScale         = 0.5f * tileSize;
         tile._numberLabel.Color             = (number < 0) ? Color.magenta : _NumberColors[number];
         tile._numberLabel.Opacity           = 0.0f;
+        tile._numberLabel.IsVisible         = number > 0;
         tile._numberLabel.TextAlignment     = TextAlignment.Center; // NOTE: seems to have no effect ):
         tile._numberLabel.VerticalAlignment = dfVerticalAlignment.Middle; // NOTE: seems to have no effect ):
         tile._setup                         = true;
@@ -276,15 +275,6 @@ public class MinesweeperTile : MonoBehaviour
         tile._numberLabel.gameObject.SetLayerRecursively(bglayer);
 
         return tile;
-    }
-
-    public static void SetTarget(MinesweeperTile newTarget)
-    {
-        if (_Target != null)
-            _Target._isTargeted = false;
-        _Target = newTarget;
-        if (newTarget != null)
-            newTarget._isTargeted = true;
     }
 
     public void Reveal(bool detonateMines = true, bool playSounds = true)
@@ -301,31 +291,6 @@ public class MinesweeperTile : MonoBehaviour
 
     public void ManualUpdate(float dtime, float alpha)
     {
-        if (!this._setup || GameManager.Instance.IsPaused)
-        {
-            this._numberLabel.IsVisible = false;
-            this._numberLabel.Opacity = 0.0f;
-            return;
-        }
-        this._lifetime += dtime;
-        float percentDone = Mathf.Min(this._lifetime / _SHWOOP_TIME, 1f);
-        float sizeFactor = percentDone < 0.33f ? (4f * percentDone) : (1.33f - 0.5f * (percentDone - 0.33f));
-        float ease = Ease.InQuad(sizeFactor) - 1f;
-        if (this._lifetime >= _SHWOOP_TIME)
-            ease = 0f;
-        Color renderColor = this._revealed ? this._color : this._flagged ? _FlaggedColor : _UnknownColor;
-        if (!this._revealed && this._isTargeted)
-            renderColor = Color.Lerp(renderColor.Invert(), renderColor, Mathf.Abs(Mathf.Sin(8f * BraveTime.ScaledTimeSinceStartup)));
-        this._square.Setup(
-          shape : Geometry.Shape.RECTANGLE,
-          color : renderColor.WithAlpha(alpha * (0.75f - 0.5f * percentDone)),
-          pos   : this._tl - ease * Vector2.one,
-          pos2  : this._br + ease * Vector2.one);
-        this._numberLabel.TextAlignment = TextAlignment.Center;
-        this._numberLabel.VerticalAlignment = dfVerticalAlignment.Middle;
-        this._numberLabel.IsVisible = this._revealed;
-        this._numberLabel.Opacity = this._revealed ? alpha * _NUM_OPACITY : 0.0f;
-        this._numberLabel.Place(this._labelPos);
     }
 
     private void OnDestroy()
@@ -339,14 +304,17 @@ public class MinesweeperTile : MonoBehaviour
 
 public class MinesweeperGame : MonoBehaviour
 {
-    private const int _SAFETY_BUFFER = 2;
+    private const int _SAFETY_BUFFER = 4;
     private const float SPAWN_DELAY  = 0.10f;
     private const float SETUP_DELAY  = 0.05f;
     private const float _MINE_CHANCE = 0.16f;
     private const int ITER_DELAY     = 5; // number of iterations to delay revealing tiles after initial population
     private const float DISMISS_TIME = 1.0f;
+    private const float _SHWOOP_TIME = 0.18f;
+    private const float _NUM_OPACITY = 0.85f;
 
-    internal const int _TS           = 2; // tile scale -> number of game tiles per side corresponding to one minesweeper tile
+    private static readonly Color _UnknownColor = new Color(0.15f, 0.25f, 0.65f);
+    private static readonly Color _FlaggedColor = new Color(0.55f, 0.95f, 0.65f);
 
     private static MinesweeperGame _Game = null;
     public static bool IsGameActive => _Game != null;
@@ -373,27 +341,29 @@ public class MinesweeperGame : MonoBehaviour
     private float _dismissTime                               = 0.0f;
     private Queue<MinesweeperTile> _revealQueue              = new();
     private float _nextRevealTime                            = 0f;
+    private int _tileSize                                    = 2;
 
-    public static void StartGame(PlayerController player)
+    public static void StartGame(PlayerController player, bool mastered)
     {
         RoomHandler playerRoom = player.CurrentRoom;
         if (playerRoom == null)
             return;
-        IntVector2 playerTile = player.SpriteBottomCenter.XY().QuantizeTileRound(_TS);
+        IntVector2 playerTile = player.SpriteBottomCenter.XY().QuantizeTileRound(mastered ? 1 : 2);
         if (!IsValidStartingTile(playerTile, GameManager.Instance.Dungeon.data, playerRoom))
             return;
         if (_Game)
             _Game.Teardown();
-        ActiveGame.Setup(player, playerTile);
+        ActiveGame.Setup(player, playerTile, mastered);
     }
 
-    public void Setup(PlayerController player, IntVector2 startingTile)
+    public void Setup(PlayerController player, IntVector2 startingTile, bool mastered)
     {
         if (this._setup)
             return;
 
         this._player     = player;
         this._gameCenter = startingTile;
+        this._tileSize   = mastered ? 1 : 2;
         this._tiles      = new List<MinesweeperTile>();
         this._tileMap    = new Dictionary<IntVector2, MinesweeperTile>();
         this._gameRoom   = this._player.CurrentRoom;
@@ -409,8 +379,8 @@ public class MinesweeperGame : MonoBehaviour
             return;
         this._dismissing = true;
         this._dismissTime = DISMISS_TIME;
-        foreach (var tile in this._tiles)
-            tile.Reveal(detonateMines: false, playSounds: false);
+        // foreach (var tile in this._tiles)
+        //     tile.Reveal(detonateMines: false, playSounds: false);
         if (this._gameRoom != null)
             this._gameRoom.OnEnemiesCleared -= this.OnRoomCleared;
         base.gameObject.Play("minesweeper_place_sound");
@@ -433,7 +403,6 @@ public class MinesweeperGame : MonoBehaviour
         DeregisterEvents();
         if (this._gameRoom != null)
             this._gameRoom.OnEnemiesCleared -= this.OnRoomCleared;
-        MinesweeperTile.SetTarget(null);
         for (int i = this._tiles.Count - 1; i >= 0; --i)
         {
             if (this._tiles[i])
@@ -488,24 +457,25 @@ public class MinesweeperGame : MonoBehaviour
         _Frontier.Enqueue(this._gameCenter);
         _Processed.Add(this._gameCenter);
         int generation = 0;
+        int safetyBuffer = _SAFETY_BUFFER / this._tileSize;
         while (_Frontier.Count > 0)
         {
             ++generation;
             for (int n = _Frontier.Count - 1; n >= 0; --n)
             {
                 IntVector2 tilePos = _Frontier.Dequeue();
-                for (int i = -_TS; i <= _TS; i += _TS)
+                for (int i = -this._tileSize; i <= this._tileSize; i += this._tileSize)
                 {
-                    for (int j = -_TS; j <= _TS; j += _TS)
+                    for (int j = -this._tileSize; j <= this._tileSize; j += this._tileSize)
                     {
                         IntVector2 newPos = new IntVector2(tilePos.x + i, tilePos.y + j);
                         if (_Processed.Contains(newPos))
                             continue;
                         _Processed.Add(newPos);
                         bool viable = true;
-                        for (int ii = 0; ii < _TS; ++ii)
+                        for (int ii = 0; ii < this._tileSize; ++ii)
                         {
-                            for (int jj = 0; jj < _TS; ++jj)
+                            for (int jj = 0; jj < this._tileSize; ++jj)
                             {
                                 IntVector2 subPos = new IntVector2(newPos.x + ii, newPos.y + jj);
                                 if (!IsValidStartingTile(subPos, dd, this._gameRoom))
@@ -518,7 +488,7 @@ public class MinesweeperGame : MonoBehaviour
                         if (!viable)
                             continue;
                         _Frontier.Enqueue(newPos);
-                        if (generation > _SAFETY_BUFFER && UnityEngine.Random.value < _MINE_CHANCE)
+                        if (generation > safetyBuffer && UnityEngine.Random.value < _MINE_CHANCE)
                         {
                             if (IsValidMineTile(newPos, dd, this._gameRoom))
                                 _Mines.Add(newPos);
@@ -540,9 +510,9 @@ public class MinesweeperGame : MonoBehaviour
             {
                 IntVector2 tilePos = _Frontier.Dequeue();
                 int neighborMines = 0;
-                for (int i = -_TS; i <= _TS; i += _TS)
+                for (int i = -this._tileSize; i <= this._tileSize; i += this._tileSize)
                 {
-                    for (int j = -_TS; j <= _TS; j += _TS)
+                    for (int j = -this._tileSize; j <= this._tileSize; j += this._tileSize)
                     {
                         IntVector2 newPos = new IntVector2(tilePos.x + i, tilePos.y + j);
                         if (_Mines.Contains(newPos))
@@ -551,9 +521,9 @@ public class MinesweeperGame : MonoBehaviour
                             continue;
                         _Processed.Add(newPos);
                         bool viable = true;
-                        for (int ii = 0; ii < _TS; ++ii)
+                        for (int ii = 0; ii < this._tileSize; ++ii)
                         {
-                            for (int jj = 0; jj < _TS; ++jj)
+                            for (int jj = 0; jj < this._tileSize; ++jj)
                             {
                                 IntVector2 subPos = new IntVector2(newPos.x + ii, newPos.y + jj);
                                 if (!IsValidStartingTile(subPos, dd, this._gameRoom))
@@ -568,7 +538,7 @@ public class MinesweeperGame : MonoBehaviour
                         _Frontier.Enqueue(newPos);
                     }
                 }
-                MinesweeperTile newTile = MinesweeperTile.Setup(tilePos, _Mines.Contains(tilePos) ? -1 : neighborMines);
+                MinesweeperTile newTile = MinesweeperTile.Setup(tilePos, _Mines.Contains(tilePos) ? -1 : neighborMines, this._tileSize);
                 if (this._tiles.Count == 0)
                     this._revealQueue.Enqueue(newTile); // first tile automatically gets added to reveal queue
                 this._tiles.Add(newTile);
@@ -593,9 +563,9 @@ public class MinesweeperGame : MonoBehaviour
             return;
         // if the tile has 0 mines next to it, reveal adjacent tiles
         IntVector2 revealPos = tile.Pos;
-        for (int i = -_TS; i <= _TS; i += _TS)
+        for (int i = -this._tileSize; i <= this._tileSize; i += this._tileSize)
         {
-            for (int j = -_TS; j <= _TS; j += _TS)
+            for (int j = -this._tileSize; j <= this._tileSize; j += this._tileSize)
             {
                 IntVector2 neighborPos = new IntVector2(revealPos.x + i, revealPos.y + j);
                 if (this._tileMap.TryGetValue(neighborPos, out MinesweeperTile neighborTile) && !neighborTile.IsRevealed)
@@ -604,15 +574,17 @@ public class MinesweeperGame : MonoBehaviour
         }
     }
 
-    public static MinesweeperTile TileAtPosition(Vector2 pos)
+    public MinesweeperTile TileAtPosition(Vector2 pos)
     {
         if (!_Game || _Game._tileMap == null)
             return null;
-        if (_Game._tileMap.TryGetValue(pos.QuantizeTileRound(_TS), out MinesweeperTile tile))
+        if (_Game._tileMap.TryGetValue(pos.QuantizeTileRound(this._tileSize), out MinesweeperTile tile))
             return tile;
         return null;
     }
 
+    private const float _PROFILE_RATE = 0.5f;
+    private static float _NextProfile = 0.0f;
     private void OnFinishedFrame()
     {
         if (!this._setup)
@@ -636,8 +608,68 @@ public class MinesweeperGame : MonoBehaviour
             }
         }
 
-        foreach (MinesweeperTile tile in this._tiles)
-            tile.ManualUpdate(dtime: dtime, this._dismissing ? this._dismissTime : 1.0f);
+        bool profile = false;
+        float now = BraveTime.ScaledTimeSinceStartup;
+        if (now > _NextProfile)
+        {
+          _NextProfile = now + _PROFILE_RATE;
+          profile = true;
+        }
+
+        float uiScale              = Pixelator.Instance.ScaleTileScale / Pixelator.Instance.CurrentTileScale; // 1.33, usually
+        float alpha                = this._dismissing ? this._dismissTime : 1.0f;
+        float adj                  = ((this._tiles.Count > 0) && this._tiles[0]) ? (this._tiles[0]._numberLabel.PixelsToUnits() / uiScale) : 0.0f;
+        float offscreenPercent     = 0.10f / this._tileSize;
+        // precompute camera transform conversion matrix for more quickly computing label positions, thanks AI O:
+        CameraController mcc       = GameManager.Instance.MainCameraController;
+        Camera mainCam             = mcc.Camera;
+        Camera renderCam           = GameUIRoot.Instance.m_manager.RenderCamera;
+        Matrix4x4 inVP             = mainCam.projectionMatrix * mainCam.worldToCameraMatrix;
+        Matrix4x4 outVP            = renderCam.projectionMatrix * renderCam.worldToCameraMatrix;
+        Matrix4x4 conversionMatrix = outVP.inverse * inVP;
+
+        int labelUpdates = 0;
+        if (GameManager.Instance.IsPaused)
+          foreach (MinesweeperTile tile in this._tiles)
+            tile._numberLabel.IsVisible = false;
+        else foreach (MinesweeperTile tile in this._tiles)
+        {
+            // update tile geometry
+            if (this._dismissing || (tile._lifetime < _SHWOOP_TIME)) // optimization to prevent redrawing grid tiles if we don't need to
+            {
+              tile._lifetime += dtime;
+              float percentDone = Mathf.Min(tile._lifetime / _SHWOOP_TIME, 1f);
+              float sizeFactor = percentDone < 0.33f ? (4f * percentDone) : (1.33f - 0.5f * (percentDone - 0.33f));
+              float ease = Ease.InQuad(sizeFactor) - 1f;
+              if (tile._lifetime >= _SHWOOP_TIME)
+                  ease = 0f;
+              Color renderColor = tile._revealed ? tile._color : tile._flagged ? _FlaggedColor : _UnknownColor;
+              tile._square.Setup(
+                shape : Geometry.Shape.RECTANGLE,
+                color : renderColor.WithAlpha(alpha * (0.75f - 0.5f * percentDone)),
+                pos   : tile._tl - ease * Vector2.one,
+                pos2  : tile._br + ease * Vector2.one);
+            }
+
+            // update tile label
+            if (tile._number > 0) // optimization: don't draw the label if it's empty
+            {
+              if (tile._revealed && alpha > 0 && mcc.PointIsVisible(tile._labelPos, offscreenPercent))
+              {
+                // fast matrix conversion
+                tile._numberLabel.IsVisible = true;
+                tile._numberLabel.Opacity = alpha * _NUM_OPACITY;
+                Vector4 v = conversionMatrix * new Vector4(tile._labelPos.x, tile._labelPos.y, 0f, 1f);
+                tile._numberLabel.transform.position = new Vector3(v.x, v.y, 0f);
+                ++labelUpdates;
+              }
+              else
+                tile._numberLabel.IsVisible = false;
+            }
+        }
+
+        if (profile)
+          Lazy.DebugConsoleLog($"rendered {labelUpdates,4} out of {this._tiles.Count,4} labels {((100f * labelUpdates) / this._tiles.Count):F2}%");
 
         if (this._dismissing || !this._populated || this._player.IsGhost || !this._player.CurrentGun || GameManager.Instance.IsPaused)
             return;
@@ -650,11 +682,11 @@ public class MinesweeperGame : MonoBehaviour
             if (enemy.specRigidbody is not SpeculativeRigidbody body)
                 continue;
             MinesweeperTile enemyTile = null;
-            if (this._tileMap.TryGetValue(body.UnitBottomCenter.QuantizeTileRound(_TS), out enemyTile))
+            if (this._tileMap.TryGetValue(body.UnitBottomCenter.QuantizeTileRound(this._tileSize), out enemyTile))
                 RevealTile(enemyTile);
-            if (this._tileMap.TryGetValue(body.UnitBottomLeft.QuantizeTileRound(_TS), out enemyTile))
+            if (this._tileMap.TryGetValue(body.UnitBottomLeft.QuantizeTileRound(this._tileSize), out enemyTile))
                 RevealTile(enemyTile);
-            if (this._tileMap.TryGetValue(body.UnitBottomRight.QuantizeTileRound(_TS), out enemyTile))
+            if (this._tileMap.TryGetValue(body.UnitBottomRight.QuantizeTileRound(this._tileSize), out enemyTile))
                 RevealTile(enemyTile);
         }
 
@@ -664,48 +696,20 @@ public class MinesweeperGame : MonoBehaviour
             HandlePlayerReveals(otherPlayer);
 
         int numToReveal = this._revealQueue.Count;
-        float now = BraveTime.ScaledTimeSinceStartup;
         if (numToReveal > 0 && this._nextRevealTime <= now)
         {
             for (int n = 0; n < numToReveal; ++n)
                 RevealTile(this._revealQueue.Dequeue());
             this._nextRevealTime = now + SPAWN_DELAY;
         }
-
-        // HandleTargetedTile(curTile); // NOTE: scrapped mechanic, projectiles now sweep tiles and tiles can no longer be flagged
     }
 
     private void HandlePlayerReveals(PlayerController player)
     {
-        IntVector2 curTile = player.SpriteBottomCenter.XY().FloorToInt().ToIntVector2().QuantizeRound(_TS);
+        IntVector2 curTile = player.SpriteBottomCenter.XY().FloorToInt().ToIntVector2().QuantizeRound(this._tileSize);
         bool validTile = this._tileMap.TryGetValue(curTile, out MinesweeperTile standingTile);
         if (validTile && !standingTile.IsFlagged) // don't reveal flagged tiles so we can safely walk over them
             this._revealQueue.Enqueue(standingTile);
-    }
-
-    private void HandleTargetedTile(IntVector2 curTile)
-    {
-        float aimAngle;
-        if (!this._player.IsKeyboardAndMouse())  //WARNING: this has caused a null dereference, but not sure how
-          aimAngle = this._player.m_activeActions.Aim.Vector.ToAngle();
-        else
-          aimAngle = (this._player.unadjustedAimPoint.XY() - this._player.CenterPosition).ToAngle();
-        int quadrant = Mathf.RoundToInt(aimAngle.Clamp360() / 45f);
-        IntVector2 aimVec = quadrant switch {
-            1 => IntVector2.UpRight,
-            2 => IntVector2.Up,
-            3 => IntVector2.UpLeft,
-            4 => IntVector2.Left,
-            5 => IntVector2.DownLeft,
-            6 => IntVector2.Down,
-            7 => IntVector2.DownRight,
-            _ => IntVector2.Right,
-        };
-        IntVector2 aimTile = curTile + _TS * aimVec;
-        Gun playerGun = this._player.CurrentGun;
-        bool validTarget = this._tileMap.TryGetValue(aimTile, out MinesweeperTile targetTile);
-        this._targetTile = (validTarget && playerGun && playerGun.gameObject.GetComponent<Cleansweep>()) ? targetTile : null;
-        MinesweeperTile.SetTarget(this._targetTile);
     }
 
     private void RegisterEvents()

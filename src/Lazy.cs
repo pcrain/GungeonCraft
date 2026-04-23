@@ -23,6 +23,12 @@ public static class Lazy
         ETGModConsole.Log($"<color=#ffffaaff>{text}</color>");
     }
 
+    [System.Diagnostics.Conditional("DEBUG")]
+    public static void DebugConsoleLog(object text)
+    {
+        System.Console.WriteLine(text);
+    }
+
     /// <summary>Warn with the console</summary>
     public static void RuntimeWarn(string text)
     {
