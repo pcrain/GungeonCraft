@@ -10,6 +10,7 @@
 - Fixed bug with Ignizol teleporting for a single frame when turning around while carrying him
 - Fixed (maybe???) issue on Windows with screen shaders causing lighting artifacts
 - Changed mastery ritual to use the center of gun sprites instead of gun transforms so positioning is more intuitive
+- Prevented visual effects of Camping Supplies from activating outside combat
 
 ## 1.28.3 (2026-03-15)
 
