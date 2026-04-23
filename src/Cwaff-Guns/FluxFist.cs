@@ -29,6 +29,7 @@ public class FluxFist : CwaffGun
     private bool _attract                        = false;
     private bool _toggleWhenDoneFiring           = false;
     private float _nextSoundTime                 = 0f;
+    private PlayerController _lastOwner          = null;
 
     private static Projectile NorthBeam          = null;
     private static Projectile SouthBeam          = null;
@@ -76,6 +77,42 @@ public class FluxFist : CwaffGun
         _AttractParticle = VFX.Create("flux_fist_attract_vfx", fps: 10, loops: false);
     }
 
+    private void CheckFlight(bool enabled)
+    {
+      if (!this._lastOwner)
+        return;
+      this._lastOwner.SetIsFlying(enabled, ItemName);
+      if (enabled)
+        this._lastOwner.AdditionalCanDodgeRollWhileFlying.AddOverride(ItemName);
+      else
+        this._lastOwner.AdditionalCanDodgeRollWhileFlying.RemoveOverride(ItemName);
+    }
+
+    public override void OnMasteryStatusChanged()
+    {
+        base.OnMasteryStatusChanged();
+        CheckFlight(true);
+    }
+
+    public override void OnSwitchedToThisGun()
+    {
+        base.OnSwitchedToThisGun();
+        this._lastOwner = this.PlayerOwner;
+        CheckFlight(this.Mastered);
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        CheckFlight(false);
+        base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        CheckFlight(false);
+        base.OnDestroy();
+    }
+
     public override void OverrideShootAnimation(ref string overrideAnimation)
     {
         overrideAnimation = this._attract ? "flux_fist_south_fire" : "flux_fist_north_fire";
@@ -94,8 +131,9 @@ public class FluxFist : CwaffGun
         const float POLARIZE_STRENGTH = 1f / POLARIZE_SECONDS;
         if (projectile.gameObject.GetComponent<MagnetBeamBehavior>() is not MagnetBeamBehavior mbb)
           return;
+        float strength = this.Mastered ? 3.0f : 1.0f;
         rigidbody.gameObject.GetOrAddComponent<MagnetizedEnemyBehavior>()
-          .Polarize(BraveTime.DeltaTime * POLARIZE_STRENGTH * (mbb.attract ? -1.0f : 1.0f));
+          .Polarize(BraveTime.DeltaTime * POLARIZE_STRENGTH * (mbb.attract ? -strength : strength));
     }
 
     private void TogglePolarity()

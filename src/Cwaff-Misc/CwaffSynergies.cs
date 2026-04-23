@@ -338,6 +338,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfRetina>(MASTERY_RETINA, Retina.ItemName);
         // Mana costs are halved and max power detonations trigger a blank effect.
         NewMastery<MasteryOfEntropynnium>(MASTERY_ENTROPYNNIUM, Entropynnium.ItemName);
+        // Flux Fist magnetizes enemies 3 times faster and passively grants levitation.
+        NewMastery<MasteryOfFluxFist>(MASTERY_FLUX_FIST, FluxFist.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -625,6 +627,7 @@ internal class MasteryOfHeartbreaker         : MasteryDummyItem {}
 internal class MasteryOfCleansweep           : MasteryDummyItem {}
 internal class MasteryOfRetina               : MasteryDummyItem {}
 internal class MasteryOfEntropynnium         : MasteryDummyItem {}
+internal class MasteryOfFluxFist            : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -774,4 +777,5 @@ public enum Synergy {
     MASTERY_CLEANSWEEP,
     MASTERY_RETINA,
     MASTERY_ENTROPYNNIUM,
+    MASTERY_FLUX_FIST,
 };
