@@ -41,9 +41,7 @@ public class Entropynnium : CwaffGun
           .AssignGun(out Gun gun)
           .InitSpecialProjectile<ManaExplosionProjectile>(GunData.New(clipSize: -1, cooldown: 0.15f, damage: 25f, hideAmmo: true,
             shootStyle: ShootStyle.Charged, range: 9999f, sequenceStyle: ProjectileSequenceStyle.Ordered, invisibleProjectile: true))
-          .SetupChargeProjectiles(gun.DefaultModule, 1, (i, p) => new() {
-            Projectile = p.Clone(GunData.New(speed: 40f + 20f * i)),
-            ChargeTime = 0.5f });
+          .SetupChargeProjectiles(gun.DefaultModule, 1, (i, p) => new() { Projectile = p, ChargeTime = 0.5f });
 
         _ManaParticlePrefab = VFX.Create("mana_particle", fps: 30);
 

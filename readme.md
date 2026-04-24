@@ -9,9 +9,9 @@
 
 ### Features
 
-- 156 new items, including
-	+ 84 new guns
-	+ 48 new passive items
+- 162 new items, including
+	+ 88 new guns
+	+ 50 new passive items
 	+ 24 new active items
 - Lore for all new guns and items
 - A new custom character: Rogo from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/)

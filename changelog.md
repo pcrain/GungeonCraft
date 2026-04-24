@@ -1,17 +1,25 @@
 # Changelog
 
-## 1.29.0 (TBD)
+## 1.29.0 (2026-04-23)
+
+#### Features:
 
 - Added Entropynnium, Cleansweep, Flux Fist, Retina, Newton's Apple, and Demolition Contract
 	- Cleansweep and Newton's Apple sprites thanks to [SpecialAPI](https://github.com/SpecialAPI)!
-	- Retina sprite thanks to [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)
+	- Retina sprite thanks to [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)!
 - Added masteries for Entropynnium, Cleansweep, Flux Fist, and Retina
+- Added 5 new synergies
+
+#### Balance Changes and Polish:
+
 - Updated Ignizol's sprites to match those in [Ignizol Combusts Literally Everything](https://captainpretzel.itch.io/ignizol-combusts-literally-everything)
-- Fixed bug with Ignizol teleporting for a single frame when turning around while carrying him
-- Fixed (maybe???) issue on Windows with screen shaders causing lighting artifacts
-- Changed mastery ritual to use the center of gun sprites instead of gun transforms so positioning is more intuitive
 - Prevented visual effects of Camping Supplies from activating outside combat
-- Added 5 new synergies (and renamed 1 old one)
+
+#### Bugfixes and Misc:
+
+- Fixed (maybe???) issue on Windows with screen shaders causing lighting artifacts
+- Fixed bug with Ignizol teleporting for a single frame when turning around while carrying him
+- Changed mastery ritual to use the center of gun sprites instead of gun transforms so positioning is more intuitive
 
 ## 1.28.3 (2026-03-15)
 
