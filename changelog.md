@@ -2,7 +2,7 @@
 
 ## 1.29.0 (TBD)
 
-- Added Entropynnium, Cleansweep, Flux Fist, Retina, and Newton's Apple
+- Added Entropynnium, Cleansweep, Flux Fist, Retina, Newton's Apple, and Demolition Contract
 	- Cleansweep and Newton's Apple sprites thanks to [SpecialAPI](https://github.com/SpecialAPI)!
 	- Retina sprite thanks to [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)
 - Added masteries for Entropynnium, Cleansweep, Flux Fist, and Retina
