@@ -1,4 +1,5 @@
-﻿namespace CwaffingTheGungy;
+﻿
+namespace CwaffingTheGungy;
 
 public class Grandmaster : CwaffGun
 {
@@ -44,6 +45,53 @@ public class Grandmaster : CwaffGun
             AnimatedBullet.Create(refClip: ref _BlackKingSprite,   name: "chess_king_black",   scale: 0.8f, anchor: Anchor.MiddleCenter))
           .Attach<PlayChessBehavior>()
           .Assign(out _Projectile);
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        player.OnChestBroken += this.OnChestBroken;
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        player.OnChestBroken -= this.OnChestBroken;
+        base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnChestBroken -= this.OnChestBroken;
+        base.OnDestroy();
+    }
+
+    private void OnChestBroken(PlayerController player, Chest chest)
+    {
+        if (!player.HasSynergy(Synergy.CHEST_BATTLE_ADVANCED))
+          return;
+        int casings = DetermineCasingValueOfChest(chest);
+        if (casings > 0)
+          LootEngine.SpawnCurrency(chest.transform.position, casings);
+    }
+
+    private static int DetermineCasingValueOfChest(Chest chest)
+    {
+      const int MIN_CASINGS = 10;
+      if (!chest || chest.IsOpen)
+        return 0;
+      if (chest.IsRainbowChest)
+        return 200;
+      if (chest.lootTable is not LootData loot)
+        return MIN_CASINGS;
+      float lootWeight = loot.S_Chance + loot.A_Chance + loot.B_Chance + loot.C_Chance + loot.D_Chance;
+      return Mathf.Max(MIN_CASINGS, Mathf.FloorToInt((
+        50f * loot.S_Chance +
+        40f * loot.A_Chance +
+        30f * loot.B_Chance +
+        20f * loot.C_Chance +
+        10f * loot.D_Chance
+        ) / lootWeight));
     }
 }
 

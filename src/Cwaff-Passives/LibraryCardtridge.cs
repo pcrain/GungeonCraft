@@ -164,6 +164,7 @@ public class LibraryCardtridge : CwaffPassive
             _BookItemIDs.Add(Lazy.PickupId<MMAiming>());
             _BookItemIDs.Add(Lazy.PickupId<BlankChecks>());
             _BookItemIDs.Add(Lazy.PickupId<Ticonderogun>());
+            _BookItemIDs.Add(Lazy.PickupId<DemolitionContract>());
             foreach (string s in _ModdedItemNames)
                 if (Lazy.GetModdedItem(s) is PickupObject moddedItem)
                     _BookItemIDs.Add(moddedItem.PickupObjectId);

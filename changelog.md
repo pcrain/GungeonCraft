@@ -11,6 +11,7 @@
 - Fixed (maybe???) issue on Windows with screen shaders causing lighting artifacts
 - Changed mastery ritual to use the center of gun sprites instead of gun transforms so positioning is more intuitive
 - Prevented visual effects of Camping Supplies from activating outside combat
+- Added 5 new synergies (and renamed 1 old one)
 
 ## 1.28.3 (2026-03-15)
 

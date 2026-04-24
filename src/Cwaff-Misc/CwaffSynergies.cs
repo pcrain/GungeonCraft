@@ -151,6 +151,17 @@ public static class CwaffSynergies
         NewSynergy(JOB_SECURITY, "Job Security", new[]{IName(CustodiansBadge.ItemName), IName(RatPoison.ItemName)});
         // Vacuum Cleaner and Leafblower are dual wielded.
         NewSynergy(FULL_CIRCULATION, "Full Circulation", new[]{IName(VacuumCleaner.ItemName), IName(Leafblower.ItemName)});
+        // Enemies killed by explosions drop 2 extra casings instead of 1.
+        NewSynergy(GLUED_BACK_TOGETHER_IN_HELL, "Glued Back Together in Hell", new[]{IName(DemolitionContract.ItemName), IName(Scotsman.ItemName)});
+        // Ignizol's ignition radius is doubled.
+        NewSynergy(COMBUST_LITERALLY_EVERYTHING, "Combust Literally Everything", new[]{IName(ScaldingJelly.ItemName), "molotov_launcher"});
+        // All enemies are stunned while Bottled Abyss is active.
+        NewSynergy(SUNKEN_EYE, "Sunken Eye", new[]{IName(GorgunEye.ItemName), IName(BottledAbyss.ItemName)});
+        // Glass Cannon no longer breaks when taking damage.
+        NewSynergy(BULLETPROOF_GLASS, "Bulletproof Glass", new[]{IName(GlassAmmoBox.ItemName), "glass_cannon"});
+        // Unopened chests drop 10-50 casings when destroyed, depending on their quality
+        NewSynergy(CHEST_BATTLE_ADVANCED, "Chest Battle Advanced", new[]{IName(Grandmaster.ItemName), "book_of_chest_anatomy"});
+
       #endregion
 
       #region Masteries
@@ -688,6 +699,11 @@ public enum Synergy {
     WRONG_KIND_OF_COMPASS,
     JOB_SECURITY,
     FULL_CIRCULATION,
+    GLUED_BACK_TOGETHER_IN_HELL,
+    COMBUST_LITERALLY_EVERYTHING,
+    SUNKEN_EYE,
+    BULLETPROOF_GLASS,
+    CHEST_BATTLE_ADVANCED,
 
     // Masteries
     MASTERY_GRANDMASTER,

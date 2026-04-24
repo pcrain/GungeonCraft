@@ -325,11 +325,16 @@ public class IgnizolCompanion : CwaffCompanionController
         private static DeadlyDeadlyGoopManager _FireGooper = null;
         private void SetTheWorldAblaze()
         {
+            const float BASE_COMBUSTION_RADIUS = 1.5f;
             if (this._igniteTime > BraveTime.ScaledTimeSinceStartup)
                 return;
             if (!_FireGooper)
                 _FireGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.FireDef);
-            _FireGooper.AddGoopCircle(m_aiActor.specRigidbody.UnitBottomCenter, 1.5f);
+            float combustionRadius = BASE_COMBUSTION_RADIUS;
+            if (this.m_companionController.m_owner is PlayerController pc)
+              if (pc.HasSynergy(Synergy.COMBUST_LITERALLY_EVERYTHING))
+                combustionRadius *= 2.0f;
+            _FireGooper.AddGoopCircle(m_aiActor.specRigidbody.UnitBottomCenter, combustionRadius);
         }
 
         private bool ReachedTarget()

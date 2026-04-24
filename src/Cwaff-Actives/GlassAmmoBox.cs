@@ -162,3 +162,17 @@ public class GlassAmmoGun : MonoBehaviour
             this._owner.healthHaver.OnDamaged -= this.ShatterOnDamaged;
     }
 }
+
+/// <summary>Prevent Glass Cannon from breaking when taking damage while holding a Glass Ammo Box.</summary>
+[HarmonyPatch]
+public static class GlassAmmoBoxPatches
+{
+  [HarmonyPatch(typeof(OnGunDamagedModifier), nameof(OnGunDamagedModifier.OnReceivedDamage))]
+  [HarmonyPrefix]
+  private static bool OnGunDamagedModifierOnReceivedDamagePatch(OnGunDamagedModifier __instance, PlayerController player)
+  {
+      if (!__instance.m_gun || __instance.m_gun.PickupObjectId != (int)Items.GlassCannon)
+        return true;
+      return !player.HasSynergy(Synergy.BULLETPROOF_GLASS);
+  }
+}

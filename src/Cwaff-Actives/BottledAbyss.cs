@@ -60,12 +60,17 @@ public class BottledAbyss : CwaffActive
         private float _scale      = 0.0f;
         private RoomHandler _room = null;
         private Vector2 _pos      = default;
+        private bool _doStun      = false;
 
         private IEnumerator Start()
         {
             base.gameObject.transform.localScale = Vector3.one;
             this._pos = base.gameObject.transform.position;
             this._room = this._pos.GetAbsoluteRoom();
+
+            foreach (PlayerController player in GameManager.Instance.AllPlayers)
+              if (player.HasSynergy(Synergy.SUNKEN_EYE))
+                this._doStun = true;
 
             for (float elapsed = 0f; elapsed < _EXPAND_TIME; elapsed += BraveTime.DeltaTime)
             {
@@ -113,6 +118,8 @@ public class BottledAbyss : CwaffActive
                     continue;
                 if (enemy.specRigidbody is not SpeculativeRigidbody srb)
                     continue;
+                if (this._doStun && enemy.behaviorSpeculator is BehaviorSpeculator bs && !bs.ImmuneToStun)
+                  bs.Stun(0.1f);
                 if ((this._pos - srb.UnitBottomCenter).sqrMagnitude > sqrRadius)
                     continue;
                 enemy.ForceFall();

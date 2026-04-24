@@ -28,7 +28,12 @@ public class DemolitionContract : CwaffPassive
 
     private void HandleEnemyDeath(HealthHaver hh)
     {
-        if (hh.aiActor is AIActor enemy && hh.lastIncurredDamageSource == StringTableManager.GetEnemiesString("#EXPLOSION"))
-          LootEngine.SpawnCurrency(enemy.CenterPosition, 1);
+        if (hh.aiActor is not AIActor enemy)
+          return;
+        if (hh.lastIncurredDamageSource != StringTableManager.GetEnemiesString("#EXPLOSION"))
+          return;
+        if (this.Owner is not PlayerController pc)
+          return;
+        LootEngine.SpawnCurrency(enemy.CenterPosition, pc.HasSynergy(Synergy.GLUED_BACK_TOGETHER_IN_HELL) ? 2 : 1);
     }
 }
