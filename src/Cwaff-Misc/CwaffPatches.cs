@@ -251,7 +251,7 @@ static class ReplaceEnemyGunsPatch
     {
         if (!enemy.aiShooter)
             return false;
-        if (!Lazy.AnyoneHasSynergy(Synergy.MASTERY_BLASTECH_F4))
+        if (!Synergy.MASTERY_BLASTECH_F4.Active())
             return false;
         if ((int)_BlasTechID < 0)
             _BlasTechID = (Items)Lazy.PickupId<BlasTechF4>();
@@ -265,7 +265,7 @@ static class ReplaceEnemyGunsPatch
             return false;
         if (!enemy.aiShooter || enemy.healthHaver is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
             return false;
-        if (!Lazy.CoinFlip() && (!Lazy.CoinFlip() || !Lazy.AnyoneHasSynergy(Synergy.DUBBLE_BUBBLE)))
+        if (!Lazy.CoinFlip() && (!Lazy.CoinFlip() || !Synergy.DUBBLE_BUBBLE.Active()))
             return false;
 
         enemy.ReplaceGun(Items.BubbleBlaster);

@@ -25,7 +25,7 @@ public class BulletproofTablecloth : CwaffPassive
                 return true; // call the original method
             if (!Lazy.AnyoneHas<BulletproofTablecloth>())
                 return true; // call the original method
-            if (Lazy.AnyoneHasSynergy(Synergy.FURNITURE_POLISH))
+            if (Synergy.FURNITURE_POLISH.Active())
                 table.GetComponentInChildren<SpeculativeRigidbody>().ReflectProjectiles = true;
             return false; // skip the original method
         }

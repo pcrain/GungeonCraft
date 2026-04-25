@@ -152,7 +152,7 @@ public class FlakseedFlower : MonoBehaviour
         this._firePos = this._sprite.WorldTopCenter + new Vector2(0f, -0.125f);
         this._nextFireRate = _MIN_FIRE_RATE + _FIRE_RATE_VARIANCE * UnityEngine.Random.value;
         this._animator.AnimationCompleted += OnAnimationCompleted;
-        this._growsFasterInWater = Lazy.AnyoneHasSynergy(Synergy.LAWN_CARE);
+        this._growsFasterInWater = Synergy.LAWN_CARE.Active();
     }
 
     private void OnAnimationCompleted(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip)

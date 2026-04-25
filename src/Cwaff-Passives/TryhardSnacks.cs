@@ -49,7 +49,7 @@ public class TryhardSnacks : CwaffPassive
           if (!_EngageTimes.TryGetValue(enemy, out float spawnTime))
             return currentDamage;
           float activeTime = _SPAWN_CAMP_TIME;
-          if (Lazy.AnyoneHasSynergy(Synergy.GAMER_REFLEXES))
+          if (Synergy.GAMER_REFLEXES.Active())
             activeTime *= 2f;
           if ((BraveTime.ScaledTimeSinceStartup - spawnTime) > activeTime)
             return currentDamage;

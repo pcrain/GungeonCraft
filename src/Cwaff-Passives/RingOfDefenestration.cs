@@ -35,7 +35,7 @@ public class RingOfDefenestration : CwaffPassive
                 return;
 
             int pickupID = _RewardWeights.WeightedRandom();
-            int rewards = ((UnityEngine.Random.value <= DOUBLE_REWARD_CHANCE) && (Lazy.AnyoneHasSynergy(Synergy.THE_ABYSS_STARES_BACK))) ? 2 : 1;
+            int rewards = ((UnityEngine.Random.value <= DOUBLE_REWARD_CHANCE) && (Synergy.THE_ABYSS_STARES_BACK.Active())) ? 2 : 1;
             for (int i = 0; i < rewards; ++i)
             {
                 if (pickupID < 0) // currency

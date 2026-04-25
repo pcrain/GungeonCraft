@@ -29,7 +29,7 @@ public class VolcanicAmmolet : CwaffBlankModificationItem, ICustomBlankDoer
         _ExplosionTimer = QUICK_EXPLOSION_DELAY;  // temporarily sets the queued explosion speed until the next time the queue is empty
         Exploder.Explode(
             p.transform.position,
-            Lazy.AnyoneHasSynergy(Synergy.DEMOLITION_MAN) ? _LargeVolcanicExplosion : Scotsman._ScotsmanExplosion,
+            Synergy.DEMOLITION_MAN.Active() ? _LargeVolcanicExplosion : Scotsman._ScotsmanExplosion,
             Vector2.zero,
             ignoreQueues: false);
     }

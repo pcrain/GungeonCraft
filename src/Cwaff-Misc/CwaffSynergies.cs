@@ -523,6 +523,20 @@ public static class CwaffSynergies
     public static CustomSynergyType Synergy(this Synergy synergy) => _Synergies[(int)synergy];
     public static string SynergyName(this Synergy synergy) => _SynergyNames[(int)synergy];
     public static bool HasSynergy(this PlayerController player, Synergy synergy) => player.ActiveExtraSynergies.Contains((int)_SynergyIds[(int)synergy]);
+    public static bool Active(this Synergy synergy)
+    {
+      if (GameManager.Instance.PrimaryPlayer is not PlayerController p1)
+        return false;
+      if (p1.ActiveExtraSynergies.Contains((int)_SynergyIds[(int)synergy]))
+        return true;
+      if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+        return false;
+      if (GameManager.Instance.SecondaryPlayer is not PlayerController p2)
+        return false;
+      if (p2.ActiveExtraSynergies.Contains((int)_SynergyIds[(int)synergy]))
+        return true;
+      return false;
+    }
 
     // stat fixer-uppers
     public static StatModifier Mult(this StatType s, float a) => new(){statToBoost = s, modifyType = ModifyMethod.MULTIPLICATIVE, amount = a};

@@ -121,7 +121,7 @@ public class TranquilizerBehavior : MonoBehaviour
 
             if (shooter.CurrentGun is Gun gun)
             {
-                bool mastered = Lazy.AnyoneHasSynergy(Synergy.MASTERY_TRANQUILIZER);
+                bool mastered = Synergy.MASTERY_TRANQUILIZER.Active();
                 if (mastered || UnityEngine.Random.value <= _DROP_AMMO_CHANCE)
                     LootEngine.SpawnItem(ScavengingArms._SmallAmmoPickup, this._enemy.Position, Vector2.zero, 0f, false);
                 if (mastered || UnityEngine.Random.value <= _DROP_GUN_CHANCE)
