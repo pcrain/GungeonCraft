@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.29.1 (TBD)
+
+- Fixed Heartbreaker's projectiles not having homing properties when fired using Duct Tape, Chance Bullets, or Ring of Triggers
+
 ## 1.29.0 (2026-04-23)
 
 #### Features:

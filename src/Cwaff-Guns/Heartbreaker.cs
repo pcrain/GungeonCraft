@@ -33,7 +33,7 @@ public class Heartbreaker : CwaffGun
           .SetReloadAudio("heartbeat_sound", 0, 2, 4)
           .Attach<HeartbreakerAmmoDisplay>()
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(sprite: "heartbreaker_projectile", fps: 15, clipSize: 5, cooldown: 0.25f, burstCooldown: 0.04f, spawnSound: "heartbreaker_fire_sound",
+          .InitSpecialProjectile<HeartbreakerProjectile>(GunData.New(sprite: "heartbreaker_projectile", fps: 15, clipSize: 5, cooldown: 0.25f, burstCooldown: 0.04f, spawnSound: "heartbreaker_fire_sound",
             angleVariance: 30f, damage: 5.5f, speed: 25f, range: 1000f, force: 9f, shootStyle: ShootStyle.Burst, hitEnemySound: "heartbreaker_impact_sound",
             lightStrength: 8f, lightRange: 0.75f, lightColor: ExtendedColours.vibrantOrange, glowAmount: 30f, customClip: true))
           .SetAllImpactVFX(VFX.CreatePool("heartbreak_projectile_impact_vfx", fps: 60, loops: false, anchor: Anchor.MiddleCenter,
@@ -117,12 +117,6 @@ public class Heartbreaker : CwaffGun
         Material mat = this.gun.sprite.renderer.material;
         mat.SetFloat(CwaffVFX._EmissivePowerId, 1f + 2f * phase);
         mat.SetFloat(CwaffVFX._EmissiveColorPowerId, 2f + 8f * phase);
-    }
-
-    public override void PostProcessProjectile(Projectile projectile)
-    {
-        base.PostProcessProjectile(projectile);
-        projectile.OverrideMotionModule = new HeartbreakerProjectileMotionModule();
     }
 
     public override void OnSwitchedToThisGun()
@@ -286,7 +280,7 @@ public class Heartbreaker : CwaffGun
     }
 }
 
-public class HeartbreakerProjectileMotionModule : ProjectileMotionModule
+public class HeartbreakerProjectile : Projectile
 {
     private const float _DECEL_START        = 0.15f;
     private const float _LERP_RATE          = 13f;
@@ -318,7 +312,13 @@ public class HeartbreakerProjectileMotionModule : ProjectileMotionModule
         return nearestEnemy ? (nearestEnemy.CenterPosition - source.SafeCenter).normalized : Lazy.RandomVector();
     }
 
-    public override void Move(Projectile source, Transform projectileTransform, tk2dBaseSprite projectileSprite, SpeculativeRigidbody specRigidbody, ref float m_timeElapsed, ref Vector2 m_currentDirection, bool Inverted, bool shouldRotate)
+    public override void Start()
+    {
+        base.Start();
+        this.m_usesNormalMoveRegardless = true; // unaffected by, e.g., Helix Bullets initially
+    }
+
+    public override void Move()
     {
         float now = BraveTime.ScaledTimeSinceStartup;
         float dtime = BraveTime.DeltaTime;
@@ -330,55 +330,43 @@ public class HeartbreakerProjectileMotionModule : ProjectileMotionModule
             case State.START:
                 if (this._stateTime >= _DECEL_START)
                 {
-                    this._startSpeed = source.baseData.speed;
+                    this._startSpeed = this.baseData.speed;
                     if (this._startSpeed < _MIN_START_SPEED)
                         this._startSpeed = _MIN_START_SPEED;
                     this._state = State.DECEL;
                 }
-                specRigidbody.Velocity = source.m_currentDirection * source.m_currentSpeed;
+                specRigidbody.Velocity = this.m_currentDirection * this.m_currentSpeed;
                 break;
             case State.DECEL:
-                newSpeed = Lazy.SmoothestLerp(source.baseData.speed, 0f, _LERP_RATE);
-                if (newSpeed < 1f || source.m_currentDirection == Vector2.zero)
+                newSpeed = Lazy.SmoothestLerp(this.baseData.speed, 0f, _LERP_RATE);
+                if (newSpeed < 1f || this.m_currentDirection == Vector2.zero)
                 {
                     newSpeed = 1f;
-                    this._targetDir = DetermineTargetDir(source, specRigidbody);
+                    this._targetDir = DetermineTargetDir(this, specRigidbody);
                     this._state = State.LOCKON;
                     this._stateTime = 0f;
                 }
-                source.baseData.speed = newSpeed;
-                source.UpdateSpeed();
-                specRigidbody.Velocity = source.m_currentDirection * newSpeed;
+                this.baseData.speed = newSpeed;
+                this.UpdateSpeed();
+                specRigidbody.Velocity = this.m_currentDirection * newSpeed;
                 break;
             case State.LOCKON:
                 specRigidbody.Velocity += (this._startSpeed * _LOCKON_SPEED_SCALE * dtime) * this._targetDir;
                 if (specRigidbody.Velocity.sqrMagnitude > _HOME_THRES_SQR)
                 {
                     newSpeed = _HOME_SPEED_SCALE * this._startSpeed;
-                    source.baseData.speed = newSpeed;
-                    source.UpdateSpeed();
+                    this.baseData.speed = newSpeed;
+                    this.UpdateSpeed();
                     specRigidbody.Velocity = newSpeed * this._targetDir;
                     this._state = State.HOME;
-                    source.gameObject.Play("heartbreaker_home_sound");
+                    this.gameObject.Play("heartbreaker_home_sound");
                 }
                 break;
             case State.HOME:
                 specRigidbody.Velocity = (_HOME_SPEED_SCALE * this._startSpeed) * this._targetDir;
+                this.m_usesNormalMoveRegardless = false; // allow being affected by, e.g., Helix bullets
                 break;
         }
-        projectileTransform.localRotation = specRigidbody.Velocity.EulerZ();
+        this.transform.localRotation = specRigidbody.Velocity.EulerZ();
     }
-
-    private void ResetAngle(float angleDiff)
-    {
-        if (float.IsNaN(angleDiff))
-            return;
-
-        Quaternion q        = Quaternion.Euler(0f, 0f, angleDiff);
-        _initialUpVector    = q * _initialUpVector;
-        _initialRightVector = q * _initialRightVector;
-    }
-
-    public override void UpdateDataOnBounce(float angleDiff) => ResetAngle(angleDiff);
-    public override void AdjustRightVector(float angleDiff) => ResetAngle(angleDiff);
 }
