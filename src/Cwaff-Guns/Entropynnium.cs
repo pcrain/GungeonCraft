@@ -330,7 +330,9 @@ public class ExplosionMana : MonoBehaviour
 
 public class ManaExplosionProjectile : Projectile
 {
-    private float _radius = 0f;
+    private const float _DEFAULT_RADIUS = 4f;
+
+    private float _radius = -1f;
     private float _forceMult = 0f;
 
     internal static GameObject _ExplosionPrefab = null;
@@ -351,7 +353,29 @@ public class ManaExplosionProjectile : Projectile
     public override void Move()
     {
         Detonate();
+
         DieInAir(true, false, false, false);
+    }
+
+    private void DoParticles(Vector2 pos, int num)
+    {
+      CwaffVFX.SpawnBurst(
+        prefab           : Entropynnium._ManaParticlePrefab,
+        numToSpawn       : num,
+        basePosition     : pos,
+        positionVariance : 1.0f,
+        minVariance      : 0.5f,
+        minVelocity      : 8f,
+        velocityVariance : 4f,
+        velType          : CwaffVFX.Vel.AwayRadial,
+        rotType          : CwaffVFX.Rot.Random,
+        lifetime         : 0.4f,
+        startScale       : 0.6f,
+        endScale         : 0.2f,
+        emissivePower    : 100f,
+        emissiveColor    : ExtendedColours.purple,
+        height           : 8f
+      );
     }
 
     private void Detonate()
@@ -359,10 +383,16 @@ public class ManaExplosionProjectile : Projectile
         if (this._radius == 0f || this.Owner is not PlayerController player)
             return; // nothing to do, just die instantly
 
+        Vector2 ppos = this.m_transform.position;
+        if (this._radius < 0f)
+        {
+          // Lazy.DebugConsoleLog($"default mana radius at {ppos.x},{ppos.y}");
+          this._radius = _DEFAULT_RADIUS;
+        }
+
         float potency = Mathf.Min(this._radius / (0.67f * Entropynnium._MAX_RADIUS), 1f); // allow it to reach max potency at 2/3 max radius
         float damage = this.baseData.damage * Mathf.Sqrt(this._radius);
         float force = damage * this._forceMult;
-        Vector2 ppos = this.m_transform.position;
 
         ExplosionData boom = Entropynnium._SmallManaExplosion.Clone();
         boom.damage = damage;
@@ -380,26 +410,10 @@ public class ManaExplosionProjectile : Projectile
                 sourceNormal     : Vector2.zero,
                 ignoreQueues     : true,
                 ignoreDamageCaps : true);
-            CwaffVFX.SpawnBurst(
-                prefab           : Entropynnium._ManaParticlePrefab,
-                numToSpawn       : 32,
-                basePosition     : enemy.CenterPosition,
-                positionVariance : 1.0f,
-                minVariance      : 0.5f,
-                minVelocity      : 8f,
-                velocityVariance : 4f,
-                velType          : CwaffVFX.Vel.AwayRadial,
-                rotType          : CwaffVFX.Rot.Random,
-                lifetime         : 0.4f,
-                startScale       : 0.6f,
-                endScale         : 0.2f,
-                emissivePower    : 100f,
-                emissiveColor    : ExtendedColours.purple,
-                height           : 8f
-              );
+            DoParticles(enemy.CenterPosition, 32);
             anythingDetonated = true;
         }
         if (anythingDetonated)
-            base.gameObject.Play("mana_detonate");
+          base.gameObject.Play("mana_detonate");
     }
 }
