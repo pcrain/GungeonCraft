@@ -241,7 +241,7 @@ public class MinesweeperTile : MonoBehaviour
             this._numberLabel.IsVisible = false;
             this._numberLabel.Opacity = 0.0f;
         }
-        if (this._square)
+        if (this._square && this._square._meshRenderer)
           this._square._meshRenderer.enabled = false;
         LinkedListNode<MinesweeperTile> node = _ActiveTiles.Last;
         _ActiveTiles.RemoveLast();
@@ -289,10 +289,6 @@ public class MinesweeperTile : MonoBehaviour
             Exploder.Explode(this._center, Cleansweep._MineExplosion, Vector2.zero, ignoreQueues: true, ignoreDamageCaps: true);
         else if (playSounds)
             base.gameObject.PlayOnce("minesweeper_place_sound");
-    }
-
-    public void ManualUpdate(float dtime, float alpha)
-    {
     }
 
     private void OnDestroy()
@@ -583,6 +579,15 @@ public class MinesweeperGame : MonoBehaviour
         if (this._tileMap.TryGetValue(pos.QuantizeTileRound(this._tileSize), out MinesweeperTile tile))
             return tile;
         return null;
+    }
+
+    private void LateUpdate()
+    {
+        if (!this._setup || this._tiles == null || !GameManager.Instance.IsPaused)
+          return;
+        foreach (MinesweeperTile tile in this._tiles)
+          if (tile && tile._numberLabel)
+            tile._numberLabel.IsVisible = false;
     }
 
     private const float _PROFILE_RATE = 0.5f;

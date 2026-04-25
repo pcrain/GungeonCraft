@@ -4,6 +4,8 @@
 
 - Fixed Heartbreaker's projectiles not having homing properties when fired using Duct Tape, Chance Bullets, or Ring of Triggers
 - Fixed Entropynnium's detonation projectiles not working with Chance Bullets or Ring of Triggers
+- Fixed Cleansweep's Minesweeper grid labels being visible while the game is paused
+- Fixed null deref caused by trying to disable a non-existent renderer when quick restarting with an active Minesweeper grid
 
 ## 1.29.0 (2026-04-23)
 
