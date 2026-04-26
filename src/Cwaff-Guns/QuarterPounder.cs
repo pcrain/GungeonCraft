@@ -109,7 +109,7 @@ public class MidasProjectile : MonoBehaviour
     }
 }
 
-public class GoldenDeath : MonoBehaviour, IPlayerInteractable
+public class GoldenDeath : MonoBehaviour
 {
     private const float _START_EMIT    = 30.0f;
     private const float _MAX_EMIT      = 50.0f;
@@ -127,7 +127,6 @@ public class GoldenDeath : MonoBehaviour, IPlayerInteractable
     private float _lifetime;
     private bool _decaying;
     private tk2dSprite _sprite;
-    private RoomHandler _room;
     private SpeculativeRigidbody _body;
     private bool _exploding;
     private PlayerController _midasOWner;
@@ -138,6 +137,7 @@ public class GoldenDeath : MonoBehaviour, IPlayerInteractable
         this._decaying = false;
 
         this._body = base.gameObject.GetComponent<SpeculativeRigidbody>();
+        this._body.OnCollision += this.OnCollision;
         this._sprite = base.gameObject.GetComponent<tk2dSprite>();
         this._sprite.usesOverrideMaterial = true;
         Material mat = this._sprite.renderer.material;
@@ -147,16 +147,21 @@ public class GoldenDeath : MonoBehaviour, IPlayerInteractable
             mat.SetFloat("_UsePalette", 1f);
             mat.SetTexture("_PaletteTex", this._paletteTexture);
         }
-
         CwaffVFX.SpawnBurst(prefab: QuarterPounder._MidasParticleVFX, numToSpawn: _NUM_PARTICLES, basePosition: this._sprite.WorldCenter,
             positionVariance: _PART_SPREAD, baseVelocity: Vector2.zero, velocityVariance: _PART_SPEED, velType: CwaffVFX.Vel.Radial,
             rotType: CwaffVFX.Rot.Random, lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
-
-        this._room = base.transform.position.GetAbsoluteRoom();
-        if (this._room != null)
-            this._room.RegisterInteractable(this);
-
         base.gameObject.Play("turn_to_gold");
+    }
+
+    private void OnCollision(CollisionData data)
+    {
+      if (this._exploding || !data.OtherRigidbody || data.OtherRigidbody.gameActor is not PlayerController p || !p.HasSynergy(Synergy.MASTERY_QUARTER_POUNDER))
+        return;
+
+      this._exploding = true;
+      this._lifetime = 0.0f;
+      this._midasOWner = p;
+      base.gameObject.Play("midas_touch_sound");
     }
 
     private void Update()
@@ -208,46 +213,4 @@ public class GoldenDeath : MonoBehaviour, IPlayerInteractable
             this._lifetime = 0.0f;
         }
     }
-
-  public void OnEnteredRange(PlayerController interactor)
-  {
-    if (!this || this._exploding || !interactor.HasSynergy(Synergy.MASTERY_QUARTER_POUNDER))
-      return;
-
-    this._exploding = true;
-    this._lifetime = 0.0f;
-    this._midasOWner = interactor;
-    base.gameObject.Play("midas_touch_sound");
-  }
-
-  public void OnExitRange(PlayerController interactor)
-  {
-    if (!this)
-      return;
-  }
-
-  public float GetDistanceToPoint(Vector2 point)
-  {
-    if (!this)
-      return 1000f;
-    if (this._sprite == null)
-      return 100f;
-    Vector3 v = BraveMathCollege.ClosestPointOnRectangle(point, this._body.UnitBottomLeft, this._body.UnitDimensions);
-    return Vector2.Distance(point, v) / 1.5f;
-  }
-
-  public float GetOverrideMaxDistance()
-  {
-    return -1f;
-  }
-
-  public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)
-  {
-    shouldBeFlipped = false;
-    return string.Empty;
-  }
-
-  public void Interact(PlayerController player)
-  {
-  }
 }

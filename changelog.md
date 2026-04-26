@@ -14,6 +14,7 @@
 - Revamped Sextant's projectile to be an extremely fast normal projectile rather than an instant-damage projectile
 - Made projectiles reflected by Maestro receive player projectile modifiers (e.g., bouncing, piercing, helix movement, etc.)
 - Fixed Natascha's spin up sound playing while the game is paused
+- Changed Midas touch effect from Quarter Pounder's mastery to trigger when actually touching statues rather than just getting near them
 
 ## 1.29.0 (2026-04-23)
 
