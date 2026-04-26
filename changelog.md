@@ -1,6 +1,16 @@
 # Changelog
 
-## 1.29.1 (TBD)
+## 1.29.1 (2026-04-26)
+
+#### Balance Changes and Polish:
+
+- Changed Midas touch effect from Quarter Pounder's mastery to trigger when actually touching statues rather than just getting near them
+- Made Midas-touched projectiles receive player projectile modifiers (e.g., bouncing, piercing, orbiting, etc.)
+- Made projectiles reflected by Maestro receive player projectile modifiers
+- Revamped Sextant's projectile to be an extremely fast normal projectile rather than an instant-damage projectile
+- Limited Groundhog's max shockwave range to 10 tiles
+
+#### Bugfixes and Misc:
 
 - Fixed Heartbreaker's projectiles not having homing properties when fired using Duct Tape, Chance Bullets, or Ring of Triggers
 - Fixed Entropynnium's detonation projectiles not working with Chance Bullets or Ring of Triggers
@@ -9,13 +19,8 @@
 - Fixed Gradius not working with Backup Gun, Ring of Triggers, Scattershot, Chance Bullets, or Duct Tape
 - Fixed Groundhog not working with Ring of Triggers, Chance Bullets, or Duct Tape
 - Fixed Groundhog not working properly in hallways between rooms
-- Limited Groundhog's max shockwave range to 10 tiles
 - Fixed Sextant not working properly with Backup Gun, Scattershot, Ring of Triggers, Chance Bullets, or Duct Tape
-- Revamped Sextant's projectile to be an extremely fast normal projectile rather than an instant-damage projectile
-- Made projectiles reflected by Maestro receive player projectile modifiers (e.g., bouncing, piercing, helix movement, etc.)
 - Fixed Natascha's spin up sound playing while the game is paused
-- Changed Midas touch effect from Quarter Pounder's mastery to trigger when actually touching statues rather than just getting near them
-- Made Midas-touched projectiles receive player projectile modifiers
 
 ## 1.29.0 (2026-04-23)
 
