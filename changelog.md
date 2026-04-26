@@ -7,6 +7,9 @@
 - Fixed Cleansweep's Minesweeper grid labels being visible while the game is paused
 - Fixed null deref caused by trying to disable a non-existent renderer when quick restarting with an active Minesweeper grid
 - Fixed Gradius not working with Backup Gun, Ring of Triggers, Scattershot, Chance Bullets, or Duct Tape
+- Fixed Groundhog not working with Ring of Triggers, Chance Bullets, or Duct Tape
+- Fixed Groundhog not working properly in hallways between rooms
+- Limited Groundhog's max shockwave range to 10 tiles
 
 ## 1.29.0 (2026-04-23)
 
