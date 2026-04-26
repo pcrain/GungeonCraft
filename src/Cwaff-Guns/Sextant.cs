@@ -77,7 +77,8 @@ public class Sextant : CwaffGun
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 80, shootFps: 14, reloadFps: 4,
             muzzleFrom: Items.Mailbox, fireAudio: "sextant_shoot_sound", carryOffset: new IntVector2(6, 0))
           .InitSpecialProjectile<PrecisionProjectile>(GunData.New(sprite: null, clipSize: 1, cooldown: 0.25f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 50.0f, speed: 25f, range: 18f, force: 12f, invisibleProjectile: true, customClip: true));
+            damage: 50.0f, speed: 900f, range: 18f, force: 12f, invisibleProjectile: true, customClip: true))
+          .Assign(out Projectile proj);
 
         _MathSymbols = VFX.Create("math_symbols", loops: false);
 
@@ -86,6 +87,7 @@ public class Sextant : CwaffGun
             _SextantTrailPrefab.usesStartAnimation = false;
             _SextantTrailPrefab.globalTimer = 0.0f;
             _SextantTrailPrefab.cascadeTimer = 0.02f;
+        proj.AddTrail(_SextantTrailPrefab);
     }
 
     private void Start()
@@ -272,7 +274,7 @@ public class Sextant : CwaffGun
                 positionVariance: 1f, baseVelocity: velMag * baseVel.normalized, velocityVariance: velMag - 1f, velType: CwaffVFX.Vel.Radial,
                 lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
         }
-        DoTrailParticles(this.canDoCrit);
+        // DoTrailParticles(this.canDoCrit);
     }
 
     public override void OnPostFired(PlayerController player, Gun gun)
@@ -293,36 +295,7 @@ public class Sextant : CwaffGun
 
     private float GetDamageMultFromFocusTime()
     {
-        return Mathf.Clamp01((/*1f + Mathf.Floor*/(this._drawTimer / _PHASE_TIME)) / this._maxDrawablePhase);
-    }
-
-    public void DoTrailParticles(bool isCrit)
-    {
-        const float TARGET_GAP = 1.5f;
-        const float TARGET_CRIT_GAP = 0.3f;
-
-        if (!this._lastContact.HasValue)
-            return;
-
-        float gapMag = (isCrit ? TARGET_CRIT_GAP : TARGET_GAP);
-        for (int n = 0; n < 2; ++n)
-        {
-            if (n == 1 && !this._lastRebound.HasValue)
-                return;
-            Vector2 start = n == 0 ? this.gun.barrelOffset.position : this._lastContact.Value;
-            Vector2 end = n == 0 ? this._lastContact.Value : this._lastRebound.Value;
-            // CwaffTrailController.Spawn(SubtractorBeam._GreenTrailPrefab, start, end);
-            CwaffTrailController.Spawn(_SextantTrailPrefab, start, end);
-            Vector2 delta = end - start;
-            Vector2 dnorm = delta.normalized;
-            Vector2 gap = gapMag * dnorm;
-            Vector2 perp = dnorm.Rotate(90f);
-            int numParticles = Mathf.FloorToInt(delta.magnitude / gapMag);
-            for (int i = 0; i < numParticles; ++i)
-              CwaffVFX.Spawn(prefab: _MathSymbols, position: start + i * gap,
-                velocity: (UnityEngine.Random.Range(1f, 4f) *  (Lazy.CoinFlip() ? perp : -perp)).Rotate(UnityEngine.Random.Range(1f, 10f)),
-                lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
-        }
+        return Mathf.Clamp01(((this._drawTimer / _PHASE_TIME)) / this._maxDrawablePhase);
     }
 
     public bool Untargetable(SpeculativeRigidbody body)
@@ -711,37 +684,93 @@ public class PrecisionProjectile : Projectile
 {
     public const float BOSS_DAMAGE_MULT_ON_CRIT = 2f;
 
-    public AIActor target = null;
-    public bool isCrit = false;
+    public AIActor target  = null;
+    public bool isCrit     = false;
+    public Vector2 lastPos = default;
+
+    // private bool _didInstantCollision = false;
 
     public override void Start()
     {
         base.Start();
         this.m_usesNormalMoveRegardless = true; // ignore Helix Bullets, etc.
+        this.specRigidbody.OnCollision += this.OnCollision;
+        if (this.isCrit)
+        {
+          this.BossDamageMultiplier *= BOSS_DAMAGE_MULT_ON_CRIT;
+          this.pierceMinorBreakables = true;
+        }
+        this.lastPos = base.transform.position;
+    }
+
+    private void OnCollision(CollisionData data)
+    {
+        if (!this.isCrit)
+          return;
+        if (data.OtherRigidbody is not SpeculativeRigidbody body)
+          return;
+        if (body.aiActor is not AIActor enemy || !enemy.isActiveAndEnabled || enemy.IsGone)
+          return;
+        if (enemy.healthHaver is not HealthHaver hh || hh.IsDead || !hh.IsVulnerable)
+          return;
+
+        //NOTE: friction must be applied BEFORE damage or m_currentMinFriction prevents it from working
+        StickyFrictionManager.Instance.RegisterCustomStickyFriction(0.75f, 0f, true);
+        base.gameObject.Play("sextant_critical_hit_sound");
+        enemy.DuplicateInWorldAsMesh().Dissipate(time: 1.5f, amplitudeEnd: 5f, progressive: true);
+        enemy.EraseFromExistenceWithRewards();
     }
 
     public override void Move()
     {
-        if (target && target.IsNormalEnemy && target.healthHaver && !target.IsGone)
-        {
-            if (isCrit)
-            {
-                //NOTE: friction must be applied BEFORE damage or m_currentMinFriction prevents it from working
-                StickyFrictionManager.Instance.RegisterCustomStickyFriction(0.75f, 0f, true);
-                if (target.healthHaver.IsBoss || target.healthHaver.IsSubboss)
-                    target.healthHaver.ApplyDamage(
-                        BOSS_DAMAGE_MULT_ON_CRIT * baseData.damage,
-                        target.CenterPosition - base.transform.position.XY(), "Sextant", ignoreDamageCaps: true);
-                else
-                {
-                    target.DuplicateInWorldAsMesh().Dissipate(time: 1.5f, amplitudeEnd: 5f, progressive: true);
-                    target.EraseFromExistenceWithRewards();
-                }
-                base.gameObject.Play("sextant_critical_hit_sound");
-            }
-            else
-                target.healthHaver.ApplyDamage(baseData.damage, target.CenterPosition - base.transform.position.XY(), "Sextant");
-        }
-        DieInAir(true, false, false, false);
+      DoTrailParticles();
+      base.Move();
     }
+
+    public void DoTrailParticles()
+    {
+        const float TARGET_GAP      = 1.5f;
+        const float TARGET_CRIT_GAP = 0.3f;
+
+        float gapMag     = (this.isCrit ? TARGET_CRIT_GAP : TARGET_GAP);
+        Vector2 start    = this.lastPos;
+        Vector2 end      = base.m_transform.position;
+        this.lastPos     = start;
+        Vector2 delta    = end - start;
+        Vector2 dnorm    = delta.normalized;
+        Vector2 gap      = gapMag * dnorm;
+        Vector2 perp     = dnorm.Rotate(90f);
+        int numParticles = Mathf.FloorToInt(delta.magnitude / gapMag);
+        for (int i = 0; i < numParticles; ++i)
+          CwaffVFX.Spawn(prefab: Sextant._MathSymbols, position: start + i * gap,
+            velocity: (UnityEngine.Random.Range(1f, 4f) *  (Lazy.CoinFlip() ? perp : -perp)).Rotate(UnityEngine.Random.Range(1f, 10f)),
+            lifetime: 0.5f, fadeOutTime: 0.5f, randomFrame: true);
+    }
+
+    // public override void Move()
+    // {
+    //     base.Move();
+    //     if (this._didInstantCollision || !this.target || !this.target.IsNormalEnemy || !this.target.healthHaver || this.target.IsGone || this.target.specRigidbody is not SpeculativeRigidbody other)
+    //       return;
+
+    //     LinearCastResult lcr = LinearCastResult.Pool.Allocate();
+    //     Vector2 pos = base.transform.position.XY();
+    //     Vector2 collisionPoint = this.target.CenterPosition;
+    //     PixelCollider collider = other.PrimaryPixelCollider;
+    //     if (collider != null && BraveUtility.LineIntersectsAABB(pos, collider.UnitCenter, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
+    //     {
+    //         collisionPoint = intersection;
+    //         Lazy.DebugConsoleLog($"  collide at {intersection.x}, {intersection.y}");
+    //     }
+    //     lcr.Contact = collisionPoint;
+    //     lcr.Normal = (pos - collisionPoint).normalized;
+    //     lcr.OtherPixelCollider = collider;
+    //     lcr.MyPixelCollider = base.specRigidbody.PrimaryPixelCollider;
+    //     this.SendInDirection(dirVec: -lcr.Normal, resetDistance: true, updateRotation: true);
+    //     // base.transform.position = collisionPoint;
+    //     // base.specRigidbody.Reinitialize();
+    //     // base.ForceCollision(base.specRigidbody, lcr);
+    //     LinearCastResult.Pool.Free(ref lcr);
+    //     this._didInstantCollision = true;
+    // }
 }

@@ -9,6 +9,8 @@
 - Fixed Gradius not working with Backup Gun, Ring of Triggers, Scattershot, Chance Bullets, or Duct Tape
 - Fixed Groundhog not working with Ring of Triggers, Chance Bullets, or Duct Tape
 - Fixed Groundhog not working properly in hallways between rooms
+- Fixed Sextant not working properly with Backup Gun, Scattershot, Ring of Triggers, Chance Bullets, or Duct Tape
+- Revamped Sextant's projectile to be an extremely fast normal projectile rather than an instant-damage projectile
 - Limited Groundhog's max shockwave range to 10 tiles
 
 ## 1.29.0 (2026-04-23)
