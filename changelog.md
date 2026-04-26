@@ -11,6 +11,7 @@
 - Fixed Groundhog not working properly in hallways between rooms
 - Fixed Sextant not working properly with Backup Gun, Scattershot, Ring of Triggers, Chance Bullets, or Duct Tape
 - Revamped Sextant's projectile to be an extremely fast normal projectile rather than an instant-damage projectile
+- Made projectiles reflected by Maestro receive player projectile modifiers (e.g., bouncing, piercing, helix movement, etc.)
 - Limited Groundhog's max shockwave range to 10 tiles
 
 ## 1.29.0 (2026-04-23)

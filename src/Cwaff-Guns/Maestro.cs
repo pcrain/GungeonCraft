@@ -74,6 +74,7 @@ public class Maestro : CwaffGun
         p.UpdateCollisionMask();
         p.ResetDistance();
         p.Reflected();
+        pc.DoPostProcessProjectile(p);
 
         p.Speed = Mathf.Max(REFLECT_SPEED, p.Speed);
         CwaffVFX.Spawn(prefab: _LaunchVFX, position: p.SafeCenter, rotation: p.Direction.EulerZ());
