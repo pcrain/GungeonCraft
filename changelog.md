@@ -9,10 +9,11 @@
 - Fixed Gradius not working with Backup Gun, Ring of Triggers, Scattershot, Chance Bullets, or Duct Tape
 - Fixed Groundhog not working with Ring of Triggers, Chance Bullets, or Duct Tape
 - Fixed Groundhog not working properly in hallways between rooms
+- Limited Groundhog's max shockwave range to 10 tiles
 - Fixed Sextant not working properly with Backup Gun, Scattershot, Ring of Triggers, Chance Bullets, or Duct Tape
 - Revamped Sextant's projectile to be an extremely fast normal projectile rather than an instant-damage projectile
 - Made projectiles reflected by Maestro receive player projectile modifiers (e.g., bouncing, piercing, helix movement, etc.)
-- Limited Groundhog's max shockwave range to 10 tiles
+- Fixed Natascha's spin up sound playing while the game is paused
 
 ## 1.29.0 (2026-04-23)
 

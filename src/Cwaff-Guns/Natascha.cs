@@ -46,12 +46,13 @@ public class Natascha : CwaffGun
             return;
         }
 
+        this.gun.LoopSoundIf(this.gun && (this._maintainSpinup || this.gun.IsFiring), "minigun_spin");
+
         if (this._maintainSpinup && this.gun.spriteAnimator.currentClip.name != gun.shootAnimation)
         {
             if (this._speedMult == 1.0f)
             {
                 gun.gameObject.Play("minigun_wind_down_stop");
-                gun.gameObject.Play("minigun_spin");
             }
             this.gun.spriteAnimator.currentClip = gun.spriteAnimator.GetClipByName(gun.shootAnimation);
             this.gun.spriteAnimator.Play();
