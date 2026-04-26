@@ -220,3 +220,112 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
         __instance.gameObject.Play(cp.chargeSound);
     }
 }
+
+/// <summary>Special class for projectiles that do something weird when spawned in and die immediately.</summary>
+[HarmonyPatch]
+public class WeirdProjectile : Projectile
+{
+  public enum FiredBy
+  {
+    FREEFIRE,      // free fired by, e.g., Ring of Triggers, Chance Bullets, etc.
+    PRIMARYGUN,    // fired from a human player's primary gun
+    SECONDARYGUN,  // fired from a human player's secondary (dual wield) gun
+    ENEMYGUN,      // fired from an AIActor's gun
+  }
+
+  internal static Stack<Gun>              _CurrentProjectileGun = new(); //NOTE: used by a patch in CwaffPatches
+  internal static Stack<ProjectileModule> _CurrentProjectileMod = new(); //NOTE: used by a patch in CwaffPatches
+
+  public Gun sourceGun              { get; private set; } // gun that spawned the projectile
+  public ProjectileModule sourceMod { get; private set; } // projectile module that spawned the projectile
+  public FiredBy firedBy            { get; private set; } // means by which the projectile was spawned
+
+  private void OnEnable()
+  {
+    DetermineFiringSource();
+    this.damageTypes         = CoreDamageTypes.None;
+    this.collidesWithEnemies = false;
+    this.collidesWithPlayer  = false;
+    if (base.gameObject.GetComponent<tk2dBaseSprite>() is tk2dBaseSprite sprite)
+      UnityEngine.Object.Destroy(sprite);
+    base.gameObject.AddComponent<FakeProjectileComponent>();
+  }
+
+  public override sealed void Move()
+  {
+    if (this.firedBy switch
+    {
+      FiredBy.FREEFIRE     => OnFreeFired(),
+      FiredBy.PRIMARYGUN   => OnFiredByPlayer(primaryGun: true),
+      FiredBy.SECONDARYGUN => OnFiredByPlayer(primaryGun: false),
+      FiredBy.ENEMYGUN     => OnFiredByEnemy(),
+      _                    => true,
+    })
+      OnFiredByAnything();
+    DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
+  }
+
+  /// <summary>Called when a projectile is fired from a non-gun source.</summary>
+  protected virtual bool OnFreeFired()                    => true;
+
+  /// <summary>Called when a projectile is fired from a player's gun.</summary>
+  protected virtual bool OnFiredByPlayer(bool primaryGun) => true;
+
+  /// <summary>Called when a projectile is fired from an enemy's gun.</summary>
+  protected virtual bool OnFiredByEnemy()                 => true;
+
+  /// <summary>Called when a projectile is fired by any source, provided the source-specific method returned true.</summary>
+  protected virtual void OnFiredByAnything()
+  {
+
+  }
+
+  /// <summary>Effectively transforms the Gun into a different projectile entirely</summary>
+  protected Projectile SpawnDifferentProjectile(Projectile proj)
+  {
+    GameObject newProjObject = SpawnManager.SpawnProjectile(proj.gameObject, base.transform.position, base.transform.rotation);
+    Projectile newProj = newProjObject.GetComponent<Projectile>();
+    newProj.Owner = this.Owner;
+    newProj.Shooter = this.Shooter;
+    if (this.Owner is PlayerController player)
+      player.DoPostProcessProjectile(newProj);
+    return newProj;
+  }
+
+  /// <summary>Effectively transforms the Gun into a different projectile entirely</summary>
+  protected Projectile SpawnDifferentProjectile(GameObject proj)
+  {
+    GameObject newProjObject = SpawnManager.SpawnProjectile(proj, base.transform.position, base.transform.rotation);
+    Projectile newProj = newProjObject.GetComponent<Projectile>();
+    newProj.Owner = this.Owner;
+    newProj.Shooter = this.Shooter;
+    if (this.Owner is PlayerController player)
+      player.DoPostProcessProjectile(newProj);
+    return newProj;
+  }
+
+
+  private void DetermineFiringSource()
+  {
+    if (_CurrentProjectileGun.Count == 0 || _CurrentProjectileGun.Peek() is not Gun gun || gun.m_owner is not GameActor actor)
+    {
+      this.sourceGun = null;
+      this.sourceMod = null;
+      this.firedBy = FiredBy.FREEFIRE;
+      return;
+    }
+
+    this.sourceGun = gun;
+    this.sourceMod = _CurrentProjectileMod.Peek();
+    if (actor is AIActor enemy)
+      this.firedBy = FiredBy.ENEMYGUN;
+    else if (actor is not PlayerController player)
+      this.firedBy = FiredBy.FREEFIRE;
+    else if (gun == player.CurrentGun)
+      this.firedBy = FiredBy.PRIMARYGUN;
+    else if (gun == player.CurrentSecondaryGun)
+      this.firedBy = FiredBy.SECONDARYGUN;
+    else
+      this.firedBy = FiredBy.FREEFIRE;
+  }
+}

@@ -43,9 +43,9 @@ public class Gradius : CwaffGun
           .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1985, shootFps: 14, reloadFps: 4,
             fireAudio: null, reloadAudio: null, carryOffset: new IntVector2(16, 0), doesScreenShake: false, infiniteAmmo: false/*, canReloadNoMatterAmmo: true*/)
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(baseProjectile: Items.HegemonyRifle.DefaultProjectile(), clipSize: -1, cooldown: 0.04f, damage: 10f,
+          .InitSpecialProjectile<GradiusCommandProjectile>(GunData.New(baseProjectile: Items.HegemonyRifle.DefaultProjectile(), clipSize: -1, cooldown: 0.04f, damage: 10f,
             angleVariance: 0f, shootStyle: ShootStyle.Automatic, hideAmmo: true));
-        gun.DefaultModule.projectiles = new(){ Lazy.NoProjectile() };
+        // gun.DefaultModule.projectiles = new(){ Lazy.NoProjectile() };
 
         _JadeRingImpactVFX = VFX.Create("jade_projectile_impact_vfx", fps: 60, loops: false, anchor: Anchor.MiddleCenter,
             emissivePower: 0.5f, emissiveColorPower: 1.5f, emissiveColour: ExtendedColours.vibrantOrange,
@@ -60,6 +60,26 @@ public class Gradius : CwaffGun
 
         for (int i = 0; i < _ShipNames.Length; ++i)
             _ShipPrefab[i] = VFX.Create(_ShipNames[i], emissivePower: 3f, scale: 0.5f).Attach<GradiusShip>();
+    }
+
+    private class GradiusCommandProjectile : WeirdProjectile
+    {
+        protected override bool OnFiredByPlayer(bool primaryGun)
+        {
+            if (!this.sourceGun || this.sourceMod == null || this.sourceGun.gameObject.GetComponent<Gradius>() is not Gradius gradius)
+              return true; // fall back on default behavior
+            Vector2 angle = (this.Direction.ToAngle().AddRandomSpread(this.sourceMod.angleVariance)).ToVector();
+            for (int i = gradius._extantShips.Count - 1; i >= 0; --i)
+                if (gradius._extantShips[i])
+                    gradius._extantShips[i].AttemptToFire(angle);
+            return false; // skip OnFiredByAnything()
+        }
+
+        protected override void OnFiredByAnything()
+        {
+          // spawn a random gradius projectile if we're not spawned by the Gradius ship itself
+          SpawnDifferentProjectile(GradiusShip.GetGradiusProjectile());
+        }
     }
 
     #if DEBUG
@@ -77,14 +97,6 @@ public class Gradius : CwaffGun
     {
         base.OnSwitchedToThisGun();
         CreateShips();
-    }
-
-    public override void OnPostFired(PlayerController player, Gun gun)
-    {
-        base.OnPostFired(player, gun);
-        for (int i = this._extantShips.Count - 1; i >= 0; --i)
-            if (this._extantShips[i])
-                this._extantShips[i].AttemptToFire();
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -448,6 +460,7 @@ public class GradiusShip : MonoBehaviour
     private ParticleSystem _ps = null;
     private int _level = 1;
     private Geometry[] _levelBlips = [null, null, null, null, null];
+    private int _lastFiredFrame = 0;
 
     internal bool _mastered = false;
     internal float _cooldown = 0f;
@@ -589,30 +602,36 @@ public class GradiusShip : MonoBehaviour
         return target;
     }
 
-    public void AttemptToFire()
+    public static GameObject GetGradiusProjectile(Ship? ship = null)
     {
-        const float MAX_MISALIGN = 8f;
-        if (this._cooldown > 0 || !this._owner)
+      return (ship ?? (Ship)UnityEngine.Random.Range(0, 4)) switch {
+        Ship.Falchion => Lazy.GunDefaultProjectile((int)Items.Com4nd0).gameObject,
+        Ship.Jade     => Gradius._RoundLaserProjectile.gameObject,
+        Ship.Lord     => Gradius._WeakseekerProjectile.gameObject,
+        Ship.Vic      => Lazy.GunDefaultProjectile((int)Items.HegemonyRifle).gameObject,
+        _             => Lazy.GunDefaultProjectile(Lazy.PickupId<OmnidirectionalLaser>()).gameObject,
+      };
+    }
+
+    public void AttemptToFire(Vector2 direction)
+    {
+        // const float MAX_MISALIGN = 8f;
+        if (!this._owner)
+          return;
+
+        int frameCount = Time.frameCount; // NOTE: allow, e.g., Scattershot to work by creating more projectiles on the same frame
+        if (this._cooldown > 0 && this._lastFiredFrame < frameCount)
             return;
-        Quaternion rot = base.transform.localRotation;
-        float zRot = rot.eulerAngles.z.Clamp360();
-        float qzRot = zRot.Quantize(90f, VectorConversions.Round);
-        if (zRot.AbsAngleTo(qzRot) > MAX_MISALIGN)
-            return; // NOTE: prevent firing when not axis-aligned
-        rot = qzRot.EulerZ();
+
+        this._lastFiredFrame = frameCount;
+        Quaternion rot = direction.EulerZ();
 
         this._cooldown = GetCooldown() / this._owner.FireRateMult();
         // NOTE: delay cooldown of ships with the opposite mastery status by half of our cooldown so we alternate fire
         this._gun.DelayMastered(this._shipType, !this._mastered, 0.5f * this._cooldown);
 
         Vector2 pos = this._sprite.WorldCenterRight();
-        GameObject prefab = this._shipType switch {
-            Ship.Falchion => Lazy.GunDefaultProjectile((int)Items.Com4nd0).gameObject,
-            Ship.Jade     => Gradius._RoundLaserProjectile.gameObject,
-            Ship.Lord     => Gradius._WeakseekerProjectile.gameObject,
-            Ship.Vic      => Lazy.GunDefaultProjectile((int)Items.HegemonyRifle).gameObject,
-            _             => Lazy.GunDefaultProjectile(Lazy.PickupId<OmnidirectionalLaser>()).gameObject,
-        };
+        GameObject prefab = GetGradiusProjectile(this._shipType);
         if (this._shipType == Ship.Lord && GetWeakestVisibleEnemy(pos, rot) is AIActor target)
             rot = (target.CenterPosition - pos).EulerZ(); // seek towards weakest enemy
         GameObject po = SpawnManager.SpawnProjectile(prefab, pos, rot);
@@ -643,7 +662,7 @@ public class GradiusShip : MonoBehaviour
 
         if (_MuzzleVFX == null)
             _MuzzleVFX = Items.Mailbox.AsGun().muzzleFlashEffects;
-        _MuzzleVFX.SpawnAtPosition(pos, zRotation: zRot);
+        _MuzzleVFX.SpawnAtPosition(pos, zRotation: rot.eulerAngles.z.Clamp360());
     }
 
     private static readonly float[] _FalchionCooldowns = [2.50f, 1.80f, 1.20f, 0.70f, 0.50f];

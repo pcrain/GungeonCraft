@@ -207,6 +207,20 @@ internal static class ShootSingleProjectilePatch
             cursor.CallPrivate(typeof(CwaffProjectile), nameof(CwaffProjectile.DetermineIfFiredForFree));
         }
     }
+
+    /// <summary>Patches for detecting which Gun, if any, a projectile was fired from.</summary>
+    [HarmonyPrefix]
+    private static void GunShootSingleProjectilePrefix(Gun __instance, ProjectileModule mod, ProjectileData overrideProjectileData = null, GameObject overrideBulletObject = null)
+    {
+      WeirdProjectile._CurrentProjectileGun.Push(__instance);
+      WeirdProjectile._CurrentProjectileMod.Push(mod);
+    }
+    [HarmonyPostfix]
+    private static void GunShootSingleProjectilePostfix(Gun __instance, ProjectileModule mod, ProjectileData overrideProjectileData = null, GameObject overrideBulletObject = null)
+    {
+      WeirdProjectile._CurrentProjectileMod.Pop();
+      WeirdProjectile._CurrentProjectileGun.Pop();
+    }
 }
 
 [HarmonyPatch(typeof(PlayerItem), nameof(PlayerItem.DidDamage))]
