@@ -3804,5 +3804,18 @@ public static class Extensions
     newSprite.transform.parent = oldSprite.transform;
     return newSprite;
   }
+
+  /// <summary>Set an override shader for a sprite, optionally with a palette.</summary>
+  public static void OverrideShader(this tk2dBaseSprite sprite, Shader shader, Texture2D optionalPalette = null)
+  {
+    sprite.usesOverrideMaterial = true;
+    Material mat = sprite.renderer.material;
+    mat.shader = shader;
+    if (optionalPalette != null)
+    {
+        mat.SetFloat("_UsePalette", 1f);
+        mat.SetTexture("_PaletteTex", optionalPalette);
+    }
+  }
 }
 

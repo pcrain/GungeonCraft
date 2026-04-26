@@ -65,14 +65,12 @@ public class QuarterPounder : CwaffGun
 
 public class MidasProjectile : MonoBehaviour
 {
-    private const float _SHEEN_WIDTH = 20.0f;
-    internal static Color _Gold      = new Color(1f,1f,0f,1f);
-    internal static Color _White     = new Color(1f,1f,1f,1f);
+    internal static Color _Gold  = new Color(1f,1f,0f,1f);
+    internal static Color _White = new Color(1f,1f,1f,1f);
 
     private void Start()
     {
-        Projectile p = base.GetComponent<Projectile>();
-        p.OnWillKillEnemy += this.OnWillKillEnemy;
+        base.GetComponent<Projectile>().OnWillKillEnemy += this.OnWillKillEnemy;
     }
 
     private void OnWillKillEnemy(Projectile bullet, SpeculativeRigidbody enemy)
@@ -82,23 +80,22 @@ public class MidasProjectile : MonoBehaviour
 
         tk2dBaseSprite sprite = enemy.aiActor.DuplicateInWorld();
         GameObject statue = sprite.gameObject;
-
         IntVector2 offset = (16f * (sprite.WorldBottomLeft - statue.transform.position.XY())).ToIntVector2(); // compute offsets to make speculative rigid body work correctly
-        PixelCollider pixelCollider = new PixelCollider();
-            pixelCollider.CollisionLayer         = CollisionLayer.PlayerBlocker;
-            pixelCollider.Enabled                = true;
-            pixelCollider.IsTrigger              = false;;
-            pixelCollider.ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual;
-            pixelCollider.ManualOffsetX          = offset.x;
-            pixelCollider.ManualOffsetY          = offset.y;
-            pixelCollider.ManualWidth            = Mathf.CeilToInt(C.PIXELS_PER_TILE * sprite.GetBounds().size.x);
-            pixelCollider.ManualHeight           = Mathf.CeilToInt(C.PIXELS_PER_TILE * sprite.GetBounds().size.y);
         SpeculativeRigidbody s = statue.AddComponent<SpeculativeRigidbody>();
             s.CanBePushed        = true;
             s.CanBeCarried       = true;
             s.CollideWithOthers  = true;
             s.CollideWithTileMap = false;
-            s.PixelColliders     = new List<PixelCollider>{pixelCollider};
+            s.PixelColliders     = [new(){
+                CollisionLayer         = CollisionLayer.PlayerBlocker,
+                Enabled                = true,
+                IsTrigger              = false,
+                ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
+                ManualOffsetX          = offset.x,
+                ManualOffsetY          = offset.y,
+                ManualWidth            = Mathf.CeilToInt(C.PIXELS_PER_TILE * sprite.GetBounds().size.x),
+                ManualHeight           = Mathf.CeilToInt(C.PIXELS_PER_TILE * sprite.GetBounds().size.y),
+            }];
             s.Initialize();
         statue.AddComponent<GoldenDeath>()._paletteTexture = enemy.aiActor.optionalPalette;
 
@@ -123,30 +120,18 @@ public class GoldenDeath : MonoBehaviour
     private const float _PART_LIFE     = 0.5f;
     private const float _PART_EMIT     = 20f;
 
-    internal Texture2D _paletteTexture;
-    private float _lifetime;
-    private bool _decaying;
-    private tk2dSprite _sprite;
-    private SpeculativeRigidbody _body;
-    private bool _exploding;
-    private PlayerController _midasOWner;
+    internal Texture2D _paletteTexture   = null;
+    private float _lifetime              = 0.0f;
+    private bool _decaying               = false;
+    private tk2dSprite _sprite           = null;
+    private bool _exploding              = false;
+    private PlayerController _midasOwner = null;
 
     private void Start()
     {
-        this._lifetime = 0.0f;
-        this._decaying = false;
-
-        this._body = base.gameObject.GetComponent<SpeculativeRigidbody>();
-        this._body.OnCollision += this.OnCollision;
+        base.gameObject.GetComponent<SpeculativeRigidbody>().OnCollision += this.OnCollision;
         this._sprite = base.gameObject.GetComponent<tk2dSprite>();
-        this._sprite.usesOverrideMaterial = true;
-        Material mat = this._sprite.renderer.material;
-        mat.shader = CwaffShaders.GoldShader;
-        if (this._paletteTexture)
-        {
-            mat.SetFloat("_UsePalette", 1f);
-            mat.SetTexture("_PaletteTex", this._paletteTexture);
-        }
+        this._sprite.OverrideShader(CwaffShaders.GoldShader, this._paletteTexture);
         CwaffVFX.SpawnBurst(prefab: QuarterPounder._MidasParticleVFX, numToSpawn: _NUM_PARTICLES, basePosition: this._sprite.WorldCenter,
             positionVariance: _PART_SPREAD, baseVelocity: Vector2.zero, velocityVariance: _PART_SPEED, velType: CwaffVFX.Vel.Radial,
             rotType: CwaffVFX.Rot.Random, lifetime: _PART_LIFE, fadeOutTime: _PART_LIFE, emissivePower: _PART_EMIT, emissiveColor: Color.white);
@@ -155,13 +140,12 @@ public class GoldenDeath : MonoBehaviour
 
     private void OnCollision(CollisionData data)
     {
-      if (this._exploding || !data.OtherRigidbody || data.OtherRigidbody.gameActor is not PlayerController p || !p.HasSynergy(Synergy.MASTERY_QUARTER_POUNDER))
-        return;
-
-      this._exploding = true;
-      this._lifetime = 0.0f;
-      this._midasOWner = p;
-      base.gameObject.Play("midas_touch_sound");
+        if (this._exploding || !data.OtherRigidbody || data.OtherRigidbody.gameActor is not PlayerController p || !p.HasSynergy(Synergy.MASTERY_QUARTER_POUNDER))
+            return;
+        this._exploding = true;
+        this._lifetime = 0.0f;
+        this._midasOwner = p;
+        base.gameObject.Play("midas_touch_sound");
     }
 
     private void Update()
@@ -181,7 +165,9 @@ public class GoldenDeath : MonoBehaviour
                     Projectile p = SpawnManager.SpawnProjectile(QuarterPounder._GoldProjectile.gameObject, this._sprite.WorldCenter, angle).GetComponent<Projectile>();
                     p.baseData.speed *= UnityEngine.Random.Range(0.9f, 1.1f);
                     p.collidesWithPlayer = false;
-                    p.Owner = this._midasOWner;
+                    p.Owner = this._midasOwner;
+                    if (this._midasOwner)
+                      this._midasOwner.DoPostProcessProjectile(p);
                     p.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
                     p.sprite.usesOverrideMaterial = true;
                     p.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
