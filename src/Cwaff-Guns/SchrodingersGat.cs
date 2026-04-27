@@ -12,8 +12,6 @@ public class SchrodingersGat : CwaffGun
     public static string LongDescription  = "Fires bullets that leave enemies in a quantum state until they are observed by either dealing or receiving damage. Once observed, enemies have a 50% chance of already being dead, revealing themselves and their projectiles as illusions. Bullets from this gun cannot affect the same enemy twice.";
     public static string Lore             = "Famously used by a mad scientist who would often fire dozens of rounds into a locked box with an animal inside, claiming it was both alive and dead until the box was opened. That scientist eventually landed in prison on charges for kidnapping and murdering dozens of pet cats, insisting \"we don't know if I kidnapped and murdered dozens of cats until we observe it!\" throughout the entire court proceedings.";
 
-    private float _speedMult                      = 1.0f;
-
     public static void Init()
     {
         Lazy.SetupGun<SchrodingersGat>(ItemName, ShortDescription, LongDescription, Lore)
@@ -99,7 +97,6 @@ public class SchrodingersStat : MonoBehaviour
     private bool _observed = false;
     private bool _actuallyDead;
     private bool _doneUpdating;
-    private bool _enemyVisible;
     private AIActor _enemy;
     private Renderer _renderer;
     private float _flickerTimer;
@@ -119,7 +116,6 @@ public class SchrodingersStat : MonoBehaviour
 
         this._enemy                        = base.GetComponent<AIActor>();
         this._doneUpdating                 = false;
-        this._enemyVisible                 = true;
         this._actuallyDead                 = Lazy.CoinFlip();
         this._renderer                     = this._enemy.GetComponent<Renderer>();
         this._flickerTimer                 = 0.0f;

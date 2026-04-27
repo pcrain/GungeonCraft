@@ -15,7 +15,6 @@ public class Scotsman : CwaffGun
     internal List<Stickybomb> _extantStickies = new();
 
     private Vector2 _aimPoint                = Vector2.zero;
-    private int _nextIndex                   = 0;
     private Vector2 _whereIsThePlayerLooking = Vector2.zero;
 
     public static void Init()

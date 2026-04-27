@@ -46,8 +46,8 @@ public class GungeonitePickaxe : CwaffActive
 
     private static int   _ChunksBuilt = 0;
     private static float _ChunkBuildMsTotal = 0;
-    private static float _ChunkBuildMsMin = 0;
-    private static float _ChunkBuildMsMax = 0;
+    // private static float _ChunkBuildMsMin = 0;
+    // private static float _ChunkBuildMsMax = 0;
     private static void BuildForChunkSanityCheck(BuildForChunkDelegate orig, tk2dTileMap tileMap, SpriteChunk chunk, bool useColor, bool skipPrefabs, int baseX, int baseY, LayerInfo layerData)
     {
         System.Diagnostics.Stopwatch tempWatch = System.Diagnostics.Stopwatch.StartNew();
@@ -182,7 +182,7 @@ public class GungeonitePickaxe : CwaffActive
         // GameManager.Instance.Dungeon.RebuildTilemap(pc.CurrentRoom.OverrideTilemap ?? GameManager.Instance.Dungeon.m_tilemap);
     }
 
-    private static Coroutine _RebuildCoroutine = null;
+    // private static Coroutine _RebuildCoroutine = null;
     public static void RebuildAdjacentChunks(tk2dTileMap tilemap, int chunkX, int chunkY)
     {
         ETGModConsole.Log($"is main tilemap? {tilemap == GameManager.Instance.Dungeon.MainTilemap}");

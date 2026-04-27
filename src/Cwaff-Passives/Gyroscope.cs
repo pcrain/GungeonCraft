@@ -9,7 +9,6 @@ public class Gyroscope : CwaffDodgeRollItem
 
     internal static GameObject _TornadoVFX;
 
-    private PlayerController _owner = null;
     private GyroscopeRoll _dodgeRoller = null;
 
     public static void Init()

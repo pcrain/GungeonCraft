@@ -10,7 +10,6 @@ public partial class ArmisticeBoss : AIActor
   internal const float TIRED_THRES = 0.67f;
   internal const float EXHAUSTED_THRES = 0.34f;
 
-  private static GameObject _NapalmReticle      = null;
   private static AIBulletBank.Entry _MainBullet = null;
   private static AIBulletBank.Entry _TurretBullet = null;
   private static AIBulletBank.Entry _WarheadBullet = null;
@@ -369,8 +368,6 @@ public partial class ArmisticeBoss : AIActor
       CustomTrackedStats.DEFEATED_ARMI.Increment();
       CustomDungeonFlags.HAS_DEFEATED_ARMI.Set();
     }
-
-    private Geometry _debugHitbox = null;
 
     private void SetParticleColor(Color? colorMaybe = null)
     {

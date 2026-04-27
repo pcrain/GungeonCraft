@@ -212,7 +212,6 @@ public class VacuumParticle : MonoBehaviour
     private VacuumCleaner _vac     = null;
     private Gun _gun               = null;
     private tk2dBaseSprite _sprite = null;
-    private float _accel           = 0.0f;
     private Vector2 _velocity      = Vector2.zero;
     private float _lifetime        = 0.0f;
     private bool _isDebris         = true; // false for the VFX particles created by the vacuum animation itself, true for actual debris

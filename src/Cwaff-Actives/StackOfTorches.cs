@@ -20,8 +20,6 @@ public class StackOfTorches : CwaffActive
     private static GameObject _SconcePrefab      = null;
     private static List<GameObject> _Torches     = null;
 
-    private PlayerController _owner              = null;
-
     public static void Init()
     {
         PlayerItem item = Lazy.SetupActive<StackOfTorches>(ItemName, ShortDescription, LongDescription, Lore);

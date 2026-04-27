@@ -50,7 +50,6 @@ public class Sextant : CwaffGun
 
     private float _drawTimer            = 0.0f;
     private float _soundTimer           = 0.0f;
-    private int _phase                  = 0;
     private int _maxDrawablePhase       = 0;
     private float _lastAimAngle         = 0.0f;
     private float _lastSpread           = 0.0f;
@@ -232,7 +231,6 @@ public class Sextant : CwaffGun
         this._slidingAngleWindow = 0.0f;
         this._slidingMagWindow = 0.0f;
         this._timeFocusing = 0.0f;
-        this._phase = 0;
         if (postShotCooldown)
             this._cooldownTimer = Mathf.Max(this._cooldownTimer, this.gun.AdjustedReloadTime);
         else

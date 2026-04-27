@@ -1,4 +1,3 @@
-
 namespace CwaffingTheGungy;
 
 public class Itemfinder : CwaffActive

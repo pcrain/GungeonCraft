@@ -1,5 +1,3 @@
-
-
 namespace CwaffingTheGungy;
 
 public class BBGun : CwaffGun
@@ -14,7 +12,6 @@ public class BBGun : CwaffGun
     private static readonly float[] _CHARGE_LEVELS  = {0.25f,0.5f,1.0f,2.0f};
     internal static Projectile _PinProjectile = null;
 
-    private float _lastCharge = 0.0f;
     private readonly List<TheBB> _extantBbs = new();
 
     public static void Init()

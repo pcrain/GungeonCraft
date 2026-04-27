@@ -191,7 +191,6 @@ public static class CwaffTweaks
     [HarmonyPatch]
     private static class FoyerPreloaderAwakePatcher
     {
-        private static bool did = false;
         [HarmonyPatch(typeof(FoyerPreloader), nameof(FoyerPreloader.Awake))]
         [HarmonyPostfix]
         private static void FoyerPreloaderAwakePatch(FoyerPreloader __instance)

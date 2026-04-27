@@ -380,16 +380,17 @@ if [ $rebuild -eq 1 ]; then
 
   #Don't warn about unused variables
   #  (list is semicolon delimited))
-  nowarn="CS0414"
-  if [ $USEXTERNALASSEMBLY -eq 1 ]; then
-    nowarn="${nowarn};CS0109" #CustomShopController issues warnings about unnecessary new with the real game's assembly
-  fi
+  # nowarn="CS0414"
+  # if [ $USEXTERNALASSEMBLY -eq 1 ]; then
+  #   nowarn="${nowarn};CS0109" #CustomShopController issues warnings about unnecessary new with the real game's assembly
+  # fi
 
   #Actually rebuild the project
   echo -e "[${GRN}>${BLN}] Building $buildColor$buildType$BLN project"
   # cat "${projfile}" | sed '/Assembly-CSharp-Full/,+3d' > "${projfile}.fixed"
   # if [ $thunderstore -eq 1 ]; then
-    dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary" -property:Configuration="$buildType"
+    # dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary" -property:Configuration="$buildType"
+    dotnet build --no-restore -m -noLogo -v:minimal -clp:"Summary" -property:Configuration="$buildType"
   # else
   #   dotnet build --no-restore -m -noLogo -warnAsMessage:"${nowarn}" -v:minimal -clp:"Summary"
   # fi

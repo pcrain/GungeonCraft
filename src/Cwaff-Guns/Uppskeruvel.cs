@@ -25,7 +25,6 @@ public class Uppskeruvel : CwaffGun
     public int souls = 0;
 
     private int _level = 0;
-    private int _nextLevelThreshold = 0;
     private bool _spawningSouls = false;
     private List<UppskeruvelCombatSoul> _extantSouls = new();
     private List<int> _usedIndices = new();
@@ -453,7 +452,6 @@ public class UppskeruvelCombatSoul : MonoBehaviour
     private PlayerController _owner = null;
     private AIActor _enemy          = null;
     private Uppskeruvel _gun        = null;
-    private float _homeSpeed        = 0.0f;
     private tk2dSprite _sprite      = null;
     private float _lifetime         = 0.0f;
     private Vector2 _velocity       = Vector2.zero;

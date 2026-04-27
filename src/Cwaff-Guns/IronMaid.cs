@@ -166,7 +166,6 @@ public class IronMaidBullets : MonoBehaviour
     private IronMaid         _ironMaid;
     private float            _moveTimer;
     private bool             _launchSequenceStarted;
-    private bool             _wasEverInStasis;
     private int              _index;
 
     public void Setup(IronMaid ironMaid)
@@ -179,7 +178,6 @@ public class IronMaidBullets : MonoBehaviour
         this._projectile            = base.GetComponent<Projectile>();
         this._owner                 = _projectile.Owner as PlayerController;
         this._launchSequenceStarted = false;
-        this._wasEverInStasis       = false;
         this._index                 = 0;
 
         // Phase 1 / 5 -- the initial fire
@@ -194,7 +192,6 @@ public class IronMaidBullets : MonoBehaviour
 
         // Phase 2 / 5 -- the freeze
         this._projectile.SetSpeed(0.01f);
-        this._wasEverInStasis = true;
         Vector2 pos = this._projectile.SafeCenter;
         Vector2 targetDir = this._projectile.Direction;
         AIActor targetEnemy = null;

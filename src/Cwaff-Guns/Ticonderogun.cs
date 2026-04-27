@@ -34,7 +34,6 @@ public class Ticonderogun : CwaffGun
     private bool _eraserMode                     = false; // whether we are currently charging our weapon
     private float _lastDrawTime                  = 0f;    // the last time that VFX were drawn
     private float _timeCharging                  = 0f;
-    private float _lifeElapsed                   = 0f;
     private Vector2 _adjustedAimPoint            = Vector2.zero;
     private Vector2 _targetEnemyPos              = Vector2.zero;
     private Vector2 _cameraPositionAtChargeStart = Vector2.zero;

@@ -293,8 +293,6 @@ public class HeartbreakerProjectile : Projectile
 
     private float _stateTime            = 0f;
     private State _state                = State.START;
-    private Vector2 _initialRightVector = default;
-    private Vector2 _initialUpVector    = default;
     private Vector2 _targetDir          = default;
     private float _startSpeed           = 0f;
 

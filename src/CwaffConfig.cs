@@ -1,4 +1,3 @@
-
 namespace CwaffingTheGungy;
 
 public static class CwaffConfig

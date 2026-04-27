@@ -82,7 +82,6 @@ public class HappyIceCreamHaver : MonoBehaviour
     private const float _TARGET_SWITCH_RATE = 1.00f;
 
     private AIActor _enemy;
-    private float _lastTargetSwitch = 0f;
 
     private void Start()
     {

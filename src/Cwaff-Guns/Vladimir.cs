@@ -17,7 +17,6 @@ public class Vladimir : CwaffGun
     internal int _enemiesKilled                        = 0;
 
     private List<AIActor> _skeweredEnemies             = new();
-    private int _power                                 = 0;
 
     public static void Init()
     {

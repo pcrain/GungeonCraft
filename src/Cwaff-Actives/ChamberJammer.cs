@@ -57,7 +57,6 @@ internal class UsedChamberJammer : FakeItem
     private int _playerId;
     private int _gunId;
     private float _percentAmmoToLose;
-    private bool _deserialized = false; // whether we were just deserialized
     //WARNING: deserialization doesn't seem to work right with multiple copies of an item -> n copies of an item results in n*n deserializations, and all
     //         copies of an item are given the attributes of the final item deserialized. so, we get around this vanilla bug by using an index
 
@@ -212,7 +211,6 @@ public class ChamberEaterAmmoDisplay : CustomAmmoDisplay
 
     private Gun _gun                 = null;
     private PlayerController _owner  = null;
-    private float _lifeTime          = 0f;
     private float _startMaxAmmo      = 0f;
     private int _displayedMaxAmmo    = 0;
     private bool _ammoDrainCompleted = false;

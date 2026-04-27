@@ -10,7 +10,6 @@ public class GasterBlaster : CwaffActive
     internal static Projectile _GasterBlast;
     internal static GameObject _GasterBlaster;
 
-    private bool _anyGunFiredInRoom = false;
     private PlayerController _owner = null;
 
     public static void Init()

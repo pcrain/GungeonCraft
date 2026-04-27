@@ -351,10 +351,7 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
     private Vector2 _newAngle          = Vector2.zero;
     private float   _lifetime          = 0.0f;
     private SpeculativeRigidbody _body = null;
-    private bool    _trace             = false;
-    private float   _last_trace        = 0.0f;
     private Suncaster _gun             = null;
-    private bool _autotarget           = true;
     private RoomHandler _room          = null;
 
     public SuncasterPrism target       = null;
@@ -436,7 +433,7 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
           return;
         }
 
-        if (this.target && this._autotarget)
+        if (this.target)
           this._angle = ((this.target.transform.position - base.transform.position).normalized);
 
         if ((this._lifetime += BraveTime.DeltaTime) > _MAX_LIFE)

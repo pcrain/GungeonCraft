@@ -275,8 +275,6 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
     private Vector2 _initialRightVector;
     private Vector2 _initialUpVector;
     private Vector2 _privateLastPosition;
-    private float _xDisplacement;
-    private float _yDisplacement;
 
     private AIActor _nextEnemyInPath = null;
     private Vector2 _circleCenter;
@@ -320,8 +318,6 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
         _initialRightVector  = ((!shouldRotate) ? m_currentDirection : projectileTransform.right.XY());
         _initialUpVector     = ((!shouldRotate) ? (Quaternion.Euler(0f, 0f, 90f) * m_currentDirection) : projectileTransform.up);
         _initialized         = true;
-        _xDisplacement       = 0f;
-        _yDisplacement       = 0f;
 
         float aimAngle = _initialRightVector.ToAngle();
         AIActor firstEnemy = Lazy.NearestEnemyWithinConeOfVision(lastPosition, aimAngle, _SCAN_DELTA,

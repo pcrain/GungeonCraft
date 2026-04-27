@@ -148,7 +148,6 @@ public class Femtobyte : CwaffGun
     internal bool _displayNameDirty = false;
     internal string _lastEnemyKilled = null;
     internal string _lastEnemyName = null;
-    private bool _suppressNextClick = false;
 
     public static void Init()
     {
@@ -444,7 +443,7 @@ public class Femtobyte : CwaffGun
         p.AddComponent<DigitizedProjectile>();
     }
 
-    bool _DidDebugSetup = false;
+    // bool _DidDebugSetup = false;
     public override void OnPlayerPickup(PlayerController player)
     {
         StaticReferenceManager.ProjectileAdded -= CheckFromDigitizedOwner;

@@ -176,8 +176,6 @@ public class MinesweeperTile : MonoBehaviour
         new Color(0.50f, 0.50f, 0.50f), // 8
     ];
 
-    private static MinesweeperTile _Target = null;
-
     internal bool _setup             = false;
     internal IntVector2 _pos         = default;
     internal Vector2 _tl             = default;
@@ -591,7 +589,7 @@ public class MinesweeperGame : MonoBehaviour
     }
 
     private const float _PROFILE_RATE = 0.5f;
-    private static float _NextProfile = 0.0f;
+    // private static float _NextProfile = 0.0f;
     private void OnFinishedFrame()
     {
         if (!this._setup)

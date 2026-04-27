@@ -10,7 +10,6 @@ public class CwaffRaidenBeamController : BeamController
 
   private class Bone
   {
-    private static int _Counter = 0;
     private static int _BonesCreated = 0;
     private static readonly LinkedList<Bone> _BonePool = new();
 

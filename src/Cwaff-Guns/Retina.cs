@@ -152,8 +152,6 @@ public class RetinaHUD : MonoBehaviour
   private bool _setup              = false;   // whether we're set up
   private bool _active             = false;   // whether we're active
   private Retina _gun              = null;    // gun we're attache dto
-  private Vector2 _center          = default; // center of the HUD (corresponds to view center)
-  private Vector2 _topLeft         = default; // top left of the HUD, as determined by _center and _scale
   private float _shwoop             = 0.0f;    // percent of HUD that's visible
   private List<Geometry> _geometry = new();   // all shapes rendered by the HUD
   private List<dfLabel> _labels    = new();   // all labels rendered by the HUD

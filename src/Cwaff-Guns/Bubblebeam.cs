@@ -189,12 +189,10 @@ public class EnbubbledBehaviour : MonoBehaviour
     private AIActor _enemy = null;
     private Projectile _proj = null;
     private tk2dSprite _bubble = null;
-    private float _lifetime = 0.0f;
     private bool _setup = false;
     private Vector2 _drift = Vector2.zero;
     private float _vfxSize = 1f;
     private bool _projectileCollisionOverride = false;
-    private bool _enemyCollisionOverride = false;
     private Transform _parent = null;
     private tk2dBaseSprite _parentSprite = null;
     private Vector3 _startPos;

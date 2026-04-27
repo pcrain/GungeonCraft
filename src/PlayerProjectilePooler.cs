@@ -70,7 +70,7 @@ internal class PlayerProjectilePooler
 
   /// <summary>List of pooled player projectiles that have been spawned in, but haven't been assigned an owner yet. Need to defer calling Start() until owner has been assigned.</summary>
   private static readonly List<Projectile> _AwaitingNewOwner = new();
-  private static bool _DoingFloorCleanup = false;
+  // private static bool _DoingFloorCleanup = false;
   private static List<Component> _Components = new();
 
   /// <summary>Map of all poolable projectile prefabs to their pooler.</summary>
@@ -115,7 +115,7 @@ internal class PlayerProjectilePooler
   {
     try
     {
-      _DoingFloorCleanup = true;
+      // _DoingFloorCleanup = true;
       Lazy.DebugLog($"cleaning up projectile pools!");
       foreach (PlayerProjectilePooler pooler in _Poolers.Values)
       {
@@ -131,7 +131,7 @@ internal class PlayerProjectilePooler
     }
     finally
     {
-      _DoingFloorCleanup = false;
+      // _DoingFloorCleanup = false;
     }
   }
 

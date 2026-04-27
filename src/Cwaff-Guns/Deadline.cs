@@ -17,7 +17,6 @@ public class Deadline : CwaffGun
     internal static GameObject _SplodeVFX;
 
     private static List <DeadlineLaser> _MyLasers = new();
-    private float _myTimer = 0;
     private GameObject _myLaserSight = null;
     private GameObject _debugLaserSight = null;
 

@@ -1,5 +1,3 @@
-
-
 namespace CwaffingTheGungy;
 
 public class Groundhog : CwaffGun

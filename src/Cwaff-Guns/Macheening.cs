@@ -12,7 +12,6 @@ public class Macheening : CwaffGun
     private static string _PrefireAnim;
 
     private bool _hasLichguard = false;
-    private EasyLight _light = null;
 
     public static void Init()
     {

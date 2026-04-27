@@ -1,5 +1,4 @@
-﻿
-namespace CwaffingTheGungy;
+﻿namespace CwaffingTheGungy;
 
 public class Missiletoe : CwaffGun
 {

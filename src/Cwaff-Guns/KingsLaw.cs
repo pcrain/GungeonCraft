@@ -192,8 +192,6 @@ public class KingsLawBullets : MonoBehaviour
 
     private PlayerController _owner                 = null;
     private Projectile       _projectile            = null;
-    private bool             _launchSequenceStarted = false;
-    private bool             _wasEverInStasis       = false;
     private GameObject       _runeLarge             = null;
     private GameObject       _runeSmall             = null;
     private float            _offsetAngle           = 0.0f;

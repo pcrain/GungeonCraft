@@ -1,5 +1,4 @@
-﻿
-namespace CwaffingTheGungy;
+﻿namespace CwaffingTheGungy;
 
 /*
    TODO:
@@ -52,8 +51,6 @@ public class Jugglernaut : CwaffGun
     private int _juggleLevel = 0;
     private Coroutine _glowRoutine = null;
     private List<AIActor> _juggledEnemies = new();
-    private bool _cachedFlipped = false;
-    private bool _firstSpriteCheck = true;
 
     public static void Init()
     {

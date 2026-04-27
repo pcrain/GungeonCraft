@@ -107,7 +107,6 @@ public class GunbrellaProjectile : MonoBehaviour
     private const float _DELAY                = 0.03f;  // delay between firing projectiles
     private const float _TIME_TO_REACH_TARGET = _LAUNCH_TIME + _HANG_TIME + _FALL_TIME;
 
-    private static float _LastFireTime = 0.0f;
     private static float _LastLaunchTime = 0.0f;
     private static int   _LastLaunchIndex = 0;
 
@@ -118,8 +117,6 @@ public class GunbrellaProjectile : MonoBehaviour
     private Vector2 _exactTarget     = Vector2.zero;
     private Vector2 _startVelocity   = Vector2.zero;
 
-    private bool _launching          = false;
-    private bool _falling            = false;
     private float _extraDelay        = 0.0f; // must be public so unity serializes it properly with the prefab
     private bool _naturalSpawn       = false;
     private bool _mastered           = false;
@@ -203,7 +200,6 @@ public class GunbrellaProjectile : MonoBehaviour
             this._projectile.IgnoreTileCollisionsFor(_TIME_TO_REACH_TARGET);
             this._projectile.SetSpeed(_LAUNCH_SPEED * speedMult);
             this._projectile.baseData.range = float.MaxValue;
-            this._launching = true;
             float launchTime = _LAUNCH_TIME / speedMult;
             float homeStrength = _HOME_STRENGTH * speedMult;
             while (this._lifetime < launchTime)
@@ -216,7 +212,6 @@ public class GunbrellaProjectile : MonoBehaviour
             this._lifetime -= launchTime;
 
             // Phase 2 / 4 -- slight delay
-            this._launching = false;
             this._projectile.SetSpeed(0.01f);
             while (this._lifetime < (_HANG_TIME + this._extraDelay))
             {
@@ -237,7 +232,6 @@ public class GunbrellaProjectile : MonoBehaviour
         // Phase 3 / 4 -- fall from the skies
         float fallTime = (this._mastered ? _SPEAR_TIME : _FALL_TIME) / speedMult;
         float launchSpeed = (this._mastered ? (_FALL_TIME / _SPEAR_TIME) : 1f) * _LAUNCH_SPEED * speedMult;
-        this._falling = true;
         Vector2 targetFallVelocity = (250f + 40f*UnityEngine.Random.value).ToVector(1f);
         this._projectile.SetSpeed(launchSpeed);
         Vector2 offsetTarget = this._exactTarget + Lazy.RandomVector(_SPREAD * UnityEngine.Random.value * (this._owner ? this._owner.AccuracyMult() : 1f));

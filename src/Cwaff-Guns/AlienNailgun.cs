@@ -21,7 +21,6 @@ public class AlienNailgun : CwaffGun
     private Coroutine _dnaReconstruct       = null;
     private int _spawnIndex                 = -1;
     private string _targetGuid              = null;
-    private float _curChargeTime            = 0.0f;
     private bool _constructionComplete      = false;
     private List<GameObject> _fragments     = new();
     private GameObject _preview             = null;
@@ -229,7 +228,6 @@ public class AlienNailgun : CwaffGun
                 g.SafeDestroy();
             this._fragments.Clear();
         }
-        this._curChargeTime = 0.0f;
         this._constructionComplete = false;
     }
 

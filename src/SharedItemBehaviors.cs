@@ -287,7 +287,6 @@ public class ProjectileSlashingBehaviour : MonoBehaviour  // stolen from NN
 
 public static class AnimatedBullet // stolen and modified from NN
 {
-    private static int _ClipCounter = 0;
     private static HashSet<string> _KnownClips = new();
     /// <summary>Create an animated projectile sprite.</summary>
     /// <param name="name">Base name of the sprite to use for the animation.</param>
@@ -1416,7 +1415,6 @@ public class Nametag : MonoBehaviour
     private GameObject _canvasGo;
     private GameObject _textGo;
 
-    private static int _NumNames = 0;
     private static Font _Font;
 
     public void Setup(TextAnchor anchor = TextAnchor.UpperCenter)

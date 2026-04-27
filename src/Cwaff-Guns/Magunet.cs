@@ -21,7 +21,6 @@ public class Magunet : CwaffGun
     internal const float _SQR_REACH    = _REACH * _REACH; // avoid an unnecessary sqrt() by using sqrmagnitude
     private const float _NUM_PARTICLES = 3f;
 
-    private float _timeOfLastCheck = 0.0f;
     private float _timeOfLastFX    = 0.0f;
     private bool  _wasCharging     = false;
     private GameObject _extantChargeVFX = null;
@@ -161,18 +160,13 @@ public class MagnetParticle : MonoBehaviour
     private const float _MAX_LIFE           = 0.5f;
     private const float _MIN_DIST_TO_VACUUM = 1.25f;
     private const float _MIN_VAC_DIST_SQR   = _MIN_DIST_TO_VACUUM * _MIN_DIST_TO_VACUUM;
-    private const float _MIN_ALPHA          = 0.3f;
-    private const float _MAX_ALPHA          = 1.0f;
-    private const float _DLT_ALPHA          = _MAX_ALPHA - _MIN_ALPHA;
     private const float _MIN_LAUNCH_SPEED   = 24f;
     private const float _MAX_LAUNCH_SPEED   = 40f;
 
     private Gun _gun               = null;
     private tk2dBaseSprite _sprite = null;
-    private float _accel           = 0.0f;
     private Vector2 _velocity      = Vector2.zero;
     private float _lifetime        = 0.0f;
-    private float _alpha           = _MIN_ALPHA;
     private bool _isDebris         = true; // false for the VFX particles created by the vacuum animation itself, true for actual debris
     private DebrisObject _debris   = null;
     private float _startDistance   = 0.0f;

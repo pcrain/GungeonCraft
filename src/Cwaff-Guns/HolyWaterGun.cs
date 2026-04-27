@@ -110,11 +110,8 @@ public class ExorcismJuice : MonoBehaviour
 
 public class Exorcisable : MonoBehaviour
 {
-    internal const float _EXORCISM_DPS   = 15.0f; // damage per second
+    internal const float _EXORCISM_DPS  = 15.0f; // damage per second
     private const float _EXORCISM_POWER = _EXORCISM_DPS / C.FPS; // damage per frame
-
-    private static uint ExorcismSoundId = 0;
-    private static float ExorcismTimer = 0.0f;
 
     private AIActor _enemy;
     private void Start()
@@ -185,8 +182,6 @@ public class GhostlyDeath : MonoBehaviour
 
 public class GameActorHolyGoopEffect : GameActorSpeedEffect
 {
-    private static StatModifier[] _CaffeineGoopBuffs = null;
-
     public override void OnEffectApplied(GameActor actor, RuntimeGameActorEffectData effectData, float partialAmount = 1f)
     {
         base.OnEffectApplied(actor, effectData, partialAmount);
