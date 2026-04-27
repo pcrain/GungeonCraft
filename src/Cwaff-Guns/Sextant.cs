@@ -715,6 +715,9 @@ public class PrecisionProjectile : Projectile
         //NOTE: friction must be applied BEFORE damage or m_currentMinFriction prevents it from working
         StickyFrictionManager.Instance.RegisterCustomStickyFriction(0.75f, 0f, true);
         base.gameObject.Play("sextant_critical_hit_sound");
+        if (hh.IsBoss || hh.IsSubboss)
+          return;
+
         enemy.DuplicateInWorldAsMesh().Dissipate(time: 1.5f, amplitudeEnd: 5f, progressive: true);
         enemy.EraseFromExistenceWithRewards();
     }
