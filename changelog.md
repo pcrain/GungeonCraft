@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.29.2 (TBD)
+## 1.29.2 (2026-04-27)
 
 - Fixed critical hits from Sextant insta-killing bosses and softlocking the game in some instances
 
