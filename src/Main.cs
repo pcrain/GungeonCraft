@@ -283,6 +283,7 @@ public class Initialisation : BaseUnityPlugin
                 Cleansweep.Init();
                 FluxFist.Init();
                 Retina.Init();
+                ChainGun.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

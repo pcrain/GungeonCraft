@@ -427,3 +427,30 @@ static class AttackWhileRollingPatch
       return true;
     }
 }
+
+//NOTE: used by KnockbackUnleasher (indirectly used by Chain Gun)
+[HarmonyPatch]
+static class AllowMoreThan30KnockbackPatch
+{
+  [HarmonyPatch(typeof(KnockbackDoer), nameof(KnockbackDoer.Update))]
+  [HarmonyILManipulator]
+  private static void KnockbackDoerUpdatePatchIL(ILContext il)
+  {
+      ILCursor cursor = new ILCursor(il);
+      if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcR4(30))) // float oldKnockbackCap
+          return;
+
+      cursor.Emit(OpCodes.Ldarg_0); // KnockbackDoer self
+      cursor.Emit(OpCodes.Ldloc_S, (byte)10); // float magnitude
+      cursor.CallPrivate(typeof(AllowMoreThan30KnockbackPatch), nameof(AllowMoreThan30Knockback));
+  }
+
+  private static float AllowMoreThan30Knockback(float oldKnockbackCap, KnockbackDoer self, float magnitude)
+  {
+    if (magnitude < oldKnockbackCap)
+      return oldKnockbackCap;
+    if (!self.gameObject.GetComponent<KnockbackUnleasher>())
+      return oldKnockbackCap;
+    return KnockbackUnleasher.UNLEASHED_KNOCKBACK_CAP;
+  }
+}
