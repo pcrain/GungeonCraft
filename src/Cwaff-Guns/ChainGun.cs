@@ -1,15 +1,18 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - handle overextended chains smoothly
-    - fade out chains and destroy them a certain time after being connected
-    - don't allow double connecting enemies
-    - let enemies run into enemy bullets and other enemies while chained
-    - add damage while chained
-    - add particle effects from slamming into walls while chained
+using static CwaffingTheGungy.RopeSim; // StretchPolicy
 
+/* TODO:
+    - better sounds would still be great
+    - better debris than chain links
+    - add support for controller
+    - add cleanup (destroy chains) when in another room and not onscreen
+
+    - add and animate gun
     - scale chain length with range stat
     - scale whipping speed with damage stat
+
+    - maybe figure out better enemy slamming physics
 */
 
 public class ChainGun : CwaffGun
@@ -19,18 +22,31 @@ public class ChainGun : CwaffGun
     public static string LongDescription  = "TBD";
     public static string Lore             = "TBD";
 
+    internal static GameObject[] _ChainDebris = new GameObject[2];
+    internal static GameObject _ChainImpact = null;
     internal static tk2dSpriteAnimationClip _ChainLink = null;
 
     public static void Init()
     {
         Lazy.SetupGun<ChainGun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 600, shootFps: 14, reloadFps: 4,
-            muzzleFrom: Items.Mailbox)
-          .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic,
-            damage: 5.5f, speed: 25f, range: 18f, force: 12f, hitEnemySound: "paintball_impact_enemy_sound",
-            hitWallSound: "paintball_impact_wall_sound"));
+            muzzleFrom: Items.Mailbox, fireAudio: "chain_launch_sound")
+          .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, invisibleProjectile: true,
+            damage: 5.5f, speed: 75f, range: 18f, force: 12f, pierceBreakables: true, hitSound: "chain_impact_sound"))
+          .Attach<ChainGunProjectile>();
 
         _ChainLink = VFX.Create("chain_link").DefaultAnimation();
+        _ChainImpact = VFX.Create("chain_impact_vfx", fps: 20, loops: false, anchor: Anchor.MiddleLeft);
+
+        for (int i = 0; i < 2; ++i)
+            _ChainDebris[i] = BreakableAPIToolbox.GenerateDebrisObject(
+                shardSpritePath         : $"chain_debris_{i+1}",
+                debrisObjectsCanRotate  : true,
+                LifeSpanMin             : 1,
+                LifeSpanMax             : 1,
+                AngularVelocity         : 0,
+                AngularVelocityVariance : 180,
+                DebrisBounceCount       : 1).gameObject;
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -38,6 +54,38 @@ public class ChainGun : CwaffGun
         base.PostProcessProjectile(projectile);
         new GameObject("chainlink").AddComponent<ChainkLink>().Setup(this.gun.GunPlayerOwner(), projectile, this);
     }
+
+    public static void DoChainDebrisAt(Vector2 pos, int num)
+    {
+      for (int i = 0; i < num; ++i)
+      {
+          UnityEngine.Object.Instantiate(
+            ChainGun._ChainDebris[UnityEngine.Random.Range(0, 2)], pos, Lazy.RandomEulerZ())
+          .GetComponent<DebrisObject>().Trigger(Lazy.RandomVector(2f * UnityEngine.Random.value).ToVector3ZUp(2f), 0.25f);
+      }
+    }
+}
+
+public class ChainGunProjectile : MonoBehaviour
+{
+  private Projectile _proj;
+
+  private void Start()
+  {
+    this._proj = base.gameObject.GetComponent<Projectile>();
+    if (!this._proj)
+      return;
+
+    this._proj.OnDestruction += this.OnProjectileDestruction;
+  }
+
+  private void OnProjectileDestruction(Projectile projectile)
+  {
+      if (!projectile || projectile != this._proj)
+        return;
+      this._proj.OnDestruction -= this.OnProjectileDestruction;
+      ChainGun.DoChainDebrisAt(this._proj.SafeCenter, 3);
+  }
 }
 
 public class ChainkLink : MonoBehaviour
@@ -59,7 +107,7 @@ public class ChainkLink : MonoBehaviour
     private bool _setup = false;
     private bool _active = false;
     private int _knockbackId = -1;
-    private Vector2 _physicsEndPos = default;
+    private float _nextSlamTime = 0.0f;
 
     public void Setup(PlayerController owner, Projectile proj, ChainGun gun)
     {
@@ -75,9 +123,11 @@ public class ChainkLink : MonoBehaviour
       this._owner                 = owner;
       this._gun                   = gun;
       this._connectedToGun        = gun != null;
-      Vector2 endPos              = gun.gun.barrelOffset.position; //TODO: null check
-      this._physicsEndPos         = endPos;
-      this._mesh                  = CwaffRopeMesh.Create(ChainGun._ChainLink, startPos: endPos, endPos: endPos, numSegments: SEGMENTS, segLength: SEGLENGTH);
+      Vector2 endPos              = gun ? gun.gun.barrelOffset.transform.position : proj.SafeCenter;
+      this._mesh                  = CwaffRopeMesh.Create(
+        animation: ChainGun._ChainLink, startPos: endPos, endPos: endPos, numSegments: SEGMENTS, segLength: SEGLENGTH,
+        stretchPolicy: StretchPolicy.GROWTEMPORARY);
+      this._mesh.gameObject.SetLayerRecursively(LayerMask.NameToLayer("BG_Critical"));
       this._active                = true;
       this._setup                 = true;
     }
@@ -96,6 +146,8 @@ public class ChainkLink : MonoBehaviour
     {
       if (!enemy || enemy.healthHaver is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
         return false;
+      if (enemy.gameObject.GetComponent<KnockbackUnleasher>())
+        return false; // NOTE: this is the only real check if the enemy already has a chain linked to them, maybe we want something better?
       if (enemy.knockbackDoer is not KnockbackDoer kbd || kbd.m_isImmobile.Value)
         return false;
       if (enemy.behaviorSpeculator is not BehaviorSpeculator bs || bs.ImmuneToStun)
@@ -107,38 +159,103 @@ public class ChainkLink : MonoBehaviour
 
       this._connectedToEnemy = true;
       this._enemy = enemy;
+      this._enemy.HitByEnemyBullets = true;
       this._enemyBody = body;
+      this._enemyBody.OnTileCollision += this.OnPossiblySlammedIntoWall;
+      // this._enemyBody.OnPreRigidbodyCollision += this.OnPossiblySlammedIntoOtherEnemy; // TODO: see if we can make this interesting later
+      // this._enemyBody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
       this._enemy.gameObject.AddComponent<KnockbackUnleasher>(); // uncap knockback for this specific enemy while they're chained
-      // bs.enabled = false;
       if (this._owner)
         this._enemyBody.RegisterSpecificCollisionException(this._owner.specRigidbody);
       bs.Stun(3600f, true);
       this._mesh.endPos = enemy.CenterPosition;
-      base.gameObject.Play("chain_connect_sound"); // TODO: add this
+      // base.gameObject.Play("chain_lockdown_sound");
       return true;
+    }
+
+    private void OnPossiblySlammedIntoOtherEnemy(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+    {
+      const float COLLATERAL_DAMAGE_SCALE = 0.25f;
+      if (otherRigidbody && otherRigidbody.aiActor is AIActor other)
+      {
+        if (other.IsNormalEnemy && other.healthHaver is HealthHaver hh)
+        {
+          hh.ApplyDamage(COLLATERAL_DAMAGE_SCALE * myRigidbody.Velocity.magnitude, myRigidbody.Velocity, "Pinball");
+          otherRigidbody.RegisterTemporaryCollisionException(myRigidbody, 0.25f);
+        }
+        PhysicsEngine.SkipCollision = true;
+      }
+    }
+
+    private void OnPossiblySlammedIntoWall(CollisionData tileCollision)
+    {
+      const float MIN_SLAM_GAP     = 0.1f;
+      const float FORCE_SHAKE_MULT = 0.001f;
+      const float DAMAGE_VEL_MULT  = 0.01f;
+
+      float now = BraveTime.ScaledTimeSinceStartup;
+      if (!this._enemyBody || now < this._nextSlamTime || !this._enemy || this._enemy.knockbackDoer is not KnockbackDoer kbd)
+      {
+          this._nextSlamTime = now + MIN_SLAM_GAP;
+          return;
+      }
+      this._nextSlamTime = now + MIN_SLAM_GAP;
+
+      float slamVel = this._enemyBody.Velocity.magnitude;
+      float slamForce = FORCE_SHAKE_MULT * (kbd.weight * slamVel);
+      float slamDamage = DAMAGE_VEL_MULT * slamVel * slamVel;
+      // Lazy.DebugConsoleLog($"enemy slammed with force {slamForce}, velocity {slamVel}, and {slamDamage} damage");
+      if (this._enemy.healthHaver is HealthHaver hh)
+        hh.ApplyDamage(slamDamage, -tileCollision.Normal, "slammed", CoreDamageTypes.None, DamageCategory.Collision);
+      base.gameObject.Play((slamForce > 1) ? "wall_slam_heavy" : (slamForce > 0.5) ? "wall_slam_medium" : "wall_slam_light");
+      base.gameObject.Play("chain_snap_sound");
+      CwaffVFX.Spawn(
+        prefab        : ChainGun._ChainImpact,
+        position      : tileCollision.Contact,
+        rotation      : tileCollision.Normal.ToAngle().EulerZ(),
+        velocity      : 2f * tileCollision.Normal.normalized,
+        emissivePower : 5f,
+        emissiveColor : Color.white,
+        startScale    : Mathf.Clamp01(slamForce),
+        endScale      : Mathf.Clamp01(slamForce)
+        );
+      // ChainGun.DoChainDebrisAt(tileCollision.Contact, Mathf.Clamp(Mathf.CeilToInt(10f * slamForce), 4, 20));
+      // CwaffVFX.SpawnBurst(
+      //     prefab           : Entropynnium._ManaParticlePrefab,
+      //     numToSpawn       : Mathf.Clamp(Mathf.CeilToInt(10f * slamForce), 4, 20),
+      //     basePosition     : tileCollision.Contact,
+      //     positionVariance : 2f,
+      //     minVariance      : 1f,
+      //     velType          : CwaffVFX.Vel.OutwardFromCenter,
+      //     rotType          : CwaffVFX.Rot.Random,
+      //     lifetime         : 0.5f,
+      //     startScale       : 0.6f,
+      //     endScale         : 0.2f,
+      //     emissivePower    : 100f,
+      //     emissiveColor    : ExtendedColours.purple
+      //   );
+      GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(
+        mag: slamForce, spd: 2f * slamForce, tim: 0.3f * Mathf.Min(slamForce, 1f), foff: 0f), tileCollision.Contact);
     }
 
     private void LateUpdate()
     {
-      const float KB_SCALAR = 500.0f;
+      const float KB_SCALAR = 12.0f;
 
       if (!this._setup || !this._active || BraveTime.DeltaTime == 0.0f || GameManager.Instance.IsPaused)
         return;
       if (this._connectedToGun && (!this._owner || !this._gun || this._owner.CurrentGun != this._gun.gun))
       {
-        // Lazy.DebugConsoleLog($"no gun");
         Disconnect();
         return;
       }
       if (this._connectedToProjectile && !this._projectile)
       {
-        // Lazy.DebugConsoleLog($"no proj");
         Disconnect();
         return;
       }
-      if (this._connectedToEnemy && (!this._enemy || !this._enemyBody))
+      if (this._connectedToEnemy && (!this._enemy || !this._enemyBody || (this._enemy.healthHaver is HealthHaver hh && hh.IsDead)))
       {
-        // Lazy.DebugConsoleLog($"no enemy");
         Disconnect();
         return;
       }
@@ -149,37 +266,35 @@ public class ChainkLink : MonoBehaviour
         this._mesh.startPos += this._projectile.LastVelocity * BraveTime.DeltaTime;
       else
       {
-        // Lazy.DebugConsoleLog($"no position");
         Disconnect();
         return;
       }
 
       Vector2 bpos = this._mesh.startPos;
       Vector2 targetPos = this._owner.unadjustedAimPoint.XY();
-      Vector2 newEndPos;
       if (this._connectedToEnemy && this._enemy && this._enemyBody && this._enemy.knockbackDoer is KnockbackDoer kbd)
       {
         Vector2 enemyPos = this._enemyBody.UnitCenter;
-        newEndPos = Lazy.SmoothestLerp(enemyPos, targetPos, 4f);
-        Vector2 tempDelta = (newEndPos - enemyPos);
-        float magnitude = tempDelta.magnitude;
+        Vector2 tempDelta = (targetPos - enemyPos);
         kbd.m_activeContinuousKnockbacks.Clear(); // nothing else but the chain should affect this enemy
         if ((targetPos - this._mesh.endPos).magnitude >= 0.25f) // move only if the mouse has been moved significantly
-          this._knockbackId = kbd.ApplyContinuousKnockback(tempDelta, KB_SCALAR * magnitude);
+          this._knockbackId = kbd.ApplyContinuousKnockback(tempDelta, KB_SCALAR * tempDelta.magnitude);
         else
           this._knockbackId = kbd.ApplyContinuousKnockback(tempDelta, 0.0f);
-        newEndPos = enemyPos;
-        this._mesh.endPos = newEndPos;
+        this._mesh.endPos = enemyPos;
+      }
+      else if (this._connectedToProjectile && this._projectile)
+      {
+        this._mesh.endPos = this._projectile.SafeCenter;
       }
       else
       {
-        newEndPos = Lazy.SmoothestLerp(this._mesh.endPos, targetPos, 14f);
+        Vector2 newEndPos = Lazy.SmoothestLerp(this._mesh.endPos, targetPos, 14f);
         Vector2 delta = (newEndPos - bpos);
         if (delta.sqrMagnitude > SQR_ROPELENGTH)
           newEndPos = bpos + ROPELENGTH * delta.normalized;
         this._mesh.endPos = newEndPos;
       }
-      this._physicsEndPos = newEndPos;
     }
 
     private void Disconnect()
@@ -187,10 +302,7 @@ public class ChainkLink : MonoBehaviour
       if (this._enemy)
       {
         if (this._enemy.behaviorSpeculator is BehaviorSpeculator bs)
-        {
-          // bs.enabled = true;
           bs.EndStun();
-        }
         if (this._enemy.knockbackDoer is KnockbackDoer kbd)
         {
           Vector2 kbforce = Vector2.zero;
@@ -201,8 +313,13 @@ public class ChainkLink : MonoBehaviour
         }
         if (this._enemy.gameObject.GetComponent<KnockbackUnleasher>() is KnockbackUnleasher kbu)
           UnityEngine.Object.Destroy(kbu);
-        if (this._enemyBody && this._owner)
-          this._enemyBody.DeregisterSpecificCollisionException(this._owner.specRigidbody);
+        if (this._enemyBody)
+        {
+          this._enemyBody.OnTileCollision -= this.OnPossiblySlammedIntoWall;
+          this._enemyBody.OnPreRigidbodyCollision -= this.OnPossiblySlammedIntoOtherEnemy;
+          if (this._owner)
+            this._enemyBody.DeregisterSpecificCollisionException(this._owner.specRigidbody);
+        }
       }
       this._connectedToEnemy      = false;
       this._enemy                 = null;
@@ -210,13 +327,20 @@ public class ChainkLink : MonoBehaviour
       this._connectedToGun        = false;
       this._projectile            = null;
       this._connectedToProjectile = false;
-      base.gameObject.Play("chain_snap_sound"); // TODO: add this
-      this._active = false; //TODO: become debris
+      base.gameObject.Play("chain_snap_sound");
+      if (this._mesh)
+        this._mesh.LockWhenStationary(); // prevent the chain from updating once it stops moving around much
+      this._active = false;
     }
 
     private void OnDestroy()
     {
-      Lazy.DebugConsoleLog($"chain destroyed");
+      // Lazy.DebugConsoleLog($"chain destroyed");
+      if (this._enemyBody)
+      {
+        this._enemyBody.OnTileCollision -= this.OnPossiblySlammedIntoWall;
+        this._enemyBody.OnPreRigidbodyCollision -= this.OnPossiblySlammedIntoOtherEnemy;
+      }
       if (this._projectile)
         this._projectile.OnHitEnemy -= this.OnHitEnemy;
       if (this._mesh)
@@ -280,6 +404,7 @@ public class CwaffRopeMesh : MonoBehaviour
   public tk2dSpriteAnimationClip animation;
   public Vector2 startPos;
   public Vector2 endPos;
+  public bool locked; // if true, prevents the rope from updating
 
   private tk2dTiledSprite m_sprite;
   private int m_spriteSubtileWidth;
@@ -291,13 +416,18 @@ public class CwaffRopeMesh : MonoBehaviour
   private List<Vector2> _ropePoints;
   private float _segLength;
   private float _updateTimer;
+  private StretchPolicy _stretchPolicy;
+  private float _softMaxRopeLength;
+  private int _numSegments;
+  private float _lockThreshold; // if > 0, locks the rope once it's stopped moving
 
   private const int _BEZIER_CURVE_SEGMENTS = 20;
   private const int c_bonePixelLength = 4;
   private const float c_boneUnitLength = 0.25f;
   private const float c_trailHeightOffset = 0.5f;
 
-  public static CwaffRopeMesh Create(tk2dSpriteAnimationClip animation, Vector2 startPos, Vector2 endPos, int numSegments, float segLength, string name = null)
+  public static CwaffRopeMesh Create(tk2dSpriteAnimationClip animation, Vector2 startPos, Vector2 endPos, int numSegments, float segLength,
+    string name = null, StretchPolicy stretchPolicy = StretchPolicy.STRETCH)
   {
       CwaffRopeMesh mesh   = new GameObject(name ?? "new CwaffRopeMesh", typeof(CwaffRopeMesh)).GetComponent<CwaffRopeMesh>();
       mesh.animation       = animation;
@@ -306,13 +436,23 @@ public class CwaffRopeMesh : MonoBehaviour
       mesh._segLength      = segLength;
       mesh._ropePrevPoints = new();
       mesh._ropePoints     = new();
+      mesh._stretchPolicy  = stretchPolicy;
+      mesh._numSegments    = numSegments;
       Vector2 delta = (1f / numSegments) * (endPos - startPos);
       for (int i = 0; i <= numSegments; ++i)
       {
         mesh._ropePrevPoints.Add(startPos + i * delta);
         mesh._ropePoints.Add(startPos + i * delta);
       }
+      mesh._softMaxRopeLength = segLength * numSegments;
+      mesh.locked = false;
+      mesh._lockThreshold = 0f;
       return mesh;
+  }
+
+  public void LockWhenStationary(float threshold = 0.01f)
+  {
+    this._lockThreshold = threshold;
   }
 
   private void Start()
@@ -332,14 +472,15 @@ public class CwaffRopeMesh : MonoBehaviour
   private static readonly Quaternion _Rot90 = Quaternion.Euler(0f, 0f, 90f);
   private void Update()
   {
+    if (this.locked)
+      return;
     m_globalTimer += BraveTime.DeltaTime;
     this._updateTimer += BraveTime.DeltaTime;
     if (this._updateTimer < UPDATE_RATE)
-      return;
+      return; // rope updates need to happen at a fixed time rate due to verlet integration silliness
     this._updateTimer -= UPDATE_RATE;
 
-    Bone.ReturnAll(ref m_bones);
-    DrawRope();
+    UpdateRope();
     for (LinkedListNode<Bone> n = m_bones.First; n != m_bones.Last; n = n.Next)
       n.Value.normal = (_Rot90 * (n.Next.Value.pos - n.Value.pos)).normalized;
     if (m_bones.Count > 1)
@@ -348,6 +489,8 @@ public class CwaffRopeMesh : MonoBehaviour
 
   private void LateUpdate()
   {
+    if (this.locked)
+      return;
     m_minBonePosition = new Vector2(float.MaxValue, float.MaxValue);
     m_maxBonePosition = new Vector2(float.MinValue, float.MinValue);
     for (LinkedListNode<Bone> n = m_bones.First; n != null; n = n.Next)
@@ -366,12 +509,74 @@ public class CwaffRopeMesh : MonoBehaviour
     Bone.ReturnAll(ref m_bones);
   }
 
-  private void DrawRope()
+  private void UpdateRope()
   {
-    RopeSim.SimulateRope(this.startPos, this.endPos, this._ropePoints, this._ropePrevPoints,
+    Bone.ReturnAll(ref m_bones);
+    Vector2 curStartPos = this.startPos;
+    Vector2 curEndPos = this.endPos;
+    switch (this._stretchPolicy)
+    {
+      case StretchPolicy.CLAMP:
+      {
+        // clamp end to max length
+        Vector2 toEnd = curEndPos - curStartPos;
+        float dist = toEnd.magnitude;
+        float extraLength = dist - this._softMaxRopeLength;
+        if (extraLength > 0f)
+            curEndPos = curStartPos + (toEnd / dist) * this._softMaxRopeLength;
+        break;
+      }
+      case StretchPolicy.GROWTEMPORARY:
+      case StretchPolicy.GROWPERMANENT:
+      {
+        Vector2 toEnd = curEndPos - curStartPos;
+        float dist = toEnd.magnitude;
+        float extraLength = dist - this._softMaxRopeLength;
+        int curExtraPoints = Mathf.Max(0, Mathf.CeilToInt((float)extraLength / this._segLength));
+        int prevExtraPoints = this._ropePoints.Count - (this._numSegments + 1);
+        if (prevExtraPoints > curExtraPoints && this._stretchPolicy != StretchPolicy.GROWPERMANENT)
+        {
+          int pointsToRemove = prevExtraPoints - curExtraPoints;
+          this._ropePoints.RemoveRange(this._ropePoints.Count - pointsToRemove, pointsToRemove);
+          this._ropePrevPoints.RemoveRange(this._ropePrevPoints.Count - pointsToRemove, pointsToRemove);
+        }
+        else if (prevExtraPoints < curExtraPoints)
+        {
+          int pointsToAdd = curExtraPoints - prevExtraPoints;
+          while (--pointsToAdd >= 0)
+          {
+            Vector2 nextPos = this.endPos;
+            if (pointsToAdd > 0)
+            {
+              Vector2 prevPos = this._ropePoints[this._ropePoints.Count - 1];
+              nextPos = prevPos + this._segLength * (this.endPos - prevPos).normalized;
+            }
+            this._ropePoints.Add(nextPos);
+            this._ropePrevPoints.Add(nextPos);
+          }
+        }
+        break;
+      }
+      default:
+        break;
+    }
+    // Lazy.DebugConsoleLog($"simulating {this._ropePoints.Count} points");
+    RopeSim.SimulateRope(curStartPos, curEndPos, this._ropePoints, this._ropePrevPoints,
       minSegLength: this._segLength, maxSegLength: this._segLength, updateRate: UPDATE_RATE);
     for (int j = 0; j < this._ropePoints.Count; j++)
       m_bones.AddLast(Bone.Rent(this._ropePoints[j]));
+    if (this._lockThreshold > 0f)
+    {
+      float maxMovement = 0.0f;
+      for (int i = this._ropePoints.Count - 1; i >= 0; --i)
+        maxMovement = Mathf.Max(maxMovement, (this._ropePoints[i] - this._ropePrevPoints[i]).sqrMagnitude);
+      // Lazy.DebugConsoleLog($" max movement is {Mathf.Sqrt(maxMovement)}");
+      if (maxMovement <= (this._lockThreshold * this._lockThreshold))
+      {
+        // Lazy.DebugConsoleLog($"    locking updates!");
+        this.locked = true;
+      }
+    }
   }
 
   private void GetTiledSpriteGeomDesc(out int numVertices, out int numIndices, tk2dSpriteDefinition spriteDef, Vector2 dimensions)
@@ -433,6 +638,14 @@ public static class RopeSim
     private const float DEFAULT_DAMPING             = 0.98f;
     private static readonly Vector2 DEFAULT_GRAVITY = new Vector2(0f, -1.5f); // visual sag
 
+    public enum StretchPolicy
+    {
+      STRETCH,       // rope stretches each segment to fill its entire length
+      CLAMP,         // clamps the rope length to maxSegmentLength * numSegments, remainder of rope does not render
+      GROWTEMPORARY, // rope temporarily grows to visually render to its current length, but shrinks back as its able to
+      GROWPERMANENT, // rope permanently grows to visually render to its current length
+    }
+
     /// <summary>
     /// Given start and end points for a rope and a list of current and previous points for rope segments, updates
     /// the list of previous and current intermediate rope points with the specified physics parameters. Uses
@@ -454,12 +667,6 @@ public static class RopeSim
         float _damping      = damping ?? DEFAULT_DAMPING;
         Vector2 _gravity    = gravity ?? DEFAULT_GRAVITY;
         float maxRopeLength = maxSegLength * (count - 1);
-
-        // clamp end to max length
-        Vector2 toEnd = end - start;
-        float dist = toEnd.magnitude;
-        if (dist > maxRopeLength && dist > 0f)
-            end = start + (toEnd / dist) * maxRopeLength;
 
         // do verlet integration
         Vector2 sqrdtgrav = _gravity * dt * dt;
