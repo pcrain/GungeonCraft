@@ -2,35 +2,29 @@ namespace CwaffingTheGungy;
 
 using static CwaffingTheGungy.RopeSim; // StretchPolicy
 
-/* TODO:
-    - handle gun changes / reloading / firing extra projectiles more gracefully
-    - balance stats
-    - scale chain length with range stat
-    - scale whipping speed with damage stat
-    - mastery
-*/
-
 public class ChainDriver : CwaffGun
 {
     public static string ItemName         = "Chain Driver";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "The Strongest Links";
+    public static string LongDescription  = "Fires chains that shackle enemies. Shackled enemies are dragged towards the current aim point, and can be slammed into solid objects. Enemy weight and damage stat influence drag speed. Reloading releases shackled enemies. Increases curse by 1 while in inventory.";
+    public static string Lore             = "They say a chain is only as strong as its weakest link. By breaking and reassembling chains millions of times until only the strongest links survived, gunsmiths were able to produce a chain so powerful it developed arcane self-regenerating properties. In typical fashion, they ignored all the potential good an infinite supply of iron could offer, and instead chose to stuff it inside a firearm.";
 
-    internal static GameObject[] _ChainDebris = new GameObject[2];
-    internal static GameObject _ChainImpact = null;
+    internal static GameObject[] _ChainDebris          = new GameObject[2];
+    internal static GameObject _ChainImpact            = null;
     internal static tk2dSpriteAnimationClip _ChainLink = null;
+
+    private List<ChainkLink> _attachedLinks            = new();
 
     public static void Init()
     {
         Lazy.SetupGun<ChainDriver>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.9f, ammo: 600, shootFps: 30, reloadFps: 4,
-            muzzleFrom: Items.Mailbox, fireAudio: "chain_launch_sound")
-          .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.18f, shootStyle: ShootStyle.SemiAutomatic, invisibleProjectile: true,
-            damage: 5.5f, speed: 75f, range: 18f, force: 12f, pierceBreakables: true, hitSound: "chain_impact_sound_b"))
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 1, shootFps: 30, reloadFps: 4,
+            muzzleFrom: Items.Mailbox, fireAudio: "chain_launch_sound", canGainAmmo: false, suppressReloadLabel: true, curse: 1f)
+          .InitProjectile(GunData.New(clipSize: 1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic, invisibleProjectile: true,
+            damage: 5.5f, speed: 75f, range: 18f, force: 12f, pierceBreakables: true, hitSound: "chain_impact_sound_b", customClip: true))
           .Attach<ChainLinkDoer>();
 
-        _ChainLink = VFX.Create("chain_link").DefaultAnimation();
+        _ChainLink   = VFX.Create("chain_link").DefaultAnimation();
         _ChainImpact = VFX.Create("chain_impact_vfx", fps: 20, loops: false, anchor: Anchor.MiddleLeft);
 
         for (int i = 0; i < 2; ++i)
@@ -51,6 +45,54 @@ public class ChainDriver : CwaffGun
           cdp.Setup(this);
     }
 
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        base.OnDroppedByPlayer(player);
+        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+    }
+
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        base.OnReloadPressed(player, gun, manualReload);
+        if (!manualReload)
+          return;
+        for (int i = this._attachedLinks.Count - 1; i >= 0; --i)
+          if (this._attachedLinks[i])
+            this._attachedLinks[i].Disconnect(manual: true);
+        this._attachedLinks.Clear();
+    }
+
+    private void OnTriedToInitiateAttack(PlayerController player)
+    {
+        if (!player || player.CurrentGun != this.gun || !AnyAttachedChains())
+            return; // inactive, do normal firing stuff
+        player.SuppressThisClick = true; // can't fire more than one chain at once
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+        base.OnDestroy();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        if (this.gun.ammo == 0 && !AnyAttachedChains())
+        {
+          this.gun.CurrentAmmo  = 1;
+          this.gun.MoveBulletsIntoClip(1);
+        }
+    }
+
     public static void DoChainDebrisAt(Vector2 pos, int num)
     {
       for (int i = 0; i < num; ++i)
@@ -59,6 +101,32 @@ public class ChainDriver : CwaffGun
             .GetComponent<DebrisObject>();
           debris.Trigger(Lazy.RandomVector(2f * UnityEngine.Random.value).ToVector3ZUp(2f), 0.25f);
       }
+    }
+
+    private bool AnyAttachedChains()
+    {
+      for (int i = this._attachedLinks.Count - 1; i >= 0; --i)
+      {
+        if (this._attachedLinks[i] && this._attachedLinks[i].AttachedToGun)
+          return true;
+        this._attachedLinks.RemoveAt(i);
+      }
+      return false;
+    }
+
+    internal void RegisterChain(ChainkLink chain)
+    {
+      this._attachedLinks.Add(chain);
+    }
+
+    internal void DeregisterChain(ChainkLink chain)
+    {
+      this._attachedLinks.TryRemove(chain);
+      if (this._attachedLinks.Count > 0)
+        return;
+
+      this.gun.CurrentAmmo  = 1;
+      this.gun.MoveBulletsIntoClip(1);
     }
 }
 
@@ -113,6 +181,8 @@ public class ChainkLink : MonoBehaviour
     private bool _active = false;
     private int _knockbackId = -1;
     private float _nextSlamTime = 0.0f;
+    private float _forceMultiplier = 0.0f;
+    private bool _mastered = false;
 
     private static List<ChainkLink> _ExtantChainsOnFloor = new();
 
@@ -120,6 +190,8 @@ public class ChainkLink : MonoBehaviour
     {
       _ExtantChainsOnFloor.Add(this);
     }
+
+    public bool AttachedToGun => this._active && this._connectedToGun && this._gun != null;
 
     public void Setup(PlayerController owner, Projectile proj, ChainDriver gun)
     {
@@ -135,7 +207,13 @@ public class ChainkLink : MonoBehaviour
       proj.OnHitEnemy += this.OnHitEnemy;
 
       this._owner                 = owner;
+      this._forceMultiplier       = owner ? owner.DamageMult() : 1.0f;
       this._gun                   = gun;
+      if (this._gun)
+      {
+        this._gun.RegisterChain(this);
+        this._mastered = this._gun.Mastered;
+      }
       this._connectedToGun        = gun != null;
       Vector2 endPos              = gun ? gun.gun.barrelOffset.transform.position : proj.SafeCenter;
       this._mesh                  = CwaffRopeMesh.Create(
@@ -340,13 +418,18 @@ public class ChainkLink : MonoBehaviour
       Vector2 tempDelta = (targetPos - enemyPos);
       kbd.m_activeContinuousKnockbacks.Clear(); // nothing else but the chain should affect this enemy
       if ((targetPos - this._mesh.endPos).magnitude >= 0.25f) // move only if the mouse has been moved significantly
-          this._knockbackId = kbd.ApplyContinuousKnockback(tempDelta, KB_SCALAR * tempDelta.magnitude);
+      {
+          float kbforce = this._forceMultiplier * KB_SCALAR * tempDelta.magnitude;
+          if (this._mastered)
+            kbforce *= Mathf.Max(kbd.weight / 15f, 1f); // everything is treated as if it has the weight of a Tazie
+          this._knockbackId = kbd.ApplyContinuousKnockback(tempDelta, kbforce);
+      }
       else
           this._knockbackId = kbd.ApplyContinuousKnockback(tempDelta, 0.0f);
       this._mesh.endPos = enemyPos;
     }
 
-    private void Disconnect()
+    internal void Disconnect(bool manual = false)
     {
       DeregisterEvents();
       if (this._enemy)
@@ -369,6 +452,8 @@ public class ChainkLink : MonoBehaviour
             this._enemyBody.DeregisterSpecificCollisionException(this._owner.specRigidbody);
         }
       }
+      if (this._gun)
+        this._gun.DeregisterChain(this);
       this._connectedToEnemy      = false;
       this._enemy                 = null;
       this._gun                   = null;
@@ -395,6 +480,8 @@ public class ChainkLink : MonoBehaviour
 
     private void OnDestroy()
     {
+      if (this._gun)
+        this._gun.DeregisterChain(this);
       DeregisterEvents();
       if (this._mesh)
         UnityEngine.Object.Destroy(this._mesh.gameObject);

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.30.0 (TBD)
+
+- Added Chain Driver
+- Added mastery for Chain Driver
+
 ## 1.29.2 (2026-04-27)
 
 - Fixed critical hits from Sextant insta-killing bosses and softlocking the game in some instances

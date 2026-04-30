@@ -351,6 +351,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfEntropynnium>(MASTERY_ENTROPYNNIUM, Entropynnium.ItemName);
         // Flux Fist magnetizes enemies 3 times faster and passively grants levitation.
         NewMastery<MasteryOfFluxFist>(MASTERY_FLUX_FIST, FluxFist.ItemName);
+        // Enemy weight is ignored when determining drag speed, increasing damage potential against heavier enemies.
+        NewMastery<MasteryOfChainDriver>(MASTERY_CHAIN_DRIVER, ChainDriver.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -652,7 +654,8 @@ internal class MasteryOfHeartbreaker         : MasteryDummyItem {}
 internal class MasteryOfCleansweep           : MasteryDummyItem {}
 internal class MasteryOfRetina               : MasteryDummyItem {}
 internal class MasteryOfEntropynnium         : MasteryDummyItem {}
-internal class MasteryOfFluxFist            : MasteryDummyItem {}
+internal class MasteryOfFluxFist             : MasteryDummyItem {}
+internal class MasteryOfChainDriver          : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -808,4 +811,5 @@ public enum Synergy {
     MASTERY_RETINA,
     MASTERY_ENTROPYNNIUM,
     MASTERY_FLUX_FIST,
+    MASTERY_CHAIN_DRIVER,
 };
