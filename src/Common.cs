@@ -103,7 +103,7 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
             DumpComponents(child.gameObject, true, indent + 1);
     }
 
-    public static void DumpFieldsAndProperties<T>(T o)
+    public static void DumpFieldsAndProperties<T>(this T o)
     {
         foreach (var f in typeof(T).GetFields())
             Console.WriteLine(String.Format("field {0} = {1}", f.Name, f.GetValue(o)));

@@ -353,6 +353,9 @@ public static class CwaffSynergies
         NewMastery<MasteryOfFluxFist>(MASTERY_FLUX_FIST, FluxFist.ItemName);
         // Enemy weight is ignored when determining drag speed, increasing damage potential against heavier enemies.
         NewMastery<MasteryOfChainDriver>(MASTERY_CHAIN_DRIVER, ChainDriver.ItemName);
+        // Reload time is reduced by 1/3, ammo is tripled, and lasers now create explosions on point of impact.
+        NewMastery<MasteryOfRLTSRTSGTSBTSLB>(MASTERY_RLTSRTSGTSBTSLB, RLTSRTSGTSBTSLB.ItemName)
+          .MultReload(0.66f).MultAmmo(3f);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -656,6 +659,7 @@ internal class MasteryOfRetina               : MasteryDummyItem {}
 internal class MasteryOfEntropynnium         : MasteryDummyItem {}
 internal class MasteryOfFluxFist             : MasteryDummyItem {}
 internal class MasteryOfChainDriver          : MasteryDummyItem {}
+internal class MasteryOfRLTSRTSGTSBTSLB      : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -812,4 +816,5 @@ public enum Synergy {
     MASTERY_ENTROPYNNIUM,
     MASTERY_FLUX_FIST,
     MASTERY_CHAIN_DRIVER,
+    MASTERY_RLTSRTSGTSBTSLB,
 };

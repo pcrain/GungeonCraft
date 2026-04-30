@@ -463,9 +463,9 @@ public static class GunBuilder
     p.damagesWalls                                    = b.damagesWalls ?? p.damagesWalls;
     if (p.specRigidbody)
       p.specRigidbody.CollideWithTileMap              = b.collidesWithTilemap ?? p.specRigidbody.CollideWithTileMap;  // doesn't work!
-    if (b.recoil.HasValue && b.recoil.Value != 0f)
+    if (b.recoil.HasValue)
     {
-      p.AppliesKnockbackToPlayer = true;
+      p.AppliesKnockbackToPlayer = b.recoil.Value != 0f;
       p.PlayerKnockbackForce = b.recoil.Value;
     }
     if (b.electric.HasValue)

@@ -55,6 +55,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public  bool                              suppressReloadLabel        = false;  // whether to suppress reload label when out of ammo
   public  float                             percentSpeedWhileFiring    = 1.0f;   // max relative speed the player can move while firing the gun
   public  float                             percentSpeedWhileCharging  = 1.0f;   // max relative speed the player can move while charging the gun
+  public  float                             percentSpeedWhileReloading = 1.0f;   // max relative speed the player can move while reloading the gun
   public  bool                              preventRollingWhenCharging = false;  // whether holding the gun prevents the player from dodge rolling
   public  float                             spinupTime                 = 0.0f;   // the amount of time it takes an automatic weapon to start firing
   public  string                            spinupSound                = null;   // the sound to play while an automatic gun is spinning up
@@ -480,14 +481,14 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       {
           if (__instance.CurrentGun is not Gun gun)
             return true; // call the original method
-          if (!gun.IsCharging)
-            return true; // call the original method
           if (gun.GetComponent<CwaffGun>() is not CwaffGun cg)
             return true; // call the original method
-          if (!cg.preventRollingWhenCharging)
-            return true; // call the original method
-          __result = false; // change the original result
-          return false;    // skip the original method
+          if ((gun.IsCharging && cg.preventRollingWhenCharging) || (gun.IsReloading && cg.percentSpeedWhileReloading == 0.0f))
+          {
+            __result = false; // change the original result
+            return false;    // skip the original method
+          }
+          return true; // call the original method
       }
   }
 
@@ -517,6 +518,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
             return;
           if (gun.IsCharging || cg._spinupRemaining != cg.spinupTime)
             vec = cg.percentSpeedWhileCharging * vec;
+          if (gun.IsReloading)
+            vec = cg.percentSpeedWhileReloading * vec;
           else if (gun.IsFiring)
             vec = cg.percentSpeedWhileFiring * vec;
       }

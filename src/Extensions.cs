@@ -964,6 +964,7 @@ public static class Extensions
   /// <param name="attacksThroughWalls">Whether the gun may be fired while pointed inside a wall.</param>
   /// <param name="suppressReloadLabel">Whether the "Reload" label should be suppressed when the current clip is empty.</param>
   /// <param name="percentSpeedWhileCharging">Speed multiplier to apply to the player while the gun is charging.</param>
+  /// <param name="percentSpeedWhileReloading">Speed multiplier to apply to the player while the gun is reloading.</param>
   /// <param name="onlyUsesIdleInWeaponBox">Whether the gun should only play its idle animation in the weapon box.</param>
   /// <param name="continuousFireAnimation">Whether the gun uses a continuous fire animation [DUPLICATE HARMONY PATCH VERSION].</param>
   /// <param name="preventRollingWhenCharging">Whether dodge rolling should be disabled while the gun is charging.</param>
@@ -980,7 +981,7 @@ public static class Extensions
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
     bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f, bool canAttackWhileRolling = false,
-    bool isStarterGun = false)
+    bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -1028,6 +1029,7 @@ public static class Extensions
 
     cg.canAttackWhileRolling = canAttackWhileRolling;
     cg.percentSpeedWhileCharging = percentSpeedWhileCharging;
+    cg.percentSpeedWhileReloading = percentSpeedWhileReloading;
     cg.percentSpeedWhileFiring = percentSpeedWhileFiring;
     if (dynamicBarrelOffsets)
       CwaffGun.SetUpDynamicBarrelOffsets(gun);

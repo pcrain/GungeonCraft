@@ -2,8 +2,8 @@
 
 ## 1.30.0 (TBD)
 
-- Added Chain Driver
-- Added mastery for Chain Driver
+- Added Chain Driver and RLTSRTSGTSBTSLB
+- Added masteries for Chain Driver and RLTSRTSGTSBTSLB
 
 ## 1.29.2 (2026-04-27)
 
