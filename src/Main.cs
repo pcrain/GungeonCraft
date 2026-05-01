@@ -285,6 +285,7 @@ public class Initialisation : BaseUnityPlugin
                 Retina.Init();
                 ChainDriver.Init();
                 RLTSRTSGTSBTSLB.Init();
+                PhotonCannon.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

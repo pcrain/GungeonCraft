@@ -41,34 +41,6 @@ public class MacchiAuto : CwaffGun
             return;
         beam.gameObject.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.SuperCoffeeGoop;
     }
-
-    /// <summary>Allow beams to apply arbitrary status effects</summary>
-    [HarmonyPatch(typeof(BasicBeamController), nameof(BasicBeamController.FrameUpdate))]
-    private class BeamApplyArbitraryStatusEffectPatch
-    {
-        [HarmonyILManipulator]
-        private static void BeamApplyArbitraryStatusEffectIL(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-
-            if (!cursor.TryGotoNext(MoveType.Before,
-              instr => instr.MatchCall<BraveBehaviour>("get_projectile"),
-              instr => instr.MatchLdfld<Projectile>("AppliesSpeedModifier")))
-                return;
-
-            // BeamController is already on the stack here
-            cursor.Emit(OpCodes.Ldloc_S, (byte)30); // V_30 == the enemy gameActor
-            cursor.CallPrivate(typeof(BeamApplyArbitraryStatusEffectPatch), nameof(ApplyExtraBeamStatusEffects));
-            cursor.Emit(OpCodes.Ldarg_0); // put the BeamController back on the call stack
-        }
-
-        private static void ApplyExtraBeamStatusEffects(BeamController beam, GameActor gameActor)
-        {
-            foreach (GameActorEffect e in beam.projectile.statusEffectsToApply)
-                if (UnityEngine.Random.value < BraveMathCollege.SliceProbability(beam.statusEffectChance, BraveTime.DeltaTime))
-                    gameActor.ApplyEffect(e);
-        }
-    }
 }
 
 public class OverdoseJuice : MonoBehaviour

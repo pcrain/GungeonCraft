@@ -161,6 +161,7 @@ public static class CwaffSynergies
         NewSynergy(BULLETPROOF_GLASS, "Bulletproof Glass", new[]{IName(GlassAmmoBox.ItemName), "glass_cannon"});
         // Unopened chests drop 10-50 casings when destroyed, depending on their quality
         NewSynergy(CHEST_BATTLE_ADVANCED, "Chest Battle Advanced", new[]{IName(Grandmaster.ItemName), "book_of_chest_anatomy"});
+        NewMastery<MasteryOfPhotonCannon>(MASTERY_PHOTON_CANNON, PhotonCannon.ItemName);
 
       #endregion
 
@@ -660,6 +661,7 @@ internal class MasteryOfEntropynnium         : MasteryDummyItem {}
 internal class MasteryOfFluxFist             : MasteryDummyItem {}
 internal class MasteryOfChainDriver          : MasteryDummyItem {}
 internal class MasteryOfRLTSRTSGTSBTSLB      : MasteryDummyItem {}
+internal class MasteryOfPhotonCannon         : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -817,4 +819,5 @@ public enum Synergy {
     MASTERY_FLUX_FIST,
     MASTERY_CHAIN_DRIVER,
     MASTERY_RLTSRTSGTSBTSLB,
+    MASTERY_PHOTON_CANNON
 };
