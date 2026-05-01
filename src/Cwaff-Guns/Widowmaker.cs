@@ -29,7 +29,7 @@ public class Widowmaker : CwaffGun
         // offset the sprites a bit to prevent them from crawling on thin air when on lower walls
         foreach (var clip in _WidowmakerPrefab.GetComponent<tk2dSpriteAnimation>().clips)
             clip.OffsetAllFrames(new Vector2(-0.25f, 0f));
-        _WidowmakerPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.Projectile);
+        _WidowmakerPrefab.AutoRigidBody(clayer: CollisionLayer.Projectile);
         _WidowmakerPrefab.AddComponent<Crawlyboi>();
 
         _WidowTurretProjectile = Items.Ak47.CloneProjectile(GunData.New(damage: 10.0f, speed: 50.0f, force: 10.0f, range: 80.0f,

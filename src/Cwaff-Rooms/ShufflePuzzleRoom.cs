@@ -39,7 +39,7 @@ public class ShufflePuzzleRoomController : MonoBehaviour
     _ShufflePuzzleRooms.Add(RoomFactory.BuildNewRoomFromResource($"{C.MOD_INT_NAME}/Resources/Rooms/shuffle_puzzle.newroom").room);
 
     _PuzzleBagPrefab = VFX.Create("puzzle_bag");
-    _PuzzleBagPrefab.AutoRigidBody(Anchor.MiddleCenter);
+    _PuzzleBagPrefab.AutoRigidBody();
   }
 
   private void Start()

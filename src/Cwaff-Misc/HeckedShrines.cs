@@ -89,7 +89,7 @@ public class HeckedShrine : MonoBehaviour, IPlayerInteractable
           shrine.sprite.SetGlowiness(100f);
       }
 
-      shrine.body                   = shrine.gameObject.AutoRigidBody(anchor: SHRINE_ANCHOR/*, canBePushed: true*/);
+      shrine.body                   = shrine.gameObject.AutoRigidBody();
       shrine.sprite.FlipX           = shrinePrefab.positionInRoom.x < 0;
       shrine.sprite.HeightOffGround = -2f;
       shrine.sprite.UpdateZDepth();

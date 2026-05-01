@@ -69,7 +69,7 @@ public class FluxFist : CwaffGun
           gun.QuickUpdateGunAnimation(anim);
 
         _MagnetBallPrefab = VFX.Create("magnet_ball");
-        _MagnetBallPrefab.AutoRigidBody(anchor: Anchor.MiddleCenter, canBePushed: true);
+        _MagnetBallPrefab.AutoRigidBody(canBePushed: true);
         KnockbackDoer kbd = _MagnetBallPrefab.AddComponent<KnockbackDoer>();
         kbd.weight = 10f;
 

@@ -1829,17 +1829,15 @@ public static class Extensions
 
   //WARNING: only works with our VFX and sprites, can't be used with basegame sprites or results in wonky hitboxes
   /// <summary>Set up a SpeculativeRigidBody for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
-  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, Anchor anchor, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false)
+  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false)
   {
     SpeculativeRigidbody body = g.GetOrAddComponent<SpeculativeRigidbody>();
-
     tk2dBaseSprite sprite     = g.GetComponent<tk2dBaseSprite>();
-    IntVector2 spriteSize     = (C.PIXELS_PER_TILE * sprite.GetBounds().size.XY()).ToIntVector2();
-    IntVector2 rawOffsets     = tk2dSpriteGeomGen.GetAnchorOffset(anchor, spriteSize.x, spriteSize.y).ToIntVector2();
-    IntVector2 spriteOffsets = rawOffsets - spriteSize;
-    if (!sprite.FlipX)  // NOTE: VFX sprites are set up by default with a LowerCenter anchor, so these shenanigans are necessary to get the body right
-      spriteOffsets = spriteOffsets.WithX(-rawOffsets.x);
-    body.PixelColliders       = new List<PixelCollider>(){new(){
+    var bounds                = sprite.GetBounds();
+    IntVector2 spriteSize     = (C.PIXELS_PER_TILE * bounds.size.XY()).ToIntVector2();
+    IntVector2 spriteOffsets  = (C.PIXELS_PER_TILE * bounds.min.XY()).ToIntVector2();
+
+    body.PixelColliders      = new List<PixelCollider>(){new(){
       ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
       ManualOffsetX          = spriteOffsets.x,
       ManualOffsetY          = spriteOffsets.y,

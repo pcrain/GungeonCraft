@@ -32,14 +32,14 @@ public class Flakseed : CwaffGun
         _FlakFlowerPrefab = VFX.Create("flakseed_sprout", anchor: Anchor.LowerCenter, emissivePower: 1f);
         _FlakFlowerPrefab.AddAnimation("bloom", "flakseed_flower", fps: 4, anchor: Anchor.LowerCenter, emissivePower: 1f);
         _FlakFlowerPrefab.AddComponent<FlakseedFlower>();
-        _FlakFlowerPrefab.AutoRigidBody(Anchor.LowerCenter, CollisionLayer.PlayerHitBox);
+        _FlakFlowerPrefab.AutoRigidBody(CollisionLayer.PlayerHitBox);
 
         _MegaFlakFlowerPrefab = VFX.Create("mega_flak_flower_sprout", anchor: Anchor.MiddleCenter, emissivePower: 1f);
         _MegaFlakFlowerPrefab.AddAnimation("wait", "mega_flak_flower_wait", fps: 10, anchor: Anchor.MiddleCenter, emissivePower: 1f);
         _MegaFlakFlowerPrefab.AddAnimation("attack", "mega_flak_flower_attack", fps: 10 , anchor: Anchor.MiddleCenter, emissivePower: 1f, loops: false);
         _MegaFlakFlowerPrefab.AddAnimation("vanish", "mega_flak_flower_vanish", fps: 10, anchor: Anchor.MiddleCenter, emissivePower: 1f, loops: false);
         _MegaFlakFlowerPrefab.AddComponent<FlakseedFlower>().mega = true;
-        _MegaFlakFlowerPrefab.AutoRigidBody(Anchor.MiddleCenter, CollisionLayer.PlayerHitBox);
+        _MegaFlakFlowerPrefab.AutoRigidBody(CollisionLayer.PlayerHitBox);
 
         Color lightGreen = new Color(0.7f, 0.85f, 0.65f);
         _FlakFlowerProjectile = Items.Ak47.CloneProjectile(GunData.New(

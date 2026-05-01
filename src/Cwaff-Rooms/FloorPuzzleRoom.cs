@@ -222,7 +222,7 @@ public class FloorPuzzleTile : MonoBehaviour
   public static void Init()
   {
     Prefab = VFX.Create("puzzle_tile_square",/*, emissivePower: 2f*/ anchor: Anchor.MiddleCenter);
-    Prefab.AutoRigidBody(anchor: Anchor.MiddleCenter, clayer: CollisionLayer.PlayerBlocker);
+    Prefab.AutoRigidBody(clayer: CollisionLayer.PlayerBlocker);
     Prefab.AddComponent<FloorPuzzleTile>();
 
     Prefab.AddAnimation("wall",        "pressedplate_broken",                  fps: 30, anchor: Anchor.MiddleCenter, loops: false);

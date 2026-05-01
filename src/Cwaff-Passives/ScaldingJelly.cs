@@ -27,7 +27,7 @@ public class ScaldingJelly : CwaffCompanion
             clip.frames[0].AddSound("ignizol_fall_sound");
         }
 
-        friend.gameObject.AutoRigidBody(Anchor.LowerLeft, CollisionLayer.EnemyCollider);
+        friend.gameObject.AutoRigidBody(CollisionLayer.EnemyCollider);
 
         BehaviorSpeculator bs = friend.gameObject.GetComponent<BehaviorSpeculator>();
         bs.MovementBehaviors.Add(new IgnizolCompanion.IgnizolMovementBehavior());
