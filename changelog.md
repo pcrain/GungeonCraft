@@ -3,7 +3,7 @@
 ## 1.30.0 (TBD)
 
 - Added Chain Driver, RLTSRTSGTSBTSLB, and Photon Cannon
-- Added masteries for Chain Driver and RLTSRTSGTSBTSLB
+- Added masteries for Chain Driver, RLTSRTSGTSBTSLB, and Photon Cannon
 
 ## 1.29.2 (2026-04-27)
 

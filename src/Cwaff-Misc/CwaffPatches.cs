@@ -479,6 +479,6 @@ static class BeamApplyArbitraryStatusEffectPatch
     {
         foreach (GameActorEffect e in beam.projectile.statusEffectsToApply)
             if (UnityEngine.Random.value < BraveMathCollege.SliceProbability(beam.statusEffectChance, BraveTime.DeltaTime))
-                gameActor.ApplyEffect(e);
+                gameActor.ApplyEffect(e, sourceProjectile: beam.projectile);
     }
 }

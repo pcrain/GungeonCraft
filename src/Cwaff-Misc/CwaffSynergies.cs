@@ -161,7 +161,6 @@ public static class CwaffSynergies
         NewSynergy(BULLETPROOF_GLASS, "Bulletproof Glass", new[]{IName(GlassAmmoBox.ItemName), "glass_cannon"});
         // Unopened chests drop 10-50 casings when destroyed, depending on their quality
         NewSynergy(CHEST_BATTLE_ADVANCED, "Chest Battle Advanced", new[]{IName(Grandmaster.ItemName), "book_of_chest_anatomy"});
-        NewMastery<MasteryOfPhotonCannon>(MASTERY_PHOTON_CANNON, PhotonCannon.ItemName);
 
       #endregion
 
@@ -357,6 +356,8 @@ public static class CwaffSynergies
         // Reload time is reduced by 1/3, ammo is tripled, and lasers now create explosions on point of impact.
         NewMastery<MasteryOfRLTSRTSGTSBTSLB>(MASTERY_RLTSRTSGTSBTSLB, RLTSRTSGTSBTSLB.ItemName)
           .MultReload(0.66f).MultAmmo(3f);
+        // Beams now inflict severe sunburn, which enemies cannot recover from.
+        NewMastery<MasteryOfPhotonCannon>(MASTERY_PHOTON_CANNON, PhotonCannon.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
