@@ -60,7 +60,8 @@ public class FloorPuzzleRoomController : MonoBehaviour
         GameObject puzzleTile = UnityEngine.Object.Instantiate(FloorPuzzleTile.Prefab);
         puzzleTile.transform.position = area.UnitCenter + TILE_SIZE * new Vector2(i - puzzleRadius, j - puzzleRadius);
         FloorPuzzleTile tile = puzzleTile.GetComponent<FloorPuzzleTile>();
-        tile.Setup(controller: this, isWall: !pathPositions.Contains(new IntVector2(i, j)));
+        IntVector2 tileIndex = new IntVector2(i, j);
+        tile.Setup(controller: this, tileIndex: tileIndex, isWall: !pathPositions.Contains(tileIndex));
         if (i == startPos.x && j == startPos.y)
         {
           tile._type = FloorPuzzleTile.TileType.ENTRY;
@@ -218,6 +219,7 @@ public class FloorPuzzleTile : MonoBehaviour
   private SpeculativeRigidbody _body = null;
   private tk2dSprite _sprite = null;
   private float _triggerTimer = 0.0f;
+  private IntVector2 _tileIndex = default;
 
   public static void Init()
   {
@@ -237,9 +239,10 @@ public class FloorPuzzleTile : MonoBehaviour
     Prefab.AddAnimation("reset_white", "pressedplate_presseddown_reset_white", fps: 10, anchor: Anchor.MiddleCenter, loops: false);
   }
 
-  public void Setup(FloorPuzzleRoomController controller, bool isWall)
+  public void Setup(FloorPuzzleRoomController controller, IntVector2 tileIndex, bool isWall)
   {
     this._controller = controller;
+    this._tileIndex = tileIndex;
 
     this._sprite = base.gameObject.GetComponent<tk2dSprite>();
     this._sprite.usesOverrideMaterial = true;
@@ -303,14 +306,20 @@ public class FloorPuzzleTile : MonoBehaviour
     }
 
     this._active = true;
+    this._animator.Resume();
+    this._animator.PlayFromFrame("press", 0);
     if (this._controller._last)
     {
       this._controller._last._animator.Resume();
       this._controller._last._animator.PlayFromFrame("unpress", 0);
+      if (IntVector2.ManhattanDistance(this._controller._last._tileIndex, this._tileIndex) > 1)
+      {
+        this._controller._last._animator.PlayFromFrame("fail", 0);
+        this._controller.Fail(); // don't allow skiipping tiles
+        return;
+      }
     }
     this._controller._last = this;
-    this._animator.Resume();
-    this._animator.PlayFromFrame("press", 0);
     if (this._type == TileType.ENTRY)
       this._controller.StartPuzzle();
     if (this._controller.CheckSuccess())

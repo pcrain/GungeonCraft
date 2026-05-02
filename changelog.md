@@ -7,6 +7,7 @@
 - Fixed null deref caused by Newton's Apple attempting to find enemies when changing floors
 - Fixed critical hits from Sextant no longer ignoring DPS caps
 - Fixed Alligator's maximum clips per enemy not being limited to 8 after a code rework 
+- Prevented cheating on floor puzzles due to skipping over tiles
 
 ## 1.29.2 (2026-04-27)
 
