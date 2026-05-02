@@ -36,7 +36,7 @@ public class ScaldingJelly : CwaffCompanion
 
 public class IgnizolCompanion : CwaffCompanionController
 {
-    public class IgnizolMovementBehavior : MovementBehaviorBase
+    public class IgnizolMovementBehavior : CwaffCompanionMovementBehaviorBase
     {
         internal enum State {
             IDLE,   // bouncing in place without a care in the world
@@ -53,7 +53,6 @@ public class IgnizolCompanion : CwaffCompanionController
 
         private const float _IGNITE_DELAY         = 1.0f;
         private const float _MOVE_SPEED           = 3.5f;
-        private const float _PATH_INTERVAL        = 0.25f;
         private const float _LAUNCH_RADIUS        = 4.5f;
         private const float _COLLSION_DAMAGE      = 10.0f;
         private const float _WANDER_TIME_MIN      = 1.5f;
@@ -79,20 +78,12 @@ public class IgnizolCompanion : CwaffCompanionController
         private const float _LAUNCH_DIST_MAX_SQR  = _LAUNCH_DIST_MAX * _LAUNCH_DIST_MAX;
         private const float _PICKUP_DIST_SQR      = _PICKUP_DIST * _PICKUP_DIST;
 
-        private int m_sequentialPathFails;
-        private float m_stateTimer;
-        private float m_repathTimer;
-        private CompanionController m_companionController;
-
-        private GameActor _targetActor = null;
-        private Vector2 _targetPos = default;
         private Vector2 _launchStart = default;
         private Vector2 _launchTarget = default;
         private Vector2 _launchVelocity = default;
         private float _launchBeginTime = 0.0f;
         private State _state = WANDER;
         private bool _airborne = false;
-        private bool _allowPathing = true;
         private PlayerController _carrier = null;
         private tk2dSprite _jumpSprite = null;
         private EasyLight _light = null;
@@ -107,7 +98,8 @@ public class IgnizolCompanion : CwaffCompanionController
         public override void Start()
         {
             base.Start();
-            m_companionController = m_gameObject.GetComponent<CompanionController>();
+            this.retargetOnPathingFailure = true;
+
             m_aiActor.MovementModifiers += this.AdjustMovement;
             m_aiActor.spriteAnimator.OnPlayAnimationCalled += this.EnsureSmoothIdleAnimationTransition;
             m_aiActor.CustomPitDeathHandling += this.CustomPitDeathHandling;
@@ -147,10 +139,14 @@ public class IgnizolCompanion : CwaffCompanionController
             this.m_aiActor.gameObject.Play("ignizol_hit_sound");
         }
 
-        private void Warp(Vector2 pos)
+        protected override void OnWarp()
         {
-            m_aiActor.CompanionWarp(pos);
             this._igniteTime = BraveTime.ScaledTimeSinceStartup + _IGNITE_DELAY; // don't burn instantly upon teleporting
+        }
+
+        protected override bool PreventWarping()
+        {
+            return this._state == CARRY;
         }
 
         private void CustomPitDeathHandling(AIActor actor, ref bool suppressDamage)
@@ -185,7 +181,7 @@ public class IgnizolCompanion : CwaffCompanionController
             base.m_aiActor.specRigidbody.CollideWithTileMap = false;
             base.m_aiActor.SetIsFlying(true, _CARRY_REASON, adjustShadow: false);
             this.m_aiActor.ToggleShadowVisiblity(false);
-            ClearPaths();
+            m_aiActor.ClearPath();
         }
 
         private void GetThrown()
@@ -228,12 +224,6 @@ public class IgnizolCompanion : CwaffCompanionController
             base.Destroy();
         }
 
-        public override void Upkeep()
-        {
-            base.Upkeep();
-            DecrementTimer(ref m_repathTimer);
-        }
-
         private AIActor FindTargetableEnemy()
         {
             PlayerController owner = m_companionController.m_owner;
@@ -263,7 +253,7 @@ public class IgnizolCompanion : CwaffCompanionController
             return nearest;
         }
 
-        private void DetermineNewTarget()
+        protected override void DetermineNewTarget()
         {
             PlayerController owner = m_companionController.m_owner;
 
@@ -291,7 +281,7 @@ public class IgnizolCompanion : CwaffCompanionController
                 this._targetPos = this.m_aiActor.CenterPosition;
                 this._state = IDLE;
                 this._allowPathing = false;
-                ClearPaths();
+                m_aiActor.ClearPath();
                 this.m_stateTimer = UnityEngine.Random.Range(_IDLE_TIME_MIN, _IDLE_TIME_MAX);
                 return;
             }
@@ -301,14 +291,14 @@ public class IgnizolCompanion : CwaffCompanionController
             this.m_stateTimer = UnityEngine.Random.Range(_WANDER_TIME_MIN, _WANDER_TIME_MAX);
         }
 
-        private bool IsTargetValid()
+        protected override bool IsTargetValid()
         {
             if (this._state == CHASE)
                 return this.m_stateTimer > 0f && this._targetActor && this._targetActor.healthHaver && this._targetActor.healthHaver.IsAlive;
             return true;
         }
 
-        private void UpdateStateAndTargetPosition()
+        protected override void UpdateStateAndTargetPosition()
         {
             if (!IsTargetValid())
                 DetermineNewTarget();
@@ -337,7 +327,7 @@ public class IgnizolCompanion : CwaffCompanionController
             _FireGooper.AddGoopCircle(m_aiActor.specRigidbody.UnitBottomCenter, combustionRadius);
         }
 
-        private bool ReachedTarget()
+        protected override bool ReachedTarget()
         {
             switch(this._state)
             {
@@ -358,7 +348,7 @@ public class IgnizolCompanion : CwaffCompanionController
 
         private void ResetState()
         {
-            ClearPaths();
+            m_aiActor.ClearPath();
             this._allowPathing = false;
             this._airborne = false;
             this._targetActor = null;
@@ -383,7 +373,7 @@ public class IgnizolCompanion : CwaffCompanionController
             shadowObject.transform.localPosition += this.m_aiActor.ActorShadowOffset;
         }
 
-        private void OnReachedTarget()
+        protected override void OnReachedTarget()
         {
             switch(this._state)
             {
@@ -442,74 +432,6 @@ public class IgnizolCompanion : CwaffCompanionController
             this.m_aiActor.ToggleShadowVisiblity(false);
             this._airborne = true;
             this._allowPathing = false;
-        }
-
-        private void ClearPaths()
-        {
-            m_aiActor.ClearPath();
-        }
-
-        private bool CorrectForInaccessibleCell()
-        {
-            IntVector2 pos = m_aiActor.specRigidbody.UnitCenter.ToIntVector2(VectorConversions.Floor);
-            CellData currentCell = GameManager.Instance.Dungeon.data[pos];
-            if (currentCell == null || !currentCell.IsPlayerInaccessible)
-                return false;
-
-            if (m_repathTimer > 0f)
-                return true;
-
-            m_repathTimer = _PATH_INTERVAL;
-            RoomHandler currentRoom = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(pos);
-            if (currentRoom == null)
-                return true;
-
-            IntVector2? nearestAvailableCell = currentRoom.GetNearestAvailableCell(
-                pos.ToCenterVector2(), m_aiActor.Clearance, m_aiActor.PathableTiles, false,
-                (IntVector2 pos) => !GameManager.Instance.Dungeon.data[pos].IsPlayerInaccessible);
-            if (nearestAvailableCell.HasValue)
-                m_aiActor.PathfindToPosition(nearestAvailableCell.Value.ToCenterVector2());
-            return true;
-        }
-
-        private void RepathToTarget()
-        {
-            // adjust relative to the center of our sprite
-            Vector2 bottomLeft = m_aiActor.transform.position.XY();
-            Vector2 center = m_aiActor.sprite.WorldCenter;
-            Vector2 adjustedTarget = this._targetPos + (bottomLeft - center);
-
-            if (m_repathTimer > 0f)
-                return;
-
-            m_repathTimer = _PATH_INTERVAL;
-            m_aiActor.PathfindToPosition(adjustedTarget);
-
-            if (m_aiActor.Path == null)
-            {
-                m_sequentialPathFails = 0;
-                return;
-            }
-
-            if (m_aiActor.Path.InaccurateLength > 50f)
-            {
-                m_aiActor.ClearPath();
-                m_sequentialPathFails = 0;
-                Warp(adjustedTarget);
-                DetermineNewTarget();
-            }
-            else if (!m_aiActor.Path.WillReachFinalGoal && (++m_sequentialPathFails) > 3)
-            {
-                CellData cellData2 = GameManager.Instance.Dungeon.data[adjustedTarget.ToIntVector2(VectorConversions.Floor)];
-                if (cellData2 != null && cellData2.IsPassable)
-                {
-                    m_sequentialPathFails = 0;
-                    Warp(adjustedTarget);
-                    DetermineNewTarget();
-                }
-            }
-            else
-                m_sequentialPathFails = 0;
         }
 
         private Vector2 DeltaToTarget()
@@ -644,41 +566,6 @@ public class IgnizolCompanion : CwaffCompanionController
         {
             ToggleRendererAndOutlines(this._jumpSprite, false);
             ToggleRendererAndOutlines(this.m_aiActor.sprite, true);
-        }
-
-        private bool InDifferentRoom()
-        {
-            Vector2 pos = m_aiActor.CenterPosition;
-            if (m_companionController.m_owner is PlayerController pc && pc.CurrentRoom is RoomHandler ownerRoom)
-                return ownerRoom != pos.GetAbsoluteRoom();
-            return !GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.4f);
-        }
-
-        public override BehaviorResult Update()
-        {
-            if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel || !m_companionController || !m_aiActor.CompanionOwner)
-                return BehaviorResult.SkipAllRemainingBehaviors;
-
-            if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.END_TIMES)
-            {
-                m_aiActor.ClearPath();
-                return BehaviorResult.SkipAllRemainingBehaviors;
-            }
-
-            DecrementTimer(ref m_stateTimer);
-
-            UpdateStateAndTargetPosition();
-            if (InDifferentRoom() && this._state != CARRY)
-            {
-                Warp(m_companionController.m_owner.CenterPosition);
-                DetermineNewTarget();
-            }
-            else if (ReachedTarget())
-                OnReachedTarget();
-            else if (this._allowPathing)
-                RepathToTarget();
-
-            return BehaviorResult.SkipRemainingClassBehaviors;
         }
     }
 }

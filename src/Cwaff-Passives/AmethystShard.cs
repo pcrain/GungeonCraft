@@ -54,7 +54,7 @@ public class AllayCompanion : CwaffCompanionController
 {
     internal static GameObject _AllaySparkles;
 
-    public class AllayMovementBehavior : MovementBehaviorBase
+    public class AllayMovementBehavior : CwaffCompanionMovementBehaviorBase
     {
         /* Behavior sketch:
           - spinning near a grounded item while allay is in follow mode makes allay pick up the nearest item and switch to scout mode
@@ -77,21 +77,10 @@ public class AllayCompanion : CwaffCompanionController
 
         private const float _ROOM_CLEAR_ITEM_CHANCE = 0.075f;
 
-        public float PathInterval = 0.25f;
         public float IdealRadius = 3f;
 
-        [NonSerialized]
-        public bool TemporarilyDisabled;
-
-        private int m_sequentialPathFails;
-        private float m_idleTimer = 2f;
-        private float m_repathTimer;
-        private CompanionController m_companionController;
-
-        private GameActor _targetActor = null;
         private GameActor _heldActor = null;
         private PickupObject _targetItem = null;
-        private Vector2 _targetPos = default;
         private State _state = OWNER_FOLLOW;
         private bool _scouting = false;
         private Vector2 _pitPos = default;
@@ -109,7 +98,8 @@ public class AllayCompanion : CwaffCompanionController
         public override void Start()
         {
             base.Start();
-            m_companionController = m_gameObject.GetComponent<CompanionController>();
+            preventWarpingWhenOnscreen = true;
+
             m_aiActor.FallingProhibited = true;
             m_aiActor.PathableTiles |= CellTypes.PIT;
             m_aiActor.MovementModifiers += AdjustMovement;
@@ -177,12 +167,6 @@ public class AllayCompanion : CwaffCompanionController
                 Commands._OnDebugKeyPressed -= ShowState;
             #endif
             base.Destroy();
-        }
-
-        public override void Upkeep()
-        {
-            base.Upkeep();
-            DecrementTimer(ref m_repathTimer);
         }
 
         private void OnTileCollision(CollisionData tileCollision)
@@ -323,7 +307,7 @@ public class AllayCompanion : CwaffCompanionController
             return this._cachedRoomHasPits;
         }
 
-        private void DetermineNewTarget()
+        protected override void DetermineNewTarget()
         {
             PlayerController owner = m_companionController.m_owner;
 
@@ -364,7 +348,7 @@ public class AllayCompanion : CwaffCompanionController
             }
         }
 
-        private bool IsTargetValid()
+        protected override bool IsTargetValid()
         {
             switch(this._state)
             {
@@ -387,7 +371,7 @@ public class AllayCompanion : CwaffCompanionController
             return false;
         }
 
-        private void UpdateStateAndTargetPosition()
+        protected override void UpdateStateAndTargetPosition()
         {
             if (this._state == OWNER_FOLLOW || m_companionController.IsBeingPet || !IsTargetValid())
                 DetermineNewTarget();
@@ -415,7 +399,7 @@ public class AllayCompanion : CwaffCompanionController
 
         private const float _DANCE_RADIUS = 3.0f;
         private const float _DANCE_RADIUS_SQR = _DANCE_RADIUS * _DANCE_RADIUS;
-        private bool ReachedTarget()
+        protected override bool ReachedTarget()
         {
             const float _PICKUP_RADIUS = 1.0f;
             const float _PICKUP_RADIUS_SQR = _PICKUP_RADIUS * _PICKUP_RADIUS;
@@ -442,7 +426,7 @@ public class AllayCompanion : CwaffCompanionController
             return false;
         }
 
-        private void OnReachedTarget()
+        protected override void OnReachedTarget()
         {
             switch(this._state)
             {
@@ -676,78 +660,8 @@ public class AllayCompanion : CwaffCompanionController
             }
         }
 
-        private bool CorrectForInaccessibleCell()
-        {
-            IntVector2 pos = m_aiActor.specRigidbody.UnitCenter.ToIntVector2(VectorConversions.Floor);
-            CellData currentCell = GameManager.Instance.Dungeon.data[pos];
-            if (currentCell == null || !currentCell.IsPlayerInaccessible)
-                return false;
-
-            if (m_repathTimer > 0f)
-                return true;
-
-            m_repathTimer = PathInterval;
-            RoomHandler currentRoom = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(pos);
-            if (currentRoom == null)
-                return true;
-
-            IntVector2? nearestAvailableCell = currentRoom.GetNearestAvailableCell(
-                pos.ToCenterVector2(), m_aiActor.Clearance, m_aiActor.PathableTiles, false,
-                (IntVector2 pos) => !GameManager.Instance.Dungeon.data[pos].IsPlayerInaccessible);
-            if (nearestAvailableCell.HasValue)
-                m_aiActor.PathfindToPosition(nearestAvailableCell.Value.ToCenterVector2());
-            return true;
-        }
-
         const float _SNAP_DIST = 1f;
         const float _SNAP_DIST_SQR = _SNAP_DIST * _SNAP_DIST;
-        private void RepathToTarget()
-        {
-            // adjust relative to the center of our sprite
-            Vector2 bottomLeft = m_aiActor.transform.position.XY();
-            Vector2 center = m_aiActor.sprite.WorldCenter;
-            Vector2 adjustedTarget = this._targetPos + (bottomLeft - center);
-
-            m_idleTimer = Mathf.Max(m_idleTimer, 2f);
-            if (m_repathTimer > 0f)
-                return;
-
-            m_repathTimer = PathInterval;
-            if (m_companionController && m_companionController.IsBeingPet)
-            {
-                Vector2 petterPos = m_companionController.m_pettingDoer.specRigidbody.UnitCenter + m_companionController.m_petOffset;
-                if (Vector2.Distance(petterPos, m_aiActor.specRigidbody.UnitCenter) < 0.08f)
-                    m_aiActor.ClearPath();
-                else
-                    m_aiActor.PathfindToPosition(petterPos, petterPos);
-            }
-            else
-                m_aiActor.PathfindToPosition(adjustedTarget);
-
-            if (m_aiActor.Path == null)
-            {
-                m_sequentialPathFails = 0;
-                return;
-            }
-
-            if (m_aiActor.Path.InaccurateLength > 50f)
-            {
-                m_aiActor.ClearPath();
-                m_sequentialPathFails = 0;
-                m_aiActor.CompanionWarp(adjustedTarget);
-            }
-            else if (!m_aiActor.Path.WillReachFinalGoal && (++m_sequentialPathFails) > 3)
-            {
-                CellData cellData2 = GameManager.Instance.Dungeon.data[adjustedTarget.ToIntVector2(VectorConversions.Floor)];
-                if (cellData2 != null && cellData2.IsPassable)
-                {
-                    m_sequentialPathFails = 0;
-                    m_aiActor.CompanionWarp(adjustedTarget);
-                }
-            }
-            else
-                m_sequentialPathFails = 0;
-        }
 
         private Vector2 DeltaToTarget()
         {
@@ -839,46 +753,6 @@ public class AllayCompanion : CwaffCompanionController
             m_aiActor.specRigidbody.Reinitialize();
             m_aiActor.aiAnimator.FacingDirection = (nextPos - pos).ToAngle();
             return true;
-        }
-
-        private bool OffScreenAndInDifferentRoom()
-        {
-            Vector2 pos = m_aiActor.CenterPosition;
-            if (GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.4f))
-                return false;
-            RoomHandler ownerRoom = m_companionController.m_owner.CurrentRoom;
-            return (ownerRoom == null || ownerRoom != pos.GetAbsoluteRoom());
-        }
-
-        public override BehaviorResult Update()
-        {
-            if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel || !m_companionController || !m_aiActor.CompanionOwner)
-                return BehaviorResult.SkipAllRemainingBehaviors;
-
-            if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.END_TIMES)
-            {
-                m_aiActor.ClearPath();
-                return BehaviorResult.SkipAllRemainingBehaviors;
-            }
-
-            if (TemporarilyDisabled)
-                return BehaviorResult.Continue;
-
-            DecrementTimer(ref m_idleTimer);
-
-            UpdateStateAndTargetPosition();
-            if (OffScreenAndInDifferentRoom())
-                m_aiActor.CompanionWarp(m_companionController.m_owner.CenterPosition);
-            else if (ReachedTarget())
-                OnReachedTarget();
-            else
-                RepathToTarget();
-
-            // #if DEBUG
-            // CwaffVFX.Spawn(VFX.MiniPickup, this._targetPos, lifetime: 0.1f, fadeOutTime: 0.1f);
-            // #endif
-
-            return BehaviorResult.SkipRemainingClassBehaviors;
         }
     }
 }

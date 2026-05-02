@@ -3817,5 +3817,16 @@ public static class Extensions
         mat.SetTexture("_PaletteTex", optionalPalette);
     }
   }
+
+  /// <summary>Returns true if a companion is in a different room than its owner</summary>
+  public static bool InDifferentRoomThanOwner(this CompanionController companionController)
+  {
+    if (companionController.aiActor is not AIActor actor)
+      return false;
+    Vector2 pos = actor.CenterPosition;
+    if (companionController.m_owner is PlayerController pc && pc.CurrentRoom is RoomHandler ownerRoom)
+        return ownerRoom != pos.GetAbsoluteRoom();
+    return !GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.4f);
+  }
 }
 

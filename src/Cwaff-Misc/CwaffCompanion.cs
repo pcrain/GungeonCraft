@@ -6,6 +6,146 @@ public abstract class CwaffCompanionController : CompanionController
 {
 }
 
+public class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
+{
+  public float pathInterval = 0.25f; // amount of time between repathing
+  public bool retargetOnPathingFailure = false; // if true, determine a new target after warping due to pathing failure
+  public bool preventWarpingWhenOnscreen = false; // if true, don't warp when on screen, even if we're in a different room than our owner
+
+  protected GameActor _targetActor; // actor we're currently targeting
+  protected float m_repathTimer; // timer until next attempt at repathing
+  protected float m_stateTimer; // timer until our current state has expired
+  protected CompanionController m_companionController; // companion controller for this behavior
+  protected Vector2 _targetPos; // position we're currently targeting
+  protected bool _allowPathing = true; // whether we're currently allowed to path
+
+  private int m_sequentialPathFails;
+
+  public override void Start()
+  {
+    base.Start();
+    m_companionController = m_gameObject.GetComponent<CompanionController>();
+  }
+
+  /// <summary>Return to to prevent the companion from warping.</summary>
+  protected virtual bool PreventWarping() => false;
+  /// <summary>Returns true iff the companion has reached its designated target</summary>
+  protected virtual bool ReachedTarget() => false;
+  /// <summary>Called every update as long as ReachedTarget() is true</summary>
+  protected virtual void OnReachedTarget() {}
+  /// <summary>Returns true iff the current target is valid</summary>
+  protected virtual bool IsTargetValid() => false;
+  /// <summary>Updates _targetPos and potentially _targetActor</summary>
+  protected virtual void DetermineNewTarget() {}
+  /// <summary>Called at the beginning of every normal Update cycle</summary>
+  protected virtual void UpdateStateAndTargetPosition() {}
+  /// <summary>Called immediately before warping.</summary>
+  protected virtual void OnPreWarp() {}
+  /// <summary>Called immediately after warping.</summary>
+  protected virtual void OnWarp() {}
+  /// <summary>Attempts to path over to _targetPos, calling DetermineNewTarget() as necessary on failure.</summary>
+  protected virtual void RepathToTarget()  {
+      // adjust relative to the center of our sprite
+      Vector2 bottomLeft = m_aiActor.transform.position.XY();
+      Vector2 center = m_aiActor.sprite.WorldCenter;
+      Vector2 adjustedTarget = this._targetPos + (bottomLeft - center);
+
+      if (m_repathTimer > 0f)
+          return;
+
+      m_repathTimer = pathInterval;
+      if (m_companionController && m_companionController.IsBeingPet)
+      {
+          Vector2 petterPos = m_companionController.m_pettingDoer.specRigidbody.UnitCenter + m_companionController.m_petOffset;
+          if (Vector2.Distance(petterPos, m_aiActor.specRigidbody.UnitCenter) < 0.08f)
+              m_aiActor.ClearPath();
+          else
+              m_aiActor.PathfindToPosition(petterPos, petterPos);
+      }
+      else
+          m_aiActor.PathfindToPosition(adjustedTarget);
+
+      if (m_aiActor.Path == null)
+      {
+          m_sequentialPathFails = 0;
+          return;
+      }
+
+      if (m_aiActor.Path.InaccurateLength > 50f)
+      {
+          m_aiActor.ClearPath();
+          m_sequentialPathFails = 0;
+          Warp(adjustedTarget);
+          if (retargetOnPathingFailure)
+            DetermineNewTarget();
+      }
+      else if (!m_aiActor.Path.WillReachFinalGoal && (++m_sequentialPathFails) > 3)
+      {
+          CellData cellData2 = GameManager.Instance.Dungeon.data[adjustedTarget.ToIntVector2(VectorConversions.Floor)];
+          if (cellData2 != null && cellData2.IsPassable)
+          {
+              m_sequentialPathFails = 0;
+              Warp(adjustedTarget);
+              if (retargetOnPathingFailure)
+                DetermineNewTarget();
+          }
+      }
+      else
+          m_sequentialPathFails = 0;
+  }
+  /// <summary>Warps the companion to a given position.</summary>
+  protected void Warp(Vector2 pos)
+  {
+      OnPreWarp();
+      m_aiActor.CompanionWarp(pos);
+      OnWarp();
+  }
+  /// <summary>Returns true iff the companion is offscreen and/or in a different room.</summary>
+  private bool CheckOffscreenForWarpingPurposes()
+  {
+      if (!preventWarpingWhenOnscreen)
+          return m_companionController.InDifferentRoomThanOwner();
+      Vector2 pos = m_aiActor.CenterPosition;
+      if (GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.4f))
+          return false;
+      RoomHandler ownerRoom = m_companionController.m_owner.CurrentRoom;
+      return (ownerRoom == null || ownerRoom != pos.GetAbsoluteRoom());
+  }
+  /// <summary>Called every tick the behavior is active.</summary>
+  public sealed override void Upkeep()
+  {
+      base.Upkeep();
+      DecrementTimer(ref m_repathTimer);
+      DecrementTimer(ref m_stateTimer);
+  }
+  /// <summary>Called after Upkeep() every tick the behavior is active and the companion is not stunned.</summary>
+  public sealed override BehaviorResult Update()
+  {
+      if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel || !m_companionController || !m_aiActor.CompanionOwner)
+          return BehaviorResult.SkipAllRemainingBehaviors;
+
+      if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.END_TIMES)
+      {
+          m_aiActor.ClearPath();
+          return BehaviorResult.SkipAllRemainingBehaviors;
+      }
+
+      UpdateStateAndTargetPosition();
+      if (CheckOffscreenForWarpingPurposes() && !PreventWarping())
+      {
+          Warp(m_companionController.m_owner.CenterPosition);
+          if (retargetOnPathingFailure)
+            DetermineNewTarget();
+      }
+      else if (ReachedTarget())
+          OnReachedTarget();
+      else if (this._allowPathing)
+          RepathToTarget();
+
+      return BehaviorResult.SkipRemainingClassBehaviors;
+  }
+}
+
 public static class CwaffCompanionBuilder
 {
     public static Friend InitCompanion<Friend>(this PassiveItem item, string friendName = null, int baseFps = 4, List<string> extraAnims = null)
@@ -18,6 +158,11 @@ public static class CwaffCompanionBuilder
         }
 
         string name = (friendName ?? item.itemName).ToID();
+        if (ResMap.Get($"{name}_idle") == null)
+        {
+            Lazy.RuntimeWarn($"All companions must have an idle_001 animation, but no \"{name}_idle_001\" sprite found");
+            return null;
+        }
 
         Friend friend = CompanionBuilder.BuildPrefab(name, $"{C.MOD_PREFIX}:{name}_companion", $"{name}_idle_001", IntVector2.Zero, IntVector2.One)
           .AddComponent<Friend>();
