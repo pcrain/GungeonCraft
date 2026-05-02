@@ -6,7 +6,7 @@ public abstract class CwaffCompanionController : CompanionController
 {
 }
 
-public class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
+public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
 {
   public float pathInterval = 0.25f; // amount of time between repathing
   public bool retargetOnPathingFailure = false; // if true, determine a new target after warping due to pathing failure
@@ -25,24 +25,35 @@ public class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
   {
     base.Start();
     m_companionController = m_gameObject.GetComponent<CompanionController>();
+    m_aiActor.MovementModifiers += this.TickMovement;
   }
 
-  /// <summary>Return to to prevent the companion from warping.</summary>
-  protected virtual bool PreventWarping() => false;
+  public override void Destroy()
+  {
+      if (m_aiActor)
+          m_aiActor.MovementModifiers -= this.TickMovement;
+      base.Destroy();
+  }
+
+  /// <summary>Called every frame while moving.</summary>
+  protected virtual void TickMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel) {}
+  /// <summary>Called every normal tick at the beginning of Update</summary>
+  protected virtual void UpdateStateAndTargetPosition() {}
+  /// <summary>Returns true iff the current target is valid</summary>
+  protected virtual bool IsTargetValid() => false;
   /// <summary>Returns true iff the companion has reached its designated target</summary>
   protected virtual bool ReachedTarget() => false;
   /// <summary>Called every update as long as ReachedTarget() is true</summary>
   protected virtual void OnReachedTarget() {}
-  /// <summary>Returns true iff the current target is valid</summary>
-  protected virtual bool IsTargetValid() => false;
   /// <summary>Updates _targetPos and potentially _targetActor</summary>
   protected virtual void DetermineNewTarget() {}
-  /// <summary>Called at the beginning of every normal Update cycle</summary>
-  protected virtual void UpdateStateAndTargetPosition() {}
+  /// <summary>Return true to prevent the companion from warping.</summary>
+  protected virtual bool PreventWarping() => false;
   /// <summary>Called immediately before warping.</summary>
   protected virtual void OnPreWarp() {}
   /// <summary>Called immediately after warping.</summary>
   protected virtual void OnWarp() {}
+
   /// <summary>Attempts to path over to _targetPos, calling DetermineNewTarget() as necessary on failure.</summary>
   protected virtual void RepathToTarget()  {
       // adjust relative to the center of our sprite
@@ -93,6 +104,7 @@ public class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
       else
           m_sequentialPathFails = 0;
   }
+
   /// <summary>Warps the companion to a given position.</summary>
   protected void Warp(Vector2 pos)
   {
@@ -100,6 +112,50 @@ public class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
       m_aiActor.CompanionWarp(pos);
       OnWarp();
   }
+
+  /// <summary>Checks if the companion is within a certain radius of its target position.</summary>
+  protected bool NearTargetPos(float radius, bool checkInBounds = true)
+  {
+    if (checkInBounds && !m_aiActor.CenterPosition.InBounds())
+      return false;
+    return (this._targetPos - m_aiActor.CenterPosition).sqrMagnitude <= (radius * radius);
+  }
+
+  /// <summary>Checks if the companion is within a certain radius of its target actor.</summary>
+  protected bool NearTargetActor(float radius, bool checkInBounds = true)
+  {
+    if (!this._targetActor || (checkInBounds && !m_aiActor.CenterPosition.InBounds()))
+      return false;
+    return (this._targetActor.CenterPosition - m_aiActor.CenterPosition).sqrMagnitude <= (radius * radius);
+  }
+
+  /// <summary>Checks if the companion has line of sight its target position.</summary>
+  protected bool CanSeeTargetPos()
+  {
+    return m_aiActor.CenterPosition.HasLineOfSight(this._targetPos);
+  }
+
+  /// <summary>Checks if the companion has line of sight its target actor.</summary>
+  protected bool CanSeeTargetActor()
+  {
+    return this._targetActor && m_aiActor.CenterPosition.HasLineOfSight(this._targetActor.CenterPosition);
+  }
+
+  /// <summary>Returns true iff the companion is over or within one unit of a pit cell.</summary>
+  protected bool NearPit()
+  {
+    return m_aiActor.CenterPosition.NearPit();
+  }
+
+  /// <summary>Determines the distance to _targetPos relative to the center of our sprite.</summary>
+  protected Vector2 DeltaToTarget()
+  {
+      // adjust relative to the center of our sprite
+      Vector2 bottomLeft = m_aiActor.transform.position.XY();
+      Vector2 adjustedTarget = this._targetPos - m_aiActor.sprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter);
+      return adjustedTarget - bottomLeft;
+  }
+
   /// <summary>Returns true iff the companion is offscreen and/or in a different room.</summary>
   private bool CheckOffscreenForWarpingPurposes()
   {
@@ -111,6 +167,7 @@ public class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
       RoomHandler ownerRoom = m_companionController.m_owner.CurrentRoom;
       return (ownerRoom == null || ownerRoom != pos.GetAbsoluteRoom());
   }
+
   /// <summary>Called every tick the behavior is active.</summary>
   public sealed override void Upkeep()
   {
@@ -118,6 +175,7 @@ public class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
       DecrementTimer(ref m_repathTimer);
       DecrementTimer(ref m_stateTimer);
   }
+
   /// <summary>Called after Upkeep() every tick the behavior is active and the companion is not stunned.</summary>
   public sealed override BehaviorResult Update()
   {
@@ -148,7 +206,7 @@ public class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
 
 public static class CwaffCompanionBuilder
 {
-    public static Friend InitCompanion<Friend>(this PassiveItem item, string friendName = null, int baseFps = 4, List<string> extraAnims = null)
+    public static Friend InitCompanion<Friend>(this PassiveItem item, string friendName = null, int baseFps = 4, List<string> extraAnims = null, bool autoRigidBody = true)
         where Friend : CwaffCompanionController
     {
         if (item is not CwaffCompanion cc)
@@ -167,8 +225,14 @@ public static class CwaffCompanionBuilder
         Friend friend = CompanionBuilder.BuildPrefab(name, $"{C.MOD_PREFIX}:{name}_companion", $"{name}_idle_001", IntVector2.Zero, IntVector2.One)
           .AddComponent<Friend>();
         friend.SetupAnimations(baseFps: baseFps, extraAnims: extraAnims);
-        //NOTE: should use LowerLeft anchor if we have a SpeculativeRigidBody and MiddleCenter otherwise, but we can't know ahead of time
-        friend.aiActor.ActorShadowOffset = new Vector3(friend.aiActor.sprite.GetRelativePositionFromAnchor(Anchor.LowerLeft).x, 0f, 0f);
+        //NOTE: should use LowerLeft anchor if we have a SpeculativeRigidBody and MiddleCenter otherwise
+        if (autoRigidBody)
+        {
+          friend.gameObject.AutoRigidBody(CollisionLayer.EnemyCollider);
+          friend.aiActor.ActorShadowOffset = Vector2.zero;
+        }
+        else
+          friend.aiActor.ActorShadowOffset = new Vector3(friend.aiActor.sprite.GetRelativePositionFromAnchor(Anchor.LowerLeft).x, 0f, 0f);
         friend.companionID = CompanionController.CompanionIdentifier.NONE;
 
         cc.CompanionGuid = friend.aiActor.EnemyGuid;

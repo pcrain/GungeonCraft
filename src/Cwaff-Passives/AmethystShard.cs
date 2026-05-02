@@ -102,7 +102,6 @@ public class AllayCompanion : CwaffCompanionController
 
             m_aiActor.FallingProhibited = true;
             m_aiActor.PathableTiles |= CellTypes.PIT;
-            m_aiActor.MovementModifiers += AdjustMovement;
             m_aiActor.sprite.HeightOffGround = 2f;
             m_aiActor.sprite.UpdateZDepth();
             m_companionController.m_owner.OnRoomClearEvent += PossiblyFindCopyOfHeldItem;
@@ -159,8 +158,6 @@ public class AllayCompanion : CwaffCompanionController
         {
             DropItem();
             DropEnemy(droppedEarly: true);
-            if (m_aiActor)
-                m_aiActor.MovementModifiers -= AdjustMovement;
             if (m_companionController && m_companionController.m_owner)
                 m_companionController.m_owner.OnRoomClearEvent -= PossiblyFindCopyOfHeldItem;
             #if DEBUG
@@ -398,11 +395,9 @@ public class AllayCompanion : CwaffCompanionController
         }
 
         private const float _DANCE_RADIUS = 3.0f;
-        private const float _DANCE_RADIUS_SQR = _DANCE_RADIUS * _DANCE_RADIUS;
+        private const float _PICKUP_RADIUS = 1.0f;
         protected override bool ReachedTarget()
         {
-            const float _PICKUP_RADIUS = 1.0f;
-            const float _PICKUP_RADIUS_SQR = _PICKUP_RADIUS * _PICKUP_RADIUS;
             if (m_companionController.IsBeingPet)
                 return false;
 
@@ -413,15 +408,15 @@ public class AllayCompanion : CwaffCompanionController
                 case ENEMY_CARRY:
                     return m_aiActor.IsOverPit && (this._heldActor.WillDefinitelyFall() || DeltaToTarget().sqrMagnitude < 0.1f);
                 case OWNER_FOLLOW:
-                    return (Vector2.Distance(this._targetPos, m_aiActor.CenterPosition) <= IdealRadius) && m_aiActor.CenterPosition.InBounds();
+                    return NearTargetPos(IdealRadius);
                 case ITEM_RETRIEVE:
-                    return (Vector2.Distance(this._targetPos, m_aiActor.CenterPosition) <= IdealRadius) && !m_aiActor.CenterPosition.NearPit();
+                    return NearTargetPos(IdealRadius, checkInBounds: false) && !NearPit();
                 case ENEMY_SEEK:
                 case ITEM_SEEK:
                 case ITEM_INSPECT:
-                    return ((this._targetPos - m_aiActor.CenterPosition).sqrMagnitude <= _PICKUP_RADIUS_SQR);
+                    return NearTargetPos(_PICKUP_RADIUS);
                 case ITEM_LOCATE:
-                    return ((this._targetPos - m_aiActor.CenterPosition).sqrMagnitude <= _DANCE_RADIUS_SQR);
+                    return NearTargetPos(_DANCE_RADIUS);
             }
             return false;
         }
@@ -431,7 +426,7 @@ public class AllayCompanion : CwaffCompanionController
             switch(this._state)
             {
                 case OWNER_FOLLOW:
-                    BecomeIdle(); break;
+                    m_aiActor.ClearPath(); break;
                 case ENEMY_SEEK:
                     GrabEnemy(); break;
                 case ENEMY_CARRY:
@@ -487,11 +482,6 @@ public class AllayCompanion : CwaffCompanionController
             this._state = ITEM_INSPECT;
             this._targetItem = item;
             this._targetActor = null;
-        }
-
-        private void BecomeIdle()
-        {
-            m_aiActor.ClearPath();
         }
 
         private void GrabEnemy()
@@ -663,14 +653,6 @@ public class AllayCompanion : CwaffCompanionController
         const float _SNAP_DIST = 1f;
         const float _SNAP_DIST_SQR = _SNAP_DIST * _SNAP_DIST;
 
-        private Vector2 DeltaToTarget()
-        {
-            // adjust relative to the center of our sprite
-            Vector2 bottomLeft = m_aiActor.transform.position.XY();
-            Vector2 adjustedTarget = this._targetPos - m_aiActor.sprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter);
-            return adjustedTarget - bottomLeft;
-        }
-
         private void UpdateMovementSpeed()
         {
             float sqrDist = (m_aiActor.sprite.WorldCenter - this._targetPos).sqrMagnitude;
@@ -690,7 +672,7 @@ public class AllayCompanion : CwaffCompanionController
         }
 
         private float _lastSparkle = 0.0f;
-        private void AdjustMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
+        protected override void TickMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
         {
             UpdateMovementSpeed();
             DoSpinningChecks();

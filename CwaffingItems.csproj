@@ -88,6 +88,7 @@
     <Compile Include="src\Cwaff-Passives\GoopStabilizer.cs"/>
     <Compile Include="src\Cwaff-Passives\BubbleWand.cs"/>
     <Compile Include="src\Cwaff-Passives\WarriorsGi.cs"/>
+    <Compile Include="src\Cwaff-Passives\Shmuppy.cs"/>
     <Compile Include="src\Cwaff-Passives\DeadRinger.cs"/>
     <Compile Include="src\Cwaff-Passives\CreditCard.cs"/>
     <Compile Include="src\Cwaff-Passives\DisplayPedestal.cs"/>

@@ -27,8 +27,6 @@ public class ScaldingJelly : CwaffCompanion
             clip.frames[0].AddSound("ignizol_fall_sound");
         }
 
-        friend.gameObject.AutoRigidBody(CollisionLayer.EnemyCollider);
-
         BehaviorSpeculator bs = friend.gameObject.GetComponent<BehaviorSpeculator>();
         bs.MovementBehaviors.Add(new IgnizolCompanion.IgnizolMovementBehavior());
     }
@@ -100,7 +98,6 @@ public class IgnizolCompanion : CwaffCompanionController
             base.Start();
             this.retargetOnPathingFailure = true;
 
-            m_aiActor.MovementModifiers += this.AdjustMovement;
             m_aiActor.spriteAnimator.OnPlayAnimationCalled += this.EnsureSmoothIdleAnimationTransition;
             m_aiActor.CustomPitDeathHandling += this.CustomPitDeathHandling;
             m_aiActor.specRigidbody.CollideWithOthers = true; //NOTE: this doesn't work in CwaffCompanion.InitCompanion for some reason...investigate later
@@ -216,8 +213,6 @@ public class IgnizolCompanion : CwaffCompanionController
 
         public override void Destroy()
         {
-            if (m_aiActor)
-                m_aiActor.MovementModifiers -= this.AdjustMovement;
             if (this._jumpSprite)
                 UnityEngine.Object.Destroy(this._jumpSprite);
             CwaffEvents.OnEmptyInteract -= this.AttemptToPickUpOrThrow;
@@ -332,7 +327,7 @@ public class IgnizolCompanion : CwaffCompanionController
             switch(this._state)
             {
                 case CHASE:
-                    return ((this._targetPos - m_aiActor.CenterPosition).sqrMagnitude <= _LAUNCH_RADIUS_SQR) && m_aiActor.CenterPosition.HasLineOfSight(this._targetPos);
+                    return NearTargetPos(_LAUNCH_RADIUS) && CanSeeTargetPos();
                 case IDLE:
                 case WANDER:
                 case CHARGE:
@@ -340,8 +335,6 @@ public class IgnizolCompanion : CwaffCompanionController
                 case JUMP:
                 case THROW:
                     return !this._airborne;
-                case CARRY:
-                    return false;
             }
             return false;
         }
@@ -434,14 +427,6 @@ public class IgnizolCompanion : CwaffCompanionController
             this._allowPathing = false;
         }
 
-        private Vector2 DeltaToTarget()
-        {
-            // adjust relative to the center of our sprite
-            Vector2 bottomLeft = m_aiActor.transform.position.XY();
-            Vector2 adjustedTarget = this._targetPos - m_aiActor.sprite.GetRelativePositionFromAnchor(Anchor.MiddleCenter);
-            return adjustedTarget - bottomLeft;
-        }
-
         private void UpdateMovementSpeed()
         {
             float newSpeed = _MOVE_SPEED;
@@ -468,7 +453,7 @@ public class IgnizolCompanion : CwaffCompanionController
                 SpriteOutlineManager.RemoveOutlineFromSprite(sprite);
         }
 
-        private void AdjustMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
+        protected override void TickMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
         {
             #if DEBUG
                 if (_debugNameTag)
