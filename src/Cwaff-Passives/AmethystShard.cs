@@ -19,8 +19,9 @@ public class AmethystShard : CwaffCompanion
         PassiveItem item  = Lazy.SetupPassive<AmethystShard>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
 
-        AllayCompanion friend = item.InitCompanion<AllayCompanion>(friendName: CompanionName.ToID(), baseFps: 12);
-        friend.MakeIntangible();
+        AllayCompanion friend = item.InitCompanion<AllayCompanion>(friendName: CompanionName.ToID(), baseFps: 12)
+          .SetPettingOffsets(new Vector2(-0.625f, -0.25f), new Vector2(0.375f, -0.25f))
+          .MakeIntangible();
         friend.aiActor.specRigidbody.CollideWithTileMap = true;
 
         BehaviorSpeculator bs = friend.gameObject.GetComponent<BehaviorSpeculator>();
@@ -370,7 +371,7 @@ public class AllayCompanion : CwaffCompanionController
 
         protected override void UpdateStateAndTargetPosition()
         {
-            if (this._state == OWNER_FOLLOW || m_companionController.IsBeingPet || !IsTargetValid())
+            if (this._state == OWNER_FOLLOW || m_companionController.IsBeingPet)
                 DetermineNewTarget();
             if (this._state != OWNER_FOLLOW)
                 this._cumulativeGunRotation = 0.0f; // reset spinning checks

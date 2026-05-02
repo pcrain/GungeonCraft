@@ -376,7 +376,7 @@ public class Initialisation : BaseUnityPlugin
                 CombatLeotard.Init();
                 NewtonsApple.Init();
                 DemolitionContract.Init();
-                Shmuppy.Init();
+                ChewToy.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

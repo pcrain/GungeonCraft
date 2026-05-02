@@ -72,6 +72,7 @@ public class Cammy
             // GungeonCraft
             "cg:amethyst_shard",
             "cg:scalding_jelly",
+            "cg:chew_toy",
         };
 
         // if (C.DEBUG_BUILD)  // test some wonky offsets

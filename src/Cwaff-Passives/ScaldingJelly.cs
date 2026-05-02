@@ -295,8 +295,6 @@ public class IgnizolCompanion : CwaffCompanionController
 
         protected override void UpdateStateAndTargetPosition()
         {
-            if (!IsTargetValid())
-                DetermineNewTarget();
             if (!this._airborne && this._state != CARRY)
                 SetTheWorldAblaze();
             if (!this._targetActor || !this._targetActor.sprite)

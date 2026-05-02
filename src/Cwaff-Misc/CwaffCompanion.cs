@@ -2,8 +2,31 @@ namespace CwaffingTheGungy;
 
 using static DirectionalAnimation.DirectionType;
 
+[HarmonyPatch]
 public abstract class CwaffCompanionController : CompanionController
 {
+  [SerializeField]
+  private Vector2 _petOffsetRight = Vector2.zero;
+  [SerializeField]
+  private Vector2 _petOffsetLeft  = Vector2.zero;
+
+  internal void SetPettingOffsetsInternal(Vector2 right, Vector2? left = null)
+  {
+    this._petOffsetRight = right;
+    this._petOffsetLeft = left ?? right;
+  }
+
+  [HarmonyPatch(typeof(CompanionController), nameof(CompanionController.DoPet))]
+  [HarmonyPostfix]
+  private static void PettingFixerPatch(CompanionController __instance, PlayerController player)
+  {
+    if (__instance is not CwaffCompanionController ccc)
+      return;
+    if (__instance.aiAnimator.FacingDirection < 90f)
+      ccc.m_petOffset = ccc._petOffsetRight;
+    else
+      ccc.m_petOffset = ccc._petOffsetLeft;
+  }
 }
 
 public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
@@ -39,7 +62,7 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
   protected virtual void TickMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel) {}
   /// <summary>Called every normal tick at the beginning of Update</summary>
   protected virtual void UpdateStateAndTargetPosition() {}
-  /// <summary>Returns true iff the current target is valid</summary>
+  /// <summary>Returns true iff the current target is valid. Update() will automatically call DetermineNewTarget() if this returns false.</summary>
   protected virtual bool IsTargetValid() => false;
   /// <summary>Returns true iff the companion has reached its designated target</summary>
   protected virtual bool ReachedTarget() => false;
@@ -55,7 +78,7 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
   protected virtual void OnWarp() {}
 
   /// <summary>Attempts to path over to _targetPos, calling DetermineNewTarget() as necessary on failure.</summary>
-  protected virtual void RepathToTarget()  {
+  protected void RepathToTarget()  {
       // adjust relative to the center of our sprite
       Vector2 bottomLeft = m_aiActor.transform.position.XY();
       Vector2 center = m_aiActor.sprite.WorldCenter;
@@ -147,6 +170,12 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
     return m_aiActor.CenterPosition.NearPit();
   }
 
+  /// <summary>Returns true iff the companion is in combat.</summary>
+  protected bool InCombat()
+  {
+    return m_companionController.m_owner is PlayerController p && p.IsInCombat;
+  }
+
   /// <summary>Determines the distance to _targetPos relative to the center of our sprite.</summary>
   protected Vector2 DeltaToTarget()
   {
@@ -188,6 +217,8 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
           return BehaviorResult.SkipAllRemainingBehaviors;
       }
 
+      if (!IsTargetValid())
+          DetermineNewTarget();
       UpdateStateAndTargetPosition();
       if (CheckOffscreenForWarpingPurposes() && !PreventWarping())
       {
@@ -264,7 +295,7 @@ public static class CwaffCompanionBuilder
             aiAnimator.IdleFidgetAnimations = [fidgetAnim];
         foreach (string anim in extraAnims.EmptyIfNull())
         {
-            bool loop = (anim != "pitfall");
+            bool loop = (anim != "pitfall") && (anim != "death");
             aiAnimator.OtherAnimations.Add(new(){name = anim, anim = coll.AutoAnimation(ref clips, $"{name}_{anim}", fps: baseFps, loop: loop)});
         }
         spriteAnimator.library.clips = clips.ToArray();
@@ -331,7 +362,7 @@ public static class CwaffCompanionBuilder
         return None;
     }
 
-    public static void MakeIntangible(this CwaffCompanionController friend)
+    public static T MakeIntangible<T>(this T friend) where T : CwaffCompanionController
     {
         friend.CanCrossPits = true;
         friend.aiActor.healthHaver.PreventAllDamage = true;
@@ -339,5 +370,12 @@ public static class CwaffCompanionBuilder
         friend.aiActor.specRigidbody.CollideWithOthers = false;
         friend.aiActor.specRigidbody.CollideWithTileMap = false;
         friend.aiActor.HasShadow = false;
+        return friend;
+    }
+
+    public static T SetPettingOffsets<T>(this T self, Vector2 right, Vector2? left = null) where T : CwaffCompanionController
+    {
+      self.SetPettingOffsetsInternal(right, left);
+      return self;
     }
 }
