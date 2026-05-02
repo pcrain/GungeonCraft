@@ -179,8 +179,6 @@ public class Alligator : CwaffGun
 
 public class AlligatorProjectile : MonoBehaviour
 {
-    const int _MAX_CLIPS_PER_ENEMY = 8;
-
     private void Start()
     {
         Projectile p = base.gameObject.GetComponent<Projectile>();
@@ -195,7 +193,7 @@ public class AlligatorProjectile : MonoBehaviour
             return;
         if (body.healthHaver is not HealthHaver hh)
             return;
-        if (!aiActor.IsHostile(canBeNeutral: true) || aiActor.gameObject.GetComponents<AlligatorCableHandler>().Length >= _MAX_CLIPS_PER_ENEMY)
+        if (!aiActor.IsHostile(canBeNeutral: true) || AlligatorCableHandler.MaxClipsAttachedToEnemy(aiActor))
             return;
         new GameObject().AddComponent<AlligatorCableHandler>()
             .Initialize(projectile.Owner as PlayerController, aiActor, aiActor.transform, aiActor.CenterPosition - aiActor.transform.position.XY());
@@ -231,6 +229,8 @@ public class AlligatorCableHandler : MonoBehaviour
     private Vector3 _dropVelocity       = Vector3.zero;
     private Vector3 _dropOffsetVector   = Vector3.zero;
     private Vector3 _lastGoodEndPos     = Vector3.zero;
+
+    private static readonly Dictionary<AIActor, int> _ClipCounter = new();
 
     internal List<GameObject> _extantSparks = new();
     internal List<float> _extantSpawnTimes  = new();
@@ -293,7 +293,17 @@ public class AlligatorCableHandler : MonoBehaviour
                 this._alligator = a2;
             if (this._alligator)
                 this._alligator._cables.Add(this);
+            if (!_ClipCounter.ContainsKey(this._enemy))
+              _ClipCounter[this._enemy] = 1;
+            else
+              _ClipCounter[this._enemy] += 1;
         }
+    }
+
+    public static bool MaxClipsAttachedToEnemy(AIActor enemy)
+    {
+      const int _MAX_CLIPS_PER_ENEMY = 8;
+      return _ClipCounter.TryGetValue(enemy, out int val) && val >= _MAX_CLIPS_PER_ENEMY;
     }
 
     private void FallOnFloor()
@@ -303,6 +313,8 @@ public class AlligatorCableHandler : MonoBehaviour
             this._alligator._cables.Remove(this);
             this._alligator = null;
         }
+        if (this._enemy)
+          _ClipCounter[this._enemy] -= 1;
 
         for (int i = this._extantSparks.Count - 1; i >= 0; --i)
             if (this._extantSparks[i])
@@ -392,6 +404,8 @@ public class AlligatorCableHandler : MonoBehaviour
     {
         if (this._alligator)
             this._alligator._cables.Remove(this);
+        if (this._enemy)
+          _ClipCounter[this._enemy] -= 1;
         for (int i = this._extantSparks.Count - 1; i >= 0; --i)
             if (this._extantSparks[i])
                 UnityEngine.Object.Destroy(this._extantSparks[i]);
