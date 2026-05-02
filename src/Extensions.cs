@@ -2463,6 +2463,8 @@ public static class Extensions
   /// <summary>Get all active enemies in a room given a Vector2 position, returning an empty list instead of null when the target is invalid</summary>
   public static List<AIActor> SafeGetEnemiesInRoom(this Vector2 pos)
   {
+    if (GameManager.Instance.Dungeon is not Dungeon d || d.data == null)
+      return _NoEnemies;
     if (pos.GetAbsoluteRoom() is not RoomHandler room)
       return _NoEnemies;
     room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref _RefEnemies);
@@ -2481,6 +2483,8 @@ public static class Extensions
   public static void SafeGetEnemiesInRoom(this Vector2 pos, ref List<AIActor> refList)
   {
     refList.Clear();
+    if (GameManager.Instance.Dungeon is not Dungeon d || d.data == null)
+      return;
     if (pos.GetAbsoluteRoom() is RoomHandler room)
       room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref refList);
   }

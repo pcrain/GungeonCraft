@@ -4,6 +4,7 @@
 
 - Added Chain Driver, RLTSRTSGTSBTSLB, Photon Cannon, and Chew Toy
 - Added masteries for Chain Driver, RLTSRTSGTSBTSLB, and Photon Cannon
+- Fixed null deref caused by Newton's Apple attempting to find enemies when changing floors
 
 ## 1.29.2 (2026-04-27)
 
