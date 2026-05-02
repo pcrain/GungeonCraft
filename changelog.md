@@ -5,6 +5,7 @@
 - Added Chain Driver, RLTSRTSGTSBTSLB, Photon Cannon, and Chew Toy
 - Added masteries for Chain Driver, RLTSRTSGTSBTSLB, and Photon Cannon
 - Fixed null deref caused by Newton's Apple attempting to find enemies when changing floors
+- Fixed critical hits from Sextant no longer ignoring DPS caps
 
 ## 1.29.2 (2026-04-27)
 

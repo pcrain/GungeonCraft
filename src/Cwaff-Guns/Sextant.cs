@@ -697,6 +697,7 @@ public class PrecisionProjectile : Projectile
         {
           this.BossDamageMultiplier *= BOSS_DAMAGE_MULT_ON_CRIT;
           this.pierceMinorBreakables = true;
+          this.ignoreDamageCaps = true;
         }
         this.lastPos = base.transform.position;
     }
