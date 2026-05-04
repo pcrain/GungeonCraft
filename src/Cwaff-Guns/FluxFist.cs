@@ -77,12 +77,14 @@ public class FluxFist : CwaffGun
         _AttractParticle = VFX.Create("flux_fist_attract_vfx", fps: 10, loops: false);
     }
 
-    private void CheckFlight(bool enabled)
+    private void CheckFlight(bool newEnabled)
     {
       if (!this._lastOwner)
         return;
-      this._lastOwner.SetIsFlying(enabled, ItemName);
-      if (enabled)
+      if (newEnabled == this._lastOwner.m_isFlying.HasOverride(ItemName))
+        return;
+      this._lastOwner.SetIsFlying(newEnabled, ItemName);
+      if (newEnabled)
         this._lastOwner.AdditionalCanDodgeRollWhileFlying.AddOverride(ItemName);
       else
         this._lastOwner.AdditionalCanDodgeRollWhileFlying.RemoveOverride(ItemName);
@@ -109,7 +111,8 @@ public class FluxFist : CwaffGun
 
     public override void OnDestroy()
     {
-        CheckFlight(false);
+        if (this._lastOwner == this.PlayerOwner)
+          CheckFlight(false);
         base.OnDestroy();
     }
 
