@@ -101,7 +101,7 @@ public class SubtractorBeam : CwaffGun
             if (current.Value is not dfLabel label)
                 label = current.Value = EasyLabel.Create(unicode: false, outline: true);
             label.Text = $"{Mathf.CeilToInt(enemy.healthHaver.currentHealth)}[sprite \"mini_heart_ui\"]";
-            label.Place(enemy.sprite.WorldBottomCenter + new Vector2(0, -1f));
+            label.Place(enemy.sprite.WorldBottomCenter + new Vector2(0, -0.75f));
         }
     }
 
