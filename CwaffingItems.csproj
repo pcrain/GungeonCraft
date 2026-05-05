@@ -80,6 +80,7 @@
     <Compile Include="src\Cwaff-Passives\MMAiming.cs"/>
     <Compile Include="src\Cwaff-Passives\BionicFinger.cs"/>
     <Compile Include="src\Cwaff-Passives\UtilityVest.cs"/>
+    <Compile Include="src\Cwaff-Passives\SuperColdWatch.cs"/>
     <Compile Include="src\Cwaff-Passives\SafetyGloves.cs"/>
     <Compile Include="src\Cwaff-Passives\Blazer.cs"/>
     <Compile Include="src\Cwaff-Passives\AdrenalineShot.cs"/>

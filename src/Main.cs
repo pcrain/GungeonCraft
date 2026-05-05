@@ -377,6 +377,7 @@ public class Initialisation : BaseUnityPlugin
                 NewtonsApple.Init();
                 DemolitionContract.Init();
                 ChewToy.Init();
+                SuperColdWatch.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

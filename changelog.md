@@ -2,7 +2,9 @@
 
 ## 1.30.0 (TBD)
 
-- Added Chain Driver, RLTSRTSGTSBTSLB, Photon Cannon, and Chew Toy
+- Added Chain Driver, RLTSRTSGTSBTSLB, Photon Cannon, Chew Toy, and Super Cold Watch
+	- RLTSRTSGTSBTSLB sprite thanks to [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)!
+	- Super Cold Watch sprite thanks to [SpecialAPI](https://github.com/SpecialAPI)!
 - Added masteries for Chain Driver, RLTSRTSGTSBTSLB, and Photon Cannon
 - Fixed null deref caused by Newton's Apple attempting to find enemies when changing floors
 - Fixed critical hits from Sextant no longer ignoring DPS caps
