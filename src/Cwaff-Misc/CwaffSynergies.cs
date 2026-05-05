@@ -171,7 +171,7 @@ public static class CwaffSynergies
         NewSynergy(CHAIN_SMOKER, "Chain Smoker", new[]{IName(ChainDriver.ItemName), "cigarettes"});
         // Grenade eggs cost 2 ammo to fire instead of 5.
         NewSynergy(BAZOOKA_LAYLEE, "Bazooka Laylee", new[]{IName(Breegull.ItemName), "com4nd0"});
-        // Training level is increased by triple the normal amount when Weight Robes' training is active.
+        // Training level is increased by triple the normal amount when Weighted Robes' training is active.
         NewSynergy(GUN_SOHAN, "Gun Sohan", new[]{IName(WeightedRobes.ItemName), IName(WarriorsGi.ItemName)});
 
       #endregion

@@ -32,7 +32,8 @@ public partial class Geometry : MonoBehaviour
     /// <param name="angle">The angle for circle-like shapes (only meaningful when arc is less than 360 degrees).</param>
     /// <param name="arc">The angle a circle-like shape subtends (used for drawing cones / wedges).</param>
     /// <param name="radiusInner">The inner radius for ring-like shapes.</param>
-    public Geometry Setup(Shape shape = Shape.NONE, Color? color = null, Vector2? pos = null, Vector2? pos2 = null, float? radius = null, float? angle = null, float? arc = null, float? radiusInner = null)
+    /// <param name="useScreenSpace">If true, coordinates are taken to be screen space instead of world space. (0,0) is the bottom-left of the screen, (1,1) is the top-right.</param>
+    public Geometry Setup(Shape shape = Shape.NONE, Color? color = null, Vector2? pos = null, Vector2? pos2 = null, float? radius = null, float? angle = null, float? arc = null, float? radiusInner = null, bool useScreenSpace = false)
     {
         if (this.shape == Shape.NONE && shape == Shape.NONE)
         {
@@ -50,6 +51,23 @@ public partial class Geometry : MonoBehaviour
           this.shape = shape;
         if (!this._didSetup)
             CreateMesh();
+
+        if (useScreenSpace)
+        {
+          CameraController mcc = GameManager.Instance.MainCameraController;
+          if (pos is Vector2 posv)
+            pos = new Vector2(
+              Mathf.Lerp(mcc.m_cachedMinPos.x, mcc.m_cachedMaxPos.x, posv.x),
+              Mathf.Lerp(mcc.m_cachedMinPos.y, mcc.m_cachedMaxPos.y, posv.y));
+          if (pos2 is Vector2 pos2v)
+            pos2 = new Vector2(
+              Mathf.Lerp(mcc.m_cachedMinPos.x, mcc.m_cachedMaxPos.x, pos2v.x),
+              Mathf.Lerp(mcc.m_cachedMinPos.y, mcc.m_cachedMaxPos.y, pos2v.y));
+          if (radius is float radiusv)
+            radius = Mathf.Clamp01(radiusv) * (mcc.m_cachedMaxPos.x - mcc.m_cachedMinPos.x);
+          if (radiusInner is float radiusInnerv)
+            radiusInner = Mathf.Clamp01(radiusInnerv) * (mcc.m_cachedMaxPos.x - mcc.m_cachedMinPos.x);
+        }
 
         this.color  = color  ?? this.color;
         this.pos    = pos    ?? this.pos;
