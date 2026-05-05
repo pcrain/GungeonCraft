@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 public static class CwaffLabel
 {
-  public static dfLabel MakeNewLabel(bool unicode = true, bool outline = false)
+  public static dfLabel MakeNewLabel(bool unicode = true, bool outline = false, TextAlignment align = TextAlignment.Center)
   {
       dfLabel label = UnityEngine.Object.Instantiate(GameUIRoot.Instance.p_needsReloadLabel.gameObject, GameUIRoot.Instance.transform).GetComponent<dfLabel>();
       if (unicode)
@@ -12,8 +12,13 @@ public static class CwaffLabel
           label.TextScale = 2.0f;
       }
       label.transform.localScale = Vector3.one / GameUIRoot.GameUIScalar;
-      label.Anchor = dfAnchorStyle.CenterVertical | dfAnchorStyle.CenterHorizontal;
-      label.TextAlignment = TextAlignment.Center;
+      label.TextAlignment = align;
+      if (align == TextAlignment.Left)
+        label.Pivot = dfPivotPoint.BottomLeft;
+      else if (align == TextAlignment.Right)
+        label.Pivot = dfPivotPoint.BottomRight;
+      else
+        label.Pivot = dfPivotPoint.BottomCenter;
       label.VerticalAlignment = dfVerticalAlignment.Middle;
       label.Opacity = 1f;
       label.Text = string.Empty;
@@ -21,6 +26,7 @@ public static class CwaffLabel
       label.IsVisible = true;
       label.ProcessMarkup = true;
       label.Color = Color.white;
+      label.WordWrap = true;
       if (outline)
       {
         label.Outline = true;
@@ -31,7 +37,7 @@ public static class CwaffLabel
       return label;
   }
 
-  public static void Place(this dfLabel label, Vector2 pos, float rot = 0f)
+  public static void Place(this dfLabel label, Vector2 pos, float rot = 0f, TextAlignment? align = null)
   {
       rot = rot.Clamp180();
       Vector2 finalPos = pos;
@@ -52,6 +58,16 @@ public static class CwaffLabel
           GameManager.Instance.MainCameraController.Camera,
           GameUIRoot.Instance.m_manager.RenderCamera).WithZ(0f).QuantizeFloor(adj);
       label.transform.localRotation = rot.EulerZ();
+      if (align.HasValue)
+      {
+        TextAlignment alignment = label.TextAlignment = align.Value;
+        if (alignment == TextAlignment.Left)
+          label.Pivot = dfPivotPoint.MiddleLeft;
+        else if (alignment == TextAlignment.Right)
+          label.Pivot = dfPivotPoint.MiddleRight;
+        else
+          label.Pivot = dfPivotPoint.MiddleCenter;
+      }
       label.IsVisible = true;
       LabelExt le = label.gameObject.GetComponent<LabelExt>();
       le.lastPos = pos;

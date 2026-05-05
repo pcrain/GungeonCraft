@@ -608,10 +608,7 @@ public class Sextant : CwaffGun
             this._heightLabel.Text = $"h={Mathf.RoundToInt(C.PIXELS_PER_TILE * (tr.y - br.y))}";
             this._heightLabel.Color = bboxColor;
             this._heightLabel.Opacity = curPhaseCompletion;
-            //HACK: horrendous math since I can't get labels to be anything other than bottom-center aligned...fix later maybe
-            this._heightLabel.Place(0.5f * (tr + br) + new Vector2(
-                this._heightLabel.Size.x * 0.5f * fontSizeToPixels + 0.25f, -this._heightLabel.Size.y * 0.5f * fontSizeToPixels),
-              0f);
+            this._heightLabel.Place(0.5f * (tr + br) + new Vector2(0.25f, 0.0f), 0f, align: TextAlignment.Left);
 
             // phase 6: weak point
             curPhaseCompletion = phaseCompetion[currentPhase++];

@@ -201,11 +201,10 @@ public class RetinaHUD : MonoBehaviour
     this._vulnHeader            = Lab(color: Color.cyan);
     this._vulnLabel             = Lab(color: Color.cyan);
 
-    this._nameLabel.AutoSize = false;
-    this._nameLabel.AutoHeight = false;
+    this._nameLabel.AutoHeight = true;
     this._nameLabel.WordWrap = true;
     this._nameLabel.VerticalAlignment = dfVerticalAlignment.Top;
-    this._nameLabel.Anchor = dfAnchorStyle.Top | dfAnchorStyle.CenterHorizontal;
+    this._nameLabel.Pivot = dfPivotPoint.TopCenter;
     this._nameLabel.Size = new Vector2(160f, 48f); // split long names onto multiple lines
 
     this._extraTargetSprites = new();
@@ -245,10 +244,8 @@ public class RetinaHUD : MonoBehaviour
 
   private dfLabel Lab(Color? color = null, TextAlignment align = TextAlignment.Center)
   {
-    dfLabel label = CwaffLabel.MakeNewLabel(unicode: false, outline: false);
+    dfLabel label = CwaffLabel.MakeNewLabel(unicode: false, outline: false, align: align);
     label.Color = color ?? Color.white;
-    // label.OutlineColor = Color.black;
-    label.TextAlignment = align; // TODO: make this actuall works
     this._labels.Add(label);
     return label;
   }
@@ -459,8 +456,8 @@ public class RetinaHUD : MonoBehaviour
     // place individual elements in screen space
     // Place(this._base, Vector2.zero, Vector2.one);
     Place(this._targetInfoRectangle, Vector2.zero, new Vector2(_PANEL_SIZE_X, _PANEL_SIZE_Y), newColor: ExtendedColours.vibrantOrange.WithAlpha(0.2f * ease));
-    Place(this._nameHeader,        "Species",     new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
-    Place(this._nameLabel,         targetName,    new Vector2(infoPos, GetNextLine(ref linePos, 2.25f) - 0.03f), newColor: _LabelColor); // NOTE: 0.03 fudge factor for multiline text
+    Place(this._nameHeader,        "Species",     new Vector2(infoPos, GetNextLine(ref linePos, 0.0f)),  newColor: _HeaderColor);
+    Place(this._nameLabel,         targetName,    new Vector2(infoPos, GetNextLine(ref linePos, 3.25f)), newColor: _LabelColor);
     Place(this._rangeHeader,       "Range",       new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
     Place(this._rangeLabel,        range,         new Vector2(infoPos, GetNextLine(ref linePos, 1.25f)), newColor: _LabelColor);
     Place(this._collateralHeader,  "Collateral",  new Vector2(infoPos, GetNextLine(ref linePos, 1.0f)),  newColor: _HeaderColor);
