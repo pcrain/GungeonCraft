@@ -1635,7 +1635,7 @@ public partial class ArmisticeBoss : AIActor
           for (int i = 0; i <= BOUNCES; ++i)
           {
             BraveMathCollege.LineSegmentRectangleIntersection(curPos + curAngleVec / 32f, curPos + 100 * curAngleVec, trueBounds.min, trueBounds.max, ref isect);
-            this._lines[(BOUNCES + 1) * idx + i].Setup(color: c, pos: curPos, pos2: isect);
+            this._lines[(BOUNCES + 1) * idx + i].Place(color: c, pos: curPos, pos2: isect);
             curPos = isect;
             if (Mathf.Abs(isect.x - left) < EPSILON || Mathf.Abs(isect.x - right) < EPSILON)
               curAngleVec = new Vector2(-curAngleVec.x, curAngleVec.y);

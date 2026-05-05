@@ -646,7 +646,7 @@ public class MinesweeperGame : MonoBehaviour
               if (tile._lifetime >= _SHWOOP_TIME)
                   ease = 0f;
               Color renderColor = tile._revealed ? tile._color : tile._flagged ? _FlaggedColor : _UnknownColor;
-              tile._square.Setup(
+              tile._square.Place(
                 color : renderColor.WithAlpha(alpha * (0.75f - 0.5f * percentDone)),
                 pos   : tile._tl - ease * Vector2.one,
                 pos2  : tile._br + ease * Vector2.one);

@@ -268,7 +268,6 @@
     <Compile Include="src\Cwaff-Misc\CwaffReticle.cs"/>
     <Compile Include="src\Cwaff-Misc\ModdedShopItemAdder.cs"/>
     <Compile Include="src\Cwaff-Misc\FancyShopBuilder.cs"/>
-    <Compile Include="src\Cwaff-Misc\CwaffLabel.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffGenericNPC.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffItems.cs"/>
     <Compile Include="src\Cwaff-Misc\Geometry.cs"/>
@@ -278,6 +277,7 @@
     <Compile Include="src\Cwaff-Misc\HeckedShrines.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffRunData.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
+    <Compile Include="src\Cwaff-Misc\EasyLabel.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Misc\AtlasHelper.cs"/>

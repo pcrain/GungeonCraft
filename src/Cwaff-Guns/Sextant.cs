@@ -344,7 +344,7 @@ public class Sextant : CwaffGun
             float fadeoutAbs = this._cooldownTimer / this.gun.AdjustedReloadTime;
             foreach (Geometry g in this._shapes)
                 if (g.shape != Geometry.Shape.NONE)
-                  g.Setup(color: g.color.WithAlpha(fadeoutAbs));
+                  g.Place(color: g.color.WithAlpha(fadeoutAbs));
             foreach (dfLabel label in this._labels)
             {
                 label.Opacity = Mathf.Max(label.Opacity - fadeoutDelta, 0f);
@@ -521,7 +521,7 @@ public class Sextant : CwaffGun
 
         // phase 1a: aim angle
         curPhaseCompletion = phaseCompetion[currentPhase++];
-        this._aimAngleArc.Setup(aimColor, pos: barrelPos, radius: AIM_CIRCLE_MAG, angle: baseShotAngle.Clamp360(), arc: 180f * curPhaseCompletion);
+        this._aimAngleArc.Place(aimColor, pos: barrelPos, radius: AIM_CIRCLE_MAG, angle: baseShotAngle.Clamp360(), arc: 180f * curPhaseCompletion);
         this._shotAngleLabel.Text = $"θ={Mathf.RoundToInt(pc.m_currentGunAngle.Clamp180())}°";
         this._shotAngleLabel.Color = aimColor;
         this._shotAngleLabel.Opacity = curPhaseCompletion;
@@ -533,14 +533,14 @@ public class Sextant : CwaffGun
         Vector2 focusPoint = barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG);
         Vector2 leftPoint = barrelPos + (baseShotAngle + 90f).ToVector(AIM_CIRCLE_MAG);
         Vector2 rightPoint = barrelPos + (baseShotAngle - 90f).ToVector(AIM_CIRCLE_MAG);
-        this._leftFocus.Setup(focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, leftPoint, focusCompletion));
-        this._rightFocus.Setup(focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, rightPoint, focusCompletion));
+        this._leftFocus.Place(focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, leftPoint, focusCompletion));
+        this._rightFocus.Place(focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, rightPoint, focusCompletion));
 
         // phase 2: aim spread
         curPhaseCompletion = phaseCompetion[currentPhase++];
         float approxSpread = spread * curPhaseCompletion;
-        this._leftAdjSpread.Setup(spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle - approxSpread).Clamp360());
-        this._rightAdjSpread.Setup(spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle + approxSpread).Clamp360());
+        this._leftAdjSpread.Place(spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle - approxSpread).Clamp360());
+        this._rightAdjSpread.Place(spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle + approxSpread).Clamp360());
         this._spreadLabel.Text = $"±{approxSpread:0.0}°";
         this._spreadLabel.Color = spreadColor;
         this._spreadLabel.Opacity = curPhaseCompletion;
@@ -548,7 +548,7 @@ public class Sextant : CwaffGun
 
         // phase 3: aim distance
         curPhaseCompletion = phaseCompetion[currentPhase++];
-        this._perfectShot.Setup(magColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: baseShotAngle.Clamp360());
+        this._perfectShot.Place(magColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: baseShotAngle.Clamp360());
         this._shotDistanceLabel.Text = $"Δ={Mathf.RoundToInt(C.PIXELS_PER_TILE * distanceToTarget * curPhaseCompletion)}";
         this._shotDistanceLabel.Color = magColor;
         this._shotDistanceLabel.Opacity = curPhaseCompletion;
@@ -559,13 +559,13 @@ public class Sextant : CwaffGun
         {
             curPhaseCompletion = phaseCompetion[currentPhase++];
             float reboundAngle = reboundVector.ToAngle();
-            this._reboundShot.Setup(reboundColor, pos: targetContact, radius: reboundMag * curPhaseCompletion, angle: reboundAngle);
+            this._reboundShot.Place(reboundColor, pos: targetContact, radius: reboundMag * curPhaseCompletion, angle: reboundAngle);
 
             float reboundArcDiameter = Mathf.Min(2f, 0.5f * distanceToTarget);
             float reboundArcRadius = 0.5f * reboundArcDiameter;
             Vector2 reboundArcCenter = targetContact + reboundArcRadius * targetNormal;
             float reboundTheta = 2f * (baseShotAngle + 180f).AbsAngleTo(reboundAngle);
-            this._reboundArc.Setup(reboundColor, pos: reboundArcCenter, radius: reboundArcRadius,
+            this._reboundArc.Place(reboundColor, pos: reboundArcCenter, radius: reboundArcRadius,
               angle: targetNormal.ToAngle(), arc: reboundTheta * curPhaseCompletion);
 
             this._reboundAngleLabel.Text = $"∠{Mathf.RoundToInt(0.5f * reboundTheta * curPhaseCompletion)}°";
@@ -592,10 +592,10 @@ public class Sextant : CwaffGun
             Vector2 bl = center + curPhaseCompletion * (new Vector2(bounds.xMin, bounds.yMin) - center);
             Vector2 tr = center + curPhaseCompletion * (new Vector2(bounds.xMax, bounds.yMax) - center);
             Vector2 br = center + curPhaseCompletion * (new Vector2(bounds.xMax, bounds.yMin) - center);
-            this._topBbox.Setup(bboxColor, pos: tl, pos2: tr);
-            this._bottomBbox.Setup(bboxColor, pos: bl, pos2: br);
-            this._leftBbox.Setup(bboxColor, pos: tl, pos2: bl);
-            this._rightBbox.Setup(bboxColor, pos: tr, pos2: br);
+            this._topBbox.Place(bboxColor, pos: tl, pos2: tr);
+            this._bottomBbox.Place(bboxColor, pos: bl, pos2: br);
+            this._leftBbox.Place(bboxColor, pos: tl, pos2: bl);
+            this._rightBbox.Place(bboxColor, pos: tr, pos2: br);
 
             this._widthLabel.Text = $"w={Mathf.RoundToInt(C.PIXELS_PER_TILE * (tr.x - tl.x))}";
             this._widthLabel.Color = bboxColor;
@@ -615,14 +615,14 @@ public class Sextant : CwaffGun
             Vector2 b = 0.5f * (bl + br);
             float radius = 0.5f * Mathf.Min(r.x - l.x, t.y - b.y);
             float arcLength = 90f * curPhaseCompletion;
-            this._weakPointL.Setup(lockonColor, pos: l, pos2: l + curPhaseCompletion * (center - l));
-            this._weakPointR.Setup(lockonColor, pos: r, pos2: r + curPhaseCompletion * (center - r));
-            this._weakPointT.Setup(lockonColor, pos: t, pos2: t + curPhaseCompletion * (center - t));
-            this._weakPointB.Setup(lockonColor, pos: b, pos2: b + curPhaseCompletion * (center - b));
-            this._weakPointArcR.Setup(lockonColor, pos: center, radius: radius, angle:  45f, arc: arcLength);
-            this._weakPointArcT.Setup(lockonColor, pos: center, radius: radius, angle: 135f, arc: arcLength);
-            this._weakPointArcL.Setup(lockonColor, pos: center, radius: radius, angle: 225f, arc: arcLength);
-            this._weakPointArcB.Setup(lockonColor, pos: center, radius: radius, angle: 315f, arc: arcLength);
+            this._weakPointL.Place(lockonColor, pos: l, pos2: l + curPhaseCompletion * (center - l));
+            this._weakPointR.Place(lockonColor, pos: r, pos2: r + curPhaseCompletion * (center - r));
+            this._weakPointT.Place(lockonColor, pos: t, pos2: t + curPhaseCompletion * (center - t));
+            this._weakPointB.Place(lockonColor, pos: b, pos2: b + curPhaseCompletion * (center - b));
+            this._weakPointArcR.Place(lockonColor, pos: center, radius: radius, angle:  45f, arc: arcLength);
+            this._weakPointArcT.Place(lockonColor, pos: center, radius: radius, angle: 135f, arc: arcLength);
+            this._weakPointArcL.Place(lockonColor, pos: center, radius: radius, angle: 225f, arc: arcLength);
+            this._weakPointArcB.Place(lockonColor, pos: center, radius: radius, angle: 315f, arc: arcLength);
 
             canDoCritThisFrame = (curPhaseCompletion >= 1.0f);
 

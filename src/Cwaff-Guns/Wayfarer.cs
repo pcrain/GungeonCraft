@@ -414,7 +414,7 @@ public class WayfarerProjectile : MonoBehaviour
       float alpha = Mathf.Min(percentDone, 1f - percentDone);
       for (int i = 0; i < 2; ++i)
       {
-        ((i == 0) ? this._pingRing : this._ownerRing).Setup(
+        ((i == 0) ? this._pingRing : this._ownerRing).Place(
           color: (this._autonomous ? Color.red : Color.green).WithAlpha(alpha),
           pos: (i == 0) ? this._projectile.SafeCenter : this._owner.CenterPosition,
           radius: dist, radiusInner: Mathf.Max(0f, dist - RING_THICKNESS));

@@ -54,7 +54,7 @@ public partial class Geometry : MonoBehaviour
     /// <param name="arc">The angle a circle-like shape subtends (used for drawing cones / wedges).</param>
     /// <param name="radiusInner">The inner radius for ring-like shapes.</param>
     /// <param name="useScreenSpace">If true, coordinates are taken to be screen space instead of world space. (0,0) is the bottom-left of the screen, (1,1) is the top-right.</param>
-    public Geometry Setup(Color? color = null, Vector2? pos = null, Vector2? pos2 = null, float? radius = null, float? angle = null, float? arc = null, float? radiusInner = null, bool useScreenSpace = false)
+    public Geometry Place(Color? color = null, Vector2? pos = null, Vector2? pos2 = null, float? radius = null, float? angle = null, float? arc = null, float? radiusInner = null, bool useScreenSpace = false)
     {
         if (useScreenSpace)
         {

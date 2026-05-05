@@ -228,15 +228,15 @@ public class Stereoscope : CwaffGun
 
             if (enemy.specRigidbody is SpeculativeRigidbody body)
             {
-                RentIcon(Geometry.Shape.FILLEDCIRCLE).Setup(
+                RentIcon(Geometry.Shape.FILLEDCIRCLE).Place(
                     color: _FreqColors[resonantFrequency + 6].WithAlpha(alpha),
                     pos: body.UnitBottomCenter + iconOffset, radius: iconRadius,
                     angle: MiddleAngleFromFrequency(resonantFrequency), arc: 30f);
-                RentIcon(Geometry.Shape.FILLEDCIRCLE).Setup(
+                RentIcon(Geometry.Shape.FILLEDCIRCLE).Place(
                     color: Color.white.WithAlpha(alpha),
                     pos: body.UnitBottomCenter + iconOffset, radius: iconRadius,
                     angle: this.PlayerOwner.m_currentGunAngle.Clamp360(), arc: 12f);
-                RentIcon(Geometry.Shape.CIRCLE).Setup(
+                RentIcon(Geometry.Shape.CIRCLE).Place(
                     color: _FreqColors[resonantFrequency + 6].WithAlpha(alpha),
                     pos: body.UnitBottomCenter + iconOffset, radius: iconRadius,
                     angle: MiddleAngleFromFrequency(resonantFrequency), arc: 360f);

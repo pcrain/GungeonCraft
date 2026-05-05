@@ -3667,16 +3667,16 @@ public static class Extensions
       vline.parent = body.gameObject.transform;
     }
     PixelCollider c = body.PrimaryPixelCollider;
-    box.gameObject.GetComponent<Geometry>().Setup(
+    box.gameObject.GetComponent<Geometry>().Place(
       color: color ?? Color.magenta.WithAlpha(0.5f),
       pos: c.UnitTopLeft.Quantize(C.PIXEL_SIZE, VectorConversions.Round),
       pos2: c.UnitBottomRight.Quantize(C.PIXEL_SIZE, VectorConversions.Round));
     Vector2 pos = box.parent.position;
-    hline.gameObject.GetComponent<Geometry>().Setup(
+    hline.gameObject.GetComponent<Geometry>().Place(
       color: color2 ?? Color.cyan.WithAlpha(0.5f),
       pos: pos + Vector2.left,
       pos2: pos + Vector2.right);
-    vline.gameObject.GetComponent<Geometry>().Setup(
+    vline.gameObject.GetComponent<Geometry>().Place(
       color: color2 ?? Color.cyan.WithAlpha(0.5f),
       pos: pos + Vector2.down,
       pos2: pos + Vector2.up);

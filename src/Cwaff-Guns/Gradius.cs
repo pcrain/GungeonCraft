@@ -417,7 +417,7 @@ public class RoundLaser : Projectile
         if (ship)
             base.transform.position = ship.WorldCenter;
         Vector2 pos = base.transform.position;
-        this._laserRing.Setup(color: Color.Lerp(_StartColor, _EndColor, t),
+        this._laserRing.Place(color: Color.Lerp(_StartColor, _EndColor, t),
           pos: pos, radius: r + _THICKNESS, radiusInner: r);
 
         foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(center: pos, radius: r, ignoreWalls: true))
@@ -764,7 +764,7 @@ public class GradiusShip : MonoBehaviour
         {
             if (!this._levelBlips[i])
                 this._levelBlips[i] = Geometry.Create(Geometry.Shape.RING);
-            this._levelBlips[i].Setup(color: _ShipColors[t], pos: basePos + (baseRot * new Vector2(baseOff.x, baseOff.y + 0.125f * i)), radius: 0.03125f, radiusInner: 0f);
+            this._levelBlips[i].Place(color: _ShipColors[t], pos: basePos + (baseRot * new Vector2(baseOff.x, baseOff.y + 0.125f * i)), radius: 0.03125f, radiusInner: 0f);
         }
     }
 

@@ -398,7 +398,7 @@ public class PogoDodgeRoll : CustomDodgeRoll
             radius = MAX_BOUNCE_RADIUS * (1f - (percentLeft * percentLeft));
             target = this._owner.CenterPosition +  radius * (this._owner.unadjustedAimPoint.XY() - this._owner.sprite.WorldCenter).normalized;
             // this._chargeRadius.Setup(Color.blue.WithAlpha(0.1f), pos: this._owner.CenterPosition, radius: radius);
-            this._chargeTarget.Setup(Color.cyan.WithAlpha(0.15f), pos: target, radius: 1f);
+            this._chargeTarget.Place(Color.cyan.WithAlpha(0.15f), pos: target, radius: 1f);
             yield return null;
         }
         this._owner.OnReceivedDamage -= this.OnReceivedDamage;

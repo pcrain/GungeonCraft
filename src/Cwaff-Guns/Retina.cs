@@ -186,11 +186,11 @@ public class RetinaHUD : MonoBehaviour
   {
     this._gun = this.gameObject.GetComponent<Retina>();
 
-    this._base                  = Geom(Geometry.Shape.RECTANGLE).Setup(color: ExtendedColours.vibrantOrange.WithAlpha(0.1f));
-    this._targetInfoRectangle   = Geom(Geometry.Shape.RECTANGLE).Setup(color: ExtendedColours.vibrantOrange.WithAlpha(0.2f));
-    this._healthbarBack         = Geom(Geometry.Shape.RECTANGLE).Setup(color: Color.black);
-    this._healthbarHurt         = Geom(Geometry.Shape.RECTANGLE).Setup(color: Color.green.WithAlpha(0.85f));
-    this._healthbarFore         = Geom(Geometry.Shape.RECTANGLE).Setup(color: Color.red.WithAlpha(0.85f));
+    this._base                  = Geom(Geometry.Shape.RECTANGLE).Place(color: ExtendedColours.vibrantOrange.WithAlpha(0.1f));
+    this._targetInfoRectangle   = Geom(Geometry.Shape.RECTANGLE).Place(color: ExtendedColours.vibrantOrange.WithAlpha(0.2f));
+    this._healthbarBack         = Geom(Geometry.Shape.RECTANGLE).Place(color: Color.black);
+    this._healthbarHurt         = Geom(Geometry.Shape.RECTANGLE).Place(color: Color.green.WithAlpha(0.85f));
+    this._healthbarFore         = Geom(Geometry.Shape.RECTANGLE).Place(color: Color.red.WithAlpha(0.85f));
 
     this._nameHeader            = Lab(color: Color.cyan);
     this._nameLabel             = Lab(color: Color.cyan);
@@ -295,7 +295,7 @@ public class RetinaHUD : MonoBehaviour
     Vector2 pos2 = new Vector2(
       Mathf.Lerp(this._worldBottomLeft.x, this._worldTopRight.x, this._basePos.x + bottomRight.x),
       Mathf.Lerp(this._worldBottomLeft.y, this._worldTopRight.y, this._basePos.y + bottomRight.y));
-    g.Setup(pos: pos, pos2: pos2, color: newColor);
+    g.Place(pos: pos, pos2: pos2, color: newColor);
   }
 
   private void Place(dfLabel d, string text, Vector2 screenPos, Color? newColor = null)
