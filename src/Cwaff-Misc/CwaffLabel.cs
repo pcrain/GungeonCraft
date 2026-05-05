@@ -1,8 +1,9 @@
 namespace CwaffingTheGungy;
 
-public static class CwaffLabel
+/// <summary>Convenience class for easily creating and placing dfLabels in world space.</summary>
+public static class EasyLabel
 {
-  public static dfLabel MakeNewLabel(bool unicode = true, bool outline = false, TextAlignment align = TextAlignment.Center)
+  public static dfLabel Create(bool unicode = true, bool outline = false, TextAlignment align = TextAlignment.Center)
   {
       dfLabel label = UnityEngine.Object.Instantiate(GameUIRoot.Instance.p_needsReloadLabel.gameObject, GameUIRoot.Instance.transform).GetComponent<dfLabel>();
       if (unicode)

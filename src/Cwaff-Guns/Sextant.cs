@@ -138,13 +138,13 @@ public class Sextant : CwaffGun
             if (l)
                 UnityEngine.Object.Destroy(l.gameObject);
         this._labels.Clear();
-        this._labels.Add(this._shotAngleLabel = CwaffLabel.MakeNewLabel());
-        this._labels.Add(this._spreadLabel = CwaffLabel.MakeNewLabel());
-        this._labels.Add(this._shotDistanceLabel = CwaffLabel.MakeNewLabel());
-        this._labels.Add(this._reboundAngleLabel = CwaffLabel.MakeNewLabel());
-        this._labels.Add(this._widthLabel = CwaffLabel.MakeNewLabel());
-        this._labels.Add(this._heightLabel = CwaffLabel.MakeNewLabel());
-        this._labels.Add(this._damageLabel = CwaffLabel.MakeNewLabel());
+        this._labels.Add(this._shotAngleLabel = EasyLabel.Create());
+        this._labels.Add(this._spreadLabel = EasyLabel.Create());
+        this._labels.Add(this._shotDistanceLabel = EasyLabel.Create());
+        this._labels.Add(this._reboundAngleLabel = EasyLabel.Create());
+        this._labels.Add(this._widthLabel = EasyLabel.Create());
+        this._labels.Add(this._heightLabel = EasyLabel.Create());
+        this._labels.Add(this._damageLabel = EasyLabel.Create());
     }
 
     public override void OnSwitchedAwayFromThisGun()

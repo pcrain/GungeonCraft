@@ -244,7 +244,7 @@ public class RetinaHUD : MonoBehaviour
 
   private dfLabel Lab(Color? color = null, TextAlignment align = TextAlignment.Center)
   {
-    dfLabel label = CwaffLabel.MakeNewLabel(unicode: false, outline: false, align: align);
+    dfLabel label = EasyLabel.Create(unicode: false, outline: false, align: align);
     label.Color = color ?? Color.white;
     this._labels.Add(label);
     return label;

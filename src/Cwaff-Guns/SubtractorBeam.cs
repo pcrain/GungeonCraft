@@ -94,12 +94,12 @@ public class SubtractorBeam : CwaffGun
             if (!enemy || !enemy.IsHostile(canBeNeutral: true) || !enemy.sprite)
                 continue;
             if (_PooledNametags.Count == 0)
-                _PooledNametags.AddLast(CwaffLabel.MakeNewLabel(unicode: false, outline: true));
+                _PooledNametags.AddLast(EasyLabel.Create(unicode: false, outline: true));
             LinkedListNode<dfLabel> current = _PooledNametags.Last;
             _PooledNametags.RemoveLast();
             _ActiveNametags.AddLast(current);
             if (current.Value is not dfLabel label)
-                label = current.Value = CwaffLabel.MakeNewLabel(unicode: false, outline: true);
+                label = current.Value = EasyLabel.Create(unicode: false, outline: true);
             label.Text = $"{Mathf.CeilToInt(enemy.healthHaver.currentHealth)}[sprite \"mini_heart_ui\"]";
             label.Place(enemy.sprite.WorldBottomCenter + new Vector2(0, -1f));
         }

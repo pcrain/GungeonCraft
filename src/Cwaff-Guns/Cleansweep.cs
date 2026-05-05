@@ -220,7 +220,7 @@ public class MinesweeperTile : MonoBehaviour
         {
             MinesweeperTile newTile = new GameObject("minesweeper tile").AddComponent<MinesweeperTile>();
             newTile._square         = new GameObject("minesweeper tile square").AddComponent<Geometry>();
-            newTile._numberLabel    = CwaffLabel.MakeNewLabel(unicode: false, outline: false);
+            newTile._numberLabel    = EasyLabel.Create(unicode: false, outline: false);
             newTile._numberLabelT   = newTile._numberLabel.transform;
             node.Value              = newTile;
             // Lazy.DebugLog($"created node number {(++_Counter)}");
