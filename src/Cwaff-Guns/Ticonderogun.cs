@@ -452,6 +452,12 @@ public class Ticonderogun : CwaffGun
         if (this.PlayerOwner.HasSynergy(Synergy.DRAW_FIRE))
             if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.FireDef) is DeadlyDeadlyGoopManager gooper)
                 gooper.AddGoopCircle(pencilPos, 0.75f);
+        if (this.PlayerOwner.HasSynergy(Synergy.TOXIC_LANGUAGE))
+            if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef) is DeadlyDeadlyGoopManager gooper)
+                gooper.AddGoopCircle(pencilPos, 0.75f);
+        if (this.PlayerOwner.HasSynergy(Synergy.PURPLE_PROSE))
+            if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.CharmGoopDef) is DeadlyDeadlyGoopManager gooper)
+                gooper.AddGoopCircle(pencilPos, 0.75f);
 
         // If we have too many points, remove everything and start over
         if (this._extantPoints.Count >= _POINT_CAP)

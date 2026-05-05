@@ -1611,6 +1611,9 @@ public static class Extensions
   /// <summary>Get the player's current curse level</summary>
   public static float Curse(this PlayerController p) => p.stats.GetStatValue(StatType.Curse);
 
+  /// <summary>Get the player's current coolness level</summary>
+  public static float Coolness(this PlayerController p) => p.stats.GetStatValue(StatType.Coolness);
+
   /// <summary>returns true if sprite a overlaps sprite b in the world</summary>
   public static bool Overlaps(this tk2dBaseSprite a, tk2dBaseSprite b)
   {

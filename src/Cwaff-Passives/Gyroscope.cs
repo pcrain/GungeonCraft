@@ -319,7 +319,7 @@ public class GyroscopeRoll : CustomDodgeRoll
         #endregion
 
         #region The Stumble
-            if (chargePercent >= DIZZY_THRES)
+            if (!this._owner.HasSynergy(Synergy.PERFECTLY_BALANCED) && chargePercent >= DIZZY_THRES)
             {
                 this._owner.SetInputOverride("gyrostumble");
                 this._owner.ToggleGunRenderers(false,"gyrostumble");

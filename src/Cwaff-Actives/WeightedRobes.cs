@@ -123,6 +123,8 @@ public class WeightedRobes : CwaffActive, ILabelItem
     {
         if (!this._active)
             return;
+        if (player.HasSynergy(Synergy.GUN_SOHAN))
+          trainingDone *= 3;
         int pid = player.PlayerIDX;
         this._trainingDone[pid] = Mathf.Min(this._trainingDone[pid] + trainingDone, _MAX_TRAINING);
         player.StartCoroutine(DoTraining_CR(player, false));

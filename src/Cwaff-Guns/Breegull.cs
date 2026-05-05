@@ -179,6 +179,11 @@ public class Breegull : CwaffGun
             this.gun.LocalInfiniteAmmo = true;
             this.gun.DefaultModule.ammoCost = 0;
         }
+        else if (this._currentEggType == 2 && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.BAZOOKA_LAYLEE))
+        {
+            this.gun.LocalInfiniteAmmo = false;
+            this.gun.DefaultModule.ammoCost = 2;
+        }
         else
             this.gun.LocalInfiniteAmmo = false;
         if (hadInfiniteAmmo != this.gun.LocalInfiniteAmmo)

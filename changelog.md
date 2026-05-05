@@ -10,6 +10,7 @@
 - Prevented cheating on floor puzzles due to skipping over tiles
 - Fixed player's shadow continuously moving when switching to from Flux Fist
 - Fixed flight not being granted when picking up mastered Flux Fist until switching away from and back to it
+- Added 6 new synergies
 
 ## 1.29.2 (2026-04-27)
 

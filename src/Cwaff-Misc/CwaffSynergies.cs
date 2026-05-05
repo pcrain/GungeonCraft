@@ -161,6 +161,18 @@ public static class CwaffSynergies
         NewSynergy(BULLETPROOF_GLASS, "Bulletproof Glass", new[]{IName(GlassAmmoBox.ItemName), "glass_cannon"});
         // Unopened chests drop 10-50 casings when destroyed, depending on their quality
         NewSynergy(CHEST_BATTLE_ADVANCED, "Chest Battle Advanced", new[]{IName(Grandmaster.ItemName), "book_of_chest_anatomy"});
+        // Ticonderogun leaves poison goop along drawn lines.
+        NewSynergy(TOXIC_LANGUAGE, "Toxic Language", new[]{IName(Ticonderogun.ItemName), "irradiated_lead"});
+        // Ticonderogun leaves charm goop along drawn lines.
+        NewSynergy(PURPLE_PROSE, "Purple Prose", new[]{IName(Ticonderogun.ItemName), "charming_rounds"});
+        // Gyroscope charges no longer cause dizziness.
+        NewSynergy(PERFECTLY_BALANCED, "Perfectly Balanced", new[]{IName(Gyroscope.ItemName), IName(KalibersJustice.ItemName)});
+        // Chain Driver does 10% more damage for every point of coolness the player has.
+        NewSynergy(CHAIN_SMOKER, "Chain Smoker", new[]{IName(ChainDriver.ItemName), "cigarettes"});
+        // Grenade eggs cost 2 ammo to fire instead of 5.
+        NewSynergy(BAZOOKA_LAYLEE, "Bazooka Laylee", new[]{IName(Breegull.ItemName), "com4nd0"});
+        // Training level is increased by triple the normal amount when Weight Robes' training is active.
+        NewSynergy(GUN_SOHAN, "Gun Sohan", new[]{IName(WeightedRobes.ItemName), IName(WarriorsGi.ItemName)});
 
       #endregion
 
@@ -728,6 +740,12 @@ public enum Synergy {
     SUNKEN_EYE,
     BULLETPROOF_GLASS,
     CHEST_BATTLE_ADVANCED,
+    TOXIC_LANGUAGE,
+    PURPLE_PROSE,
+    PERFECTLY_BALANCED,
+    CHAIN_SMOKER,
+    BAZOOKA_LAYLEE,
+    GUN_SOHAN,
 
     // Masteries
     MASTERY_GRANDMASTER,
