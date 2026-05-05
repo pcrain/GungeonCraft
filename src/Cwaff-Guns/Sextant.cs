@@ -143,7 +143,7 @@ public class Sextant : CwaffGun
         this._labels.Add(this._shotDistanceLabel = EasyLabel.Create());
         this._labels.Add(this._reboundAngleLabel = EasyLabel.Create());
         this._labels.Add(this._widthLabel = EasyLabel.Create());
-        this._labels.Add(this._heightLabel = EasyLabel.Create());
+        this._labels.Add(this._heightLabel = EasyLabel.Create(align: TextAlignment.Left));
         this._labels.Add(this._damageLabel = EasyLabel.Create());
     }
 
@@ -609,7 +609,7 @@ public class Sextant : CwaffGun
             this._heightLabel.Text = $"h={Mathf.RoundToInt(C.PIXELS_PER_TILE * (tr.y - br.y))}";
             this._heightLabel.Color = bboxColor;
             this._heightLabel.Opacity = curPhaseCompletion;
-            this._heightLabel.Place(0.5f * (tr + br) + new Vector2(0.25f, 0.0f), 0f, align: TextAlignment.Left);
+            this._heightLabel.Place(0.5f * (tr + br) + new Vector2(0.25f, 0.0f), 0f);
 
             // phase 6: weak point
             curPhaseCompletion = phaseCompetion[currentPhase++];

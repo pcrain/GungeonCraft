@@ -38,7 +38,7 @@ public static class EasyLabel
       return label;
   }
 
-  public static void Place(this dfLabel label, Vector2 pos, float rot = 0f, TextAlignment? align = null)
+  public static void Place(this dfLabel label, Vector2 pos, float rot = 0f)
   {
       rot = BraveMathCollege.ClampAngle180(rot);
       Vector2 finalPos = pos;
@@ -59,16 +59,6 @@ public static class EasyLabel
           GameManager.Instance.MainCameraController.Camera,
           GameUIRoot.Instance.m_manager.RenderCamera).WithZ(0f).QuantizeFloor(adj);
       label.transform.localRotation = Quaternion.Euler(0f, 0f, rot);
-      if (align.HasValue)
-      {
-        TextAlignment alignment = label.TextAlignment = align.Value;
-        if (alignment == TextAlignment.Left)
-          label.Pivot = dfPivotPoint.MiddleLeft;
-        else if (alignment == TextAlignment.Right)
-          label.Pivot = dfPivotPoint.MiddleRight;
-        else
-          label.Pivot = dfPivotPoint.MiddleCenter;
-      }
       label.IsVisible = true;
       LabelExt le = label.gameObject.GetComponent<LabelExt>();
       le.lastPos = pos;
