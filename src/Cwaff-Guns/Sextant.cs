@@ -347,7 +347,8 @@ public class Sextant : CwaffGun
             float fadeoutDelta = adjustedDtime / this.gun.AdjustedReloadTime;
             float fadeoutAbs = this._cooldownTimer / this.gun.AdjustedReloadTime;
             foreach (Geometry g in this._shapes)
-                g.Setup(color: g.color.WithAlpha(fadeoutAbs));
+                if (g.shape != Geometry.Shape.NONE)
+                  g.Setup(color: g.color.WithAlpha(fadeoutAbs));
             foreach (dfLabel label in this._labels)
             {
                 label.Opacity = Mathf.Max(label.Opacity - fadeoutDelta, 0f);

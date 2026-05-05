@@ -40,25 +40,25 @@ public static class EasyLabel
 
   public static void Place(this dfLabel label, Vector2 pos, float rot = 0f, TextAlignment? align = null)
   {
-      rot = rot.Clamp180();
+      rot = BraveMathCollege.ClampAngle180(rot);
       Vector2 finalPos = pos;
       float uiScale = Pixelator.Instance.ScaleTileScale / Pixelator.Instance.CurrentTileScale; // 1.33, usually
       float adj = label.PixelsToUnits() / uiScale; // PixelsToUnits() == 1 / 303.75 == 16/9 * 2/1080
       if (Mathf.Abs(rot) > 90f)
       {
           float fontSizeToPixels = uiScale / C.PIXELS_PER_CELL;
-          rot = (rot + 180f).Clamp180();
+          rot = BraveMathCollege.ClampAngle180(rot + 180f);
           //NOTE: need to adjust position of bottom-aligned text
           //HACK: 0.5 seems to be the magic number for this font size here, idk how to arrive at this answer computationally though...
           //NOTE: label.Font.LineHeight == 40, label.TextScale == 0.6, label.Size.Y == 24, label.PixelsToUnits() == (1 / 303.75)
           //NOTE: df magic pixel scale = 1 / 64 == 1 / C.PIXELS_PER_CELL
-          finalPos += (rot - 90f).ToVector(label.Size.y * fontSizeToPixels);  //WARN: guessing at the math here...
+          finalPos += BraveMathCollege.DegreesToVector(rot - 90f, label.Size.y * fontSizeToPixels);  //WARN: guessing at the math here...
       }
       label.transform.position = dfFollowObject.ConvertWorldSpaces(
           finalPos,
           GameManager.Instance.MainCameraController.Camera,
           GameUIRoot.Instance.m_manager.RenderCamera).WithZ(0f).QuantizeFloor(adj);
-      label.transform.localRotation = rot.EulerZ();
+      label.transform.localRotation = Quaternion.Euler(0f, 0f, rot);
       if (align.HasValue)
       {
         TextAlignment alignment = label.TextAlignment = align.Value;

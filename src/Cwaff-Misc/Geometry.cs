@@ -15,6 +15,7 @@ public partial class Geometry : MonoBehaviour
         RECTANGLE,
     }
 
+    public Shape shape       { get; private set; } = Shape.NONE;
     public Color color       { get; private set; } = default;
     public Vector2 pos       { get; private set; } = default;
     public float radius      { get; private set; } = 1f;
@@ -33,20 +34,20 @@ public partial class Geometry : MonoBehaviour
     /// <param name="radiusInner">The inner radius for ring-like shapes.</param>
     public Geometry Setup(Shape shape = Shape.NONE, Color? color = null, Vector2? pos = null, Vector2? pos2 = null, float? radius = null, float? angle = null, float? arc = null, float? radiusInner = null)
     {
-        if (this._shape == Shape.NONE && shape == Shape.NONE)
+        if (this.shape == Shape.NONE && shape == Shape.NONE)
         {
             // Lazy.DebugLog($"must set shape of mesh!");
             UnityEngine.Debug.LogError($"must set shape of mesh!");
             return this;
         }
-        if (this._shape != Shape.NONE && shape != Shape.NONE && this._shape != shape)
+        if (this.shape != Shape.NONE && shape != Shape.NONE && this.shape != shape)
         {
             // Lazy.DebugLog($"can't change shape of mesh!");
             UnityEngine.Debug.LogError($"can't change shape of mesh!");
             return this;
         }
         if (shape != Shape.NONE)
-          this._shape = shape;
+          this.shape = shape;
         if (!this._didSetup)
             CreateMesh();
 
@@ -99,7 +100,6 @@ public partial class Geometry : MonoBehaviour
     private GameObject _meshObject = null;
     private Mesh _mesh = null;
     private Vector3[] _vertices = null;
-    private Shape _shape = Shape.NONE;
     private MeshRenderer _meshRenderer = null;
 
     private void Awake()
@@ -113,7 +113,7 @@ public partial class Geometry : MonoBehaviour
 
     private void CreateMesh()
     {
-        switch (this._shape)
+        switch (this.shape)
         {
             case Shape.FILLEDCIRCLE:
                 this._vertices = new Vector3[_CIRCLE_SEGMENTS + 2];
@@ -193,7 +193,7 @@ public partial class Geometry : MonoBehaviour
     private void RebuildMeshes()
     {
         Vector3 basePos = this.pos;
-        switch (this._shape)
+        switch (this.shape)
         {
             case Shape.FILLEDCIRCLE:
                 this._vertices[0] = basePos;
@@ -243,7 +243,7 @@ public partial class Geometry : MonoBehaviour
         }
         this._mesh.vertices = this._vertices; // necessary to actually trigger an update for some reason
         this._mesh.RecalculateBounds();
-        if (this._shape == Shape.FILLEDCIRCLE)
+        if (this.shape == Shape.FILLEDCIRCLE)
             this._mesh.RecalculateNormals();
     }
 
