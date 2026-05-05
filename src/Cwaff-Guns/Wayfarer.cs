@@ -420,7 +420,7 @@ public class WayfarerProjectile : MonoBehaviour
           radius: dist, radiusInner: Mathf.Max(0f, dist - RING_THICKNESS));
         if (this._autonomous)
         {
-          this._ownerRing._meshRenderer.enabled = false;
+          this._ownerRing.Disable();
           break;
         }
       }

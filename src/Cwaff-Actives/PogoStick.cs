@@ -533,8 +533,8 @@ public class PogoDodgeRoll : CustomDodgeRoll
         this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreCollisions);
         this._owner.ownerlessStatModifiers.TryRemove(this._noSpeed);
         this._owner.stats.RecalculateStats(this._owner);
-        this._chargeRadius._meshRenderer.enabled = false;
-        this._chargeTarget._meshRenderer.enabled = false;
+        this._chargeRadius.Disable();
+        this._chargeTarget.Disable();
         this._state = State.INACTIVE;
     }
 

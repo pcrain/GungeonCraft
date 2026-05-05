@@ -749,7 +749,7 @@ public class GradiusShip : MonoBehaviour
             for (int i = 0; i < Gradius._MAX_SHIP_LEVEL; ++i)
             {
                 if (this._levelBlips[i])
-                    this._levelBlips[i]._meshRenderer.enabled = false;
+                    this._levelBlips[i].Disable();
             }
             return;
         }

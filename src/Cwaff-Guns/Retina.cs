@@ -479,9 +479,9 @@ public class RetinaHUD : MonoBehaviour
     }
     else
     {
-      this._healthbarBack._meshRenderer.enabled = false;
-      this._healthbarHurt._meshRenderer.enabled = false;
-      this._healthbarFore._meshRenderer.enabled = false;
+      this._healthbarBack.Disable();
+      this._healthbarHurt.Disable();
+      this._healthbarFore.Disable();
     }
 
     // handle additional target renders
@@ -563,7 +563,7 @@ public class RetinaHUD : MonoBehaviour
 
     foreach (Geometry g in this._geometry)
       if (g)
-          g._meshRenderer.enabled = false;
+          g.Disable();
 
     foreach (dfLabel label in this._labels)
     {

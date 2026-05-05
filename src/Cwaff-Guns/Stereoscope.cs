@@ -96,7 +96,7 @@ public class Stereoscope : CwaffGun
                 _ActiveIcons[i].RemoveLast();
                 if (current.Value is not Geometry g)
                     continue;
-                g._meshRenderer.enabled = false;
+                g.Disable();
                 _PooledIcons[i].AddLast(current);
             }
     }

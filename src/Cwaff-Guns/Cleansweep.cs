@@ -239,8 +239,8 @@ public class MinesweeperTile : MonoBehaviour
             this._numberLabel.IsVisible = false;
             this._numberLabel.Opacity = 0.0f;
         }
-        if (this._square && this._square._meshRenderer)
-          this._square._meshRenderer.enabled = false;
+        if (this._square)
+          this._square.Disable();
         LinkedListNode<MinesweeperTile> node = _ActiveTiles.Last;
         _ActiveTiles.RemoveLast();
         node.Value = this;

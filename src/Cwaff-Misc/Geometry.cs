@@ -1,8 +1,9 @@
 namespace CwaffingTheGungy;
 
-/// <summary>Class for drawing various custom geometry meshes </summary>
-public class Geometry : MonoBehaviour
+/// <summary>Public API for drawing various custom geometry meshes.</summary>
+public partial class Geometry : MonoBehaviour
 {
+    /// <summary>Shapes we're capable of drawing</summary>
     public enum Shape
     {
         NONE,
@@ -14,28 +15,97 @@ public class Geometry : MonoBehaviour
         RECTANGLE,
     }
 
-    public Color color = default;
-    public Vector2 pos = default;
-    public float radius = 1f;
-    public float radiusInner = 0.5f;
-    public float angle = 0f;
-    public float arc = 360f;
+    public Color color       { get; private set; } = default;
+    public Vector2 pos       { get; private set; } = default;
+    public float radius      { get; private set; } = 1f;
+    public float radiusInner { get; private set; } = 0.5f;
+    public float angle       { get; private set; } = 0f;
+    public float arc         { get; private set; } = 360f;
 
+    /// <summary>Sets up and enables the renderer for this Geometry in world coordinates.</summary>
+    /// <param name="shape">The shape of the geometry to render. Cannot be changed after initial Setup().</param>
+    /// <param name="color">The color of the geometry to render.</param>
+    /// <param name="pos">The origin of the geometry. Corresponds to the center for circle-like shapes, a corner for rectangle-like shapes, and an endpoint for line-like shapes.</param>
+    /// <param name="pos2">A second point uniquely definining the geometry. Corresponds to a point on the perimeter for circle-like shapes, the corner opposite of the origin for rectangle-like shapes, and a second endpoint for line-like shapes.</param>
+    /// <param name="radius">The radius for circle-like shapes.</param>
+    /// <param name="angle">The angle for circle-like shapes (only meaningful when arc is less than 360 degrees).</param>
+    /// <param name="arc">The angle a circle-like shape subtends (used for drawing cones / wedges).</param>
+    /// <param name="radiusInner">The inner radius for ring-like shapes.</param>
+    public Geometry Setup(Shape shape = Shape.NONE, Color? color = null, Vector2? pos = null, Vector2? pos2 = null, float? radius = null, float? angle = null, float? arc = null, float? radiusInner = null)
+    {
+        if (this._shape == Shape.NONE && shape == Shape.NONE)
+        {
+            // Lazy.DebugLog($"must set shape of mesh!");
+            UnityEngine.Debug.LogError($"must set shape of mesh!");
+            return this;
+        }
+        if (this._shape != Shape.NONE && shape != Shape.NONE && this._shape != shape)
+        {
+            // Lazy.DebugLog($"can't change shape of mesh!");
+            UnityEngine.Debug.LogError($"can't change shape of mesh!");
+            return this;
+        }
+        if (shape != Shape.NONE)
+          this._shape = shape;
+        if (!this._didSetup)
+            CreateMesh();
+
+        this.color  = color  ?? this.color;
+        this.pos    = pos    ?? this.pos;
+        if (pos2.HasValue)
+        {
+            Vector2 delta = pos2.Value - this.pos;
+            this.radius   = delta.magnitude;
+            this.angle    = delta.ToAngle();
+            this.arc      = arc    ?? this.arc;
+        }
+        else
+        {
+            this.radius = radius ?? this.radius;
+            this.angle  = angle  ?? this.angle;
+            this.arc    = arc    ?? this.arc;
+            this.radiusInner = radiusInner ?? this.radiusInner;
+        }
+        if (color.HasValue)
+            this._meshRenderer.material.SetColor(_OverrideColorId, this.color);
+        if (!this._didSetup || pos.HasValue || pos2.HasValue || radius.HasValue || radiusInner.HasValue)
+            RebuildMeshes();
+        this._didSetup = true;
+        this._meshRenderer.enabled = true;
+        return this;
+    }
+
+    /// <summary>Disables the renderer for this Geometry. Can be re-enabled by calling Setup() with no arguments.</summary>
+    public Geometry Disable()
+    {
+      if (this._meshRenderer)
+        this._meshRenderer.enabled = false;
+      return this;
+    }
+}
+
+// Private API
+public partial class Geometry : MonoBehaviour
+{
     private const int _CIRCLE_SEGMENTS = 100;
     private const int _MAX_LINE_SEGMENTS = 100;
     private const int _MAX_LINE_VERTICES = _MAX_LINE_SEGMENTS * 2;
     private const float _MIN_SEG_LEN = 0.2f;
 
-    internal MeshRenderer _meshRenderer = null;
+    private static readonly Vector2 _WayOffscreen = new Vector2(100000f, 100000f);
+    private static readonly int _OverrideColorId = Shader.PropertyToID("_OverrideColor");
 
     private bool _didSetup = false;
-    private GameObject _meshObject = new GameObject("debug_circle", typeof(MeshFilter), typeof(MeshRenderer));
-    private Mesh _mesh = new();
-    private Vector3[] _vertices;
+    private GameObject _meshObject = null;
+    private Mesh _mesh = null;
+    private Vector3[] _vertices = null;
     private Shape _shape = Shape.NONE;
+    private MeshRenderer _meshRenderer = null;
 
     private void Awake()
     {
+        this._mesh = new Mesh();
+        this._meshObject = new GameObject("debug_circle", typeof(MeshFilter), typeof(MeshRenderer));
         this._meshObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
         this._meshObject.GetComponent<MeshFilter>().mesh = this._mesh;
         this._meshRenderer = this._meshObject.GetComponent<MeshRenderer>();
@@ -117,11 +187,9 @@ public class Geometry : MonoBehaviour
 
         Material mat = this._meshRenderer.material = BraveResources.Load("Global VFX/WhiteMaterial", ".mat") as Material;
         mat.shader = ShaderCache.Acquire("tk2d/BlendVertexColorAlphaTintableTilted");
-        mat.SetColor(CwaffVFX._OverrideColorId, this.color);
+        mat.SetColor(_OverrideColorId, this.color);
     }
 
-    // private static bool _PrintVertices = true;
-    private static readonly Vector2 _WayOffscreen = new Vector2(1000f, 1000f);
     private void RebuildMeshes()
     {
         Vector3 basePos = this.pos;
@@ -177,48 +245,6 @@ public class Geometry : MonoBehaviour
         this._mesh.RecalculateBounds();
         if (this._shape == Shape.FILLEDCIRCLE)
             this._mesh.RecalculateNormals();
-    }
-
-    public Geometry Setup(Shape shape = Shape.NONE, Color? color = null, Vector2? pos = null, float? radius = null, float? angle = null, float? arc = null, Vector2? pos2 = null, float? radiusInner = null)
-    {
-        if (this._shape == Shape.NONE && shape == Shape.NONE)
-        {
-            Lazy.DebugLog($"must set shape of mesh!");
-            return this;
-        }
-        if (this._shape != Shape.NONE && shape != Shape.NONE && this._shape != shape)
-        {
-            Lazy.DebugLog($"can't change shape of mesh!");
-            return this;
-        }
-        if (shape != Shape.NONE)
-          this._shape = shape;
-        if (!this._didSetup)
-            CreateMesh();
-
-        this.color  = color  ?? this.color;
-        this.pos    = pos    ?? this.pos;
-        if (pos2.HasValue)
-        {
-            Vector2 delta = pos2.Value - this.pos;
-            this.radius   = delta.magnitude;
-            this.angle    = delta.ToAngle();
-            this.arc      = arc    ?? this.arc;
-        }
-        else
-        {
-            this.radius = radius ?? this.radius;
-            this.angle  = angle  ?? this.angle;
-            this.arc    = arc    ?? this.arc;
-            this.radiusInner = radiusInner ?? this.radiusInner;
-        }
-        if (color.HasValue)
-            this._meshRenderer.material.SetColor(CwaffVFX._OverrideColorId, this.color);
-        if (!this._didSetup || pos.HasValue || pos2.HasValue || radius.HasValue || radiusInner.HasValue)
-            RebuildMeshes();
-        this._didSetup = true;
-        this._meshRenderer.enabled = true;
-        return this;
     }
 
     private void OnDestroy()

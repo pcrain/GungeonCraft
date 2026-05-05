@@ -244,7 +244,7 @@ public class Sextant : CwaffGun
     {
         foreach (Geometry g in this._shapes)
             if (g)
-                g._meshRenderer.enabled = false;
+                g.Disable();
         foreach (dfLabel label in this._labels)
         {
             if (!label)
@@ -347,7 +347,7 @@ public class Sextant : CwaffGun
             float fadeoutDelta = adjustedDtime / this.gun.AdjustedReloadTime;
             float fadeoutAbs = this._cooldownTimer / this.gun.AdjustedReloadTime;
             foreach (Geometry g in this._shapes)
-                g._meshRenderer.material.SetColor(CwaffVFX._OverrideColorId, g.color.WithAlpha(fadeoutAbs));
+                g.Setup(color: g.color.WithAlpha(fadeoutAbs));
             foreach (dfLabel label in this._labels)
             {
                 label.Opacity = Mathf.Max(label.Opacity - fadeoutDelta, 0f);
@@ -578,8 +578,8 @@ public class Sextant : CwaffGun
         }
         else
         {
-            this._reboundShot._meshRenderer.enabled = false;
-            this._reboundArc._meshRenderer.enabled = false;
+            this._reboundShot.Disable();
+            this._reboundArc.Disable();
             this._reboundAngleLabel.IsVisible = false;
         }
 
@@ -643,18 +643,18 @@ public class Sextant : CwaffGun
         }
         else
         {
-            this._topBbox._meshRenderer.enabled = false;
-            this._bottomBbox._meshRenderer.enabled = false;
-            this._leftBbox._meshRenderer.enabled = false;
-            this._rightBbox._meshRenderer.enabled = false;
-            this._weakPointL._meshRenderer.enabled = false;
-            this._weakPointR._meshRenderer.enabled = false;
-            this._weakPointT._meshRenderer.enabled = false;
-            this._weakPointB._meshRenderer.enabled = false;
-            this._weakPointArcL._meshRenderer.enabled = false;
-            this._weakPointArcR._meshRenderer.enabled = false;
-            this._weakPointArcT._meshRenderer.enabled = false;
-            this._weakPointArcB._meshRenderer.enabled = false;
+            this._topBbox.Disable();
+            this._bottomBbox.Disable();
+            this._leftBbox.Disable();
+            this._rightBbox.Disable();
+            this._weakPointL.Disable();
+            this._weakPointR.Disable();
+            this._weakPointT.Disable();
+            this._weakPointB.Disable();
+            this._weakPointArcL.Disable();
+            this._weakPointArcR.Disable();
+            this._weakPointArcT.Disable();
+            this._weakPointArcB.Disable();
             this._widthLabel.IsVisible = false;
             this._heightLabel.IsVisible = false;
             this._damageLabel.IsVisible = false;
