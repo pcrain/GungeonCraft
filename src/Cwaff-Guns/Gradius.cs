@@ -395,7 +395,7 @@ public class RoundLaser : Projectile
 
         base.damageTypes &= (~CoreDamageTypes.Electric); // remove robot's electric damage type from the projectile
 
-        this._laserRing = new GameObject().AddComponent<Geometry>();
+        this._laserRing = Geometry.Create(Geometry.Shape.RING);
     }
 
     public override void Move()
@@ -417,7 +417,7 @@ public class RoundLaser : Projectile
         if (ship)
             base.transform.position = ship.WorldCenter;
         Vector2 pos = base.transform.position;
-        this._laserRing.Setup(shape: Geometry.Shape.RING, color: Color.Lerp(_StartColor, _EndColor, t),
+        this._laserRing.Setup(color: Color.Lerp(_StartColor, _EndColor, t),
           pos: pos, radius: r + _THICKNESS, radiusInner: r);
 
         foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(center: pos, radius: r, ignoreWalls: true))
@@ -759,17 +759,12 @@ public class GradiusShip : MonoBehaviour
         Vector3 basePos = base.transform.position;
         Quaternion baseRot = base.transform.localRotation;
 
-        // if (!this._levelBlips[0])
-        //     this._levelBlips[0] = new GameObject().AddComponent<Geometry>();
-        // this._levelBlips[0].Setup(shape: Geometry.Shape.CIRCLE, color: _ShipColors[t], pos: this._sprite ? this._sprite.WorldCenter : basePos,
-        //   radius: 0.625f, radiusInner: 0.5f, arc: 90f * (level - 1), angle: baseRot.eulerAngles.z + 180f);
-
         Vector3 baseOff = new Vector3(0.5625f, -0.25f, 0f);
         for (int i = 0; i < level; ++i)
         {
             if (!this._levelBlips[i])
-                this._levelBlips[i] = new GameObject().AddComponent<Geometry>();
-            this._levelBlips[i].Setup(shape: Geometry.Shape.RING, color: _ShipColors[t], pos: basePos + (baseRot * new Vector2(baseOff.x, baseOff.y + 0.125f * i)), radius: 0.03125f, radiusInner: 0f);
+                this._levelBlips[i] = Geometry.Create(Geometry.Shape.RING);
+            this._levelBlips[i].Setup(color: _ShipColors[t], pos: basePos + (baseRot * new Vector2(baseOff.x, baseOff.y + 0.125f * i)), radius: 0.03125f, radiusInner: 0f);
         }
     }
 

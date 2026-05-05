@@ -3650,33 +3650,33 @@ public static class Extensions
     const string VLINENAME = "debug hitbox vline";
     if (body.gameObject.transform.Find(BOXNAME) is not Transform box)
     {
-      box = new GameObject(BOXNAME, typeof(Geometry)).transform;
+      box = Geometry.Create(Geometry.Shape.RECTANGLE).gameObject.transform;
+      box.gameObject.name = BOXNAME;
       box.parent = body.gameObject.transform;
     }
     if (body.gameObject.transform.Find(HLINENAME) is not Transform hline)
     {
-      hline = new GameObject(HLINENAME, typeof(Geometry)).transform;
+      hline = Geometry.Create(Geometry.Shape.LINE).gameObject.transform;
+      hline.gameObject.name = HLINENAME;
       hline.parent = body.gameObject.transform;
     }
     if (body.gameObject.transform.Find(VLINENAME) is not Transform vline)
     {
-      vline = new GameObject(VLINENAME, typeof(Geometry)).transform;
+      vline = Geometry.Create(Geometry.Shape.LINE).gameObject.transform;
+      vline.gameObject.name = VLINENAME;
       vline.parent = body.gameObject.transform;
     }
     PixelCollider c = body.PrimaryPixelCollider;
     box.gameObject.GetComponent<Geometry>().Setup(
-      shape: Geometry.Shape.RECTANGLE,
       color: color ?? Color.magenta.WithAlpha(0.5f),
       pos: c.UnitTopLeft.Quantize(C.PIXEL_SIZE, VectorConversions.Round),
       pos2: c.UnitBottomRight.Quantize(C.PIXEL_SIZE, VectorConversions.Round));
     Vector2 pos = box.parent.position;
     hline.gameObject.GetComponent<Geometry>().Setup(
-      shape: Geometry.Shape.LINE,
       color: color2 ?? Color.cyan.WithAlpha(0.5f),
       pos: pos + Vector2.left,
       pos2: pos + Vector2.right);
     vline.gameObject.GetComponent<Geometry>().Setup(
-      shape: Geometry.Shape.LINE,
       color: color2 ?? Color.cyan.WithAlpha(0.5f),
       pos: pos + Vector2.down,
       pos2: pos + Vector2.up);

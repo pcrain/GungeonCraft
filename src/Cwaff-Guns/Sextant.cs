@@ -28,8 +28,6 @@ public class Sextant : CwaffGun
     private Geometry _perfectShot       = null;
     private Geometry _reboundShot       = null;
     private Geometry _reboundArc        = null;
-    private Geometry _leftBaseSpread    = null;
-    private Geometry _rightBaseSpread   = null;
     private Geometry _leftFocus         = null;
     private Geometry _rightFocus        = null;
     private Geometry _leftAdjSpread     = null;
@@ -108,28 +106,26 @@ public class Sextant : CwaffGun
             if (g)
                 UnityEngine.Object.Destroy(g.gameObject);
         this._shapes.Clear();
-        this._shapes.Add(this._perfectShot = MakeNewGeometry());
-        this._shapes.Add(this._reboundShot = MakeNewGeometry());
-        this._shapes.Add(this._reboundArc = MakeNewGeometry());
-        this._shapes.Add(this._leftBaseSpread = MakeNewGeometry());
-        this._shapes.Add(this._rightBaseSpread = MakeNewGeometry());
-        this._shapes.Add(this._leftFocus = MakeNewGeometry());
-        this._shapes.Add(this._rightFocus = MakeNewGeometry());
-        this._shapes.Add(this._leftAdjSpread = MakeNewGeometry());
-        this._shapes.Add(this._rightAdjSpread = MakeNewGeometry());
-        this._shapes.Add(this._aimAngleArc = MakeNewGeometry());
-        this._shapes.Add(this._topBbox = MakeNewGeometry());
-        this._shapes.Add(this._bottomBbox = MakeNewGeometry());
-        this._shapes.Add(this._leftBbox = MakeNewGeometry());
-        this._shapes.Add(this._rightBbox = MakeNewGeometry());
-        this._shapes.Add(this._weakPointL = MakeNewGeometry());
-        this._shapes.Add(this._weakPointR = MakeNewGeometry());
-        this._shapes.Add(this._weakPointT = MakeNewGeometry());
-        this._shapes.Add(this._weakPointB = MakeNewGeometry());
-        this._shapes.Add(this._weakPointArcL = MakeNewGeometry());
-        this._shapes.Add(this._weakPointArcR = MakeNewGeometry());
-        this._shapes.Add(this._weakPointArcT = MakeNewGeometry());
-        this._shapes.Add(this._weakPointArcB = MakeNewGeometry());
+        this._shapes.Add(this._perfectShot = Geometry.Create(Geometry.Shape.LINE));
+        this._shapes.Add(this._reboundShot = Geometry.Create(Geometry.Shape.LINE));
+        this._shapes.Add(this._reboundArc = Geometry.Create(Geometry.Shape.CIRCLE));
+        this._shapes.Add(this._leftFocus = Geometry.Create(Geometry.Shape.LINE));
+        this._shapes.Add(this._rightFocus = Geometry.Create(Geometry.Shape.LINE));
+        this._shapes.Add(this._leftAdjSpread = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._rightAdjSpread = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._aimAngleArc = Geometry.Create(Geometry.Shape.CIRCLE));
+        this._shapes.Add(this._topBbox = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._bottomBbox = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._leftBbox = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._rightBbox = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._weakPointL = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._weakPointR = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._weakPointT = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._weakPointB = Geometry.Create(Geometry.Shape.DASHEDLINE));
+        this._shapes.Add(this._weakPointArcL = Geometry.Create(Geometry.Shape.CIRCLE));
+        this._shapes.Add(this._weakPointArcR = Geometry.Create(Geometry.Shape.CIRCLE));
+        this._shapes.Add(this._weakPointArcT = Geometry.Create(Geometry.Shape.CIRCLE));
+        this._shapes.Add(this._weakPointArcB = Geometry.Create(Geometry.Shape.CIRCLE));
     }
 
     private void RegenerateLabels()
@@ -525,7 +521,7 @@ public class Sextant : CwaffGun
 
         // phase 1a: aim angle
         curPhaseCompletion = phaseCompetion[currentPhase++];
-        this._aimAngleArc.Setup(Geometry.Shape.CIRCLE, aimColor, pos: barrelPos, radius: AIM_CIRCLE_MAG, angle: baseShotAngle.Clamp360(), arc: 180f * curPhaseCompletion);
+        this._aimAngleArc.Setup(aimColor, pos: barrelPos, radius: AIM_CIRCLE_MAG, angle: baseShotAngle.Clamp360(), arc: 180f * curPhaseCompletion);
         this._shotAngleLabel.Text = $"θ={Mathf.RoundToInt(pc.m_currentGunAngle.Clamp180())}°";
         this._shotAngleLabel.Color = aimColor;
         this._shotAngleLabel.Opacity = curPhaseCompletion;
@@ -537,14 +533,14 @@ public class Sextant : CwaffGun
         Vector2 focusPoint = barrelPos + baseShotAngle.ToVector(AIM_CIRCLE_MAG);
         Vector2 leftPoint = barrelPos + (baseShotAngle + 90f).ToVector(AIM_CIRCLE_MAG);
         Vector2 rightPoint = barrelPos + (baseShotAngle - 90f).ToVector(AIM_CIRCLE_MAG);
-        this._leftFocus.Setup(Geometry.Shape.LINE, focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, leftPoint, focusCompletion));
-        this._rightFocus.Setup(Geometry.Shape.LINE, focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, rightPoint, focusCompletion));
+        this._leftFocus.Setup(focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, leftPoint, focusCompletion));
+        this._rightFocus.Setup(focusColor, pos: focusPoint, pos2: Vector2.Lerp(focusPoint, rightPoint, focusCompletion));
 
         // phase 2: aim spread
         curPhaseCompletion = phaseCompetion[currentPhase++];
         float approxSpread = spread * curPhaseCompletion;
-        this._leftAdjSpread.Setup(Geometry.Shape.DASHEDLINE, spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle - approxSpread).Clamp360());
-        this._rightAdjSpread.Setup(Geometry.Shape.DASHEDLINE, spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle + approxSpread).Clamp360());
+        this._leftAdjSpread.Setup(spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle - approxSpread).Clamp360());
+        this._rightAdjSpread.Setup(spreadColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: (baseShotAngle + approxSpread).Clamp360());
         this._spreadLabel.Text = $"±{approxSpread:0.0}°";
         this._spreadLabel.Color = spreadColor;
         this._spreadLabel.Opacity = curPhaseCompletion;
@@ -552,7 +548,7 @@ public class Sextant : CwaffGun
 
         // phase 3: aim distance
         curPhaseCompletion = phaseCompetion[currentPhase++];
-        this._perfectShot.Setup(Geometry.Shape.LINE, magColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: baseShotAngle.Clamp360());
+        this._perfectShot.Setup(magColor, pos: barrelPos, radius: distanceToTarget * curPhaseCompletion, angle: baseShotAngle.Clamp360());
         this._shotDistanceLabel.Text = $"Δ={Mathf.RoundToInt(C.PIXELS_PER_TILE * distanceToTarget * curPhaseCompletion)}";
         this._shotDistanceLabel.Color = magColor;
         this._shotDistanceLabel.Opacity = curPhaseCompletion;
@@ -563,13 +559,13 @@ public class Sextant : CwaffGun
         {
             curPhaseCompletion = phaseCompetion[currentPhase++];
             float reboundAngle = reboundVector.ToAngle();
-            this._reboundShot.Setup(Geometry.Shape.LINE, reboundColor, pos: targetContact, radius: reboundMag * curPhaseCompletion, angle: reboundAngle);
+            this._reboundShot.Setup(reboundColor, pos: targetContact, radius: reboundMag * curPhaseCompletion, angle: reboundAngle);
 
             float reboundArcDiameter = Mathf.Min(2f, 0.5f * distanceToTarget);
             float reboundArcRadius = 0.5f * reboundArcDiameter;
             Vector2 reboundArcCenter = targetContact + reboundArcRadius * targetNormal;
             float reboundTheta = 2f * (baseShotAngle + 180f).AbsAngleTo(reboundAngle);
-            this._reboundArc.Setup(Geometry.Shape.CIRCLE, reboundColor, pos: reboundArcCenter, radius: reboundArcRadius,
+            this._reboundArc.Setup(reboundColor, pos: reboundArcCenter, radius: reboundArcRadius,
               angle: targetNormal.ToAngle(), arc: reboundTheta * curPhaseCompletion);
 
             this._reboundAngleLabel.Text = $"∠{Mathf.RoundToInt(0.5f * reboundTheta * curPhaseCompletion)}°";
@@ -596,10 +592,10 @@ public class Sextant : CwaffGun
             Vector2 bl = center + curPhaseCompletion * (new Vector2(bounds.xMin, bounds.yMin) - center);
             Vector2 tr = center + curPhaseCompletion * (new Vector2(bounds.xMax, bounds.yMax) - center);
             Vector2 br = center + curPhaseCompletion * (new Vector2(bounds.xMax, bounds.yMin) - center);
-            this._topBbox.Setup(Geometry.Shape.DASHEDLINE, bboxColor, pos: tl, pos2: tr);
-            this._bottomBbox.Setup(Geometry.Shape.DASHEDLINE, bboxColor, pos: bl, pos2: br);
-            this._leftBbox.Setup(Geometry.Shape.DASHEDLINE, bboxColor, pos: tl, pos2: bl);
-            this._rightBbox.Setup(Geometry.Shape.DASHEDLINE, bboxColor, pos: tr, pos2: br);
+            this._topBbox.Setup(bboxColor, pos: tl, pos2: tr);
+            this._bottomBbox.Setup(bboxColor, pos: bl, pos2: br);
+            this._leftBbox.Setup(bboxColor, pos: tl, pos2: bl);
+            this._rightBbox.Setup(bboxColor, pos: tr, pos2: br);
 
             this._widthLabel.Text = $"w={Mathf.RoundToInt(C.PIXELS_PER_TILE * (tr.x - tl.x))}";
             this._widthLabel.Color = bboxColor;
@@ -619,14 +615,14 @@ public class Sextant : CwaffGun
             Vector2 b = 0.5f * (bl + br);
             float radius = 0.5f * Mathf.Min(r.x - l.x, t.y - b.y);
             float arcLength = 90f * curPhaseCompletion;
-            this._weakPointL.Setup(Geometry.Shape.DASHEDLINE, lockonColor, pos: l, pos2: l + curPhaseCompletion * (center - l));
-            this._weakPointR.Setup(Geometry.Shape.DASHEDLINE, lockonColor, pos: r, pos2: r + curPhaseCompletion * (center - r));
-            this._weakPointT.Setup(Geometry.Shape.DASHEDLINE, lockonColor, pos: t, pos2: t + curPhaseCompletion * (center - t));
-            this._weakPointB.Setup(Geometry.Shape.DASHEDLINE, lockonColor, pos: b, pos2: b + curPhaseCompletion * (center - b));
-            this._weakPointArcR.Setup(Geometry.Shape.CIRCLE, lockonColor, pos: center, radius: radius, angle:  45f, arc: arcLength);
-            this._weakPointArcT.Setup(Geometry.Shape.CIRCLE, lockonColor, pos: center, radius: radius, angle: 135f, arc: arcLength);
-            this._weakPointArcL.Setup(Geometry.Shape.CIRCLE, lockonColor, pos: center, radius: radius, angle: 225f, arc: arcLength);
-            this._weakPointArcB.Setup(Geometry.Shape.CIRCLE, lockonColor, pos: center, radius: radius, angle: 315f, arc: arcLength);
+            this._weakPointL.Setup(lockonColor, pos: l, pos2: l + curPhaseCompletion * (center - l));
+            this._weakPointR.Setup(lockonColor, pos: r, pos2: r + curPhaseCompletion * (center - r));
+            this._weakPointT.Setup(lockonColor, pos: t, pos2: t + curPhaseCompletion * (center - t));
+            this._weakPointB.Setup(lockonColor, pos: b, pos2: b + curPhaseCompletion * (center - b));
+            this._weakPointArcR.Setup(lockonColor, pos: center, radius: radius, angle:  45f, arc: arcLength);
+            this._weakPointArcT.Setup(lockonColor, pos: center, radius: radius, angle: 135f, arc: arcLength);
+            this._weakPointArcL.Setup(lockonColor, pos: center, radius: radius, angle: 225f, arc: arcLength);
+            this._weakPointArcB.Setup(lockonColor, pos: center, radius: radius, angle: 315f, arc: arcLength);
 
             canDoCritThisFrame = (curPhaseCompletion >= 1.0f);
 
@@ -662,11 +658,6 @@ public class Sextant : CwaffGun
         if (canDoCritThisFrame && !this.canDoCrit)
             base.gameObject.Play("sextant_crit_ready_sound");
         this.canDoCrit = canDoCritThisFrame;
-    }
-
-    private Geometry MakeNewGeometry()
-    {
-        return new GameObject().AddComponent<Geometry>();
     }
 
     private static void StabilizeLabel(dfLabel label)

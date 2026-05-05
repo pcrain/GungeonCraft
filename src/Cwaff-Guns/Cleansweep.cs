@@ -219,7 +219,7 @@ public class MinesweeperTile : MonoBehaviour
         if (!node.Value)
         {
             MinesweeperTile newTile = new GameObject("minesweeper tile").AddComponent<MinesweeperTile>();
-            newTile._square         = new GameObject("minesweeper tile square").AddComponent<Geometry>();
+            newTile._square         = Geometry.Create(Geometry.Shape.RECTANGLE);
             newTile._numberLabel    = EasyLabel.Create(unicode: false, outline: false);
             newTile._numberLabelT   = newTile._numberLabel.transform;
             node.Value              = newTile;
@@ -647,7 +647,6 @@ public class MinesweeperGame : MonoBehaviour
                   ease = 0f;
               Color renderColor = tile._revealed ? tile._color : tile._flagged ? _FlaggedColor : _UnknownColor;
               tile._square.Setup(
-                shape : Geometry.Shape.RECTANGLE,
                 color : renderColor.WithAlpha(alpha * (0.75f - 0.5f * percentDone)),
                 pos   : tile._tl - ease * Vector2.one,
                 pos2  : tile._br + ease * Vector2.one);

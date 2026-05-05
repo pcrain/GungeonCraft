@@ -23,8 +23,29 @@ public partial class Geometry : MonoBehaviour
     public float angle       { get; private set; } = 0f;
     public float arc         { get; private set; } = 360f;
 
-    /// <summary>Sets up and enables the renderer for this Geometry in world coordinates.</summary>
+    /// <summary>Creates a new Geometry object.</summary>
     /// <param name="shape">The shape of the geometry to render. Cannot be changed after initial Setup().</param>
+    public static Geometry Create(Shape shape)
+    {
+      if (shape == Shape.NONE)
+      {
+          UnityEngine.Debug.LogError($"must set shape of Geometry on creation");
+          return null;
+      }
+      Geometry g = new GameObject().AddComponent<Geometry>();
+      g.shape = shape;
+      g.CreateMesh();
+      return g;
+    }
+
+    /// <summary>Requests that a Geometry object be drawn on the GUI background layer. Recommended if drawing in screen space.</summary>
+    public Geometry UseGUILayer()
+    {
+      base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("GUI"));
+      return this;
+    }
+
+    /// <summary>Sets up and enables the renderer for a Geometry object in world coordinates.</summary>
     /// <param name="color">The color of the geometry to render.</param>
     /// <param name="pos">The origin of the geometry. Corresponds to the center for circle-like shapes, a corner for rectangle-like shapes, and an endpoint for line-like shapes.</param>
     /// <param name="pos2">A second point uniquely definining the geometry. Corresponds to a point on the perimeter for circle-like shapes, the corner opposite of the origin for rectangle-like shapes, and a second endpoint for line-like shapes.</param>
@@ -33,25 +54,8 @@ public partial class Geometry : MonoBehaviour
     /// <param name="arc">The angle a circle-like shape subtends (used for drawing cones / wedges).</param>
     /// <param name="radiusInner">The inner radius for ring-like shapes.</param>
     /// <param name="useScreenSpace">If true, coordinates are taken to be screen space instead of world space. (0,0) is the bottom-left of the screen, (1,1) is the top-right.</param>
-    public Geometry Setup(Shape shape = Shape.NONE, Color? color = null, Vector2? pos = null, Vector2? pos2 = null, float? radius = null, float? angle = null, float? arc = null, float? radiusInner = null, bool useScreenSpace = false)
+    public Geometry Setup(Color? color = null, Vector2? pos = null, Vector2? pos2 = null, float? radius = null, float? angle = null, float? arc = null, float? radiusInner = null, bool useScreenSpace = false)
     {
-        if (this.shape == Shape.NONE && shape == Shape.NONE)
-        {
-            // Lazy.DebugLog($"must set shape of mesh!");
-            UnityEngine.Debug.LogError($"must set shape of mesh!");
-            return this;
-        }
-        if (this.shape != Shape.NONE && shape != Shape.NONE && this.shape != shape)
-        {
-            // Lazy.DebugLog($"can't change shape of mesh!");
-            UnityEngine.Debug.LogError($"can't change shape of mesh!");
-            return this;
-        }
-        if (shape != Shape.NONE)
-          this.shape = shape;
-        if (!this._didSetup)
-            CreateMesh();
-
         if (useScreenSpace)
         {
           CameraController mcc = GameManager.Instance.MainCameraController;
@@ -101,6 +105,15 @@ public partial class Geometry : MonoBehaviour
         this._meshRenderer.enabled = false;
       return this;
     }
+}
+
+public static class GeometryHelpers
+{
+  /// <summary>Convenience method for creating Geometry directly from a Geometry Shape.</summary>
+  public static Geometry Create(this Geometry.Shape shape)
+  {
+    return Geometry.Create(shape);
+  }
 }
 
 // Private API

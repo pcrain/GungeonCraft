@@ -86,11 +86,11 @@ public class Entropynnium : CwaffGun
             return;
 
         if (!this._extantManaRing)
-            this._extantManaRing = new GameObject("mana_ring").AddComponent<Geometry>();
+            this._extantManaRing = Geometry.Create(Geometry.Shape.RING);
 
         Transform gunTransform = this.gun.barrelOffset.transform;
         Vector2 ppos = gunTransform.position;
-        this._extantManaRing.Setup(shape: Geometry.Shape.RING, color: ExtendedColours.purple.WithAlpha(0.05f),
+        this._extantManaRing.Setup(color: ExtendedColours.purple.WithAlpha(0.05f),
           pos: ppos, radius: this._manaRadius, radiusInner: this._manaRadius - _THICKNESS);
 
         // spawn some intimindating looking mana particles

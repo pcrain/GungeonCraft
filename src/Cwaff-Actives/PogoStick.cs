@@ -362,9 +362,9 @@ public class PogoDodgeRoll : CustomDodgeRoll
             yield break;
         }
         if (!this._chargeRadius)
-            this._chargeRadius = new GameObject().AddComponent<Geometry>();
+            this._chargeRadius = Geometry.Create(Geometry.Shape.FILLEDCIRCLE);
         if (!this._chargeTarget)
-            this._chargeTarget = new GameObject().AddComponent<Geometry>();
+            this._chargeTarget = Geometry.Create(Geometry.Shape.FILLEDCIRCLE);
       #endregion
 
       #region Wait for pogo bounce to finish
@@ -397,8 +397,8 @@ public class PogoDodgeRoll : CustomDodgeRoll
             float percentLeft = 1f - Mathf.Clamp01(elapsed / MAX_CHARGE_TIME);
             radius = MAX_BOUNCE_RADIUS * (1f - (percentLeft * percentLeft));
             target = this._owner.CenterPosition +  radius * (this._owner.unadjustedAimPoint.XY() - this._owner.sprite.WorldCenter).normalized;
-            // this._chargeRadius.Setup(Geometry.Shape.FILLEDCIRCLE, Color.blue.WithAlpha(0.1f), pos: this._owner.CenterPosition, radius: radius);
-            this._chargeTarget.Setup(Geometry.Shape.FILLEDCIRCLE, Color.cyan.WithAlpha(0.15f), pos: target, radius: 1f);
+            // this._chargeRadius.Setup(Color.blue.WithAlpha(0.1f), pos: this._owner.CenterPosition, radius: radius);
+            this._chargeTarget.Setup(Color.cyan.WithAlpha(0.15f), pos: target, radius: 1f);
             yield return null;
         }
         this._owner.OnReceivedDamage -= this.OnReceivedDamage;

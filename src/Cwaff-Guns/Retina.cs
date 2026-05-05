@@ -186,11 +186,11 @@ public class RetinaHUD : MonoBehaviour
   {
     this._gun = this.gameObject.GetComponent<Retina>();
 
-    this._base                  = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: ExtendedColours.vibrantOrange.WithAlpha(0.1f));
-    this._targetInfoRectangle   = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: ExtendedColours.vibrantOrange.WithAlpha(0.2f));
-    this._healthbarBack         = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: Color.black);
-    this._healthbarHurt         = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: Color.green.WithAlpha(0.85f));
-    this._healthbarFore         = Geom().Setup(shape: Geometry.Shape.RECTANGLE, color: Color.red.WithAlpha(0.85f));
+    this._base                  = Geom(Geometry.Shape.RECTANGLE).Setup(color: ExtendedColours.vibrantOrange.WithAlpha(0.1f));
+    this._targetInfoRectangle   = Geom(Geometry.Shape.RECTANGLE).Setup(color: ExtendedColours.vibrantOrange.WithAlpha(0.2f));
+    this._healthbarBack         = Geom(Geometry.Shape.RECTANGLE).Setup(color: Color.black);
+    this._healthbarHurt         = Geom(Geometry.Shape.RECTANGLE).Setup(color: Color.green.WithAlpha(0.85f));
+    this._healthbarFore         = Geom(Geometry.Shape.RECTANGLE).Setup(color: Color.red.WithAlpha(0.85f));
 
     this._nameHeader            = Lab(color: Color.cyan);
     this._nameLabel             = Lab(color: Color.cyan);
@@ -234,10 +234,9 @@ public class RetinaHUD : MonoBehaviour
       return extraTarget;
   }
 
-  private Geometry Geom()
+  private Geometry Geom(Geometry.Shape shape)
   {
-      Geometry g = new GameObject().AddComponent<Geometry>();
-      g.gameObject.SetLayerRecursively(LayerMask.NameToLayer("GUI"));
+      Geometry g = Geometry.Create(shape).UseGUILayer();
       this._geometry.Add(g);
       return g;
   }

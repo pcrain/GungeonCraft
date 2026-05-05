@@ -269,8 +269,8 @@ public class WayfarerProjectile : MonoBehaviour
         this._projectile.BulletScriptSettings.surviveTileCollisions = true;
         this._projectile.specRigidbody.OnTileCollision += this.OnTileCollision;
         this._projectile.specRigidbody.OnRigidbodyCollision += this.OnRigidBodyCollision;
-        this._pingRing = new GameObject().AddComponent<Geometry>();
-        this._ownerRing = new GameObject().AddComponent<Geometry>();
+        this._pingRing = Geometry.Create(Geometry.Shape.RING);
+        this._ownerRing = Geometry.Create(Geometry.Shape.RING);
 
         bool straggler = this._owner.HasSynergy(Synergy.STRAGGLER);
         bool trailblazer = this._owner.HasSynergy(Synergy.TRAILBLAZER);
@@ -414,7 +414,7 @@ public class WayfarerProjectile : MonoBehaviour
       float alpha = Mathf.Min(percentDone, 1f - percentDone);
       for (int i = 0; i < 2; ++i)
       {
-        ((i == 0) ? this._pingRing : this._ownerRing).Setup(Geometry.Shape.RING,
+        ((i == 0) ? this._pingRing : this._ownerRing).Setup(
           color: (this._autonomous ? Color.red : Color.green).WithAlpha(alpha),
           pos: (i == 0) ? this._projectile.SafeCenter : this._owner.CenterPosition,
           radius: dist, radiusInner: Mathf.Max(0f, dist - RING_THICKNESS));

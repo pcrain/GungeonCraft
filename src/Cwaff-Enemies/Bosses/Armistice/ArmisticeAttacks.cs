@@ -1609,7 +1609,7 @@ public partial class ArmisticeBoss : AIActor
         int numLines = (BOUNCES + 1) * (RAYS * 2 + 1);
         _lines = new List<Geometry>(numLines);
         for (int i = 0; i <= numLines; ++i)
-          _lines.Add(new GameObject().AddComponent<Geometry>());
+          _lines.Add(Geometry.Create(Geometry.Shape.LINE));
       }
 
       AIActor boss = base.BulletBank.aiActor;
@@ -1635,7 +1635,7 @@ public partial class ArmisticeBoss : AIActor
           for (int i = 0; i <= BOUNCES; ++i)
           {
             BraveMathCollege.LineSegmentRectangleIntersection(curPos + curAngleVec / 32f, curPos + 100 * curAngleVec, trueBounds.min, trueBounds.max, ref isect);
-            this._lines[(BOUNCES + 1) * idx + i].Setup(shape: Geometry.Shape.LINE, color: c, pos: curPos, pos2: isect);
+            this._lines[(BOUNCES + 1) * idx + i].Setup(color: c, pos: curPos, pos2: isect);
             curPos = isect;
             if (Mathf.Abs(isect.x - left) < EPSILON || Mathf.Abs(isect.x - right) < EPSILON)
               curAngleVec = new Vector2(-curAngleVec.x, curAngleVec.y);
@@ -2046,9 +2046,9 @@ public partial class ArmisticeBoss : AIActor
         _Velocities[i] = new VelSnapshot();
 
       #if DEBUG
-      // Geometry line = new GameObject().AddComponent<Geometry>();
-      // Geometry vline = new GameObject().AddComponent<Geometry>();
-      // Geometry shootLine = new GameObject().AddComponent<Geometry>();
+      // Geometry line = Geometry.Create(Geometry.Shape.LINE);
+      // Geometry vline = Geometry.Create(Geometry.Shape.LINE);
+      // Geometry shootLine = Geometry.Create(Geometry.Shape.LINE);
       #endif
       //WARNING: can't use frame-perfect time scale or _VEL_BUFFER_SIZE can overflow during time slow effects
       // base.TimeScale = -1f;
@@ -2101,8 +2101,8 @@ public partial class ArmisticeBoss : AIActor
         bool valid = Lazy.DeterminePerfectAngleToShootAt(shootPoint, pc.CenterPosition, avgVelocity, projSpeed, out aimAngle, out time, adjustForTurboMode: true);
 
         #if DEBUG
-        // line.Setup(shape: Geometry.Shape.LINE, color: valid ? Color.green : Color.red, pos: shootPoint, pos2: pc.CenterPosition + time * avgVelocity);
-        // vline.Setup(shape: Geometry.Shape.LINE, color: Color.yellow, pos: pc.CenterPosition, pos2: pc.CenterPosition + time * avgVelocity);
+        // line.Setup(color: valid ? Color.green : Color.red, pos: shootPoint, pos2: pc.CenterPosition + time * avgVelocity);
+        // vline.Setup(color: Color.yellow, pos: pc.CenterPosition, pos2: pc.CenterPosition + time * avgVelocity);
         #endif
 
         // figure out if we actually need to fire
@@ -2110,7 +2110,7 @@ public partial class ArmisticeBoss : AIActor
         {
           lastFireTime = now;
           #if DEBUG
-          // shootLine.Setup(shape: Geometry.Shape.LINE, color: Color.cyan, pos: shootPoint, pos2: pc.CenterPosition + time * avgVelocity);
+          // shootLine.Setup(color: Color.cyan, pos: shootPoint, pos2: pc.CenterPosition + time * avgVelocity);
           #endif
           actor.gameObject.PlayUnique("armistice_gun_spread_sound");
           for (int i = -spread; i <= spread; ++i)

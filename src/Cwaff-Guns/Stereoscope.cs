@@ -171,12 +171,12 @@ public class Stereoscope : CwaffGun
     {
         int i = shape == Geometry.Shape.FILLEDCIRCLE ? 0 : 1; //NOTE: separate pools for different shapes since the shape itself can't be changed
         if (_PooledIcons[i].Count == 0)
-            _PooledIcons[i].AddLast(new GameObject().AddComponent<Geometry>());
+            _PooledIcons[i].AddLast(Geometry.Create(shape));
         LinkedListNode<Geometry> current = _PooledIcons[i].Last;
         _PooledIcons[i].RemoveLast();
         _ActiveIcons[i].AddLast(current);
         if (current.Value is not Geometry icon)
-            icon = current.Value = new GameObject().AddComponent<Geometry>();
+            icon = current.Value = Geometry.Create(shape);
         return icon;
     }
 
@@ -228,15 +228,15 @@ public class Stereoscope : CwaffGun
 
             if (enemy.specRigidbody is SpeculativeRigidbody body)
             {
-                RentIcon(Geometry.Shape.FILLEDCIRCLE).Setup(shape: Geometry.Shape.FILLEDCIRCLE,
+                RentIcon(Geometry.Shape.FILLEDCIRCLE).Setup(
                     color: _FreqColors[resonantFrequency + 6].WithAlpha(alpha),
                     pos: body.UnitBottomCenter + iconOffset, radius: iconRadius,
                     angle: MiddleAngleFromFrequency(resonantFrequency), arc: 30f);
-                RentIcon(Geometry.Shape.FILLEDCIRCLE).Setup(shape: Geometry.Shape.FILLEDCIRCLE,
+                RentIcon(Geometry.Shape.FILLEDCIRCLE).Setup(
                     color: Color.white.WithAlpha(alpha),
                     pos: body.UnitBottomCenter + iconOffset, radius: iconRadius,
                     angle: this.PlayerOwner.m_currentGunAngle.Clamp360(), arc: 12f);
-                RentIcon(Geometry.Shape.CIRCLE).Setup(shape: Geometry.Shape.CIRCLE,
+                RentIcon(Geometry.Shape.CIRCLE).Setup(
                     color: _FreqColors[resonantFrequency + 6].WithAlpha(alpha),
                     pos: body.UnitBottomCenter + iconOffset, radius: iconRadius,
                     angle: MiddleAngleFromFrequency(resonantFrequency), arc: 360f);
