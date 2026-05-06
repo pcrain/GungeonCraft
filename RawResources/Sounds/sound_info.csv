@@ -398,3 +398,5 @@ rocket_plonk_sound,5.0,1,sound,1
 rocket_wiggle_sound,2.0,1,sound,1
 rocket_fire_sound,-2.5,1,sound,1
 shmuppy_bark_sound,-3.5,1,sound,0
+paper_crinkle_sound,10.0,1,sound,1
+paper_fall_sound,10.0,1,sound,1

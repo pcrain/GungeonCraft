@@ -64,7 +64,6 @@ public class InsurancePolicy : CwaffActive
         _InsuranceSpriteBullet     = item.sprite.collection.GetSpriteIdByName("insurance_policy_bullet_icon");
 
         _InsuranceChestPrefab = GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.B).gameObject.ClonePrefab().GetComponent<Chest>();
-            _InsuranceChestPrefab.groundHitDelay = 0.10f;
             _InsuranceChestPrefab.groundHitDelay = 0.40f;
             _InsuranceChestPrefab.spawnAnimName = _InsuranceChestPrefab.sprite.SetUpAnimation("insurance_chest_appear", 11);
                 _InsuranceChestPrefab.spriteAnimator.GetClipByName("insurance_chest_appear").frames[0].triggerEvent = true;

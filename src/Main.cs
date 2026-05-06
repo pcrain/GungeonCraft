@@ -162,6 +162,8 @@ public class Initialisation : BaseUnityPlugin
                 CwaffTweaks.Init();
                 // Hecked Mode Tribute Statues
                 HeckedShrine.Init();
+                // Incredible Items
+                IncredibleItems.Init();
                 // Midrun data
                 CwaffRunData.Init();
                 setupConfigWatch.Stop();

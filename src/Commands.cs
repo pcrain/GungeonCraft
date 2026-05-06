@@ -18,7 +18,8 @@ public class Commands
         // Base command for doing whatever I'm testing at the moment
         ETGModConsole.Commands.AddGroup("hh", delegate (string[] args)
         {
-            GameManager.Instance.PrimaryPlayer.HealthAndArmorSwapped ^= true;
+            // GameManager.Instance.PrimaryPlayer.HealthAndArmorSwapped ^= true;
+            IncredibleItems.SpawnPaperChest();
         });
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
