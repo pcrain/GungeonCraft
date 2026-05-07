@@ -41,6 +41,7 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
   protected CompanionController m_companionController; // companion controller for this behavior
   protected Vector2 _targetPos; // position we're currently targeting
   protected bool _allowPathing = true; // whether we're currently allowed to path
+  protected bool _isCompanion = false; // whether we're a companion or an enemy
 
   private int m_sequentialPathFails;
 
@@ -48,6 +49,7 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
   {
     base.Start();
     m_companionController = m_gameObject.GetComponent<CompanionController>();
+    _isCompanion = m_companionController != null;
     m_aiActor.MovementModifiers += this.TickMovement;
   }
 
@@ -173,7 +175,7 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
   /// <summary>Returns true iff the companion is in combat.</summary>
   protected bool InCombat()
   {
-    return m_companionController.m_owner is PlayerController p && p.IsInCombat;
+    return m_companionController && m_companionController.m_owner is PlayerController p && p.IsInCombat;
   }
 
   /// <summary>Determines the distance to _targetPos relative to the center of our sprite.</summary>
@@ -185,9 +187,14 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
       return adjustedTarget - bottomLeft;
   }
 
+  /// <summary>Returns true if m_stateTimer <= 0.</summary>
+  protected bool StateExpired() => m_stateTimer <= 0.0f;
+
   /// <summary>Returns true iff the companion is offscreen and/or in a different room.</summary>
   private bool CheckOffscreenForWarpingPurposes()
   {
+      if (!m_companionController)
+          return false;
       if (!preventWarpingWhenOnscreen)
           return m_companionController.InDifferentRoomThanOwner();
       Vector2 pos = m_aiActor.CenterPosition;
@@ -208,7 +215,7 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
   /// <summary>Called after Upkeep() every tick the behavior is active and the companion is not stunned.</summary>
   public sealed override BehaviorResult Update()
   {
-      if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel || !m_companionController || !m_aiActor.CompanionOwner)
+      if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel)
           return BehaviorResult.SkipAllRemainingBehaviors;
 
       if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.END_TIMES)
@@ -235,8 +242,10 @@ public abstract class CwaffCompanionMovementBehaviorBase : MovementBehaviorBase
   }
 }
 
-public static class CwaffCompanionBuilder
+public static class CwaffCompanionAndEnemyBuilder
 {
+    public static GameObject FortunesFavorVFX = null;
+
     public static Friend InitCompanion<Friend>(this PassiveItem item, string friendName = null, int baseFps = 4, List<string> extraAnims = null, bool autoRigidBody = true)
         where Friend : CwaffCompanionController
     {
@@ -255,29 +264,63 @@ public static class CwaffCompanionBuilder
 
         Friend friend = CompanionBuilder.BuildPrefab(name, $"{C.MOD_PREFIX}:{name}_companion", $"{name}_idle_001", IntVector2.Zero, IntVector2.One)
           .AddComponent<Friend>();
-        friend.SetupAnimations(baseFps: baseFps, extraAnims: extraAnims);
+        AIActor actor = friend.gameObject.GetComponent<AIActor>();
+        actor.SetupAnimations(baseFps: baseFps, extraAnims: extraAnims);
         //NOTE: should use LowerLeft anchor if we have a SpeculativeRigidBody and MiddleCenter otherwise
         if (autoRigidBody)
         {
-          friend.gameObject.AutoRigidBody(CollisionLayer.EnemyCollider);
-          friend.aiActor.ActorShadowOffset = Vector2.zero;
+          actor.gameObject.AutoRigidBody(CollisionLayer.EnemyCollider);
+          actor.ActorShadowOffset = Vector2.zero;
         }
         else
-          friend.aiActor.ActorShadowOffset = new Vector3(friend.aiActor.sprite.GetRelativePositionFromAnchor(Anchor.LowerLeft).x, 0f, 0f);
+          actor.ActorShadowOffset = new Vector3(actor.sprite.GetRelativePositionFromAnchor(Anchor.LowerLeft).x, 0f, 0f);
         friend.companionID = CompanionController.CompanionIdentifier.NONE;
 
-        cc.CompanionGuid = friend.aiActor.EnemyGuid;
+        cc.CompanionGuid = actor.EnemyGuid;
         return friend;
     }
 
-    private static void SetupAnimations(this CwaffCompanionController friend, int baseFps, List<string> extraAnims = null)
+    public static AIActor InitEnemy(this string enemyName, int health, string shortDesc, string longDesc, int baseFps = 4, List<string> extraAnims = null, bool autoRigidBody = true, bool doCorpse = true)
     {
-        string name = friend.gameObject.name;
+        string name = enemyName.ToID();
+        if (ResMap.Get($"{name}_idle") == null)
+        {
+            Lazy.RuntimeWarn($"All enemies must have an idle_001 animation, but no \"{name}_idle_001\" sprite found");
+            return null;
+        }
+
+        AIActor actor = EnemyBuilder.BuildPrefab(name, $"{C.MOD_PREFIX}:{name}_enemy", $"{name}_idle_001", IntVector2.Zero, IntVector2.One, false)
+          .GetComponent<AIActor>();
+        HealthHaver hh = actor.gameObject.GetComponent<HealthHaver>();
+        hh.SetHealthMaximum(health);
+        hh.FullHeal();
+        actor.SetupAnimations(baseFps: baseFps, extraAnims: extraAnims);
+        //NOTE: should use LowerLeft anchor if we have a SpeculativeRigidBody and MiddleCenter otherwise
+        if (autoRigidBody)
+        {
+          actor.gameObject.AutoRigidBody((List<CollisionLayer>)[CollisionLayer.EnemyCollider, CollisionLayer.EnemyHitBox]);
+          actor.ActorShadowOffset = Vector2.zero;
+        }
+        else
+          actor.ActorShadowOffset = new Vector3(actor.sprite.GetRelativePositionFromAnchor(Anchor.LowerLeft).x, 0f, 0f);
+        if (doCorpse)
+          actor.CorpseObject = EnemyDatabase.GetOrLoadByGuid("01972dee89fc4404a5c408d50007dad5").CorpseObject;
+        if (FortunesFavorVFX == null)
+          FortunesFavorVFX = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
+
+        actor.SetupAmmonomiconEntry(shortDesc: shortDesc, longDesc: longDesc, EnemyName: enemyName);
+        return actor;
+    }
+
+    private static void SetupAnimations(this AIActor actor, int baseFps, List<string> extraAnims = null)
+    {
+        string name = actor.gameObject.name;
+        CompanionController cc = actor.gameObject.GetComponent<CompanionController>();
 
         tk2dSpriteCollectionData coll     = VFX.Collection;
-        AIAnimator aiAnimator             = friend.gameObject.GetComponent<AIAnimator>();
-        tk2dSpriteAnimator spriteAnimator = friend.gameObject.GetComponent<tk2dSpriteAnimator>();
-        spriteAnimator.library            = friend.gameObject.AddComponent<tk2dSpriteAnimation>();
+        AIAnimator aiAnimator             = actor.gameObject.GetComponent<AIAnimator>();
+        tk2dSpriteAnimator spriteAnimator = actor.gameObject.GetComponent<tk2dSpriteAnimator>();
+        spriteAnimator.library            = actor.gameObject.AddComponent<tk2dSpriteAnimation>();
         aiAnimator.OtherAnimations        = new();
 
         List<tk2dSpriteAnimationClip> clips = new();
@@ -289,7 +332,8 @@ public static class CwaffCompanionBuilder
         if (coll.AutoAnimation(ref clips, $"{name}_pet", fps: baseFps) is DirectionalAnimation petAnim)
         {
             aiAnimator.OtherAnimations.Add(new(){name = "pet", anim = petAnim});
-            friend.CanBePet = true; //TODO: fix m_petOffset after calling DoPet() with patch
+            if (cc)
+              cc.CanBePet = true;
         }
         if (coll.AutoAnimation(ref clips, $"{name}_fidget", fps: baseFps) is DirectionalAnimation fidgetAnim)
             aiAnimator.IdleFidgetAnimations = [fidgetAnim];
@@ -299,6 +343,51 @@ public static class CwaffCompanionBuilder
             aiAnimator.OtherAnimations.Add(new(){name = anim, anim = coll.AutoAnimation(ref clips, $"{name}_{anim}", fps: baseFps, loop: loop)});
         }
         spriteAnimator.library.clips = clips.ToArray();
+    }
+
+    // stolen from Bunny, thanks Bunny
+    private static void SetupAmmonomiconEntry(this AIActor enemy, string shortDesc, string longDesc, string EnemyName)
+    {
+        string lowerName = EnemyName.ToID();
+        if (enemy.GetComponent<EncounterTrackable>() != null)
+            UnityEngine.Object.Destroy(enemy.GetComponent<EncounterTrackable>());
+        enemy.encounterTrackable = enemy.gameObject.AddComponent<EncounterTrackable>();
+        enemy.encounterTrackable.journalData = new JournalEntry();
+        enemy.encounterTrackable.EncounterGuid = enemy.EnemyGuid;
+        enemy.encounterTrackable.prerequisites = new DungeonPrerequisite[0];
+        enemy.encounterTrackable.journalData.SuppressKnownState = false;
+        enemy.encounterTrackable.journalData.IsEnemy = true;
+        enemy.encounterTrackable.journalData.SuppressInAmmonomicon = false;
+        string ammonomiconIconName = $"{C.MOD_PREFIX}_{lowerName}_icon";
+        AtlasHelper.AddSpritesToCollection([ammonomiconIconName], AmmonomiconController.ForceInstance.EncounterIconCollection);
+        enemy.encounterTrackable.journalData.AmmonomiconSprite = ammonomiconIconName;
+        enemy.encounterTrackable.journalData.enemyPortraitSprite = ResourceExtractor.GetTextureFromResource($"{C.MOD_INT_NAME}/Resources/{lowerName}_portrait.png");
+        enemy.encounterTrackable.ProxyEncounterGuid = string.Empty;
+        ETGMod.Databases.Strings.Enemies.Set("#" + EnemyName.ToUpper(), EnemyName);
+        ETGMod.Databases.Strings.Enemies.Set("#" + shortDesc.ToUpper(), shortDesc);
+        ETGMod.Databases.Strings.Enemies.Set("#" + longDesc.ToUpper(), longDesc);
+        enemy.encounterTrackable.journalData.PrimaryDisplayName = "#" + EnemyName.ToUpper();
+        enemy.encounterTrackable.journalData.NotificationPanelDescription = "#" + shortDesc.ToUpper();
+        enemy.encounterTrackable.journalData.AmmonomiconFullEntry = "#" + longDesc.ToUpper();
+        enemy.encounterTrackable.journalData.SuppressKnownState = false;
+
+        EnemyDatabaseEntry item = new EnemyDatabaseEntry
+        {
+            myGuid = enemy.EnemyGuid,
+            placeableWidth = 2,
+            placeableHeight = 2,
+            isNormalEnemy = true,
+            path = enemy.EnemyGuid,
+            isInBossTab = false,
+            encounterGuid = enemy.EnemyGuid
+        };
+        EnemyDatabase.Instance.Entries.Add(item);
+        EncounterDatabaseEntry encounterDatabaseEntry = new EncounterDatabaseEntry(enemy.encounterTrackable)
+        {
+            path = enemy.EnemyGuid,
+            myGuid = enemy.EnemyGuid
+        };
+        EncounterDatabase.Instance.Entries.Add(encounterDatabaseEntry);
     }
 
     /// <summary>Sets up the appropriate directional animation from the available sprites with the given prefix</summary>

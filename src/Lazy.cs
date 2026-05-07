@@ -1594,4 +1594,26 @@ public static class Lazy
       }
   }
   #endif
+
+  public static IntVector2? RandomCellForEnemySpawn(this AIActor enemyPrefab, RoomHandler room, IntVector2? targetCenter = null)
+  {
+      Pathfinding.CellValidator cellValidator = (IntVector2 c) => {
+        for (int k = 0; k < enemyPrefab.Clearance.x; k++)
+        {
+          for (int l = 0; l < enemyPrefab.Clearance.y; l++)
+          {
+            if (GameManager.Instance.Dungeon.data.isTopWall(c.x + k, c.y + l))
+              return false;
+            if (!targetCenter.HasValue)
+              continue;
+            if (IntVector2.DistanceSquared(targetCenter.Value, c.x + k, c.y + l) < 16f)
+              return false;
+            if (IntVector2.DistanceSquared(targetCenter.Value, c.x + k, c.y + l) > 400f)
+              return false;
+          }
+        }
+        return true;
+      };
+      return room.GetRandomAvailableCell(enemyPrefab.Clearance, enemyPrefab.PathableTiles, canPassOccupied: false, cellValidator);
+  }
 }

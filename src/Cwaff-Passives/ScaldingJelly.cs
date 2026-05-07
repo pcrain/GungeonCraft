@@ -16,7 +16,7 @@ public class ScaldingJelly : CwaffCompanion
         PassiveItem item  = Lazy.SetupPassive<ScaldingJelly>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.D;
 
-        IgnizolCompanion friend = item.InitCompanion<IgnizolCompanion>(friendName: CompanionName.ToID(), baseFps: 20,
+        IgnizolCompanion friend = item.InitCompanion<IgnizolCompanion>(friendName: CompanionName, baseFps: 20,
             extraAnims: ["charge", "jump", "carry", "pitfall"]);
 
         tk2dSpriteAnimation library = friend.gameObject.GetComponent<tk2dSpriteAnimation>();
@@ -89,10 +89,6 @@ public class IgnizolCompanion : CwaffCompanionController
         private int _lastIdleFrame = -1;
         private float _igniteTime = 0.0f;
 
-    #if DEBUG
-        private Nametag _debugNameTag = null;
-    #endif
-
         public override void Start()
         {
             base.Start();
@@ -117,11 +113,6 @@ public class IgnizolCompanion : CwaffCompanionController
             this._light.gameObject.transform.localPosition = m_aiActor.sprite.GetRelativePositionFromAnchor(Anchor.UpperCenter);
 
             CwaffEvents.OnEmptyInteract += this.AttemptToPickUpOrThrow;
-
-            #if DEBUG
-                // _debugNameTag = m_aiActor.gameObject.AddComponent<Nametag>();
-                // _debugNameTag.Setup();
-            #endif
         }
 
         private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -453,14 +444,7 @@ public class IgnizolCompanion : CwaffCompanionController
 
         protected override void TickMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
         {
-            #if DEBUG
-                if (_debugNameTag)
-                {
-                    _debugNameTag.SetName($"{this._state.ToString()}\n clip: {base.m_aiAnimator.spriteAnimator.CurrentClip.name}");
-                    _debugNameTag.UpdateWhileParentAlive();
-                }
-            #endif
-
+            // m_aiActor.DebugNametag($"{this._state.ToString()}\n clip: {base.m_aiAnimator.spriteAnimator.CurrentClip.name}");
             Vector2 curPos = m_aiActor.specRigidbody.UnitCenter;
 
             if (this._light)

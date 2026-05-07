@@ -19,7 +19,7 @@ public class AmethystShard : CwaffCompanion
         PassiveItem item  = Lazy.SetupPassive<AmethystShard>(ItemName, ShortDescription, LongDescription, Lore);
         item.quality      = ItemQuality.B;
 
-        AllayCompanion friend = item.InitCompanion<AllayCompanion>(friendName: CompanionName.ToID(), baseFps: 12)
+        AllayCompanion friend = item.InitCompanion<AllayCompanion>(friendName: CompanionName, baseFps: 12)
           .SetPettingOffsets(new Vector2(-0.625f, -0.25f), new Vector2(0.375f, -0.25f))
           .MakeIntangible();
         friend.aiActor.specRigidbody.CollideWithTileMap = true;

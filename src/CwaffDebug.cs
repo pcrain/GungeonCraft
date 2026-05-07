@@ -84,6 +84,19 @@ internal static class CwaffDebug
         }
     }
   #endif
+
+  /// <summary>Draws some debug information over an enemy's head.</summary>
+  [System.Diagnostics.Conditional("DEBUG")]
+  public static void DebugNametag(this AIActor actor, string text)
+  {
+    if (actor.gameObject.GetComponent<Nametag>() is not Nametag nt)
+    {
+      nt = actor.gameObject.AddComponent<Nametag>();
+      nt.Setup();
+    }
+    nt.SetName(text);
+    nt.UpdateWhileParentAlive();
+  }
 }
 
 /// <summary>Profiling helper class</summary>

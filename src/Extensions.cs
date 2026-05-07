@@ -1834,7 +1834,7 @@ public static class Extensions
 
   //WARNING: only works with our VFX and sprites, can't be used with basegame sprites or results in wonky hitboxes
   /// <summary>Set up a SpeculativeRigidBody for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
-  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false, float height = 1.0f)
+  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false, float height = 1.0f, bool keepExistingColliders = false)
   {
     SpeculativeRigidbody body = g.GetOrAddComponent<SpeculativeRigidbody>();
     tk2dBaseSprite sprite     = g.GetComponent<tk2dBaseSprite>();
@@ -1842,7 +1842,9 @@ public static class Extensions
     IntVector2 spriteSize     = (C.PIXELS_PER_TILE * bounds.size.XY()).ToIntVector2();
     IntVector2 spriteOffsets  = (C.PIXELS_PER_TILE * bounds.min.XY()).ToIntVector2();
 
-    body.PixelColliders      = new List<PixelCollider>(){new(){
+    if (!keepExistingColliders)
+      body.PixelColliders = new List<PixelCollider>();
+    body.PixelColliders.Add(new(){
       ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
       ManualOffsetX          = spriteOffsets.x,
       ManualOffsetY          = spriteOffsets.y,
@@ -1851,9 +1853,22 @@ public static class Extensions
       CollisionLayer         = clayer,
       Enabled                = true,
       IsTrigger              = false,
-    }};
+    });
     body.CanBePushed = canBePushed;
 
+    return body;
+  }
+
+  /// <summary>Set up a SpeculativeRigidBody with multiple collision layers for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
+  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, List<CollisionLayer> clayers, bool canBePushed = false, float height = 1.0f, bool keepExistingColliders = false)
+  {
+    bool first = true;
+    SpeculativeRigidbody body = null;
+    foreach (CollisionLayer clayer in clayers)
+    {
+      body = g.AutoRigidBody(clayer, canBePushed, height, !first);
+      first = false;
+    }
     return body;
   }
 
@@ -2038,12 +2053,12 @@ public static class Extensions
   }
 
   /// <summary>Spawns an enemy in and skips the awakening animation + all other startup behaviors</summary>
-  public static void SpawnInInstantly(this AIActor enemy)
+  public static void SpawnInInstantly(this AIActor enemy, bool isReinforcement = true)
   {
     enemy.HasDonePlayerEnterCheck = true;
-    enemy.IsInReinforcementLayer = true;
+    enemy.IsInReinforcementLayer = isReinforcement;
     enemy.ToggleRenderers(true);
-    enemy.OnEngaged(true);
+    enemy.OnEngaged(isReinforcement);
     enemy.aiAnimator.EndAnimation();
   }
 
