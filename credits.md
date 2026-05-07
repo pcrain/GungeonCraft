@@ -44,6 +44,8 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/): Derail Gun, Gunflower, Retina
 
+  - [Hashashaaaa](https://www.reddit.com/r/EnterTheGungeon/comments/b1fnc4/very_big_halo_weapon_set/): Fuel Rod Gun
+
   - [ChaosMiles07](https://www.spriters-resource.com/custom_edited/thelegendofzeldacustoms/sheet/66258/): Glockarina
 
   - [Chasersgaming](https://opengameart.org/content/asset-pack-8-ball-pool): English

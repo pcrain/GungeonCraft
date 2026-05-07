@@ -288,6 +288,7 @@ public class Initialisation : BaseUnityPlugin
                 ChainDriver.Init();
                 RLTSRTSGTSBTSLB.Init();
                 PhotonCannon.Init();
+                FuelRodGun.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

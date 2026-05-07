@@ -113,33 +113,10 @@ public class Overflow : CwaffGun
         if (this.gun.CurrentStrengthTier != this.curGoopType)
             this.gun.CurrentStrengthTier = this.curGoopType;
         #if DEBUG
-            Commands._OnDebugKeyPressed -= SpawnBarrel;
-            Commands._OnDebugKeyPressed += SpawnBarrel;
+            Commands._OnDebugKeyPressed -= Lazy.DebugSpawnBarrels;
+            Commands._OnDebugKeyPressed += Lazy.DebugSpawnBarrels;
         #endif
     }
-
-    #if DEBUG
-    private static void SpawnBarrel()
-    {
-        List<string> _Barrels = [ "red barrel", "red drum", "blue drum", "purple drum", "yellow drum" ];
-        RoomHandler room = GameManager.Instance.PrimaryPlayer.CurrentRoom;
-        Vector2 pos = GameManager.Instance.PrimaryPlayer.CenterPosition;
-        for (int i = 0; i < _Barrels.Count; ++i)
-        {
-            Vector2 bpos = pos + (i * 360f / _Barrels.Count).ToVector(2f);
-            GameObject barrelPrefab = Femtobyte._NameToPrefabMap[_Barrels[i]].prefab;
-            GameObject barrel = UnityEngine.Object.Instantiate(barrelPrefab, bpos, Quaternion.identity);
-            barrel.GetComponentInChildren<tk2dSprite>().PlaceAtPositionByAnchor(bpos, Anchor.MiddleCenter);
-            KickableObject kickable = barrel.GetComponentInChildren<KickableObject>();
-            room.RegisterInteractable(kickable);
-            kickable.ConfigureOnPlacement(room);
-            SpeculativeRigidbody barrelBody = barrel.GetComponentInChildren<SpeculativeRigidbody>();
-            barrelBody.Initialize();
-            barrelBody.CorrectForWalls();
-            PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(barrelBody, null, false);
-        }
-    }
-    #endif
 
     public override void OnSwitchedAwayFromThisGun()
     {

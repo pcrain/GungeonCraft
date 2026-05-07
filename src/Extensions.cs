@@ -1095,7 +1095,7 @@ public static class Extensions
   /// <summary>Create a prefab trail, add it to a prefab projectile, and return the projectile.</summary>
   public static Projectile AttachTrail(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
     float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null,
-    Vector2? boneSpawnOffset = null)
+    Vector2? boneSpawnOffset = null, float? glowAmount = null)
   {
       CwaffTrailController trail = VFX.CreateSpriteTrailObject(
           spriteName         : spriteName,
@@ -1109,6 +1109,8 @@ public static class Extensions
           );
       trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
       trail.gameObject.transform.parent = target.transform;
+      if (glowAmount is float glowAmountv)
+        trail.gameObject.SetGlowiness(glowAmountv);
       trail.boneSpawnOffset = boneSpawnOffset ?? Vector2.zero;
       return target;
   }
@@ -1832,7 +1834,7 @@ public static class Extensions
 
   //WARNING: only works with our VFX and sprites, can't be used with basegame sprites or results in wonky hitboxes
   /// <summary>Set up a SpeculativeRigidBody for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
-  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false)
+  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false, float height = 1.0f)
   {
     SpeculativeRigidbody body = g.GetOrAddComponent<SpeculativeRigidbody>();
     tk2dBaseSprite sprite     = g.GetComponent<tk2dBaseSprite>();
@@ -1845,7 +1847,7 @@ public static class Extensions
       ManualOffsetX          = spriteOffsets.x,
       ManualOffsetY          = spriteOffsets.y,
       ManualWidth            = spriteSize.x,
-      ManualHeight           = spriteSize.y,
+      ManualHeight           = Mathf.CeilToInt(height * spriteSize.y),
       CollisionLayer         = clayer,
       Enabled                = true,
       IsTrigger              = false,
@@ -2908,6 +2910,18 @@ public static class Extensions
           effect                 = effect.effect,
           ss                     = effect.ss,
       };
+  }
+
+  /// <summary>Scales the radius of an explosion, including its VFX.</summary>
+  public static ExplosionData Scale(this ExplosionData effect, float scalar)
+  {
+      ExplosionData e = effect.Clone();
+      e.forceUseThisRadius = true;
+      e.pushRadius *= scalar;
+      e.damageRadius*= scalar;
+      e.effect = effect.effect.ClonePrefab();
+      e.effect.transform.localScale *= scalar;
+      return e;
   }
 
   /// <summary>Set an audio event for a specific frame of a projectile's animation</summary>

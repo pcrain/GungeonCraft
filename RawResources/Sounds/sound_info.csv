@@ -400,3 +400,5 @@ rocket_fire_sound,-2.5,1,sound,1
 shmuppy_bark_sound,-3.5,1,sound,0
 paper_crinkle_sound,10.0,1,sound,1
 paper_fall_sound,10.0,1,sound,1
+fuel_rod_reload_click_sound,6.0,1,sound,1
+fuel_rod_reload_place_sound,6.0,1,sound,1

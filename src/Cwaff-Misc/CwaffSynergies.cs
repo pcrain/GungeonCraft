@@ -370,6 +370,8 @@ public static class CwaffSynergies
           .MultReload(0.66f).MultAmmo(3f);
         // Beams now inflict severe sunburn, which enemies cannot recover from.
         NewMastery<MasteryOfPhotonCannon>(MASTERY_PHOTON_CANNON, PhotonCannon.ItemName);
+        // Ammo gained from barrels is tripled, and ammo can also be gained from conventional sources.
+        NewMastery<MasteryOfFuelRodGun>(MASTERY_FUEL_ROD_GUN, FuelRodGun.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -675,6 +677,7 @@ internal class MasteryOfFluxFist             : MasteryDummyItem {}
 internal class MasteryOfChainDriver          : MasteryDummyItem {}
 internal class MasteryOfRLTSRTSGTSBTSLB      : MasteryDummyItem {}
 internal class MasteryOfPhotonCannon         : MasteryDummyItem {}
+internal class MasteryOfFuelRodGun           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -838,5 +841,6 @@ public enum Synergy {
     MASTERY_FLUX_FIST,
     MASTERY_CHAIN_DRIVER,
     MASTERY_RLTSRTSGTSBTSLB,
-    MASTERY_PHOTON_CANNON
+    MASTERY_PHOTON_CANNON,
+    MASTERY_FUEL_ROD_GUN,
 };

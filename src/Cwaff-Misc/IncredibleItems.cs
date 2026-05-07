@@ -9,15 +9,18 @@ public static class IncredibleItems
     public static void Init()
     {
         _PaperChestPrefab = GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.A).gameObject.ClonePrefab().GetComponent<Chest>();
-            _PaperChestPrefab.spawnAnimName = _PaperChestPrefab.sprite.SetUpAnimation("chest_paper_appear", 2);
+
+            _PaperChestPrefab.spawnAnimName = null;
             _PaperChestPrefab.openAnimName  = _PaperChestPrefab.sprite.SetUpAnimation("chest_paper_open", 30);
             _PaperChestPrefab.breakAnimName = _PaperChestPrefab.openAnimName;
             tk2dSpriteAnimator animator = _PaperChestPrefab.spriteAnimator;
               animator.SetAudio("chest_paper_open", "paper_crinkle_sound", 4, 15, 18, 24);
               animator.SetAudio("chest_paper_open", "paper_fall_sound", 30);
-            _PaperChestPrefab.sprite.SetUpAnimation("chest_paper_idle", 11);
+              animator.defaultClipId = animator.GetClipIdByName(_PaperChestPrefab.sprite.SetUpAnimation("chest_paper_idle", 11));
+              _PaperChestPrefab.sprite.SetSprite(animator.library.clips[animator.defaultClipId].frames[0].spriteId);
             _PaperChestPrefab.IsLocked = false; // can't get lock renderer to attach properly after adjusting appearance animation
             _PaperChestPrefab.GetComponent<MajorBreakable>().HitPoints = 1;
+            _PaperChestPrefab.gameObject.AutoRigidBody(height: 0.35f);
 
         GunCarryingCase.Init();
         WWIRations.Init();
@@ -25,10 +28,10 @@ public static class IncredibleItems
 
     private static T SetupIncredibleItem<T>(this T item) where T : PickupObject
     {
-      item.quality = CwaffItemQuality.F;
+      item.quality                   = CwaffItemQuality.F;
       item.ShouldBeExcludedFromShops = true;
-      item.CanBeSold = false;
-      item.IgnoredByRat = true;
+      item.CanBeSold                 = false;
+      item.IgnoredByRat              = true;
       return item;
     }
 
@@ -49,7 +52,9 @@ public static class IncredibleItems
 
     public static Chest SpawnPaperChest()
     {
-        Chest chest = Chest.Spawn(IncredibleItems._PaperChestPrefab, GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool _));
+        Chest chest = Chest.Spawn(IncredibleItems._PaperChestPrefab,
+          GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool _));
+        chest.specRigidbody.enabled = true;
         chest.m_isMimic = false;
         chest.IsLocked = false;
         chest.m_isGlitchChest = false;
