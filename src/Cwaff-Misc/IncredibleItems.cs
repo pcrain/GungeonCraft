@@ -34,6 +34,7 @@ public static class IncredibleItems
 
         GunCarryingCase.Init();
         WWIRations.Init();
+        Headstone.Init();
     }
 
     private static T SetupIncredibleItem<T>(this T item) where T : PickupObject
@@ -42,6 +43,9 @@ public static class IncredibleItems
       item.ShouldBeExcludedFromShops = true;
       item.CanBeSold                 = false;
       item.IgnoredByRat              = true;
+      item.UsesCustomCost            = true;
+      item.CustomCost                = 0;
+      _IncredibleItemIDs.Add(item.PickupObjectId);
       return item;
     }
 
@@ -50,15 +54,6 @@ public static class IncredibleItems
 
     public static PlayerItem SetupActive<T>(string ItemName, string ShortDescription, string LongDescription, string Lore) where T : PlayerItem
       => Lazy.SetupActive<T>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true).SetupIncredibleItem();
-
-    public static int RandomIncredibleItem()
-    {
-        if (_IncredibleItemIDs.Count == 0)
-          foreach (PickupObject item in PickupObjectDatabase.Instance.Objects)
-            if (item && item.quality == CwaffItemQuality.F)
-              _IncredibleItemIDs.Add(item.PickupObjectId);
-        return _IncredibleItemIDs.ChooseRandom();
-    }
 
     public static Chest SpawnPaperChest()
     {
@@ -77,7 +72,7 @@ public static class IncredibleItems
         chest.IsLocked = false;
         chest.m_isGlitchChest = false;
         chest.contents = null;
-        chest.forceContentIds = [RandomIncredibleItem()];
+        chest.forceContentIds = [_IncredibleItemIDs.ChooseRandom()];
         RoomHandler room = chest.transform.position.GetAbsoluteRoom();
         if (room != null)
           chest.RegisterChestOnMinimap(room);
@@ -87,7 +82,11 @@ public static class IncredibleItems
     [HarmonyPatch]
     private static class IncredibleChestPlacerPatches
     {
+      #if DEBUG
+      private const float _INCREDIBLE_CHEST_CHANCE = 1.00f;
+      #else
       private const float _INCREDIBLE_CHEST_CHANCE = 0.01f;
+      #endif
 
       [HarmonyPatch(typeof(FloorChestPlacer), nameof(FloorChestPlacer.ConfigureOnPlacement))]
       [HarmonyPrefix]
@@ -136,5 +135,57 @@ public class WWIRations : CwaffActive
       user.healthHaver.ApplyHealing((DateTime.Now.Year < 1939) ? 3f : 0f);
       AkSoundEngine.PostEvent("Play_OBJ_med_kit_01", base.gameObject);
       user.PlayEffectOnActor((Items.Ration.AsActive() as RationItem).healVFX, Vector3.zero);
+    }
+}
+
+public class Headstone : CwaffPassive
+{
+    public static string ItemName         = "Headstone";
+    public static string ShortDescription = "Proper Burial";
+    public static string LongDescription  = "Reduces curse to 0 while dead.";
+    public static string Lore             = "";
+
+    private HealthHaver lastOwner = null;
+    private StatModifier _curseMod = null;
+
+    public static void Init()
+    {
+        PassiveItem item  = IncredibleItems.SetupPassive<Headstone>(ItemName, ShortDescription, LongDescription, Lore);
+    }
+
+    public override void Pickup(PlayerController player)
+    {
+        base.Pickup(player);
+        if (player.healthHaver is not HealthHaver hh)
+          return;
+        this.lastOwner = hh;
+        hh.OnDeath -= this.OnDeath;
+        hh.OnDeath += this.OnDeath;
+    }
+
+    public override void DisableEffect(PlayerController player)
+    {
+        base.DisableEffect(player);
+        if (player && player.healthHaver is HealthHaver hh)
+          hh.OnDeath -= this.OnDeath;
+    }
+
+    private void OnDeath(Vector2 vector)
+    {
+        if (!this.lastOwner || !this.lastOwner.isPlayerCharacter)
+          return;
+        this._curseMod = StatType.Curse.Add(-this.lastOwner.m_player.stats.GetStatValue(StatType.Curse));
+        this.lastOwner.m_player.ownerlessStatModifiers.Add(this._curseMod);
+        this.lastOwner.m_player.stats.RecalculateStats(this.lastOwner.m_player);
+    }
+
+    public override void Update()
+    {
+        if (this._curseMod == null || !this.lastOwner || this.lastOwner.IsDead)
+          return;
+        this.lastOwner.m_player.ownerlessStatModifiers.Remove(this._curseMod);
+        this.lastOwner.m_player.stats.RecalculateStats(this.lastOwner.m_player);
+        this._curseMod = null;
+        this.lastOwner = null;
     }
 }

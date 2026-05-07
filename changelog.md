@@ -16,6 +16,7 @@
 - Rebalanced difficulty and rewards for floor puzzle rooms
 	- Old behavior: size (7/8/9) puzzles on (early/midgame/late) floors, random room reward chest (random quality, usually lower)
 	- New behavior: size (7-9/8-10/9-11) puzzles on (early/midgame/late) floors, chest quality scales with puzzle size
+- Added proper custom ammo clip sprites for each of Breegull's egg types
 
 ## 1.29.2 (2026-04-27)
 

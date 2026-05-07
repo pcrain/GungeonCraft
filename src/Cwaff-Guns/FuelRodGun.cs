@@ -13,10 +13,12 @@ public class FuelRodGun : CwaffGun
 
     internal static readonly List<Projectile> _Rods = new();
     internal static readonly List<GameObject> _AmmoCells = new();
+    internal static readonly List<String> _AmmoSprites = new();
 
     private int _newGoopType;
     private bool _ammoDisplayDirty = true;
     private int _cachedAmmo = 1;
+    private int _uiAmmoType = -1;
 
     public int curAmmoType = 0;
     public List<int> ammoOfEachType = new();
@@ -43,15 +45,19 @@ public class FuelRodGun : CwaffGun
         // WATER
         _Rods.Add(baseProj.Clone(GunData.New(sprite: "fuel_rod_cannon_projectile_water")).MakeFuelRodProjectile(goop: EasyGoopDefinitions.WaterGoop));
         _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_water", emissivePower: 100f));
+        _AmmoSprites.Add(Lazy.SetupCustomAmmoClip("fuel_rod_gun_water"));
         // EXPLOSIVE
         _Rods.Add(baseProj.Clone(GunData.New(sprite: "fuel_rod_cannon_projectile_fire")).MakeFuelRodProjectile(power: 2.0f));
         _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_fire", emissivePower: 100f));
+        _AmmoSprites.Add(Lazy.SetupCustomAmmoClip("fuel_rod_gun_fire"));
         // OIL
         _Rods.Add(baseProj.Clone(GunData.New(sprite: "fuel_rod_cannon_projectile_oil")).MakeFuelRodProjectile(goop: EasyGoopDefinitions.OilDef));
         _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_oil", emissivePower: 100f));
+        _AmmoSprites.Add(Lazy.SetupCustomAmmoClip("fuel_rod_gun_oil"));
         // POISON
         _Rods.Add(baseProj.Clone(GunData.New(sprite: "fuel_rod_cannon_projectile_poison")).MakeFuelRodProjectile(goop: EasyGoopDefinitions.PoisonDef));
         _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_poison", emissivePower: 100f));
+        _AmmoSprites.Add(Lazy.SetupCustomAmmoClip("fuel_rod_gun_poison"));
     }
 
     public override Projectile OnPreFireProjectileModifier(Gun gun, Projectile projectile, ProjectileModule mod)
@@ -87,10 +93,16 @@ public class FuelRodGun : CwaffGun
     public override void Update()
     {
       base.Update();
-      if (this._cachedAmmo == this.gun.CurrentAmmo)
-        return;
-      this._cachedAmmo = this.gun.CurrentAmmo;
-      UpdateAmmo();
+      if (this._cachedAmmo != this.gun.CurrentAmmo)
+      {
+        this._cachedAmmo = this.gun.CurrentAmmo;
+        UpdateAmmo();
+      }
+      if (this._uiAmmoType != this.curAmmoType)
+      {
+          this._uiAmmoType = this.curAmmoType;
+          this.gun.DefaultModule.customAmmoType = _AmmoSprites[this.curAmmoType];
+      }
     }
 
     public override void OnMasteryStatusChanged()

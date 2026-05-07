@@ -1193,7 +1193,7 @@ public static class Extensions
   public static ProjectileModule SetupCustomAmmoClip(this ProjectileModule mod, string clipname)
   {
       mod.ammoType       = GameUIAmmoType.AmmoType.CUSTOM;
-      mod.customAmmoType = AtlasHelper.GetOrAddCustomAmmoType($"{clipname}_clip", ResMap.Get($"{clipname}_clipfull")[0], ResMap.Get($"{clipname}_clipempty")[0]);
+      mod.customAmmoType = Lazy.SetupCustomAmmoClip(clipname);
       return mod;
   }
 

@@ -27,6 +27,7 @@ public class Breegull : CwaffGun
     {
         public Projectile projectile;
         public string sound;
+        public string clip;
         public string ui;
         public int ammo;
     }
@@ -58,15 +59,18 @@ public class Breegull : CwaffGun
           .Attach<HomingModifier>(home => { home.HomingRadius = 10f; home.AngularVelocity = 720f; });
 
         _Eggs = new List<EggData>() {
-            new EggData(){ projectile = _EggNormal,    sound = "collect_egg_normal_sound",    ui = "breegull_normal_ui",    ammo = 1, },
-            new EggData(){ projectile = _EggFire,      sound = "collect_egg_fire_sound",      ui = "breegull_fire_ui",      ammo = 2, },
-            new EggData(){ projectile = _EggGrenade,   sound = "collect_egg_grenade_sound",   ui = "breegull_grenade_ui",   ammo = 5, },
-            new EggData(){ projectile = _EggIce,       sound = "collect_egg_ice_sound",       ui = "breegull_ice_ui",       ammo = 2, },
-            new EggData(){ projectile = _EggClockwork, sound = "collect_egg_clockwork_sound", ui = "breegull_clockwork_ui", ammo = 3, },
+            SetupEggData("normal",    _EggNormal,    1),
+            SetupEggData("fire",      _EggFire,      2),
+            SetupEggData("grenade",   _EggGrenade,   5),
+            SetupEggData("ice",       _EggIce,       2),
+            SetupEggData("clockwork", _EggClockwork, 3),
         };
 
         _TalonDust = VFX.Create("talon_trot_dust", fps: 30, loops: false);
     }
+
+    private static EggData SetupEggData(string name, Projectile projectile, int ammo)
+      => new(){projectile = projectile, sound = $"collect_egg_{name}_sound", clip = Lazy.SetupCustomAmmoClip("breegull_" + name), ui = $"breegull_{name}_ui", ammo = ammo};
 
     public override void Update()
     {
@@ -168,6 +172,7 @@ public class Breegull : CwaffGun
     {
         EggData e = _Eggs[this._currentEggType];
         this.gun.DefaultModule.ammoCost = e.ammo;  //BUG: with certain items, the ammo cost here seems to be ignored...can't replicate though
+        this.gun.DefaultModule.customAmmoType = e.clip;
         bool hadInfiniteAmmo = this.gun.LocalInfiniteAmmo;
         if (this._currentEggType == 0 && this.PlayerOwner && this.PlayerOwner.HasSynergy(Synergy.CHEATO_PAGE))
         {
