@@ -197,7 +197,12 @@ public class Ticonderogun : CwaffGun
     private void DoEncirclingMagic(AIActor enemy, float damage)
     {
         if (enemy.healthHaver.IsVulnerable)
+        {
             enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.Magic, DamageCategory.Normal);
+            if (enemy.healthHaver.IsDead && this.PlayerOwner.HasSynergy(Synergy.PURPLE_PROSE))
+                if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.CharmGoopDef) is DeadlyDeadlyGoopManager gooper)
+                    gooper.TimedAddGoopCircle(enemy.CenterPosition, 3.0f);
+        }
         CwaffVFX.SpawnBurst(
             prefab           : _RunePrefab,
             numToSpawn       : _NUM_RUNES,
@@ -454,9 +459,6 @@ public class Ticonderogun : CwaffGun
                 gooper.AddGoopCircle(pencilPos, 0.75f);
         if (this.PlayerOwner.HasSynergy(Synergy.TOXIC_LANGUAGE))
             if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.PoisonDef) is DeadlyDeadlyGoopManager gooper)
-                gooper.AddGoopCircle(pencilPos, 0.75f);
-        if (this.PlayerOwner.HasSynergy(Synergy.PURPLE_PROSE))
-            if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.CharmGoopDef) is DeadlyDeadlyGoopManager gooper)
                 gooper.AddGoopCircle(pencilPos, 0.75f);
 
         // If we have too many points, remove everything and start over

@@ -163,7 +163,7 @@ public static class CwaffSynergies
         NewSynergy(CHEST_BATTLE_ADVANCED, "Chest Battle Advanced", new[]{IName(Grandmaster.ItemName), "book_of_chest_anatomy"});
         // Ticonderogun leaves poison goop along drawn lines.
         NewSynergy(TOXIC_LANGUAGE, "Toxic Language", new[]{IName(Ticonderogun.ItemName), "irradiated_lead"});
-        // Ticonderogun leaves charm goop along drawn lines.
+        // Enemies killed by Ticonderogun spawn charm goop.
         NewSynergy(PURPLE_PROSE, "Purple Prose", new[]{IName(Ticonderogun.ItemName), "charming_rounds"});
         // Gyroscope charges no longer cause dizziness.
         NewSynergy(PERFECTLY_BALANCED, "Perfectly Balanced", new[]{IName(Gyroscope.ItemName), IName(KalibersJustice.ItemName)});
