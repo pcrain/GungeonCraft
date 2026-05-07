@@ -9,9 +9,9 @@
 
 ### Features
 
-- 162 new items, including
-	+ 88 new guns
-	+ 50 new passive items
+- 168 new items, including
+	+ 92 new guns
+	+ 52 new passive items
 	+ 24 new active items
 - Lore for all new guns and items
 - A new custom character: Rogo from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/)
@@ -42,10 +42,10 @@
 * Found a Bug?
 	- [Open an Issue on GitHub](https://github.com/pcrain/GungeonCraft/issues)! Please bear in mind that I work on this in my free time for fun, so I might not fix every bug, but I'll do my best to get to all of the important ones. C:
 * Why does my gun say "Normal" above it?
-	- Try beating the new boss :>
-* Where do I find the new boss?
+	- Try beating [REDACTED] :>
+* Where do I find [REDACTED]?
 	- Check behind the Hero Shrine at the start. I'm sure you can figure out the rest. C:
-* Where do I find the *other* new boss?
+* Where do I find the *other* [REDACTED]?
 	- Watch the trailer. C:
 
 ### Wiki

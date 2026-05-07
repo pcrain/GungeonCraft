@@ -1,24 +1,32 @@
 # Changelog
 
-## 1.30.0 (TBD)
+## 1.30.0 (2026-05-07)
+
+#### Features:
 
 - Added Chain Driver, RLTSRTSGTSBTSLB, Photon Cannon, Chew Toy, Super Cold Watch, and Fuel Rod Gun
 	- RLTSRTSGTSBTSLB sprite thanks to [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)!
 	- Super Cold Watch sprite thanks to [SpecialAPI](https://github.com/SpecialAPI)!
 - Added masteries for Chain Driver, RLTSRTSGTSBTSLB, Photon Cannon, and Fuel Rod Gun
+- Added Shmuppy enemy
+	- Shmuppy sprites, portrait, and description thanks to [TitaniumGrunt7](https://www.deviantart.com/titaniumgrunt7/art/Enter-the-Gungeon-Shmuppy-715527348)!
+- Added 6 new synergies
+	
+#### Balance Changes and Polish:
+
+- Rebalanced difficulty and rewards for floor puzzle rooms
+	- Old behavior: size (7/8/9) puzzles on (early/midgame/late) floors, random room reward chest (random quality, usually lower)
+	- New behavior: size (7-9/8-10/9-11) puzzles on (early/midgame/late) floors, chest quality scales with puzzle size
+- Added proper custom ammo clip sprites for each of Breegull's egg types
+
+#### Bugfixes and Misc:
+
 - Fixed null deref caused by Newton's Apple attempting to find enemies when changing floors
 - Fixed critical hits from Sextant no longer ignoring DPS caps
 - Fixed Alligator's maximum clips per enemy not being limited to 8 after a code rework 
 - Prevented cheating on floor puzzles due to skipping over tiles
 - Fixed player's shadow continuously moving when switching to from Flux Fist
-- Fixed flight not being granted when picking up mastered Flux Fist until switching away from and back to it
-- Added 6 new synergies
-- Rebalanced difficulty and rewards for floor puzzle rooms
-	- Old behavior: size (7/8/9) puzzles on (early/midgame/late) floors, random room reward chest (random quality, usually lower)
-	- New behavior: size (7-9/8-10/9-11) puzzles on (early/midgame/late) floors, chest quality scales with puzzle size
-- Added proper custom ammo clip sprites for each of Breegull's egg types
-- Added Shmuppy enemy
-	- Shmuppy sprites, portrait, and description thanks to [TitaniumGrunt7](https://www.deviantart.com/titaniumgrunt7/art/Enter-the-Gungeon-Shmuppy-715527348)
+- Fixed flight not being granted when picking up mastered Flux Fist until switching away from it and back to it
 
 ## 1.29.2 (2026-04-27)
 

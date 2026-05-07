@@ -16,7 +16,8 @@ public class RLTSRTSGTSBTSLB : CwaffGun
           .SetReloadAudio("rocket_wiggle_sound", 24, 26, 28, 30, 32, 34)
           .SetMuzzleVFX(Items.TheExotic, onlyCopyBasicEffects: false)
           .AddToShop(ItemBuilder.ShopType.Trorc)
-          .InitProjectile(GunData.New(baseProjectile: Items.TheExotic.Projectile(), clipSize: 2, cooldown: 1.0f, recoil: 50f, customClip: true))
+          .InitProjectile(GunData.New(baseProjectile: Items.TheExotic.Projectile(), shootStyle: ShootStyle.SemiAutomatic, clipSize: 2,
+            cooldown: 1.0f, recoil: 50f, customClip: true))
           .Assign(out Projectile pRocket);
         Projectile pLaser         = Items.FlashRay.Projectile().Clone();
           pLaser.gameObject.AddComponent<MasteryProcessor>();

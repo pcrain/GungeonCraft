@@ -81,6 +81,9 @@ def main():
   npcData = getNPCs()
   WIKI_PARAMS["npcs"] = "".join([NPC_TEMPLATE.format(**v) for k,v in npcData.items()])
 
+  enemyData = getEnemies()
+  WIKI_PARAMS["enemies"] = "".join([ENEMY_TEMPLATE.format(**v) for k,v in enemyData.items()])
+
   characterData = getCharacters()
   WIKI_PARAMS["characters"] = "".join([CHARACTER_TEMPLATE.format(**v) for k,v in characterData.items()])
 
@@ -287,7 +290,7 @@ def scanSynergies(passives, actives, guns):
           filenames.append(f"""[[File:{e[1]}]]""")
           itemnames.append(e[0])
       else:
-          cap_item = " ".join([(w if w in ["of", "the", "3rd"] else w.title()) for w in item_id.replace("_"," ").split()])
+          cap_item = " ".join([(w if w in ["of", "the", "3rd"] else w[0].upper()+w[1:]) for w in item_id.replace("_"," ").split()])
           if cap_item == "Seven Leaf Clover":
             cap_item = "Seven-Leaf Clover"
           filenames.append(f"""[[File:{cap_item.replace(" ","_")}.png]]""")
@@ -384,6 +387,15 @@ def getNPCs():
     },
   }
 
+def getEnemies():
+  return {
+    "shmuppy" : {
+      "filename"      : imageFor("shmuppy_idle_front_right_001.png"),
+      "enemyname"     : "[https://www.deviantart.com/titaniumgrunt7/art/Enter-the-Gungeon-Shmuppy-715527348 Shmuppy]",
+      "type"          : "Normal Enemy",
+      "notes"         : "Occasionally spawns alongside Bullet Kin. Will attempt to distract the player and deflect bullets with its bark.",
+    },
+  }
 
 def getCharacters():
   return {
@@ -450,6 +462,14 @@ NPC_TEMPLATE='''
 |{type}
 |{condition}
 |{description}
+'''
+
+ENEMY_TEMPLATE='''
+|- style="vertical-align:middle; height: 128px;"
+|<div style="transform-origin: center; transform: scale(2);">{filename}</div>
+|{enemyname}
+|{type}
+|{notes}
 '''
 
 CHARACTER_TEMPLATE='''
@@ -526,6 +546,16 @@ WIKI_TEMPLATE='''
 !Spawn Condition (Classic)
 !style="width: 50%"|Description
 {npcs}
+|}}
+
+== Enemies ==
+
+{{| {tablestyle}
+!style="font-weight: bold; width: 112px;"|Icon
+!Name
+!Type
+!style="width: 50%"|Notes
+{enemies}
 |}}
 
 == Custom Character ==
