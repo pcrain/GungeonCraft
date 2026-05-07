@@ -6,6 +6,7 @@ public class FloorPuzzleRoomController : MonoBehaviour
   internal static readonly string _GUID = "floor_puzzle_controller"; //WARNING: don't change without also updating GUID in RAT
 
   private const float MAX_TIME_BETWEEN_TRIGGERS = 0.1f;
+  private const int BASE_PUZZLE_SIZE = 9;
 
   internal FloorPuzzleTile _last = null;
   internal bool _puzzleSucceeded = false;
@@ -19,6 +20,7 @@ public class FloorPuzzleRoomController : MonoBehaviour
   private FloorPuzzleTile _entry = null;
   private FloorPuzzleTile _exit = null;
   private RoomHandler _room = null;
+  private int _puzzleSize = 0;
 
   public static void Init()
   {
@@ -34,28 +36,32 @@ public class FloorPuzzleRoomController : MonoBehaviour
   {
     const float TILE_SIZE = 24f / 16f; // size of the sprites in game units
     const float COVERAGE = 0.75f; // approximate percentage of puzzle that should be floor tiles (as opposed to wall tiles)
-    int puzzleSize = 9;
+    this._puzzleSize = BASE_PUZZLE_SIZE;
 
-    #if !DEBUG // always max difficulty in debug mode
     GlobalDungeonData.ValidTilesets tileSet = GameManager.Instance.Dungeon.tileIndices.tilesetId;
     if (tileSet == GlobalDungeonData.ValidTilesets.CASTLEGEON || tileSet == GlobalDungeonData.ValidTilesets.GUNGEON)
-      puzzleSize = 7;
-    else if (tileSet == GlobalDungeonData.ValidTilesets.MINEGEON || tileSet == GlobalDungeonData.ValidTilesets.CATACOMBGEON || tileSet == GlobalDungeonData.ValidTilesets.SEWERGEON)
-      puzzleSize = 8;
+      this._puzzleSize -= 1;
+    else if (tileSet != GlobalDungeonData.ValidTilesets.MINEGEON && tileSet != GlobalDungeonData.ValidTilesets.CATACOMBGEON && tileSet != GlobalDungeonData.ValidTilesets.SEWERGEON)
+      this._puzzleSize += 1;
+
+    #if DEBUG
+      this._puzzleSize = BASE_PUZZLE_SIZE + 1;
     #endif
 
-    float puzzleRadius = 0.5f * (puzzleSize - 1);
+    this._puzzleSize += ((int[])[-1, 0, 1]).ChooseRandom(); // randomly adjust difficulty by +/- 1
+
+    float puzzleRadius = 0.5f * (this._puzzleSize - 1);
     this._room = base.transform.position.GetAbsoluteRoom();
     CellArea area = this._room.area;
-    Lazy.DebugLog($"  spawning floor puzzle of size {puzzleSize} by {puzzleSize} in room of size {area.dimensions.x} by {area.dimensions.y} at {area.UnitCenter}");
+    Lazy.DebugLog($"  spawning floor puzzle of size {this._puzzleSize} by {this._puzzleSize} in room of size {area.dimensions.x} by {area.dimensions.y} at {area.UnitCenter}");
 
-    LinkedList<IntVector2> path = FloorPuzzleGenerator.GeneratePuzzleOfSize(puzzleSize, puzzleSize, targetCoverage: COVERAGE);
+    LinkedList<IntVector2> path = FloorPuzzleGenerator.GeneratePuzzleOfSize(this._puzzleSize, this._puzzleSize, targetCoverage: COVERAGE);
     HashSet<IntVector2> pathPositions = new(path);
     IntVector2 startPos = path.First.Value;
     IntVector2 endPos = path.Last.Value;
-    for (int i = 0; i < puzzleSize; ++i)
+    for (int i = 0; i < this._puzzleSize; ++i)
     {
-      for (int j = 0; j < puzzleSize; ++j)
+      for (int j = 0; j < this._puzzleSize; ++j)
       {
         GameObject puzzleTile = UnityEngine.Object.Instantiate(FloorPuzzleTile.Prefab);
         puzzleTile.transform.position = area.UnitCenter + TILE_SIZE * new Vector2(i - puzzleRadius, j - puzzleRadius);
@@ -173,6 +179,18 @@ public class FloorPuzzleRoomController : MonoBehaviour
     _tilesCollidedThisFrame.Add(tile);
   }
 
+  private Chest GetChestForPuzzleDifficulty()
+  {
+    ItemQuality quality = this._puzzleSize switch {
+      < (BASE_PUZZLE_SIZE - 1) => ItemQuality.D,
+      BASE_PUZZLE_SIZE - 1     => ItemQuality.C,
+      BASE_PUZZLE_SIZE         => ItemQuality.B,
+      BASE_PUZZLE_SIZE + 1     => ItemQuality.A,
+      > (BASE_PUZZLE_SIZE + 1) => ItemQuality.S,
+    };
+    return GameManager.Instance.RewardManager.GetTargetChestPrefab(quality);
+  }
+
   internal bool CheckSuccess()
   {
     if (this._puzzleSucceeded || this._puzzleFailed)
@@ -186,9 +204,9 @@ public class FloorPuzzleRoomController : MonoBehaviour
     IntVector2 bestRewardLocation = this._room.GetBestRewardLocation(new IntVector2(2, 1));
     if (GameStatsManager.Instance.IsRainbowRun)
         LootEngine.SpawnBowlerNote(GameManager.Instance.RewardManager.BowlerNoteChest, bestRewardLocation.ToCenterVector2(), this._room, true);
-    else
+    else if (Chest.Spawn(GetChestForPuzzleDifficulty(), bestRewardLocation, this._room) is Chest chest)
     {
-      Chest chest = this._room.SpawnRoomRewardChest(null, bestRewardLocation);
+      chest.RegisterChestOnMinimap(this._room);
       chest.ForceUnlock();
     }
     base.gameObject.Play("puzzle_solve");

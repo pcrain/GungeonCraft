@@ -8,19 +8,29 @@ public static class IncredibleItems
 
     public static void Init()
     {
-        _PaperChestPrefab = GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.A).gameObject.ClonePrefab().GetComponent<Chest>();
+        Chest baseChest = GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.A);
+        _PaperChestPrefab = baseChest.gameObject.ClonePrefab().GetComponent<Chest>();
 
-            _PaperChestPrefab.spawnAnimName = null;
+            _PaperChestPrefab.ShadowSprite = null;
+            if (_PaperChestPrefab.gameObject.transform.Find("Shadow") is Transform shadow)
+              UnityEngine.Object.Destroy(shadow.gameObject);
+            if (_PaperChestPrefab.gameObject.transform.Find("SpawnTransform") is Transform spawnTransform)
+              UnityEngine.Object.Destroy(spawnTransform.gameObject);
+            _PaperChestPrefab.spawnTransform = null;
+            //WARNING: if spawnAnimName is set to null, the first one will work okay, but subsequent runs will cause chests to appear as their original variants
+            //         however, if it's NOT set to null, then the chest spawns in with a disabled SpeculativeRigidBody due to SpawnBehavior_CR()
+            _PaperChestPrefab.spawnAnimName = "chest_paper_idle";
             _PaperChestPrefab.openAnimName  = _PaperChestPrefab.sprite.SetUpAnimation("chest_paper_open", 30);
             _PaperChestPrefab.breakAnimName = _PaperChestPrefab.openAnimName;
             tk2dSpriteAnimator animator = _PaperChestPrefab.spriteAnimator;
               animator.SetAudio("chest_paper_open", "paper_crinkle_sound", 4, 15, 18, 24);
               animator.SetAudio("chest_paper_open", "paper_fall_sound", 30);
-              animator.defaultClipId = animator.GetClipIdByName(_PaperChestPrefab.sprite.SetUpAnimation("chest_paper_idle", 11));
+              animator.defaultClipId = animator.GetClipIdByName(_PaperChestPrefab.sprite.SetUpAnimation("chest_paper_idle", 1));
               _PaperChestPrefab.sprite.SetSprite(animator.library.clips[animator.defaultClipId].frames[0].spriteId);
             _PaperChestPrefab.IsLocked = false; // can't get lock renderer to attach properly after adjusting appearance animation
             _PaperChestPrefab.GetComponent<MajorBreakable>().HitPoints = 1;
-            _PaperChestPrefab.gameObject.AutoRigidBody(height: 0.35f);
+            _PaperChestPrefab.gameObject.AutoRigidBody(height: 0.25f);
+            _PaperChestPrefab.gameObject.AddComponent<PaperChestInitializer>();
 
         GunCarryingCase.Init();
         WWIRations.Init();
@@ -52,15 +62,46 @@ public static class IncredibleItems
 
     public static Chest SpawnPaperChest()
     {
-        Chest chest = Chest.Spawn(IncredibleItems._PaperChestPrefab,
+        return Chest.Spawn(IncredibleItems._PaperChestPrefab,
           GameManager.Instance.PrimaryPlayer.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool _));
+    }
+
+    private class PaperChestInitializer : MonoBehaviour
+    {
+      private void Start()
+      {
+        Chest chest = base.gameObject.GetComponent<Chest>();
         chest.specRigidbody.enabled = true;
+        chest.specRigidbody.Reinitialize();
         chest.m_isMimic = false;
         chest.IsLocked = false;
         chest.m_isGlitchChest = false;
         chest.contents = null;
         chest.forceContentIds = [RandomIncredibleItem()];
-        return chest;
+        RoomHandler room = chest.transform.position.GetAbsoluteRoom();
+        if (room != null)
+          chest.RegisterChestOnMinimap(room);
+      }
+    }
+
+    [HarmonyPatch]
+    private static class IncredibleChestPlacerPatches
+    {
+      private const float _INCREDIBLE_CHEST_CHANCE = 0.01f;
+
+      [HarmonyPatch(typeof(FloorChestPlacer), nameof(FloorChestPlacer.ConfigureOnPlacement))]
+      [HarmonyPrefix]
+      private static void FloorChestPlacerConfigureOnPlacementPatch(FloorChestPlacer __instance, RoomHandler room)
+      {
+          float magnificence = GameManager.Instance.RewardManager.CurrentRewardData.DetermineCurrentMagnificence(true);
+          if (magnificence < 4 || UnityEngine.Random.value > _INCREDIBLE_CHEST_CHANCE)
+            return;
+          __instance.UseOverrideChest = true;
+          __instance.OverrideChestPrefab = _PaperChestPrefab;
+          __instance.CenterChestInRegion = true;
+          __instance.xPixelOffset = -8;
+          __instance.yPixelOffset = -8;
+      }
     }
 }
 

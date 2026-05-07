@@ -13,6 +13,9 @@
 - Fixed player's shadow continuously moving when switching to from Flux Fist
 - Fixed flight not being granted when picking up mastered Flux Fist until switching away from and back to it
 - Added 6 new synergies
+- Rebalanced difficulty and rewards for floor puzzle rooms
+	- Old behavior: size (7/8/9) puzzles on (early/midgame/late) floors, random room reward chest (random quality, usually lower)
+	- New behavior: size (7-9/8-10/9-11) puzzles on (early/midgame/late) floors, chest quality scales with puzzle size
 
 ## 1.29.2 (2026-04-27)
 
