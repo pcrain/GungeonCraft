@@ -6,8 +6,8 @@ public class ChewToy : CwaffCompanion
 {
     public static string ItemName         = "Chew Toy";
     public static string ShortDescription = "Bullet Bitten";
-    public static string LongDescription  = "Spawns Shmuppy. While in combat, Shmuppy will distract and draw fire from a single enemy. Shmuppy is scared of bosses, and will play dead during boss fights.";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Spawns a friendly Shmuppy. While in combat, Shmuppy will distract and draw fire from a single enemy. Shmuppy is scared of bosses, and will play dead during boss fights.";
+    public static string Lore             = "While normally completely loyal to the Bullet Kin, Shmuppies have an incredibly soft spot for their favorite chew toys, and with minimal effort, can be coaxed into joining any friendly Gungeoneer on their adventure. They seem to be a lot more easily distracted while by your side, but their heart is in the right place.";
 
     public static string CompanionName    = "Shmuppy";
 

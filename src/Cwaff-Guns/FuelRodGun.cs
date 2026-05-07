@@ -5,7 +5,7 @@ public class FuelRodGun : CwaffGun
     public static string ItemName         = "Fuel Rod Gun";
     public static string ShortDescription = "Barely Contained";
     public static string LongDescription  = "Launches highly explosive fuel rods. Cannot use conventional ammo, but can extract fuel by interacting with barrels while equipped. Reloading cycles through available fuel types.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A highly destructive support weapon, manufactured in an alternate timeline by an advanced alien race waging war against humanity. It was designed with several mechanisms for rendering it inoperable should it fall into the wrong hands. Naturally, it was most frequently wielded by low-level grunts with these mechanisms completely disabled.";
 
     public enum FuelRodAmmoType { WATER, EXPLOSIVE, OIL, POISON, /* VOID,*/ }
 
@@ -26,7 +26,7 @@ public class FuelRodGun : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<FuelRodGun>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.EXPLOSIVE, reloadTime: 1.0f, ammo: 15, shootFps: 24, smoothReload: 0.0f,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.EXPLOSIVE, reloadTime: 1.0f, ammo: 15, shootFps: 24, smoothReload: 0.0f,
             fireAudio: "fuel_rod_gun_fire_sound", canGainAmmo: false, canReloadNoMatterAmmo: true)
           .SetReloadAudio("fuel_rod_reload_place_sound", 8)
           .SetReloadAudio("fuel_rod_reload_click_sound", 14)

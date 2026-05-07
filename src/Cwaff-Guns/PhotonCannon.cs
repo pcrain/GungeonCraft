@@ -5,7 +5,7 @@ public class PhotonCannon : CwaffGun
     public static string ItemName         = "Photon Cannon";
     public static string ShortDescription = "20 Minute Battery Life";
     public static string LongDescription  = "Fires a beam that continuously inflicts sunburn. Sunburn deals increasing damage over time the longer an enemy is afflicted. Enemies not afflicted with sunburn within the last second recover from the status completely.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "Via the controlled tunneling of massless particles through a cylindrical polymer at light speed, and the redirecting of those particles to a single point of contact through an amorphous silica-based substrate, this weapon is capable of transferring millions of femtojoules of raw energy to a designated target in seconds.";
 
     private const float _SOUND_TIMER         = 0.25f;
 

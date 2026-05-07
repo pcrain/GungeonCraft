@@ -20,11 +20,10 @@
 - Barter Shop: trades 3 random D-A tier items for any higher-tiered item
 - Insurance Shop: sells insurance policies that let you carry items over to the next run
 - Hecked Mode: randomize enemies' guns for a truly hecked playing experience (enabled via the Mod Config menu)
-- A new secret boss or two
+- Two new secret bosses
 - Gun mastery system
 - You can pet Junior \o/
 - You can become the greatest janitor the Gungeon has ever seen O:
-- Easter eggs
 - And more! 
 - Check out the [official trailer](https://youtu.be/5DJ5meM842w)
 

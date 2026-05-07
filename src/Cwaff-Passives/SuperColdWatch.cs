@@ -5,7 +5,7 @@ public class SuperColdWatch : CwaffPassive
     public static string ItemName         = "Super Cold Watch";
     public static string ShortDescription = "Time Moves As You...Don't?";
     public static string LongDescription  = "All other objects gradually slow down as the player moves, down to a minimum of 1/8 their normal speed. Standing still or dodge rolling will reset time to its normal speed.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A Super Hot Watch that was left to cool off in the Hollow for far too long. You feel an otherworldly coldness and stillness in the air around you as you hold it, comparable to being permanently stuck in the moment of complete silence after telling a poorly received joke at a funeral.";
 
     private const float _BUILDUP_TIME = 5.0f;
     private const float _MAX_TIMESCALE_REDUCTION = 0.875f;
@@ -26,9 +26,9 @@ public class SuperColdWatch : CwaffPassive
     {
       this._effectStrength = _MAX_TIMESCALE_REDUCTION * Ease.OutQuad(Mathf.Clamp01(this._activeTime / _BUILDUP_TIME));
       this._statModifiers ??= new[] {
-          StatType.RateOfFire.Mult(1f),
-          StatType.MovementSpeed.Mult(1f),
-          StatType.ReloadSpeed.Mult(1f),
+        StatType.RateOfFire.Mult(1f),
+        StatType.MovementSpeed.Mult(1f),
+        StatType.ReloadSpeed.Mult(1f),
       };
       float statStrength = 1f - this._effectStrength;
       float invertedStatStrength = 1f / statStrength;
@@ -48,10 +48,10 @@ public class SuperColdWatch : CwaffPassive
     {
       base.Update();
       float now = Time.realtimeSinceStartup;
-      bool shouldBeActive = m_pickedUp && !GameManager.Instance.IsLoadingLevel && m_owner &&
-        (m_owner.CurrentInputState == PlayerInputState.AllInput || m_owner.CurrentInputState == PlayerInputState.OnlyMovement) &&
-        !m_owner.IsFalling && !m_owner.IsDodgeRolling && m_owner.healthHaver && !m_owner.healthHaver.IsDead &&
-        m_owner.specRigidbody && m_owner.specRigidbody.Velocity.sqrMagnitude > 0.01f;
+      bool shouldBeActive = m_pickedUp && !GameManager.Instance.IsLoadingLevel && m_owner
+        && (m_owner.CurrentInputState == PlayerInputState.AllInput || m_owner.CurrentInputState == PlayerInputState.OnlyMovement)
+        && !m_owner.IsFalling && !m_owner.IsDodgeRolling && m_owner.healthHaver && !m_owner.healthHaver.IsDead
+        && m_owner.specRigidbody && m_owner.specRigidbody.Velocity.sqrMagnitude > 0.01f;
       if (!shouldBeActive)
       {
         if (!this._active)
