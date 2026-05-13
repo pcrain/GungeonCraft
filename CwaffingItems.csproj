@@ -281,6 +281,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffRunData.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
     <Compile Include="src\Cwaff-Misc\EasyLabel.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffRopeMesh.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffSynergies.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffEvents.cs"/>
     <Compile Include="src\Cwaff-Misc\AtlasHelper.cs"/>

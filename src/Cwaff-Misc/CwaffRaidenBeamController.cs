@@ -477,18 +477,16 @@ public class CwaffRaidenBeamController : BeamController
     int numSubtilesInSprite = spritePixelLength / 4;
     int lastBoneIndex = Mathf.Max(m_bones.Count - 1, 0);
     int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
-    boundsCenter = (m_minBonePosition + m_maxBonePosition) / 2f;
-    boundsExtents = (m_maxBonePosition - m_minBonePosition) / 2f;
-    LinkedListNode<CwaffBone> linkedListNode = m_bones.First;
+    boundsCenter = 0.5f * (m_minBonePosition + m_maxBonePosition);
+    boundsExtents = 0.5f * (m_maxBonePosition - m_minBonePosition);
+    LinkedListNode<CwaffBone> bone = m_bones.First;
     int verticesDrawn = 0;
     int animationFrame = Mathf.FloorToInt(Mathf.Repeat(m_globalTimer * m_animationClip.fps, m_animationClip.frames.Length));
     for (int i = 0; i < totalSpritesToDraw; i++)
     {
       int lastSubtileIndex = numSubtilesInSprite - 1;
       if (i == totalSpritesToDraw - 1 && lastBoneIndex % numSubtilesInSprite != 0)
-      {
         lastSubtileIndex = lastBoneIndex % numSubtilesInSprite - 1;
-      }
       tk2dSpriteDefinition segmentSprite = spriteDef;
       if (usesStartAnimation && i == 0)
       {
@@ -501,11 +499,11 @@ public class CwaffRaidenBeamController : BeamController
       for (int j = 0; j <= lastSubtileIndex; j++)
       {
         float fractionOfSubtileToDraw = 1f;
+        CwaffBone curBone = bone.Value;
+        CwaffBone nextBone = bone.Next.Value;
         if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex)
-          fractionOfSubtileToDraw = Vector2.Distance(linkedListNode.Next.Value.pos, linkedListNode.Value.pos);
+          fractionOfSubtileToDraw = Vector2.Distance(nextBone.pos, curBone.pos);
         int uvCurrent = offset + verticesDrawn;
-        CwaffBone curBone = linkedListNode.Value;
-        CwaffBone nextBone = linkedListNode.Next.Value;
         pos[uvCurrent++] = (curBone.pos  + curBone.normal  * (segmentSprite.position0.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);
         pos[uvCurrent++] = (nextBone.pos + nextBone.normal * (segmentSprite.position1.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);
         pos[uvCurrent++] = (curBone.pos  + curBone.normal  * (segmentSprite.position2.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);
@@ -519,8 +517,7 @@ public class CwaffRaidenBeamController : BeamController
         uv[uvCurrent++] = maxUV;
         verticesDrawn += 4;
         numSpritesDrawn += fractionOfSubtileToDraw / m_spriteSubtileWidth;
-        if (linkedListNode != null)
-          linkedListNode = linkedListNode.Next;
+        bone = bone.Next;
       }
     }
   }
