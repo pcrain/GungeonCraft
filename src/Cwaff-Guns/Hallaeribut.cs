@@ -6,12 +6,12 @@ public class Hallaeribut : CwaffGun
 {
     public static string ItemName         = "Hallaeribut";
     public static string ShortDescription = "Modern Warfare Cod";
-    public static string LongDescription  = "Fires piranhas that devour any targets in their sight. Becomes increasingly hungry as ammo is depleted, spawning more piranhas per shot but having increasingly negative side effects: when Peckish, cannot be dropped; when Hungry, cannot pick up ammo for other guns; when Starving, cannot switch to other guns; when Famished, feeds on the player every 30 seconds.";
+    public static string LongDescription  = "Fires piranhas that devour any targets in their sight. Becomes increasingly hungry as ammo is depleted, spawning more piranhas per shot but having increasingly negative side effects: when Peckish, cannot be dropped; when Hungry, cannot pick up ammo for other guns; when Starving, cannot switch to other guns; when Famished, feeds on the player to restore 20% ammo when out of ammo";
     public static string Lore             = "Piranhas are not known to be picky eaters. It's uncertain who first brought them into the Gungeon or for what purpose, but the fact that they're more than willing to eat flesh, metal, and lead is by all means a good enough reason to stick them in a gun and fire away. Just be extra careful whan handling the ammunition....";
 
     private const int _SWARM_SIZE = 2;
     private const int _BURSTS_PER_CLIP = 5;
-    private const float _STARVE_TIMER = 30f;
+    private const float _FAMISH_AMMO_PERCENT = 0.2f;
 
     // NOTE: spaced to be at 25% increments assuming we shoot 2, 4, 6, and 8 shots 40 times each == 800 total ammo
     private static readonly float[] _AmmoThresholds = [1.0f, 0.9f, 0.7f, 0.4f, 0.0f];
@@ -27,7 +27,6 @@ public class Hallaeribut : CwaffGun
     internal static GameObject _BiteVFX;
 
     private State _state = Satiated;
-    private float _famishTimer = 0.0f;
     private int _cachedAmmo = -1;
 
     public static void Init()
@@ -73,17 +72,10 @@ public class Hallaeribut : CwaffGun
     {
         if ((int)this._state < (int)Famished)
             return;
-        if (this._state == Ravenous)
-        {
-            if (this.gun.CurrentAmmo > 0 || this.gun.InfiniteAmmo || this.gun.LocalInfiniteAmmo)
-                return; // don't snack on player while ravenous unless we're out of ammo
-            if (AttemptRavenousItemConsume(checkInventory: true))
-                return;
-        }
-        else if (this._state == Famished && (BraveTime.ScaledTimeSinceStartup - this._famishTimer) < _STARVE_TIMER)
+        if (this.gun.CurrentAmmo > 0 || this.gun.InfiniteAmmo || this.gun.LocalInfiniteAmmo)
+            return; // don't snack on player while famished or ravenous unless we're out of ammo
+        if (this._state == Ravenous && AttemptRavenousItemConsume(checkInventory: true))
             return;
-
-        this._famishTimer = BraveTime.ScaledTimeSinceStartup;
         if (this.PlayerOwner.healthHaver is not HealthHaver hh || hh.IsDead)
             return;
 
@@ -91,8 +83,7 @@ public class Hallaeribut : CwaffGun
             DamageCategory.Unstoppable, ignoreInvulnerabilityFrames: true);
         CwaffVFX.Spawn(prefab: Hallaeribut._BiteVFX, position: this.PlayerOwner.CenterPosition, lifetime: 0.3f, fadeOutTime: 0.1f);
         this.PlayerOwner.gameObject.Play("chomp_large_sound");
-        if (this._state == Ravenous)
-            this.gun.GainAmmo(Mathf.CeilToInt(0.2f * this.gun.AdjustedMaxAmmo)); // restore 20% when ravenous
+        this.gun.GainAmmo(Mathf.CeilToInt(_FAMISH_AMMO_PERCENT * this.gun.AdjustedMaxAmmo)); // restore ammo when feeding on player
     }
 
     public override void OnFullClipReload(PlayerController player, Gun gun)
@@ -129,7 +120,7 @@ public class Hallaeribut : CwaffGun
         if (item.PickupObjectId == (int)Items.Junk)
             percentAmmoToRestore = 0.1f;
         else
-            percentAmmoToRestore = Mathf.Max(1, item.QualityGrade()) * 0.2f;
+            percentAmmoToRestore = Mathf.Clamp(item.QualityGrade(), 1, 5) * 0.2f;
         this.gun.GainAmmo(Mathf.CeilToInt(percentAmmoToRestore * this.gun.AdjustedMaxAmmo));
 
         // drop and destroy the item so we properly call the Drop() / Destroy() events and can't pick it back up
@@ -245,8 +236,6 @@ public class Hallaeribut : CwaffGun
         this.gun.CanBeDropped = newState == Satiated;
         this.gun.CanBeSold = this.gun.CanBeDropped;
         this.PlayerOwner.inventory.GunLocked.SetOverride(ItemName, newState >= Starving);
-        if ((int)this._state < (int)Famished && (int)newState >= (int)Famished)
-            this._famishTimer = BraveTime.ScaledTimeSinceStartup;
 
         this._state = newState;
     }
