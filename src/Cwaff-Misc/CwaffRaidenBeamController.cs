@@ -8,54 +8,6 @@ public class CwaffRaidenBeamController : BeamController
     Room = 20
   }
 
-  private class Bone
-  {
-    private static int _BonesCreated = 0;
-    private static readonly LinkedList<Bone> _BonePool = new();
-
-    public Vector2 pos;
-    public Vector2 normal;
-
-    internal static LinkedListNode<Bone> Rent(Vector2 pos)
-    {
-      if (_BonePool.Count == 0)
-        _BonePool.AddLast(new Bone());
-
-      LinkedListNode<Bone> node = _BonePool.Last;
-      _BonePool.RemoveLast();
-
-      Bone bone   = node.Value;
-      bone.pos    = pos;
-      bone.normal = default;
-
-      return node;
-    }
-
-    internal static void Return(LinkedListNode<Bone> bone)
-    {
-      _BonePool.AddLast(bone);
-      // System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
-    }
-
-    internal static void ReturnAll(ref LinkedList<Bone> bones)
-    {
-      if (bones == null)
-        return;
-      while (bones.Count > 0)
-      {
-        LinkedListNode<Bone> bone = bones.Last;
-        bones.RemoveLast();
-        _BonePool.AddLast(bone);
-      }
-      // System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
-    }
-
-    private Bone() // can only be created by Rent
-    {
-      ++_BonesCreated;
-    }
-  }
-
   public string beamAnimation;
 
   public bool usesStartAnimation;
@@ -103,7 +55,7 @@ public class CwaffRaidenBeamController : BeamController
 
   private int m_spriteSubtileWidth;
 
-  private LinkedList<Bone> m_bones = new LinkedList<Bone>();
+  private LinkedList<CwaffBone> m_bones = new LinkedList<CwaffBone>();
 
   private Vector2 m_minBonePosition;
 
@@ -243,7 +195,7 @@ public class CwaffRaidenBeamController : BeamController
 
     m_minBonePosition = new Vector2(float.MaxValue, float.MaxValue);
     m_maxBonePosition = new Vector2(float.MinValue, float.MinValue);
-    for (LinkedListNode<Bone> linkedListNode = m_bones.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
+    for (LinkedListNode<CwaffBone> linkedListNode = m_bones.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
     {
       m_minBonePosition = Vector2.Min(m_minBonePosition, linkedListNode.Value.pos);
       m_maxBonePosition = Vector2.Max(m_maxBonePosition, linkedListNode.Value.pos);
@@ -327,7 +279,7 @@ public class CwaffRaidenBeamController : BeamController
           break;
       }
     }
-    Bone.ReturnAll(ref m_bones);
+    CwaffBone.ReturnAll(ref m_bones);
     this._growthTime = 1f - Mathf.Min(this._growthTime + BraveTime.DeltaTime, _EXTEND_TIME) / _EXTEND_TIME;
     this._growthTime = 1f - (this._growthTime * this._growthTime); // cubic ease in
     Vector3? impactPos = null;
@@ -428,7 +380,7 @@ public class CwaffRaidenBeamController : BeamController
       if (ImpactRenderer)
         ImpactRenderer.renderer.enabled = false;
     }
-    LinkedListNode<Bone> linkedListNode = m_bones.First;
+    LinkedListNode<CwaffBone> linkedListNode = m_bones.First;
     while (linkedListNode != null && linkedListNode != m_bones.Last)
     {
       linkedListNode.Value.normal = (Quaternion.Euler(0f, 0f, 90f) * (linkedListNode.Next.Value.pos - linkedListNode.Value.pos)).normalized;
@@ -471,7 +423,7 @@ public class CwaffRaidenBeamController : BeamController
 
   public override void OnDestroy()
   {
-    Bone.ReturnAll(ref m_bones);
+    CwaffBone.ReturnAll(ref m_bones);
     base.OnDestroy();
   }
 
@@ -493,9 +445,9 @@ public class CwaffRaidenBeamController : BeamController
     float approxPixelLength = c_bonePixelLength * approxLength;
     curveStart = BraveMathCollege.CalculateBezierPoint(0f, p0, p1, p2, p3);
     if (m_bones.Count == 0)
-      m_bones.AddLast(Bone.Rent(curveStart));
+      m_bones.AddLast(CwaffBone.Rent(curveStart));
     for (int j = 1; j <= approxPixelLength; j++)
-      m_bones.AddLast(Bone.Rent(BraveMathCollege.CalculateBezierPoint(j / approxPixelLength, p0, p1, p2, p3)));
+      m_bones.AddLast(CwaffBone.Rent(BraveMathCollege.CalculateBezierPoint(j / approxPixelLength, p0, p1, p2, p3)));
   }
 
   private void DrawMainBezierCurve(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
@@ -527,7 +479,7 @@ public class CwaffRaidenBeamController : BeamController
     int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
     boundsCenter = (m_minBonePosition + m_maxBonePosition) / 2f;
     boundsExtents = (m_maxBonePosition - m_minBonePosition) / 2f;
-    LinkedListNode<Bone> linkedListNode = m_bones.First;
+    LinkedListNode<CwaffBone> linkedListNode = m_bones.First;
     int verticesDrawn = 0;
     int animationFrame = Mathf.FloorToInt(Mathf.Repeat(m_globalTimer * m_animationClip.fps, m_animationClip.frames.Length));
     for (int i = 0; i < totalSpritesToDraw; i++)
@@ -552,8 +504,8 @@ public class CwaffRaidenBeamController : BeamController
         if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex)
           fractionOfSubtileToDraw = Vector2.Distance(linkedListNode.Next.Value.pos, linkedListNode.Value.pos);
         int uvCurrent = offset + verticesDrawn;
-        Bone curBone = linkedListNode.Value;
-        Bone nextBone = linkedListNode.Next.Value;
+        CwaffBone curBone = linkedListNode.Value;
+        CwaffBone nextBone = linkedListNode.Next.Value;
         pos[uvCurrent++] = (curBone.pos  + curBone.normal  * (segmentSprite.position0.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);
         pos[uvCurrent++] = (nextBone.pos + nextBone.normal * (segmentSprite.position1.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);
         pos[uvCurrent++] = (curBone.pos  + curBone.normal  * (segmentSprite.position2.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);

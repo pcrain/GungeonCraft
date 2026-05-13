@@ -296,6 +296,7 @@
     <Compile Include="src\Cwaff-Misc\tk2dMeshSprite.cs"/>
     <Compile Include="src\Cwaff-Misc\MiniInteractable.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffProjectile.cs"/>
+    <Compile Include="src\Cwaff-Misc\CwaffBone.cs"/>
     <Compile Include="src\Cwaff-Misc\DamageAdjuster.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffShaders.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffMasteries.cs"/>

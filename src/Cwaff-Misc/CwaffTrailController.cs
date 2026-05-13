@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 // Version of TrailController that doesn't rely on rigid bodies or projectiles and pools bones for memory efficiency
 public class CwaffTrailController : BraveBehaviour
 {
-  private class Bone
+  private class CwaffTrailBone
   {
     public Vector2 pos;
     public float posX;
@@ -13,17 +13,17 @@ public class CwaffTrailController : BraveBehaviour
     public bool Hide;
 
     private static int _BonesCreated = 0;
-    private static readonly LinkedList<Bone> _BonePool = new();
+    private static readonly LinkedList<CwaffTrailBone> _BonePool = new();
 
-    internal static LinkedListNode<Bone> Rent(Vector2 pos, float posX)
+    internal static LinkedListNode<CwaffTrailBone> Rent(Vector2 pos, float posX)
     {
       if (_BonePool.Count == 0)
-        _BonePool.AddLast(new Bone());
+        _BonePool.AddLast(new CwaffTrailBone());
 
-      LinkedListNode<Bone> node = _BonePool.Last;
+      LinkedListNode<CwaffTrailBone> node = _BonePool.Last;
       _BonePool.RemoveLast();
 
-      Bone bone = node.Value;
+      CwaffTrailBone bone = node.Value;
       bone.pos            = pos;
       bone.posX           = posX;
 
@@ -35,7 +35,7 @@ public class CwaffTrailController : BraveBehaviour
       return node;
     }
 
-    internal static void Return(LinkedListNode<Bone> bone)
+    internal static void Return(LinkedListNode<CwaffTrailBone> bone)
     {
       _BonePool.AddLast(bone);
       // #if DEBUG
@@ -43,7 +43,7 @@ public class CwaffTrailController : BraveBehaviour
       // #endif
     }
 
-    private Bone() // can only be created by Rent
+    private CwaffTrailBone() // can only be created by Rent
     {
       ++_BonesCreated;
     }
@@ -113,7 +113,7 @@ public class CwaffTrailController : BraveBehaviour
 
   private int m_spriteSubtileWidth;
 
-  private readonly LinkedList<Bone> m_bones = new LinkedList<Bone>();
+  private readonly LinkedList<CwaffTrailBone> m_bones = new LinkedList<CwaffTrailBone>();
 
   private ParticleSystem m_dispersalParticles;
 
@@ -226,8 +226,8 @@ public class CwaffTrailController : BraveBehaviour
     trail_sprite.OverrideSetTiledSpriteGeom = SetTiledSpriteGeom;
     tk2dSpriteDefinition currentSpriteDef = trail_sprite.GetCurrentSpriteDef();
     m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.untrimmedBoundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
-    m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, 0f));
-    m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, 0f));
+    m_bones.AddLast(CwaffTrailBone.Rent(TruePosition + boneSpawnOffset, 0f));
+    m_bones.AddLast(CwaffTrailBone.Rent(TruePosition + boneSpawnOffset, 0f));
 
     if (usesStartAnimation)
       m_startAnimationClip = base.spriteAnimator.GetClipByName(startAnimation);
@@ -262,7 +262,7 @@ public class CwaffTrailController : BraveBehaviour
     m_globalTimer += BraveTime.DeltaTime;
     if (usesAnimation)
     {
-      LinkedListNode<Bone> linkedListNode = m_bones.First;
+      LinkedListNode<CwaffTrailBone> linkedListNode = m_bones.First;
       float lastNodeAnimationTimer = 0f;
       while (linkedListNode != null)
       {
@@ -290,10 +290,10 @@ public class CwaffTrailController : BraveBehaviour
               {
                 break;
               }
-              LinkedListNode<Bone> node = linkedListNode;
+              LinkedListNode<CwaffTrailBone> node = linkedListNode;
               linkedListNode = linkedListNode.Next;
               m_bones.Remove(node);
-              Bone.Return(node);
+              CwaffTrailBone.Return(node);
             }
             flag = true;
             m_isDirty = true;
@@ -365,9 +365,9 @@ public class CwaffTrailController : BraveBehaviour
     }
     while (m_bones.Count > 0)
     {
-      LinkedListNode<Bone> node = m_bones.Last;
+      LinkedListNode<CwaffTrailBone> node = m_bones.Last;
       m_bones.RemoveLast();
-      Bone.Return(node);
+      CwaffTrailBone.Return(node);
     }
     base.OnDestroy();
   }
@@ -389,8 +389,8 @@ public class CwaffTrailController : BraveBehaviour
     Vector2 specRigidbodyPosition = this.body.Position.UnitPosition + PhysicsEngine.PixelToUnit(obj.NewPixelsToMove);
     HandleExtension(specRigidbodyPosition);
     m_bones.Last.Value.Hide = true;
-    m_bones.AddLast(Bone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX));
-    m_bones.AddLast(Bone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX));
+    m_bones.AddLast(CwaffTrailBone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX));
+    m_bones.AddLast(CwaffTrailBone.Rent(m_bones.Last.Value.pos, m_bones.Last.Value.posX));
   }
 
   private void PostRigidbodyMovement(SpeculativeRigidbody rigidbody, Vector2 unitDelta, IntVector2 pixelDelta)
@@ -408,7 +408,7 @@ public class CwaffTrailController : BraveBehaviour
     float maxX = float.MinValue;
     float minY = float.MaxValue;
     float maxY = float.MinValue;
-    for (LinkedListNode<Bone> linkedListNode = m_bones.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
+    for (LinkedListNode<CwaffTrailBone> linkedListNode = m_bones.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
     {
       Vector2 pos = linkedListNode.Value.pos;
       if (pos.x < minX) minX = pos.x;
@@ -431,8 +431,8 @@ public class CwaffTrailController : BraveBehaviour
 
     if (!destroyOnEmpty && m_bones.Count == 0)
     {
-      m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX));
-      m_bones.AddLast(Bone.Rent(TruePosition + boneSpawnOffset, m_maxPosX));
+      m_bones.AddLast(CwaffTrailBone.Rent(TruePosition + boneSpawnOffset, m_maxPosX));
+      m_bones.AddLast(CwaffTrailBone.Rent(TruePosition + boneSpawnOffset, m_maxPosX));
     }
     if (this.body && this.body.projectile && this.body.projectile.OverrideTrailPoint.HasValue)
       toPosition = this.body.projectile.OverrideTrailPoint.Value;
@@ -449,7 +449,7 @@ public class CwaffTrailController : BraveBehaviour
     Vector2 vector = newPos - m_bones.Last.Value.pos;
     Vector2 v = m_bones.Last.Value.pos - m_bones.Last.Previous.Value.pos;
     float magnitude = v.magnitude;
-    LinkedListNode<Bone> previous = m_bones.Last.Previous;
+    LinkedListNode<CwaffTrailBone> previous = m_bones.Last.Previous;
     float num = Vector3.Distance(newPos, m_bones.Last.Previous.Value.pos);
     if (num < 0.25f) // minimum move distance to create a trail
     {
@@ -483,11 +483,11 @@ public class CwaffTrailController : BraveBehaviour
       {
         if (num7 < 0.25f)
         {
-          m_bones.AddLast(Bone.Rent(newPos, m_bones.Last.Value.posX + num7));
+          m_bones.AddLast(CwaffTrailBone.Rent(newPos, m_bones.Last.Value.posX + num7));
           break;
         }
         pos += vector3 * 0.25f;
-        m_bones.AddLast(Bone.Rent(pos, m_bones.Last.Value.posX + 0.25f));
+        m_bones.AddLast(CwaffTrailBone.Rent(pos, m_bones.Last.Value.posX + 0.25f));
         num7 -= 0.25f;
         if (usesGlobalTimer && m_globalTimer > globalTimer)
         {
@@ -496,7 +496,7 @@ public class CwaffTrailController : BraveBehaviour
       }
     }
     m_maxPosX = m_bones.Last.Value.posX;
-    LinkedListNode<Bone> linkedListNode = previous;
+    LinkedListNode<CwaffTrailBone> linkedListNode = previous;
     while (linkedListNode != null && linkedListNode.Next != null)
     {
       linkedListNode.Value.normal = (Quaternion.Euler(0f, 0f, 90f) * (linkedListNode.Next.Value.pos - linkedListNode.Value.pos)).normalized;
@@ -506,14 +506,14 @@ public class CwaffTrailController : BraveBehaviour
     m_isDirty = true;
   }
 
-  private void DoDispersalParticles(LinkedListNode<Bone> boneNode, int subtilesPerTile)
+  private void DoDispersalParticles(LinkedListNode<CwaffTrailBone> boneNode, int subtilesPerTile)
   {
     if (!UsesDispersalParticles || boneNode.Value == null || boneNode.Next == null || boneNode.Next.Value == null)
     {
       return;
     }
     Vector3 vector = boneNode.Value.pos.ToVector3ZUp(boneNode.Value.pos.y);
-    LinkedListNode<Bone> linkedListNode = boneNode;
+    LinkedListNode<CwaffTrailBone> linkedListNode = boneNode;
     for (int i = 0; i < subtilesPerTile; i++)
     {
       if (linkedListNode.Next == null)
@@ -560,7 +560,7 @@ public class CwaffTrailController : BraveBehaviour
     int num4 = Mathf.CeilToInt((float)lastBoneIndex / (float)num2);
     boundsCenter = (m_minBonePosition + m_maxBonePosition) / 2f;
     boundsExtents = (m_maxBonePosition - m_minBonePosition) / 2f;
-    LinkedListNode<Bone> linkedListNode = m_bones.First;
+    LinkedListNode<CwaffTrailBone> linkedListNode = m_bones.First;
     int uvIndex = offset;
     tk2dSpriteDefinition[] defs = trail_sprite.Collection.spriteDefinitions;
     float invSubtile =  1f / (float)m_spriteSubtileWidth;
@@ -570,7 +570,7 @@ public class CwaffTrailController : BraveBehaviour
       if (i == num4 - 1 && lastBoneIndex % num2 != 0)
         num7 = lastBoneIndex % num2 - 1;
       tk2dSpriteDefinition segmentSprite = spriteDef;
-      Bone bone = linkedListNode.Value;
+      CwaffTrailBone bone = linkedListNode.Value;
       if (usesStartAnimation && i == 0)
       {
         int startAnimationFrame = Mathf.Clamp(Mathf.FloorToInt(bone.AnimationTimer * m_startAnimationClip.fps), 0, m_startAnimationClip.frames.Length - 1);
@@ -586,7 +586,7 @@ public class CwaffTrailController : BraveBehaviour
       float ymax = segmentSprite.position3.y * m_projectileScale;
       for (int j = 0; j <= num7; j++)
       {
-        Bone nextBone = linkedListNode.Next.Value;
+        CwaffTrailBone nextBone = linkedListNode.Next.Value;
         float num11 = 1f;
         if (i == num4 - 1 && j == num7)
           num11 = Vector2.Distance(nextBone.pos, bone.pos);

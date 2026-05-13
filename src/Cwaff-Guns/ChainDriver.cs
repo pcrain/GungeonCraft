@@ -493,54 +493,6 @@ public class ChainkLink : MonoBehaviour
 /// <summary>Class for creating massless rope sprites with known start and end points.</summary>
 public class CwaffRopeMesh : MonoBehaviour
 {
-  private class Bone
-  {
-    private static readonly LinkedList<Bone> _BonePool = new();
-    private static int _BonesCreated = 0;
-
-    public Vector2 pos;
-    public Vector2 normal;
-
-    internal static LinkedListNode<Bone> Rent(Vector2 pos)
-    {
-      if (_BonePool.Count == 0)
-        _BonePool.AddLast(new Bone());
-
-      LinkedListNode<Bone> node = _BonePool.Last;
-      _BonePool.RemoveLast();
-
-      Bone bone = node.Value;
-      bone.pos    = pos;
-      bone.normal = default;
-
-      return node;
-    }
-
-    internal static void Return(LinkedListNode<Bone> bone)
-    {
-      _BonePool.AddLast(bone);
-      // System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
-    }
-
-    internal static void ReturnAll(ref LinkedList<Bone> bones)
-    {
-      if (bones == null)
-        return;
-      while (bones.Count > 0)
-      {
-        LinkedListNode<Bone> bone = bones.Last;
-        bones.RemoveLast();
-        _BonePool.AddLast(bone);
-      }
-      // System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
-    }
-
-    private Bone() // can only be created by Rent
-    {
-      ++_BonesCreated;
-    }
-  }
-
   private const float UPDATE_RATE = 1.0f / 60.0f; // seconds between rope updates (needs to be fixed due to verlet integration)
 
   public tk2dSpriteAnimationClip animation;
@@ -550,7 +502,7 @@ public class CwaffRopeMesh : MonoBehaviour
   public tk2dTiledSprite sprite;
 
   private int m_spriteSubtileWidth;
-  private LinkedList<Bone> m_bones = new LinkedList<Bone>();
+  private LinkedList<CwaffBone> m_bones = new LinkedList<CwaffBone>();
   private Vector2 m_minBonePosition;
   private Vector2 m_maxBonePosition;
   private float m_globalTimer;
@@ -620,7 +572,7 @@ public class CwaffRopeMesh : MonoBehaviour
     this._updateTimer -= UPDATE_RATE;
 
     UpdateRope();
-    for (LinkedListNode<Bone> n = m_bones.First; n != m_bones.Last; n = n.Next)
+    for (LinkedListNode<CwaffBone> n = m_bones.First; n != m_bones.Last; n = n.Next)
       n.Value.normal = (_Rot90 * (n.Next.Value.pos - n.Value.pos)).normalized;
     if (m_bones.Count > 1)
       m_bones.Last.Value.normal = m_bones.Last.Previous.Value.normal;
@@ -632,7 +584,7 @@ public class CwaffRopeMesh : MonoBehaviour
       return;
     m_minBonePosition = new Vector2(float.MaxValue, float.MaxValue);
     m_maxBonePosition = new Vector2(float.MinValue, float.MinValue);
-    for (LinkedListNode<Bone> n = m_bones.First; n != null; n = n.Next)
+    for (LinkedListNode<CwaffBone> n = m_bones.First; n != null; n = n.Next)
     {
       m_minBonePosition = Vector2.Min(m_minBonePosition, n.Value.pos);
       m_maxBonePosition = Vector2.Max(m_maxBonePosition, n.Value.pos);
@@ -644,12 +596,12 @@ public class CwaffRopeMesh : MonoBehaviour
 
   private void OnDestroy()
   {
-    Bone.ReturnAll(ref m_bones);
+    CwaffBone.ReturnAll(ref m_bones);
   }
 
   private void UpdateRope()
   {
-    Bone.ReturnAll(ref m_bones);
+    CwaffBone.ReturnAll(ref m_bones);
     Vector2 curStartPos = this.startPos;
     Vector2 curEndPos = this.endPos;
     switch (this._stretchPolicy)
@@ -702,7 +654,7 @@ public class CwaffRopeMesh : MonoBehaviour
     RopeSim.SimulateRope(curStartPos, curEndPos, this._ropePoints, this._ropePrevPoints,
       minSegLength: this._segLength, maxSegLength: this._segLength, updateRate: UPDATE_RATE);
     for (int j = 0; j < this._ropePoints.Count; j++)
-      m_bones.AddLast(Bone.Rent(this._ropePoints[j]));
+      m_bones.AddLast(CwaffBone.Rent(this._ropePoints[j]));
     if (this._lockThreshold > 0f)
     {
       float maxMovement = 0.0f;
@@ -732,7 +684,7 @@ public class CwaffRopeMesh : MonoBehaviour
     int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
     boundsCenter = 0.5f * (m_maxBonePosition + m_minBonePosition);
     boundsExtents = 0.5f * (m_maxBonePosition - m_minBonePosition);
-    LinkedListNode<Bone> bone = m_bones.First;
+    LinkedListNode<CwaffBone> bone = m_bones.First;
     int verticesDrawn = 0;
     int animationFrame = Mathf.FloorToInt(Mathf.Repeat(m_globalTimer * animation.fps, animation.frames.Length));
     tk2dSpriteAnimationFrame frame = animation.frames[animationFrame];
@@ -746,8 +698,8 @@ public class CwaffRopeMesh : MonoBehaviour
       for (int j = 0; j <= lastSubtileIndex; j++)
       {
         float fractionOfSubtileToDraw = 1f;
-        Bone curBone = bone.Value;
-        Bone nextBone = bone.Next.Value;
+        CwaffBone curBone = bone.Value;
+        CwaffBone nextBone = bone.Next.Value;
         if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex)
           fractionOfSubtileToDraw = Vector2.Distance(nextBone.pos, curBone.pos);
         int uvCurrent = offset + verticesDrawn;
