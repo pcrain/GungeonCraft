@@ -13,6 +13,12 @@ ITEMDIRS  = [
   "Cwaff-Guns",
   ]
 
+def getId(modprefix, name):
+  iid = name.replace("-", "").replace(".", "").replace("'", "").replace(":", "").replace(" ", "_").lower()
+  if modprefix is None:
+    return iid
+  return f"{modprefix}:"+iid
+
 def main():
   modprefix = modname = modversion = None
   with open(MODDATAFILE, 'r') as fin:
@@ -54,7 +60,7 @@ def main():
             elif "ItemName" in line:
               name = line.split('"')[1]
               #NOTE: this needs to be kept in sync with the InternalName() function in Extensions.cs
-              iid = f"{modprefix}:"+name.replace("-", "").replace(".", "").replace("'", "").replace(":", "").replace(" ", "_").lower()
+              iid = getId(modprefix, name)
               # print(f"NAME: {name} ({iid})")
         if None in [iid, name, desc]:
           raise Exception(f"failed to get item data for {f}")
@@ -73,6 +79,13 @@ def main():
           comment = lastline.replace("// ","").replace("//","")
           name = sline.split('"')[1]
           sid = "#"+name.upper().replace("\n", "").replace("\\", "").replace("\"", "").replace(" ", "_").replace(".", "").replace("-", "")
+          synergies[sid] = {"name": name, "notes" : comment }
+        elif sline.startswith("NewMastery"):
+          comment = lastline.replace("// ","").replace("//","")
+          sname = sline.split('(')[1].split(',')[0]
+          gunname = items[getId(modprefix, sname.replace("MASTERY_",""))]["name"]
+          name = "Mastery of " + gunname
+          sid = "#"+getId(None, gunname+" Mastery").upper()
           synergies[sid] = {"name": name, "notes" : comment }
         lastline = sline
     except StopIteration:

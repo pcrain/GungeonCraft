@@ -309,7 +309,7 @@ public static class CwaffSynergies
         // Flakseed's sprouts can grow in hostile terrain and can no longer be trampled. Fully grown sprouts become larger flak flowers that attack and stun nearby enemies with their roots.
         NewMastery<MasteryOfFlakseed>(MASTERY_FLAKSEED, Flakseed.ItemName);
         // Cars have much better handling, deal 25% more damage, and can crash into walls up to 3 times before disappearing.
-        NewMastery<MasteryOfRCLauncher>(MASTERY_R_C_LAUNCHER, RCLauncher.ItemName)
+        NewMastery<MasteryOfRCLauncher>(MASTERY_RC_LAUNCHER, RCLauncher.ItemName)
             .MultDamage(1.25f);
         // B. B. Gun projectiles deflect all enemy projectiles in their path, transforming them to pins in the process.
         NewMastery<MasteryOfBBGun>(MASTERY_B_B_GUN, BBGun.ItemName);
@@ -813,7 +813,7 @@ public enum Synergy {
     MASTERY_MACCHI_AUTO,
     MASTERY_CHROMA,
     MASTERY_FLAKSEED,
-    MASTERY_R_C_LAUNCHER,
+    MASTERY_RC_LAUNCHER,
     MASTERY_B_B_GUN,
     MASTERY_NYCTERIAN,
     MASTERY_SELTZER_PELTER,
