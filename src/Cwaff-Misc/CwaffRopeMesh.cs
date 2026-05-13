@@ -128,6 +128,7 @@ public class CwaffRopeMesh : MonoBehaviour
         }
         break;
       }
+      case StretchPolicy.STRETCH:
       default:
         break;
     }

@@ -275,21 +275,15 @@ public class CwaffTrailController : BraveBehaviour
           int num4 = Mathf.FloorToInt((linkedListNode.Value.AnimationTimer - BraveTime.DeltaTime) * tk2dSpriteAnimationClip2.fps);
           int num5 = Mathf.FloorToInt(linkedListNode.Value.AnimationTimer * tk2dSpriteAnimationClip2.fps);
           if (num5 != num4)
-          {
             m_isDirty = true;
-          }
           if (linkedListNode.Value.AnimationTimer > (float)tk2dSpriteAnimationClip2.frames.Length / tk2dSpriteAnimationClip2.fps)
           {
             if (usesStartAnimation && linkedListNode == m_bones.First)
-            {
               usesStartAnimation = false;
-            }
             for (int i = 0; i < num2; i++)
             {
               if (linkedListNode == null)
-              {
                 break;
-              }
               LinkedListNode<CwaffTrailBone> node = linkedListNode;
               linkedListNode = linkedListNode.Next;
               m_bones.Remove(node);
@@ -327,23 +321,17 @@ public class CwaffTrailController : BraveBehaviour
           }
         }
         if (flag || linkedListNode == null)
-        {
           continue;
-        }
         for (int j = 0; j < num2; j++)
         {
           if (linkedListNode == null)
-          {
             break;
-          }
           linkedListNode = linkedListNode.Next;
         }
       }
     }
     if (destroyOnEmpty && m_bones.Count == 0) //NOTE: patched from original method to keep alive even when we have no bones
-    {
       UnityEngine.Object.Destroy(base.gameObject);
-    }
   }
 
   public void LateUpdate()
@@ -509,17 +497,14 @@ public class CwaffTrailController : BraveBehaviour
   private void DoDispersalParticles(LinkedListNode<CwaffTrailBone> boneNode, int subtilesPerTile)
   {
     if (!UsesDispersalParticles || boneNode.Value == null || boneNode.Next == null || boneNode.Next.Value == null)
-    {
       return;
-    }
+
     Vector3 vector = boneNode.Value.pos.ToVector3ZUp(boneNode.Value.pos.y);
     LinkedListNode<CwaffTrailBone> linkedListNode = boneNode;
     for (int i = 0; i < subtilesPerTile; i++)
     {
       if (linkedListNode.Next == null)
-      {
         break;
-      }
       linkedListNode = linkedListNode.Next;
     }
     Vector3 vector2 = linkedListNode.Value.pos.ToVector3ZUp(linkedListNode.Value.pos.y);

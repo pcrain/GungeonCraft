@@ -108,16 +108,16 @@ public class CwaffRaidenBeamController : BeamController
     {
       foreach (AIActor target in m_targets)
       {
-        if (!target || !target.healthHaver)
+        if (!target || target.healthHaver is not HealthHaver hh)
           continue;
 
-        impactAnimation = ((string.IsNullOrEmpty(BossImpactAnimation) || !target.healthHaver.IsBoss) ? EnemyImpactAnimation : BossImpactAnimation);
-        if (target.healthHaver.IsBoss && (bool)base.projectile)
+        impactAnimation = ((string.IsNullOrEmpty(BossImpactAnimation) || !hh.IsBoss) ? EnemyImpactAnimation : BossImpactAnimation);
+        if (hh.IsBoss && (bool)base.projectile)
           damage *= base.projectile.BossDamageMultiplier;
         if ((bool)base.projectile && base.projectile.BlackPhantomDamageMultiplier != 1f && target.IsBlackPhantom)
           damage *= base.projectile.BlackPhantomDamageMultiplier;
         float damageThisTick = damage * BraveTime.DeltaTime;
-        target.healthHaver.ApplyDamage(damageThisTick, Vector2.zero, base.Owner.ActorName);
+        hh.ApplyDamage(damageThisTick, Vector2.zero, base.Owner.ActorName);
         if (playerController && playerController.CurrentGun && playerController.CurrentGun.gameObject.GetComponent<Yggdrashell>() is Yggdrashell ygg)
           ygg.UpdateDamageDealt(damageThisTick);
       }
@@ -150,7 +150,6 @@ public class CwaffRaidenBeamController : BeamController
     m_isDirty = false;
   }
 
-  // [CompilerGenerated]
   /// <summary>Using static version to avoid allocations.</summary>
   private static class BeamSorter
   {
@@ -158,7 +157,7 @@ public class CwaffRaidenBeamController : BeamController
 
     internal static int Compare(AIActor a, AIActor b)
     {
-      return Vector2.Distance(barrelPosition, a.CenterPosition).CompareTo(Vector2.Distance(barrelPosition, b.CenterPosition));
+      return (barrelPosition - a.CenterPosition).sqrMagnitude.CompareTo((barrelPosition - b.CenterPosition).sqrMagnitude);
     }
   }
 

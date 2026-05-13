@@ -91,21 +91,23 @@ public class CwaffBoneManager : BraveBehaviour
     _globalTimer += BraveTime.DeltaTime;
   }
 
-  public void ManualUpdate()
-  {
-
-  }
-
   public void ManualLateUpdate()
   {
-    _minBonePosition = new Vector2(float.MaxValue, float.MaxValue);
-    _maxBonePosition = new Vector2(float.MinValue, float.MinValue);
+    float minX = float.MaxValue;
+    float maxX = float.MinValue;
+    float minY = float.MaxValue;
+    float maxY = float.MinValue;
     for (LinkedListNode<CwaffBone> n = _bones.First; n != null; n = n.Next)
     {
-      _minBonePosition = Vector2.Min(_minBonePosition, n.Value.pos);
-      _maxBonePosition = Vector2.Max(_maxBonePosition, n.Value.pos);
+      Vector2 pos = n.Value.pos;
+      if (pos.x < minX) minX = pos.x;
+      if (pos.x > maxX) maxX = pos.x;
+      if (pos.y < minY) minY = pos.y;
+      if (pos.y > maxY) maxY = pos.y;
     }
-    base.transform.position = new Vector3(_minBonePosition.x, _minBonePosition.y);
+    _minBonePosition = new Vector2(minX, minY);
+    _maxBonePosition = new Vector2(maxX, maxY);
+    base.transform.position = new Vector3(minX, minY);
     _sprite.ForceBuild();
     _sprite.UpdateZDepth();
   }
