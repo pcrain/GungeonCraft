@@ -63,14 +63,6 @@ public class Alyx : CwaffGun
         RecalculateAmmo();
     }
 
-    public override void OnFirstPickup(PlayerController player)
-    {
-        base.OnFirstPickup(player);
-        this.gun.SetBaseMaxAmmo(_BASE_MAX_AMMO);
-        this.gun.CurrentAmmo = _BASE_MAX_AMMO;
-        this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
-    }
-
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
@@ -103,6 +95,8 @@ public class Alyx : CwaffGun
 
     private void RecalculateAmmo()
     {
+        if (this.timeAtLastRecalc < 0)
+          this.timeAtLastRecalc = BraveTime.ScaledTimeSinceStartup;
         float timeSinceLastRecalc = BraveTime.ScaledTimeSinceStartup - this.timeAtLastRecalc;
         if (timeSinceLastRecalc <= _MIN_CALC_RATE)
             return;
@@ -121,10 +115,11 @@ public class Alyx : CwaffGun
                 _PoisonGooper.AddGoopCircle(this.PlayerOwner.SpriteBottomCenter.XY() - this.PlayerOwner.m_currentGunAngle.ToVector(1f), 0.75f);
             else
                 _PoisonGooper.AddGoopCircle(this.gun.sprite.WorldCenter, 1f);
+            if (newAmmo < this.gun.CurrentAmmo)
+              this.gun.CurrentAmmo = newAmmo;
+            if (newMaxAmmo < this.gun.GetBaseMaxAmmo())
+              this.gun.SetBaseMaxAmmo(newMaxAmmo);
         }
-
-        this.gun.CurrentAmmo = newAmmo;
-        this.gun.SetBaseMaxAmmo(newMaxAmmo);
 
         if (newMaxAmmo > _MIN_AMMO_TO_PERSIST)
             return;

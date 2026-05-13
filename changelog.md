@@ -4,6 +4,7 @@
 
 - Fixed rare null deref caused by mastery ritual code querying GameManager without a valid GameManager instance
 - Added mastery descriptions to [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips/?utm_source=discord) output
+- Fixed issue with Alyx completely decaying immediately after spawning in under unknown circumstances
 
 ## 1.30.0 (2026-05-07)
 
