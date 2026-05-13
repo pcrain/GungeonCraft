@@ -9,69 +9,28 @@ public class CwaffRaidenBeamController : BeamController
   }
 
   public string beamAnimation;
-
   public bool usesStartAnimation;
-
   public string startAnimation;
-
   public tk2dBaseSprite ImpactRenderer;
-
-  // [CheckAnimation(null)]
   public string EnemyImpactAnimation;
-
-  // [CheckAnimation(null)]
   public string BossImpactAnimation;
-
-  // [CheckAnimation(null)]
   public string OtherImpactAnimation;
-
   public TargetType targetType = TargetType.Screen;
-
   public int maxTargets = -1;
-
-  public float endRampHeight;
-
-  public int endRampSteps;
-
-  public bool FlipUvsY;
-
   public bool SelectRandomTarget;
 
   private List<AIActor> s_enemiesInRoom = new List<AIActor>();
-
   private tk2dTiledSprite m_sprite;
-
-  private tk2dSpriteAnimationClip m_startAnimationClip;
-
-  private tk2dSpriteAnimationClip m_animationClip;
-
   private bool m_isCurrentlyFiring = true;
-
   private bool m_audioPlaying;
-
   private List<AIActor> m_targets = new List<AIActor>();
-
   private SpeculativeRigidbody m_hitRigidbody;
-
-  private int m_spriteSubtileWidth;
-
-  private LinkedList<CwaffBone> m_bones = new LinkedList<CwaffBone>();
-
-  private Vector2 m_minBonePosition;
-
-  private Vector2 m_maxBonePosition;
-
   private bool m_isDirty;
-
-  private float m_globalTimer;
-
   private float _growthTime = 0.0f;
-
   private bool _lockedOn = false;
-
   private int _firstWrapBoneIndex;
-
   private Vector2 lastImpactPosition;
+  private CwaffBoneManager _boneManager;
 
   private Vector3 mainBezierPoint1;
   private Vector3 mainBezierPoint2;
@@ -79,50 +38,36 @@ public class CwaffRaidenBeamController : BeamController
   private Vector3 mainBezierPoint4;
 
   private const float _EXTEND_TIME = 1.25f;
-
   private const int c_segmentCount = 20;
-
   private const int c_bonePixelLength = 4;
-
   private const float c_boneUnitLength = 0.25f;
-
   private const float c_trailHeightOffset = 0.5f;
 
-  private float m_projectileScale = 1f;
-
-  public override bool ShouldUseAmmo
-  {
-    get
-    {
-      return true;
-    }
-  }
-
-  public float RampHeightOffset { get; set; }
+  public override bool ShouldUseAmmo => true;
 
   public void Start()
   {
     base.transform.parent = SpawnManager.Instance.VFX;
-    base.transform.rotation = Quaternion.identity;
-    base.transform.position = Vector3.zero;
-    m_sprite = GetComponent<tk2dTiledSprite>();
-    m_sprite.OverrideGetTiledSpriteGeomDesc = GetTiledSpriteGeomDesc;
-    m_sprite.OverrideSetTiledSpriteGeom = SetTiledSpriteGeom;
-    tk2dSpriteDefinition currentSpriteDef = m_sprite.GetCurrentSpriteDef();
-    m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.untrimmedBoundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
-    if (usesStartAnimation)
-      m_startAnimationClip = base.spriteAnimator.GetClipByName(startAnimation);
-    m_animationClip = base.spriteAnimator.GetClipByName(beamAnimation);
+    float projectileScale = 1f;
     if (base.projectile.Owner is PlayerController playerController)
-      m_projectileScale = playerController.BulletScaleModifier;
+      projectileScale = playerController.BulletScaleModifier;
+    tk2dSpriteAnimationClip animation = base.spriteAnimator.GetClipByName(beamAnimation);
+    tk2dSpriteAnimationClip startAnimationClip = null;
+    if (usesStartAnimation)
+      startAnimationClip = base.spriteAnimator.GetClipByName(startAnimation);
+
+    this.m_sprite = base.gameObject.GetOrAddComponent<tk2dTiledSprite>();
+    this._boneManager = base.gameObject.AddComponent<CwaffBoneManager>();
+    this._boneManager.Setup(animation: animation, startAnimation: startAnimationClip, projectileScale: projectileScale);
+
     if (ImpactRenderer)
-      ImpactRenderer.transform.localScale = new Vector3(m_projectileScale, m_projectileScale, 1f);
+      ImpactRenderer.transform.localScale = new Vector3(projectileScale, projectileScale, 1f);
     this.lastImpactPosition = base.Origin;
   }
 
   public void Update()
   {
-    m_globalTimer += BraveTime.DeltaTime;
+    this._boneManager.UpdateTimers();
     for (int i = m_targets.Count - 1; i >= 0; i--)
     {
       AIActor aIActor = m_targets[i];
@@ -193,20 +138,16 @@ public class CwaffRaidenBeamController : BeamController
     if (!m_isDirty)
       return;
 
-    m_minBonePosition = new Vector2(float.MaxValue, float.MaxValue);
-    m_maxBonePosition = new Vector2(float.MinValue, float.MinValue);
-    for (LinkedListNode<CwaffBone> linkedListNode = m_bones.First; linkedListNode != null; linkedListNode = linkedListNode.Next)
-    {
-      m_minBonePosition = Vector2.Min(m_minBonePosition, linkedListNode.Value.pos);
-      m_maxBonePosition = Vector2.Max(m_maxBonePosition, linkedListNode.Value.pos);
-    }
-    Vector2 vector = new Vector2(m_minBonePosition.x, m_minBonePosition.y) - base.transform.position.XY();
-    base.transform.position = new Vector3(m_minBonePosition.x, m_minBonePosition.y);
     m_sprite.HeightOffGround = 0.5f;
+
+    Vector3 oldPosition = base.transform.position;
+    this._boneManager.ManualLateUpdate();
     if (ImpactRenderer)
-      ImpactRenderer.transform.position -= vector.ToVector3ZUp();
-    m_sprite.ForceBuild();
-    m_sprite.UpdateZDepth();
+    {
+      Vector3 vector = (base.transform.position - oldPosition).WithZ(0f);
+      ImpactRenderer.transform.position -= vector;
+    }
+    m_isDirty = false;
   }
 
   // [CompilerGenerated]
@@ -279,7 +220,7 @@ public class CwaffRaidenBeamController : BeamController
           break;
       }
     }
-    CwaffBone.ReturnAll(ref m_bones);
+    this._boneManager.ReturnAllBones();
     this._growthTime = 1f - Mathf.Min(this._growthTime + BraveTime.DeltaTime, _EXTEND_TIME) / _EXTEND_TIME;
     this._growthTime = 1f - (this._growthTime * this._growthTime); // cubic ease in
     Vector3? impactPos = null;
@@ -315,7 +256,7 @@ public class CwaffRaidenBeamController : BeamController
         for (int k = 0; k < m_targets.Count; k++)
         {
           nextBoneDir = nextBoneDir.normalized * _WRAP_TIGHTNESS;
-          _firstWrapBoneIndex = m_bones.Count;
+          _firstWrapBoneIndex = this._boneManager.BoneCount();
           float time = BraveTime.ScaledTimeSinceStartup;
 
           // draw wrapping VFX around target
@@ -380,14 +321,9 @@ public class CwaffRaidenBeamController : BeamController
       if (ImpactRenderer)
         ImpactRenderer.renderer.enabled = false;
     }
-    LinkedListNode<CwaffBone> linkedListNode = m_bones.First;
-    while (linkedListNode != null && linkedListNode != m_bones.Last)
-    {
-      linkedListNode.Value.normal = (Quaternion.Euler(0f, 0f, 90f) * (linkedListNode.Next.Value.pos - linkedListNode.Value.pos)).normalized;
-      linkedListNode = linkedListNode.Next;
-    }
-    if (m_bones.Count > 0)
-      m_bones.Last.Value.normal = m_bones.Last.Previous.Value.normal;
+
+    this._boneManager.RecomputeNormals();
+
     m_isDirty = true;
     if (ImpactRenderer)
     {
@@ -421,12 +357,6 @@ public class CwaffRaidenBeamController : BeamController
     UnityEngine.Object.Destroy(base.gameObject);
   }
 
-  public override void OnDestroy()
-  {
-    CwaffBone.ReturnAll(ref m_bones);
-    base.OnDestroy();
-  }
-
   public override void AdjustPlayerBeamTint(Color targetTintColor, int priority, float lerpTime = 0f)
   {
   }
@@ -444,10 +374,10 @@ public class CwaffRaidenBeamController : BeamController
     }
     float approxPixelLength = c_bonePixelLength * approxLength;
     curveStart = BraveMathCollege.CalculateBezierPoint(0f, p0, p1, p2, p3);
-    if (m_bones.Count == 0)
-      m_bones.AddLast(CwaffBone.Rent(curveStart));
+    if (!this._boneManager.HasBones())
+      this._boneManager.RentBone(curveStart);
     for (int j = 1; j <= approxPixelLength; j++)
-      m_bones.AddLast(CwaffBone.Rent(BraveMathCollege.CalculateBezierPoint(j / approxPixelLength, p0, p1, p2, p3)));
+      this._boneManager.RentBone(BraveMathCollege.CalculateBezierPoint(j / approxPixelLength, p0, p1, p2, p3));
   }
 
   private void DrawMainBezierCurve(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
@@ -462,63 +392,5 @@ public class CwaffRaidenBeamController : BeamController
   public Vector2 GetPointOnMainBezier(float t)
   {
     return BraveMathCollege.CalculateBezierPoint(t, mainBezierPoint1, mainBezierPoint2, mainBezierPoint3, mainBezierPoint4);
-  }
-
-  public void GetTiledSpriteGeomDesc(out int numVertices, out int numIndices, tk2dSpriteDefinition spriteDef, Vector2 dimensions)
-  {
-    int segments = Mathf.Max(m_bones.Count - 1, 0);
-    numVertices = segments * 4;
-    numIndices = segments * 6;
-  }
-
-  public void SetTiledSpriteGeom(Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
-  {
-    int spritePixelLength = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
-    int numSubtilesInSprite = spritePixelLength / 4;
-    int lastBoneIndex = Mathf.Max(m_bones.Count - 1, 0);
-    int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
-    boundsCenter = 0.5f * (m_minBonePosition + m_maxBonePosition);
-    boundsExtents = 0.5f * (m_maxBonePosition - m_minBonePosition);
-    LinkedListNode<CwaffBone> bone = m_bones.First;
-    int verticesDrawn = 0;
-    int animationFrame = Mathf.FloorToInt(Mathf.Repeat(m_globalTimer * m_animationClip.fps, m_animationClip.frames.Length));
-    for (int i = 0; i < totalSpritesToDraw; i++)
-    {
-      int lastSubtileIndex = numSubtilesInSprite - 1;
-      if (i == totalSpritesToDraw - 1 && lastBoneIndex % numSubtilesInSprite != 0)
-        lastSubtileIndex = lastBoneIndex % numSubtilesInSprite - 1;
-      tk2dSpriteDefinition segmentSprite = spriteDef;
-      if (usesStartAnimation && i == 0)
-      {
-        int startAnimationFrame = Mathf.FloorToInt(Mathf.Repeat(m_globalTimer * m_startAnimationClip.fps, m_startAnimationClip.frames.Length));
-        segmentSprite = m_sprite.Collection.spriteDefinitions[m_startAnimationClip.frames[startAnimationFrame].spriteId];
-      }
-      else
-        segmentSprite = m_sprite.Collection.spriteDefinitions[m_animationClip.frames[animationFrame].spriteId];
-      float numSpritesDrawn = 0f;
-      for (int j = 0; j <= lastSubtileIndex; j++)
-      {
-        float fractionOfSubtileToDraw = 1f;
-        CwaffBone curBone = bone.Value;
-        CwaffBone nextBone = bone.Next.Value;
-        if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex)
-          fractionOfSubtileToDraw = Vector2.Distance(nextBone.pos, curBone.pos);
-        int uvCurrent = offset + verticesDrawn;
-        pos[uvCurrent++] = (curBone.pos  + curBone.normal  * (segmentSprite.position0.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (nextBone.pos + nextBone.normal * (segmentSprite.position1.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (curBone.pos  + curBone.normal  * (segmentSprite.position2.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (nextBone.pos + nextBone.normal * (segmentSprite.position3.y * m_projectileScale) - m_minBonePosition).ToVector3ZUp(0f);
-        Vector2 minUV = Vector2.Lerp(segmentSprite.uvs[0], segmentSprite.uvs[1], numSpritesDrawn);
-        Vector2 maxUV = Vector2.Lerp(segmentSprite.uvs[2], segmentSprite.uvs[3], numSpritesDrawn + fractionOfSubtileToDraw / numSubtilesInSprite);
-        uvCurrent = offset + verticesDrawn;
-        uv[uvCurrent++] = minUV;
-        uv[uvCurrent++] = new Vector2(maxUV.x, minUV.y);
-        uv[uvCurrent++] = new Vector2(minUV.x, maxUV.y);
-        uv[uvCurrent++] = maxUV;
-        verticesDrawn += 4;
-        numSpritesDrawn += fractionOfSubtileToDraw / m_spriteSubtileWidth;
-        bone = bone.Next;
-      }
-    }
   }
 }

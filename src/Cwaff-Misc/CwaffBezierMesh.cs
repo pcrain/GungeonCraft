@@ -8,11 +8,7 @@ public class CwaffBezierMesh : MonoBehaviour
   public Vector2 endPos;
 
   private tk2dTiledSprite m_sprite;
-  private int m_spriteSubtileWidth;
-  private LinkedList<CwaffBone> m_bones = new LinkedList<CwaffBone>();
-  private Vector2 m_minBonePosition;
-  private Vector2 m_maxBonePosition;
-  private float m_globalTimer;
+  private CwaffBoneManager _boneManager;
 
   private Vector3 mainBezierPoint1;
   private Vector3 mainBezierPoint2;
@@ -27,6 +23,7 @@ public class CwaffBezierMesh : MonoBehaviour
   public static CwaffBezierMesh Create(tk2dSpriteAnimationClip animation, Vector2 startPos, Vector2 endPos, string name = null)
   {
       CwaffBezierMesh mesh = new GameObject(name ?? "new CwaffBezierMesh", typeof(CwaffBezierMesh)).GetComponent<CwaffBezierMesh>();
+      mesh.m_sprite        = mesh.gameObject.GetOrAddComponent<tk2dTiledSprite>();
       mesh.animation       = animation;
       mesh.startPos        = startPos;
       mesh.endPos          = endPos;
@@ -35,47 +32,23 @@ public class CwaffBezierMesh : MonoBehaviour
 
   private void Start()
   {
-    base.transform.rotation = Quaternion.identity;
-    base.transform.position = Vector3.zero;
-    m_sprite = this.AddComponent<tk2dTiledSprite>();
-    m_sprite.collection = animation.frames[0].spriteCollection;
-    m_sprite.spriteId = animation.frames[0].spriteId;
-    m_sprite.OverrideGetTiledSpriteGeomDesc = GetTiledSpriteGeomDesc;
-    m_sprite.OverrideSetTiledSpriteGeom = SetTiledSpriteGeom;
-    tk2dSpriteDefinition currentSpriteDef = m_sprite.collection.spriteDefinitions[m_sprite.spriteId];
-    m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.untrimmedBoundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
+    this._boneManager = base.gameObject.AddComponent<CwaffBoneManager>();
+    this._boneManager.Setup(animation: animation);
   }
 
   private static readonly Quaternion _Rot90 = Quaternion.Euler(0f, 0f, 90f);
   private void Update()
   {
-    m_globalTimer += BraveTime.DeltaTime;
-    CwaffBone.ReturnAll(ref m_bones);
+    this._boneManager.UpdateTimers();
+    this._boneManager.ReturnAllBones();
     DrawMainBezierCurve(startPos, startPos + Vector2.down, endPos + Vector2.up, endPos);
-    for (LinkedListNode<CwaffBone> n = m_bones.First; n != m_bones.Last; n = n.Next)
-      n.Value.normal = (_Rot90 * (n.Next.Value.pos - n.Value.pos)).normalized;
-    if (m_bones.Count > 1)
-      m_bones.Last.Value.normal = m_bones.Last.Previous.Value.normal;
+    this._boneManager.RecomputeNormals();
   }
 
   private void LateUpdate()
   {
-    m_minBonePosition = new Vector2(float.MaxValue, float.MaxValue);
-    m_maxBonePosition = new Vector2(float.MinValue, float.MinValue);
-    for (LinkedListNode<CwaffBone> n = m_bones.First; n != null; n = n.Next)
-    {
-      m_minBonePosition = Vector2.Min(m_minBonePosition, n.Value.pos);
-      m_maxBonePosition = Vector2.Max(m_maxBonePosition, n.Value.pos);
-    }
-    base.transform.position = new Vector3(m_minBonePosition.x, m_minBonePosition.y);
     m_sprite.HeightOffGround = 0.5f;
-    m_sprite.ForceBuild();
-    m_sprite.UpdateZDepth();
-  }
-
-  private void OnDestroy()
-  {
-    CwaffBone.ReturnAll(ref m_bones);
+    this._boneManager.ManualLateUpdate();
   }
 
   private void DrawBezierCurve(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
@@ -90,10 +63,10 @@ public class CwaffBezierMesh : MonoBehaviour
     }
     float approxPixelLength = c_bonePixelLength * approxLength;
     curveStart = BraveMathCollege.CalculateBezierPoint(0f, p0, p1, p2, p3);
-    if (m_bones.Count == 0)
-      m_bones.AddLast(CwaffBone.Rent(curveStart));
+    if (!this._boneManager.HasBones())
+      this._boneManager.RentBone(curveStart);
     for (int j = 1; j <= approxPixelLength; j++)
-      m_bones.AddLast(CwaffBone.Rent(BraveMathCollege.CalculateBezierPoint(j / approxPixelLength, p0, p1, p2, p3)));
+      this._boneManager.RentBone(BraveMathCollege.CalculateBezierPoint(j / approxPixelLength, p0, p1, p2, p3));
   }
 
   private void DrawMainBezierCurve(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3)
@@ -108,57 +81,5 @@ public class CwaffBezierMesh : MonoBehaviour
   public Vector2 GetPointOnMainBezier(float t)
   {
     return BraveMathCollege.CalculateBezierPoint(t, mainBezierPoint1, mainBezierPoint2, mainBezierPoint3, mainBezierPoint4);
-  }
-
-  private void GetTiledSpriteGeomDesc(out int numVertices, out int numIndices, tk2dSpriteDefinition spriteDef, Vector2 dimensions)
-  {
-    int segments = Mathf.Max(m_bones.Count - 1, 0);
-    numVertices = segments * 4;
-    numIndices = segments * 6;
-  }
-
-  private void SetTiledSpriteGeom(Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
-  {
-    int spritePixelLength = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
-    int numSubtilesInSprite = spritePixelLength / 4;
-    int lastBoneIndex = Mathf.Max(m_bones.Count - 1, 0);
-    int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
-    boundsCenter = 0.5f * (m_maxBonePosition + m_minBonePosition);
-    boundsExtents = 0.5f * (m_maxBonePosition - m_minBonePosition);
-    LinkedListNode<CwaffBone> bone = m_bones.First;
-    int verticesDrawn = 0;
-    int animationFrame = Mathf.FloorToInt(Mathf.Repeat(m_globalTimer * animation.fps, animation.frames.Length));
-    tk2dSpriteAnimationFrame frame = animation.frames[animationFrame];
-    tk2dSpriteDefinition segmentSprite = frame.spriteCollection.spriteDefinitions[frame.spriteId];
-    for (int i = 0; i < totalSpritesToDraw; i++)
-    {
-      int lastSubtileIndex = numSubtilesInSprite - 1;
-      if (i == totalSpritesToDraw - 1 && lastBoneIndex % numSubtilesInSprite != 0)
-        lastSubtileIndex = lastBoneIndex % numSubtilesInSprite - 1;
-      float numSpritesDrawn = 0f;
-      for (int j = 0; j <= lastSubtileIndex; j++)
-      {
-        float fractionOfSubtileToDraw = 1f;
-        CwaffBone curBone = bone.Value;
-        CwaffBone nextBone = bone.Next.Value;
-        if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex)
-          fractionOfSubtileToDraw = Vector2.Distance(nextBone.pos, curBone.pos);
-        int uvCurrent = offset + verticesDrawn;
-        pos[uvCurrent++] = (curBone.pos  + curBone.normal  * segmentSprite.position0.y - m_minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (nextBone.pos + nextBone.normal * segmentSprite.position1.y - m_minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (curBone.pos  + curBone.normal  * segmentSprite.position2.y - m_minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (nextBone.pos + nextBone.normal * segmentSprite.position3.y - m_minBonePosition).ToVector3ZUp(0f);
-        Vector2 minUV = Vector2.Lerp(segmentSprite.uvs[0], segmentSprite.uvs[1], numSpritesDrawn);
-        Vector2 maxUV = Vector2.Lerp(segmentSprite.uvs[2], segmentSprite.uvs[3], numSpritesDrawn + fractionOfSubtileToDraw / numSubtilesInSprite);
-        uvCurrent = offset + verticesDrawn;
-        uv[uvCurrent++] = minUV;
-        uv[uvCurrent++] = new Vector2(maxUV.x, minUV.y);
-        uv[uvCurrent++] = new Vector2(minUV.x, maxUV.y);
-        uv[uvCurrent++] = maxUV;
-        verticesDrawn += 4;
-        numSpritesDrawn += fractionOfSubtileToDraw / m_spriteSubtileWidth;
-        bone = bone.Next;
-      }
-    }
   }
 }

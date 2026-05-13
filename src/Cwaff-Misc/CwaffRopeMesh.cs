@@ -13,11 +13,6 @@ public class CwaffRopeMesh : MonoBehaviour
   public bool locked; // if true, prevents the rope from updating
   public tk2dTiledSprite sprite;
 
-  private int m_spriteSubtileWidth;
-  private LinkedList<CwaffBone> m_bones = new LinkedList<CwaffBone>();
-  private Vector2 m_minBonePosition;
-  private Vector2 m_maxBonePosition;
-  private float m_globalTimer;
   private List<Vector2> _ropePrevPoints;
   private List<Vector2> _ropePoints;
   private float _segLength;
@@ -26,6 +21,7 @@ public class CwaffRopeMesh : MonoBehaviour
   private float _softMaxRopeLength;
   private int _numSegments;
   private float _lockThreshold; // if > 0, locks the rope once it's stopped moving
+  private CwaffBoneManager _boneManager;
 
   public static CwaffRopeMesh Create(tk2dSpriteAnimationClip animation, Vector2 startPos, Vector2 endPos, int numSegments, float segLength,
     string name = null, StretchPolicy stretchPolicy = StretchPolicy.STRETCH)
@@ -34,7 +30,7 @@ public class CwaffRopeMesh : MonoBehaviour
       mesh.animation       = animation;
       mesh.startPos        = startPos;
       mesh.endPos          = endPos;
-      mesh.sprite          = mesh.AddComponent<tk2dTiledSprite>();
+      mesh.sprite          = mesh.GetOrAddComponent<tk2dTiledSprite>();
       mesh._segLength      = segLength;
       mesh._ropePrevPoints = new();
       mesh._ropePoints     = new();
@@ -59,61 +55,34 @@ public class CwaffRopeMesh : MonoBehaviour
 
   private void Start()
   {
-    base.transform.rotation = Quaternion.identity;
-    base.transform.position = Vector3.zero;
-    if (!sprite)
-      sprite = this.AddComponent<tk2dTiledSprite>();
-    sprite.collection = animation.frames[0].spriteCollection;
-    sprite.spriteId = animation.frames[0].spriteId;
-    sprite.OverrideGetTiledSpriteGeomDesc = GetTiledSpriteGeomDesc;
-    sprite.OverrideSetTiledSpriteGeom = SetTiledSpriteGeom;
-    tk2dSpriteDefinition currentSpriteDef = sprite.collection.spriteDefinitions[sprite.spriteId];
-    m_spriteSubtileWidth = Mathf.RoundToInt(currentSpriteDef.untrimmedBoundsDataExtents.x / currentSpriteDef.texelSize.x) / 4;
+    this._boneManager = base.gameObject.AddComponent<CwaffBoneManager>();
+    this._boneManager.Setup(animation: animation);
     _updateTimer = 0.0f;
   }
 
-  private static readonly Quaternion _Rot90 = Quaternion.Euler(0f, 0f, 90f);
   private void Update()
   {
     if (this.locked)
       return;
-    m_globalTimer += BraveTime.DeltaTime;
+    this._boneManager.UpdateTimers();
     this._updateTimer += BraveTime.DeltaTime;
     if (this._updateTimer < UPDATE_RATE)
       return; // rope updates need to happen at a fixed time rate due to verlet integration silliness
     this._updateTimer -= UPDATE_RATE;
 
     UpdateRope();
-    for (LinkedListNode<CwaffBone> n = m_bones.First; n != m_bones.Last; n = n.Next)
-      n.Value.normal = (_Rot90 * (n.Next.Value.pos - n.Value.pos)).normalized;
-    if (m_bones.Count > 1)
-      m_bones.Last.Value.normal = m_bones.Last.Previous.Value.normal;
+    this._boneManager.RecomputeNormals();
   }
 
   private void LateUpdate()
   {
-    if (this.locked)
-      return;
-    m_minBonePosition = new Vector2(float.MaxValue, float.MaxValue);
-    m_maxBonePosition = new Vector2(float.MinValue, float.MinValue);
-    for (LinkedListNode<CwaffBone> n = m_bones.First; n != null; n = n.Next)
-    {
-      m_minBonePosition = Vector2.Min(m_minBonePosition, n.Value.pos);
-      m_maxBonePosition = Vector2.Max(m_maxBonePosition, n.Value.pos);
-    }
-    base.transform.position = new Vector3(m_minBonePosition.x, m_minBonePosition.y);
-    sprite.ForceBuild();
-    sprite.UpdateZDepth();
-  }
-
-  private void OnDestroy()
-  {
-    CwaffBone.ReturnAll(ref m_bones);
+    if (!this.locked)
+      this._boneManager.ManualLateUpdate();
   }
 
   private void UpdateRope()
   {
-    CwaffBone.ReturnAll(ref m_bones);
+    this._boneManager.ReturnAllBones();
     Vector2 curStartPos = this.startPos;
     Vector2 curEndPos = this.endPos;
     switch (this._stretchPolicy)
@@ -162,74 +131,17 @@ public class CwaffRopeMesh : MonoBehaviour
       default:
         break;
     }
-    // Lazy.DebugConsoleLog($"simulating {this._ropePoints.Count} points");
     RopeSim.SimulateRope(curStartPos, curEndPos, this._ropePoints, this._ropePrevPoints,
       minSegLength: this._segLength, maxSegLength: this._segLength, updateRate: UPDATE_RATE);
     for (int j = 0; j < this._ropePoints.Count; j++)
-      m_bones.AddLast(CwaffBone.Rent(this._ropePoints[j]));
+      this._boneManager.RentBone(this._ropePoints[j]);
     if (this._lockThreshold > 0f)
     {
       float maxMovement = 0.0f;
       for (int i = this._ropePoints.Count - 1; i >= 0; --i)
         maxMovement = Mathf.Max(maxMovement, (this._ropePoints[i] - this._ropePrevPoints[i]).sqrMagnitude);
-      // Lazy.DebugConsoleLog($" max movement is {Mathf.Sqrt(maxMovement)}");
       if (maxMovement <= (this._lockThreshold * this._lockThreshold))
-      {
-        // Lazy.DebugConsoleLog($"    locking updates!");
         this.locked = true;
-      }
-    }
-  }
-
-  private void GetTiledSpriteGeomDesc(out int numVertices, out int numIndices, tk2dSpriteDefinition spriteDef, Vector2 dimensions)
-  {
-    int segments = Mathf.Max(m_bones.Count - 1, 0);
-    numVertices = segments * 4;
-    numIndices = segments * 6;
-  }
-
-  private void SetTiledSpriteGeom(Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
-  {
-    int spritePixelLength = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
-    int numSubtilesInSprite = spritePixelLength / 4;
-    int lastBoneIndex = Mathf.Max(m_bones.Count - 1, 0);
-    int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
-    boundsCenter = 0.5f * (m_maxBonePosition + m_minBonePosition);
-    boundsExtents = 0.5f * (m_maxBonePosition - m_minBonePosition);
-    LinkedListNode<CwaffBone> bone = m_bones.First;
-    int verticesDrawn = 0;
-    int animationFrame = Mathf.FloorToInt(Mathf.Repeat(m_globalTimer * animation.fps, animation.frames.Length));
-    tk2dSpriteAnimationFrame frame = animation.frames[animationFrame];
-    tk2dSpriteDefinition segmentSprite = frame.spriteCollection.spriteDefinitions[frame.spriteId];
-    for (int i = 0; i < totalSpritesToDraw; i++)
-    {
-      int lastSubtileIndex = numSubtilesInSprite - 1;
-      if (i == totalSpritesToDraw - 1 && lastBoneIndex % numSubtilesInSprite != 0)
-        lastSubtileIndex = lastBoneIndex % numSubtilesInSprite - 1;
-      float numSpritesDrawn = 0f;
-      for (int j = 0; j <= lastSubtileIndex; j++)
-      {
-        float fractionOfSubtileToDraw = 1f;
-        CwaffBone curBone = bone.Value;
-        CwaffBone nextBone = bone.Next.Value;
-        if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex)
-          fractionOfSubtileToDraw = Vector2.Distance(nextBone.pos, curBone.pos);
-        int uvCurrent = offset + verticesDrawn;
-        pos[uvCurrent++] = (curBone.pos  + curBone.normal  * segmentSprite.position0.y - m_minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (nextBone.pos + nextBone.normal * segmentSprite.position1.y - m_minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (curBone.pos  + curBone.normal  * segmentSprite.position2.y - m_minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (nextBone.pos + nextBone.normal * segmentSprite.position3.y - m_minBonePosition).ToVector3ZUp(0f);
-        Vector2 minUV = Vector2.Lerp(segmentSprite.uvs[0], segmentSprite.uvs[1], numSpritesDrawn);
-        Vector2 maxUV = Vector2.Lerp(segmentSprite.uvs[2], segmentSprite.uvs[3], numSpritesDrawn + fractionOfSubtileToDraw / numSubtilesInSprite);
-        uvCurrent = offset + verticesDrawn;
-        uv[uvCurrent++] = minUV;
-        uv[uvCurrent++] = new Vector2(maxUV.x, minUV.y);
-        uv[uvCurrent++] = new Vector2(minUV.x, maxUV.y);
-        uv[uvCurrent++] = maxUV;
-        verticesDrawn += 4;
-        numSpritesDrawn += fractionOfSubtileToDraw / m_spriteSubtileWidth;
-        bone = bone.Next;
-      }
     }
   }
 }
