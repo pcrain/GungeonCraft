@@ -196,7 +196,8 @@ public class SoulLinkStatus : MonoBehaviour
             return false;
 
         hh.ApplyDamage(damage, Vector2.zero, "Soul Link", CoreDamageTypes.Magic, DamageCategory.Unstoppable, true, null, false);
-        hh.knockbackDoer.ApplyKnockback(new Vector2(0f,0f), 2f);
+        if (hh.knockbackDoer is KnockbackDoer kbd)
+          kbd.ApplyKnockback(new Vector2(0f,0f), 2f);
         if (this._lastVfxTime + _MAX_VFX_RATE > BraveTime.ScaledTimeSinceStartup)
             return false; // don't play any sounds
 
