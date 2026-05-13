@@ -77,7 +77,7 @@ public class MasteryRitualComponent : MonoBehaviour
   {
     ritualTarget = null;
 
-    if (GameManager.Instance.BestActivePlayer is not PlayerController player)
+    if (!GameManager.HasInstance || GameManager.Instance.BestActivePlayer is not PlayerController player)
       return false;
 
     // Requirement #1: room must be valid and unsealed

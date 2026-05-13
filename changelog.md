@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.30.1 (TBD)
+
+- Fixed rare null deref caused by mastery ritual code querying GameManager without a valid GameManager instance
+
 ## 1.30.0 (2026-05-07)
 
 #### Features:

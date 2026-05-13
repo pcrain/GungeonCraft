@@ -27,7 +27,7 @@ public class CwaffBone
   internal static void Return(LinkedListNode<CwaffBone> bone)
   {
     _BonePool.AddLast(bone);
-    // System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
+    // Lazy.DebugConsoleLog($"returned {_BonePool.Count}/{_BonesCreated} bones");
   }
 
   internal static void ReturnAll(ref LinkedList<CwaffBone> bones)
@@ -40,12 +40,13 @@ public class CwaffBone
       bones.RemoveLast();
       _BonePool.AddLast(bone);
     }
-    // System.Console.WriteLine($"returned {_BonePool.Count}/{_BonesCreated} bones");
+    // Lazy.DebugConsoleLog($"returned {_BonePool.Count}/{_BonesCreated} bones");
   }
 
   private CwaffBone() // can only be created by Rent
   {
     ++_BonesCreated;
+    // Lazy.DebugConsoleLog($"rented bone {_BonesCreated}");
   }
 }
 
