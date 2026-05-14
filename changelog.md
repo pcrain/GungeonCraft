@@ -13,6 +13,7 @@
 - Removed debug log message from Blacksmith dialogue
 - Fixed companion Shmuppies charging towards the door the player just walked through when entering a new room
 - Made Gunflower unable to gain ammo from ammo boxes
+- Fixed Gunflower's fire sound playing when dodge rolling while firing
 
 ## 1.30.0 (2026-05-07)
 

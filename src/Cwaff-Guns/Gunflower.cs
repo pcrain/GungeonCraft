@@ -41,7 +41,7 @@ public class Gunflower : CwaffGun
         if (this.Mastered && !this.gun.IsFiring)
             DoPassiveAmmoRegen();
         UpdateNutrients();
-        bool shouldPlaySound = this.gun && this.gun.IsFiring;
+        bool shouldPlaySound = this.gun && this.gun.IsFiring && !player.IsDodgeRolling;
         this.gun.LoopSoundIf(shouldPlaySound, "gunflower_fire_sound", loopPointMs: 1750, rewindAmountMs: 1750 - 1177);
         if (GetExtantBeam() is BasicBeamController beam && beam.State == BeamState.Firing)
         {
