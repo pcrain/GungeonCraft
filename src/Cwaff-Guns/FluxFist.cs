@@ -28,7 +28,6 @@ public class FluxFist : CwaffGun
     private MagnetBall _magnetBall               = null;
     private bool _attract                        = false;
     private bool _toggleWhenDoneFiring           = false;
-    private float _nextSoundTime                 = 0f;
     private PlayerController _lastOwner          = null;
 
     private static Projectile NorthBeam          = null;
@@ -150,14 +149,7 @@ public class FluxFist : CwaffGun
     private void LateUpdate()
     {
         if (this.gun.IsFiring)
-        {
-          float now = BraveTime.ScaledTimeSinceStartup;
-          if (this._nextSoundTime < now)
-          {
-              this._nextSoundTime = now + _SOUND_TIMER;
-              base.gameObject.Play(this._attract ? "flux_fist_attract_sound" : "flux_fist_repel_sound");
-          }
-        }
+          base.gameObject.Play(this._attract ? "flux_fist_attract_sound" : "flux_fist_repel_sound", soundRate: _SOUND_TIMER);
         else if (this._toggleWhenDoneFiring)
         {
           this._toggleWhenDoneFiring = false;
@@ -292,7 +284,6 @@ public class MagnetBall : MonoBehaviour
     private PlayerController _owner    = null;
     private tk2dBaseSprite _sprite     = null;
     private SpeculativeRigidbody _body = null;
-    private float _nextSound           = 0.0f;
     private KnockbackDoer _kbd         = null;
     private Dictionary<AIActor, ActiveKnockbackData> _KnockbackDict = new();
 
@@ -389,10 +380,7 @@ public class MagnetBall : MonoBehaviour
         meb.HandleInfluenceParticles(basePos, 1f - Mathf.Sqrt(1f - influence));
         didAnything = true;
       }
-      if (didAnything && now >= this._nextSound)
-      {
-        this._nextSound = now + _SOUND_RATE;
-        base.gameObject.Play("magnet_ball_attract_sound");
-      }
+      if (didAnything)
+        base.gameObject.Play("magnet_ball_attract_sound", soundRate: _SOUND_RATE);
     }
 }

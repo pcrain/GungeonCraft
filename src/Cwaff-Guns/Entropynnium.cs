@@ -26,7 +26,6 @@ public class Entropynnium : CwaffGun
 
     private float _manaRadius = 0f;
     private float _nextParticleTime = 0f;
-    private float _nextSoundTime = 0f;
     private int _manaDrainedThisCharge = 0;
 
     private Geometry _extantManaRing = null;
@@ -94,12 +93,8 @@ public class Entropynnium : CwaffGun
           pos: ppos, radius: this._manaRadius, radiusInner: this._manaRadius - _THICKNESS);
 
         // spawn some intimindating looking mana particles
+        base.gameObject.Play("entropynnium_charge_sound", soundRate: _SOUND_TIMER);
         float now = BraveTime.ScaledTimeSinceStartup;
-        if (this._nextSoundTime < now)
-        {
-            this._nextSoundTime = now + _SOUND_TIMER;
-            base.gameObject.Play("entropynnium_charge_sound");
-        }
         if (this._nextParticleTime < now)
         {
             this._nextParticleTime = now + _PARTICLE_TIMER;

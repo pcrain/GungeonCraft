@@ -146,7 +146,6 @@ public class FrisbeeBehaviour : MonoBehaviour
     private PlayerController _owner = null;
     private PlayerController _rider = null;
     private SpeculativeRigidbody _body = null;
-    private float _soundTimer = 0.0f;
     private int _framesSinceLastCollision = 9999;
 
     private void Awake()
@@ -269,7 +268,6 @@ public class FrisbeeBehaviour : MonoBehaviour
             ? moveVec.ToAngle()
             : user.m_currentGunAngle).Quantize(90f, VectorConversions.Round);
         this._state = FLYING;
-        this._soundTimer = 0.0f;
         this._body.CorrectForWalls();
         this._body.Velocity = launchAngle.ToVector(_FRISBEE_SPEED);
         base.gameObject.PlayOnce("frisbee_throw_sound");
@@ -305,11 +303,7 @@ public class FrisbeeBehaviour : MonoBehaviour
             return;
 
         ++this._framesSinceLastCollision;
-        if ((this._soundTimer += BraveTime.DeltaTime) > _SOUND_RATE)
-        {
-            this._soundTimer = 0.0f;
-            base.gameObject.PlayOnce("frisbee_spin_sound_alt");
-        }
+        base.gameObject.Play("frisbee_spin_sound_alt", soundRate: _SOUND_RATE);
 
         base.GetComponent<tk2dSprite>().transform.localRotation = AngleFromFrisbeeAnimation().EulerZ();
         if (this._state != RIDDEN || !this._rider)

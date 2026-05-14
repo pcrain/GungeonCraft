@@ -1740,10 +1740,25 @@ public static class Extensions
   /// <remarks>Potentially the same as the Projectile.SetFrame() extension</remarks>
   public static void PickFrame(this Projectile p, int frame = -1) => p.spriteAnimator.PickFrame(frame);
 
-  /// <summary>Play a sound on a GameObject</summary>
-  public static void Play(this GameObject g, string sound)
+  private static readonly Dictionary<int, float> _SoundTimes = new();
+  /// <summary>Play a sound on a GameObject with an optional maximumum sound rate. Returns true iff the sound was played.</summary>
+  public static bool Play(this GameObject g, string sound, float soundRate = 0.0f)
   {
+    if (soundRate > 0)
+    {
+      float now = BraveTime.ScaledTimeSinceStartup;
+      int hash;
+      unchecked
+      {
+          hash = ((g != null ? g.GetHashCode() : 0) * 397) ^ (sound != null ? sound.GetHashCode() : 0);
+      }
+      if (_SoundTimes.TryGetValue(hash, out float lastSoundTime))
+        if (lastSoundTime + soundRate > now)
+          return false;
+      _SoundTimes[hash] = now;
+    }
     AkSoundEngine.PostEvent(sound, g);
+    return true;
   }
 
   /// <summary>Play a sound on a GameObject, stopping any instances of the sound on that object.</summary>

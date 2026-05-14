@@ -178,7 +178,6 @@ public class SeltzerProjectile : MonoBehaviour
         seltzer.UpdateRotationRate();
 
         p.gameObject.Play("seltzer_spray_sound");
-        float lastSoundTime = BraveTime.ScaledTimeSinceStartup;
 
         int maxSounds = 20; // if the cans get stuck, things can get really noisy, so don't let them make too much noise
 
@@ -192,12 +191,8 @@ public class SeltzerProjectile : MonoBehaviour
                 if (!seltzer._beam)
                     seltzer.CreateBeam();
 
-                if ((maxSounds > 0) && (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup))
-                {
+                if ((maxSounds > 0) && p.gameObject.Play("seltzer_spray_sound", soundRate: _SOUND_RATE))
                     --maxSounds;
-                    lastSoundTime = BraveTime.ScaledTimeSinceStartup;
-                    p.gameObject.Play("seltzer_spray_sound");
-                }
 
                 Vector2 oldSpeed = p.LastVelocity;
                 curAngle += seltzer._rotationRate;
@@ -226,12 +221,8 @@ public class SeltzerProjectile : MonoBehaviour
                 if (!seltzer._beam)
                     seltzer.CreateBeam();
 
-                if ((maxSounds > 0) && (lastSoundTime + _SOUND_RATE < BraveTime.ScaledTimeSinceStartup))
-                {
+                if ((maxSounds > 0) && p.gameObject.Play("seltzer_spray_sound", soundRate: _SOUND_RATE))
                     --maxSounds;
-                    lastSoundTime = BraveTime.ScaledTimeSinceStartup;
-                    p.gameObject.Play("seltzer_spray_sound");
-                }
 
                 if (p.baseData.speed > 0.1f)
                     p.ApplyFriction(_AIR_DRAG);

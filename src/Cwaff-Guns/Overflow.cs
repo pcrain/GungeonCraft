@@ -21,7 +21,6 @@ public class Overflow : CwaffGun
     private KickableObject _attachedBarrel = null;
     private CwaffBezierMesh _cable = null;
     private float _fillTimer = 0.0f;
-    private float _pumpSoundTimer = 0.0f;
     private int _newGoopType;
     private float _nextLeakTime = 0.0f;
 
@@ -214,15 +213,12 @@ public class Overflow : CwaffGun
             return;
         }
 
-        float now = BraveTime.ScaledTimeSinceStartup;
-        bool playPumpSound = false;
-
         bool draining = this.gun.CurrentStrengthTier != this._newGoopType;
         float rate = (draining || this.Mastered) ? _DRAIN_RATE : _FILL_RATE;
         this._fillTimer += BraveTime.DeltaTime;
         while (this._fillTimer > rate)
         {
-            playPumpSound = ((now - this._pumpSoundTimer) > _PUMP_SOUND_RATE);
+            this.gun.gameObject.Play("overflow_pump_sound", soundRate: _PUMP_SOUND_RATE);
             this._fillTimer -= rate;
             if (draining)
             {
@@ -237,12 +233,6 @@ public class Overflow : CwaffGun
             }
             else if (this.gun.CurrentAmmo < this.gun.AdjustedMaxAmmo)
                 this.gun.GainAmmo(1);
-        }
-
-        if (playPumpSound)
-        {
-            this.gun.gameObject.Play("overflow_pump_sound");
-            this._pumpSoundTimer = now;
         }
     }
 

@@ -14,7 +14,6 @@ public class PhotonCannon : CwaffGun
 
     internal static GameObject _SweatVFX = null;
 
-    private float _nextSoundTime = 0f;
     private EasyLight _glassLight = null;
 
     public static void Init()
@@ -48,15 +47,9 @@ public class PhotonCannon : CwaffGun
     private void LateUpdate()
     {
         if (!this.gun.IsFiring)
-        {
           base.gameObject.Play("photon_beam_sound_stop");
-          return;
-        }
-        float now = BraveTime.ScaledTimeSinceStartup;
-        if (this._nextSoundTime > now)
-          return;
-        this._nextSoundTime = now + _SOUND_TIMER;
-        base.gameObject.Play("photon_beam_sound");
+        else
+          base.gameObject.Play("photon_beam_sound", soundRate: _SOUND_TIMER);
     }
 }
 

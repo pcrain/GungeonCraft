@@ -64,7 +64,6 @@ public class Toothpaste : CwaffGun
     private const float _HIT_CLEAR_RATE = 0.5f;  // how often HandleToothpasteGoopSpread() clears its list of hit enemies
     private const float _SPREAD_SOUND_RATE = 0.2f; // max rate at which goop spreading sounds can play
 
-    private static float _NextSoundTime = 0f;
     private static float _NextHitClearTime = 0f;
     private static float _NextUpdateTime = 0f;
     private static HashSet<IntVector2> _ConvertedGoops = new();
@@ -96,11 +95,8 @@ public class Toothpaste : CwaffGun
             anyNewGoops |= HandleSingleToothpasteGoopSpread(ddgm, goop);
         }
 
-        if (anyNewGoops && now >= _NextSoundTime)
-        {
-            ddgm.gameObject.Play("toothpaste_suds_spread_sound");
-            _NextSoundTime = now + _SPREAD_SOUND_RATE;
-        }
+        if (anyNewGoops)
+            ddgm.gameObject.Play("toothpaste_suds_spread_sound", soundRate: _SPREAD_SOUND_RATE);
 
         if (_ConvertedGoops.Count > 0)
         {
