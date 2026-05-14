@@ -10,6 +10,7 @@
 	- New behavior: feeds on the player when reduced to 0 ammo and refills 20% ammo immediately
 - Fixed null deref caused by Soul Kaliber's Soul Link status effect trying to apply knockback to enemies without KnockbackDoers
 - Prevented Mastered Platinum Star from being fired while time is frozen to deter infinite time freeze loops
+- Removed debug log message from Blacksmith dialogue
 
 ## 1.30.0 (2026-05-07)
 

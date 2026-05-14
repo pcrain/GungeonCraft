@@ -7,7 +7,7 @@ public static class CwaffDialog
   {
     if (talker.playmakerFsm is not PlayMakerFSM fsm)
     {
-      System.Console.WriteLine($"no fsm found");
+      Lazy.DebugLog($"no fsm found");
       return;
     }
 
@@ -18,7 +18,7 @@ public static class CwaffDialog
       {
         if (!replaceExisting)
         {
-          System.Console.WriteLine($"state {stateName} already found, doing nothing");
+          Lazy.DebugLog($"state {stateName} already found, doing nothing");
           return;
         }
         //TODO: handle replacement
@@ -113,17 +113,17 @@ public static class CwaffDialog
   {
     if (talker.playmakerFsm is not PlayMakerFSM fsm)
     {
-      System.Console.WriteLine($"couldn't find FSM for dialog");
+      Lazy.DebugLog($"couldn't find FSM for dialog");
       return;
     }
     if (fsm.fsm.activeState is not FsmState curState)
     {
-      System.Console.WriteLine($"fsm state is not active");
+      Lazy.DebugLog($"fsm state is not active");
       return;
     }
     if (fsm.fsm.GetState(stateName) is not FsmState targetState)
     {
-      System.Console.WriteLine($"target state does not exist");
+      Lazy.DebugLog($"target state does not exist");
       return;
     }
 
@@ -189,13 +189,13 @@ public static class CwaffDialog
 //   [HarmonyPrefix]
 //   private static void FSMEventPatch(Fsm __instance, string fsmEventName)
 //   {
-//     // System.Console.WriteLine($"calling event {fsmEventName} on {__instance.Name} for target {__instance.EventTarget}");
+//     // Lazy.DebugLog($"calling event {fsmEventName} on {__instance.Name} for target {__instance.EventTarget}");
 //   }
 
 //   [HarmonyPatch(typeof(DialogueBox), nameof(DialogueBox.OnUpdate))]
 //   [HarmonyPostfix]
 //   private static void DialogueBoxOnUpdatePatch(DialogueBox __instance)
 //   {
-//     // System.Console.WriteLine($"m_dialogueState == {__instance.m_dialogueState}, m_talkDoer.State == {__instance.m_talkDoer.State}, finished == {__instance.finished}");
+//     // Lazy.DebugLog($"m_dialogueState == {__instance.m_dialogueState}, m_talkDoer.State == {__instance.m_talkDoer.State}, finished == {__instance.finished}");
 //   }
 // }

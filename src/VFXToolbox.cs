@@ -1578,7 +1578,7 @@ public class LightFader : MonoBehaviour
 
   private void OnSpawned()
   {
-    System.Console.WriteLine($"light enabled");
+    // System.Console.WriteLine($"light enabled");
   }
 
   private void Update()

@@ -38,8 +38,11 @@ internal static class ArmisticePatches
         noPrompt  : "None at all.",
         noState   : "negative");
       talker.AddNewDialogState("affirmative", new(){"I see.", "Off you go then."});
-      talker.AddNewDialogState("negative", customAction: () => {
-        CwaffRunData.Instance.noPastRegrets = true; System.Console.WriteLine($"CwaffRunData.Instance.noPastRegrets = {CwaffRunData.Instance.noPastRegrets}"); },
+      talker.AddNewDialogState("negative",
+        customAction: () => {
+          CwaffRunData.Instance.noPastRegrets = true;
+          Lazy.DebugLog($"CwaffRunData.Instance.noPastRegrets = {CwaffRunData.Instance.noPastRegrets}");
+        },
         dialogue: new(){
           "Interesting... ",
           "The {wj}gun{w} and {wj}bullet{w} give those with regrets a chance to change their past.",
