@@ -90,6 +90,7 @@ public static class CwaffDialog
         suppressReinteractDelay    = false,
         suppressFurtherInteraction = false,
       });
+      Append(ref newState.actions, new RestartWhenFinished());
     }
 
     // initialize all of our new actions with the state info

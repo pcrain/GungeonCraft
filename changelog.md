@@ -14,6 +14,11 @@
 - Fixed companion Shmuppies charging towards the door the player just walked through when entering a new room
 - Made Gunflower unable to gain ammo from ammo boxes
 - Fixed Gunflower's fire sound playing when dodge rolling while firing
+- Changed how characters that can't normally obtain the Bullet That Can Kill the Past (i.e., pastless characters) access [REDACTED]
+	- Pastless characters no longer automatically go to [REDACTED] when firing the Gun That Can Kill the Past
+	- Added alternate Blacksmith dialogue for pastless characters that grants access to [REDACTED] 
+	- Tweaked Blacksmith [REDACTED] dialogue slightly
+- Fixed being unable to interact with Blacksmith in Forge after [REDACTED] dialogue options
 
 ## 1.30.0 (2026-05-07)
 

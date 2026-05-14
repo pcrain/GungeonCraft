@@ -3,6 +3,49 @@ namespace CwaffingTheGungy;
 [HarmonyPatch]
 internal static class ArmisticePatches
 {
+  private class DidArmisticeDialogue : MonoBehaviour {}
+
+  private static bool StartArmisticeDialogue(TalkDoerLite talker, bool didBulletPickup)
+  {
+      if (talker.gameObject.GetComponent<DidArmisticeDialogue>())
+        return false;
+      talker.gameObject.AddComponent<DidArmisticeDialogue>();
+      List<string> questionDialogue = didBulletPickup
+        ? new(){
+          "...hey... ",
+          "You've already killed your past, right?",
+          "Why do you need this bullet?",
+          "Do you still have lingering regrets?" }
+        : new(){
+          "...hey... ",
+          "You're not here to kill your past, right?",
+          "Why do you need this bullet?",
+          "Are you seeking something else?"
+        };
+      talker.AddNewDialogState("pastRegrets",
+        dialogue: questionDialogue,
+        yesPrompt : didBulletPickup ? "A few." : "No.", // NOTE: confusing naming...
+        yesState  : "affirmative",
+        noPrompt  : didBulletPickup ? "None at all." : "Yes.",
+        noState   : "negative");
+      talker.AddNewDialogState("affirmative", new(){"I see.", "Off you go then."});
+      talker.AddNewDialogState("negative",
+        customAction: () => {
+          if (!didBulletPickup)
+            GameManager.Instance.BestActivePlayer.AcquirePassiveItemPrefabDirectly(Items.BulletThatCanKillThePast.AsPassive());
+          CwaffRunData.Instance.noPastRegrets = true;
+          Lazy.DebugLog($"CwaffRunData.Instance.noPastRegrets = {CwaffRunData.Instance.noPastRegrets}");
+        },
+        dialogue: new(){
+          "Interesting... ",
+          "The {wj}gun{w} and {wj}bullet{w} give those with regrets a chance to change their past.",
+          "If you truly have no regrets, what will happen when you fire the {wj}gun{w}?",
+          "... ",
+          "Off you go then.",
+        });
+      talker.StartDialog("pastRegrets");
+      return true;
+  }
 
   /// <summary>Add dynamic dialog to Blacksmith if preconditions are met.</summary>
   [HarmonyPatch(typeof(BulletThatCanKillThePast), nameof(BulletThatCanKillThePast.Pickup))]
@@ -21,38 +64,21 @@ internal static class ArmisticePatches
       return;
     foreach (var ix in room.GetRoomInteractables())
     {
-      if (ix is not TalkDoerLite talker || !talker)
+      if (ix is not TalkDoerLite talker || !talker || talker.name != "NPC_Blacksmith")
         continue;
-      if (talker.name != "NPC_Blacksmith")
-        continue;
-
-      talker.AddNewDialogState("pastRegrets",
-        dialogue: new(){
-          "...hey... ",
-          "You've already killed your past, right?",
-          "Why do you need this bullet?",
-          "Do you still have lingering regrets?"
-          },
-        yesPrompt : "A few.",
-        yesState  : "affirmative",
-        noPrompt  : "None at all.",
-        noState   : "negative");
-      talker.AddNewDialogState("affirmative", new(){"I see.", "Off you go then."});
-      talker.AddNewDialogState("negative",
-        customAction: () => {
-          CwaffRunData.Instance.noPastRegrets = true;
-          Lazy.DebugLog($"CwaffRunData.Instance.noPastRegrets = {CwaffRunData.Instance.noPastRegrets}");
-        },
-        dialogue: new(){
-          "Interesting... ",
-          "The {wj}gun{w} and {wj}bullet{w} give those with regrets a chance to change their past.",
-          "If you truly no longer have regrets, what will happen to you when you fire the {wj}gun{w}?",
-          "... ",
-          "Off you go then.",
-        });
-      talker.StartDialog("pastRegrets");
+      StartArmisticeDialogue(talker, didBulletPickup: true);
       break;
     }
+  }
+
+  /// <summary>Add dynamic dialog to Blacksmith for characters that can't normally pick up the BTCKTP</summary>
+  [HarmonyPatch(typeof(TalkDoerLite), nameof(TalkDoerLite.Interact))]
+  [HarmonyPrefix]
+  private static bool TalkDoerLiteInteractPatch(TalkDoerLite __instance, PlayerController interactor)
+  {
+    if (__instance.name != "NPC_Blacksmith" || !interactor.AllowAlternateArmisticeAccess() || !StartArmisticeDialogue(__instance, didBulletPickup: false))
+      return true;
+    return false;
   }
 
   /// <summary>Allow the GTCKTP to take us to the secret area</summary>
@@ -95,7 +121,7 @@ internal static class ArmisticePatches
       cursor.Emit(OpCodes.Brtrue, afterAllPastChecks);
   }
 
-  private static bool ForceAllowArmisticeAccess(this PlayerController player)
+  private static bool AllowAlternateArmisticeAccess(this PlayerController player)
   {
     if (!GungeonFlags.BOSSKILLED_LICH.Get())
       return false; // nobody should be able to access Armistice until the Lich has been defeated
@@ -111,8 +137,6 @@ internal static class ArmisticePatches
   }
 
   private static bool NoPastRegrets(bool oldValue) {
-    if (!CwaffRunData.Instance.noPastRegrets && GameManager.Instance.PrimaryPlayer) // assign directly to noPastRegrets so CheckIfShouldGoToNoRegretsPast() below works correctly
-      CwaffRunData.Instance.noPastRegrets = GameManager.Instance.PrimaryPlayer.ForceAllowArmisticeAccess(); // allow players without a past to access Armistice
     return oldValue || CwaffRunData.Instance.noPastRegrets;
   }
 
@@ -121,9 +145,7 @@ internal static class ArmisticePatches
       if (!CwaffRunData.Instance.noPastRegrets)
         return false;
 
-      #if DEBUG
-      System.Console.WriteLine($"  secrets O:");
-      #endif
+      Lazy.DebugConsoleLog($"  secrets O:");
 
       for (int i = 0; i < GameManager.Instance.AllPlayers.Length; i++)
       {
