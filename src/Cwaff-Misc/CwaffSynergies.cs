@@ -396,6 +396,7 @@ public static class CwaffSynergies
         _SynergyNames[index] = name;
         // Get the actual ID of our synergy entry in the AdvancedSynergyDatabase, which doesn't necessarily match the CustomSynergyType enum
         _SynergyIds[index] = GameManager.Instance.SynergyManager.synergies.Length - 1;
+        // Lazy.DebugConsoleLog($" registered synergy {ase.NameKey}");
         // Return the AdvancedSynergyEntry
         return ase;
     }

@@ -14,7 +14,8 @@ ITEMDIRS  = [
   ]
 
 def getId(modprefix, name):
-  iid = name.replace("-", "").replace(".", "").replace("'", "").replace(":", "").replace(" ", "_").lower()
+  iid = name.replace("\n", "").replace("\\", "").replace("\"", "").replace(" ", "_").replace(".", "").replace("-", "").lower()
+  iid = iid.replace(":", "") # extra postprocessing step need for itemtips specifically
   if modprefix is None:
     return iid
   return f"{modprefix}:"+iid
@@ -60,7 +61,7 @@ def main():
             elif "ItemName" in line:
               name = line.split('"')[1]
               #NOTE: this needs to be kept in sync with the InternalName() function in Extensions.cs
-              iid = getId(modprefix, name)
+              iid = getId(modprefix, name).replace("'","")
               # print(f"NAME: {name} ({iid})")
         if None in [iid, name, desc]:
           raise Exception(f"failed to get item data for {f}")
