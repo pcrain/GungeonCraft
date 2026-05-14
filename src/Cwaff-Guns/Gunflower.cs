@@ -21,7 +21,7 @@ public class Gunflower : CwaffGun
     {
         Lazy.SetupGun<Gunflower>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 100, shootFps: 4, reloadFps: 4,
-            muzzleFrom: Items.Mailbox, dynamicBarrelOffsets: true, loopFireAt: 4)
+            muzzleFrom: Items.Mailbox, dynamicBarrelOffsets: true, loopFireAt: 4, canGainAmmo: false)
           .InitProjectile(GunData.New(baseProjectile: Items.Moonscraper.Projectile(), clipSize: -1, cooldown: 0.18f, //NOTE: inherit from Moonscraper for hitscan
             shootStyle: ShootStyle.Beam, damage: 100f, speed: -1f, customClip: true, ammoCost: 3, angleVariance: 0f,
             beamSprite: "gunflower_beam", beamFps: 17, beamChargeFps: 8, beamImpactFps: 14,
@@ -115,7 +115,7 @@ public class Gunflower : CwaffGun
             { consumesGoop = true; nutrition = -1; }  // mystery goops are assumed toxic
         if (nutrition > 0)
         {
-            this.gun.GainAmmo(nutrition);
+            this.gun.CurrentAmmo += nutrition;
             if (player.HasSynergy(Synergy.PHOTOSYNTHESIS) && player.GetGun((int)Items.Camera) is Gun camera)
                 camera.GainAmmo(nutrition);
             this.gun.gameObject.PlayOnce("starmageddon_bullet_impact_sound_2");
