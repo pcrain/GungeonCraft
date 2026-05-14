@@ -168,6 +168,12 @@ public class ShmuppyCompanion : CwaffCompanionController
             this._targetActor = _isCompanion ? m_companionController.m_owner : FindNearbyBulletKin();
             this._targetPos = this._targetActor ? this._targetActor.CenterPosition : m_aiActor.CenterPosition;
             this._state = NearTargetActor(FAR_FROM_OWNER) ? IDLE : FOLLOW;
+            RepathToTarget();
+        }
+
+        protected override void OnWarp()
+        {
+            DetermineNewTarget();
         }
 
         protected override void TickMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)

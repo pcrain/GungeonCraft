@@ -11,6 +11,7 @@
 - Fixed null deref caused by Soul Kaliber's Soul Link status effect trying to apply knockback to enemies without KnockbackDoers
 - Prevented Mastered Platinum Star from being fired while time is frozen to deter infinite time freeze loops
 - Removed debug log message from Blacksmith dialogue
+- Fixed companion Shmuppies charging towards the door the player just walked through when entering a new room
 
 ## 1.30.0 (2026-05-07)
 
