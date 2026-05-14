@@ -3421,14 +3421,15 @@ public static class Extensions
       return rm.GetItemForPlayer(player, Lazy.CoinFlip() ? rm.ItemsLootTable : rm.GunsLootTable, quality, null);
   }
 
-  // TODO: in the future, might need to account for dual wields
   /// <summary>Determine whether a projectile is mastered.</summary>
-  public static bool Mastered<T>(this Projectile proj) where T : CwaffGun
+  public static bool Mastered<T>(this Projectile proj, bool mustBeActiveGun = false) where T : CwaffGun
   {
     if (!proj)
       return false;
     if (proj.Owner is not PlayerController player)
       return false;
+    if (!mustBeActiveGun)
+      return player.GetGun<T>() is T tInventory && tInventory.Mastered;
     if (player.CurrentGun is not Gun gun)
       return false;
     if (gun.gameObject.GetComponent<T>() is not T t)

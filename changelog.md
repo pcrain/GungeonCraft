@@ -20,6 +20,8 @@
 	- Tweaked Blacksmith [REDACTED] dialogue slightly
 - Fixed being unable to interact with Blacksmith in Forge after [REDACTED] dialogue options
 - Tweaked and shortened the descriptions of several guns
+- Fixed projectiles from mastered guns not having their mastered attributes when fired from other sources (e.g., Ring of Triggers)
+- Fixed Empath's projectiles not functioning properly when fired from sources other than Empath
 
 ## 1.30.0 (2026-05-07)
 
