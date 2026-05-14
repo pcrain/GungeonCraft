@@ -280,7 +280,7 @@ public class WeirdProjectile : Projectile
 
   }
 
-  /// <summary>Effectively transforms the Gun into a different projectile entirely</summary>
+  /// <summary>Effectively transforms the original projectile into a different projectile entirely</summary>
   protected Projectile SpawnDifferentProjectile(Projectile proj)
   {
     GameObject newProjObject = SpawnManager.SpawnProjectile(proj.gameObject, base.transform.position, base.transform.rotation);
@@ -292,7 +292,7 @@ public class WeirdProjectile : Projectile
     return newProj;
   }
 
-  /// <summary>Effectively transforms the Gun into a different projectile entirely</summary>
+  /// <summary>Effectively transforms the original projectile into a different projectile entirely</summary>
   protected Projectile SpawnDifferentProjectile(GameObject proj)
   {
     GameObject newProjObject = SpawnManager.SpawnProjectile(proj, base.transform.position, base.transform.rotation);

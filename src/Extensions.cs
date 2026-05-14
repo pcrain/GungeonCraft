@@ -1740,23 +1740,53 @@ public static class Extensions
   /// <remarks>Potentially the same as the Projectile.SetFrame() extension</remarks>
   public static void PickFrame(this Projectile p, int frame = -1) => p.spriteAnimator.PickFrame(frame);
 
-  private static readonly Dictionary<int, float> _SoundTimes = new();
+  /// <summary>Internal struct for managing rate-limited sounds.</summary>
+  internal struct SoundRateData
+  {
+    private GameObject go;
+    private string sound;
+    private float nextSoundTime;
+
+    private static readonly List<SoundRateData> _SoundTimes = new();
+
+    internal SoundRateData(GameObject gameObject, string soundName, float next)
+    {
+      this.go = gameObject;
+      this.sound = soundName;
+      this.nextSoundTime = next;
+    }
+
+    internal static bool PlayRateLimited(GameObject g, string sound, float soundRate = 0.0f)
+    {
+      // clean up old sounds as we go
+      int oldLength = _SoundTimes.Count;
+      float now = BraveTime.ScaledTimeSinceStartup;
+      int numValidSounds = oldLength;
+      bool shouldPlay = true;
+      for (int i = 0; i < numValidSounds; )
+      {
+        SoundRateData d = _SoundTimes[i];
+        if (!d.go || d.nextSoundTime <= now)
+        {
+          _SoundTimes[i] = _SoundTimes[--numValidSounds];
+          continue;
+        }
+        if (sound == d.sound)
+          shouldPlay = false;
+        ++i;
+      }
+      if (numValidSounds < oldLength)
+        _SoundTimes.RemoveRange(numValidSounds, oldLength - numValidSounds);
+      if (shouldPlay)
+        _SoundTimes.Add(new SoundRateData(g, sound, now + soundRate));
+      return shouldPlay;
+    }
+  }
   /// <summary>Play a sound on a GameObject with an optional maximumum sound rate. Returns true iff the sound was played.</summary>
   public static bool Play(this GameObject g, string sound, float soundRate = 0.0f)
   {
-    if (soundRate > 0)
-    {
-      float now = BraveTime.ScaledTimeSinceStartup;
-      int hash;
-      unchecked
-      {
-          hash = ((g != null ? g.GetHashCode() : 0) * 397) ^ (sound != null ? sound.GetHashCode() : 0);
-      }
-      if (_SoundTimes.TryGetValue(hash, out float lastSoundTime))
-        if (lastSoundTime + soundRate > now)
-          return false;
-      _SoundTimes[hash] = now;
-    }
+    if (soundRate > 0 && !SoundRateData.PlayRateLimited(g, sound, soundRate))
+      return false;
     AkSoundEngine.PostEvent(sound, g);
     return true;
   }
