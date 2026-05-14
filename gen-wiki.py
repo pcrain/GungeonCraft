@@ -339,6 +339,7 @@ def scanGuns(masteryData):
       "firerate"    : findPattern(text, r"""cooldown\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="0.15", resolveVars = True), # cooldown of pea shooter, the default gun
       "reloadspeed" : computeReloadTime(text),
       "spread"      : findPattern(text, r"""angleVariance\s*:\s*(.*?)(?:\.0)?f?[,\)]""", default="10"), # spread of pea shooter, the default gun
+      "shortdesc"   : findPattern(text, r"""ShortDescription\s*=\s*\"(.*)\";"""),
       "description" : makePrettyDescription(findPattern(text, r"""LongDescription\s*=\s*\"(.*)\";""")),
       "mastery"     : "",
       }
@@ -428,19 +429,19 @@ ACTIVE_TEMPLATE='''
 
 GUN_TEMPLATE='''
 |-
-|<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename}</div>{itemname}
+|<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename}</div>{itemname}<br/><small>''"{shortdesc}"''</small>
 |{{{{Quality|{quality}}}}}
 |{type}
-|{class}
 |{magazine}
 |{ammo}
 |{damage}
+|{firerate}
+|{reloadspeed}
 |{speed}
 |{range}
 |{knockback}
-|{firerate}
-|{reloadspeed}
 |{spread}
+|{class}
 |{description}{mastery}
 '''
 
@@ -489,21 +490,37 @@ WIKI_TEMPLATE='''
 
 == Guns ==
 
-{{| {tablestyle}
-!style="width: {iconwidth}"|Name
-!Qual.
-!Type
-!Class
-!{{{{Hover|[[File:Drum_Clip.png]]|Clip Size}}}}
-!{{{{Hover|[[File:Ammo_Belt.png]]|Ammo Capacity}}}}
-!{{{{Hover|[[File:-1_Bullets.png]]|Projectile Damage}}}}
-!{{{{Hover|[[File:Rocket-Powered Bullets.png]]|Projectile Velocity}}}}
-!{{{{Hover|[[File:Grappling_Hook.png]]|Projectile Range}}}}
-!{{{{Hover|[[File:Heavy_Bullets.png]]|Projectile Knockback}}}}
-!{{{{Hover|[[File:Lichy Trigger Finger.png]]|Rate of fire: delay between shots; lower number means higher fire rate}}}}
-!{{{{Hover|[[File:Oiled_Cylinder.png]]|Reload Speed: Number of seconds it takes to reload}}}}
-!{{{{Hover|[[File:Scope.png]]|Spread: higher number means less accuracy}}}}
-!style="width: 50%"|Effect
+{{| class="sortable wikitable compact-headers" style="text-align:center"
+|-
+! <div class="rotated-text">Name</div>
+! <div class="rotated-text">Quality</div>
+! <div class="rotated-text">Type</div>
+! data-sort-type="number" |<div class="rotated-text"> Magazine Size</div>
+! data-sort-type="number" |<div class="rotated-text">Ammo Capacity</div>
+! <div class="rotated-text">Damage</div>
+! <div class="rotated-text">{{{{Hover|Fire Rate|Delay between shots; lower number means higher fire rate}}}}</div>
+! <div class="rotated-text">{{{{Hover|Reload Time|Number of seconds it takes to reload}}}}</div>
+! <div class="rotated-text">Shot Speed</div>
+! <div class="rotated-text">Range</div>
+! <div class="rotated-text">{{{{Hover|Force|Knockback}}}}</div>
+! <div class="rotated-text">{{{{Hover|Spread|Higher number means less accuracy}}}}</div>
+! <div class="rotated-text">Class</div>
+! <div class="rotated-text">Description</div>
+|- class="sort-arrows"
+! &nbsp; <!-- Name -->
+! &nbsp; <!-- Quality -->
+! &nbsp; <!-- Type -->
+! &nbsp; <!--  data-sort-type="number" |Magazine Size -->
+! &nbsp; <!--  data-sort-type="number" |Ammo Capacity -->
+! &nbsp; <!-- Damage -->
+! &nbsp; <!-- {{{{Hover|Fire Rate|Delay between shots; lower number means higher fire rate}}}} -->
+! &nbsp; <!-- {{{{Hover|Reload Time|Number of seconds it takes to reload}}}} -->
+! &nbsp; <!-- Shot Speed -->
+! &nbsp; <!-- Range -->
+! &nbsp; <!-- Force -->
+! &nbsp; <!-- {{{{Hover|Spread|Higher number means less accuracy}}}} -->
+! &nbsp; <!-- Class -->
+! &nbsp; <!-- Description -->
 {guns}
 |}}
 

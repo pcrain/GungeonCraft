@@ -1782,6 +1782,7 @@ public static class Extensions
       return shouldPlay;
     }
   }
+
   /// <summary>Play a sound on a GameObject with an optional maximumum sound rate. Returns true iff the sound was played.</summary>
   public static bool Play(this GameObject g, string sound, float soundRate = 0.0f)
   {
