@@ -4,7 +4,7 @@ public class Blamethrower : CwaffGun
 {
     public static string ItemName         = "Blamethrower";
     public static string ShortDescription = "Take It Up with HR";
-    public static string LongDescription  = "Fires harsh words that deal emotional damage and may inflict blame, making enemies run away and take 4x emotional damage. Taking damage from an enemy or enemy projectile gives that enemy the scapegoat status, making it 100% susceptible to blame and causing it to drop an appropriate health / armor pickup when killed with the Blamethrower.";
+    public static string LongDescription  = "Fires harsh words that deal emotional damage and may inflict blame, making enemies run away and take 4x emotional damage. Taking damage from an enemy or enemy projectile gives that enemy the scapegoat status, making it 100% susceptible to blame and dropping an appropriate health / armor pickup when killed with Blamethrower.";
     public static string Lore             = "Whoever claimed that actions speak louder than words has clearly never stared down the barrel of a military-grade bullhorn. As the saying goes, sticks and stones may break your bones, but words can get you grounded, expelled, fired, ostracized, defenestrated, imprisoned, executed, or flipped off depending on your specific life circumstances.";
 
     internal static GameObject _BlameImpact = null;

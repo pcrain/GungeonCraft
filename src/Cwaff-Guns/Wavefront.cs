@@ -4,7 +4,7 @@ public class Wavefront : CwaffGun
 {
     public static string ItemName         = "Wavefront";
     public static string ShortDescription = "Particle-larly Interesting";
-    public static string LongDescription  = "Fires bullets that persistently orbit and gravitate towards the player for up to 15 seconds until they collide with an enemy.";
+    public static string LongDescription  = "Fires bullets that orbit and gravitate towards the player for 15 seconds or until colliding with an enemy.";
     public static string Lore             = "The primary difficulty of working with projectiles that gravitate towards you is, hopefully unsurprisingly, the fact that those projectiles can hit you. The Gungineer in charge of redesigning this gun to meet modern safety standards came up with a rather ingenious workaround for this issue: do nothing, but claim that you have incorporated proprietary technology that reduces the likelihood of shooting yourself so people will buy it anyway. The redesigned gun received 100% approval from those who survived using it, and the Gungineer received an employee of the year award from management shortly after the redesign went live.";
 
     internal static GameObject _LinkVFXPrefab = null;

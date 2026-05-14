@@ -4,7 +4,7 @@ public class Wayfarer : CwaffGun
 {
     public static string ItemName         = "Wayfarer";
     public static string ShortDescription = "Search and Destroy";
-    public static string LongDescription  = "Launches a high velocity drone projectile that pierces enemies and sticks to walls. Attempting to fire while the drone is stuck to a wall will relaunch the drone towards the cursor without consuming additional ammo. The drone is destroyed upon reloading, colliding with certain objects, or exiting the current room. Only one drone can be deployed at any given time. Guns cannot be changed while a drone is active.";
+    public static string LongDescription  = "Launches a high velocity drone that pierces enemies and sticks to walls. Subsequent shots relaunch stationary drones towards the cursor. Drones are destroyed upon reloading, colliding with certain objects, or exiting the current room. Guns cannot be changed while a drone is active.";
     public static string Lore             = "Developed as a secret research project coincidentally timed around the invention of sticky notes, this weapons grants its wielder unprecedented control over the trajectory of its projectiles. Once released to the general public, it quickly became apparent this level of control was often both unnecessary and disorienting. While it never reached mainstream popularity, it did find a niche use among the wealthy as an excellent car key locator.";
 
     private const string _WAYFARER_OVERRIDE = "Wayfarer Gunlock";

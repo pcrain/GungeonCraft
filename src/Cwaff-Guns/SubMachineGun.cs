@@ -4,7 +4,7 @@ public class SubMachineGun : CwaffGun
 {
     public static string ItemName         = "Sub Machine Gun";
     public static string ShortDescription = "The Hero You Deserve";
-    public static string LongDescription  = "Fires harmless sandwiches that have a chance to permacharm enemies equal to twice the percent of health they have lost, with enemies at 50% health or less being 100% susceptible to charm. Enemies are fully healed upon being charmed. Can be eaten when out of ammo to restore 1.5 hearts.";
+    public static string LongDescription  = "Fires harmless sandwiches that have a chance to permacharm and fully heal enemies equal to twice the percent of health they have lost. Enemies at 50% health or less are 100% susceptible to charm. Can be eaten when out of ammo to restore 1.5 hearts.";
     public static string Lore             = "Calling this object a gun stretches the definition of the word to its absolute limits, but it evidently scrapes by just enough to get a pass from both the legal system and the Breach's marketing division. Even so, this 'gun' doesn't seem to be particularly useful as a conventional firearm.";
 
     private const float _HEAL_AMOUNT = 1.5f;

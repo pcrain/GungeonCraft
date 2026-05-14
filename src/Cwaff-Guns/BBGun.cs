@@ -4,7 +4,7 @@ public class BBGun : CwaffGun
 {
     public static string ItemName         = "B. B. Gun";
     public static string ShortDescription = "Spare No One";
-    public static string LongDescription  = "Fires a single large projectile that bounces off walls and knocks enemies around with extreme force. Projectile damage and knockback scale with projectile speed. Projectiles can be caught while in motion, restoring ammo but knocking the player back in the process. Ammo can only be regained by catching projectiles, interacting with them while they are at rest, or clearing a room.";
+    public static string LongDescription  = "Fires a heavy ricocheting projectile that can be caught while in motion, restoring ammo but knocking the player back. Projectile damage and knockback scale with projectile speed. Ammo is regained upon room clear, or upon catching or interacting with a projectile.";
     public static string Lore             = "This gun was originally used in the mid-18th century for hunting turkeys, as they were the only birds slow enough to actually hit with any degree of reliability. While hunters quickly decided that using a large, slow, rolling projectile wasn't ideal for hunting, the gun's legacy lives on today in shooting arenas known as \"alleys\", where sporting enthusiasts roll similar projectiles against red and white wooden objects in hopes of scoring a \"turkey\" themselves.";
 
     private const float _BOUNCE_SPEED_DECAY = 0.8f;

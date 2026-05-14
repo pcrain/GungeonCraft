@@ -4,7 +4,7 @@ public class Stereoscope : CwaffGun
 {
     public static string ItemName         = "Stereoscope";
     public static string ShortDescription = "Surround Sound";
-    public static string LongDescription  = "Continuously emits sound at a pitch corresponding to aim direction, and fires sonic waves which only damage enemies that resonate with the current pitch. Each enemy type resonates with a specific pitch that remains the same until leaving the Gungeon. Enemies are stunned while they are resonating, and sonic waves deal extra damage when fired in time with Stereoscope's beat.";
+    public static string LongDescription  = "Continuously emits sound at a pitch corresponding to aim direction, and fires sonic waves which only damage enemies that resonate with the current pitch. Each enemy type resonates with a specific pitch. Enemies are stunned while resonating, and sonic waves deal extra damage when fired in time with Stereoscope's beat.";
     public static string Lore             = "A sonic weapon that was once very popular among 90's kids and Kins, doomed to fall into obscurity after the advent of the iBomb and later the iPwn. While the Stereoscope's ability to incapacitate the Gundead is indisputable, it's anyone's guess as to whether the prevailing theory regarding the Gundead's sensitivity to certain frequencies holds any weight, or if they just really despise the average Gungeoneer's taste in music.";
 
     private const int _IDLE_FPS           = 19;
