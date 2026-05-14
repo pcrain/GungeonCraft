@@ -109,9 +109,10 @@ public class PogoGun : CwaffGun
         UpdateHandRenderers();
     }
 
-    private void OnTriedToInitiateAttack(PlayerController player)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (this && player.CurrentGun == this.gun && this._onPogo)
+        base.OnTriedToInitiateAttack(player);
+        if (this._onPogo)
           player.SuppressThisClick = true; // can't be fired while riding Pogo Stick
     }
 
@@ -125,11 +126,6 @@ public class PogoGun : CwaffGun
     {
         base.OnSwitchedToThisGun();
         this._wasOnPogo = false;
-        if (this.PlayerOwner is PlayerController player)
-        {
-            player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-            player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
-        }
         Update();
     }
 
@@ -143,14 +139,11 @@ public class PogoGun : CwaffGun
     {
         base.OnPlayerPickup(player);
         this._wasOnPogo = false;
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
         Update();
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         EnableRenderers(player);
         base.OnDroppedByPlayer(player);
     }
@@ -158,8 +151,6 @@ public class PogoGun : CwaffGun
     public override void OnDestroy()
     {
         EnableRenderers();
-        if (this.PlayerOwner)
-            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         if (this._rightHand)
         {
             this._rightHand.gameObject.transform.parent = null;

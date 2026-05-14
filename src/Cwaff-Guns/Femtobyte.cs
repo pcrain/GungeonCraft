@@ -343,10 +343,9 @@ public class Femtobyte : CwaffGun
         return false;
     }
 
-    private void OnTriedToInitiateAttack(PlayerController player)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (!player || player.CurrentGun != this.gun)
-            return; // inactive, do normal firing stuff
+        base.OnTriedToInitiateAttack(player);
         if (this.gun.CurrentStrengthTier == 0)
             return; // empty slot, do normal firing stuff
         Vector2 pos = player.unadjustedAimPoint;
@@ -452,7 +451,6 @@ public class Femtobyte : CwaffGun
         CwaffEvents.OnBankBulletOwnerAssigned += CheckFromDigitizedOwner;
         base.OnPlayerPickup(player);
         AdjustGunShader(on: true);
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
         UpdateCurrentSlot();
 
         #if DEBUG
@@ -480,7 +478,6 @@ public class Femtobyte : CwaffGun
         AdjustGunShader(on: false);
         if (this._placementPhantom)
             UnityEngine.Object.Destroy(this._placementPhantom);
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         base.OnDroppedByPlayer(player);
     }
 
@@ -512,8 +509,6 @@ public class Femtobyte : CwaffGun
 
     public override void OnDestroy()
     {
-        if (this.PlayerOwner)
-            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         if (this._placementPhantom)
             UnityEngine.Object.Destroy(this._placementPhantom);
         base.OnDestroy();

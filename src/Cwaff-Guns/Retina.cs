@@ -33,8 +33,6 @@ public class Retina : CwaffGun
     {
         if (!player)
           return;
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
         player.OnReceivedDamage -= this.OnReceivedDamage;
         player.OnReceivedDamage += this.OnReceivedDamage;
     }
@@ -48,7 +46,6 @@ public class Retina : CwaffGun
     {
         if (!player)
           return;
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         player.OnReceivedDamage -= this.OnReceivedDamage;
     }
 
@@ -59,11 +56,12 @@ public class Retina : CwaffGun
         RegisterEvents(this.PlayerOwner);
     }
 
-    private void OnTriedToInitiateAttack(PlayerController player)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (!player || player.IsDodgeRolling || player.CurrentInputState != PlayerInputState.AllInput)
+        base.OnTriedToInitiateAttack(player);
+        if (player.IsDodgeRolling || player.CurrentInputState != PlayerInputState.AllInput)
             return; // inactive, do normal firing stuff
-        if (player.CurrentGun != this.gun || this.gun.IsReloading || this.gun.ClipShotsRemaining == 0 || this.gun.CurrentAmmo == 0)
+        if (this.gun.IsReloading || this.gun.ClipShotsRemaining == 0 || this.gun.CurrentAmmo == 0)
             return; // inactive, do normal firing stuff
         CreateHUDIfNecessary();
         if (!this._hud || this._hud.Active)

@@ -62,28 +62,10 @@ public class Cleansweep : CwaffGun
             gun.PlayIfExists(gun.idleAnimation, restartIfPlaying: true);
     }
 
-    public override void OnPlayerPickup(PlayerController player)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        base.OnPlayerPickup(player);
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
-    }
-
-    public override void OnDroppedByPlayer(PlayerController player)
-    {
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        base.OnDroppedByPlayer(player);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.PlayerOwner)
-            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        base.OnDestroy();
-    }
-
-    private void OnTriedToInitiateAttack(PlayerController player)
-    {
-        if (!player || !player.IsInCombat || player.CurrentGun != gun || gun.CurrentAmmo < _GAME_AMMO_COST || MinesweeperGame.IsGameActive)
+        base.OnTriedToInitiateAttack(player);
+        if (!player.IsInCombat || gun.CurrentAmmo < _GAME_AMMO_COST || MinesweeperGame.IsGameActive)
             return; // inactive, do normal firing stuff
 
         gun.LoseAmmo(_GAME_AMMO_COST);

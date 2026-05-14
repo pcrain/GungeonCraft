@@ -35,7 +35,6 @@ public class RacketLauncher : CwaffGun
         base.OnPlayerPickup(player);
         gun.SetAnimationFPS(gun.idleAnimation, _IDLE_FPS); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.Play();
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
@@ -43,20 +42,11 @@ public class RacketLauncher : CwaffGun
         base.OnDroppedByPlayer(player);
         gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
         gun.spriteAnimator.StopAndResetFrameToDefault();
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
     }
 
-    public override void OnDestroy()
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (this.PlayerOwner)
-            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        base.OnDestroy();
-    }
-
-    private void OnTriedToInitiateAttack(PlayerController player)
-    {
-        if (!player || player.CurrentGun != this.gun)
-            return; // inactive, do normal firing stuff
+        base.OnTriedToInitiateAttack(player);
         if (this._extantTennisBalls.Count == 0 && gun.CurrentAmmo > 0)
             return; // we should just try to fire normally
 

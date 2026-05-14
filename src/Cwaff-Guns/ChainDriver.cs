@@ -45,19 +45,6 @@ public class ChainDriver : CwaffGun
           cdp.Setup(this);
     }
 
-    public override void OnPlayerPickup(PlayerController player)
-    {
-        base.OnPlayerPickup(player);
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
-    }
-
-    public override void OnDroppedByPlayer(PlayerController player)
-    {
-        base.OnDroppedByPlayer(player);
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-    }
-
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
     {
         base.OnReloadPressed(player, gun, manualReload);
@@ -69,18 +56,11 @@ public class ChainDriver : CwaffGun
         this._attachedLinks.Clear();
     }
 
-    private void OnTriedToInitiateAttack(PlayerController player)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (!player || player.CurrentGun != this.gun || !AnyAttachedChains())
-            return; // inactive, do normal firing stuff
-        player.SuppressThisClick = true; // can't fire more than one chain at once
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.PlayerOwner)
-            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        base.OnDestroy();
+        base.OnTriedToInitiateAttack(player);
+        if (AnyAttachedChains())
+          player.SuppressThisClick = true; // can't fire more than one chain at once
     }
 
     public override void Update()

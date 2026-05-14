@@ -31,11 +31,11 @@ public class PlatinumStar : CwaffGun
         _MenacingVFX = VFX.Create("menacing_vfx", emissivePower: 3f);
     }
 
-    private void OnTriedToInitiateAttack(PlayerController player)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (!player || player.CurrentGun != this.gun || !JojoReferenceHandler.TimeIsFrozen())
-            return;
-        player.SuppressThisClick = true; // can't fire while time is frozen
+        base.OnTriedToInitiateAttack(player);
+        if (JojoReferenceHandler.TimeIsFrozen())
+          player.SuppressThisClick = true; // can't fire while time is frozen
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manual)
@@ -44,13 +44,6 @@ public class PlatinumStar : CwaffGun
         LaunchAllBullets(this.PlayerOwner);
         if (gun.IsReloading)
             gun.muzzleFlashEffects.DestroyAll(); // since we're preventing gun rotation on reload, the muzzle vfx look weird, so just disable them
-    }
-
-    public override void OnPlayerPickup(PlayerController player)
-    {
-        base.OnPlayerPickup(player);
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
     }
 
     public override void OnSwitchedToThisGun()
@@ -63,7 +56,6 @@ public class PlatinumStar : CwaffGun
     {
         base.OnDroppedByPlayer(player);
         LaunchAllBullets(this.PlayerOwner);
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -83,13 +75,6 @@ public class PlatinumStar : CwaffGun
         base.Update();
         if (this.gun.spriteAnimator.currentClip is tk2dSpriteAnimationClip clip)
             this.gun.preventRotation = (clip.name == this.gun.reloadAnimation);
-    }
-
-    public override void OnDestroy()
-    {
-        if (this.PlayerOwner)
-            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        base.OnDestroy();
     }
 }
 

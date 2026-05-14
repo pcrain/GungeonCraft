@@ -28,10 +28,9 @@ public class Wayfarer : CwaffGun
           .AttachTrail("wayfarer_trail", fps: 30, cascadeTimer: C.FRAME, softMaxLength: 1f);
     }
 
-    private void OnTriedToInitiateAttack(PlayerController player)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (!player || player.CurrentGun != this.gun)
-            return; // inactive, do normal firing stuff
+        base.OnTriedToInitiateAttack(player);
         RemoveDeadProjectiles();
         for (int i = this._extantProjectiles.Count - 1; i >= 0; --i)
         {
@@ -46,7 +45,6 @@ public class Wayfarer : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
         this._lerpyboi = player.gameObject.GetOrAddComponent<OverrideLerper>();
     }
 
@@ -54,7 +52,6 @@ public class Wayfarer : CwaffGun
     {
         base.OnDroppedByPlayer(player);
         CleanupWayfarer();
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -93,8 +90,6 @@ public class Wayfarer : CwaffGun
 
     public override void OnDestroy()
     {
-        if (this.PlayerOwner)
-            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         CleanupWayfarer();
         base.OnDestroy();
     }

@@ -178,6 +178,11 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
   public override void OnDestroy()
   {
+    if (this.PlayerOwner is PlayerController player)
+    {
+      player.GunChanged -= this.OnGunsChanged;
+      player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+    }
     base.OnDestroy();
     if (this._masterySprite)
     {
@@ -211,8 +216,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       OnFirstPickup(player);
     base.OnPlayerPickup(player);
 
-    player.GunChanged -= OnGunsChanged;
-    player.GunChanged += OnGunsChanged;
+    player.GunChanged -= this.OnGunsChanged;
+    player.GunChanged += this.OnGunsChanged;
 
     DoMasteryChecks(player);
   }
@@ -242,6 +247,14 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   }
 
   /// <summary>
+  /// OnTriedToInitiateAttack() is called when the player tries to initiate an attack with this gun.
+  /// </summary>
+  public virtual void OnTriedToInitiateAttack(PlayerController player)
+  {
+
+  }
+
+  /// <summary>
   /// OnSwitchedToThisGun() when the player switches to this behaviour's affected gun.
   /// </summary>
   public virtual void OnSwitchedToThisGun()
@@ -249,6 +262,11 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     this.gun.PreventNormalFireAudio = true;
     if (gun.spriteAnimator.GetClipByName(gun.shootAnimation) is tk2dSpriteAnimationClip clip)
       this.gun.OverrideNormalFireAudioEvent = clip.frames[0].eventAudio;
+    if (this.PlayerOwner is PlayerController player)
+    {
+      player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
+      player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
+    }
   }
 
   /// <summary>
@@ -258,6 +276,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   {
     foreach (CwaffReticle ret in base.gameObject.GetComponents<CwaffReticle>())
       ret.HideImmediately();
+    if (this.PlayerOwner is PlayerController player)
+      player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
   }
 
   public override void OnDroppedByPlayer(PlayerController player)
@@ -265,7 +285,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       base.OnDroppedByPlayer(player);
       foreach (CwaffReticle ret in base.gameObject.GetComponents<CwaffReticle>())
         ret.HideImmediately();
-      player.GunChanged -= OnGunsChanged;
+      player.GunChanged -= this.OnGunsChanged;
+      player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
   }
 
   public override void Update()

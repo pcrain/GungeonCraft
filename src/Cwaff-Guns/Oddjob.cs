@@ -56,18 +56,10 @@ public class Oddjob : CwaffGun
         RemoveHatFromHead();
     }
 
-    public override void OnPlayerPickup(PlayerController player)
-    {
-        base.OnPlayerPickup(player);
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
-    }
-
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
         RemoveHatFromHead();
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
     }
 
     private void ReturnHatProjectile()
@@ -94,11 +86,7 @@ public class Oddjob : CwaffGun
 
     public override void OnDestroy()
     {
-        if (this.PlayerOwner)
-        {
-            this.PlayerOwner.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-            RemoveHatFromHead();
-        }
+        RemoveHatFromHead();
         base.OnDestroy();
     }
 
@@ -130,10 +118,9 @@ public class Oddjob : CwaffGun
         }
     }
 
-    private void OnTriedToInitiateAttack(PlayerController player)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (!player || player.CurrentGun != this.gun)
-            return; // inactive, do normal firing stuff
+        base.OnTriedToInitiateAttack(player);
         if (this._extantOddjobProj)
             player.SuppressThisClick = true; // can't fire more than one hat at once
     }

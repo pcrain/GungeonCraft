@@ -104,14 +104,11 @@ public class Gradius : CwaffGun
         base.OnPlayerPickup(player);
         CwaffEvents.OnWillPickUpMinorInteractible += DoPickupChecks;
         GameManager.Instance.OnNewLevelFullyLoaded += this.OnNewFloor;
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
-        player.OnTriedToInitiateAttack += this.OnTriedToInitiateAttack;
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
-        player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         CwaffEvents.OnWillPickUpMinorInteractible -= DoPickupChecks;
         base.OnDroppedByPlayer(player);
     }
@@ -174,9 +171,10 @@ public class Gradius : CwaffGun
         DestroyShips();
     }
 
-    private void OnTriedToInitiateAttack(PlayerController player)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        if (player && player.CurrentGun == this.gun && this._zipTime > 0f)
+        base.OnTriedToInitiateAttack(player);
+        if (this._zipTime > 0f)
             player.SuppressThisClick = true; // can't fire when our guns are fading in
     }
 
@@ -240,8 +238,6 @@ public class Gradius : CwaffGun
         StopAllCoroutines();
         CwaffEvents.OnWillPickUpMinorInteractible -= DoPickupChecks;
         GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewFloor;
-        if (this.PlayerOwner is PlayerController player)
-            player.OnTriedToInitiateAttack -= this.OnTriedToInitiateAttack;
         base.OnDestroy();
     }
 
