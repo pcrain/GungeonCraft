@@ -36,7 +36,7 @@ public class FuelRodGun : CwaffGun
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(sprite: "fuel_rod_cannon_projectile_empty", clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 40.0f, speed: 50f, range: 100f, force: 25f, recoil: 20f, shouldRotate: true, customClip: true, pierceBreakables: true,
-            glowColor: ExtendedColours.lime, glowAmount: 100f))
+            glowColor: ExtendedColours.lime, glowAmount: 100f, becomeDebris: true))
           .AttachTrail("fuel_rod_trail", fps: 120, timeTillAnimStart: 0.00f, glowAmount: 55f,
             destroyOnEmpty: true, dispersalPrefab: Lazy.DispersalParticles(ExtendedColours.lime))
           .Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultLarge.Scale(1.5f))
@@ -68,7 +68,6 @@ public class FuelRodGun : CwaffGun
     public override void PostProcessProjectile(Projectile projectile)
     {
       base.PostProcessProjectile(projectile);
-      projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
       projectile.OnBecameDebris += this.OnBecameDebris;
     }
 

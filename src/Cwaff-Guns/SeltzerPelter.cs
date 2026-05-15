@@ -20,7 +20,7 @@ public class SeltzerPelter : CwaffGun
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
             damage: 16.0f, speed: 30.0f, force: 45.0f, range: 999.0f, sprite: "can_projectile", fps: 1, anchor: Anchor.MiddleCenter, // 1 FPS minimum, stop animator manually later
-            anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2))) // prevent uneven colliders from glitching into walls
+            anchorsChangeColliders: false, overrideColliderPixelSizes: new IntVector2(2, 2), becomeDebris: true)) // prevent uneven colliders from glitching into walls
           .Attach<BounceProjModifier>(bounce => {
               bounce.numberOfBounces      = 9999;
               bounce.chanceToDieOnBounce  = 0f;
@@ -79,7 +79,6 @@ public class SeltzerProjectile : MonoBehaviour
         this._owner = this._canProjectile.Owner as PlayerController;
         this._mastered = this._canProjectile.Mastered<SeltzerPelter>();
         this._canProjectile.BulletScriptSettings.surviveRigidbodyCollisions = true;
-        this._canProjectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
         this._canProjectile.shouldRotate = false; // prevent automatic rotation after creation
         this._canProjectile.specRigidbody.OnRigidbodyCollision += OnRigidbodyCollision;
 

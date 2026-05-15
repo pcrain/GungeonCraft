@@ -29,7 +29,7 @@ public class Crapshooter : CwaffGun
           .SetReloadAudio(_DiceSounds[2], 2, 18, 23, 25, 31)
           .InitSpecialProjectile<GrenadeProjectile>(GunData.New(clipSize: 12, cooldown: 0.16f,
             shootStyle: ShootStyle.Automatic, scale: 2.0f, damage: 3f, speed: 24f, force: 10f, range: 30f, customClip: true,
-            sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false))
+            sprite: "crapshooter_projectile", fps: 12, anchor: Anchor.MiddleCenter, shouldRotate: false, becomeDebris: true))
           .Attach<GrenadeProjectile>(g => { g.startingHeight = 0.5f; })
           .Attach<BounceProjModifier>(bounce => {
             bounce.percentVelocityToLoseOnBounce = 0.5f;
@@ -54,7 +54,6 @@ public class Crapshooter : CwaffGun
 
         base.gameObject.Play(_DiceSounds.ChooseRandom());
         projectile.SetFrame(this._nextRoll);
-        projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
         switch (this._nextRoll + 1)
         {
             case 1: // crappy dice
