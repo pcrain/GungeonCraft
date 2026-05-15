@@ -1,27 +1,32 @@
 # Changelog
 
-## 1.30.1 (TBD)
+## 1.30.1 (2026-05-14)
 
-- Fixed rare null deref caused by mastery ritual code querying GameManager without a valid GameManager instance
-- Added mastery descriptions to the [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips/?utm_source=discord) file
-- Fixed issue with Alyx completely decaying immediately after spawning in under unknown circumstances
-- Reworked Hallaeribut's Famished state
-	- Old behavior: feeds on the player every 30 seconds while Famished, no ammo gain
-	- New behavior: feeds on the player when reduced to 0 ammo and refills 20% ammo immediately
-- Fixed null deref caused by Soul Kaliber's Soul Link status effect trying to apply knockback to enemies without KnockbackDoers
-- Prevented Mastered Platinum Star from being fired while time is frozen to deter infinite time freeze loops
-- Removed debug log message from Blacksmith dialogue
-- Fixed companion Shmuppies charging towards the door the player just walked through when entering a new room
-- Made Gunflower unable to gain ammo from ammo boxes
-- Fixed Gunflower's fire sound playing when dodge rolling while firing
+#### Balance Changes and Polish:
+
 - Changed how characters that can't normally obtain the Bullet That Can Kill the Past (i.e., pastless characters) access [REDACTED]
 	- Pastless characters no longer automatically go to [REDACTED] when firing the Gun That Can Kill the Past
 	- Added alternate Blacksmith dialogue for pastless characters that grants access to [REDACTED] 
 	- Tweaked Blacksmith [REDACTED] dialogue slightly
-- Fixed being unable to interact with Blacksmith in Forge after [REDACTED] dialogue options
+- Reworked Hallaeribut's Famished state
+	- Old behavior: feeds on the player every 30 seconds while Famished, no ammo gain
+	- New behavior: feeds on the player when reduced to 0 ammo and refills 20% ammo immediately
+- Added mastery descriptions to the [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips) file
+- Prevented Mastered Platinum Star from being fired while time is frozen to deter infinite time freeze loops
+- Made Gunflower unable to gain ammo from ammo boxes
 - Tweaked and shortened the descriptions of several guns
+
+#### Bugfixes and Misc:
+
+- Fixed rare null deref caused by mastery ritual code querying GameManager without a valid GameManager instance
+- Fixed null deref caused by Soul Kaliber's Soul Link status effect trying to apply knockback to enemies without KnockbackDoers
+- Fixed issue with Alyx completely decaying immediately after spawning in under unknown circumstances
 - Fixed projectiles from mastered guns not having their mastered attributes when fired from other sources (e.g., Ring of Triggers)
 - Fixed Empath's projectiles not functioning properly when fired from sources other than Empath
+- Fixed companion Shmuppies charging towards the door the player just walked through when entering a new room
+- Fixed Gunflower's fire sound playing when dodge rolling while firing
+- Fixed being unable to interact with Blacksmith in Forge after [REDACTED] dialogue options
+- Removed debug log message from Blacksmith dialogue
 
 ## 1.30.0 (2026-05-07)
 
@@ -110,7 +115,7 @@
 
 #### Bugfixes and Misc:
 
-- Fixed synergy support for [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips/?utm_source=discord) (thanks to [Ricky](https://thunderstore.io/c/enter-the-gungeon/p/Ricky2148/) and [SomeBunny](https://thunderstore.io/c/enter-the-gungeon/p/TeamPlanetside/) for help figuring this out!)
+- Fixed synergy support for [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips) (thanks to [Ricky](https://thunderstore.io/c/enter-the-gungeon/p/Ricky2148/) and [SomeBunny](https://thunderstore.io/c/enter-the-gungeon/p/TeamPlanetside/) for help figuring this out!)
 - Fixed Credit Card effectively granting certain weapons infinite fire rate in combination with certain items (thanks to [Silstrom](https://thunderstore.io/c/enter-the-gungeon/p/Silstrom/) for finding and diagnosing the issue!)
 - Fixed Xelsior not properly destroying other items when absorbing guns dropped from Rainbow Chests in Rainbow Mode (thanks to [Skilotar](https://thunderstore.io/c/enter-the-gungeon/p/Skilotar/) for the fix!)
 - Fixed custom characters with pasts not being able to access their pasts due to automatically being taken to [REDACTED]
@@ -1716,7 +1721,7 @@
 
 ## 1.1.1 (2023-11-05)
 - New custom projectile and ammo clip sprites for several guns thanks to Lynceus :D
-- Added full support for the [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips/?utm_source=discord) mod for all GungeonCraft items
+- Added full support for the [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips) mod for all GungeonCraft items
 - Updated to ModTheGungeon API 1.7.0 for faster load times (thanks SpecialAPI!)
 - Fixed an issue where a few console commands from other mods would be disabled when GungeonCraft is loaded
 - Fixed Tranquilizer being able to stun enemies immune to stun
