@@ -113,6 +113,13 @@ public class CwaffBoneManager : BraveBehaviour
     _sprite.UpdateZDepth();
   }
 
+  public void UpdateAnimations()
+  {
+    UpdateTimers();
+    _sprite.ForceBuild();
+    _sprite.UpdateZDepth();
+  }
+
   private static readonly Quaternion _Rot90 = Quaternion.Euler(0f, 0f, 90f);
   public void RecomputeNormals()
   {

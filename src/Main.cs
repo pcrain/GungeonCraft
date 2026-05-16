@@ -289,6 +289,7 @@ public class Initialisation : BaseUnityPlugin
                 RLTSRTSGTSBTSLB.Init();
                 PhotonCannon.Init();
                 FuelRodGun.Init();
+                Nightlighter.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
@@ -460,11 +461,12 @@ public class Initialisation : BaseUnityPlugin
                 setupSynergiesWatch.Stop();
             #endregion
 
-            #region Shop NPCs (can't be async due to post-load barter table setup issues causing null derefs)
+            #region NPCs (can't be async due to post-load barter table setup issues causing null derefs)
                 System.Diagnostics.Stopwatch setupShopsWatch = System.Diagnostics.Stopwatch.StartNew();
                 Cammy.Init();
                 Bart.Init();
                 Kevlar.Init();
+                Don.Init();
                 setupShopsWatch.Stop();
             #endregion
 

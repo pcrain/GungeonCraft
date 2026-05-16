@@ -11,6 +11,7 @@ public class CwaffRopeMesh : MonoBehaviour
   public Vector2 startPos;
   public Vector2 endPos;
   public bool locked; // if true, prevents the rope from updating
+  public bool animateWhileLocked; // if true, keeps updating the rope even while locked
   public tk2dTiledSprite sprite;
 
   private List<Vector2> _ropePrevPoints;
@@ -44,13 +45,15 @@ public class CwaffRopeMesh : MonoBehaviour
       }
       mesh._softMaxRopeLength = segLength * numSegments;
       mesh.locked = false;
+      mesh.animateWhileLocked = false;
       mesh._lockThreshold = 0f;
       return mesh;
   }
 
-  public void LockWhenStationary(float threshold = 0.01f)
+  public void LockWhenStationary(float threshold = 0.01f, bool keepAnimating = false)
   {
     this._lockThreshold = threshold;
+    this.animateWhileLocked = keepAnimating;
   }
 
   private void Start()
@@ -78,6 +81,8 @@ public class CwaffRopeMesh : MonoBehaviour
   {
     if (!this.locked)
       this._boneManager.ManualLateUpdate();
+    else if (this.animateWhileLocked)
+      this._boneManager.UpdateAnimations();
   }
 
   private void UpdateRope()

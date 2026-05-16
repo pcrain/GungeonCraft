@@ -232,6 +232,7 @@
     <Compile Include="src\Cwaff-Guns\Oddjob.cs"/>
     <Compile Include="src\Cwaff-Guns\Retina.cs"/>
     <Compile Include="src\Cwaff-Guns\OmnidirectionalLaser.cs"/>
+    <Compile Include="src\Cwaff-Guns\Nightlighter.cs"/>
     <Compile Include="src\Cwaff-Guns\Zealot.cs"/>
     <Compile Include="src\Cwaff-Guns\Sextant.cs"/>
     <Compile Include="src\Cwaff-Guns\Gunbrella.cs"/>
