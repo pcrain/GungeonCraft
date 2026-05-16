@@ -65,11 +65,11 @@ public class InsurancePolicy : CwaffActive
 
         _InsuranceChestPrefab = GameManager.Instance.RewardManager.GetTargetChestPrefab(ItemQuality.B).gameObject.ClonePrefab().GetComponent<Chest>();
             _InsuranceChestPrefab.groundHitDelay = 0.40f;
-            _InsuranceChestPrefab.spawnAnimName = _InsuranceChestPrefab.sprite.SetUpAnimation("insurance_chest_appear", 11);
+            _InsuranceChestPrefab.spawnAnimName = _InsuranceChestPrefab.sprite.SetUpAnimation("insurance_chest_appear", 11).name;
                 _InsuranceChestPrefab.spriteAnimator.GetClipByName("insurance_chest_appear").frames[0].triggerEvent = true;
                 _InsuranceChestPrefab.spriteAnimator.GetClipByName("insurance_chest_appear").frames[0].eventAudio = "Play_OBJ_smallchest_spawn_01";
-            _InsuranceChestPrefab.openAnimName  = _InsuranceChestPrefab.sprite.SetUpAnimation("insurance_chest_open", 12);
-            _InsuranceChestPrefab.breakAnimName = _InsuranceChestPrefab.sprite.SetUpAnimation("insurance_chest_break", 11);
+            _InsuranceChestPrefab.openAnimName  = _InsuranceChestPrefab.sprite.SetUpAnimation("insurance_chest_open", 12).name;
+            _InsuranceChestPrefab.breakAnimName = _InsuranceChestPrefab.sprite.SetUpAnimation("insurance_chest_break", 11).name;
             _InsuranceChestPrefab.sprite.SetUpAnimation("insurance_chest_idle", 11);
             _InsuranceChestPrefab.IsLocked = false; // can't get lock renderer to attach properly after adjusting appearance animation
             _InsuranceChestPrefab.GetComponent<MajorBreakable>().HitPoints = float.MaxValue; // insurance chest should be unbreakable

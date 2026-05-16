@@ -391,9 +391,9 @@ public static class CwaffCompanionAndEnemyBuilder
     }
 
     /// <summary>Sets up the appropriate directional animation from the available sprites with the given prefix</summary>
-    private static DirectionalAnimation AutoAnimation(this tk2dSpriteCollectionData coll, ref List<tk2dSpriteAnimationClip> clips, string name, int fps, bool loop = true)
+    public static DirectionalAnimation AutoAnimation(this tk2dSpriteCollectionData coll, ref List<tk2dSpriteAnimationClip> clips, string name, int fps, bool loop = true)
     {
-        DirectionalAnimation.DirectionType dType = AutoDetectDirectionFromSpriteName(name);
+        DirectionalAnimation.DirectionType dType = Lazy.AutoDetectDirectionFromSpriteName(name);
         if (dType == None)
         {
             // Lazy.RuntimeWarn($"failed to get animations for {name}");
@@ -424,31 +424,6 @@ public static class CwaffCompanionAndEnemyBuilder
             AnimNames = animNames,
             Flipped   = new DirectionalAnimation.FlipType[nanims],
         };
-    }
-
-    private static DirectionalAnimation.DirectionType AutoDetectDirectionFromSpriteName(string name)
-    {
-        if (ResMap.Has($"{name}_north_northeast"))
-            return SixteenWay;
-        if (ResMap.Has($"{name}_northeast"))
-            return EightWayOrdinal;
-        if (ResMap.Has($"{name}_north"))
-            return FourWayCardinal;
-        if (ResMap.Has($"{name}_front_right"))
-        {
-            if (ResMap.Has($"{name}_right"))
-                return EightWay;
-            if (ResMap.Has($"{name}_front"))
-                return SixWay;
-            return FourWay;
-        }
-        if (ResMap.Has($"{name}_right"))
-            return TwoWayHorizontal;
-        if (ResMap.Has($"{name}_front"))
-            return TwoWayVertical;
-        if (ResMap.Has(name))
-            return Single;
-        return None;
     }
 
     public static T MakeIntangible<T>(this T friend) where T : CwaffCompanionController

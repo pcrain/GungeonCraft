@@ -29,6 +29,7 @@ public class Commands
             //     aIActor.HandleReinforcementFallIntoRoom(0);
             // }
 
+            // Minimap.Instance.RevealAllRooms(false);
             UnityEngine.Object.Instantiate(Don._NPC.gameObject,
               GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Quaternion.identity);
         });

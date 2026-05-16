@@ -1,6 +1,7 @@
 namespace CwaffingTheGungy;
 
 using static GlobalDungeonData.ValidTilesets;
+using static DirectionalAnimation.DirectionType;
 
 /// <summary>All-purpose helper methods for being a lazy dumdum</summary>
 public static class Lazy
@@ -1459,6 +1460,15 @@ public static class Lazy
     return t;
   }
 
+  /// <summary>Register an easy placeable for use in Room Architect Tool</summary>
+  public static GameObject RegisterEasyRATPlaceable(this GameObject placeableObject, string guid)
+  {
+    DungeonPlaceable placeable = BreakableAPIToolbox.GenerateDungeonPlaceable(new(){{placeableObject, 1f}});
+    StaticReferences.StoredDungeonPlaceables.Add(guid, placeable);
+    Alexandria.DungeonAPI.StaticReferences.customPlaceables.Add($"{C.MOD_PREFIX}:{guid}", placeable); // prepend our mod's prefix to the guid for RAT
+    return placeableObject;
+  }
+
   private static GameObject _BaseDispersalSystem = null;
   /// <summary>Get a basic particle dispersal system for projectiles with trails.</summary>
   public static GameObject DispersalParticles(Color color)
@@ -1615,5 +1625,30 @@ public static class Lazy
         return true;
       };
       return room.GetRandomAvailableCell(enemyPrefab.Clearance, enemyPrefab.PathableTiles, canPassOccupied: false, cellValidator);
+  }
+
+  public static DirectionalAnimation.DirectionType AutoDetectDirectionFromSpriteName(string name)
+  {
+      if (ResMap.Has($"{name}_north_northeast"))
+          return SixteenWay;
+      if (ResMap.Has($"{name}_northeast"))
+          return EightWayOrdinal;
+      if (ResMap.Has($"{name}_north"))
+          return FourWayCardinal;
+      if (ResMap.Has($"{name}_front_right"))
+      {
+          if (ResMap.Has($"{name}_right"))
+              return EightWay;
+          if (ResMap.Has($"{name}_front"))
+              return SixWay;
+          return FourWay;
+      }
+      if (ResMap.Has($"{name}_right"))
+          return TwoWayHorizontal;
+      if (ResMap.Has($"{name}_front"))
+          return TwoWayVertical;
+      if (ResMap.Has(name))
+          return Single;
+      return None;
   }
 }

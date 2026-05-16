@@ -59,7 +59,7 @@ public class ChewToy : CwaffCompanion
       private static void AIActorOnEngagedPrefixPatch(AIActor __instance, bool isReinforcement, ref bool __state)
       {
           __state = false; // by default, do nothing
-          if (!__instance || __instance.m_hasBeenEngaged || __instance.IsInReinforcementLayer)
+          if (!__instance || __instance.m_hasBeenEngaged || __instance.IsInReinforcementLayer || isReinforcement)
             return;
           if (__instance.EnemyGuid != Enemies.BulletKin)
             return;

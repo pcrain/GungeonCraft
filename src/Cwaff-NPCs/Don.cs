@@ -15,6 +15,7 @@ public class Don : FancyNPC
     PIZZA_TIME_FAILED,        // pizza event happened this floor and was failed
     PIZZA_TIME_PARTIAL,       // pizza event happened this floor and was partially successful
     PIZZA_TIME_SUCCESS,       // pizza event happened this floor and was completely successful
+    PIZZA_TIME_TIMEOUT,       // pizza event happened this floor and was not completed in time
     NO_DELIVERIES_FINISHED,   // no pizzas have been delivered, and you are wasting your time talking to Don
     SOME_DELIVERIES_FINISHED, // at least one pizza has been delivered, but not all of them
     ALL_DELIVERIES_FINISHED,  // all pizzas have been delivered
@@ -38,6 +39,47 @@ public class Don : FancyNPC
     // _NPC.defaultAudioEvent = "don_voice_1";
     _NPC.defaultAudioEvents = ["don_voice_1", "don_voice_2"];
     _NPC.voiceRate = 0.1f;
+
+    List<DungeonPrerequisite> dungeonPrerequisites = new(){
+      new CwaffPrerequisite { prerequisite = CwaffPrerequisites.NONE }
+    };
+
+    VFX.Create("pizza_box_decor", anchor: Anchor.LowerCenter).RegisterEasyRATPlaceable("pizza_box");
+
+    string roomPath = $"{C.MOD_INT_NAME}/Resources/Rooms/pizza.newroom";
+    PrototypeDungeonRoom donRoom = FancyShopBuilder.BuildNewRoomFromResourceWithoutRegistering(roomPath).room;  // prevents the game from spawning the rooms and disregarding prerequisites
+    FancyShopBuilder.InjectRoomIntoUniquePool(
+      protoroom            : donRoom,
+      injectionAnnotation  : "Don's Pizza Shop Room",
+      placementRules       : new() { ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN },
+      chanceToLock         : 0,
+      prerequisites        : dungeonPrerequisites,
+      injectorName         : "Don's Pizza Shop Room",
+      selectionWeight      : 1,
+      chanceToSpawnEachRun : C.DEBUG_BUILD ? 1.0f : 0.1f, //TODO: tweak later
+      addSingularPlaceable : _NPC.gameObject,
+      XFromCenter          : 0.0f,
+      YFromCenter          : 3.25f,
+      oncePerRun           : true, //NOTE: necessary to make sure the validator doesn't have to do any heavy lifting (possibly makes validator redundant?)
+      allowedTilesets      : (int)(GlobalDungeonData.ValidTilesets.CASTLEGEON/* | GlobalDungeonData.ValidTilesets.GUNGEON*/)
+      );
+
+  }
+
+  protected override void Start()
+  {
+    base.Start();
+    RoomHandler room = base.transform.position.GetAbsoluteRoom();
+    List<MinorBreakable> breakables = room.GetComponentsInRoom<MinorBreakable>();
+    for (int i = breakables.Count - 1; i >= 0; --i)
+    {
+      MinorBreakable breakable = breakables[i];
+      GameObject go = breakable.gameObject;
+      if (go.name != "Kitchen_Counter(Clone)")
+        continue;
+      breakable.OnlyBrokenByCode = true; // make the counters indestructible
+    }
+    PizzaTimeController._DonNPC = this;
   }
 
   private State DetermineTalkingState(PlayerController interactor)
@@ -52,6 +94,8 @@ public class Don : FancyNPC
     }
     if (PizzaTimeController._PizzaTimeAttemptedThisFloor)
     {
+      if (PizzaTimeController._TimerExpired)
+        return State.PIZZA_TIME_TIMEOUT;
       if (PizzaTimeController._CurDeliveries == PizzaTimeController._MaxDeliveries)
         return State.PIZZA_TIME_SUCCESS;
       if (PizzaTimeController._CurDeliveries == 0)
@@ -60,7 +104,7 @@ public class Don : FancyNPC
     }
     if (interactor.IsGunLocked)
       return State.INCAPABLE_OF_DELIVERY;
-    if (PizzaTimeController.AnyRoomsStillOccupied())
+    if (PizzaTimeController.AnyRoomsStillOccupied() && !C.DEBUG_BUILD)
       return State.ENEMIES_ON_FLOOR;
     return State.READY_FOR_PIZZA_TIME;
   }
@@ -106,6 +150,12 @@ public class Don : FancyNPC
     yield break;
   }
 
+  private IEnumerator ScriptPIZZA_TIME_TIMEOUT()
+  {
+    yield return Converse("ScriptPIZZA_TIME_TIMEOUT");
+    yield break;
+  }
+
   private IEnumerator ScriptNO_DELIVERIES_FINISHED()
   {
     yield return Converse("ScriptNO_DELIVERIES_FINISHED");
@@ -130,45 +180,33 @@ public class Don : FancyNPC
     yield break;
   }
 
+  private IEnumerator ScriptUNKNOWN()
+  {
+    yield break;
+  }
+
   protected override IEnumerator NPCTalkingScript()
   {
-    PlayerController interactor = Interactor();
-    State state = DetermineTalkingState(interactor);
-    switch(state)
+    yield return DetermineTalkingState(Interactor()) switch
     {
-      case State.READY_FOR_PIZZA_TIME: yield return ScriptREADY_FOR_PIZZA_TIME(); break;
-      case State.ENEMIES_ON_FLOOR: yield return ScriptENEMIES_ON_FLOOR(); break;
-      case State.INCAPABLE_OF_DELIVERY: yield return ScriptINCAPABLE_OF_DELIVERY(); break;
-      case State.PIZZA_TIME_FAILED: yield return ScriptPIZZA_TIME_FAILED(); break;
-      case State.PIZZA_TIME_PARTIAL: yield return ScriptPIZZA_TIME_PARTIAL(); break;
-      case State.PIZZA_TIME_SUCCESS: yield return ScriptPIZZA_TIME_SUCCESS(); break;
-      case State.NO_DELIVERIES_FINISHED: yield return ScriptNO_DELIVERIES_FINISHED(); break;
-      case State.SOME_DELIVERIES_FINISHED: yield return ScriptSOME_DELIVERIES_FINISHED(); break;
-      case State.ALL_DELIVERIES_FINISHED: yield return ScriptALL_DELIVERIES_FINISHED(); break;
-    }
-
-    // yield return Dialogue(new(){
-    //   "hey",
-    //   "how's it going",
-    //   "got the goods",
-    // }, "idle");
-
-    // yield return Dialogue(new(){
-    //   "aw",
-    //   "too bad",
-    //   "lorem ipsum dolor sit amet consecutive words i really don't remember how the rest of this goes to be quite honest with you i'm just testing custom voice boxes",
-    // }, "cry");
-
-    // yield return Prompt("Nothing", "Something");
-    // if (PromptResult() == 1)
-    // {
-    //   yield return Dialogue(new(){
-    //     "amazing",
-    //   }, "celebrate");
-    // }
-
+      State.READY_FOR_PIZZA_TIME     => ScriptREADY_FOR_PIZZA_TIME(),
+      State.ENEMIES_ON_FLOOR         => ScriptENEMIES_ON_FLOOR(),
+      State.INCAPABLE_OF_DELIVERY    => ScriptINCAPABLE_OF_DELIVERY(),
+      State.PIZZA_TIME_FAILED        => ScriptPIZZA_TIME_FAILED(),
+      State.PIZZA_TIME_PARTIAL       => ScriptPIZZA_TIME_PARTIAL(),
+      State.PIZZA_TIME_SUCCESS       => ScriptPIZZA_TIME_SUCCESS(),
+      State.PIZZA_TIME_TIMEOUT       => ScriptPIZZA_TIME_TIMEOUT(),
+      State.NO_DELIVERIES_FINISHED   => ScriptNO_DELIVERIES_FINISHED(),
+      State.SOME_DELIVERIES_FINISHED => ScriptSOME_DELIVERIES_FINISHED(),
+      State.ALL_DELIVERIES_FINISHED  => ScriptALL_DELIVERIES_FINISHED(),
+      _                              => ScriptUNKNOWN(),
+    };
     Reset();
-
     yield break;
+  }
+
+  public override float GetOverrideMaxDistance()
+  {
+    return 2.0f; // so we can interact from across a counter
   }
 }

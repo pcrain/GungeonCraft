@@ -435,7 +435,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         return Vector2.Distance(point, v) / 1.5f;
     }
 
-    public float GetOverrideMaxDistance()
+    public virtual float GetOverrideMaxDistance()
     {
         return -1f;
     }

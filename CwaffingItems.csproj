@@ -323,6 +323,7 @@
     <EmbeddedResource Include="Resources\Rooms\floor_puzzle.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\barter.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\petshop.newroom"/>
+    <EmbeddedResource Include="Resources\Rooms\pizza.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\insurance.newroom"/>
     <Reference Include="UnityEngine.ClothModule"/>
     <Reference Include="UnityEngine.UnityConnectModule"/>

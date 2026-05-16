@@ -3,6 +3,12 @@
 ## 1.31.0 (TBD)
 
 - Synchronized [REDACTED]'s and [REDACTED]'s speech audio to match their dialogue better
+- Overhauled Pizza minigame
+	- Hungry Bullet Kin can no longer receive knockback
+	- Fixed bug with chest rewards being granted when delivering under 50% of pizzas
+	- Fixed Shmuppies being able to spawn during Pizza minigame
+	- Adjusted Bullet Kin placement to better avoid being hidden by walls
+	- Fixed chest rewards from Pizza minigame being a tier higher than what was written on the delivery summary note
 
 ## 1.30.1 (2026-05-14)
 

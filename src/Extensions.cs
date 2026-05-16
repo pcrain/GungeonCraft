@@ -1130,7 +1130,7 @@ public static class Extensions
   }
 
   /// <summary>Add a new animation to the same collection as a reference sprite</summary>
-  public static string SetUpAnimation(this tk2dBaseSprite sprite, string animationName, float fps,
+  public static tk2dSpriteAnimationClip SetUpAnimation(this tk2dBaseSprite sprite, string animationName, float fps,
     tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Once, bool copyMaterialSettings = false)
   {
     tk2dSpriteCollectionData collection = sprite.collection;
@@ -1144,7 +1144,51 @@ public static class Extensions
         collection.spriteDefinitions[fid].CopyMaterialProps(baseMat);
     }
     tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(anim, collection, spriteIds, animationName, wrapMode, fps);
-    return animationName;
+    // Lazy.DebugConsoleLog($"  created clip with name {clip.name} in collection {collection.name}");
+    return clip;
+  }
+
+  /// <summary>Adds a new animation to an AIActor's sprite collection</summary>
+  public static void AddSpecialAnimation(this AIActor actor, string spriteBaseName, string animName, float fps, bool loop = true,
+    bool copyMaterialSettings = true, IntVector2 pixelOffset = default)
+  {
+      tk2dBaseSprite sprite = actor.sprite;
+      DirectionalAnimation.DirectionType dType = Lazy.AutoDetectDirectionFromSpriteName(spriteBaseName);
+      if (dType == DirectionalAnimation.DirectionType.None)
+      {
+          Lazy.RuntimeWarn($"failed to get animations for {spriteBaseName}");
+          return;
+      }
+
+      DirectionalAnimation.SingleAnimation[] sa = DirectionalAnimation.m_combined[(int)dType];
+      int nanims = sa.Length;
+      string[] animNames = new string[nanims];
+      tk2dSpriteCollectionData coll = sprite.collection;
+      sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
+      for (int i = 0; i < nanims; ++i)
+      {
+          string aname = string.IsNullOrEmpty(sa[i].suffix) ? spriteBaseName : $"{spriteBaseName}_{sa[i].suffix}";
+          // Lazy.DebugConsoleLog($"got {ResMap.Get(aname).Count} frames for animation {aname}");
+          tk2dSpriteAnimationClip clip = sprite.SetUpAnimation(aname, fps, true ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once,
+            copyMaterialSettings: copyMaterialSettings);
+          animNames[i] = clip.name;
+          if (pixelOffset != default)
+            clip.OffsetAllFrames(new Vector2(C.PIXEL_SIZE * pixelOffset.x, C.PIXEL_SIZE * pixelOffset.y));
+      }
+      AIAnimator.NamedDirectionalAnimation newOtheranim = new AIAnimator.NamedDirectionalAnimation
+      {
+          name = animName,
+          anim = new DirectionalAnimation
+          {
+              Prefix    = (dType == DirectionalAnimation.DirectionType.Single)
+                ? spriteBaseName  // NOTE: DirectionType.Single ignores AnimNames and just uses Prefix directly for animation resolution, so we need to do this
+                : animName,
+              AnimNames = animNames,
+              Type      = dType,
+              Flipped   = new DirectionalAnimation.FlipType[nanims],
+          }
+      };
+      sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
   }
 
   /// <summary>Same as PlaceAtPositionByAnchor(), but adjusted for sprite's current scale</summary>

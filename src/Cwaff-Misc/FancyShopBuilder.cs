@@ -145,8 +145,8 @@ public static class FancyShopBuilder
       selectionWeight      : 1,
       chanceToSpawnEachRun : spawnChanceEachRun,
       addSingularPlaceable : shop,
-      XFromCenter          : 0,
-      YFromCenter          : 0,
+      XFromCenter          : -0.75f,
+      YFromCenter          : -0.75f,
       oncePerRun           : exactlyOncePerRun,
       allowedTilesets      : allowedTilesets
       );
@@ -509,7 +509,7 @@ public static class FancyShopBuilder
   {
       if (addSingularPlaceable != null)
       {
-          Vector2 offset = new Vector2(-0.75f, -0.75f);
+          Vector2 offset = new Vector2(XFromCenter, YFromCenter);
           Vector2 vector = new Vector2((float)(protoroom.Width / 2) + offset.x, (float)(protoroom.Height / 2) + offset.y);
 
           protoroom.placedObjectPositions.Add(vector);

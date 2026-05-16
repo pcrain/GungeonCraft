@@ -20,12 +20,12 @@ public static class IncredibleItems
             //WARNING: if spawnAnimName is set to null, the first one will work okay, but subsequent runs will cause chests to appear as their original variants
             //         however, if it's NOT set to null, then the chest spawns in with a disabled SpeculativeRigidBody due to SpawnBehavior_CR()
             _PaperChestPrefab.spawnAnimName = "chest_paper_idle";
-            _PaperChestPrefab.openAnimName  = _PaperChestPrefab.sprite.SetUpAnimation("chest_paper_open", 30);
+            _PaperChestPrefab.openAnimName  = _PaperChestPrefab.sprite.SetUpAnimation("chest_paper_open", 30).name;
             _PaperChestPrefab.breakAnimName = _PaperChestPrefab.openAnimName;
             tk2dSpriteAnimator animator = _PaperChestPrefab.spriteAnimator;
               animator.SetAudio("chest_paper_open", "paper_crinkle_sound", 4, 15, 18, 24);
               animator.SetAudio("chest_paper_open", "paper_fall_sound", 30);
-              animator.defaultClipId = animator.GetClipIdByName(_PaperChestPrefab.sprite.SetUpAnimation("chest_paper_idle", 1));
+              animator.defaultClipId = animator.GetClipIdByName(_PaperChestPrefab.sprite.SetUpAnimation("chest_paper_idle", 1).name);
               _PaperChestPrefab.sprite.SetSprite(animator.library.clips[animator.defaultClipId].frames[0].spriteId);
             _PaperChestPrefab.IsLocked = false; // can't get lock renderer to attach properly after adjusting appearance animation
             _PaperChestPrefab.GetComponent<MajorBreakable>().HitPoints = 1;

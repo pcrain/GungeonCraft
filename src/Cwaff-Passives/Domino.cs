@@ -1,9 +1,5 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - optmimize laggy startup
-*/
-
 public class Domino : CwaffPassive
 {
     public static string ItemName         = "Domino";
@@ -11,7 +7,12 @@ public class Domino : CwaffPassive
     public static string LongDescription  = "Upon clearing a floor of enemies, adds an optional pizza delivery event marker to the floor exit room. Triggering the event grants a Pizza Peel for delivering as many pizzas as possible to Bullet Kin on the way back to the floor entrance. Casings are awarded upon reaching the event marker in the floor entrance based on the amount of pizzas delivered, while an additional casing multiplier or chest reward may be granted for high delivery rates. No rewards are granted if the event marker is not reached before the timer runs out.";
     public static string Lore             = "Pizza delivery in the Gungeon is rather awkward. Bullet Kin are known to immensely enjoy their pizza; however, Gungeon protocol prohibits them from ordering pizza while on duty. Bullet Kin have consequently been known to occasionally aid adventurers in clearing out floors for the sole purpose of clocking out to enjoy their pizza time earlier.";
 
+    internal const string NO_PIZZA_MESSAGE =
+        "After microseconds of careful consideration, we've determined you to be completely incapable of delivering pizza in your current state. Thank you for understanding.\n\n~ Management";
+
     internal static bool _ShouldPlayMusic = true;
+
+    internal static GameObject _PizzaMinimapIcon = null;
 
     public static void Init()
     {
@@ -20,46 +21,27 @@ public class Domino : CwaffPassive
         item.BanFromCoop();
 
         PizzaPeel.Init();
-        MoneyGun.Init();
-        PizzaGun.Init();
+
+        AIActor bulletKin = EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
+          bulletKin.AddSpecialAnimation("bullet_money", "money", 8, pixelOffset: new IntVector2(-7, 0));
+          bulletKin.AddSpecialAnimation("bullet_pizza", "pizza", 12, pixelOffset: new IntVector2(-7, 0));
+
+        _PizzaMinimapIcon = new GameObject("minimap_pizza_icon").RegisterPrefab(deactivate: false);
+        _PizzaMinimapIcon.AddComponent<tk2dSprite>().SetSprite(VFX.Collection, AtlasHelper.AddSpritesToCollection(ResMap.Get("minimap_pizza_icon"), VFX.Collection).x);
     }
 
     public override void Pickup(PlayerController player)
     {
         base.Pickup(player);
-        player.OnRoomClearEvent += OnRoomClear;
-        CwaffEvents.OnChangedRooms += PizzaTimeController.MaybeSpawnPizzaAtExit;
-        CwaffEvents.OnFloorEnded += PizzaTimeController.OnFloorEnded;
-
         CwaffEvents.OnCleanStart -= PizzaTimeController.OnFloorEnded;
         CwaffEvents.OnCleanStart += PizzaTimeController.OnFloorEnded; // no need to remove this when the item is dropped
-
-        #if DEBUG
-        Commands._OnDebugKeyPressed -= ToggleMusic;
-        Commands._OnDebugKeyPressed += ToggleMusic;
-        #endif
+        CwaffEvents.OnFloorEnded += PizzaTimeController.OnFloorEnded;
     }
-
-    #if DEBUG
-    private static void ToggleMusic()
-    {
-        _ShouldPlayMusic = !_ShouldPlayMusic;
-        System.Console.WriteLine($"set _ShouldPlayMusic to {_ShouldPlayMusic}");
-    }
-    #endif
 
     public override void DisableEffect(PlayerController player)
     {
         base.DisableEffect(player);
-        if (player)
-            player.OnRoomClearEvent -= OnRoomClear;
-        CwaffEvents.OnChangedRooms -= PizzaTimeController.MaybeSpawnPizzaAtExit;
         CwaffEvents.OnFloorEnded -= PizzaTimeController.OnFloorEnded;
-    }
-
-    private static void OnRoomClear(PlayerController player)
-    {
-        PizzaTimeController.MaybeSpawnPizzaAtExit(player, null, null);
     }
 }
 
@@ -118,7 +100,6 @@ public class PizzaPeel : CwaffGun
           Enabled                = true,
           IsTrigger              = true,
         }};
-        _PizzaBox.AddComponent<PizzaBox>();
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -162,10 +143,8 @@ public class PizzaPeel : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (!this.PlayerOwner || !this.PlayerOwner.AcceptingNonMotionInput)
-            return;
-
-        UpdateAnimations();
+        if (PlayerOwner && PlayerOwner.AcceptingNonMotionInput)
+            UpdateAnimations();
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -200,89 +179,8 @@ public class PizzaPeelAmmoDisplay : CustomAmmoDisplay
     }
 }
 
-public class PizzaBox : MonoBehaviour
-{
-    private const float _PARTICLE_RATE = 0.025f;
-
-    private const string NO_PIZZA_MESSAGE =
-        "After microseconds of careful consideration, we've determined you to be completely incapable of delivering pizza in your current state. Thank you for understanding.\n\n~ Management";
-
-    private Vector2 _basePos;
-    private float _nextParticle = 0f;
-    private bool _didNote = false;
-
-    public bool endsEvent = false;
-
-    private void Start()
-    {
-        base.gameObject.GetComponent<SpeculativeRigidbody>().OnPreRigidbodyCollision += this.MaybeStartEvent;
-        this._basePos = base.transform.position;
-    }
-
-    private void Update()
-    {
-        float now = BraveTime.ScaledTimeSinceStartup;
-        float yOff = (3f / 16f) * Mathf.Sin(3f * now);
-        Vector2 newPos = this._basePos + new Vector2(0f, yOff);;
-        base.transform.position = newPos;
-        if (this._nextParticle > now)
-            return;
-
-        CwaffVFX.Spawn(
-            prefab         : VFX.SinglePixel,
-            position       : newPos,
-            velocity       : 2f * Vector2.up + Lazy.RandomVector(1f),
-            lifetime       : 0.5f,
-            emissivePower  : 3000f,
-            overrideColor  : Color.red,
-            emitColorPower : 8f,
-            height         : 5f
-          );
-        this._nextParticle = now + _PARTICLE_RATE;
-    }
-
-    private void MaybeStartEvent(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
-    {
-        if (!otherRigidbody || otherRigidbody.gameObject.GetComponent<PlayerController>() is not PlayerController pc)
-            return;
-
-        if (endsEvent)
-            PizzaTimeController.HandleDeliverySuccess();
-        else
-        {
-            if (!PizzaTimeController.StartPizzaTime(pc))
-            {
-                if (!this._didNote)
-                {
-                    this._didNote = true;
-                    CustomNoteDoer.CreateNote(pc.CenterPosition, NO_PIZZA_MESSAGE);
-                }
-                return;
-            }
-        }
-
-        CwaffVFX.SpawnBurst(
-            prefab           : PizzaPeel._PizzaSliceVFX,
-            numToSpawn       : 20,
-            basePosition     : pc.CenterPosition,
-            positionVariance : 1f,
-            minVelocity      : 6f,
-            velocityVariance : 2f,
-            velType          : CwaffVFX.Vel.AwayRadial,
-            rotType          : CwaffVFX.Rot.Random,
-            lifetime         : 0.8f,
-            fadeOutTime      : 0.25f,
-            uniform          : true
-          );
-
-        UnityEngine.Object.Destroy(base.gameObject);
-    }
-}
-
 public class PizzaPeelProjectile : MonoBehaviour
 {
-    private static int _PizzaItem = -1;
-
     private Projectile _projectile;
     private PlayerController _owner;
 
@@ -313,11 +211,7 @@ public class PizzaPeelProjectile : MonoBehaviour
             return;
 
         p.hasPizza = true;
-        if (_PizzaItem < 0)
-            _PizzaItem = Lazy.PickupId<PizzaGun>();
-        enemy.ReplaceGun((Items)_PizzaItem);
-        if (enemy.EnemyGuid == Enemies.BulletKin)
-            enemy.aiAnimator.OverrideIdleAnimation = "smile";
+        p.DeregisterRoomIcon();
 
         if (enemy.aiShooter && enemy.aiShooter.behaviorSpeculator is BehaviorSpeculator bs)
         {
@@ -337,55 +231,11 @@ public class PizzaPeelProjectile : MonoBehaviour
             vfx.AddComponent<GlowAndFadeOut>().Setup(
                 fadeInTime: 0.25f, glowInTime: 0.50f, holdTime: 0.0f, glowOutTime: 0.50f, fadeOutTime: 0.25f, maxEmit: 50f, destroy: true);
 
+        enemy.aiAnimator.OverrideIdleAnimation = "pizza";
+
         enemy.gameObject.Play("got_some_cash");
 
         ++PizzaTimeController._CurDeliveries;
-    }
-
-    private void Update()
-    {
-      // enter update code here
-    }
-
-    private void OnDestroy()
-    {
-      // enter destroy code here
-    }
-}
-
-public class MoneyGun : CwaffGun
-{
-    public static string ItemName         = "Money Gun";
-    public static string ShortDescription = "O:";
-    public static string LongDescription  = "$$$";
-    public static string Lore             = "$$$$$";
-
-    public static void Init()
-    {
-        Lazy.SetupGun<MoneyGun>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true)
-          .SetAttributes(quality: ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true)
-          .DefaultModule.projectiles = new(){ Lazy.NoProjectile() };
-    }
-
-    public override void Update()
-    {
-        base.Update();
-        this.gun.OverrideAngleSnap = 180f;
-    }
-}
-
-public class PizzaGun : CwaffGun
-{
-    public static string ItemName         = "Pizza Gun";
-    public static string ShortDescription = "=D";
-    public static string LongDescription  = "Pizza";
-    public static string Lore             = "Peepaga, Peepaga";
-
-    public static void Init()
-    {
-        Lazy.SetupGun<PizzaGun>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true)
-          .SetAttributes(quality: ItemQuality.SPECIAL, gunClass: GunClass.SILLY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true, preventRotation: true)
-          .DefaultModule.projectiles = new(){ Lazy.NoProjectile() };
     }
 }
 
@@ -396,10 +246,18 @@ public class WantsPizza : MonoBehaviour {
     private AIActor _enemy = null;
     private HealthHaver _hh = null;
     private GameObject _threatArrow = null;
+    private RoomHandler _room = null;
+    private GameObject _roomIcon = null;
 
     private void Start()
     {
         this._enemy = base.gameObject.GetComponent<AIActor>();
+        if (this._enemy.knockbackDoer is KnockbackDoer kbd)
+          kbd.SetImmobile(true, "pizza");
+        if (this._enemy.specRigidbody is SpeculativeRigidbody body)
+          body.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.PlayerCollider, CollisionLayer.PlayerHitBox));
+        else
+          Lazy.DebugConsoleLog($"no hitbox");
     }
 
     private void Update()
@@ -419,6 +277,7 @@ public class WantsPizza : MonoBehaviour {
 
     private void OnDestroy()
     {
+        DeregisterRoomIcon();
         if (this._threatArrow)
             UnityEngine.Object.Destroy(this._threatArrow);
     }
@@ -461,6 +320,20 @@ public class WantsPizza : MonoBehaviour {
         _threatArrow.transform.position = result.ToVector3ZUp().Quantize(0.0625f);
         _threatArrow.transform.localRotation = rot;
     }
+
+    public void RegisterRoomIcon(RoomHandler room)
+    {
+        this._room = room;
+        this._roomIcon = Minimap.Instance.RegisterRoomIcon(room, Domino._PizzaMinimapIcon, forceActive: true);
+    }
+
+    public void DeregisterRoomIcon()
+    {
+        if (!this._roomIcon)
+            return;
+        Minimap.Instance.DeregisterRoomIcon(this._room, this._roomIcon);
+        this._roomIcon = null;
+    }
 }
 
 public class PizzaTimeController : MonoBehaviour
@@ -473,6 +346,7 @@ public class PizzaTimeController : MonoBehaviour
     internal static bool _PizzaTimeHappening = false;
     internal static bool _PizzaTimeTriedToSpawnThisFloor = false;
     internal static bool _PizzaTimeAttemptedThisFloor = false;
+    internal static bool _TimerExpired = false;
     internal static Gun _ExtantGun = null;
     internal static PlayerController _DeliveryBoi = null;
     internal static int _CurDeliveries = 0;
@@ -481,40 +355,14 @@ public class PizzaTimeController : MonoBehaviour
     internal static float _PizzaEventTimer = 0f;
     internal static RoomHandler _ElevatorRoom = null;
     internal static RoomHandler _StartRoom = null;
+    internal static FancyNPC _DonNPC = null;
 
     private static PizzaTimeController _Instance = null;
-    private static int _MoneyItem = -1;
     private static readonly List<RoomHandler> _DeliveryRooms = new();
     private static readonly LinkedList<RoomHandler> _OccupiedRooms = new();
     private static readonly LinkedList<AIActor> _Hungrybois = new();
     private static bool _PlayingMusic = false;
-    private static PizzaBox _GoalBox = null;
     private static readonly List<int> _PizzaTimeBlackList = new();
-
-    internal static void MaybeSpawnPizzaAtExit(PlayerController player, RoomHandler oldRoom, RoomHandler newRoom)
-    {
-        if (_PizzaTimeHappening || _PizzaTimeTriedToSpawnThisFloor || GameManager.Instance.IsLoadingLevel)
-            return;
-        if (!CanStartPizzaTime(player))
-        {
-            // Lazy.DebugLog($"need to clear {_OccupiedRooms.Count} for pizza time");
-            return;
-        }
-        // Lazy.DebugLog($"enabling pizza time event!");
-        _PizzaTimeTriedToSpawnThisFloor = true;
-        if (_ElevatorRoom == null)
-        {
-            // Lazy.DebugLog($"...if we had an elevator room");
-            return;
-        }
-        if (_StartRoom == null)
-        {
-            // Lazy.DebugLog($"...if we had a start room");
-            return;
-        }
-        PizzaPeel._PizzaBox.Instantiate(position: _ElevatorRoom.GetBestRewardLocation(new IntVector2(1, 1)).ToVector2())
-          .GetComponent<PizzaBox>().endsEvent = false;
-    }
 
     private static void DoPizzaTimeMusic()
     {
@@ -522,8 +370,6 @@ public class PizzaTimeController : MonoBehaviour
         // AkSoundEngine.StopAll();
         AkSoundEngine.PostEvent("Stop_MUS_All", GameManager.Instance.gameObject);
         _PlayingMusic = true;
-        //TODO: implement this
-        // throw new NotImplementedException();
     }
 
     private static void StopPizzaTimeMusic()
@@ -558,18 +404,23 @@ public class PizzaTimeController : MonoBehaviour
                 baseQuality = 0; // no chest reward under 90% delivery
                 break;
             case < 0.5f:
+                baseQuality = 0; // no chest reward under 90% delivery
                 casings /= 2; // casing penalty for under 50% delivery
                 break;
         }
 
-        IntVector2 pos = _DeliveryBoi.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success);
+        IntVector2 pos;
+        if (PizzaTimeController._DonNPC is FancyNPC npc && npc.sprite)
+          pos = (npc.sprite.WorldBottomCenter + new Vector2(-0.5f, -5.0f)).ToIntVector2(); // spawn chest a bit under Don if he's around
+        else
+          pos = _DeliveryBoi.CurrentRoom.GetCenteredVisibleClearSpot(2, 2, out bool success);
 
         if (baseQuality > 0)
         {
             if (UnityEngine.Random.value > 0.3f)
                 baseQuality += 1; // 30% chance to upgrade quality
 
-            GameObject rewardPrefab = _DeliveryBoi.GetRandomChestRewardOfQuality((ItemQuality)baseQuality);
+            GameObject rewardPrefab = _DeliveryBoi.GetRandomChestRewardOfQuality((ItemQuality)(baseQuality - 1));
             Chest chest = Lazy.SpawnChestWithSpecificItem(
               pickup: rewardPrefab.GetComponent<PickupObject>(),
               position: pos);
@@ -579,41 +430,36 @@ public class PizzaTimeController : MonoBehaviour
         string report = $"{Mathf.RoundToInt(100f * completion)}% of pizzas delivered\n\n----------\n\nReward:\n- {casings} casings";
         if (baseQuality > 0)
             report += $"\n- {_ChestNames[baseQuality - 1]} Chest";
-        CustomNoteDoer.CreateNote(pos.ToVector2() + new Vector2(0, 1f), report);
+        CustomNoteDoer.CreateNote(pos.ToVector2() + new Vector2(-1.5f, 0f), report);
 
         EndPizzaTime();
     }
 
     public static void HandleDeliveryFailure()
     {
-        // Lazy.DebugLog($"no pizza D:");
-        //TODO: handle proper failure message
+        _TimerExpired = true;
     }
 
     private static void SpawnHungryBulletKins()
     {
-        if (_MoneyItem < 0)
-            _MoneyItem = Lazy.PickupId<MoneyGun>();
-
         AIActor kinPrefab = EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
         foreach (RoomHandler room in _DeliveryRooms)
         {
             int numEnemiesInRoom = UnityEngine.Random.Range(1, 5);
-            List<Tuple<IntVector2, float>> spawnPositions = room.GetGoodSpotsInternal(2, 2);
-            if (spawnPositions.Count > numEnemiesInRoom)
-                spawnPositions.Shuffle();
-            else if (spawnPositions.Count < numEnemiesInRoom)
-                numEnemiesInRoom = spawnPositions.Count;
             for (int i = 0; i < numEnemiesInRoom; ++i)
             {
-                IntVector2 clearSpot = spawnPositions[i].First;
+                if (kinPrefab.RandomCellForEnemySpawn(room) is not IntVector2 clearSpot)
+                {
+                  numEnemiesInRoom = i;
+                  break;
+                }
                 AIActor enemy = AIActor.Spawn(kinPrefab, clearSpot, room);
                 enemy.IgnoreForRoomClear = true;
                 enemy.CollisionDamage = 0f;
                 // enemy.specRigidbody.CorrectForWalls(andRigidBodies: true);
                 enemy.ParentRoom.ResetEnemyHPPercentage();
-                enemy.gameObject.AddComponent<WantsPizza>();
-                enemy.ReplaceGun((Items)_MoneyItem);
+                WantsPizza pizzaWanter = enemy.gameObject.AddComponent<WantsPizza>();
+                // enemy.ReplaceGun((Items)_MoneyItem);
                 if (enemy.gameObject.GetComponent<BehaviorSpeculator>() is BehaviorSpeculator bs)
                 {
                     bs.AttackBehaviors.Clear();
@@ -624,6 +470,23 @@ public class PizzaTimeController : MonoBehaviour
                 }
                 enemy.HasDonePlayerEnterCheck = true;
                 enemy.OnEngaged(true);
+
+                if (enemy.aiShooter is AIShooter shooter)
+                {
+                  if (shooter.CurrentGun is Gun gun)
+                  {
+                    shooter.ToggleHandRenderers(false, "pizza");
+                    if (shooter.m_cachedBraveBulletSource != null)
+                        shooter.m_cachedBraveBulletSource.enabled = false;
+                    if (gun.DropGun().gameObject is GameObject droppedGun)
+                        UnityEngine.Object.Destroy(droppedGun);
+                  }
+                  UnityEngine.Object.Destroy(shooter);
+                }
+
+                enemy.aiAnimator.OverrideIdleAnimation = "money";
+
+                pizzaWanter.RegisterRoomIcon(room);
 
                 _Hungrybois.AddLast(enemy);
             }
@@ -643,8 +506,15 @@ public class PizzaTimeController : MonoBehaviour
             _Hungrybois.RemoveFirst();
             if (!boi || !boi.gameObject)
                 continue;
-            if (boi.gameObject.GetComponent<WantsPizza>() is WantsPizza p && p.hasPizza)
+            if (boi.gameObject.GetComponent<WantsPizza>() is WantsPizza p)
+            {
+               p.DeregisterRoomIcon();
+               if (p.hasPizza)
                 continue;
+            }
+            RoomHandler boiRoom = boi.CenterPosition.GetAbsoluteRoom();
+            if (boiRoom != null)
+              Minimap.Instance.DeregisterRoomIcon(boiRoom, PizzaPeel._PizzaSliceVFX);
             if (currentRoom != null && boi.CenterPosition.GetAbsoluteRoom() == currentRoom)
                 boi.EraseFromExistence(true);
             else
@@ -672,9 +542,11 @@ public class PizzaTimeController : MonoBehaviour
         _Hungrybois.Clear();
         _CurDeliveries = 0;
         _MaxDeliveries = 0;
+        _DonNPC = null;
         _ScannedRoomsThisFloor = false;
         _PizzaTimeTriedToSpawnThisFloor = false;
         _PizzaTimeAttemptedThisFloor = false;
+        _TimerExpired = false;
         _ElevatorRoom = null;
         _StartRoom = null;
     }
@@ -723,6 +595,7 @@ public class PizzaTimeController : MonoBehaviour
             if (RoomStillHasEnemies(room.Value))
                 _OccupiedRooms.AddLast(room);
         }
+        Lazy.DebugConsoleLog($"still {_OccupiedRooms.Count} occupied rooms");
         return _OccupiedRooms.Count > 0;
     }
 
@@ -749,25 +622,44 @@ public class PizzaTimeController : MonoBehaviour
         if (!GivePizzaPeel(deliveryboi)) // give player the PizzaPeel and gun lock them
             return false; // can't start pizza time for whatever reason
 
+        // reinitialize events in case we started the event without holding the Domino item
+        CwaffEvents.OnFloorEnded -= PizzaTimeController.OnFloorEnded;
+        CwaffEvents.OnFloorEnded += PizzaTimeController.OnFloorEnded;
+        CwaffEvents.OnCleanStart -= PizzaTimeController.OnFloorEnded;
+        CwaffEvents.OnCleanStart += PizzaTimeController.OnFloorEnded;
+
         _Instance = new GameObject().AddComponent<PizzaTimeController>();
         _Instance.gameObject.Play("pizza_event_start_sound");
         _PizzaTimeHappening = true; // prevent player from teleporting and some other stuff
         _PizzaTimeAttemptedThisFloor = true;
         _DeliveryBoi = deliveryboi;
         _DeliveryBoi.OverrideHat(CwaffHats._PizzaHat, doPoof: true);
+        // Minimap.Instance.RevealAllRooms(false);
         SpawnHungryBulletKins(); // add bullet kin to a bunch of rooms
         CalculateEventTimer(); // figure out how long to give the player to complete the event
-        //TODO: maybe add map markers for hungry bullet kin?
         DoPizzaTimeMusic();
 
-        _GoalBox = PizzaPeel._PizzaBox.Instantiate(position: _StartRoom.GetBestRewardLocation(new IntVector2(1, 1)).ToVector2())
-          .GetComponent<PizzaBox>();
-        _GoalBox.endsEvent = true;
+        CwaffVFX.SpawnBurst(
+            prefab           : PizzaPeel._PizzaSliceVFX,
+            numToSpawn       : 20,
+            basePosition     : deliveryboi.CenterPosition,
+            positionVariance : 1f,
+            minVelocity      : 6f,
+            velocityVariance : 2f,
+            velType          : CwaffVFX.Vel.AwayRadial,
+            rotType          : CwaffVFX.Rot.Random,
+            lifetime         : 0.8f,
+            fadeOutTime      : 0.25f,
+            uniform          : true
+          );
+
         return true;
     }
 
     public static void EndPizzaTime(bool floorEnded = false)
     {
+        if (!_PizzaTimeHappening)
+          return;
         // Lazy.DebugLog($"delivered {_CurDeliveries} / {_MaxDeliveries} pizzas");
         _PizzaTimeHappening = false;
         if (!floorEnded)
@@ -782,11 +674,6 @@ public class PizzaTimeController : MonoBehaviour
             DestroyPizzaPeel(_DeliveryBoi);
             _DeliveryBoi.ClearHatOverride(CwaffHats._PizzaHat, doPoof: true);
             _DeliveryBoi = null;
-        }
-        if (_GoalBox)
-        {
-            UnityEngine.Object.Destroy(_GoalBox.gameObject);
-            _GoalBox = null;
         }
         if (_Instance)
         {
@@ -833,6 +720,8 @@ public class PizzaTimeController : MonoBehaviour
     {
         if (Domino._ShouldPlayMusic)
             this.LoopSoundIf(_PlayingMusic, "pizza_time", loopPointMs: 9056, rewindAmountMs: 5318);
+        if (!_DeliveryBoi || _DeliveryBoi.IsInputOverridden || !_DeliveryBoi.AcceptingNonMotionInput)
+          return; // don't tick the clock while we're unable to control our character
         _PizzaEventTimer -= BraveTime.DeltaTime;
         if (_PizzaEventTimer > 0)
             return;

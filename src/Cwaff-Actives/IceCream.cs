@@ -20,24 +20,7 @@ public class IceCream : CwaffActive
 
         // NOTE: sprites might need lots of padding for hands to render in right positions w.r.t. vanilla sprites, see bullet kin for example
         AIActor bulletKin = EnemyDatabase.GetOrLoadByGuid(Enemies.BulletKin);
-            bulletKin.sprite.SetUpAnimation("bullet_smile_left", 2, tk2dSpriteAnimationClip.WrapMode.Loop, copyMaterialSettings: true);
-            bulletKin.sprite.SetUpAnimation("bullet_smile_right", 2, tk2dSpriteAnimationClip.WrapMode.Loop, copyMaterialSettings: true);
-            AIAnimator.NamedDirectionalAnimation newOtheranim = new AIAnimator.NamedDirectionalAnimation
-            {
-                name = "smile",
-                anim = new DirectionalAnimation
-                {
-                    Prefix    = "smile",
-                    AnimNames = new string[2]{"bullet_smile_right","bullet_smile_left"},
-                    Type      = DirectionalAnimation.DirectionType.TwoWayHorizontal,
-                    Flipped   = new DirectionalAnimation.FlipType[]{
-                        DirectionalAnimation.FlipType.None,
-                        DirectionalAnimation.FlipType.None,
-                    },
-                }
-            };
-            bulletKin.sprite.aiAnimator.OtherAnimations ??= new List<AIAnimator.NamedDirectionalAnimation>();
-            bulletKin.sprite.aiAnimator.OtherAnimations.Add(newOtheranim);
+          bulletKin.AddSpecialAnimation("bullet_smile", "smile", 2);
     }
 
     public override bool CanBeUsed(PlayerController user)
