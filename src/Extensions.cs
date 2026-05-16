@@ -1793,17 +1793,30 @@ public static class Extensions
   }
 
   /// <summary>Play a sound on a GameObject, stopping any instances of the sound on that object.</summary>
-  public static void PlayOnce(this GameObject g, string sound)
+  public static bool PlayOnce(this GameObject g, string sound, float soundRate = 0.0f)
   {
+    if (soundRate > 0 && !SoundRateData.PlayRateLimited(g, sound, soundRate))
+      return false;
     AkSoundEngine.PostEvent(sound+"_stop", g);
     AkSoundEngine.PostEvent(sound, g);
+    return true;
   }
 
   /// <summary>Play a sound on a GameObject, stopping any instances of the sound globally.</summary>
-  public static void PlayUnique(this GameObject g, string sound)
+  public static bool PlayUnique(this GameObject g, string sound, float soundRate = 0.0f)
   {
+    if (soundRate > 0 && !SoundRateData.PlayRateLimited(g, sound, soundRate))
+      return false;
     AkSoundEngine.PostEvent(sound+"_stop_all", g);
     AkSoundEngine.PostEvent(sound, g);
+    return true;
+  }
+
+  /// <summary>Stops a sound on a GameObject.</summary>
+  public static bool Stop(this GameObject g, string sound)
+  {
+    AkSoundEngine.PostEvent(sound+"_stop", g);
+    return true;
   }
 
   /// <summary>Returns a vector with the smaller component set to 0.</summary>

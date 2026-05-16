@@ -620,33 +620,17 @@ public static class FancyShopBuilder
   private static void CreateDirectionalAnimation(tk2dSpriteAnimator spriteAnimator, tk2dSpriteCollectionData collection, AIAnimator aianimator, List<int> IdsList, string animationName, float FPS)
   {
       SpriteBuilder.AddAnimation(spriteAnimator, collection, IdsList, animationName, tk2dSpriteAnimationClip.WrapMode.Once, FPS);
-      DirectionalAnimation aa = new DirectionalAnimation
-      {
-          Type = DirectionalAnimation.DirectionType.Single,
-          Prefix = animationName,
-          AnimNames = new string[1],
-          Flipped = new DirectionalAnimation.FlipType[1]
-      };
-      if (aianimator.OtherAnimations != null)
-      {
-          aianimator.OtherAnimations.Add(
-          new AIAnimator.NamedDirectionalAnimation
-          {
-              name = animationName,
-              anim = aa
-          });
-      }
-      else
-      {
-          aianimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>
-          {
-              new AIAnimator.NamedDirectionalAnimation
-              {
-                  name = animationName,
-                  anim = aa
-              }
-          };
-      }
+      if (aianimator.OtherAnimations == null)
+        aianimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>();
+      aianimator.OtherAnimations.Add(new(){
+          name = animationName,
+          anim = new DirectionalAnimation{
+              Type = DirectionalAnimation.DirectionType.Single,
+              Prefix = animationName,
+              AnimNames = new string[1],
+              Flipped = new DirectionalAnimation.FlipType[1]
+          }
+      });
   }
 
   public static void SetShotAnimation(this FancyShopData shop, List<string> paths, float fps)

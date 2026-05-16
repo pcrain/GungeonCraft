@@ -21,13 +21,16 @@ public class Commands
             // GameManager.Instance.PrimaryPlayer.HealthAndArmorSwapped ^= true;
             // IncredibleItems.SpawnPaperChest();
 
-            AIActor enemyPrefab = ChewToy.ShmuppyEnemyPrefab;
-            IntVector2? randomAvailableCell = GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomAvailableCell(new IntVector2?(enemyPrefab.Clearance), new Dungeonator.CellTypes?(enemyPrefab.PathableTiles), false);
-            if (randomAvailableCell.HasValue)
-            {
-                AIActor aIActor = AIActor.Spawn(enemyPrefab, randomAvailableCell.Value, GameManager.Instance.PrimaryPlayer.CurrentRoom, true, AIActor.AwakenAnimationType.Default, true);
-                aIActor.HandleReinforcementFallIntoRoom(0);
-            }
+            // AIActor enemyPrefab = ChewToy.ShmuppyEnemyPrefab;
+            // IntVector2? randomAvailableCell = GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomAvailableCell(new IntVector2?(enemyPrefab.Clearance), new Dungeonator.CellTypes?(enemyPrefab.PathableTiles), false);
+            // if (randomAvailableCell.HasValue)
+            // {
+            //     AIActor aIActor = AIActor.Spawn(enemyPrefab, randomAvailableCell.Value, GameManager.Instance.PrimaryPlayer.CurrentRoom, true, AIActor.AwakenAnimationType.Default, true);
+            //     aIActor.HandleReinforcementFallIntoRoom(0);
+            // }
+
+            UnityEngine.Object.Instantiate(Don._NPC.gameObject,
+              GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Quaternion.identity);
         });
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {

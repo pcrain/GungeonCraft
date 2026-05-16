@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.31.0 (TBD)
+
+- Synchronized [REDACTED]'s and [REDACTED]'s speech audio to match their dialogue better
+
 ## 1.30.1 (2026-05-14)
 
 #### Balance Changes and Polish:

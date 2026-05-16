@@ -15,14 +15,20 @@ public struct SimpleAnimationData
 
 public class FancyNPC : BraveBehaviour, IPlayerInteractable
 {
+    private static GameObject _FortunesFavorVFX = null;
+
     public Transform talkPoint;
     public Vector3 talkPointAdjustment;
-    public bool autoFlipSprite = true;
+    public bool autoFlipSprite = false;
     public bool noOutlines = false;
+    public bool lockCamera = false;
     public string defaultAudioEvent = null;
+    public List<string> defaultAudioEvents = new();
     public string audioTag = string.Empty;
     public string defaultTalkAnimation = null;
     public string defaultPauseAnimation = null;
+    public float voiceRate = 0.25f;
+    public GameObject mapIcon = null;
 
     protected bool canInteract;
     protected bool m_canUse = true;
@@ -44,61 +50,69 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     // minimum amount of time to play talking animation assuming instant text is enabled
     protected const float MIN_ANIMATION_TIME = 1.0f;
 
-    public static GameObject Setup<T>(string name, string prefix, List<SimpleAnimationData> animationData, Vector3? talkPointAdjust = null)
+    public static GameObject Setup<T>(string name, List<string> animNames, Vector3? talkPointAdjust = null)
         where T : FancyNPC
     {
-        AssetBundle shared_auto_001 = null;
-        try
+        if (_FortunesFavorVFX == null)
         {
+          AssetBundle shared_auto_001 = null;
+          try
+          {
             shared_auto_001 = ResourceManager.LoadAssetBundle("shared_auto_001");
-
-            GameObject npcObj = SpriteBuilder.SpriteFromResource(animationData[0].animPaths[0], new GameObject(prefix + ":" + name));
-                FakePrefab.MarkAsFakePrefab(npcObj);
-                UnityEngine.Object.DontDestroyOnLoad(npcObj);
-                npcObj.SetActive(false);
-                npcObj.layer = 22;
-                npcObj.name = prefix + ":" + name;
-
-            tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
-            tk2dSpriteCollectionData collection = npcObj.GetComponent<tk2dSprite>().Collection;
-                List<string> animNames = new List<string>();
-                foreach (SimpleAnimationData ad in animationData)
-                {
-                    List<int> idList = AtlasHelper.AddSpritesToCollection(ad.animPaths, collection).AsRange();
-                    foreach (int fid in idList)
-                        collection.spriteDefinitions[fid].BetterConstructOffsetsFromAnchor(Anchor.LowerCenter);
-                    SpriteBuilder.AddAnimation(spriteAnimator, collection, idList, ad.animName, tk2dSpriteAnimationClip.WrapMode.Loop, ad.animFPS);
-                    animNames.Add(ad.animName);
-                }
-
-            AIAnimator aIAnimator = ShopAPI.GenerateBlankAIAnimator(npcObj);
-                aIAnimator.spriteAnimator  = spriteAnimator;
-                aIAnimator.OtherAnimations = Lazy.EasyNamedDirectionalAnimations(animNames.ToArray());
-
-            //HACK: hitbox sizes are hardcoded, do better later when i have more time
-            SpeculativeRigidbody rigidbody = ShopAPI.GenerateOrAddToRigidBody(npcObj, CollisionLayer.LowObstacle, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
-            rigidbody.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.BulletBlocker));
-
-            FancyNPC ci = npcObj.AddComponent<T>() as FancyNPC;
-                ci.talkPointAdjustment = talkPointAdjust.HasValue ? talkPointAdjust.Value : Vector3.zero;
-
-            UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
-                dreamLuck.goopRadius = 2;
-                dreamLuck.beamRadius = 2;
-                dreamLuck.bulletRadius = 2;
-                dreamLuck.bulletSpeedModifier = 0.8f;
-                dreamLuck.vfxOffset = 0.625f;
-                dreamLuck.sparkOctantVFX = shared_auto_001.LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
-
-            shared_auto_001 = null; //this fixes crashes apparently
-            return npcObj;
-        }
-        catch (Exception message)
-        {
+            _FortunesFavorVFX = shared_auto_001.LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
+            shared_auto_001 = null;
+          }
+          catch (Exception message)
+          {
             ETGModConsole.Log(message.ToString());
             shared_auto_001 = null; //this fixes crashes apparently
-            return null;
+          }
         }
+
+        GameObject npcObj = SpriteBuilder.SpriteFromResource(ResMap.Get(animNames[0])[0], new GameObject(C.MOD_PREFIX + ":" + name));
+            FakePrefab.MarkAsFakePrefab(npcObj);
+            UnityEngine.Object.DontDestroyOnLoad(npcObj);
+            npcObj.SetActive(false);
+            npcObj.layer = 22;
+            npcObj.name = C.MOD_PREFIX + ":" + name;
+
+        tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
+        tk2dSpriteCollectionData collection = npcObj.GetComponent<tk2dSprite>().Collection;
+        string animPrefix = name + "_";
+        foreach (string an in animNames)
+        {
+            string animName = an.RemovePrefix(animPrefix);
+            List<int> idList = AtlasHelper.AddSpritesToCollection(ResMap.Get(an), collection).AsRange();
+            foreach (int fid in idList)
+                collection.spriteDefinitions[fid].BetterConstructOffsetsFromAnchor(Anchor.LowerCenter);
+            SpriteBuilder.AddAnimation(spriteAnimator, collection, idList, animName, tk2dSpriteAnimationClip.WrapMode.Loop, fps: 5);
+        }
+
+        AIAnimator aIAnimator = ShopAPI.GenerateBlankAIAnimator(npcObj);
+            aIAnimator.spriteAnimator  = spriteAnimator;
+            aIAnimator.OtherAnimations = Lazy.EasyNamedDirectionalAnimations(animNames.ToArray());
+
+        npcObj.AutoRigidBody(clayer: CollisionLayer.EnemyCollider, height: 0.5f);
+
+        FancyNPC npc = npcObj.AddComponent<T>() as FancyNPC;
+            npc.talkPointAdjustment = talkPointAdjust.HasValue ? talkPointAdjust.Value : Vector3.zero;
+
+        string npcIconName = ResMap.Get($"{name}_icon", quietFailure: true)?[0];
+        if (npcIconName != null)
+        {
+          npc.mapIcon = new GameObject($"{name}_minimap_icon_sprite").RegisterPrefab(deactivate: false);
+          npc.mapIcon.AddComponent<tk2dSprite>().SetSprite(collection, AtlasHelper.AddSpritesToCollection([npcIconName], collection).x);
+        }
+
+        UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
+            dreamLuck.goopRadius          = 2;
+            dreamLuck.beamRadius          = 2;
+            dreamLuck.bulletRadius        = 2;
+            dreamLuck.bulletSpeedModifier = 0.8f;
+            dreamLuck.vfxOffset           = 0.625f;
+            dreamLuck.sparkOctantVFX      = _FortunesFavorVFX;
+
+        return npcObj;
     }
 
     protected virtual void Start()
@@ -111,9 +125,15 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         if (this.didSetup)
             return;
 
+        Vector3 pos = base.transform.position;
         this.didSetup = true;
         this.canInteract = true;
         this.m_canUse = true;
+        SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
+        RoomHandler room = pos.GetAbsoluteRoom();
+        room.RegisterInteractable(this);
+        if (mapIcon)
+            Minimap.Instance.RegisterRoomIcon(room, mapIcon, false);
         if (base.gameObject.GetComponent<TalkDoerLite>() is TalkDoerLite talker)
         {
             this.existingNpc = true;
@@ -121,16 +141,14 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
             return;
         }
         this.talkPoint = new GameObject().transform;
-        this.talkPoint.position = base.transform.position;
+        this.talkPoint.position = pos;
         Vector3 size = base.sprite.GetCurrentSpriteDef().position3;
         this.talkPointOffset = new Vector3(0, size.y, 0) + this.talkPointAdjustment;
         if (!this.noOutlines)
             SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
-        base.aiAnimator.PlayUntilCancelled("idler");
+        base.aiAnimator.PlayUntilCancelled("idle");
         // base.aiAnimator.sprite.color = base.aiAnimator.sprite.color.WithAlpha(0f);
         // base.renderer.enabled = false;
-        if (base.specRigidbody is SpeculativeRigidbody body)
-            body.CollideWithOthers = true;
     }
 
     protected bool CanBeginConversation()
@@ -153,6 +171,12 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
             SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black);
         this.m_interactor.SetInputOverride("npcConversation");
         Pixelator.Instance.LerpToLetterbox(0.35f, 0.25f);
+        Pixelator.Instance.DoFinalNonFadedLayer = true;
+        GameUIRoot.Instance.ToggleLowerPanels(false, false, "conversation");
+        GameUIRoot.Instance.HideCoreUI("conversation");
+        Minimap.Instance.TemporarilyPreventMinimap = true;
+        if (this.lockCamera)
+          LockCamera();
     }
 
     protected void EndConversation()
@@ -160,31 +184,40 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         // TextBoxManager.ClearTextBox(this.talkPoint);
         SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white);
         this.m_interactor.ClearInputOverride("npcConversation");
-        Pixelator.Instance.LerpToLetterbox(1, 0.25f);
+        // Pixelator.Instance.LerpToLetterbox(1, 0.25f);
+        Pixelator.Instance.LerpToLetterbox(0.5f, 0.25f);
+        Pixelator.Instance.DoFinalNonFadedLayer = false;
+        GameUIRoot.Instance.ToggleLowerPanels(true, false, "conversation");
+        GameUIRoot.Instance.ShowCoreUI("conversation");
+        Minimap.Instance.TemporarilyPreventMinimap = false;
         this.m_interactor = null;  //if this method is overridden, needs to be set to null after conversation is done
+        if (this.lockCamera)
+          UnlockCamera();
+    }
+
+    private void LockCamera() // mostly stolen from basegame StartConversation FSM class
+    {
+        Vector2 talkPos = this.talkPoint.transform.position.XY();
+        Vector2 screenBuffer = new Vector2(0.3f, 0.3f);
+        CameraController mainCameraController = GameManager.Instance.MainCameraController;
+        Vector2 minPos = CameraController.CameraToWorld(screenBuffer.x, screenBuffer.y);
+        Vector2 maxPos = CameraController.CameraToWorld(1f - screenBuffer.x, 1f - screenBuffer.y);
+        Vector2 deltaPos = maxPos - minPos;
+        mainCameraController.SetManualControl(true);
+        if (new Rect(minPos.x, minPos.y, deltaPos.x, deltaPos.y).Contains(talkPos))
+        {
+          mainCameraController.OverridePosition = mainCameraController.transform.position;
+        }
+        else
+        {
+          Vector2 nearestPos = BraveMathCollege.ClosestPointOnRectangle(talkPos, minPos, maxPos - minPos);
+          mainCameraController.OverridePosition = mainCameraController.transform.position + (Vector3)(talkPos - nearestPos);
+        }
+    }
+
+    private void UnlockCamera()
+    {
         GameManager.Instance.MainCameraController.SetManualControl(false, true);
-    }
-
-    public void AppearInAPuffOfSmoke()
-    {
-      GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
-      tk2dBaseSprite sprite = gameObject2.GetComponent<tk2dBaseSprite>();
-      sprite.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), Anchor.MiddleCenter);
-      sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
-      sprite.HeightOffGround = 5f;
-      sprite.UpdateZDepth();
-    }
-
-    protected void VanishInAPuffOfSmoke()
-    {
-      GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
-      tk2dBaseSprite sprite = gameObject2.GetComponent<tk2dBaseSprite>();
-      sprite.PlaceAtPositionByAnchor(base.sprite.WorldCenter.ToVector3ZUp(0f), Anchor.MiddleCenter);
-      sprite.transform.position = sprite.transform.position.Quantize(0.0625f);
-      sprite.HeightOffGround = 5f;
-      sprite.UpdateZDepth();
-      this.transform.position.GetAbsoluteRoom().DeregisterInteractable(this);
-      UnityEngine.Object.Destroy(base.gameObject);
     }
 
     public void Interact(PlayerController interactor)
@@ -192,6 +225,16 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         if (!(CanBeginConversation()))
             return;
         base.StartCoroutine(this.HandleConversation(interactor));
+    }
+
+    protected PlayerController Interactor()
+    {
+      return this.m_interactor;
+    }
+
+    protected void Reset()
+    {
+      SetAnimation("idle");
     }
 
     protected void ShowText(string convoLine, float autoContinueTimer = -1f)
@@ -255,11 +298,13 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
 
     public Coroutine Converse(string dialogueLine, string talkAnimation = null, string pauseAnimation = null, string audioEvent =  null)
     {
-        return StartCoroutine(Dialogue(new(){dialogueLine}, talkAnimation, pauseAnimation, audioEvent));
+        return StartCoroutine(Dialogue([dialogueLine], talkAnimation, pauseAnimation, audioEvent));
     }
 
     public IEnumerator Dialogue(List<string> dialogue, string talkAnimation = null, string pauseAnimation = null, string audioEvent =  null)
     {
+        if (string.IsNullOrEmpty(audioEvent))
+          audioEvent = defaultAudioEvent; // singular defaultAudioEvent has precedence over defaultAudioEvents list
         for (int ci = 0; ci < dialogue.Count; ++ci)
         {
             TextBoxManager.ClearTextBox(this.talkPoint);
@@ -270,14 +315,25 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
             this.ShowText(dialogue[ci]);
             float timer = 0;
             bool playingTalkingAnimation = true;
-            if (!string.IsNullOrEmpty(audioEvent))
-                base.gameObject.PlayUnique(audioEvent);
-            else if (!string.IsNullOrEmpty(defaultAudioEvent))
-                base.gameObject.PlayUnique(defaultAudioEvent);
+            string lastFrameAudioEvent = string.Empty;
             while (!BraveInput.GetInstanceForPlayer(this.m_interactor.PlayerIDX).ActiveActions.GetActionFromType(GungeonActions.GungeonActionType.Interact).WasPressed || timer < MIN_TEXTBOX_TIME)
             {
                 timer += BraveTime.DeltaTime;
                 bool npcIsTalking = TextBoxManager.TextBoxCanBeAdvanced(this.talkPoint);
+                string frameAudioEvent = audioEvent;
+                if (string.IsNullOrEmpty(frameAudioEvent) && defaultAudioEvents.Count > 0)
+                  frameAudioEvent = defaultAudioEvents.ChooseRandom();
+                if (npcIsTalking && !string.IsNullOrEmpty(frameAudioEvent))
+                {
+                  if (base.gameObject.PlayUnique(frameAudioEvent, soundRate: voiceRate)) // returns true only if it actually plays
+                  {
+                    if (!string.IsNullOrEmpty(lastFrameAudioEvent) && lastFrameAudioEvent != frameAudioEvent)
+                     base.gameObject.Stop(lastFrameAudioEvent);
+                    lastFrameAudioEvent = frameAudioEvent;
+                  }
+                }
+                if (!npcIsTalking && !string.IsNullOrEmpty(lastFrameAudioEvent))
+                  base.gameObject.Stop(lastFrameAudioEvent);
                 if (playingTalkingAnimation && timer >= MIN_ANIMATION_TIME && !npcIsTalking)
                 {
                     playingTalkingAnimation = false;

@@ -138,6 +138,7 @@
     <Compile Include="src\Cwaff-NPCs\Kevlar.cs"/>
     <Compile Include="src\Cwaff-NPCs\Cammy.cs"/>
     <Compile Include="src\Cwaff-NPCs\Bart.cs"/>
+    <Compile Include="src\Cwaff-NPCs\Don.cs"/>
     <Compile Include="src\Common.cs"/>
     <Compile Include="src\Cwaff-Actives\TradingGuide.cs"/>
     <Compile Include="src\Cwaff-Actives\PogoStick.cs"/>

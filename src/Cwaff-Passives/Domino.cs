@@ -471,6 +471,7 @@ public class PizzaTimeController : MonoBehaviour
     internal const int _INDICATOR_THRESHOLD = 6;
 
     internal static bool _PizzaTimeHappening = false;
+    internal static bool _PizzaTimeTriedToSpawnThisFloor = false;
     internal static bool _PizzaTimeAttemptedThisFloor = false;
     internal static Gun _ExtantGun = null;
     internal static PlayerController _DeliveryBoi = null;
@@ -492,7 +493,7 @@ public class PizzaTimeController : MonoBehaviour
 
     internal static void MaybeSpawnPizzaAtExit(PlayerController player, RoomHandler oldRoom, RoomHandler newRoom)
     {
-        if (_PizzaTimeHappening || _PizzaTimeAttemptedThisFloor || GameManager.Instance.IsLoadingLevel)
+        if (_PizzaTimeHappening || _PizzaTimeTriedToSpawnThisFloor || GameManager.Instance.IsLoadingLevel)
             return;
         if (!CanStartPizzaTime(player))
         {
@@ -500,7 +501,7 @@ public class PizzaTimeController : MonoBehaviour
             return;
         }
         // Lazy.DebugLog($"enabling pizza time event!");
-        _PizzaTimeAttemptedThisFloor = true;
+        _PizzaTimeTriedToSpawnThisFloor = true;
         if (_ElevatorRoom == null)
         {
             // Lazy.DebugLog($"...if we had an elevator room");
@@ -672,6 +673,7 @@ public class PizzaTimeController : MonoBehaviour
         _CurDeliveries = 0;
         _MaxDeliveries = 0;
         _ScannedRoomsThisFloor = false;
+        _PizzaTimeTriedToSpawnThisFloor = false;
         _PizzaTimeAttemptedThisFloor = false;
         _ElevatorRoom = null;
         _StartRoom = null;
@@ -709,8 +711,10 @@ public class PizzaTimeController : MonoBehaviour
         _ScannedRoomsThisFloor = true;
     }
 
-    private static bool AnyRoomsStillOccupied()
+    internal static bool AnyRoomsStillOccupied()
     {
+        if (!_ScannedRoomsThisFloor)
+            ScanRooms();
         int nRooms = _OccupiedRooms.Count;
         for (int i = 0; i < nRooms; ++i)
         {
@@ -748,6 +752,7 @@ public class PizzaTimeController : MonoBehaviour
         _Instance = new GameObject().AddComponent<PizzaTimeController>();
         _Instance.gameObject.Play("pizza_event_start_sound");
         _PizzaTimeHappening = true; // prevent player from teleporting and some other stuff
+        _PizzaTimeAttemptedThisFloor = true;
         _DeliveryBoi = deliveryboi;
         _DeliveryBoi.OverrideHat(CwaffHats._PizzaHat, doPoof: true);
         SpawnHungryBulletKins(); // add bullet kin to a bunch of rooms
