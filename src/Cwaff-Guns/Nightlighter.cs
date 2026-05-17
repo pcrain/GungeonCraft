@@ -1,12 +1,10 @@
 namespace CwaffingTheGungy;
 
-using static CwaffingTheGungy.RopeSim; // StretchPolicy
-
 public class Nightlighter : CwaffGun
 {
     public static string ItemName         = "Nightlighter";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "Energy Efficient";
+    public static string LongDescription  = "Fires strings of lights that entangle enemies and weigh them down. Up to 16 strings can be attached to an enemy, with each string reducing an enemy's speed by 10%.";
     public static string Lore             = "TBD";
 
     internal static tk2dSpriteAnimationClip _LightString = null;
@@ -14,12 +12,15 @@ public class Nightlighter : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Nightlighter>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 1.5f, ammo: 200, shootFps: 14, smoothReload: 0.1f,
-            fireAudio: "chain_launch_sound")
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 1.5f, ammo: 300, shootFps: 14, smoothReload: 0.1f,
+            fireAudio: "nightlighter_fire_sound")
+          .SetReloadAudio("bulb_unscrew_sound_2", 0, 2)
+          .SetReloadAudio("bulb_replace_sound", 4)
+          .SetReloadAudio("bulb_unscrew_sound_2", 8, 10)
           .AssignGun(out Gun gun)
           .LoopAnimation(gun.emptyAnimation, 7)
           .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, invisibleProjectile: true,
-            damage: 10.0f, speed: 75f, range: 30f, force: 12f, pierceBreakables: true, hitSound: "chain_impact_sound_b", customClip: true))
+            damage: 11.0f, speed: 75f, range: 30f, force: 12f, hitSound: "nightlighter_impact_sound", customClip: true))
           .Attach<LightStringDoer>();
 
         _LightString = VFX.Create("nightlighter_light_string", fps: 12).DefaultAnimation();
@@ -53,10 +54,9 @@ public class LightStringDoer : MonoBehaviour
 
 public class LightString : MonoBehaviour
 {
-    private const int SEGMENTS         = 40;
-    private const float SEGLENGTH      = 0.25f;
-    private const float ROPELENGTH     = SEGMENTS * SEGLENGTH;
-    private const float SQR_ROPELENGTH = ROPELENGTH * ROPELENGTH;
+    private const int SEGMENTS         = 20;
+    private const int _MAX_ATTACHMENTS = 16; // max number of strings attached to a single enemy
+    private const float _SPEED_MULT_PER_CHAIN = 0.8f;
 
     private PlayerController _owner = null;
     private Nightlighter _gun = null;
@@ -64,6 +64,7 @@ public class LightString : MonoBehaviour
     private AIActor _enemy = null;
     private SpeculativeRigidbody _enemyBody = null;
     private CwaffRopeMesh _mesh = null;
+    private Vector2 _endTransformOffset = default;
     private bool _connectedToGun = false;
     private bool _connectedToProjectile = false;
     private bool _connectedToEnemy = false;
@@ -72,6 +73,7 @@ public class LightString : MonoBehaviour
     private bool _active = false;
 
     private static List<LightString> _ExtantChainsOnFloor = new();
+    private static ListDictionary _Attachments = new();
 
     private void Start()
     {
@@ -98,10 +100,9 @@ public class LightString : MonoBehaviour
       this._connectedToGun        = gun != null;
       Vector2 endPos              = gun ? gun.gun.barrelOffset.transform.position : proj.SafeCenter;
       this._mesh                  = CwaffRopeMesh.Create(
-        animation: Nightlighter._LightString, startPos: endPos, endPos: endPos, numSegments: SEGMENTS, segLength: SEGLENGTH,
-        stretchPolicy: StretchPolicy.GROWTEMPORARY);
+        animation: Nightlighter._LightString, startPos: endPos, endPos: endPos, numSegments: SEGMENTS,
+        stretchPolicy: CwaffingTheGungy.RopeSim.StretchPolicy.GROWPERMANENT);
       this._mesh.sprite.HeightOffGround = -10f; // draw behind most things
-      // this._mesh.sprite.SetGlowiness(1f/*, glowColorPower: 1.55f*/);
       this._active                = true;
       this._setup                 = true;
     }
@@ -117,9 +118,9 @@ public class LightString : MonoBehaviour
     private void OnHitEnemy(Projectile projectile, SpeculativeRigidbody rigidbody, bool arg3)
     {
         projectile.OnHitEnemy -= this.OnHitEnemy;
-        if (!this || this._connectedToEnemy || !rigidbody)
+        if (!this || this._connectedToEnemy || !rigidbody || !rigidbody.aiActor)
           return;
-        if (this._gun && this._connectedToGun && rigidbody.aiActor && TryChainLinkEnemy(rigidbody.aiActor))
+        if (TryChainLinkEnemy(rigidbody.aiActor))
           projectile.DieInAir();
     }
 
@@ -131,13 +132,32 @@ public class LightString : MonoBehaviour
         return false;
       this._connectedToProjectile = false;
       this._projectile = null;
+      this._connectedToGun = false;
+      this._gun = null;
 
       this._connectedToEnemy = true;
       this._enemy = enemy;
       this._enemyBody = body;
-      this._mesh.endPos = enemy.CenterPosition;
-      base.gameObject.Play("chain_shackle_sound"); // TODO: use different sound
+      this._enemyBody.OnPreMovement += this.ChainDown;
+      if (!_Attachments.TryGetValue(enemy, out List<LightString> attachments))
+        _Attachments[enemy] = attachments = new();
+      if (attachments.Count >= _MAX_ATTACHMENTS)
+        attachments.ChooseRandom().Disconnect();
+      attachments.Add(this);
+
+      Vector3 spriteSize = this._enemy.sprite.GetBounds().size;
+          float randomXOffset = 0.25f * spriteSize.x * UnityEngine.Random.value * BraveUtility.RandomSign();
+          float randomYOffset = 0.25f * spriteSize.y * UnityEngine.Random.value * BraveUtility.RandomSign();
+      this._endTransformOffset += new Vector2(randomXOffset, randomYOffset);
+
+      this._mesh.endPos = enemy.CenterPosition + this._endTransformOffset;
+      base.gameObject.Play("light_string_attach_sound");
       return true;
+    }
+
+    private void ChainDown(SpeculativeRigidbody rigidbody)
+    {
+        rigidbody.Velocity *= _SPEED_MULT_PER_CHAIN;
     }
 
     private void LateUpdate()
@@ -181,7 +201,7 @@ public class LightString : MonoBehaviour
         Disconnect();
         return;
       }
-      if (this._connectedToEnemy && (!this._enemy || !this._enemyBody || (this._enemy.healthHaver is HealthHaver hh && hh.IsDead)))
+      if (this._connectedToEnemy && (!this._enemy || !this._enemyBody || !this._enemyBody.enabled || this._enemy.IsGone || (this._enemy.healthHaver is HealthHaver hh && hh.IsDead)))
       {
         Disconnect();
         return;
@@ -199,7 +219,7 @@ public class LightString : MonoBehaviour
       }
 
       // if we have no projectile and we have nothing else to connect to, we're done
-      if (!this._gun || !this._enemy || !this._enemyBody)
+      if (!this._enemy || !this._enemyBody)
       {
           Disconnect(); // nothing else to do
           return;
@@ -210,20 +230,27 @@ public class LightString : MonoBehaviour
       Vector2 targetPos = (currentInput == null || this._owner.IsKeyboardAndMouse())
         ? this._owner.unadjustedAimPoint.XY()
         : this._owner.CenterPosition + 20f * currentInput.ActiveActions.Aim.Vector;
-      this._mesh.endPos = this._enemyBody.UnitCenter;
+      this._mesh.endPos = this._enemyBody.UnitCenter + this._endTransformOffset;
     }
 
-    internal void Disconnect(bool manual = false)
+    internal void Disconnect(bool forDestroy = false)
     {
       DeregisterEvents();
+      if (this._connectedToEnemy && _Attachments.TryGetValue(this._enemy, out List<LightString> attachments))
+      {
+        attachments.TryRemove(this);
+        if (attachments.Count == 0)
+          _Attachments.Remove(this._enemy);
+      }
+      if (this._enemyBody)
+        this._enemyBody.OnPreMovement -= this.ChainDown;
       this._connectedToEnemy      = false;
       this._enemy                 = null;
       this._gun                   = null;
       this._connectedToGun        = false;
       this._projectile            = null;
       this._connectedToProjectile = false;
-      // base.gameObject.Play("chain_snap_sound"); // TODO: different sound
-      if (this._mesh)
+      if (!forDestroy && this._mesh)
         this._mesh.LockWhenStationary(keepAnimating: true); // prevent the chain from updating once it stops moving around much
       this._active = false;
     }
@@ -236,7 +263,7 @@ public class LightString : MonoBehaviour
 
     private void OnDestroy()
     {
-      DeregisterEvents();
+      Disconnect(forDestroy: true);
       if (this._mesh)
         UnityEngine.Object.Destroy(this._mesh.gameObject);
     }

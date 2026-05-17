@@ -53,6 +53,8 @@ public class CwaffBone
 /// <summary>Class for managing a list of bones and the relevant sprites.</summary>
 public class CwaffBoneManager : BraveBehaviour
 {
+  private const int _SUBTILE_PIXEL_LENGTH = 4; // each subtile is 4 pixels long
+
   private LinkedList<CwaffBone> _bones = new LinkedList<CwaffBone>();
   private tk2dTiledSprite _sprite = null;
   private int _spriteSubtileWidth;
@@ -149,6 +151,30 @@ public class CwaffBoneManager : BraveBehaviour
     return _bones.Count;
   }
 
+  //TODO: use for other meshes besides CwaffRopeMesh
+  public void ReplaceBones(List<Vector2> points)
+  {
+    int nbones = this._bones.Count;
+    int npoints = points.Count;
+    LinkedListNode<CwaffBone> nextBone = this._bones.First;
+    for (int i = 0; i < points.Count; ++i)
+    {
+      if (nextBone == null)
+      {
+        _bones.AddLast(CwaffBone.Rent(points[i]));
+        continue;
+      }
+      nextBone.Value.pos = points[i];
+      nextBone = nextBone.Next;
+    }
+    while (nbones-- > npoints)
+    {
+      nextBone = this._bones.Last;
+      this._bones.RemoveLast();
+      CwaffBone.Return(nextBone);
+    }
+  }
+
   public override void OnDestroy()
   {
     base.OnDestroy();
@@ -165,16 +191,26 @@ public class CwaffBoneManager : BraveBehaviour
   private void SetTiledSpriteGeom(Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
   {
     int spritePixelLength = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
-    int numSubtilesInSprite = spritePixelLength / 4;
+    int numSubtilesInSprite = spritePixelLength / _SUBTILE_PIXEL_LENGTH;
     int lastBoneIndex = Mathf.Max(_bones.Count - 1, 0);
     int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
     boundsCenter = 0.5f * (_maxBonePosition + _minBonePosition);
     boundsExtents = 0.5f * (_maxBonePosition - _minBonePosition);
-    LinkedListNode<CwaffBone> bone = _bones.First;
-    int verticesDrawn = 0;
     int animationFrame = Mathf.FloorToInt(Mathf.Repeat(_globalTimer * _animation.fps, _animation.frames.Length));
     tk2dSpriteAnimationFrame frame = _animation.frames[animationFrame];
     tk2dSpriteDefinition segmentSprite = frame.spriteCollection.spriteDefinitions[frame.spriteId];
+    // precompute some common variables
+    float ssy0 = segmentSprite.position0.y;
+    float ssy1 = segmentSprite.position1.y;
+    float ssy2 = segmentSprite.position2.y;
+    float ssy3 = segmentSprite.position3.y;
+    Vector2 ssuv0 = segmentSprite.uvs[0];
+    Vector2 ssuv1 = segmentSprite.uvs[1];
+    Vector2 ssuv2 = segmentSprite.uvs[2];
+    Vector2 ssuv3 = segmentSprite.uvs[3];
+    // handle actual vertex updating logic
+    int uvCurrent = offset;
+    LinkedListNode<CwaffBone> bone = _bones.First;
     for (int i = 0; i < totalSpritesToDraw; i++)
     {
       int lastSubtileIndex = numSubtilesInSprite - 1;
@@ -188,19 +224,16 @@ public class CwaffBoneManager : BraveBehaviour
         CwaffBone nextBone = bone.Next.Value;
         if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex)
           fractionOfSubtileToDraw = Vector2.Distance(nextBone.pos, curBone.pos);
-        int uvCurrent = offset + verticesDrawn;
-        pos[uvCurrent++] = (curBone.pos  + curBone.normal  * segmentSprite.position0.y - _minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (nextBone.pos + nextBone.normal * segmentSprite.position1.y - _minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (curBone.pos  + curBone.normal  * segmentSprite.position2.y - _minBonePosition).ToVector3ZUp(0f);
-        pos[uvCurrent++] = (nextBone.pos + nextBone.normal * segmentSprite.position3.y - _minBonePosition).ToVector3ZUp(0f);
-        Vector2 minUV = Vector2.Lerp(segmentSprite.uvs[0], segmentSprite.uvs[1], numSpritesDrawn);
-        Vector2 maxUV = Vector2.Lerp(segmentSprite.uvs[2], segmentSprite.uvs[3], numSpritesDrawn + fractionOfSubtileToDraw / numSubtilesInSprite);
-        uvCurrent = offset + verticesDrawn;
+        Vector2 minUV = Vector2.Lerp(ssuv0, ssuv1, numSpritesDrawn);
+        Vector2 maxUV = Vector2.Lerp(ssuv2, ssuv3, numSpritesDrawn + fractionOfSubtileToDraw / numSubtilesInSprite);
+        pos[uvCurrent] = (curBone.pos  + curBone.normal  * ssy0 - _minBonePosition).ToVector3ZUp(0f);
         uv[uvCurrent++] = minUV;
+        pos[uvCurrent] = (nextBone.pos + nextBone.normal * ssy1 - _minBonePosition).ToVector3ZUp(0f);
         uv[uvCurrent++] = new Vector2(maxUV.x, minUV.y);
+        pos[uvCurrent] = (curBone.pos  + curBone.normal  * ssy2 - _minBonePosition).ToVector3ZUp(0f);
         uv[uvCurrent++] = new Vector2(minUV.x, maxUV.y);
+        pos[uvCurrent] = (nextBone.pos + nextBone.normal * ssy3 - _minBonePosition).ToVector3ZUp(0f);
         uv[uvCurrent++] = maxUV;
-        verticesDrawn += 4;
         numSpritesDrawn += fractionOfSubtileToDraw / _spriteSubtileWidth;
         bone = bone.Next;
       }
@@ -210,7 +243,7 @@ public class CwaffBoneManager : BraveBehaviour
   public void SetStartAnimatedTiledSpriteGeom(Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
   {
     int spritePixelLength = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
-    int numSubtilesInSprite = spritePixelLength / 4;
+    int numSubtilesInSprite = spritePixelLength / _SUBTILE_PIXEL_LENGTH;
     int lastBoneIndex = Mathf.Max(_bones.Count - 1, 0);
     int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
     boundsCenter = 0.5f * (_minBonePosition + _maxBonePosition);

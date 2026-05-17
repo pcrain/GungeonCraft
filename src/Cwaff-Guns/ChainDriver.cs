@@ -1,7 +1,5 @@
 namespace CwaffingTheGungy;
 
-using static CwaffingTheGungy.RopeSim; // StretchPolicy
-
 public class ChainDriver : CwaffGun
 {
     public static string ItemName         = "Chain Driver";
@@ -144,9 +142,6 @@ public class ChainLinkDoer : MonoBehaviour
 public class ChainkLink : MonoBehaviour
 {
     private const int SEGMENTS         = 40;
-    private const float SEGLENGTH      = 0.25f;
-    private const float ROPELENGTH     = SEGMENTS * SEGLENGTH;
-    private const float SQR_ROPELENGTH = ROPELENGTH * ROPELENGTH;
 
     private PlayerController _owner = null;
     private ChainDriver _gun = null;
@@ -199,8 +194,8 @@ public class ChainkLink : MonoBehaviour
       this._connectedToGun        = gun != null;
       Vector2 endPos              = gun ? gun.gun.barrelOffset.transform.position : proj.SafeCenter;
       this._mesh                  = CwaffRopeMesh.Create(
-        animation: ChainDriver._ChainLink, startPos: endPos, endPos: endPos, numSegments: SEGMENTS, segLength: SEGLENGTH,
-        stretchPolicy: StretchPolicy.GROWTEMPORARY);
+        animation: ChainDriver._ChainLink, startPos: endPos, endPos: endPos, numSegments: SEGMENTS,
+        stretchPolicy: CwaffingTheGungy.RopeSim.StretchPolicy.GROWTEMPORARY);
       this._mesh.sprite.HeightOffGround = -10f; // draw behind most things
       this._active                = true;
       this._setup                 = true;

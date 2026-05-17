@@ -6,6 +6,7 @@ using static CwaffingTheGungy.RopeSim; // StretchPolicy
 public class CwaffRopeMesh : MonoBehaviour
 {
   private const float UPDATE_RATE = 1.0f / 60.0f; // seconds between rope updates (needs to be fixed due to verlet integration)
+  private const float SEGLENGTH   = 0.25f; // should always be 1/4 since sprites are divided into 4 subtiles
 
   public tk2dSpriteAnimationClip animation;
   public Vector2 startPos;
@@ -24,7 +25,7 @@ public class CwaffRopeMesh : MonoBehaviour
   private float _lockThreshold; // if > 0, locks the rope once it's stopped moving
   private CwaffBoneManager _boneManager;
 
-  public static CwaffRopeMesh Create(tk2dSpriteAnimationClip animation, Vector2 startPos, Vector2 endPos, int numSegments, float segLength,
+  public static CwaffRopeMesh Create(tk2dSpriteAnimationClip animation, Vector2 startPos, Vector2 endPos, int numSegments,
     string name = null, StretchPolicy stretchPolicy = StretchPolicy.STRETCH)
   {
       CwaffRopeMesh mesh   = new GameObject(name ?? "new CwaffRopeMesh", typeof(CwaffRopeMesh)).GetComponent<CwaffRopeMesh>();
@@ -32,7 +33,7 @@ public class CwaffRopeMesh : MonoBehaviour
       mesh.startPos        = startPos;
       mesh.endPos          = endPos;
       mesh.sprite          = mesh.GetOrAddComponent<tk2dTiledSprite>();
-      mesh._segLength      = segLength;
+      mesh._segLength      = SEGLENGTH;
       mesh._ropePrevPoints = new();
       mesh._ropePoints     = new();
       mesh._stretchPolicy  = stretchPolicy;
@@ -43,7 +44,7 @@ public class CwaffRopeMesh : MonoBehaviour
         mesh._ropePrevPoints.Add(startPos + i * delta);
         mesh._ropePoints.Add(startPos + i * delta);
       }
-      mesh._softMaxRopeLength = segLength * numSegments;
+      mesh._softMaxRopeLength = SEGLENGTH * numSegments;
       mesh.locked = false;
       mesh.animateWhileLocked = false;
       mesh._lockThreshold = 0f;
@@ -87,7 +88,6 @@ public class CwaffRopeMesh : MonoBehaviour
 
   private void UpdateRope()
   {
-    this._boneManager.ReturnAllBones();
     Vector2 curStartPos = this.startPos;
     Vector2 curEndPos = this.endPos;
     switch (this._stretchPolicy)
@@ -139,8 +139,9 @@ public class CwaffRopeMesh : MonoBehaviour
     }
     RopeSim.SimulateRope(curStartPos, curEndPos, this._ropePoints, this._ropePrevPoints,
       minSegLength: this._segLength, maxSegLength: this._segLength, updateRate: UPDATE_RATE);
-    for (int j = 0; j < this._ropePoints.Count; j++)
-      this._boneManager.RentBone(this._ropePoints[j]);
+    // for (int j = 0; j < this._ropePoints.Count; j++)
+    //   this._boneManager.RentBone(this._ropePoints[j]);
+    this._boneManager.ReplaceBones(this._ropePoints);
     if (this._lockThreshold > 0f)
     {
       float maxMovement = 0.0f;
@@ -187,6 +188,8 @@ public static class RopeSim
         float _damping      = damping ?? DEFAULT_DAMPING;
         Vector2 _gravity    = gravity ?? DEFAULT_GRAVITY;
         float maxRopeLength = maxSegLength * (count - 1);
+        float maxSegLengthSqr = maxSegLength * maxSegLength;
+        float minSegLengthSqr = minSegLength * minSegLength;
 
         // do verlet integration
         Vector2 sqrdtgrav = _gravity * dt * dt;
@@ -202,26 +205,33 @@ public static class RopeSim
         points[count - 1] = prevPoints[count - 1] = end;
 
         // constraint solve
+        float d, d2, correctionAmount;
         for (int it = 0; it < _verletIters; it++)
         {
             float maxAdjust = 0f;
             for (int i = 0; i < count - 1; i++)
             {
                 Vector2 delta = points[i + 1] - points[i];
-                float d = delta.magnitude;
-                if (d == 0f)
+                d2 = delta.x * delta.x + delta.y * delta.y;
+                if (d2 == 0f)
                     continue;
 
-                Vector2 dir = delta / d;
-                float correctionAmount = 0f;
-                if (d > maxSegLength)
+                if (d2 > maxSegLengthSqr)
+                {
+                    d = Mathf.Sqrt(d2);
                     correctionAmount = d - maxSegLength; // too long -> pull together
-                else if (d < minSegLength)
+                }
+                else if (d2 < minSegLengthSqr)
+                {
+                    d = Mathf.Sqrt(d2);
                     correctionAmount = d - minSegLength; // too short -> push apart
+                }
                 else
                     continue; // already within bounds
 
-                maxAdjust = Mathf.Max(maxAdjust, correctionAmount);
+                Vector2 dir = delta / d;
+                if (maxAdjust < correctionAmount)
+                  maxAdjust = correctionAmount;
                 if (i == 0)
                     points[i + 1] -= dir * correctionAmount; // start fixed
                 else if (i + 1 == count - 1)
@@ -234,10 +244,7 @@ public static class RopeSim
                 }
             }
             if (maxAdjust < VERLET_THRESHOLD)
-            {
-              // Lazy.DebugConsoleLog($"early verlet finish after {it} iters");
               break; // early break if few adjustments needed to be made
-            }
         }
 
         return points;
