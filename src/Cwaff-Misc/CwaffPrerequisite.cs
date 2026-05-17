@@ -7,6 +7,8 @@ public enum CwaffPrerequisites
   COMPANION_SHOP_PREREQUISITE,
   BARTER_SHOP_PREREQUISITE,
   NOT_COOP_MODE_PREREQUISITE,
+  HAVE_DOMINO,
+  NO_DOMINO,
   TEST_PREREQUISITE,
 }
 
@@ -101,6 +103,16 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
   {
       string levelBeingLoaded = GameManager.Instance.GetLastLoadedLevelDefinition().dungeonSceneName;
       return levelBeingLoaded == "tt_mines";
+  }
+
+  public static bool HaveDomino(SpawnConditions conds)
+  {
+      return GameManager.Instance.AnyPlayerHasPickupID(Lazy.PickupId<Domino>());
+  }
+
+  public static bool NoHaveDomino(SpawnConditions conds)
+  {
+      return !GameManager.Instance.AnyPlayerHasPickupID(Lazy.PickupId<Domino>());
   }
 
   // Prerequisite tracker to be attached to game objects to count how many times they've spawned in a run, etc.

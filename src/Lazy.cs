@@ -1605,12 +1605,14 @@ public static class Lazy
   }
   #endif
 
-  public static IntVector2? RandomCellForEnemySpawn(this AIActor enemyPrefab, RoomHandler room, IntVector2? targetCenter = null)
+  public static IntVector2? RandomCellForEnemySpawn(this AIActor enemyPrefab, RoomHandler room, IntVector2? targetCenter = null, int? overrideClearance = null)
   {
+      int xClearance = overrideClearance ?? enemyPrefab.Clearance.x;
+      int yClearance = overrideClearance ?? enemyPrefab.Clearance.y;
       Pathfinding.CellValidator cellValidator = (IntVector2 c) => {
-        for (int k = 0; k < enemyPrefab.Clearance.x; k++)
+        for (int k = 0; k < xClearance; k++)
         {
-          for (int l = 0; l < enemyPrefab.Clearance.y; l++)
+          for (int l = 0; l < yClearance; l++)
           {
             if (GameManager.Instance.Dungeon.data.isTopWall(c.x + k, c.y + l))
               return false;
@@ -1624,7 +1626,8 @@ public static class Lazy
         }
         return true;
       };
-      return room.GetRandomAvailableCell(enemyPrefab.Clearance, enemyPrefab.PathableTiles, canPassOccupied: false, cellValidator);
+      return room.GetRandomAvailableCell(
+        new IntVector2(xClearance, yClearance), enemyPrefab.PathableTiles, canPassOccupied: false, cellValidator);
   }
 
   public static DirectionalAnimation.DirectionType AutoDetectDirectionFromSpriteName(string name)

@@ -3,12 +3,18 @@
 ## 1.31.0 (TBD)
 
 - Synchronized [REDACTED]'s and [REDACTED]'s speech audio to match their dialogue better
-- Overhauled Pizza minigame
+- Added new NPC: Don
+	- Don has a 6% chance of spawning in his pizza kitchen at some point during any run
+	- Talking with Don now triggers the pizza minigame formerly handled by the Domino item
+- Reworked Domino: now guarantees Don's pizza kitchen will spawn on every subsequent main floor
+- Overhauled pizza minigame
 	- Hungry Bullet Kin can no longer receive knockback
 	- Fixed bug with chest rewards being granted when delivering under 50% of pizzas
-	- Fixed Shmuppies being able to spawn during Pizza minigame
+	- Fixed Shmuppies being able to spawn during pizza minigame
+	- Added failsafe ending the pizza minigame if the player ever takes damage
+	- All Bullet Kin are despawned at the end of the pizza minigame, rather than just the ones without pizza
 	- Adjusted Bullet Kin placement to better avoid being hidden by walls
-	- Fixed chest rewards from Pizza minigame being a tier higher than what was written on the delivery summary note
+	- Chest rewards from the pizza minigame now spawn unlocked
 
 ## 1.30.1 (2026-05-14)
 

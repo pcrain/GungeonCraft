@@ -28,6 +28,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     public string defaultTalkAnimation = null;
     public string defaultPauseAnimation = null;
     public float voiceRate = 0.25f;
+    public bool alwaysReturnToIdle = true;
     public GameObject mapIcon = null;
 
     protected bool canInteract;
@@ -48,7 +49,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
     // minimum amount of time to show textboxes during interactive dialogue
     protected const float MIN_TEXTBOX_TIME = 0.2f;
     // minimum amount of time to play talking animation assuming instant text is enabled
-    protected const float MIN_ANIMATION_TIME = 1.0f;
+    protected const float MIN_ANIMATION_TIME = 0.5f;
 
     public static GameObject Setup<T>(string name, List<string> animNames, Vector3? talkPointAdjust = null)
         where T : FancyNPC
@@ -115,6 +116,11 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
         return npcObj;
     }
 
+    public void SetAnimationFPS(string animationName, float fps)
+    {
+      base.spriteAnimator.GetClipByName(animationName).fps = fps;
+    }
+
     protected virtual void Start()
     {
         Setup();
@@ -153,8 +159,8 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
 
     protected bool CanBeginConversation()
     {
-        if (TextBoxManager.HasTextBox(this.talkPoint))
-            return false;
+        // if (TextBoxManager.HasTextBox(this.talkPoint))
+        //     return false; // NOTE: commented out to allow conversation with transient textboxes active
         if (this.m_interactor != null)
             return false;
         if (!this.canInteract)
@@ -286,7 +292,7 @@ public class FancyNPC : BraveBehaviour, IPlayerInteractable
             yield return script.Current;
 
         // Tear down input overrides and letterboxing
-        if (!this.existingNpc)
+        if (!this.existingNpc && this.alwaysReturnToIdle)
             base.aiAnimator.PlayUntilCancelled("idler");
         EndConversation();
     }

@@ -10,6 +10,7 @@ public enum CustomTrackedStats
     ENCOUNTERED_SKEL,
     DEFEATED_SKEL,
     DIED_TO_SKEL,
+    ENCOUNTERED_DON,
 }
 
 internal static class CustomTrackedStatsExtensions
