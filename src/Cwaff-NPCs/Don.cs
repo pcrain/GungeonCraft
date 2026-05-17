@@ -20,6 +20,7 @@ public class Don : FancyNPC
     READY_FOR_PIZZA_TIME,     // all prerequisites for starting pizza event fulfilled
     ENEMIES_ON_FLOOR,         // can't start pizza event due to enemies being on floor
     INCAPABLE_OF_DELIVERY,    // can't start pizza event due to being gun locked / other reasons
+    COOP_MODE,                // can't start pizza event due to being in co-op mode
     NEED_FULL_MAP,            // can't start pizza event due to not having the floor fully mapped
     PIZZA_TIME_FAILED,        // pizza event happened this floor and was failed
     PIZZA_TIME_PARTIAL,       // pizza event happened this floor and was partially successful
@@ -140,6 +141,9 @@ public class Don : FancyNPC
 
   private State DetermineTalkingState(PlayerController interactor)
   {
+    if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
+      return State.COOP_MODE;
+
     bool firstEncounterEver = (int)CustomTrackedStats.ENCOUNTERED_DON.Get() == 0;
     bool firstEncounterThisRun = _EncountersThisRun == 0;
     bool firstEncounterThisFloor = !this._talked;
@@ -233,45 +237,6 @@ public class Don : FancyNPC
     yield break;
   }
 
-  private IEnumerator GiveInstructions()
-  {
-    while (true)
-    {
-      yield return Converse("Delivering pizzas is an art that takes a lifetime to master.", "talk", "gesture");
-      yield return Converse("First, the pizzas must be delivered fresh out of the oven.", "talk", "gesture");
-      yield return Converse("\"Thirty minutes or less\"?! Even five minutes is far too long!", "shout");
-      yield return Converse("Second, the pizzas must not be touched once they are baked.", "talk", "gesture");
-      yield return Converse("They must be gently scooped onto a peel and flung directly to the customer's hands.", "talk", "gesture");
-      yield return Converse("The only one handling the pizza after it's cooked must be the one eating it!", "talk", "gesture");
-      yield return Converse("Finally, pizza delivery is a sacred task. It must be performed without hesitation or distraction.", "talk", "gesture");
-      yield return Converse("One must know the delivery route. One must commit to the delivery route. And most importantly...", "talk", "gesture");
-      yield return Converse("...one must RETURN from the delivery route in a timely matter for equipment inspection and polishing.", "talk", "gesture");
-      yield return Converse("Did you get all that?", "idle");
-      yield return Prompt("One more time please.", "Understood!");
-      if (PromptResult() == 1)
-        break;
-    }
-
-    yield return PrepareForPizzaTime();
-
-    yield break;
-  }
-
-  private IEnumerator PrepareForPizzaTime()
-  {
-    PlayerController interactor = Interactor();
-    if (interactor.IsGunLocked)
-      yield return ScriptINCAPABLE_OF_DELIVERY();
-    else if (!GameManager.Instance.Dungeon.AllRoomsVisited)
-      yield return ScriptNEED_FULL_MAP();
-    else if (PizzaTimeController.CheckAnyRoomsStillOccupied()/* && !C.DEBUG_BUILD*/)
-      yield return ScriptENEMIES_ON_FLOOR();
-    else
-      yield return ScriptREADY_FOR_PIZZA_TIME();
-
-    yield break;
-  }
-
   private IEnumerator ScriptFIRST_MEETING_RUN()
   {
     yield return Converse("Oh, welcome back, mi slightly inept protege.", "idle");
@@ -339,6 +304,14 @@ public class Don : FancyNPC
     yield break;
   }
 
+  private IEnumerator ScriptCOOP_MODE()
+  {
+    yield return Converse("I'm not looking for multiple pizza deliverers right now." ,"idle");
+    yield return Converse("Come back once you're by yourself!" ,"talk", "gesture");
+    Reset();
+    yield break;
+  }
+
   private IEnumerator ScriptPIZZA_TIME_FAILED()
   {
     if (!this._didCheckin)
@@ -372,38 +345,6 @@ public class Don : FancyNPC
   private IEnumerator ScriptPIZZA_TIME_SUCCESS()
   {
     yield return BonusDialogue();
-    yield break;
-  }
-
-  private IEnumerator BonusDialogue()
-  {
-    int rng = UnityEngine.Random.Range(0, 3);
-
-    if (rng == 0)
-    {
-      yield return Converse("Sometimes I think the Gungeon may not have been the best place to open mi pizza kitchen.", "idle");
-      yield return Converse("But it was very affordable, and at the very least, it's much better than the last place I rented.", "idle");
-      yield return Converse("The owner was never there, the lighting was horrendous, and there were these scary animatronics that I swear moved around when you weren't looking.", "idle");
-      yield return Converse("Truly terrifying.", "cry");
-    }
-    else if (rng == 1)
-    {
-      yield return Converse("Anyone can come up with a pizza recipe, but do you know what the real secret ingredients are to a perfect pizza?", "talk", "gesture");
-      yield return Converse("Blood, sweat, and tears!", "shout");
-      yield return Converse("Specificially...", "idle");
-      yield return Converse("Three milliliters of blood in the pizza sauce from lightly knicking one's thumb slicing the tomatoes.", "talk", "gesture");
-      yield return Converse("Eight droplets of sweat to give the mozzarella that extra salty taste.", "talk", "gesture");
-      yield return Converse("And tears from 30 seconds of light sobbing to moisten the pizza dough to the perfect consistency.", "talk", "gesture");
-    }
-    else
-    {
-      yield return Converse("I have many a fond memory of workin in mi father Don's pizza kitchen as a child.", "idle");
-      yield return Converse("...huh? Yes, mi father was also named Don. As was his father, and HIS father, and HIS father.", "idle");
-      yield return Converse("We were a poor family you see. We could only afford one name.", "cry");
-    }
-
-    Reset();
-
     yield break;
   }
 
@@ -458,6 +399,48 @@ public class Don : FancyNPC
     yield break;
   }
 
+  private IEnumerator ScriptALL_DELIVERIES_FINISHED()
+  {
+    PizzaTimeController.EndPizzaTime();
+    yield return Converse("Wonderful, mi protege!", "celebrate");
+    yield return Converse("All of mi customers are satisfied.", "celebrate");
+    yield return Converse("I will sleep well tonight knowing all of mi customers have full bellies.", "celebrate");
+    yield return Converse("Take your daily wages and tips, plus this extra bonus as a personal token of thanks.", "celebrate");
+    PizzaTimeController.HandleDeliverySuccess();
+    yield return Converse("Until next time, mi protege.", "celebrate");
+    yield break;
+  }
+
+  private IEnumerator ScriptUNKNOWN()
+  {
+    yield return BonusDialogue();
+    yield break;
+  }
+
+  private IEnumerator GiveInstructions()
+  {
+    while (true)
+    {
+      yield return Converse("Delivering pizzas is an art that takes a lifetime to master.", "talk", "gesture");
+      yield return Converse("First, the pizzas must be delivered fresh out of the oven.", "talk", "gesture");
+      yield return Converse("\"Thirty minutes or less\"?! Even five minutes is far too long!", "shout");
+      yield return Converse("Second, the pizzas must not be touched once they are baked.", "talk", "gesture");
+      yield return Converse("They must be gently scooped onto a peel and flung directly to the customer's hands.", "talk", "gesture");
+      yield return Converse("The only one handling the pizza after it's cooked must be the one eating it!", "talk", "gesture");
+      yield return Converse("Finally, pizza delivery is a sacred task. It must be performed without hesitation or distraction.", "talk", "gesture");
+      yield return Converse("One must know the delivery route. One must commit to the delivery route. And most importantly...", "talk", "gesture");
+      yield return Converse("...one must RETURN from the delivery route in a timely matter for equipment inspection and polishing.", "talk", "gesture");
+      yield return Converse("Did you get all that?", "idle");
+      yield return Prompt("One more time please.", "Understood!");
+      if (PromptResult() == 1)
+        break;
+    }
+
+    yield return PrepareForPizzaTime();
+
+    yield break;
+  }
+
   private IEnumerator ReturnToPost()
   {
     PizzaTimeController.EndPizzaTime();
@@ -494,21 +477,50 @@ public class Don : FancyNPC
     yield break;
   }
 
-  private IEnumerator ScriptALL_DELIVERIES_FINISHED()
+  private IEnumerator PrepareForPizzaTime()
   {
-    PizzaTimeController.EndPizzaTime();
-    yield return Converse("Wonderful, mi protege!", "celebrate");
-    yield return Converse("All of mi customers are satisfied.", "celebrate");
-    yield return Converse("I will sleep well tonight knowing all of mi customers have full bellies.", "celebrate");
-    yield return Converse("Take your daily wages and tips, plus this extra bonus as a personal token of thanks.", "celebrate");
-    PizzaTimeController.HandleDeliverySuccess();
-    yield return Converse("Until next time, mi protege.", "celebrate");
+    PlayerController interactor = Interactor();
+    if (interactor.IsGunLocked)
+      yield return ScriptINCAPABLE_OF_DELIVERY();
+    else if (!GameManager.Instance.Dungeon.AllRoomsVisited)
+      yield return ScriptNEED_FULL_MAP();
+    else if (PizzaTimeController.CheckAnyRoomsStillOccupied()/* && !C.DEBUG_BUILD*/)
+      yield return ScriptENEMIES_ON_FLOOR();
+    else
+      yield return ScriptREADY_FOR_PIZZA_TIME();
+
     yield break;
   }
 
-  private IEnumerator ScriptUNKNOWN()
+  private IEnumerator BonusDialogue()
   {
-    yield return BonusDialogue();
+    int rng = UnityEngine.Random.Range(0, 3);
+
+    if (rng == 0)
+    {
+      yield return Converse("Sometimes I think the Gungeon may not have been the best place to open mi pizza kitchen.", "idle");
+      yield return Converse("But it was very affordable, and at the very least, it's much better than the last place I rented.", "idle");
+      yield return Converse("The owner was never there, the lighting was horrendous, and there were these scary animatronics that I swear moved around when you weren't looking.", "idle");
+      yield return Converse("Truly terrifying.", "cry");
+    }
+    else if (rng == 1)
+    {
+      yield return Converse("Anyone can come up with a pizza recipe, but do you know what the real secret ingredients are to a perfect pizza?", "talk", "gesture");
+      yield return Converse("Blood, sweat, and tears!", "shout");
+      yield return Converse("Specificially...", "idle");
+      yield return Converse("Three milliliters of blood in the pizza sauce from lightly knicking one's thumb slicing the tomatoes.", "talk", "gesture");
+      yield return Converse("Eight droplets of sweat to give the mozzarella that extra salty taste.", "talk", "gesture");
+      yield return Converse("And tears from 30 seconds of light sobbing to moisten the pizza dough to the perfect consistency.", "talk", "gesture");
+    }
+    else
+    {
+      yield return Converse("I have many a fond memory of workin in mi father Don's pizza kitchen as a child.", "idle");
+      yield return Converse("...huh? Yes, mi father was also named Don. As was his father, and HIS father, and HIS father.", "idle");
+      yield return Converse("We were a poor family you see. We could only afford one name.", "cry");
+    }
+
+    Reset();
+
     yield break;
   }
 
@@ -523,6 +535,7 @@ public class Don : FancyNPC
       State.ENEMIES_ON_FLOOR         => ScriptENEMIES_ON_FLOOR(),
       State.INCAPABLE_OF_DELIVERY    => ScriptINCAPABLE_OF_DELIVERY(),
       State.NEED_FULL_MAP            => ScriptNEED_FULL_MAP(),
+      State.COOP_MODE                => ScriptCOOP_MODE(),
       State.PIZZA_TIME_FAILED        => ScriptPIZZA_TIME_FAILED(),
       State.PIZZA_TIME_PARTIAL       => ScriptPIZZA_TIME_PARTIAL(),
       State.PIZZA_TIME_SUCCESS       => ScriptPIZZA_TIME_SUCCESS(),

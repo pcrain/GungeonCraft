@@ -107,12 +107,12 @@ public class CwaffPrerequisite : CustomDungeonPrerequisite
 
   public static bool HaveDomino(SpawnConditions conds)
   {
-      return GameManager.Instance.AnyPlayerHasPickupID(Lazy.PickupId<Domino>());
+      return GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER && GameManager.Instance.AnyPlayerHasPickupID(Lazy.PickupId<Domino>());
   }
 
   public static bool NoHaveDomino(SpawnConditions conds)
   {
-      return !GameManager.Instance.AnyPlayerHasPickupID(Lazy.PickupId<Domino>());
+      return GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER && !GameManager.Instance.AnyPlayerHasPickupID(Lazy.PickupId<Domino>());
   }
 
   // Prerequisite tracker to be attached to game objects to count how many times they've spawned in a run, etc.
