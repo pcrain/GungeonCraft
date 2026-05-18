@@ -309,6 +309,7 @@ public static class CwaffCompanionAndEnemyBuilder
           FortunesFavorVFX = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
 
         actor.SetupAmmonomiconEntry(shortDesc: shortDesc, longDesc: longDesc, EnemyName: enemyName);
+        Game.Enemies.Add(name, actor);
         return actor;
     }
 
