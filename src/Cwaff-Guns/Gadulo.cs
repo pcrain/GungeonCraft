@@ -67,6 +67,8 @@ public class Gadulo : CwaffGun
 
     private class GaduloDamageAdjuster : DamageAdjuster
     {
+        public override ApplyPriority Priority => ApplyPriority.Bottom; // this can 0 out damage, so give it minimum priority
+
         protected override float AdjustDamage(float currentDamage, Projectile proj, AIActor enemy)
           => (enemy.healthHaver is HealthHaver hh && hh.currentHealth <= currentDamage) ? currentDamage : 0f;
     }
