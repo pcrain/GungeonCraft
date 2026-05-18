@@ -5,23 +5,26 @@ public class Nightlighter : CwaffGun
     public static string ItemName         = "Nightlighter";
     public static string ShortDescription = "Energy Efficient";
     public static string LongDescription  = "Fires strings of lights that entangle enemies and weigh them down. Up to 16 strings can be attached to an enemy, with each string reducing an enemy's speed by 10%.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "The LED light string is an iconic staple of many a festivity and celebration. They're cheap, pretty, and easy to set up...at least the first time. When it comes time to tear them down, they have a propensity for magically tangling themselves up and becoming impossible to untangle the next time you want to use them. At least you can put this magical self-tangling to use in the Gungeon.";
 
     internal static tk2dSpriteAnimationClip _LightString = null;
+
+    internal static Projectile _NightlighterProjectile = null;
 
     public static void Init()
     {
         Lazy.SetupGun<Nightlighter>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 1.5f, ammo: 300, shootFps: 14, smoothReload: 0.1f,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 1.6f, ammo: 300, shootFps: 12, smoothReload: 0.1f,
             fireAudio: "nightlighter_fire_sound")
           .SetReloadAudio("bulb_unscrew_sound_2", 0, 2)
           .SetReloadAudio("bulb_replace_sound", 4)
           .SetReloadAudio("bulb_unscrew_sound_2", 8, 10)
           .AssignGun(out Gun gun)
           .LoopAnimation(gun.emptyAnimation, 7)
-          .InitProjectile(GunData.New(clipSize: 10, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, invisibleProjectile: true,
+          .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, invisibleProjectile: true,
             damage: 11.0f, speed: 75f, range: 30f, force: 12f, hitSound: "nightlighter_impact_sound", customClip: true))
-          .Attach<LightStringDoer>();
+          .Attach<LightStringDoer>()
+          .Assign(out _NightlighterProjectile);
 
         _LightString = VFX.Create("nightlighter_light_string", fps: 12).DefaultAnimation();
     }
@@ -38,10 +41,14 @@ public class LightStringDoer : MonoBehaviour
 {
   private bool _setup = false;
 
-  public void Setup(Nightlighter gun)
+  public void Setup(Nightlighter gun, AIActor anchorEnemy = null, List<AIActor> enemyChain = null)
   {
     if (base.gameObject.GetComponent<Projectile>() is Projectile proj)
-      new GameObject("lightstring").AddComponent<LightString>().Setup(gun ? gun.PlayerOwner : null, proj, gun);
+    {
+      if (!gun && proj.Owner is PlayerController player && player.CurrentGun is Gun cgun)
+        gun = cgun.gameObject.GetComponent<Nightlighter>();
+      new GameObject("lightstring").AddComponent<LightString>().Setup(proj, gun, anchorEnemy, enemyChain);
+    }
     this._setup = true;
   }
 
@@ -63,17 +70,23 @@ public class LightString : MonoBehaviour
     private Projectile _projectile = null;
     private AIActor _enemy = null;
     private SpeculativeRigidbody _enemyBody = null;
+    private AIActor _anchorEnemy = null;
+    private SpeculativeRigidbody _anchorEnemyBody = null;
+    private List<AIActor> _enemyChain = null;
     private CwaffRopeMesh _mesh = null;
     private Vector2 _endTransformOffset = default;
     private bool _connectedToGun = false;
     private bool _connectedToProjectile = false;
     private bool _connectedToEnemy = false;
+    private bool _anchoredToEnemy = false;
     private bool _setGlowiness = false;
+    private bool _mastered = false;
     private bool _setup = false;
     private bool _active = false;
 
     private static List<LightString> _ExtantChainsOnFloor = new();
     private static ListDictionary _Attachments = new();
+    private static List<AIActor> _AnchorTargets = new(); // temporary list for storing extra targets for mastery
 
     private void Start()
     {
@@ -82,8 +95,11 @@ public class LightString : MonoBehaviour
 
     public bool AttachedToGun => this._active && this._connectedToGun && this._gun != null;
 
-    public void Setup(PlayerController owner, Projectile proj, Nightlighter gun)
+    public void Setup(Projectile proj, Nightlighter gun, AIActor anchorEnemy, List<AIActor> enemyChain)
     {
+      if (this._setup)
+        return;
+
       CwaffEvents.OnFloorEnded -= CleanUpExtantChains;
       CwaffEvents.OnFloorEnded += CleanUpExtantChains;
       if (!proj)
@@ -95,10 +111,19 @@ public class LightString : MonoBehaviour
       this._projectile            = proj;
       proj.OnHitEnemy += this.OnHitEnemy;
 
-      this._owner                 = owner;
+      this._enemyChain = enemyChain;
+      if (this._enemyChain == null)
+        this._enemyChain = new();
+      this._owner                 = proj.Owner as PlayerController;
       this._gun                   = gun;
-      this._connectedToGun        = gun != null;
-      Vector2 endPos              = gun ? gun.gun.barrelOffset.transform.position : proj.SafeCenter;
+      this._anchorEnemy           = anchorEnemy;
+      this._anchorEnemyBody       = anchorEnemy ? anchorEnemy.specRigidbody : null;
+      this._anchoredToEnemy       = this._anchorEnemy && this._anchorEnemyBody;
+      this._connectedToGun        = gun != null && !this._anchoredToEnemy;
+      this._mastered              = gun && gun.Mastered;
+      if (this._mastered)
+        proj.pierceMinorBreakables = true;
+      Vector2 endPos              = anchorEnemy ? this._anchorEnemyBody.UnitCenter : (gun ? gun.gun.barrelOffset.transform.position : proj.SafeCenter);
       this._mesh                  = CwaffRopeMesh.Create(
         animation: Nightlighter._LightString, startPos: endPos, endPos: endPos, numSegments: SEGMENTS,
         stretchPolicy: CwaffingTheGungy.RopeSim.StretchPolicy.GROWPERMANENT);
@@ -128,12 +153,13 @@ public class LightString : MonoBehaviour
     {
       if (!enemy || enemy.healthHaver is not HealthHaver hh)
         return false;
+      if (this._enemyChain.Contains(enemy))
+        return false;
       if (enemy.specRigidbody is not SpeculativeRigidbody body)
         return false;
       this._connectedToProjectile = false;
       this._projectile = null;
       this._connectedToGun = false;
-      this._gun = null;
 
       this._connectedToEnemy = true;
       this._enemy = enemy;
@@ -144,6 +170,7 @@ public class LightString : MonoBehaviour
       if (attachments.Count >= _MAX_ATTACHMENTS)
         attachments.ChooseRandom().Disconnect();
       attachments.Add(this);
+      this._enemyChain.Add(enemy);
 
       Vector3 spriteSize = this._enemy.sprite.GetBounds().size;
           float randomXOffset = 0.25f * spriteSize.x * UnityEngine.Random.value * BraveUtility.RandomSign();
@@ -152,6 +179,28 @@ public class LightString : MonoBehaviour
 
       this._mesh.endPos = enemy.CenterPosition + this._endTransformOffset;
       base.gameObject.Play("light_string_attach_sound");
+
+      if (!this._mastered)
+        return true;
+
+      // if mastered, attempt to find another enemy to anchor onto
+      Lazy.GetAllNearbyEnemies(ref _AnchorTargets, enemy.CenterPosition, 12f);
+      _AnchorTargets.Shuffle();
+      foreach (AIActor newTarget in _AnchorTargets)
+      {
+        if (!newTarget || this._enemyChain.Contains(newTarget) || newTarget.specRigidbody is not SpeculativeRigidbody newBody)
+          continue;
+        // fire the projectile and register the current enemy as a collision exception
+        Vector2 delta = (newTarget.CenterPosition - enemy.CenterPosition);
+        Projectile p = VolleyUtility.ShootSingleProjectile(Nightlighter._NightlighterProjectile, enemy.CenterPosition, delta.ToAngle(), false, this._owner);
+        p.SetOwnerAndStats(this._owner);
+        this._owner.DoPostProcessProjectile(p);
+        p.specRigidbody.RegisterSpecificCollisionException(body);
+        // set up the new LightString component with the appropriate anchoring information
+        LightStringDoer otherString = p.gameObject.GetComponent<LightStringDoer>();
+        otherString.Setup(this._gun, anchorEnemy: enemy, enemyChain: this._enemyChain);
+        break;
+      }
       return true;
     }
 
@@ -191,6 +240,12 @@ public class LightString : MonoBehaviour
       }
       if (!this._setup || BraveTime.DeltaTime == 0.0f || GameManager.Instance.IsPaused)
         return;
+      if (this._anchoredToEnemy && (!this._anchorEnemy || !this._anchorEnemyBody || !this._anchorEnemyBody.enabled || this._anchorEnemy.IsGone || (this._anchorEnemy.healthHaver is HealthHaver hha && hha.IsDead)))
+      {
+        this._anchoredToEnemy = false;
+        this._anchorEnemy = null;
+        this._anchorEnemyBody = null;
+      }
       if (this._connectedToGun && (!this._owner || !this._gun || !this._gun.gun || this._owner.CurrentGun != this._gun.gun))
       {
         Disconnect();
@@ -207,9 +262,11 @@ public class LightString : MonoBehaviour
         return;
       }
 
-      // always update start position if we're connected to a gun
-      if (this._gun)
+      // always update start position if we're connected to a gun or anchor enemy
+      if (this._connectedToGun && this._gun)
         this._mesh.startPos = this._gun.gun.barrelOffset.transform.position;
+      else if (this._anchoredToEnemy && this._anchorEnemyBody)
+        this._mesh.startPos = this._anchorEnemyBody.UnitCenter;
 
       // if the other end is connected to a projectile, follow it
       if (this._projectile)
@@ -246,7 +303,7 @@ public class LightString : MonoBehaviour
         this._enemyBody.OnPreMovement -= this.ChainDown;
       this._connectedToEnemy      = false;
       this._enemy                 = null;
-      this._gun                   = null;
+      // this._gun                   = null;
       this._connectedToGun        = false;
       this._projectile            = null;
       this._connectedToProjectile = false;

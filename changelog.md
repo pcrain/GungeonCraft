@@ -16,6 +16,7 @@
 	- Adjusted Bullet Kin placement to better avoid being hidden by walls
 	- Chest rewards from the pizza minigame now spawn unlocked
 - Added Nightlighter
+- Added mastery for Nightlighter
 
 ## 1.30.1 (2026-05-14)
 
