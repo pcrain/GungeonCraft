@@ -413,3 +413,5 @@ light_string_attach_sound,5.0,1,sound,0
 needle_rifle_impact_wall_sound,8.0,1,sound,0
 needle_rifle_reload_hatch_sound,8.0,1,sound,0
 needle_rifle_reload_plant_sound,8.0,1,sound,0
+needler_impact_enemy_sound,-2.0,1,sound,0
+supercombine_sound,1.5,1,sound,0

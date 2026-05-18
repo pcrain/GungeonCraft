@@ -317,7 +317,7 @@ public static class VFX
         return _None ??= new VFXPool(){type = VFXPoolType.None};
     }
 
-    public static VFXPool CreatePoolFromVFXGameObject(GameObject vfx)
+    public static VFXPool CreatePoolFromVFXGameObject(this GameObject vfx)
     {
         if (!(vfxObjectToPoolMap.ContainsKey(vfx)))
         {

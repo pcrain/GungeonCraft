@@ -243,7 +243,7 @@ public sealed class GunData
     BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
     bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, float? glowColorPower = null,
     int beamDissipateFps = -1, float? spinRate = null, float? lightStrength = null, float? lightRange = null, Color? lightColor = null, string chargeSound = null, bool? damagesWalls = null,
-    Color? beamEmissionColor = null, float beamEmissionColorPower = 1.55f, float beamImpactEmission = -1f, float stunChance = 0f, float stunDuration = 1f)
+    Color? beamEmissionColor = null, float beamEmissionColorPower = 1.55f, float beamImpactEmission = -1f, float stunChance = 0f, float stunDuration = -1f)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -527,6 +527,8 @@ public static class GunBuilder
     if (p.AppliesSpeedModifier)
       p.speedEffect = Items.TripleCrossbow.AsGun().DefaultModule.projectiles[0].speedEffect;
 
+    if (b.stunDuration > 0.0f && b.stunChance <= 0.0f)
+      b.stunChance = 1.0f;
     p.StunApplyChance      = b.stunChance;
     p.AppliesStun          = b.stunChance > 0.0f;
     p.AppliedStunDuration  = b.stunDuration;
@@ -892,5 +894,38 @@ public static class GunBuilder
           if (__instance.GetComponent<ReloadAnimationSuppressor>())
               silent = true;
       }
+  }
+
+  /// <summary>Make a projectile stick to enemies upon impact, with optional effects.</summary>
+  public static Projectile StickToEnemies<T>(this Projectile proj, float glowAmount = -1f, VFXPool deathVFX = null, Action<T> setupFunc = null) where T : HealthModificationBuff
+  {
+    tk2dBaseSprite projSprite = proj.sprite;
+    tk2dSpriteAnimator animator = projSprite.spriteAnimator;
+    tk2dSpriteAnimationFrame frame = animator.Library.clips[animator.DefaultClipId].frames[0];
+    tk2dBaseSprite vfxSprite = Lazy.SpriteObject(frame.spriteCollection, frame.spriteId).RegisterPrefab();
+    vfxSprite.renderer.material.shader = projSprite.renderer.material.shader;
+    vfxSprite.renderer.material.CopyPropertiesFromMaterial(projSprite.renderer.material);
+    if (glowAmount >= 0f)
+      vfxSprite.SetGlowiness(glowAmount: glowAmount);
+    BuffVFXAnimator buffAnimator = vfxSprite.gameObject.AddComponent<BuffVFXAnimator>();
+    buffAnimator.animationStyle = BuffVFXAnimator.BuffAnimationStyle.PIERCE;
+    buffAnimator.persistsOnDeath = true;
+    if (deathVFX != null)
+    {
+      buffAnimator.UsesVFXToSpawnOnDeath = true;
+      buffAnimator.VFXToSpawnOnDeath = deathVFX;
+    }
+
+    T buff = proj.gameObject.AddComponent<T>();
+    buff.vfx = vfxSprite.gameObject;
+    if (setupFunc != null)
+      setupFunc(buff);
+
+    return proj;
+  }
+
+  public static Projectile StickToEnemies(this Projectile proj, float glowAmount = -1f, VFXPool deathVFX = null)
+  {
+    return proj.StickToEnemies<HealthModificationBuff>(glowAmount: glowAmount, deathVFX: deathVFX);
   }
 }

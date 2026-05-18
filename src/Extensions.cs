@@ -3962,5 +3962,15 @@ public static class Extensions
         return ownerRoom != pos.GetAbsoluteRoom();
     return !GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.4f);
   }
+
+  /// <summary>Get a random point on an enemy suitable for VFX or projectile attachments</summary>
+  public static Vector2 GetRandomPointOnBody(this AIActor enemy)
+  {
+    if (!enemy || !enemy.sprite)
+      return Vector2.zero;
+    if (enemy.specRigidbody is not SpeculativeRigidbody body || body.HitboxPixelCollider == null)
+      return enemy.CenterPosition;
+    return body.HitboxPixelCollider.UnitCenter + Lazy.RandomVector(enemy.sprite.GetBounds().extents.x * UnityEngine.Random.Range(0.15f, 0.5f));
+  }
 }
 

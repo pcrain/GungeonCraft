@@ -378,7 +378,7 @@ public static class CwaffSynergies
         NewMastery<MasteryOfFuelRodGun>(MASTERY_FUEL_ROD_GUN, FuelRodGun.ItemName);
         // Light strings pierce small obstacles and attempt to extend to other enemies upon impact.
         NewMastery<MasteryOfNightlighter>(MASTERY_NIGHTLIGHTER, Nightlighter.ItemName);
-        // TBD
+        // Needles stick to enemies that aren't instantly killed, and supercombine to kill enemies once their total damage exceeds the enemy's health.
         NewMastery<MasteryOfGadulo>(MASTERY_GADULO, Gadulo.ItemName);
       #endregion
 
