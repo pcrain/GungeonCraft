@@ -290,6 +290,7 @@ public class Initialisation : BaseUnityPlugin
                 PhotonCannon.Init();
                 FuelRodGun.Init();
                 Nightlighter.Init();
+                Gadulo.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

@@ -40,9 +40,9 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Forkbomb, Maestro, Missiletoe, Oddjob, Omnidirectional Laser, Plasmarble, RLTSRTSGTSBTSLB, Starmageddon, Stereoscope, Toothpaste, Vladimir
 
-  - [IdioticMuffin](https://www.reddit.com/r/EnterTheGungeon/comments/et316d/yet_even_more_gun_concepts_for_gungeon/): Grandmaster, [Paintball Cannon](https://www.reddit.com/r/EnterTheGungeon/comments/clkr07/splat_the_gungeon_weapon_concepts/)
-
   - [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/): Derail Gun, Gunflower, Nightlighter, Retina
+
+  - [IdioticMuffin](https://www.reddit.com/r/EnterTheGungeon/comments/et316d/yet_even_more_gun_concepts_for_gungeon/): Grandmaster, [Paintball Cannon](https://www.reddit.com/r/EnterTheGungeon/comments/clkr07/splat_the_gungeon_weapon_concepts/)
 
   - [Hashashaaaa](https://www.reddit.com/r/EnterTheGungeon/comments/b1fnc4/very_big_halo_weapon_set/): Fuel Rod Gun
 

@@ -245,6 +245,7 @@
     <Compile Include="src\Cwaff-Guns\English.cs"/>
     <Compile Include="src\Cwaff-Guns\DerailGun.cs"/>
     <Compile Include="src\Cwaff-Guns\FuelRodGun.cs"/>
+    <Compile Include="src\Cwaff-Guns\Gadulo.cs"/>
     <Compile Include="src\Cwaff-Guns\SubMachineGun.cs"/>
     <Compile Include="src\Cwaff-Guns\Grandmaster.cs"/>
     <Compile Include="src\Cwaff-Guns\Tranquilizer.cs"/>

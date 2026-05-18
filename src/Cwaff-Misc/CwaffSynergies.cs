@@ -378,6 +378,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfFuelRodGun>(MASTERY_FUEL_ROD_GUN, FuelRodGun.ItemName);
         // Light strings pierce small obstacles and attempt to extend to other enemies upon impact.
         NewMastery<MasteryOfNightlighter>(MASTERY_NIGHTLIGHTER, Nightlighter.ItemName);
+        // TBD
+        NewMastery<MasteryOfGadulo>(MASTERY_GADULO, Gadulo.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -686,6 +688,7 @@ internal class MasteryOfRLTSRTSGTSBTSLB      : MasteryDummyItem {}
 internal class MasteryOfPhotonCannon         : MasteryDummyItem {}
 internal class MasteryOfFuelRodGun           : MasteryDummyItem {}
 internal class MasteryOfNightlighter         : MasteryDummyItem {}
+internal class MasteryOfGadulo               : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -854,4 +857,5 @@ public enum Synergy {
     MASTERY_PHOTON_CANNON,
     MASTERY_FUEL_ROD_GUN,
     MASTERY_NIGHTLIGHTER,
+    MASTERY_GADULO,
 };

@@ -410,3 +410,6 @@ bulb_remove_sound,-2.0,1,sound,1
 bulb_replace_sound,-2.0,1,sound,1
 bulb_screw_sound,-2.0,1,sound,1
 light_string_attach_sound,5.0,1,sound,0
+needle_rifle_impact_wall_sound,8.0,1,sound,0
+needle_rifle_reload_hatch_sound,8.0,1,sound,0
+needle_rifle_reload_plant_sound,8.0,1,sound,0

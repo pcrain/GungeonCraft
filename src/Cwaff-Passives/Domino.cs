@@ -73,6 +73,7 @@ public class PizzaPeel : CwaffGun
             damage: 0.0f, speed: 25f, range: 18f, force: 12f, hitEnemySound: null, hitWallSound: null, pierceBreakables: true))
           .Attach<PizzaPeelProjectile>();
 
+        //REFACTOR: make this part of GunBuilder
         for (int i = 0; i < 5; ++i)
         {
             _IdleAnimations.Add(gun.QuickUpdateGunAnimation($"{i}_slice_idle"));
@@ -126,17 +127,18 @@ public class PizzaPeel : CwaffGun
         base.OnDestroy();
     }
 
+    //REFACTOR: make this part of GunBuilder
     private void UpdateAnimations()
     {
         if (this.gun.IsReloading)
         {
-            this.gun.idleAnimation = _IdleAnimations[4];
-            this.gun.shootAnimation = _FireAnimations[3];
+            this.gun.idleAnimation = _IdleAnimations[_IdleAnimations.Count - 1];
+            this.gun.shootAnimation = _FireAnimations[_FireAnimations.Count - 1];
         }
         else
         {
-            this.gun.idleAnimation = _IdleAnimations[Mathf.Clamp(this.gun.ClipShotsRemaining, 0, 4)];
-            this.gun.shootAnimation = _FireAnimations[Mathf.Clamp(this.gun.ClipShotsRemaining - 1, 0, 3)];
+            this.gun.idleAnimation = _IdleAnimations[Mathf.Clamp(this.gun.ClipShotsRemaining, 0, _IdleAnimations.Count - 1)];
+            this.gun.shootAnimation = _FireAnimations[Mathf.Clamp(this.gun.ClipShotsRemaining - 1, 0, _FireAnimations.Count - 1)];
         }
         this.gun.spriteAnimator.defaultClipId = this.gun.spriteAnimator.GetClipIdByName(this.gun.idleAnimation);
     }

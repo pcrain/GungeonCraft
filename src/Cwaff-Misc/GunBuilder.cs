@@ -116,6 +116,8 @@ public sealed class GunData
   public Color? beamEmissionColor;
   public float beamEmissionColorPower;
   public float beamImpactEmission;
+  public float stunChance;
+  public float stunDuration;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -221,6 +223,8 @@ public sealed class GunData
   /// <param name="beamEmissionColor">If set, determines the emissive color of beam sprites.</param>
   /// <param name="beamEmissionColorPower">Determines the emissive color power of bream sprites.</param>
   /// <param name="beamImpactEmission">If >= 0, determines emissive power of beam impact sprite (uses beam emission otherwise).</param>
+  /// <param name="stunChance">The chance for the projectile to apply stun to its target.</param>
+  /// <param name="stunDuration">The duration of stun to apply.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -239,7 +243,7 @@ public sealed class GunData
     BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
     bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, float? glowColorPower = null,
     int beamDissipateFps = -1, float? spinRate = null, float? lightStrength = null, float? lightRange = null, Color? lightColor = null, string chargeSound = null, bool? damagesWalls = null,
-    Color? beamEmissionColor = null, float beamEmissionColorPower = 1.55f, float beamImpactEmission = -1f)
+    Color? beamEmissionColor = null, float beamEmissionColorPower = 1.55f, float beamImpactEmission = -1f, float stunChance = 0f, float stunDuration = 1f)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -344,6 +348,8 @@ public sealed class GunData
       _Instance.beamEmissionColor                 = beamEmissionColor;
       _Instance.beamEmissionColorPower            = beamEmissionColorPower;
       _Instance.beamImpactEmission                = beamImpactEmission;
+      _Instance.stunChance                        = stunChance;
+      _Instance.stunDuration                      = stunDuration;
       return _Instance;
   }
 }
@@ -520,6 +526,10 @@ public static class GunBuilder
     p.AppliesSpeedModifier = b.slow > 0.0f;
     if (p.AppliesSpeedModifier)
       p.speedEffect = Items.TripleCrossbow.AsGun().DefaultModule.projectiles[0].speedEffect;
+
+    p.StunApplyChance      = b.stunChance;
+    p.AppliesStun          = b.stunChance > 0.0f;
+    p.AppliedStunDuration  = b.stunDuration;
 
     if (b.doBeamSetup ?? (b.shootStyle == ShootStyle.Beam))
       p.InternalSetupBeam(b);

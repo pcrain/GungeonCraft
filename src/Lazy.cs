@@ -1654,4 +1654,27 @@ public static class Lazy
           return Single;
       return None;
   }
+
+  /// <summary>Check if all rooms on the current floor have been visited. Code from CheckEntireFloorVisited FsmStateAction</summary>
+  public static bool AllRoomsVisited(bool includeSecretRooms = true, bool includeWarpRooms = true, bool onlyIncludeStandardRooms = false)
+  {
+    if (!includeSecretRooms || !includeWarpRooms || onlyIncludeStandardRooms)
+    {
+      int nrooms = GameManager.Instance.Dungeon.data.rooms.Count;
+      for (int i = 0; i < nrooms; i++)
+      {
+        RoomHandler room = GameManager.Instance.Dungeon.data.rooms[i];
+        if (room.RevealedOnMap || room.visibility != RoomHandler.VisibilityStatus.OBSCURED || room.OverrideTilemap)
+          continue;
+        if (!includeSecretRooms && room.IsSecretRoom)
+          continue;
+        if (!includeWarpRooms && room.IsStartOfWarpWing)
+          continue;
+        if (onlyIncludeStandardRooms && !room.IsStandardRoom && room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.SPECIAL && room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.REWARD)
+          continue;
+        return false;
+      }
+    }
+    return true;
+  }
 }

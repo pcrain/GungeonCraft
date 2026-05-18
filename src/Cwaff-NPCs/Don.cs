@@ -482,7 +482,7 @@ public class Don : FancyNPC
     PlayerController interactor = Interactor();
     if (interactor.IsGunLocked)
       yield return ScriptINCAPABLE_OF_DELIVERY();
-    else if (!GameManager.Instance.Dungeon.AllRoomsVisited)
+    else if (!Lazy.AllRoomsVisited())
       yield return ScriptNEED_FULL_MAP();
     else if (PizzaTimeController.CheckAnyRoomsStillOccupied()/* && !C.DEBUG_BUILD*/)
       yield return ScriptENEMIES_ON_FLOOR();
