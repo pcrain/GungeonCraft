@@ -22,6 +22,7 @@ public class Blackjack : CwaffGun
         Lazy.SetupGun<Blackjack>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _AMMO, canGainAmmo: false,
             shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound", fireAudio: "card_throw_sound")
+          .AddDualWieldSynergy(Synergy.BOARD_AND_CARD_GAME_NIGHT)
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: _CLIP_SIZE, cooldown: 0.16f, angleVariance: 24.0f, shootStyle: ShootStyle.Automatic,
             customClip: true, damage: 6f, speed: 22f, range: 999f, hitSound: "blackjack_card_impact_sound"))

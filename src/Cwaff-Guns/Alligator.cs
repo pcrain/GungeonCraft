@@ -34,6 +34,7 @@ public class Alligator : CwaffGun
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300, shootFps: 20, reloadFps: 16,
             muzzleVFX: "muzzle_alligator", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 50f,
             fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound", dynamicBarrelOffsets: true)
+          .AddDualWieldSynergy(Synergy.CABLE_MANAGEMENT)
           .Attach<AlligatorAmmoDisplay>()
           .InitProjectile(GunData.New(clipSize: 8, cooldown: 0.4f, angleVariance: 15.0f, shootStyle: ShootStyle.Automatic, customClip: true,
             damage: 1.0f, speed: 50.0f, sprite: "alligator_projectile", fps: 2, anchor: Anchor.MiddleCenter, electric: true))
@@ -387,6 +388,8 @@ public class AlligatorCableHandler : MonoBehaviour
 
         Vector3 vector;
         Gun gun = this._owner.CurrentGun;
+        if (!gun.GetComponent<Alligator>() && this._owner.CurrentSecondaryGun is Gun gun2)
+          gun = gun2;
         if (!gun.GetComponent<Alligator>() || !gun.renderer.enabled)
             vector = this._owner.CenterPosition.ToVector3ZisY();
         else

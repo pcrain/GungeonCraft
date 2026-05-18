@@ -19,6 +19,7 @@ public class Nightlighter : CwaffGun
           .SetReloadAudio("bulb_unscrew_sound_2", 0, 2)
           .SetReloadAudio("bulb_replace_sound", 4)
           .SetReloadAudio("bulb_unscrew_sound_2", 8, 10)
+          .AddDualWieldSynergy(Synergy.CABLE_MANAGEMENT)
           .AssignGun(out Gun gun)
           .LoopAnimation(gun.emptyAnimation, 7)
           .InitProjectile(GunData.New(clipSize: 12, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, invisibleProjectile: true,
@@ -45,8 +46,13 @@ public class LightStringDoer : MonoBehaviour
   {
     if (base.gameObject.GetComponent<Projectile>() is Projectile proj)
     {
-      if (!gun && proj.Owner is PlayerController player && player.CurrentGun is Gun cgun)
-        gun = cgun.gameObject.GetComponent<Nightlighter>();
+      if (!gun && proj.Owner is PlayerController player)
+      {
+        if (player.CurrentGun is Gun cgun)
+          gun = cgun.gameObject.GetComponent<Nightlighter>();
+        if (!gun && player.CurrentSecondaryGun is Gun cgun2)
+          gun = cgun2.gameObject.GetComponent<Nightlighter>();
+      }
       new GameObject("lightstring").AddComponent<LightString>().Setup(proj, gun, anchorEnemy, enemyChain);
     }
     this._setup = true;
@@ -246,7 +252,7 @@ public class LightString : MonoBehaviour
         this._anchorEnemy = null;
         this._anchorEnemyBody = null;
       }
-      if (this._connectedToGun && (!this._owner || !this._gun || !this._gun.gun || this._owner.CurrentGun != this._gun.gun))
+      if (this._connectedToGun && (!this._owner || !this._gun || !this._gun.gun || (this._owner.CurrentGun != this._gun.gun && this._owner.CurrentSecondaryGun != this._gun.gun)))
       {
         Disconnect();
         return;

@@ -173,6 +173,10 @@ public static class CwaffSynergies
         NewSynergy(BAZOOKA_LAYLEE, "Bazooka Laylee", new[]{IName(Breegull.ItemName), "com4nd0"});
         // Training level is increased by triple the normal amount when Weighted Robes' training is active.
         NewSynergy(GUN_SOHAN, "Gun Sohan", new[]{IName(WeightedRobes.ItemName), IName(WarriorsGi.ItemName)});
+        // Alligator and Nightlighter are dual wielded.
+        NewSynergy(CABLE_MANAGEMENT, "Cable Management", new[]{IName(Alligator.ItemName), IName(Nightlighter.ItemName)});
+        // Blackjack and Grandmaster are dual wielded.
+        NewSynergy(BOARD_AND_CARD_GAME_NIGHT, "Board and Card Game Night", new[]{IName(Grandmaster.ItemName), IName(Blackjack.ItemName)});
 
       #endregion
 
@@ -753,6 +757,8 @@ public enum Synergy {
     CHAIN_SMOKER,
     BAZOOKA_LAYLEE,
     GUN_SOHAN,
+    CABLE_MANAGEMENT,
+    BOARD_AND_CARD_GAME_NIGHT,
 
     // Masteries
     MASTERY_GRANDMASTER,

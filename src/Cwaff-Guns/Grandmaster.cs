@@ -27,6 +27,7 @@ public class Grandmaster : CwaffGun
         Lazy.SetupGun<Grandmaster>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 1.0f, ammo: 350, shootFps: 24, reloadFps: 16,
             muzzleFrom: Items.Mailbox, fireAudio: "chess_gun_fire", reloadAudio: "chess_gun_reload")
+          .AddDualWieldSynergy(Synergy.BOARD_AND_CARD_GAME_NIGHT)
           .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
             speed: 30f, damage: 10f, force: 9f, range: 1000f, shouldRotate: false))
           .AddAnimations(

@@ -17,6 +17,7 @@
 	- Chest rewards from the pizza minigame now spawn unlocked
 - Added Nightlighter
 - Added mastery for Nightlighter
+- Added 2 new synergies
 
 ## 1.30.1 (2026-05-14)
 
