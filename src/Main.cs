@@ -383,6 +383,7 @@ public class Initialisation : BaseUnityPlugin
                 DemolitionContract.Init();
                 ChewToy.Init();
                 SuperColdWatch.Init();
+                VengefulSpirit.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

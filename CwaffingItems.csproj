@@ -94,6 +94,7 @@
     <Compile Include="src\Cwaff-Passives\DisplayPedestal.cs"/>
     <Compile Include="src\Cwaff-Passives\Gyroscope.cs"/>
     <Compile Include="src\Cwaff-Passives\JohnsWick.cs"/>
+    <Compile Include="src\Cwaff-Passives\VengefulSpirit.cs"/>
     <Compile Include="src\Cwaff-Passives\ChewToy.cs"/>
     <Compile Include="src\Cwaff-Passives\RingOfDefenestration.cs"/>
     <Compile Include="src\Lazy.cs"/>

@@ -430,9 +430,12 @@ public class PizzaTimeController : MonoBehaviour
         }
         LootEngine.SpawnCurrency(pos.ToVector2(), casings, false, null, null);
 
-        string report = $"{Mathf.RoundToInt(100f * completion)}% of pizzas delivered\n\n----------\n\nReward:\n- {casings} casings";
+        string report = $"{Mathf.RoundToInt(100f * completion)}% of pizzas delivered\n\n----------\n\nReward:\n- {casings}[sprite \"ui_coin\"]";
         if (baseQuality > 0)
+        {
+            Lazy.DebugConsoleLog($"quality is {baseQuality} == {(ItemQuality)baseQuality} == {_ChestNames[baseQuality - 1]}");
             report += $"\n- {_ChestNames[baseQuality - 1]} Chest";
+        }
         CustomNoteDoer.CreateNote(pos.ToVector2() + new Vector2(-1.5f, 0f), report);
     }
 

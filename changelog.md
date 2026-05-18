@@ -15,7 +15,8 @@
 	- All Bullet Kin are despawned at the end of the pizza minigame, rather than just the ones without pizza
 	- Adjusted Bullet Kin placement to better avoid being hidden by walls
 	- Chest rewards from the pizza minigame now spawn unlocked
-- Added Nightlighter and Gadulo
+	- Tweaked text on reward note for successful pizza minigame completion
+- Added Nightlighter, Gadulo, and Vengeful Spirit
 - Added masteries for Nightlighter and Gadulo
 - Added 2 new synergies
 
