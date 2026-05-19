@@ -58,36 +58,36 @@ public class ProjectileExpiration : MonoBehaviour
     public void ExpireIn(float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
     {
       this.StartCoroutine(Expire(seconds, fadeFor, startAlpha, shrink));
-    }
 
-    private IEnumerator Expire(float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
-    {
-      if (startAlpha < 1f)
-        this.gameObject.SetAlphaImmediate(startAlpha);
-      float startXScale = this.gameObject.transform.localScale.x;
-      float startYScale = this.gameObject.transform.localScale.y;
-      if (fadeFor == 0f)
+      IEnumerator Expire(float seconds, float fadeFor = 0f, float startAlpha = 1f, bool shrink = false)
       {
-        yield return new WaitForSeconds(seconds);
+        if (startAlpha < 1f)
+          this.gameObject.SetAlphaImmediate(startAlpha);
+        float startXScale = this.gameObject.transform.localScale.x;
+        float startYScale = this.gameObject.transform.localScale.y;
+        if (fadeFor == 0f)
+        {
+          yield return new WaitForSeconds(seconds);
+          UnityEngine.Object.Destroy(this.gameObject);
+          yield break;
+        }
+
+        float lifeLeft = seconds;
+        while (lifeLeft > 0)
+        {
+          lifeLeft -= BraveTime.DeltaTime;
+          float percentAlive = Mathf.Min(1f, lifeLeft / fadeFor);
+          if (percentAlive < 1f)
+            this.gameObject.SetAlpha(startAlpha * percentAlive);
+          if (shrink)
+            this.gameObject.transform.localScale = new Vector3(percentAlive * startXScale, percentAlive * startYScale, 1.0f);
+          yield return null;
+        }
         UnityEngine.Object.Destroy(this.gameObject);
         yield break;
       }
-
-      float lifeLeft = seconds;
-      while (lifeLeft > 0)
-      {
-        lifeLeft -= BraveTime.DeltaTime;
-        float percentAlive = Mathf.Min(1f,lifeLeft / fadeFor);
-        this.gameObject.SetAlpha(startAlpha * percentAlive);
-        if (shrink)
-        {
-          this.gameObject.transform.localScale = new Vector3(percentAlive * startXScale, percentAlive * startYScale, 1.0f);
-        }
-        yield return null;
-      }
-      UnityEngine.Object.Destroy(this.gameObject);
-      yield break;
     }
+
   }
 
 /// <summary>Class for fake items that don't show up in inventory or ammonomicon, but can persistently update and get serialized during midgame saves</summary>

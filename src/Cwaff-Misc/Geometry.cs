@@ -234,9 +234,11 @@ public partial class Geometry : MonoBehaviour
                     this._vertices[i + 1] = basePos + (startF + i * gapF).ToVector3(this.radius);
                 break;
             case Shape.RING:
+                float rstart = (this.angle - 0.5f * this.arc).Clamp360();
+                float rgap = this.arc / (_CIRCLE_SEGMENTS - 1);
                 for (int i = 0; i <= _CIRCLE_SEGMENTS; ++i)
                 {
-                    float angle = (i * (360f / _CIRCLE_SEGMENTS));
+                    float angle = (rstart + i * rgap);
                     this._vertices[2 * i + 0] = basePos + angle.ToVector3(this.radius);
                     this._vertices[2 * i + 1] = basePos + angle.ToVector3(this.radiusInner);
                 }

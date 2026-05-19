@@ -477,6 +477,39 @@ public static class Extensions
       m.SetColor(CwaffVFX._OverrideColorId, c2);
   }
 
+  /// <summary>New, better version of SetGlowiness based on better understanding of shaders</summary>
+  public static void MakeGlowyBetter(this tk2dBaseSprite sprite, float? glowAmount = null, Color? glowColor = null, float? glowColorPower = null)
+  {
+      sprite.usesOverrideMaterial = true;
+      Material newMat = sprite.renderer.material;
+
+      // copy some defaults from Gun Nut
+      newMat.shader = ShaderCache.Acquire("Brave/LitCutoutUber_ColorEmissive");
+      newMat.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
+      newMat.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+      newMat.DisableKeyword("EMISSIVE_OFF");
+      newMat.EnableKeyword("EMISSIVE_ON");
+      newMat.DisableKeyword("TINTING_OFF");
+      newMat.EnableKeyword("TINTING_ON");
+      newMat.DisableKeyword("PALETTE_ON");
+      newMat.EnableKeyword("PALETTE_OFF");
+
+      newMat.SetFloat("_Cutoff", 0.5f);
+      newMat.SetFloat("_EmissiveGlowToggle", 0f);
+      newMat.SetFloat("_EmissiveThresholdSensitivity", 0.5f);
+      newMat.SetFloat("_Perpendicular", 1f);
+      newMat.SetFloat("_RectangleAmount", 0f);
+      newMat.SetFloat("_ValueMaximum", 0.97f);
+      newMat.SetFloat("_ValueMinimum", 0.7f);
+
+      if (glowAmount.HasValue)
+        newMat.SetFloat("_EmissivePower", glowAmount.Value);
+      if (glowColorPower.HasValue)
+        newMat.SetFloat("_EmissiveColorPower", glowColorPower.Value);
+      if (glowColor.HasValue)
+        newMat.SetColor("_EmissiveColor", glowColor.Value);
+  }
+
   /// <summary>Randomly add or subtract an amount from an angle</summary>
   public static float AddRandomSpread(this float angle, float spread)
   {

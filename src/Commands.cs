@@ -1,4 +1,4 @@
-﻿namespace CwaffingTheGungy;
+namespace CwaffingTheGungy;
 
 public class Commands
 {
@@ -9,6 +9,8 @@ public class Commands
 
     private static bool _Wiggling = false;
     private static int _WaterLayer = -1;
+
+    internal static GameObject _CommandObject = null;
 
     public static void Init()
     {
@@ -30,13 +32,62 @@ public class Commands
             // }
 
             // Minimap.Instance.RevealAllRooms(false);
-            UnityEngine.Object.Instantiate(Don._NPC.gameObject,
-              GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Quaternion.identity);
+            // UnityEngine.Object.Instantiate(Don._NPC.gameObject,
+            //   GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomVisibleClearSpot(1, 1).ToVector3(), Quaternion.identity);
+
+            if (!_CommandObject)
+            {
+              _CommandObject = new GameObject("shinigami");
+              tk2dSprite newSprite = _CommandObject.AddComponent<tk2dSprite>();
+              newSprite.SetSprite(VFX.Collection, DeathNote._ReaperVFX.GetComponent<tk2dSprite>().spriteId);
+              newSprite.PlaceAtPositionByAnchor(GameManager.Instance.BestActivePlayer.CenterPosition, Anchor.LowerCenter);
+              newSprite.usesOverrideMaterial = true;
+              Material newMat = newSprite.renderer.material;
+
+              newMat.shader = ShaderCache.Acquire("Brave/LitCutoutUber_ColorEmissive");
+
+              newMat.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
+              newMat.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+              newMat.DisableKeyword("EMISSIVE_OFF");
+              newMat.EnableKeyword("EMISSIVE_ON");
+              newMat.DisableKeyword("TINTING_OFF");
+              newMat.EnableKeyword("TINTING_ON");
+              newMat.DisableKeyword("PALETTE_ON");
+              newMat.EnableKeyword("PALETTE_OFF");
+
+              newMat.SetFloat("_Cutoff", 0.5f);
+              newMat.SetFloat("_EmissiveColorPower", 6.7f);
+              newMat.SetFloat("_EmissiveGlowToggle", 0f);
+              newMat.SetFloat("_EmissivePower", 1.55f);
+              newMat.SetFloat("_EmissiveThresholdSensitivity", 0.5f);
+              newMat.SetFloat("_Perpendicular", 1f);
+              newMat.SetFloat("_RectangleAmount", 0f);
+              newMat.SetFloat("_ValueMaximum", 0.97f);
+              newMat.SetFloat("_ValueMinimum", 0.7f);
+              // Color eyeColor = new Color(176f/255f, 40f/255f, 32f/255f);
+              Color eyeColor = Color.red;
+              newMat.SetColor("_EmissiveColor", eyeColor);
+            }
+            tk2dSprite sprite = _CommandObject.GetComponent<tk2dSprite>();
+            Material mat = sprite.renderer.material;
+            try
+            {
+              float glowAmount = args.Length > 0 ? float.Parse(args[0]) : 1.55f;
+              float glowColorPower = args.Length > 1 ? float.Parse(args[1]) : 6.7f;
+              float sensitivity = args.Length > 2 ? float.Parse(args[2]) : 0.5f;
+              mat.SetFloat("_EmissivePower", glowAmount);
+              mat.SetFloat("_EmissiveColorPower", glowColorPower);
+              mat.SetFloat("_EmissiveThresholdSensitivity", sensitivity);
+            }
+            catch (Exception e)
+            {
+              Lazy.DebugConsoleLog($"COMMAND ERROR: {e.Message}");
+            }
         });
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             DebrisObject debris = LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(Lazy.PickupId<VengefulSpirit>()).gameObject,
+                PickupObjectDatabase.GetById(Lazy.PickupId<DeathNote>()).gameObject,
                 // PickupObjectDatabase.GetById(IDs.Pickups["bubblebeam"]).gameObject,
                 GameManager.Instance.PrimaryPlayer.CenterPosition,
                 Vector2.zero,

@@ -173,6 +173,7 @@
     <Compile Include="src\Cwaff-Guns\Lightwing.cs"/>
     <Compile Include="src\Cwaff-Guns\FluxFist.cs"/>
     <Compile Include="src\Cwaff-Guns\Forkbomb.cs"/>
+    <Compile Include="src\Cwaff-Guns\DeathNote.cs"/>
     <Compile Include="src\Cwaff-Guns\Leafblower.cs"/>
     <Compile Include="src\Cwaff-Guns\VacuumCleaner.cs"/>
     <Compile Include="src\Cwaff-Guns\Magunet.cs"/>
@@ -314,6 +315,7 @@
     <EmbeddedResource Include="Resources\cwaffshaders-linux"/>
     <EmbeddedResource Include="Resources\sans_bosscard.png"/>
     <EmbeddedResource Include="Resources\armistice_bosscard_alt.png"/>
+    <EmbeddedResource Include="Resources\listofnames.txt"/>
     <EmbeddedResource Include="Resources\Atlases\attach_points.tsv"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_1.png"/>
     <EmbeddedResource Include="Resources\Atlases\atlas_1.atlas"/>

@@ -85,6 +85,7 @@ public static class EasyLabel
         _ConversionMatrix = outVP.inverse * inVP;
       }
       Vector4 v = _ConversionMatrix * new Vector4(finalPos.x, finalPos.y, 0f, 1f);
+      // Lazy.DebugConsoleLog($"converted {finalPos.x},{finalPos.y} to {v.x},{v.y}");
       label.transform.position = new Vector3(v.x, v.y, 0f).QuantizeFloor(adj);
 
       label.transform.localRotation = Quaternion.Euler(0f, 0f, rot);
