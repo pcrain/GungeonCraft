@@ -50,7 +50,11 @@ public class ChewToy : CwaffCompanion
     [HarmonyPatch]
     private static class ShmuppyReinforcementPatch
     {
+      // #if DEBUG
+      // private const float _SPAWN_CHANCE = 1.00f;
+      // #else
       private const float _SPAWN_CHANCE = 0.02f;
+      // #endif
       private static bool _SpawnedThisRoom = false;
       private static RoomHandler _LastSpawnedRoom = null;
 
@@ -88,7 +92,7 @@ public class ChewToy : CwaffCompanion
 
         AIActor.Spawn(
             prefabActor     : ShmuppyEnemyPrefab,
-            position        : ShmuppyEnemyPrefab.RandomCellForEnemySpawn(room) ?? __instance.CenterPosition.ToIntVector2(),
+            position        : ShmuppyEnemyPrefab.RandomCellForEnemySpawn(room, spawnFarFromPlayer: true) ?? __instance.CenterPosition.ToIntVector2(),
             source          : room,
             correctForWalls : true,
             awakenAnimType  : AIActor.AwakenAnimationType.Spawn)

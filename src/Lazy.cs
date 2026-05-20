@@ -1605,11 +1605,28 @@ public static class Lazy
   }
   #endif
 
-  public static IntVector2? RandomCellForEnemySpawn(this AIActor enemyPrefab, RoomHandler room, IntVector2? targetCenter = null, int? overrideClearance = null)
+  public static float SquareDistanceToNearestActivePlayer(Vector2 pos)
   {
+    float res = float.MaxValue;
+    foreach (PlayerController player in GameManager.Instance.AllPlayers)
+    {
+      if (!player)
+        continue;
+      float dist = (player.CenterPosition - pos).sqrMagnitude;
+      if (dist < res)
+        res = dist;
+    }
+    return res;
+  }
+
+  public static IntVector2? RandomCellForEnemySpawn(this AIActor enemyPrefab, RoomHandler room, bool spawnFarFromPlayer = false, IntVector2? targetCenter = null, int? overrideClearance = null)
+  {
+      const float MIN_PLAYER_SQR_DIST = 64f; // don't spawn within eight tiles of the player
       int xClearance = overrideClearance ?? enemyPrefab.Clearance.x;
       int yClearance = overrideClearance ?? enemyPrefab.Clearance.y;
       Pathfinding.CellValidator cellValidator = (IntVector2 c) => {
+        if (spawnFarFromPlayer && Lazy.SquareDistanceToNearestActivePlayer(c.ToVector2()) < MIN_PLAYER_SQR_DIST)
+          return false;
         for (int k = 0; k < xClearance; k++)
         {
           for (int l = 0; l < yClearance; l++)

@@ -15,7 +15,7 @@ public static class CameraOverrideController
   /// <summary>Returns true if we successfully claim ownership of the camera.</summary>
   public static bool RequestCameraControl(this GameObject obj, bool lerp = true, Action relinquishAction = null)
   {
-    if (GameManager.Instance.MainCameraController.ManualControl)
+    if (_CameraOwner != null || GameManager.Instance.MainCameraController.ManualControl)
       return false;
 
     GameManager.Instance.MainCameraController.SetManualControl(true, shouldLerp: lerp);
@@ -40,7 +40,7 @@ public static class CameraOverrideController
     return true;
   }
 
-  /// <summary>Patch to make sure control over the camera is restored when something else requests manual control.</summary>
+  /// <summary>Patch to make sure control over the camera is restored when something else demands manual control.</summary>
   [HarmonyPatch(typeof(CameraController), nameof(CameraController.SetManualControl))]
   [HarmonyPrefix]
   private static void CameraControllerSetManualControlPatch(CameraController __instance, bool manualControl, bool shouldLerp)
@@ -48,13 +48,4 @@ public static class CameraOverrideController
     if (manualControl && _CameraOwner)
       _CameraOwner.RelinquishCameraControl();
   }
-
-  // /// <summary>Patch to make sure we relinquish camera control when, e.g., fighting Gatling Gull.</summary>
-  // [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.ForceWalkInDirectionWhilePaused))]
-  // [HarmonyPostfix]
-  // private static void PlayerControllerForceWalkInDirectionWhilePausedPatch(PlayerController __instance, DungeonData.Direction direction, float thresholdValue)
-  // {
-  //   if (DeathNoteHUD._ActiveInstance is DeathNoteHUD hud)
-  //     hud.Dismiss();
-  // }
 }

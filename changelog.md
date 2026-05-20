@@ -19,6 +19,7 @@
 - Added Nightlighter, Gadulo, Vengeful Spirit, and Death Note
 - Added masteries for Nightlighter, Gadulo, and Death Note
 - Added 3 new synergies
+- Fixed Shmuppies spawning too close to doorways and causing various issues with other mods
 
 ## 1.30.1 (2026-05-14)
 
