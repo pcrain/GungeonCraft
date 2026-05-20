@@ -13,13 +13,12 @@ public static class CameraOverrideController
   }
 
   /// <summary>Returns true if we successfully claim ownership of the camera.</summary>
-  public static bool RequestCameraControl(this GameObject obj, Action relinquishAction = null)
+  public static bool RequestCameraControl(this GameObject obj, bool lerp = true, Action relinquishAction = null)
   {
     if (GameManager.Instance.MainCameraController.ManualControl)
       return false;
 
-    Lazy.DebugConsoleLog($"requested camera control");
-    GameManager.Instance.MainCameraController.SetManualControl(true);
+    GameManager.Instance.MainCameraController.SetManualControl(true, shouldLerp: lerp);
     _CameraOwner = obj;
     _OnRelinquishedCameraControl = null;
     if (relinquishAction != null)
@@ -28,17 +27,16 @@ public static class CameraOverrideController
   }
 
   /// <summary>Returns true if we successfully relinquish ownership of the camera</summary>
-  public static bool RelinquishCameraControl(this GameObject obj)
+  public static bool RelinquishCameraControl(this GameObject obj, bool lerp = true)
   {
     if (obj != _CameraOwner)
       return false;
 
-    Lazy.DebugConsoleLog($"relinquished camera control");
     if (_OnRelinquishedCameraControl != null)
       _OnRelinquishedCameraControl();
     _OnRelinquishedCameraControl = null;
     _CameraOwner = null;
-    GameManager.Instance.MainCameraController.SetManualControl(false);
+    GameManager.Instance.MainCameraController.SetManualControl(false, shouldLerp: lerp);
     return true;
   }
 
@@ -48,10 +46,7 @@ public static class CameraOverrideController
   private static void CameraControllerSetManualControlPatch(CameraController __instance, bool manualControl, bool shouldLerp)
   {
     if (manualControl && _CameraOwner)
-    {
-      Lazy.DebugConsoleLog($"manual control attempted");
       _CameraOwner.RelinquishCameraControl();
-    }
   }
 
   // /// <summary>Patch to make sure we relinquish camera control when, e.g., fighting Gatling Gull.</summary>

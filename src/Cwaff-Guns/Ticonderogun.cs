@@ -240,22 +240,8 @@ public class Ticonderogun : CwaffGun
         this._trackedEnemy = null;
         this._trackedProj = null;
         this._lastCursorPos = null;
-
-        GameManager.Instance.MainCameraController.SetManualControl(false, lerp);
-
+        base.gameObject.RelinquishCameraControl(lerp: lerp);
         this._isCharging = false;
-    }
-
-    /// <summary>Fix camera weirdness when killing a boss</summary>
-    [HarmonyPatch(typeof(BossKillCam), nameof(BossKillCam.TriggerSequence))]
-    private class BossKillCamTriggerSequencePatch
-    {
-        static void Prefix(BossKillCam __instance)
-        {
-            foreach (PlayerController player in GameManager.Instance.AllPlayers)
-                if (player && (player.CurrentGun is Gun gun) && (gun.gameObject.GetComponent<Ticonderogun>() is Ticonderogun t) && t._isCharging)
-                    t.EndCharge(lerp: false);
-        }
     }
 
     private void BeginCharge()
@@ -264,11 +250,6 @@ public class Ticonderogun : CwaffGun
         this._trackedEnemy = null;
         this._trackedProj = null;
         this._lastCursorPos = null;
-
-        // Override camera position
-        this._cameraPositionAtChargeStart = GameManager.Instance.MainCameraController.previousBasePosition;
-        GameManager.Instance.MainCameraController.SetManualControl(true, true);
-        GameManager.Instance.MainCameraController.OverridePosition = this._cameraPositionAtChargeStart;
 
         this._playerPositionAtChargeStart = this.PlayerOwner.CenterPosition;
         this._adjustedAimPoint = this._playerPositionAtChargeStart + this.PlayerOwner.m_currentGunAngle.ToVector(1f);
@@ -427,11 +408,19 @@ public class Ticonderogun : CwaffGun
         Vector2 pencilPos = GetControllerTrackingVector();
 
         // Stabilize the camera while we're using this weapon on keyboard and mouse
-        bool usingMouse = this.PlayerOwner.IsKeyboardAndMouse();
-        GameManager.Instance.MainCameraController.SetManualControl(usingMouse, true);
-        if (usingMouse)
+        if (this.PlayerOwner.IsKeyboardAndMouse())
+        {
+          if (base.gameObject.RequestCameraControl(lerp: true))
+          {
+            this._cameraPositionAtChargeStart = GameManager.Instance.MainCameraController.previousBasePosition;
+            this._playerPositionAtChargeStart = this.PlayerOwner.CenterPosition;
+          }
+          if (base.gameObject.HasControlOverCamera())
             GameManager.Instance.MainCameraController.OverridePosition =
                 this._cameraPositionAtChargeStart + (this.PlayerOwner.CenterPosition - this._playerPositionAtChargeStart);
+        }
+        else
+          base.gameObject.RelinquishCameraControl(lerp: true);
 
         // Don't draw or update anything if we've barely moved the cursor
         if (this._lastCursorPos.HasValue && (pencilPos - this._lastCursorPos.Value).magnitude < _MIN_SEGMENT_DIST)

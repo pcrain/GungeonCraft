@@ -631,7 +631,7 @@ public class DeathNoteHUD : MonoBehaviour
 
     this._active = true;
     this._shwoop = 0.0f;
-    if (base.gameObject.RequestCameraControl(OnCameraRelinquish))
+    if (base.gameObject.RequestCameraControl(relinquishAction: OnCameraRelinquish))
       GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
     base.gameObject.Play("death_note_open_sound");
     // BraveTime.SetTimeScaleMultiplier(0.5f, base.gameObject);
@@ -692,7 +692,7 @@ public class DeathNoteHUD : MonoBehaviour
       Dismiss();
     else if (this._active)
     {
-      base.gameObject.RequestCameraControl(OnCameraRelinquish);
+      base.gameObject.RequestCameraControl(relinquishAction: OnCameraRelinquish);
       if (base.gameObject.HasControlOverCamera())
         GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
     }

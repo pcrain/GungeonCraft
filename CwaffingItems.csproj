@@ -207,7 +207,6 @@
     <Compile Include="src\Cwaff-Guns\Missiletoe.cs"/>
     <Compile Include="src\Cwaff-Guns\QuarterPounder.cs"/>
     <Compile Include="src\Cwaff-Guns\PistolWhip.cs"/>
-    <Compile Include="src\Cwaff-Guns\CameraOverrideController.cs"/>
     <Compile Include="src\Cwaff-Guns\RCLauncher.cs"/>
     <Compile Include="src\Cwaff-Guns\Nycterian.cs"/>
     <Compile Include="src\Cwaff-Guns\Deadline.cs"/>
@@ -285,6 +284,7 @@
     <Compile Include="src\Cwaff-Misc\CwaffCompanion.cs"/>
     <Compile Include="src\Cwaff-Misc\HeckedShrines.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffRunData.cs"/>
+    <Compile Include="src\Cwaff-Misc\CameraOverrideController.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffTweaks.cs"/>
     <Compile Include="src\Cwaff-Misc\EasyLabel.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffRopeMesh.cs"/>
