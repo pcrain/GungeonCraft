@@ -371,8 +371,25 @@ public class DeathNoteNameHandler
 
   public static bool ResetNameProgress() => _Instance._needsReset = true;
 
+  private static readonly List<AIActor> _InactiveActors = new();
+  internal static readonly List<string> _ActiveNames = new();
+
   public IEnumerable GetNameTags()
   {
+    // phase 1: determine names that are no longer in use
+    _InactiveActors.Clear();
+    _ActiveNames.Clear();
+    foreach (var kvp in this._nametags)
+    {
+      if (!kvp.Key)
+        _InactiveActors.Add(kvp.Key);
+      else
+        _ActiveNames.Add(kvp.Value.name);
+    }
+    foreach(AIActor key in _InactiveActors)
+      this._nametags.Remove(key);
+
+    // phase 2: actually compute and return nametags
     bool resetNames = this._needsReset;
     this._needsReset = false;
     bool newLetter = (this._queuedLetter != '\0');
@@ -387,11 +404,18 @@ public class DeathNoteNameHandler
         continue;
       if (enemy.m_spriteDimensions == default) // HACK: what we're actually checking is if the enemy has called Start() yet and, e.g., become a black phantom
       {
-        Lazy.DebugConsoleLog("hasn't called start yet");
+        // Lazy.DebugConsoleLog("hasn't called start yet");
         continue;
       }
       if (!this._nametags.TryGetValue(enemy, out DeathNoteNametag tag))
-        this._nametags[enemy] = tag = DeathNoteNametag.Generate(enemy, hh);
+      {
+        const int DUPLICATE_PREVENTION_ATTEMPTS = 100;
+        string name = null;
+        int tries = DUPLICATE_PREVENTION_ATTEMPTS;
+        while (tries-- > 0 && (string.IsNullOrEmpty(name) || _ActiveNames.Contains(name)))
+          name = DeathNoteNameHandler.GenerateName(enemy, hh);
+        this._nametags[enemy] = tag = DeathNoteNametag.Generate(enemy, hh, name);
+      }
       if (resetNames)
         tag.ResetName();
       if (newLetter)
@@ -427,13 +451,13 @@ public class DeathNoteNametag
   private bool _dirty = false;
   private bool _dying = false;
 
-  public static DeathNoteNametag Generate(AIActor enemy, HealthHaver hh)
+  public static DeathNoteNametag Generate(AIActor enemy, HealthHaver hh, string name)
   {
       DeathNoteNametag tag = new DeathNoteNametag();
       tag.actor = enemy;
       tag.hh = hh;
       tag.nextLetter = 0;
-      tag.name = DeathNoteNameHandler.GenerateName(enemy, hh);
+      tag.name = name;
       tag.uppername = tag.name.ToUpper();
       tag.nameLength = tag.name.Length;
       tag._dirty = true;
