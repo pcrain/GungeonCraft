@@ -25,6 +25,7 @@
 - Fixed (for the 3rd time) gun sprites being partially white in synergy notifications
 - Optimized Retina's HUD to not be destroyed and recreated every time it's dismissed
 - Added proper lore for Retina instead of having placeholder text copy-pasted from Cleansweep
+- Fixed Shmuppy's Fortune's Favor effect triggering when standing right next to them even when they're supposed to be vulnerable
 
 ## 1.30.1 (2026-05-14)
 

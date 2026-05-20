@@ -482,3 +482,24 @@ static class BeamApplyArbitraryStatusEffectPatch
                 gameActor.ApplyEffect(e, sourceProjectile: beam.projectile);
     }
 }
+
+/// <summary>Fixes issue with UltraFortunesFavor causing IsGunBlocked() to return true even when disabled</summary>
+[HarmonyPatch(typeof(Gun), nameof(Gun.IsGunBlocked))]
+static class GunIsGunBlockedPatch
+{
+  [HarmonyILManipulator]
+  private static void GunIsGunBlockedPatchIL(ILContext il)
+  {
+      ILCursor cursor = new ILCursor(il);
+      if (!cursor.TryGotoNext(MoveType.After,
+        instr => instr.MatchLdloc((byte)8),
+        instr => instr.MatchCall<UnityEngine.Object>("op_Implicit")
+        )) // V_8 == ultraFortunesFavor
+          return;
+
+      cursor.Emit(OpCodes.Ldloc_S, (byte)8); // V_8 == ultraFortunesFavor
+      cursor.CallPrivate(typeof(GunIsGunBlockedPatch), nameof(IsUFFEnabled));
+  }
+
+  private static bool IsUFFEnabled(bool origValue, UltraFortunesFavor uff) => origValue && uff.enabled;
+}
