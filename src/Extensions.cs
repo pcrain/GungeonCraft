@@ -4008,5 +4008,20 @@ public static class Extensions
       return enemy.CenterPosition;
     return body.HitboxPixelCollider.UnitCenter + Lazy.RandomVector(enemy.sprite.GetBounds().extents.x * UnityEngine.Random.Range(0.15f, 0.5f));
   }
+
+  /// <summary>Get the player's aim direction relative to the center of the screen (mostly meaningful for keyboard and mouse).</summary>
+  public static float AimAngleFromCenterOfScreen(this PlayerController player)
+  {
+    if (!player.IsKeyboardAndMouse())
+    {
+      Vector2 aimVec = player.m_activeActions.Aim.Vector;
+      if (aimVec != Vector2.zero)
+        return aimVec.ToAngle();
+      return player.m_cachedAimDirection.XY().ToAngle();
+    }
+    CameraController mcc = GameManager.Instance.MainCameraController;
+    Vector2 screenCenter = 0.5f * (mcc.MinVisiblePoint + mcc.MaxVisiblePoint);
+    return (player.unadjustedAimPoint.XY() - screenCenter).ToAngle();
+  }
 }
 

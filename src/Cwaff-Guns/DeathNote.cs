@@ -4,8 +4,8 @@ public class DeathNote : CwaffGun
 {
     public static string ItemName         = "Death Note";
     public static string ShortDescription = "You Will Know Their Names";
-    public static string LongDescription  = "Can be used to see enemies' names. Writing a name ensures the namebearer's untimely death. Increases Curse by 3.";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Can be used to see enemies' names. Writing a name ensures the namebearer's untimely death. Does not break stealth when used. Increases Curse by 3.";
+    public static string Lore             = ""; // TODO: write lore
 
     internal static GameObject _ReaperVFX = null;
     internal static GameObject _ScytheVFX = null;
@@ -90,7 +90,7 @@ public class DeathNote : CwaffGun
     public void WriteInNotebook(PlayerController player)
     {
       base.gameObject.Play("death_note_write_sound");
-      char letter = DeathNoteHUD._NAME_LETTERS[DeathNoteHUD.LetterIndexForAngle(player.m_currentGunAngle)];
+      char letter = DeathNoteHUD._NAME_LETTERS[DeathNoteHUD.LetterIndexForAngle(player.AimAngleFromCenterOfScreen())];
       DeathNoteNameHandler.WriteLetter(letter);
       CwaffVFX.SpawnBurst(
         prefab           : _Scribbles,
@@ -234,7 +234,7 @@ public class ShinigamiVisit : MonoBehaviour
       this._lastPosition = Lazy.SmoothestLerp(this._lastPosition, this._actor.sprite.WorldTopCenter + _HoverOffset, LERP_RATE);
 
     this._shinigami.PlaceAtPositionByAnchor(this._lastPosition.HoverAt(amplitude: 0.25f), anchor: Anchor.LowerCenter);
-    if (this._activated || this._timer > 0 || this._actor.IsGone || !this._hh.IsVulnerable)
+    if (this._activated || this._timer > 0 || this._actor.IsGone || !this._hh.IsVulnerable || GameManager.IsBossIntro)
       return;
 
     this._activated = true;
@@ -247,10 +247,12 @@ public class ShinigamiVisit : MonoBehaviour
     CwaffVFX.Spawn(prefab: DeathNote._ScytheVFX, position: this._actor.sprite.WorldBottomCenter, height: 10f, flipX: true, rotation: (-45f).EulerZ());
     if (this._actor is PlayerController player)
       this._hh.NextShotKills = true;
-    this._hh.ApplyDamage(9999999f, Vector2.zero, "Shinigami", CoreDamageTypes.Magic, DamageCategory.Unstoppable,
+    this._hh.minimumHealth = 0f;
+    this._hh.ApplyDamage(9999999f, Vector2.zero, "Shinigami", CoreDamageTypes.None, DamageCategory.Unstoppable,
       ignoreInvulnerabilityFrames: true, ignoreDamageCaps: true);
-    if (this._hh.IsDead)
-      this._hh.gameObject.PlayUnique("death_note_scythe_hit_sound");
+    this._hh.gameObject.PlayUnique("death_note_scythe_hit_sound");
+    if (!this._hh.IsDead && !this._hh.IsBoss && !this._hh.IsSubboss && this._actor is AIActor enemy)
+      enemy.EraseFromExistenceWithRewards(); // some troublesome enemies like Bloodbulons don't go down as easily
   }
 
   private IEnumerator GlowTime()
@@ -290,19 +292,19 @@ public class DeathNoteNameHandler
     0f,    // starting point
     10f,   // up to this much health gets a name of length 1
     20f,   // up to this much health gets a name of length 2
-    30f,   // up to this much health gets a name of length 3
-    40f,   // up to this much health gets a name of length 4
-    50f,   // up to this much health gets a name of length 5
-    75f,   // up to this much health gets a name of length 6
-    100f,  // up to this much health gets a name of length 7
-    125f,  // up to this much health gets a name of length 8
-    150f,  // up to this much health gets a name of length 9
-    200f,  // up to this much health gets a name of length 10
-    250f,  // up to this much health gets a name of length 11
-    350f,  // up to this much health gets a name of length 12
-    500f,  // up to this much health gets a name of length 13
-    750f,  // up to this much health gets a name of length 14
-    1000f, // up to this much health gets a name of length 15
+    40f,   // up to this much health gets a name of length 3
+    60f,   // up to this much health gets a name of length 4
+    90f,   // up to this much health gets a name of length 5
+    120f,  // up to this much health gets a name of length 6
+    150f,  // up to this much health gets a name of length 7
+    200f,  // up to this much health gets a name of length 8
+    300f,  // up to this much health gets a name of length 9
+    400f,  // up to this much health gets a name of length 10
+    500f,  // up to this much health gets a name of length 11
+    750f,  // up to this much health gets a name of length 12
+    100f,  // up to this much health gets a name of length 13
+    1500f, // up to this much health gets a name of length 14
+    2000f, // up to this much health gets a name of length 15
     float.MaxValue, // 16
     ];
 
@@ -383,6 +385,11 @@ public class DeathNoteNameHandler
         continue;
       if (!enemy.isActiveAndEnabled || !enemy.IsWorthShootingAt)
         continue;
+      if (enemy.m_spriteDimensions == default) // HACK: what we're actually checking is if the enemy has called Start() yet and, e.g., become a black phantom
+      {
+        Lazy.DebugConsoleLog("hasn't called start yet");
+        continue;
+      }
       if (!this._nametags.TryGetValue(enemy, out DeathNoteNametag tag))
         this._nametags[enemy] = tag = DeathNoteNametag.Generate(enemy, hh);
       if (resetNames)
@@ -479,6 +486,18 @@ public class DeathNoteNametag
   }
 }
 
+/// <summary>Patch to make sure control over the camera is restored when something else requests manual control.</summary>
+[HarmonyPatch]
+internal static class HaveControlOverCameraControllerPatch
+{
+  [HarmonyPatch(typeof(CameraController), nameof(CameraController.SetManualControl))]
+  [HarmonyPostfix]
+  private static void CameraControllerSetManualControlPatch(CameraController __instance, bool manualControl, bool shouldLerp)
+  {
+    DeathNoteHUD._HasControlOverCamera = false;
+  }
+}
+
 public class DeathNoteHUD : MonoBehaviour
 {
   internal const string _NAME_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -490,6 +509,8 @@ public class DeathNoteHUD : MonoBehaviour
 
   private static readonly Color _GeomColor1 = new Color(0.25f, 0.25f, 0.25f);
   private static readonly Color _GeomColor2 = new Color(0.35f, 0.35f, 0.35f);
+
+  internal static bool _HasControlOverCamera = false;
 
   private bool _setup              = false;   // whether we're set up
   private float _shwoop            = 0.0f;    // whether we're shwooped open
@@ -546,8 +567,12 @@ public class DeathNoteHUD : MonoBehaviour
 
     this._active = true;
     this._shwoop = 0.0f;
-    GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
-    GameManager.Instance.MainCameraController.SetManualControl(true);
+    if (!GameManager.Instance.MainCameraController.ManualControl)
+    {
+      GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
+      GameManager.Instance.MainCameraController.SetManualControl(true);
+      _HasControlOverCamera = true;
+    }
     base.gameObject.Play("death_note_open_sound");
   }
 
@@ -581,7 +606,11 @@ public class DeathNoteHUD : MonoBehaviour
     if (deactivate)
     {
       this._active = false;
-      GameManager.Instance.MainCameraController.SetManualControl(false);
+      if (_HasControlOverCamera)
+      {
+        GameManager.Instance.MainCameraController.SetManualControl(false);
+        _HasControlOverCamera = false;
+      }
     }
   }
 
@@ -594,15 +623,19 @@ public class DeathNoteHUD : MonoBehaviour
       Dismiss();
       UnityEngine.Object.Destroy(this);
     }
-    else if (GameManager.Instance.IsPaused || player.CurrentInputState != PlayerInputState.AllInput)
+    else if (GameManager.Instance.IsPaused)
       Dismiss(deactivate: false);
-    else if (gun.IsReloading)
+    else if (player.CurrentInputState != PlayerInputState.AllInput || gun.IsReloading)
       Dismiss();
     else if (this._active)
     {
       if (!GameManager.Instance.MainCameraController.ManualControl)
+      {
         GameManager.Instance.MainCameraController.SetManualControl(true);
-      GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
+        _HasControlOverCamera = true;
+      }
+      if (_HasControlOverCamera)
+        GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
     }
   }
 
@@ -629,7 +662,7 @@ public class DeathNoteHUD : MonoBehaviour
       return;
     }
 
-    float gunAngle = player.m_currentGunAngle.Clamp360();
+    float gunAngle = player.AimAngleFromCenterOfScreen().Clamp360();
     int curSegment = LetterIndexForAngle(gunAngle);
 
     this._shwoop = Mathf.Clamp01(this._shwoop + BraveTime.DeltaTime / _SHWOOP_TIME);
