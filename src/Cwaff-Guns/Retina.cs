@@ -5,7 +5,7 @@ public class Retina : CwaffGun
     public static string ItemName         = "Retina";
     public static string ShortDescription = "Breach of Covenant";
     public static string LongDescription  = "Shoots lethal piercing directed energy blasts. Press fire once to scope in, and again to shoot. Scope out by shooting, dodging, reloading, or taking damage.";
-    public static string Lore             = "A groundbreaking achievement in landmine clearing technology, this was the weapon of choice for infantrymen in the 999 Second War. Historical evidence is inconclusive regarding against whom or for what reason this war was fought, with recent research even suggesting the entire war was manufactured by ACNE corporation for the sole purpose of selling their latest mine-clearing lineup.";
+    public static string Lore             = "An engineering marvel developed by three tech-savvy track athletes and their coach under contract by the Department of Defense. Featuring a state-of-the-art digital scope, mach 4 directed energy projectiles, and enough power to wipe out a Gun Nut, this four-runner-designed weapon is perfect for fighting from an extremely comfortable distance.";
 
     private RetinaHUD _hud = null;
 

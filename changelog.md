@@ -17,11 +17,14 @@
 	- Chest rewards from the pizza minigame now spawn unlocked
 	- Tweaked text on reward note for successful pizza minigame completion
 - Added Nightlighter, Gadulo, Vengeful Spirit, and Death Note
+	- Nightlighter sprite thanks to [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)!
+	- Vengeful Spirit and Death Note sprites thanks to [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)!
 - Added masteries for Nightlighter, Gadulo, and Death Note
 - Added 4 new synergies
 - Fixed Shmuppies spawning too close to doorways and causing various issues with other mods
 - Fixed (for the 3rd time) gun sprites being partially white in synergy notifications
 - Optimized Retina's HUD to not be destroyed and recreated every time it's dismissed
+- Added proper lore for Retina instead of having placeholder text copy-pasted from Cleansweep
 
 ## 1.30.1 (2026-05-14)
 

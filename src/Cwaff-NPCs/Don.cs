@@ -79,7 +79,7 @@ public class Don : FancyNPC
       }],
       injectorName         : roomName,
       selectionWeight      : 1,
-      chanceToSpawnEachRun : forDomino ? 1.0f : (C.DEBUG_BUILD ? 1.0f : _DON_CHANCE_PER_RUN),
+      chanceToSpawnEachRun : /*C.DEBUG_BUILD ? 1.0f : */(forDomino ? 1.0f : _DON_CHANCE_PER_RUN),
       addSingularPlaceable : forDomino ? null : _NPC.gameObject, // prevent double-adding
       XFromCenter          : 0.0f,
       YFromCenter          : 3.25f,

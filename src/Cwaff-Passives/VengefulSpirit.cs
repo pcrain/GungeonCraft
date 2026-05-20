@@ -5,7 +5,7 @@ public class VengefulSpirit : CwaffPassive
     public static string ItemName         = "Vengeful Spirit";
     public static string ShortDescription = "D:<";
     public static string LongDescription  = "Deal double damage to any enemy that has injured you.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "Revenge is often said to be a dish best served cold, but those who make that claim have no idea what they're talking about. First off, revenge isn't a dish, it's not even edible. Second, and more importantly, a nice hot homecooked plate of revenge sounds much better than some frozen bag of revenge you can get at any supermarket.";
 
     public List<string> vengeantNames = new();
 

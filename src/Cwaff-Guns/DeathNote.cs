@@ -4,8 +4,8 @@ public class DeathNote : CwaffGun
 {
     public static string ItemName         = "Death Note";
     public static string ShortDescription = "You Will Know Their Names";
-    public static string LongDescription  = "Can be used to see enemies' names. Writing a name ensures the namebearer's untimely death. Increases Curse by 3.";
-    public static string Lore             = ""; // TODO: write lore
+    public static string LongDescription  = "Use to see enemies' names. Writing a name ensures the namebearer's untimely death. Increases Curse by 3.";
+    public static string Lore             = "\"A seemingly empty notebook with an impossibly dark cover. Holding it open in your hands fills you with a sense of control over everyone's fate except your own.\" ~ An edgy quote scribbled on the back of what is obviously a 5th-grader's school notebook.";
 
     internal static GameObject _ReaperVFX = null;
     internal static GameObject _ScytheVFX = null;

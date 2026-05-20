@@ -5,7 +5,7 @@ public class Gadulo : CwaffGun
     public static string ItemName         = "Gadulo";
     public static string ShortDescription = "Authentic Subanese";
     public static string LongDescription  = "Fires shards that have very high base damage, but cannot damage enemies that they don't kill outright. Shards inflict 3 seconds of stun on enemies they don't kill.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "This weapon's crystals have a propensity for violently exploding when enough are embedded in the same organism. While incredibly effective in theory, inexperienced combatants often struggle getting them to stick to anything other than lightly-defended targets and their own sleeves.";
 
     internal static readonly List<string> _IdleAnimations = new(4);
     internal static readonly List<string> _FireAnimations = new(4);

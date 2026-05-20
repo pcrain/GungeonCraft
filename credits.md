@@ -38,7 +38,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
 #### Original Sprites (please check out the authors' work! <3)
 
-  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Femtobyte, Forkbomb, Maestro, Missiletoe, Oddjob, Omnidirectional Laser, Plasmarble, RLTSRTSGTSBTSLB, Starmageddon, Stereoscope, Toothpaste, Vladimir
+  - [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/): Death Note, Femtobyte, Forkbomb, Maestro, Missiletoe, Oddjob, Omnidirectional Laser, Plasmarble, RLTSRTSGTSBTSLB, Starmageddon, Stereoscope, Toothpaste, Vladimir
 
   - [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/): Derail Gun, Gunflower, Nightlighter, Retina
 
@@ -67,7 +67,8 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 ### Other Sprites
 
 * Thunderstore preview icon plus several custom shopkeeper, item, clip, projectile, and miscellaneous sprites by [Lynceus](https://thunderstore.io/c/enter-the-gungeon/p/Lynceus/)
-* Most hat sprites plus various item and NPC sprites by [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)
+* Most hat sprites plus various item sprites by [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)
+* Don NPC and Bullet Kin pizza time event sprites by [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)
 * Tile sprites for the floor puzzle room by [Some Bunny](https://thunderstore.io/c/enter-the-gungeon/p/TeamPlanetside/)
 * Lots of beautiful projectile and VFX sprites by [BDragon1727](https://bdragon1727.itch.io/)
 * Several item sprites by [SpecialAPI](https://github.com/SpecialAPI)
