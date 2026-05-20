@@ -179,6 +179,8 @@ public static class CwaffSynergies
         NewSynergy(BOARD_AND_CARD_GAME_NIGHT, "Board and Card Game Night", new[]{IName(Grandmaster.ItemName), IName(Blackjack.ItemName)});
         // Grants stealth upon entering a room with Death Note equipped.
         NewSynergy(ILL_TAKE_A_POTATO_CHIP, "I'll Take a Potato Chip", new[]{IName(DeathNote.ItemName), IName(TryhardSnacks.ItemName)});
+        // Toothpaste goop spreads underneath the player's feet while walking around.
+        NewSynergy(BEDTIME_ROUTINE, "Bedtime Routine", new[]{IName(Toothpaste.ItemName), IName(ComfySlippers.ItemName)});
 
       #endregion
 
@@ -768,6 +770,7 @@ public enum Synergy {
     CABLE_MANAGEMENT,
     BOARD_AND_CARD_GAME_NIGHT,
     ILL_TAKE_A_POTATO_CHIP,
+    BEDTIME_ROUTINE,
 
     // Masteries
     MASTERY_GRANDMASTER,

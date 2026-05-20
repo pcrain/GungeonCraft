@@ -42,7 +42,16 @@ public class ComfySlippers : CwaffPassive
         if (!this.Owner || !this.Owner.specRigidbody)
             return;
 
-        CellVisualData.CellFloorType cellFloorType = GameManager.Instance.Dungeon.GetFloorTypeFromPosition(this.Owner.specRigidbody.UnitBottomCenter);
+        Vector2 footPosition = this.Owner.specRigidbody.UnitBottomCenter;
+        if (this.Owner.HasSynergy(Synergy.BEDTIME_ROUTINE))
+        {
+          if (!SudsWave._ToothpasteGooper)
+            SudsWave._ToothpasteGooper = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.ToothpasteGoop);
+          if (SudsWave._ToothpasteGooper.m_goopedPositions.Contains(footPosition.WorldToGoopPosition()))
+            SudsWave._ToothpasteGooper.AddGoopCircle(footPosition, 1f);
+        }
+
+        CellVisualData.CellFloorType cellFloorType = GameManager.Instance.Dungeon.GetFloorTypeFromPosition(footPosition);
         if (cellFloorType == this._lastFloorType)
             return;
 
