@@ -4,7 +4,7 @@ public class DeathNote : CwaffGun
 {
     public static string ItemName         = "Death Note";
     public static string ShortDescription = "You Will Know Their Names";
-    public static string LongDescription  = "Can be used to see enemies' names. Writing a name ensures the namebearer's untimely death. Does not break stealth when used. Increases Curse by 3.";
+    public static string LongDescription  = "Can be used to see enemies' names. Writing a name ensures the namebearer's untimely death. Increases Curse by 3.";
     public static string Lore             = ""; // TODO: write lore
 
     internal static GameObject _ReaperVFX = null;
@@ -26,7 +26,6 @@ public class DeathNote : CwaffGun
           .AssignGun(out Gun gun)
           // .BanFromCoop() // NOTE: unsure how well this will work in co-op. commenting this out for now, we'll see how it goes
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, customClip: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
-
 
         gun.spriteAnimator.SetLoopPoint(gun.QuickUpdateGunAnimation("open", fps: 10), 3);
         gun.QuickUpdateGunAnimation("close", fps: 30, returnToIdle: true);
@@ -91,7 +90,7 @@ public class DeathNote : CwaffGun
     {
       base.gameObject.Play("death_note_write_sound");
       char letter = DeathNoteHUD._NAME_LETTERS[DeathNoteHUD.LetterIndexForAngle(player.AimAngleFromCenterOfScreen())];
-      DeathNoteNameHandler.WriteLetter(letter);
+      DeathNoteNameHandler.WriteLetter(letter, player, this.Mastered);
       CwaffVFX.SpawnBurst(
         prefab           : _Scribbles,
         numToSpawn       : 4,
@@ -130,6 +129,43 @@ public class DeathNote : CwaffGun
         return;
       player.OnReceivedDamage -= this.OnReceivedDamage;
       player.OnReceivedDamage += this.OnReceivedDamage;
+      player.OnEnteredCombat -= this.OnEnteredCombat;
+      player.OnEnteredCombat += this.OnEnteredCombat;
+    }
+
+    private void DeregisterEvents(PlayerController player)
+    {
+      if (!player)
+        return;
+      player.OnReceivedDamage -= this.OnReceivedDamage;
+      player.OnEnteredCombat -= this.OnEnteredCombat;
+    }
+
+    private void OnEnteredCombat()
+    {
+      if (this.PlayerOwner is PlayerController player && player.CurrentGun == this.gun && player.HasSynergy(Synergy.ILL_TAKE_A_POTATO_CHIP))
+        BecomeInvisible(player);
+    }
+
+    // copied and simplified from DoEffect() of CardboardBoxItem.cs
+    private void BecomeInvisible(PlayerController player)
+    {
+      player.OnDidUnstealthyAction += BreakStealth;
+      player.SetIsStealthed(true, "PotatoChips");
+      // Apply a shadowy shader
+      foreach (Material m in player.SetOverrideShader(ShaderCache.Acquire("Brave/Internal/HighPriestAfterImage")))
+      {
+        m.SetFloat(CwaffVFX._EmissivePowerId, 0f);
+        m.SetFloat("_Opacity", 0.5f);
+        m.SetColor("_DashColor", Color.gray);
+      }
+    }
+
+    private void BreakStealth(PlayerController player)
+    {
+      player.ClearOverrideShader();
+      player.SetIsStealthed(false, "PotatoChips");
+      player.OnDidUnstealthyAction -= BreakStealth;
     }
 
     private void OnReceivedDamage(PlayerController player)
@@ -154,6 +190,19 @@ public class DeathNote : CwaffGun
       DeathNoteNameHandler.Instance(); // ensure we have a DeathNoteNameHandler
       CreateHUDIfNecessary();
       RegisterEvents(this.PlayerOwner);
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        base.OnDroppedByPlayer(player);
+        DeregisterEvents(player);
+    }
+
+    public override void OnDestroy()
+    {
+        if (this.PlayerOwner)
+            DeregisterEvents(this.PlayerOwner);
+        base.OnDestroy();
     }
 
     private void CreateHUDIfNecessary()
@@ -217,6 +266,7 @@ public class ShinigamiVisit : MonoBehaviour
     this._shinigami.MakeGlowyBetter(glowColor: Color.red, glowAmount: 2f, glowColorPower: 10.0f);
     this._lastPosition = this._actor.sprite.WorldTopCenter + _OffscreenOffset;
     this._shinigami.PlaceAtPositionByAnchor(this._lastPosition.HoverAt(amplitude: 0.25f), anchor: Anchor.LowerCenter);
+
     this._setup = true;
   }
 
@@ -310,8 +360,10 @@ public class DeathNoteNameHandler
 
   private Dictionary<AIActor,DeathNoteNametag> _nametags = null;
   private char _queuedLetter = '\0';
+  private bool _preventReset = false;
   private List<char> _bestLetters = null;
   private bool _needsReset = false;
+  private PlayerController _owner = null;
 
   internal static readonly List<List<string>> _PossibleNames = new();
 
@@ -363,7 +415,12 @@ public class DeathNoteNameHandler
     return name;
   }
 
-  public static void WriteLetter(char c) => _Instance._queuedLetter = c;
+  public static void WriteLetter(char c, PlayerController owner, bool preventReset)
+  {
+    _Instance._queuedLetter = c;
+    _Instance._owner = owner;
+    _Instance._preventReset = preventReset;
+  }
 
   public static bool OneGoodLetter() => _Instance._bestLetters.Count == 1;
 
@@ -371,23 +428,15 @@ public class DeathNoteNameHandler
 
   public static bool ResetNameProgress() => _Instance._needsReset = true;
 
-  private static readonly List<AIActor> _InactiveActors = new();
   internal static readonly List<string> _ActiveNames = new();
 
   public IEnumerable GetNameTags()
   {
     // phase 1: determine names that are no longer in use
-    _InactiveActors.Clear();
+    this._nametags.RemoveDeadKeys();
     _ActiveNames.Clear();
-    foreach (var kvp in this._nametags)
-    {
-      if (!kvp.Key)
-        _InactiveActors.Add(kvp.Key);
-      else
-        _ActiveNames.Add(kvp.Value.name);
-    }
-    foreach(AIActor key in _InactiveActors)
-      this._nametags.Remove(key);
+    foreach (DeathNoteNametag tag in this._nametags.Values)
+      _ActiveNames.Add(tag.name);
 
     // phase 2: actually compute and return nametags
     bool resetNames = this._needsReset;
@@ -419,7 +468,7 @@ public class DeathNoteNameHandler
       if (resetNames)
         tag.ResetName();
       if (newLetter)
-        tag.HandleLetter(this._queuedLetter);
+        tag.HandleLetter(this._queuedLetter, this._owner, this._preventReset);
       if (tag.nextLetter < tag.nameLength) // if our name isn't completely spelled out
       {
         if (tag.nextLetter > longestName)
@@ -464,7 +513,7 @@ public class DeathNoteNametag
       return tag;
   }
 
-  public void HandleLetter(char c)
+  public void HandleLetter(char c, PlayerController owner, bool preventReset)
   {
     if (this._dying || !hh || !actor)
       return;
@@ -472,15 +521,20 @@ public class DeathNoteNametag
     this._dirty = true;
     if (c != this.uppername[nextLetter])
     {
-      nextLetter = 0;
+      if (!preventReset)
+        nextLetter = 0;
       return;
     }
     ++nextLetter;
     if (nextLetter != nameLength)
       return;
 
-    DeathNoteNameHandler.ResetNameProgress(); // once an enemy has been killed, reset progress on all other names
+    if (!preventReset)
+      DeathNoteNameHandler.ResetNameProgress(); // once an enemy has been killed, reset progress on all other names
+
     this._dying = true;
+    if (owner)
+      owner.DidUnstealthyAction();
     new GameObject().AddComponent<ShinigamiVisit>().Setup(hh);
   }
 
@@ -598,6 +652,7 @@ public class DeathNoteHUD : MonoBehaviour
       _HasControlOverCamera = true;
     }
     base.gameObject.Play("death_note_open_sound");
+    // BraveTime.SetTimeScaleMultiplier(0.5f, base.gameObject);
   }
 
   public void Dismiss(bool force = false, bool deactivate = true)
@@ -630,6 +685,7 @@ public class DeathNoteHUD : MonoBehaviour
     if (deactivate)
     {
       this._active = false;
+      // BraveTime.SetTimeScaleMultiplier(1.0f, base.gameObject);
       if (_HasControlOverCamera)
       {
         GameManager.Instance.MainCameraController.SetManualControl(false);

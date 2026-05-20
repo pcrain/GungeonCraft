@@ -4023,5 +4023,17 @@ public static class Extensions
     Vector2 screenCenter = 0.5f * (mcc.MinVisiblePoint + mcc.MaxVisiblePoint);
     return (player.unadjustedAimPoint.XY() - screenCenter).ToAngle();
   }
+
+  private static List<MonoBehaviour> _TempBehavs = new();
+  /// <summary>Remove unused key value pairs from dictionaries where keys are MonoBehaviours attached to GameObjects that might not exist that might not exist.</summary>
+  public static void RemoveDeadKeys<K, V>(this Dictionary<K, V> self) where K : MonoBehaviour
+  {
+    foreach (var key in self.Keys)
+      if (!key)
+        _TempBehavs.Add(key);
+    foreach(MonoBehaviour key in _TempBehavs)
+      self.Remove(key as K);
+    _TempBehavs.Clear();
+  }
 }
 

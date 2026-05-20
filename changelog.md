@@ -17,8 +17,8 @@
 	- Chest rewards from the pizza minigame now spawn unlocked
 	- Tweaked text on reward note for successful pizza minigame completion
 - Added Nightlighter, Gadulo, Vengeful Spirit, and Death Note
-- Added masteries for Nightlighter and Gadulo
-- Added 2 new synergies
+- Added masteries for Nightlighter, Gadulo, and Death Note
+- Added 3 new synergies
 
 ## 1.30.1 (2026-05-14)
 

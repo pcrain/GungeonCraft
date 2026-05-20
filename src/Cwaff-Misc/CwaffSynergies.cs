@@ -177,6 +177,8 @@ public static class CwaffSynergies
         NewSynergy(CABLE_MANAGEMENT, "Cable Management", new[]{IName(Alligator.ItemName), IName(Nightlighter.ItemName)});
         // Blackjack and Grandmaster are dual wielded.
         NewSynergy(BOARD_AND_CARD_GAME_NIGHT, "Board and Card Game Night", new[]{IName(Grandmaster.ItemName), IName(Blackjack.ItemName)});
+        // Grants stealth upon entering a room with Death Note equipped.
+        NewSynergy(ILL_TAKE_A_POTATO_CHIP, "I'll Take a Potato Chip", new[]{IName(DeathNote.ItemName), IName(TryhardSnacks.ItemName)});
 
       #endregion
 
@@ -380,6 +382,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfNightlighter>(MASTERY_NIGHTLIGHTER, Nightlighter.ItemName);
         // Needles stick to enemies that aren't instantly killed, and supercombine to kill enemies once their total damage exceeds the enemy's health.
         NewMastery<MasteryOfGadulo>(MASTERY_GADULO, Gadulo.ItemName);
+        // Names are no longer reset when entering an incorrect character.
+        NewMastery<MasteryOfDeathNote>(MASTERY_DEATH_NOTE, DeathNote.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -689,6 +693,7 @@ internal class MasteryOfPhotonCannon         : MasteryDummyItem {}
 internal class MasteryOfFuelRodGun           : MasteryDummyItem {}
 internal class MasteryOfNightlighter         : MasteryDummyItem {}
 internal class MasteryOfGadulo               : MasteryDummyItem {}
+internal class MasteryOfDeathNote            : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -762,6 +767,7 @@ public enum Synergy {
     GUN_SOHAN,
     CABLE_MANAGEMENT,
     BOARD_AND_CARD_GAME_NIGHT,
+    ILL_TAKE_A_POTATO_CHIP,
 
     // Masteries
     MASTERY_GRANDMASTER,
@@ -858,4 +864,5 @@ public enum Synergy {
     MASTERY_FUEL_ROD_GUN,
     MASTERY_NIGHTLIGHTER,
     MASTERY_GADULO,
+    MASTERY_DEATH_NOTE,
 };
