@@ -192,9 +192,16 @@ public class DeathNote : CwaffGun
       RegisterEvents(this.PlayerOwner);
     }
 
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        DismissHUD();
+        base.OnSwitchedAwayFromThisGun();
+    }
+
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
+        DismissHUD();
         DeregisterEvents(player);
     }
 
@@ -202,6 +209,7 @@ public class DeathNote : CwaffGun
     {
         if (this.PlayerOwner)
             DeregisterEvents(this.PlayerOwner);
+        DismissHUD();
         base.OnDestroy();
     }
 

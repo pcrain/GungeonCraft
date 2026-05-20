@@ -118,10 +118,8 @@ public class Retina : CwaffGun
 
     private void DismissHUD()
     {
-      if (!this._hud)
-        return;
-      this._hud.Dismiss(deactivate: true);
-      this._hud = null;
+      if (this._hud)
+        this._hud.Dismiss(deactivate: true);
     }
 }
 
