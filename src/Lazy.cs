@@ -1677,4 +1677,35 @@ public static class Lazy
     }
     return true;
   }
+
+  /// <summary>Static version of AmmonomiconDeathPageController function that takes a PlayerController so we can work with custom characters.</summary>
+  public static string GetPlayerCharacterName(PlayerController player)
+  {
+    switch (player.characterIdentity)
+    {
+      case PlayableCharacters.Convict:
+        return GameUIRoot.Instance.GetComponent<dfLanguageManager>().GetValue("#CHAR_CONVICT_SHORT");
+      case PlayableCharacters.Guide:
+        return GameUIRoot.Instance.GetComponent<dfLanguageManager>().GetValue("#CHAR_GUIDE_SHORT");
+      case PlayableCharacters.Soldier:
+        return GameUIRoot.Instance.GetComponent<dfLanguageManager>().GetValue("#CHAR_MARINE_SHORT");
+      case PlayableCharacters.Pilot:
+        return GameUIRoot.Instance.GetComponent<dfLanguageManager>().GetValue("#CHAR_ROGUE_SHORT");
+      case PlayableCharacters.CoopCultist:
+        return GameUIRoot.Instance.GetComponent<dfLanguageManager>().GetValue("#CHAR_CULTIST_SHORT");
+      case PlayableCharacters.Robot:
+        return GameUIRoot.Instance.GetComponent<dfLanguageManager>().GetValue("#CHAR_ROBOT_SHORT");
+      case PlayableCharacters.Bullet:
+        return GameUIRoot.Instance.GetComponent<dfLanguageManager>().GetValue("#CHAR_BULLET_SHORT");
+      case PlayableCharacters.Eevee:
+        return GameUIRoot.Instance.GetComponent<dfLanguageManager>().GetValue("#CHAR_PARADOX_SHORT");
+      case PlayableCharacters.Gunslinger:
+        return GameUIRoot.Instance.GetComponent<dfLanguageManager>().GetValue("#CHAR_GUNSLINGER_SHORT");
+      default:
+        break;
+    }
+    if (player.gameObject.GetComponent<CustomCharacter>() is CustomCharacter cc)
+      return cc.data.nameShort.Replace("_", "");
+    return player.name.Replace("_", ""); // best effort for unknown custom characters
+  }
 }

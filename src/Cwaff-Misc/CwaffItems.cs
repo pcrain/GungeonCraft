@@ -57,6 +57,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public  float                             percentSpeedWhileCharging  = 1.0f;   // max relative speed the player can move while charging the gun
   public  float                             percentSpeedWhileReloading = 1.0f;   // max relative speed the player can move while reloading the gun
   public  bool                              preventRollingWhenCharging = false;  // whether holding the gun prevents the player from dodge rolling
+  public  bool                              preventDuctTape            = false;  // whether we should forcibly prevent this gun from being duct taped
   public  float                             spinupTime                 = 0.0f;   // the amount of time it takes an automatic weapon to start firing
   public  string                            spinupSound                = null;   // the sound to play while an automatic gun is spinning up
   public  bool                              continuousFireAnimation    = false;  // if true, don't restart shooting animation when firing bullet
@@ -625,6 +626,18 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
           return true; // we use the Banana switch group as a dummy switch group without reload or charge sounds, but it still has a fire sound, so suppress it
         return wasNullOrEmpty;
       }
+  }
+
+  [HarmonyPatch]
+  private static class DuctTapeBannedGunsPatch
+  {
+    [HarmonyPatch(typeof(DuctTapeItem), nameof(DuctTapeItem.IsGunValid))]
+    [HarmonyPostfix]
+    private static void DuctTapeItemIsGunValidPatch(DuctTapeItem __instance, Gun g, Gun excluded, ref bool __result)
+    {
+      if (__result && g.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.preventDuctTape)
+        __result = false;
+    }
   }
 
   /// <summary>Allow automatic guns to have a spin up time</summary>

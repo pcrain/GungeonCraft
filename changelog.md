@@ -16,7 +16,7 @@
 	- Adjusted Bullet Kin placement to better avoid being hidden by walls
 	- Chest rewards from the pizza minigame now spawn unlocked
 	- Tweaked text on reward note for successful pizza minigame completion
-- Added Nightlighter, Gadulo, and Vengeful Spirit
+- Added Nightlighter, Gadulo, Vengeful Spirit, and Death Note
 - Added masteries for Nightlighter and Gadulo
 - Added 2 new synergies
 

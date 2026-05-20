@@ -415,7 +415,8 @@ needle_rifle_reload_hatch_sound,8.0,1,sound,0
 needle_rifle_reload_plant_sound,8.0,1,sound,0
 needler_impact_enemy_sound,-2.0,1,sound,0
 supercombine_sound,1.5,1,sound,0
-death_note_open_sound,8.0,1,sound,0
+death_note_open_sound,5.0,1,sound,0
 death_note_write_sound,8.0,1,sound,0
-death_note_scythe_hit_sound,0.0,1,sound,0
-death_note_scythe_swing_sound,2.0,1,sound,0
+death_note_scythe_hit_sound,5.0,1,sound,0
+death_note_scythe_swing_sound,5.0,1,sound,0
+death_note_close_sound,5.0,1,sound,0

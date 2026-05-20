@@ -1005,6 +1005,7 @@ public static class Extensions
   /// <param name="smoothReload">If non-negative, automatically adjusts the speed of the gun's reload animation to finish smoothReload seconds before the reload itself finishes.</param>
   /// <param name="canAttackWhileRolling">If true, the gun can be fired while dodge rolling.</param>
   /// <param name="isStarterGun">If true, the gun is marked as a starter gun for Paradox / achievement purposes.</param>
+  /// <param name="preventDuctTape">If true, prevents Duct Tape from being used on this item.</param>
   public static Gun SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
@@ -1014,7 +1015,7 @@ public static class Extensions
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
     bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f, bool canAttackWhileRolling = false,
-    bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f)
+    bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f, bool preventDuctTape = false)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -1061,6 +1062,7 @@ public static class Extensions
     }
 
     cg.canAttackWhileRolling = canAttackWhileRolling;
+    cg.preventDuctTape = preventDuctTape;
     cg.percentSpeedWhileCharging = percentSpeedWhileCharging;
     cg.percentSpeedWhileReloading = percentSpeedWhileReloading;
     cg.percentSpeedWhileFiring = percentSpeedWhileFiring;
@@ -3712,14 +3714,15 @@ public static class Extensions
   }
 
   /// <summary>Prevent an item from spawning in coop mode</summary>
-  public static void BanFromCoop(this PickupObject item)
+  public static T BanFromCoop<T>(this T item) where T : PickupObject
   {
     if (item.encounterTrackable is not EncounterTrackable t)
-      return;
+      return item;
     t.m_prerequisites ??= [];
     int oldSize = t.m_prerequisites.Length;
     Array.Resize(ref t.m_prerequisites, oldSize + 1);
     t.m_prerequisites[oldSize] = new CwaffPrerequisite{ prerequisite = CwaffPrerequisites.NOT_COOP_MODE_PREREQUISITE };
+    return item;
   }
 
   /// <summary>Allow a sprite object to fall into pits.</summary>

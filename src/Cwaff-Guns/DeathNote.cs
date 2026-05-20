@@ -1,21 +1,10 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - better sound for finishing a name
-    - letter falling animations near enemies when selecting letters
-    - vfx while death note is open
-    - animate opening / closing the notebook
-    - better sfx in general
-    - aim assist for when only one valid name is active
-
-    - add easter eggs C:
-*/
-
 public class DeathNote : CwaffGun
 {
     public static string ItemName         = "Death Note";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
+    public static string ShortDescription = "You Will Know Their Names";
+    public static string LongDescription  = "Can be used to see enemies' names. Writing a name ensures the namebearer's untimely death. Increases Curse by 3.";
     public static string Lore             = "TBD";
 
     internal static GameObject _ReaperVFX = null;
@@ -23,52 +12,116 @@ public class DeathNote : CwaffGun
 
     private DeathNoteHUD _hud = null;
 
+    private static GameObject _Scribbles;
+
+    internal string _ownerName = string.Empty;
+    internal int nextLetter = 0;
+
     public static void Init()
     {
         Lazy.SetupGun<DeathNote>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 50, shootFps: 14, reloadFps: 4, attacksThroughWalls: true)
-          .InitSpecialProjectile<DeathNoteProjectile>(GunData.New(sprite: null, clipSize: -1, cooldown: 0.75f, shootStyle: ShootStyle.SemiAutomatic, hideAmmo: true,
-            damage: 999.0f, speed: 25f, range: 100f, force: 30f));
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 444, shootFps: 14, reloadFps: 4, attacksThroughWalls: true,
+            curse: 3f, preventDuctTape: true, dynamicBarrelOffsets: true)
+          .AddToShop(ItemBuilder.ShopType.Cursula)
+          .AssignGun(out Gun gun)
+          // .BanFromCoop() // NOTE: unsure how well this will work in co-op. commenting this out for now, we'll see how it goes
+          .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, customClip: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
+
+
+        gun.spriteAnimator.SetLoopPoint(gun.QuickUpdateGunAnimation("open", fps: 10), 3);
+        gun.QuickUpdateGunAnimation("close", fps: 30, returnToIdle: true);
 
         _ReaperVFX = VFX.Create("reaper_vfx", anchor: Anchor.LowerCenter);
-        _ScytheVFX = VFX.Create("death_scythe_swing", fps: 30, loops: false, anchor: Anchor.LowerCenter);
+        _ScytheVFX = VFX.Create("death_scythe_swing", fps: 30, loops: false, anchor: Anchor.LowerCenter, zHeightOffset: 10f);
+        _Scribbles = VFX.Create("scribbles");
 
-        // read names
-        int count = 0;
+        // read name list
         using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"{C.MOD_INT_NAME}.Resources.listofnames.txt"))
         using (StreamReader reader = new StreamReader(stream))
         for (string line = reader.ReadLine(); line != null; line = reader.ReadLine())
         {
           string trimmed = line.Trim();
           if (trimmed.Length > 0)
-          {
-            ++count;
             DeathNoteNameHandler.AddPossibleName(trimmed);
-          }
         }
-        Lazy.DebugConsoleLog($"  read {count} names");
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        this.gun.OverrideAngleSnap = 180f;
+      }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+        base.OnPlayerPickup(player);
+        this.nextLetter = 0;
+        this._ownerName = Lazy.GetPlayerCharacterName(player).ToUpper();
+        Lazy.DebugConsoleLog($"picked up by {this._ownerName}");
     }
 
     public override void OnTriedToInitiateAttack(PlayerController player)
     {
       base.OnTriedToInitiateAttack(player);
+      if (this.gun.CurrentAmmo == 0 && !this.gun.InfiniteAmmo)
+      {
+        DismissHUD(); // can't fire if out of ammo
+        return;
+      }
 
       player.SuppressThisClick = true; // always suppress this gun's attacks, for now
-
       if (player.IsDodgeRolling || player.CurrentInputState != PlayerInputState.AllInput)
         return; // inactive, do normal firing stuff
       if (this.gun.IsReloading || this.gun.CurrentAmmo == 0)
         return; // inactive, do normal firing stuff
-      CreateHUDIfNecessary();
-      if (!this._hud || this._hud.Active)
+      if (!this._hud || !this._hud.Active)
       {
-        base.gameObject.Play("death_note_write_sound");
-        DeathNoteNameHandler.WriteLetter(DeathNoteHUD._NAME_LETTERS[DeathNoteHUD.LetterIndexForAngle(player.m_currentGunAngle)]);
-        return; // no HUD or HUD already active
+        CreateHUDIfNecessary();
+        if (this._hud && !this.gun.m_moduleData[this.gun.DefaultModule].onCooldown) // don't toggle HUD while the weapon is on cooldown
+        {
+          gun.PlayIfExists("death_note_open", restartIfPlaying: true);
+          this._hud.Toggle();
+        }
+        return;
       }
+      WriteInNotebook(player);
+    }
 
-      if (!this.gun.m_moduleData[this.gun.DefaultModule].onCooldown) // don't toggle HUD while the weapon is on cooldown
-        this._hud.Toggle();
+    public void WriteInNotebook(PlayerController player)
+    {
+      base.gameObject.Play("death_note_write_sound");
+      char letter = DeathNoteHUD._NAME_LETTERS[DeathNoteHUD.LetterIndexForAngle(player.m_currentGunAngle)];
+      DeathNoteNameHandler.WriteLetter(letter);
+      CwaffVFX.SpawnBurst(
+        prefab           : _Scribbles,
+        numToSpawn       : 4,
+        basePosition     : base.gun.barrelOffset.transform.position,
+        positionVariance : 0.5f,
+        baseVelocity     : new Vector2(0, 12f),
+        velocityVariance : 6f,
+        velType          : CwaffVFX.Vel.Random,
+        lifetime         : 1.5f,
+        fadeOutTime      : 0.5f,
+        randomFrame      : true,
+        emissivePower    : 10f,
+        startScale       : 0.5f,
+        emissiveColor    : Color.white
+        );
+      this.gun.LoseAmmo(1);
+      if (this.gun.CurrentAmmo == 0 && !this.gun.InfiniteAmmo)
+        DismissHUD(); // can't fire if out of ammo
+
+      if (string.IsNullOrEmpty(this._ownerName))
+        return;
+      if (this._ownerName[this.nextLetter] != letter)
+      {
+        this.nextLetter = 0;
+        return;
+      }
+      if (++this.nextLetter != this._ownerName.Length)
+        return;
+      this.nextLetter = 0;
+      new GameObject().AddComponent<ShinigamiVisit>().Setup(player.healthHaver);
     }
 
     private void RegisterEvents(PlayerController player)
@@ -86,10 +139,13 @@ public class DeathNote : CwaffGun
 
     public override bool OnManualReloadAttempted(PlayerController player)
     {
-        if (!this._hud || !this._hud.Active)
-            return true;
-        this._hud.Dismiss();
-        return false;
+      if (!this._hud || !this._hud.Active)
+        return true;
+      gun.PlayIfExists("death_note_close", restartIfPlaying: true);
+      base.gameObject.Play("death_note_close_sound");
+      // SpawnManager.SpawnVFX(GameManager.Instance.Dungeon.dungeonDustups.rollLandDustup, gun.barrelOffset.position, Quaternion.identity);
+      this._hud.Dismiss();
+      return false;
     }
 
     public override void OnSwitchedToThisGun()
@@ -110,18 +166,10 @@ public class DeathNote : CwaffGun
 
     private void DismissHUD()
     {
-      if (!this._hud)
+      if (!this._hud || !this._hud.Active)
         return;
+      gun.PlayIfExists("death_note_close", restartIfPlaying: true);
       this._hud.Dismiss();
-      this._hud = null;
-    }
-
-    private class DeathNoteProjectile : WeirdProjectile
-    {
-        protected override void OnFiredByAnything()
-        {
-          DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
-        }
     }
 }
 
@@ -132,7 +180,7 @@ public class ShinigamiVisit : MonoBehaviour
   private static readonly Vector2 _HoverOffset = new Vector2(0.0f, 1.0f);
   private static readonly Vector2 _OffscreenOffset = new Vector2(0.0f, 15.0f);
 
-  private AIActor _actor = null;
+  private GameActor _actor = null;
   private HealthHaver _hh = null;
   private SpeculativeRigidbody _body = null;
   private tk2dSprite _shinigami = null;
@@ -150,7 +198,7 @@ public class ShinigamiVisit : MonoBehaviour
       UnityEngine.Object.Destroy(base.gameObject);
       return;
     }
-    this._actor = this._hh.aiActor;
+    this._actor = this._hh.gameActor;
     if (!this._actor || !this._actor.sprite || !this._actor.specRigidbody)
     {
       UnityEngine.Object.Destroy(base.gameObject);
@@ -193,14 +241,16 @@ public class ShinigamiVisit : MonoBehaviour
     this._destroying = true;
     base.StartCoroutine(GlowTime());
     base.gameObject.Play("death_note_scythe_swing_sound");
-    CwaffVFX.Spawn(prefab: DeathNote._ScytheVFX, position: this._actor.sprite.WorldBottomCenter);
-    CwaffVFX.Spawn(prefab: DeathNote._ScytheVFX, position: this._actor.sprite.WorldBottomCenter, flipX: true);
-    CwaffVFX.Spawn(prefab: DeathNote._ScytheVFX, position: this._actor.sprite.WorldBottomCenter, rotation: 45f.EulerZ());
-    CwaffVFX.Spawn(prefab: DeathNote._ScytheVFX, position: this._actor.sprite.WorldBottomCenter, flipX: true, rotation: (-45f).EulerZ());
+    CwaffVFX.Spawn(prefab: DeathNote._ScytheVFX, position: this._actor.sprite.WorldBottomCenter, height: 10f);
+    CwaffVFX.Spawn(prefab: DeathNote._ScytheVFX, position: this._actor.sprite.WorldBottomCenter, height: 10f, flipX: true);
+    CwaffVFX.Spawn(prefab: DeathNote._ScytheVFX, position: this._actor.sprite.WorldBottomCenter, height: 10f, rotation: 45f.EulerZ());
+    CwaffVFX.Spawn(prefab: DeathNote._ScytheVFX, position: this._actor.sprite.WorldBottomCenter, height: 10f, flipX: true, rotation: (-45f).EulerZ());
+    if (this._actor is PlayerController player)
+      this._hh.NextShotKills = true;
     this._hh.ApplyDamage(9999999f, Vector2.zero, "Shinigami", CoreDamageTypes.Magic, DamageCategory.Unstoppable,
       ignoreInvulnerabilityFrames: true, ignoreDamageCaps: true);
     if (this._hh.IsDead)
-      this._hh.gameObject.Play("death_note_scythe_hit_sound");
+      this._hh.gameObject.PlayUnique("death_note_scythe_hit_sound");
   }
 
   private IEnumerator GlowTime()
@@ -304,21 +354,14 @@ public class DeathNoteNameHandler
   {
     float health = hh.AdjustedMaxHealth;
     int nameLength = _NameLengthHealthThresholds.FirstLT(health);
-    float randomValue = UnityEngine.Random.value;
-    if (randomValue < 0.2f)
-      --nameLength; // 20% chance to be one letter shorter than normal
-    else if (randomValue > 0.8f)
+    if (!hh.IsBoss && !hh.IsSubboss && nameLength < _MAX_NAME_LENGTH && UnityEngine.Random.value < 0.2f)
       ++nameLength; // 20% chance to be one letter longer than normal
-    nameLength = Mathf.Clamp(nameLength, 1, _MAX_NAME_LENGTH);
     string name = _PossibleNames[nameLength].ChooseRandom();
     Lazy.DebugConsoleLog($"{enemy.AmmonomiconName()} with {health} health gets name of length {nameLength}: {name}");
     return name;
   }
 
-  public static void WriteLetter(char c)
-  {
-    _Instance._queuedLetter = c;
-  }
+  public static void WriteLetter(char c) => _Instance._queuedLetter = c;
 
   public static bool OneGoodLetter() => _Instance._bestLetters.Count == 1;
 
@@ -366,8 +409,6 @@ public class DeathNoteNameHandler
 
 public class DeathNoteNametag
 {
-  private static GameObject _EraseVFX = null;
-
   public string name = null;
   public string uppername = null;
   public string markupName = null;
@@ -381,8 +422,6 @@ public class DeathNoteNametag
 
   public static DeathNoteNametag Generate(AIActor enemy, HealthHaver hh)
   {
-      if (_EraseVFX == null)
-        _EraseVFX = Items.YellowChamber.AsPassive().gameObject.GetComponent<YellowChamberItem>().EraseVFX;
       DeathNoteNametag tag = new DeathNoteNametag();
       tag.actor = enemy;
       tag.hh = hh;
@@ -409,7 +448,6 @@ public class DeathNoteNametag
     if (nextLetter != nameLength)
       return;
 
-    // actor.gameObject.Play("death_note_scythe_hit_sound");
     DeathNoteNameHandler.ResetNameProgress(); // once an enemy has been killed, reset progress on all other names
     this._dying = true;
     new GameObject().AddComponent<ShinigamiVisit>().Setup(hh);
@@ -418,7 +456,10 @@ public class DeathNoteNametag
   public void ResetName()
   {
     if (!this._dying)
+    {
       this.nextLetter = 0;
+      this._dirty = true;
+    }
   }
 
   public void PlaceNametag(dfLabel label)
@@ -440,7 +481,6 @@ public class DeathNoteNametag
 
 public class DeathNoteHUD : MonoBehaviour
 {
-  // internal const string _NAME_LETTERS = "ABCDEFGHIJKLMNOPRSTUVWYZ";
   internal const string _NAME_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
   private const int _NUM_LETTERS = 26;
@@ -508,7 +548,7 @@ public class DeathNoteHUD : MonoBehaviour
     this._shwoop = 0.0f;
     GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
     GameManager.Instance.MainCameraController.SetManualControl(true);
-    base.gameObject.Play("death_note_open_sound"); // TODO: better sound
+    base.gameObject.Play("death_note_open_sound");
   }
 
   public void Dismiss(bool force = false, bool deactivate = true)
@@ -616,12 +656,12 @@ public class DeathNoteHUD : MonoBehaviour
       Vector2 labelPos = screenCenter + (_WEDGE_ARC * i).ToVector(labelRadius);
       if (sel)
       {
-        labelPos += Lazy.RandomVector(0.0625f);
+        labelPos += Lazy.RandomVector(1/32f);
       }
       if (goodLetter && DeathNoteNameHandler.OneGoodLetter())
         this._selector.Place(pos: screenCenter, angle: _WEDGE_ARC * i, arc: _WEDGE_ARC,
-          radiusInner: innerRadius * 0.8f, radius: innerRadius,
-          color: Color.red.WithAlpha(geomAlpha));
+          radiusInner: innerRadius * 0.3f, radius: innerRadius * 0.9f,
+          color: (Color.Lerp(Color.red, ExtendedColours.pink, Mathf.Abs(Mathf.Sin(12f * BraveTime.ScaledTimeSinceStartup)))).WithAlpha(geomAlpha));
       this._labels[i].Color = (sel ? Color.black : goodLetter ? Color.red : Color.white).WithAlpha(Mathf.Clamp01(2f * ease - 1f));
       this._labels[i].OutlineColor = (sel ? Color.white : Color.black).WithAlpha(Mathf.Clamp01(2f * ease - 1f));
       this._labels[i].Opacity = ease;
