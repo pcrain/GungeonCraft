@@ -564,18 +564,6 @@ public class DeathNoteNametag
   }
 }
 
-/// <summary>Patch to make sure control over the camera is restored when something else requests manual control.</summary>
-[HarmonyPatch]
-internal static class HaveControlOverCameraControllerPatch
-{
-  [HarmonyPatch(typeof(CameraController), nameof(CameraController.SetManualControl))]
-  [HarmonyPostfix]
-  private static void CameraControllerSetManualControlPatch(CameraController __instance, bool manualControl, bool shouldLerp)
-  {
-    DeathNoteHUD._HasControlOverCamera = false;
-  }
-}
-
 public class DeathNoteHUD : MonoBehaviour
 {
   internal const string _NAME_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -588,16 +576,14 @@ public class DeathNoteHUD : MonoBehaviour
   private static readonly Color _GeomColor1 = new Color(0.25f, 0.25f, 0.25f);
   private static readonly Color _GeomColor2 = new Color(0.35f, 0.35f, 0.35f);
 
-  internal static bool _HasControlOverCamera = false;
-
-  private bool _setup              = false;   // whether we're set up
-  private float _shwoop            = 0.0f;    // whether we're shwooped open
-  private bool _active             = false;   // whether we're active
-  private DeathNote _gun           = null;    // gun we're attached to
-  private List<Geometry> _geometry = new();   // all shapes rendered by the HUD
-  private Geometry       _selector = new();   // extra selector rendered by the HUD
-  private List<dfLabel> _labels    = new();   // all letter labels rendered by the HUD
-  private List<dfLabel> _nametags  = new();   // all nametag labels rendered by the HUD
+  private bool _setup                 = false;   // whether we're set up
+  private float _shwoop               = 0.0f;    // whether we're shwooped open
+  private bool _active                = false;   // whether we're active
+  private DeathNote _gun              = null;    // gun we're attached to
+  private List<Geometry> _geometry    = new();   // all shapes rendered by the HUD
+  private Geometry       _selector    = new();   // extra selector rendered by the HUD
+  private List<dfLabel> _labels       = new();   // all letter labels rendered by the HUD
+  private List<dfLabel> _nametags     = new();   // all nametag labels rendered by the HUD
 
   private CameraController _camera;
   private Vector2 _worldBottomLeft;
@@ -645,14 +631,15 @@ public class DeathNoteHUD : MonoBehaviour
 
     this._active = true;
     this._shwoop = 0.0f;
-    if (!GameManager.Instance.MainCameraController.ManualControl)
-    {
+    if (base.gameObject.RequestCameraControl(OnCameraRelinquish))
       GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
-      GameManager.Instance.MainCameraController.SetManualControl(true);
-      _HasControlOverCamera = true;
-    }
     base.gameObject.Play("death_note_open_sound");
     // BraveTime.SetTimeScaleMultiplier(0.5f, base.gameObject);
+  }
+
+  private void OnCameraRelinquish()
+  {
+    // Lazy.DebugConsoleLog($" death note relinquished camera");
   }
 
   public void Dismiss(bool force = false, bool deactivate = true)
@@ -686,11 +673,7 @@ public class DeathNoteHUD : MonoBehaviour
     {
       this._active = false;
       // BraveTime.SetTimeScaleMultiplier(1.0f, base.gameObject);
-      if (_HasControlOverCamera)
-      {
-        GameManager.Instance.MainCameraController.SetManualControl(false);
-        _HasControlOverCamera = false;
-      }
+      base.gameObject.RelinquishCameraControl();
     }
   }
 
@@ -705,16 +688,12 @@ public class DeathNoteHUD : MonoBehaviour
     }
     else if (GameManager.Instance.IsPaused)
       Dismiss(deactivate: false);
-    else if (player.CurrentInputState != PlayerInputState.AllInput || gun.IsReloading)
+    else if (player.CurrentInputState != PlayerInputState.AllInput || gun.IsReloading || GameManager.IsBossIntro)
       Dismiss();
     else if (this._active)
     {
-      if (!GameManager.Instance.MainCameraController.ManualControl)
-      {
-        GameManager.Instance.MainCameraController.SetManualControl(true);
-        _HasControlOverCamera = true;
-      }
-      if (_HasControlOverCamera)
+      base.gameObject.RequestCameraControl(OnCameraRelinquish);
+      if (base.gameObject.HasControlOverCamera())
         GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
     }
   }
