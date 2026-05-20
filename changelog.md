@@ -20,6 +20,7 @@
 - Added masteries for Nightlighter, Gadulo, and Death Note
 - Added 4 new synergies
 - Fixed Shmuppies spawning too close to doorways and causing various issues with other mods
+- Fixed (for the 3rd time) gun sprites being partially white in synergy notifications
 
 ## 1.30.1 (2026-05-14)
 

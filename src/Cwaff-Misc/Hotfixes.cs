@@ -88,19 +88,25 @@ public static class BadItemOffsetsFromChestHotfix
 }
 
 /// <summary>Our guns show up funny in synergy notifications unless we use trimmed sprites, so fix that here by using the ammonomicon sprite instead</summary>
-[HarmonyPatch(typeof(UINotificationController), nameof(UINotificationController.SetupSynergySprite))]
+[HarmonyPatch]
 public static class SetupSynergySpritePatch
 {
-    static void Postfix(UINotificationController __instance, tk2dSpriteCollectionData collection, int spriteId)
+    // NOTE: also patches the main SetupSprite function because either order of iteems mucks with the synergy display
+    [HarmonyPatch(typeof(UINotificationController), nameof(UINotificationController.SetupSprite))]
+    [HarmonyPatch(typeof(UINotificationController), nameof(UINotificationController.SetupSynergySprite))]
+    static void Prefix(UINotificationController __instance, ref tk2dSpriteCollectionData collection, ref int spriteId)
     {
         string spriteName = collection.spriteDefinitions[spriteId].name;
         if (!spriteName.EndsWith("_idle_001"))
             return;
-        string trimmedSpriteName = spriteName.Replace("_idle_001", "_ammonomicon");
+        string trimmedSpriteName = C.MOD_PREFIX + "_" + spriteName.Replace("_idle_001", "_ammonomicon");
         tk2dSpriteCollectionData ammonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
         int trimmedId = ammonomiconCollection.GetSpriteIdByName(trimmedSpriteName, defaultValue: -1);
         if (trimmedId != -1)
-            __instance.notificationSynergySprite.SetSprite(ammonomiconCollection, trimmedId);
+        {
+            collection = ammonomiconCollection;
+            spriteId = trimmedId;
+        }
     }
 }
 
