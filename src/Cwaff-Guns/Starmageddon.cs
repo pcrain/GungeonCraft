@@ -135,13 +135,11 @@ public class Starmageddon : CwaffGun
         if (!this.PlayerOwner)
             return null;
 
-        List<AIActor> roomEnemies = this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom();
+        List<AIActor> roomEnemies = this.PlayerOwner.CenterPosition.GetAllNearbyEnemies();
         _EnemyWeights.Clear();
         for (int i = 0; i < roomEnemies.Count; ++i)
         {
             AIActor enemy = roomEnemies[i];
-            if (!enemy || !enemy.healthHaver || !enemy.healthHaver.IsAlive || enemy.healthHaver.PreventAllDamage || !enemy.healthHaver.IsVulnerable || !enemy.IsWorthShootingAt)
-                continue;
             if (!_EffectiveHealth.TryGetValue(enemy, out float estHealth))
                 _EffectiveHealth[enemy] = estHealth = enemy.healthHaver.currentHealth;
             if (estHealth > -damage) // allow for one extra hit beyond what would kill an enemy
@@ -340,12 +338,11 @@ public class StarmageddonProjectile : MonoBehaviour
         List<AIActor> livingEnemies = new();
         List<Vector2> weights = new();
         int i = 0;
-        foreach(AIActor enemy in GameManager.Instance.BestActivePlayer.CurrentRoom.SafeGetEnemiesInRoom())
-            if (enemy && enemy.healthHaver && enemy.healthHaver.IsAlive && enemy.healthHaver.IsVulnerable && enemy.IsWorthShootingAt)
-            {
-                livingEnemies.Add(enemy);
-                weights.Add(new(i++, 1f / (enemy.CenterPosition - this._owner.CenterPosition).sqrMagnitude));
-            }
+        foreach(AIActor enemy in GameManager.Instance.BestActivePlayer.CenterPosition.GetAllNearbyEnemies())
+        {
+            livingEnemies.Add(enemy);
+            weights.Add(new(i++, 1f / (enemy.CenterPosition - this._owner.CenterPosition).sqrMagnitude));
+        }
         return (livingEnemies.Count == 0) ? null : livingEnemies[weights.WeightedRandom()];
     }
 }

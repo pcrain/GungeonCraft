@@ -50,14 +50,10 @@ public class VoodooDoll : CwaffPassive
     {
         if (!enemy || !enemy.aiActor)
             return;
-        List<AIActor> activeEnemies = enemy.aiActor.GetAbsoluteParentRoom().SafeGetEnemiesInRoom();
 
         string myGuid = enemy.aiActor.EnemyGuid;
-        for (int n = activeEnemies.Count - 1; n >= 0; --n)
+        foreach (AIActor other in enemy.aiActor.CenterPosition.GetAllNearbyEnemies())
         {
-            AIActor other = activeEnemies[n];
-            if (!other || !other.IsHostileAndNotABoss())
-                continue; // don't care about inactive or dead enemies
             if (other.EnemyGuid != myGuid)
                 continue; // don't care about non-matching enemies
             if (other == enemy.aiActor)

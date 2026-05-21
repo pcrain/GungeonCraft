@@ -243,6 +243,7 @@ public class SunderbussShockwave : MonoBehaviour
     private float _damage;
     private float _speed;
     private float _timeBetweenShockwaves;
+    private float _radius;
     private float _sqrRadius;
     private Vector2 _start;
     private float _nextShockwaveTime;
@@ -257,6 +258,7 @@ public class SunderbussShockwave : MonoBehaviour
         this._speed                 = speed;
         this._velocity              = angle.ToVector(this._speed);
         this._timeBetweenShockwaves = spacing / (16f * speed);
+        this._radius                = radius;
         this._sqrRadius             = radius * radius;
         this._nextShockwaveTime     = this._timeBetweenShockwaves;
 
@@ -295,16 +297,11 @@ public class SunderbussShockwave : MonoBehaviour
           uniform          : true,
           randomFrame      : true);
 
-        foreach (AIActor enemy in this._room.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in pos.GetAllNearbyEnemies(radius: this._radius))
         {
-          if (!enemy || this._hitEnemies.Contains(enemy))
+          if (this._hitEnemies.Contains(enemy) || !enemy.specRigidbody)
             continue;
-          if (enemy.healthHaver is not HealthHaver hh || !hh.IsVulnerable || hh.IsDead || hh.PreventAllDamage || !enemy.specRigidbody)
-            continue;
-          Vector2 delta = enemy.CenterPosition - pos;
-          if (delta.sqrMagnitude > this._sqrRadius)
-            continue;
-          Vector2 deltaNorm = delta.normalized;
+          Vector2 deltaNorm = (enemy.CenterPosition - pos).normalized;
           enemy.healthHaver.ApplyDamage(this._damage, deltaNorm, "Sunderwave", CoreDamageTypes.None, DamageCategory.Environment);
           if (enemy.knockbackDoer)
             enemy.knockbackDoer.ApplyKnockback(deltaNorm, _SHOCKWAVE_KB, immutable: false);

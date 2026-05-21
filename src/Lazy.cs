@@ -618,9 +618,9 @@ public static class Lazy
     }
 
     /// <summary>Determine position of the nearest enemy to position start</summary>
-    public static AIActor NearestEnemy(Vector2 start, bool ignoreWalls = false)
+    public static AIActor NearestEnemy(Vector2 start, float maxDistance = -1f, bool ignoreWalls = false)
     {
-        return NearestEnemyWithinConeOfVision(start: start, coneAngle: 0f, maxDeviation: 360f,
+        return NearestEnemyWithinConeOfVision(start: start, coneAngle: 0f, maxDeviation: 360f, maxDistance: maxDistance,
           useNearestAngleInsteadOfDistance: false, ignoreWalls: ignoreWalls);
     }
 
@@ -632,7 +632,7 @@ public static class Lazy
     }
 
     /// <summary>Returns a list of all enemies within a radius of a point.</summary>
-    public static List<AIActor> GetAllNearbyEnemies(this Vector2 center, float radius = 100f, bool ignoreWalls = false,
+    public static List<AIActor> GetAllNearbyEnemies(this Vector2 center, float radius = 100f, bool ignoreWalls = true,
       bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true)
     {
         GetAllNearbyEnemies(ref _TempNearbyEnemies, center, radius, ignoreWalls, includeDead, includeGone, includeInvulnerable, limitToCurrentRoom);
@@ -640,10 +640,11 @@ public static class Lazy
     }
 
     /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
-    public static AIActor NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
+    public static AIActor NearestEnemyWithinConeOfVision(this Vector2 start, float coneAngle, float maxDeviation = 360f, float maxDistance = 100f,
+      bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false, bool includeInvulnerable = true)
     {
         _ActorDistances.Clear();
-        foreach (ActorPosData data in AllEnemiesWithinConeOfVisionInternal(start, coneAngle, maxDeviation, maxDistance, ignoreWalls))
+        foreach (ActorPosData data in AllEnemiesWithinConeOfVisionInternal(start, coneAngle, maxDeviation, maxDistance, ignoreWalls, includeInvulnerable))
             _ActorDistances.Add(data);
         return _ActorDistances.Count > 0 ? _ActorDistances.GetMinimum(useNearestAngleInsteadOfDistance
           ? (a, b) => a.angle < b.angle
@@ -651,17 +652,19 @@ public static class Lazy
     }
 
     /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
-    public static IEnumerable<AIActor> AllEnemiesWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool ignoreWalls = false)
+    public static IEnumerable<AIActor> AllEnemiesWithinConeOfVision(this Vector2 start, float coneAngle, float maxDeviation = 360f, float maxDistance = 100f,
+      bool ignoreWalls = false, bool includeInvulnerable = true)
     {
-        foreach (ActorPosData data in AllEnemiesWithinConeOfVisionInternal(start, coneAngle, maxDeviation, maxDistance, ignoreWalls))
+        foreach (ActorPosData data in AllEnemiesWithinConeOfVisionInternal(start, coneAngle, maxDeviation, maxDistance, ignoreWalls, includeInvulnerable))
             yield return data.actor;
         yield break;
     }
 
     /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
-    private static IEnumerable<ActorPosData> AllEnemiesWithinConeOfVisionInternal(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool ignoreWalls = false)
+    private static IEnumerable<ActorPosData> AllEnemiesWithinConeOfVisionInternal(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f,
+      bool ignoreWalls = false, bool includeInvulnerable = true)
     {
-        GetAllNearbyEnemies(ref _TempNearbyEnemies, start, maxDistance, ignoreWalls, includeInvulnerable: true);
+        GetAllNearbyEnemies(ref _TempNearbyEnemies, start, maxDistance, ignoreWalls, includeInvulnerable: includeInvulnerable);
         foreach (AIActor enemy in _TempNearbyEnemies)
         {
             Vector2 delta = (enemy.CenterPosition - start);
@@ -702,7 +705,7 @@ public static class Lazy
     private static List<AIActor> _TempEnemies = new(); // generic temporary list for holding all enemies under consideration | WARNING: ONLY for use directly in GetAllNearbyEnemies
 
     /// <summary>Determine all enemies within a radius of a point.</summary>
-    public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = -1f, bool ignoreWalls = false,
+    public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = -1f, bool ignoreWalls = true,
       bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true)
     {
         float sqrRadius = radius * radius;
@@ -720,7 +723,7 @@ public static class Lazy
             HealthHaver hh = enemy.healthHaver;
             if (!includeDead && (!hh || hh.IsDead))
                 continue;
-            if (!includeInvulnerable && (!hh || !hh.IsVulnerable))
+            if (!includeInvulnerable && (!hh || !hh.IsVulnerable || hh.PreventAllDamage))
                 continue;
             Vector2 tentativeTarget = enemy.CenterPosition;
             if ((radius > 0) && ((tentativeTarget - center).sqrMagnitude > sqrRadius))

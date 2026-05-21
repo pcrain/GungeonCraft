@@ -44,7 +44,7 @@ public class SoulKaliber : CwaffGun
         const float _BASE_PROT_CHANCE      = 0.25f;
         const float _PER_CURSE_PROT_CHANCE = 0.05f;
 
-        if (data == EventArgs.Empty || data.ModifiedDamage <= 0f || !hh.IsVulnerable)
+        if (data == EventArgs.Empty || data.ModifiedDamage <= 0f || !hh.IsVulnerable || hh.aiActor is not AIActor hitEnemy)
             return; // if we weren't going to take damage anyway, nothing to do
         if (!this.PlayerOwner || this.PlayerOwner.CurrentRoom is not RoomHandler room)
             return; // no valid room to check for enemies
@@ -54,7 +54,7 @@ public class SoulKaliber : CwaffGun
         //NOTE: base chance for triggering == 1 - (1 - (0.25 + 0.05 * Curse))^(# of soul linked enemies)
         float protChance = _BASE_PROT_CHANCE + _PER_CURSE_PROT_CHANCE * Mathf.Clamp(PlayerStats.GetTotalCurse(), 0, 10);
         _Targets.Clear();
-        foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in hitEnemy.CenterPosition.GetAllNearbyEnemies())
             if (enemy && (UnityEngine.Random.value <= protChance) && enemy.gameObject.GetComponent<SoulLinkStatus>())
                 _Targets.Add(enemy);
         if (_Targets.Count == 0)
@@ -169,16 +169,12 @@ public class SoulLinkStatus : MonoBehaviour
             AIActor enemy = hh.aiActor;
             if (!enemy)
                 return;
-            List<AIActor> activeEnemies = enemy.GetAbsoluteParentRoom().SafeGetEnemiesInRoom();
 
             bool shouldPlaySound = false;
-            for (int i = activeEnemies.Count - 1; i >=0; --i)
+            foreach (AIActor otherEnemy in enemy.CenterPosition.GetAllNearbyEnemies())
             {
-                AIActor otherEnemy = activeEnemies[i];
-                if (enemy == otherEnemy)
+                if (enemy == otherEnemy || otherEnemy.gameObject.GetComponent<SoulLinkStatus>() is not SoulLinkStatus soulLink)
                     continue; // don't apply damage to ourselves
-                if (otherEnemy.gameObject.GetComponent<SoulLinkStatus>() is not SoulLinkStatus soulLink)
-                    continue;
                 shouldPlaySound = soulLink.ShareThePain(data.ModifiedDamage);
             }
             if (shouldPlaySound)

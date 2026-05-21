@@ -215,21 +215,13 @@ public class Scotsman : CwaffGun
         }
 
         // Nuke the enemies
-        List<AIActor> activeEnemiesInRoom = room.SafeGetEnemiesInRoom();
-        for (int j = activeEnemiesInRoom.Count - 1; j >= 0; j--)
+        foreach (AIActor enemy in barrelPos.XY().AllEnemiesWithinConeOfVision(
+          coneAngle: gunAngle, maxDeviation: 0.5f * _CONE_SPREAD, maxDistance: _CONE_MAG, ignoreWalls: true, includeInvulnerable: false))
         {
-            AIActor enemy = activeEnemiesInRoom[j];
-            if (!enemy || enemy.IsSignatureEnemy)
+            if (enemy.IsSignatureEnemy || enemy.healthHaver.IsBoss)
                 continue;
-            if (enemy.healthHaver is not HealthHaver healthHaver || healthHaver.IsDead || healthHaver.IsBoss)
+            if (enemy.GetComponent<ExplodeOnDeath>() is not ExplodeOnDeath sploder || sploder.immuneToIBombApp)
                 continue;
-            if (enemy.GetComponent<ExplodeOnDeath>() is not ExplodeOnDeath component || component.immuneToIBombApp)
-                continue;
-
-            Vector2 delta = enemy.CenterPosition - barrelPos.XY();
-            if (delta.sqrMagnitude > _CONE_SQR_MAG || Mathf.Abs((delta.ToAngle() - gunAngle).Clamp180()) > (0.5f * _CONE_SPREAD))
-                continue;
-
             healthHaver.ApplyDamage(2.1474836E+09f, Vector2.zero, "DetonateTheWorld", CoreDamageTypes.None, DamageCategory.Normal, true);
             anythingDetonated = true;
         }

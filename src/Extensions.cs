@@ -2590,7 +2590,7 @@ public static class Extensions
         ? PhysicsEngine.UnitToPixel(ppos.ToNearestWall(out Vector2 normal, angle, minDistance: 1) - ppos)
         : PhysicsEngine.UnitToPixel(angle.ToVector(20f));
       PixelCollider projectileCollider = projectile.specRigidbody.PrimaryPixelCollider;
-      foreach (AIActor enemy in ppos.GetAllNearbyEnemies())
+      foreach (AIActor enemy in ppos.GetAllNearbyEnemies(ignoreWalls: !accountForWalls))
       {
           if (!enemy.IsHostile(canBeNeutral: true) || !enemy.specRigidbody)
               continue;

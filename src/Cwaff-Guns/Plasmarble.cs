@@ -151,7 +151,7 @@ public class PlasmarbleProjectile : MonoBehaviour
     internal static void ZapRandomEnemies(Projectile proj, int numZaps = 1, bool attachToProjectile = true, float? overrideAngle = null)
     {
         Vector2 pos = proj.specRigidbody.UnitCenter;
-        Lazy.GetAllNearbyEnemies(ref _ZappableEnemies, pos);
+        Lazy.GetAllNearbyEnemies(ref _ZappableEnemies, pos, ignoreWalls: false);
         int numZappableEnemies = _ZappableEnemies.Count;
         if (numZappableEnemies > numZaps) // don't bother shuffling the list if we're going to use the whole thing
             _ZappableEnemies.Shuffle();

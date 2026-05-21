@@ -71,7 +71,7 @@ public class NewtonsApple : CwaffPassive
             return;
 
         float dtime = BraveTime.DeltaTime;
-        foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(this.Owner.CenterPosition, ignoreWalls: true))
+        foreach (AIActor enemy in this.Owner.CenterPosition.GetAllNearbyEnemies())
         {
           if (enemy.knockbackDoer is not KnockbackDoer kbd || kbd.m_isImmobile.Value)
             continue;

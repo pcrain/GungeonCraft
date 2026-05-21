@@ -42,7 +42,7 @@ public class Outbreak : CwaffGun
         if (_INFECT_TOWARDS_CURSOR)
             target = player.CenterPosition.ToNearestWallOrEnemyOrObject(player.m_currentGunAngle, 1f);
 
-        foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in player.CenterPosition.GetAllNearbyEnemies(includeInvulnerable: true))
         {
             if (enemy.GetComponent<InfectedBehavior>() is not InfectedBehavior infection)
                 continue;

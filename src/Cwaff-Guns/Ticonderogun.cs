@@ -276,26 +276,8 @@ public class Ticonderogun : CwaffGun
     {
         if (!this.PlayerOwner)
             return null;
-
-        float aimAngle = this.PlayerOwner.m_currentGunAngle;
-        float minDelta = _AUTOTARGET_MAX_DELTA;
-        AIActor bestEnemy = null;
-        foreach (AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
-        {
-            if (!enemy || !enemy.IsHostile(canBeNeutral: true))
-                continue;
-            Vector2 enemyDelta = (enemy.CenterPosition - this.PlayerOwner.CenterPosition);
-            if (enemyDelta.sqrMagnitude > _MAX_CONTROLLER_SQR_DIST)
-                continue;
-            float deltaAngle = aimAngle.AbsAngleTo(enemyDelta.ToAngle());
-            if (deltaAngle < minDelta)
-            {
-                minDelta = deltaAngle;
-                bestEnemy = enemy;
-            }
-        }
-
-        return bestEnemy;
+        return Lazy.NearestEnemyWithinConeOfVision(this.PlayerOwner.CenterPosition, coneAngle: this.PlayerOwner.m_currentGunAngle,
+          maxDeviation: _AUTOTARGET_MAX_DELTA, maxDistance: _MAX_CONTROLLER_DIST, useNearestAngleInsteadOfDistance: true, ignoreWalls: true);
     }
 
     // Choose the projectile with the smallest angle from our aim point that is also within _MAX_CONTROLLER_DIST

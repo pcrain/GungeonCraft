@@ -152,7 +152,7 @@ public class ZagProjectile : MonoBehaviour
         Vector2 trajVector = trajectory.ToVector();
         float closest = _MAX_DIST_SQR;
         AIActor target = null;
-        foreach (AIActor enemy in ppos.GetAllNearbyEnemies())
+        foreach (AIActor enemy in ppos.GetAllNearbyEnemies(ignoreWalls: false))
         {
             if (!enemy || !enemy.IsHostile(canBeNeutral: true))
                 continue;

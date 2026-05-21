@@ -46,30 +46,9 @@ public class SafetyGloves : CwaffPassive
             return;
         if (!gun.CanGainAmmo || gun.InfiniteAmmo || gun.LocalInfiniteAmmo || gun.CurrentAmmo == gun.AdjustedMaxAmmo)
             return;
-        if (pc.GetAbsoluteParentRoom() is not RoomHandler room)
-            return;
 
-        Vector2 ppos         = pc.CenterPosition;
-        float gunAngle       = pc.m_currentGunAngle;
-        AIActor closestEnemy = null;
-        float closestDist    = _REACH_SQR;
-        foreach(AIActor enemy in room.SafeGetEnemiesInRoom())
-        {
-            if (!enemy || !Enemies.BulletKinVariants.Contains(enemy.EnemyGuid))
-                continue; // enemy is not one we should be targeting
-
-            Vector2 delta = enemy.CenterPosition - ppos;
-            if (!delta.IsNearAngle(gunAngle, 90f))
-                continue; // enemy is not within our vision range
-
-            float dist = delta.sqrMagnitude;
-            if (dist >= closestDist)
-                continue; // enemy is not the closest enemy we've encountered
-
-            closestEnemy = enemy;
-            closestDist  = dist;
-        }
-
+        AIActor closestEnemy = Lazy.NearestEnemyWithinConeOfVision(start: pc.CenterPosition, coneAngle: pc.m_currentGunAngle,
+          maxDeviation: 90f, maxDistance: _REACH, ignoreWalls: true, useNearestAngleInsteadOfDistance: false);
         if (!closestEnemy)
             return;
 

@@ -62,7 +62,7 @@ public class SubtractorBeam : CwaffGun
         if (GameManager.Instance.IsLoadingLevel || GameManager.Instance.IsPaused || BraveTime.DeltaTime == 0.0f)
             return;
         if (this.PlayerOwner is PlayerController player && player.healthHaver && player.healthHaver.IsAlive)
-            YouShallKnowTheirNames();
+            YouShallKnowTheirNames(player);
     }
 
     private void ClearNametags()
@@ -82,16 +82,16 @@ public class SubtractorBeam : CwaffGun
         _PooledNametags.Clear();
     }
 
-    private void YouShallKnowTheirNames()
+    private void YouShallKnowTheirNames(PlayerController player)
     {
         if (!_EverPickedUp)
         {
             _EverPickedUp = true;
             CwaffEvents.OnNewFloorFullyLoaded += OnNewFloorReached;
         }
-        foreach (AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in player.CenterPosition.GetAllNearbyEnemies(includeInvulnerable: true))
         {
-            if (!enemy || !enemy.IsHostile(canBeNeutral: true) || !enemy.sprite)
+            if (!enemy.sprite)
                 continue;
             if (_PooledNametags.Count == 0)
                 _PooledNametags.AddLast(EasyLabel.Create(unicode: false, outline: true));

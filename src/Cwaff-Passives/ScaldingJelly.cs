@@ -210,35 +210,6 @@ public class IgnizolCompanion : CwaffCompanionController
             base.Destroy();
         }
 
-        private AIActor FindTargetableEnemy()
-        {
-            PlayerController owner = m_companionController.m_owner;
-            if (owner.CurrentRoom is not RoomHandler room)
-                return null;
-            if (m_aiActor.CenterPosition.GetAbsoluteRoom() != room)
-                return null;
-
-            Vector2 myPos = m_aiActor.specRigidbody.UnitCenter;
-            AIActor nearest = null;
-            float nearestDist = 999f;
-
-            foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
-            {
-                if (!enemy || !enemy.isActiveAndEnabled || !enemy.IsWorthShootingAt)
-                    continue;
-                if (enemy.healthHaver is not HealthHaver hh || hh.IsDead)
-                    continue;
-
-                float sqrDist = (enemy.CenterPosition - myPos).sqrMagnitude;
-                if (sqrDist > nearestDist)
-                    continue;
-
-                nearest = enemy;
-                nearestDist = sqrDist;
-            }
-            return nearest;
-        }
-
         protected override void DetermineNewTarget()
         {
             PlayerController owner = m_companionController.m_owner;
@@ -247,7 +218,7 @@ public class IgnizolCompanion : CwaffCompanionController
 
             if (!base.m_aiAnimator.IsPlaying("idle"))
                 base.m_aiAnimator.PlayUntilCancelled("idle");
-            if (owner.IsInCombat && FindTargetableEnemy() is AIActor target)
+            if (owner.IsInCombat && Lazy.NearestEnemy(m_aiActor.specRigidbody.UnitCenter) is AIActor target)
             {
                 this._targetActor = target;
                 this._state = CHASE;

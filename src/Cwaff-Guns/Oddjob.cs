@@ -364,7 +364,7 @@ public class OddjobProjectileMotionModule : ProjectileMotionModule
 
         _nextEnemyInPath = null;
         float bestDistance = 360f;
-        foreach (AIActor enemy in _startRoom.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in this._oddProj.transform.position.XY().GetAllNearbyEnemies())
         {
             if (!EnemyIsReachable(enemy, targetAngle, clockwise, out float angleDelta))
                 continue;

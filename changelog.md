@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.31.1 (TBD)
+
+- Prevented Ignizol from trying to jump towards enemies behind walls
+
 ## 1.31.0 (2026-05-20)
 
 #### Features:

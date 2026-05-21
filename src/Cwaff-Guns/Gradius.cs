@@ -416,7 +416,7 @@ public class RoundLaser : Projectile
         this._laserRing.Place(color: Color.Lerp(_StartColor, _EndColor, t),
           pos: pos, radius: r + _THICKNESS, radiusInner: r);
 
-        foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(center: pos, radius: r, ignoreWalls: true))
+        foreach (AIActor enemy in pos.GetAllNearbyEnemies(radius: r))
         {
             if (_hitEnemies.Contains(enemy))
                 continue;

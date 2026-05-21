@@ -190,7 +190,7 @@ public class LightString : MonoBehaviour
         return true;
 
       // if mastered, attempt to find another enemy to anchor onto
-      Lazy.GetAllNearbyEnemies(ref _AnchorTargets, enemy.CenterPosition, 12f);
+      Lazy.GetAllNearbyEnemies(ref _AnchorTargets, enemy.CenterPosition, 12f, ignoreWalls: false);
       _AnchorTargets.Shuffle();
       foreach (AIActor newTarget in _AnchorTargets)
       {

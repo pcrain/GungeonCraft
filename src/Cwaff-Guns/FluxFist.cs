@@ -356,7 +356,7 @@ public class MagnetBall : MonoBehaviour
 
       bool didAnything = false;
       Vector2 basePos = this._body.UnitCenter;
-      foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(basePos, _MAX_RADIUS, ignoreWalls: true))
+      foreach (AIActor enemy in basePos.GetAllNearbyEnemies(radius: _MAX_RADIUS))
       {
         if (enemy.gameObject.GetComponent<MagnetizedEnemyBehavior>() is not MagnetizedEnemyBehavior meb)
           continue;

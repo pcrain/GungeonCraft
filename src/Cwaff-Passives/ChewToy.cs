@@ -161,7 +161,7 @@ public class ShmuppyCompanion : CwaffCompanionController
 
         private AIActor FindNearbyBulletKin()
         {
-            foreach(AIActor enemy in Lazy.GetAllNearbyEnemies(m_aiActor.CenterPosition, 16f, ignoreWalls: true, includeInvulnerable: true))
+            foreach(AIActor enemy in m_aiActor.CenterPosition.GetAllNearbyEnemies(radius: 16f, includeInvulnerable: true))
               if (enemy.AmmonomiconName().Contains("Bullet Kin"))
                 return enemy;
             return null;
@@ -218,7 +218,7 @@ public class ShmuppyCompanion : CwaffCompanionController
             if (!owner.IsInCombat)
               return;
 
-            List<AIActor> enemies = Lazy.GetAllNearbyEnemies(m_aiActor.CenterPosition, 16f, ignoreWalls: true);
+            List<AIActor> enemies = m_aiActor.CenterPosition.GetAllNearbyEnemies(radius: 16f);
             if (enemies.Count == 0 || enemies.ChooseRandom() is not AIActor enemy)
               return;
 

@@ -117,7 +117,7 @@ public class Entropynnium : CwaffGun
                 anchorTransform  : gunTransform,
                 unoccluded       : true
               );
-            foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(ppos, this._manaRadius, ignoreWalls: true))
+            foreach (AIActor enemy in ppos.GetAllNearbyEnemies(radius: this._manaRadius))
             {
                 tk2dBaseSprite dupe = enemy.DuplicateInWorld(copyShader: false);
                 dupe.ApplyShader(CwaffShaders.WiggleShader, enemy.optionalPalette);
@@ -392,7 +392,7 @@ public class ManaExplosionProjectile : Projectile
         boom.force = force;
 
         bool anythingDetonated = false;
-        foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(ppos, this._radius, ignoreWalls: true, includeInvulnerable: true))
+        foreach (AIActor enemy in ppos.GetAllNearbyEnemies(radius: this._radius, includeInvulnerable: true))
         {
             if (enemy.healthHaver is not HealthHaver hh)
               continue;

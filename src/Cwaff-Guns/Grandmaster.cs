@@ -269,7 +269,7 @@ public abstract class ChessPiece : MonoBehaviour
         Vector2? closestViableEnemyPosition = null;
         float closestEnemyDistance = 999999f;
         // float closestOrthoDistance = 999999f;
-        foreach (AIActor enemy in this._projectile.SafeCenter.GetAllNearbyEnemies())
+        foreach (AIActor enemy in this._projectile.SafeCenter.GetAllNearbyEnemies(ignoreWalls: false))
         {
             if (!enemy.IsNormalEnemy || !enemy.healthHaver || enemy.IsHarmlessEnemy)
                 continue; // we only care about normal, alive, hostile enemies

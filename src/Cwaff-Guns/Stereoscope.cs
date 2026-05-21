@@ -214,10 +214,8 @@ public class Stereoscope : CwaffGun
         float alpha = 0.35f + Mathf.Max(0.5f * GetAccuracy(twoWay: false), 0.0f);
         Vector2 iconOffset = new Vector2(0, -0.375f);
         float iconRadius = 0.375f;
-        foreach(AIActor enemy in room.SafeGetEnemiesInRoom())
+        foreach(AIActor enemy in this.PlayerOwner.CenterPosition.GetAllNearbyEnemies())
         {
-            if (!enemy || enemy.IsGone)
-                continue;
             if (enemy.behaviorSpeculator is not BehaviorSpeculator bs)
                 continue;
             string guid = enemy.EnemyGuid;
