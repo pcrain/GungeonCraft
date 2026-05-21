@@ -1062,10 +1062,10 @@ public static class HeckedMode
                 if (shooter.healthHaver && shooter.healthHaver.bodySprites != null)
                 {
                     tk2dSprite hcsprite = hc.GetComponent<tk2dSprite>();
-                    shooter.healthHaver.bodySprites.TryRemove(hcsprite);
+                    shooter.healthHaver.bodySprites.Remove(hcsprite);
                 }
                 if (shooter.m_attachedHands != null)
-                    shooter.m_attachedHands.TryRemove(hc);
+                    shooter.m_attachedHands.Remove(hc);
                 // hc.attachPoint = null;
                 if (curGunSprite)
                     curGunSprite.DetachRenderer(hc.sprite);

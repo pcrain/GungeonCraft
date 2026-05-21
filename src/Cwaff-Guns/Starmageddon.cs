@@ -103,7 +103,7 @@ public class Starmageddon : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
-        player.healthHaver.damageTypeModifiers.TryRemove(this._fireImmunity);
+        player.healthHaver.damageTypeModifiers.Remove(this._fireImmunity);
         Reset();
     }
 
@@ -116,7 +116,7 @@ public class Starmageddon : CwaffGun
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
-            this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._fireImmunity);
+            this.PlayerOwner.healthHaver.damageTypeModifiers.Remove(this._fireImmunity);
         base.OnDestroy();
     }
 

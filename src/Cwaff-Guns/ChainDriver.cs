@@ -99,7 +99,7 @@ public class ChainDriver : CwaffGun
 
     internal void DeregisterChain(ChainkLink chain)
     {
-      this._attachedLinks.TryRemove(chain);
+      this._attachedLinks.Remove(chain);
       if (this._attachedLinks.Count > 0)
         return;
 

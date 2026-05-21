@@ -531,7 +531,7 @@ public class PogoDodgeRoll : CustomDodgeRoll
         this._owner.OnReceivedDamage -= this.OnReceivedDamage;
         this._owner.OnRolledIntoEnemy -= this.DoPogoStomp;
         this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreCollisions);
-        this._owner.ownerlessStatModifiers.TryRemove(this._noSpeed);
+        this._owner.ownerlessStatModifiers.Remove(this._noSpeed);
         this._owner.stats.RecalculateStats(this._owner);
         this._chargeRadius.Disable();
         this._chargeTarget.Disable();

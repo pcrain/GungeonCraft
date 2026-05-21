@@ -78,13 +78,13 @@ public class Alyx : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
-        player.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
+        player.healthHaver.damageTypeModifiers.Remove(this._poisonImmunity);
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
-            this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._poisonImmunity);
+            this.PlayerOwner.healthHaver.damageTypeModifiers.Remove(this._poisonImmunity);
         base.OnDestroy();
     }
 

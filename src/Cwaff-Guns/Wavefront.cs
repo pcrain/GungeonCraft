@@ -78,7 +78,7 @@ public class TeslaProjectileBehavior : MonoBehaviour
 
     private void OnDestroy()
     {
-        _ExtantTeslas.TryRemove(this);
+        _ExtantTeslas.Remove(this);
     }
 
     private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)

@@ -148,7 +148,7 @@ public class Bart
     {
         if (ExactlyOneBarterableItemNearby(player) is not PickupObject pickup)
             return 0;
-        RoomHandler.unassignedInteractableObjects.TryRemove(pickup as IPlayerInteractable);
+        RoomHandler.unassignedInteractableObjects.Remove(pickup as IPlayerInteractable);
         Lazy.DoSmokeAt(pickup.sprite.WorldCenter);
         UnityEngine.Object.Destroy(pickup.gameObject);
         return 0;
@@ -196,7 +196,7 @@ public class BarterShopController : MonoBehaviour
 
     private void OnDestroy()
     {
-        _ExtantShops.TryRemove(this);
+        _ExtantShops.Remove(this);
     }
 
     public static void UpdateBarterShopPrices()

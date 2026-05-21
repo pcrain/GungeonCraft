@@ -55,7 +55,7 @@ public class NewtonsApple : CwaffPassive
         if (!this)
           return;
         projectile.OnDestruction -= this.OnProjectileDestruction;
-        this._gravityProjectiles.TryRemove(projectile);
+        this._gravityProjectiles.Remove(projectile);
     }
 
     public override void Update()

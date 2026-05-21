@@ -218,7 +218,7 @@ public class Heartbreaker : CwaffGun
         if (!targetHeart)
             return 0;
 
-        RoomHandler.unassignedInteractableObjects.TryRemove(targetIx);
+        RoomHandler.unassignedInteractableObjects.Remove(targetIx);
         if (player.CurrentRoom != null && player.CurrentRoom.IsRegistered(targetIx))
             player.CurrentRoom.DeregisterInteractable(targetIx);
         int health = Mathf.RoundToInt(2f * targetHeart.healAmount);

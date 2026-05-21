@@ -112,7 +112,7 @@ public class GameActorCaffeineGoopEffect : GameActorSpeedEffect
         if (actor is not PlayerController player)
             return;
         foreach (StatModifier stat in this._caffeineGoopBuffs)
-            player.ownerlessStatModifiers.TryRemove(stat);
+            player.ownerlessStatModifiers.Remove(stat);
         player.stats.RecalculateStats(player);
         if (!_DummyCaffeineTimeScaleObject)
             _DummyCaffeineTimeScaleObject = new();

@@ -205,7 +205,7 @@ public class TheBB : MonoBehaviour
             this._projectile.collidesWithPlayer = true;
             this._projectile.UpdateCollisionMask();
             this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnMightCollideWithPlayer;
-            _projectile.specRigidbody.m_specificCollisionExceptions.TryRemove(this._owner.specRigidbody);
+            _projectile.specRigidbody.m_specificCollisionExceptions.Remove(this._owner.specRigidbody);
         }
 
         this._freebie = this._projectile.FiredForFree();

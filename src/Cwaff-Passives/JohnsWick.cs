@@ -51,7 +51,7 @@ public class JohnsWick : CwaffPassive
         if (!player)
             return;
         player.PostProcessProjectile -= this.PostProcessProjectile;
-        player.healthHaver.damageTypeModifiers.TryRemove(this._fireResistance);
+        player.healthHaver.damageTypeModifiers.Remove(this._fireResistance);
     }
 
     private void PostProcessProjectile(Projectile proj, float effectChanceScalar)

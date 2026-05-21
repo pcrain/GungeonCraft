@@ -59,13 +59,13 @@ public class Alligator : CwaffGun
     {
         base.OnDroppedByPlayer(player);
         AdjustGunShader(on: false);
-        player.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
+        player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
-            this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
+            this.PlayerOwner.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
         base.OnDestroy();
     }
 

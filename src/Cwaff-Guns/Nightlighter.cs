@@ -301,7 +301,7 @@ public class LightString : MonoBehaviour
       DeregisterEvents();
       if (this._connectedToEnemy && _Attachments.TryGetValue(this._enemy, out List<LightString> attachments))
       {
-        attachments.TryRemove(this);
+        attachments.Remove(this);
         if (attachments.Count == 0)
           _Attachments.Remove(this._enemy);
       }

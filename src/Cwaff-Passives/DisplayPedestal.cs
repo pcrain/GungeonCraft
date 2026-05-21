@@ -162,7 +162,7 @@ public class PristineGun : MonoBehaviour
             return;
 
         this._player.GunChanged -= GunChanged;
-        CwaffRunData.Instance.pristineGunIds[this._player.PlayerIDX].TryRemove(this._gun.PickupObjectId);
+        CwaffRunData.Instance.pristineGunIds[this._player.PlayerIDX].Remove(this._gun.PickupObjectId);
         if (this._player.GetPassive<DisplayPedestal>() is DisplayPedestal dp)
             dp.UpdateStats();
     }
@@ -178,7 +178,7 @@ public class PristineGun : MonoBehaviour
             this._player.GunChanged -= GunChanged;
         if (this._inInventory && this._gun && this._player)
         {
-            CwaffRunData.Instance.pristineGunIds[this._player.PlayerIDX].TryRemove(this._gun.PickupObjectId);
+            CwaffRunData.Instance.pristineGunIds[this._player.PlayerIDX].Remove(this._gun.PickupObjectId);
             if (this._player.GetPassive<DisplayPedestal>() is DisplayPedestal dp)
                 dp.UpdateStats();
         }

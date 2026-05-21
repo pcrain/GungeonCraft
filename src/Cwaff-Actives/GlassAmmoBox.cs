@@ -146,7 +146,7 @@ public class GlassAmmoGun : MonoBehaviour
         this._gun.SetAmmoAndClearUICache(0);
         this._gun.OnDropped -= this.OnDropped;
         this._owner.healthHaver.OnDamaged -= this.ShatterOnDamaged;
-        CwaffRunData.Instance.glassGunIds[this._owner.PlayerIDX].TryRemove(this._gun.PickupObjectId);
+        CwaffRunData.Instance.glassGunIds[this._owner.PlayerIDX].Remove(this._gun.PickupObjectId);
         UnityEngine.Object.Destroy(this);
     }
 

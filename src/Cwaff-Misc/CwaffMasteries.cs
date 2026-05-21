@@ -27,7 +27,7 @@ public static class CwaffMasteries
             return;
 
           ritComp.DisableEffects();
-          MasteryRitualComponent._RitualGuns.TryRemove(ritComp);
+          MasteryRitualComponent._RitualGuns.Remove(ritComp);
           UnityEngine.Object.Destroy(ritComp);
         }
     }
@@ -408,7 +408,7 @@ public class MasteryRitualComponent : MonoBehaviour
   private void OnDestroy()
   {
     DisableEffects();
-    _RitualGuns.TryRemove(this);
+    _RitualGuns.Remove(this);
     UpdateMasteryRitualStatus(blankUser: null);
   }
 
@@ -426,7 +426,7 @@ public class MasteryRitualComponent : MonoBehaviour
       if (room != null && room.IsRegistered(gun))
         room.DeregisterInteractable(gun);
       else
-        RoomHandler.unassignedInteractableObjects.TryRemove(gun);
+        RoomHandler.unassignedInteractableObjects.Remove(gun);
 
       gun.sprite.DuplicateInWorldAsMesh().Dissipate(time: 2.5f, amplitudeEnd: 5f, progressive: true);
     }

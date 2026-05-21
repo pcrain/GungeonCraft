@@ -111,7 +111,7 @@ public class Glockarina : CwaffGun
         if (this._mode == Mode.STORM)
             pc.healthHaver.damageTypeModifiers.AddUnique(this._electricImmunity);
         else
-            pc.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
+            pc.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -130,14 +130,14 @@ public class Glockarina : CwaffGun
     {
         GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewLevelFullyLoaded;
         base.OnDroppedByPlayer(player);
-        player.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
+        player.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
     }
 
     public override void OnDestroy()
     {
         GameManager.Instance.OnNewLevelFullyLoaded -= this.OnNewLevelFullyLoaded;
         if (this.PlayerOwner)
-            this.PlayerOwner.healthHaver.damageTypeModifiers.TryRemove(this._electricImmunity);
+            this.PlayerOwner.healthHaver.damageTypeModifiers.Remove(this._electricImmunity);
         base.OnDestroy();
     }
 

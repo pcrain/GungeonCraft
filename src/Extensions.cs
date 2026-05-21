@@ -2624,14 +2624,6 @@ public static class Extensions
       list.Add(item);
   }
 
-  /// <summary>Removes an item from a list if it already contains it</summary>
-  public static bool TryRemove<T>(this List<T> list, T item)
-  {
-    if (list.Contains(item))
-      return list.Remove(item);
-    return false;
-  }
-
   /// <summary>Get an appropriate angle for the current projectile</summary>
   public static float GetAngleForProjectile(this PlayerController player, ProjectileModule mod = null)
   {
@@ -3562,7 +3554,7 @@ public static class Extensions
   {
       if (player.gameObject.GetComponent<HatController>() is not HatController hc)
         return;
-      if (!_HatOverrides[player.PlayerIDX].TryRemove(hatToRemove.hatName))
+      if (!_HatOverrides[player.PlayerIDX].Remove(hatToRemove.hatName))
         return;
       if (hc.CurrentHat is Hat curHat && curHat.hatName == hatToRemove.hatName)
         hc.RemoveCurrentHat();
