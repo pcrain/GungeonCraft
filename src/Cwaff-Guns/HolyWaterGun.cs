@@ -143,6 +143,7 @@ public class Exorcisable : MonoBehaviour
     }
 }
 
+// REFACTOR: get rid of all of this! GetTexturedEnemyIdleAnimation() is slow and gross
 public class GhostlyDeath : MonoBehaviour
 {
     private const float _FADE_TIME   = 2.5f;

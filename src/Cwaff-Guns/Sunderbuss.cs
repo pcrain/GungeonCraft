@@ -8,7 +8,6 @@ public class Sunderbuss : CwaffGun
     public static string Lore             = "An ancient artifact created by the first great gunsmith, Lord Kagreflak. It lacks the sleek form and versatility of a modern blunderbuss, instead functioning more like a primitive war hammer. Though it doesn't seem to draw the ire of the Jammed, you curiously still feel vulnerable wielding it.";
 
     internal static readonly string[] _ColorNames = ["red", "yellow", "green", "cyan", "blue", "magenta", "gray"];
-    internal static GameObject _ScorchMark = null;
     internal static GameObject _BlunderbussProjectile = null;
     internal static GameObject[] _ShatterDebris = new GameObject[7];
     internal static SunderbussShockwave _ShockwavePrefab = null;
@@ -34,7 +33,6 @@ public class Sunderbuss : CwaffGun
             shootStyle: ShootStyle.Charged, damage: 50.0f, speed: 1.0f, range: 0.01f, sprite: "sunderbuss_projectile", fps: 30,
             anchor: Anchor.MiddleCenter, chargeTime: _CHARGE_TIME, hideAmmo: true));
 
-        _ScorchMark = Explosions.EmergencyCrate.effect.transform.Find("scorch").gameObject.ClonePrefab();
         for (int i = 0; i < 7; ++i)
             _ShatterDebris[i] = BreakableAPIToolbox.GenerateDebrisObject(
                 shardSpritePath         : $"sunderbuss_debris_{_ColorNames[i]}",

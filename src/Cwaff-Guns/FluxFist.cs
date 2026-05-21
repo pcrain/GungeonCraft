@@ -307,7 +307,7 @@ public class MagnetBall : MonoBehaviour
 
       this._body.OnBeamCollision += this.OnBeamCollision;
 
-      this._sprite = this._body.DecoupleSprite(); // NOTE: lets us move the sprite around independent of the SRB
+      this._sprite = this._body.DecoupleSpriteFromCollider(); // NOTE: lets us move the sprite around independent of the SRB
 
       base.gameObject.Play("magnet_ball_attract_sound");
     }

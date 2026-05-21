@@ -287,30 +287,6 @@ public static class Lazy
         return theList;
     }
 
-    /// <summary>Moves the player towards a wall in small increments, stopping if we would hit the wall. See also MoveTowardsTargetOrWall</summary>
-    public static void MovePlayerTowardsPositionUntilHittingWall(PlayerController player, Vector2 position)
-    {
-        int num_steps = 100;
-
-        Vector2 playerPos   = player.transform.position;
-        Vector2 targetPos   = position;
-        Vector2 deltaPos    = (targetPos - playerPos)/((float)(num_steps));
-        Vector2 adjustedPos = Vector2.zero;
-
-        // magic code that slowly moves the player out of walls
-        for (int i = 0; i < num_steps; ++i)
-        {
-            player.transform.position = (playerPos + i * deltaPos).ToVector3ZisY();
-            player.specRigidbody.Reinitialize();
-            if (PhysicsEngine.Instance.OverlapCast(player.specRigidbody, null, true, false, null, null, false, null, null))
-            {
-                player.transform.position = adjustedPos;
-                break;
-            }
-            adjustedPos = player.transform.position;
-        }
-    }
-
     /// <summary>Get the player's idle animation associated with the provided gun angle</summary>
     public static string GetBaseIdleAnimationName(PlayerController p, float gunAngle)
     {
@@ -366,19 +342,19 @@ public static class Lazy
     /// <summary>Get a random vector with the specified magnitude</summary>
     public static Vector2 RandomVector(float magnitude = 1f)
     {
-      return magnitude * RandomAngle().ToVector();
+      return magnitude * (360f * UnityEngine.Random.value).ToVector();
     }
 
     /// <summary>Get a random Quaternion rotated on the Z axis</summary>
     public static Quaternion RandomEulerZ()
     {
-      return RandomAngle().EulerZ();
+      return Quaternion.Euler(0f, 0f, 360f * UnityEngine.Random.value);
     }
 
     /// <summary>Get a random boolean</summary>
     public static bool CoinFlip()
     {
-      return UnityEngine.Random.Range(0,2) == 1;
+      return UnityEngine.Random.value < 0.5f;
     }
 
     /// <summary>Get the defautl projectile for a gun by id</summary>
@@ -791,9 +767,6 @@ public static class Lazy
     {
         return Gungeon.Game.Items.GetSafe(itemName);
     }
-
-    /// <summary>Returns log_2(f)</summary>
-    public static float Log2(float f) => Mathf.Log(f, 2);
 
     /// <summary>Check whether a line intersects a circle with a given position and radius</summary>
     /// <remarks>See https://stackoverflow.com/questions/53173712/calculating-distance-of-point-to-linear-line</remarks>
@@ -1209,12 +1182,14 @@ public static class Lazy
     }
 
     /// <summary>Print a stat out</summary>
+    [System.Diagnostics.Conditional("DEBUG")]
     public static void PrintStat(StatModifier stat)
     {
         ETGModConsole.Log($"  have {(stat.modifyType == StatModifier.ModifyMethod.MULTIPLICATIVE ? "mul" : "add")} stat {stat.statToBoost} by {stat.amount}");
     }
 
     /// <summary>Print a player's ownerless stats</summary>
+    [System.Diagnostics.Conditional("DEBUG")]
     public static void PrintOwnerlessStats(PlayerController player)
     {
         foreach (StatModifier stat in player.ownerlessStatModifiers)
@@ -1238,20 +1213,6 @@ public static class Lazy
         string s = $"[color #dd6666]{Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, _RANDOM_STRING_LENGTH)}[/color]";
         _RandomStrings.Add(s);
         return s;
-    }
-
-    /// <summary>Do an elastic collision between two speculative rigid bodies</summary>
-    public static void DoElasticBounce(CollisionData collision)
-    {
-        Vector2 posDiff = collision.MyRigidbody.UnitCenter - collision.OtherRigidbody.UnitCenter;
-        Vector2 v1 = collision.MyRigidbody.Velocity;
-        Vector2 v2 = collision.OtherRigidbody.Velocity;
-        float invDistNorm = 1f / Mathf.Max(0.1f, posDiff.sqrMagnitude);
-        Vector2 newv1 = v1 - (Vector2.Dot(v1 - v2, posDiff) * invDistNorm) * posDiff;
-        Vector2 newv2 = v2 - (Vector2.Dot(v2 - v1, -posDiff) * invDistNorm) * (-posDiff);
-
-        float newSpeed = Mathf.Sqrt(Mathf.Max(v1.sqrMagnitude, v2.sqrMagnitude/*, newv1.sqrMagnitude, newv2.sqrMagnitude*/));
-        PhysicsEngine.PostSliceVelocity = newSpeed * newv1.normalized;
     }
 
     /// <summary>Get the color from a palette corresponding to a red float scalar (calculations from decompiled shader)</summary>
@@ -1534,11 +1495,13 @@ public static class Lazy
     return debrisObject;
   }
 
-  //TODO: remove dependency on Sunderbuss' prefabs
+  private static GameObject _ScorchMark = null;
   /// <summary>Create a scorch effect at the given position.</summary>
   public static void ScorchGroundAt(Vector2 pos)
   {
-      UnityEngine.Object.Instantiate(Sunderbuss._ScorchMark, pos, Quaternion.identity)
+      if (_ScorchMark == null)
+        _ScorchMark = Explosions.EmergencyCrate.effect.transform.Find("scorch").gameObject.ClonePrefab();
+      UnityEngine.Object.Instantiate(_ScorchMark, pos, Quaternion.identity)
         .SetLayerRecursively(LayerMask.NameToLayer("BG_Critical"));
   }
 

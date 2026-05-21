@@ -9,12 +9,6 @@ public static class Extensions
     self.GetOrAddComponent<Expiration>().ExpireIn(seconds, fadeFor, startAlpha, shrink);
   }
 
-  /// <summary>Check if a rectangle contains a point</summary>
-  public static bool Contains(this Rect self, Vector2 point)
-  {
-    return (point.x >= self.xMin && point.x <= self.xMax && point.y >= self.yMin && point.y <= self.yMax);
-  }
-
   /// <summary>Insets the borders of a rectangle by a specified amount on each side</summary>
   public static Rect Inset(this Rect self, float topInset, float rightInset, float bottomInset, float leftInset)
   {
@@ -34,12 +28,6 @@ public static class Extensions
   public static Rect Inset(this Rect self, float inset)
   {
     return self.Inset(inset,inset,inset,inset);
-  }
-
-  /// <summary>Gets the center of a rectangle</summary>
-  public static Vector2 Center(this Rect self)
-  {
-    return new Vector2(self.xMin + self.width / 2, self.yMin + self.height / 2);
   }
 
   /// <summary>Get a random point on the perimeter of a rectangle</summary>
@@ -89,12 +77,6 @@ public static class Extensions
       // ETGModConsole.Log("no intersection found");
     }
     return intersection;
-  }
-
-  /// <summary>Add a named bullet from a named enemy to a bullet bank</summary>
-  public static void AddBulletFromEnemy(this AIBulletBank self, string enemyGuid, string bulletName)
-  {
-    self.Bullets.Add(EnemyDatabase.GetOrLoadByGuid(enemyGuid).bulletBank.GetBullet(bulletName));
   }
 
   /// <summary>Register a game object as a prefab</summary>
@@ -645,14 +627,6 @@ public static class Extensions
     return (f < min) ? min : ((f > max) ? max : f);
   }
 
-  /// <summary>Check if a player is one hit from death</summary>
-  public static bool IsOneHitFromDeath(this PlayerController player)
-  {
-    if (player.ForceZeroHealthState)
-      return player.healthHaver.Armor == 1;
-    return player.healthHaver.GetCurrentHealth() == 0.5f;
-  }
-
   /// <summary>Check the number of hits a player is away from death</summary>
   public static int NumHitsFromDeath(this PlayerController player)
   {
@@ -878,12 +852,12 @@ public static class Extensions
     return roomPixelRect.Inset(1, 1, _ROOM_PIXEL_FUDGE_FACTOR, 1).Inset(8);
   }
 
-  public static bool FullyWithinRoom(this PlayerController pc, RoomHandler room = null)
+  public static bool FullyWithinRoom(this PlayerController pc, RoomHandler room = null) //REFACTOR: can probably remove this
   {
     return pc.specRigidbody.PixelColliders[0].FullyWithin((room ?? pc.CurrentRoom).GetRoomPixelBorder());
   }
 
-  public static bool ForceConstrainToRoom(this PlayerController pc, RoomHandler room)
+  public static bool ForceConstrainToRoom(this PlayerController pc, RoomHandler room) //REFACTOR: can probably use MovementRestrictor
   {
     // ETGModConsole.Log($"position is {pc.specRigidbody.Position.PixelPosition}");
 
@@ -1726,12 +1700,6 @@ public static class Extensions
       // Fix breakage with GenerateBeamPrefab() expecting a non-null specrigidbody (no longer necessary with FixedGenerateBeamPrefab())
       // projectile.specRigidbody = projectile.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
 
-      // Unnecessary to delete these
-      // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimation>());
-      // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dTiledSprite>());
-      // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSpriteAnimator>());
-      // UnityEngine.Object.Destroy(projectile.GetComponentInChildren<BasicBeamController>());
-
       // Create the beam itself using our resource map lookup
       //WARN: beam sprites must use the entire width / height of the canvas since bounding boxes are determined using trimmed bounds
       BasicBeamController beamComp = projectile.FixedGenerateBeamPrefab(
@@ -1754,15 +1722,6 @@ public static class Extensions
           beamDissipateAnimationPaths : ResMap.Get($"{spriteName}_dissipate", quietFailure: true),
           beamDissipateFPS            : (dissipateFps > 0) ? dissipateFps : fps
           );
-
-      // fix some more animation glitches (don't consistently work, check and enable on a case by case basis)
-      // beamComp.usesChargeDelay = false;
-      // beamComp.muzzleAnimation = "beam_start;
-      // beamComp.beamStartAnimation = null;
-      // beamComp.chargeAnimation = null;
-      // beamComp.rotateChargeAnimation = true;
-      // projectile.shouldRotate = true;
-      // projectile.shouldFlipVertically = true;
 
       return beamComp;
   }
@@ -2155,7 +2114,6 @@ public static class Extensions
     def.untrimmedBoundsDataCenter  *= scale;
     def.untrimmedBoundsDataExtents *= scale;
   }
-
 
   /// <summary>Shift a sprite definition by an offset.</summary>
   public static void ShiftBy(this tk2dSpriteDefinition def, Vector3 offset, bool changesCollider = false)
@@ -2624,14 +2582,6 @@ public static class Extensions
       list.Add(item);
   }
 
-  /// <summary>Get an appropriate angle for the current projectile</summary>
-  public static float GetAngleForProjectile(this PlayerController player, ProjectileModule mod = null)
-  {
-      if (player.CurrentGun is not Gun gun)
-          return player.m_overrideGunAngle ?? player.m_currentGunAngle;
-      return gun.gunAngle + (mod ?? gun.DefaultModule).GetAngleForShot(1f, player.stats.GetStatValue(StatType.Accuracy));
-  }
-
   /// <summary>Returns whether a projectile is on a collision path with an enemy, optionally including walls, pixel perfect collision, and outsetting our hitbox</summary>
   public static bool WouldCollideWithEnemy(this Projectile projectile, float angle, bool accountForWalls = true, bool pixelPerfect = false, int outset = 0)
   {
@@ -2858,10 +2808,6 @@ public static class Extensions
           yield break;
       }
   }
-
-  /// <summary>Unity null safe version of GetComponent</summary>
-  public static T GetSafeComponent<T>(this GameObject g) where T : Component
-    => (g && g.GetComponent<T>() is T t) ? t : null;
 
   /// <summary>Adds projectile modules to a gun when a synergy is active</summary>
   public static void AddSynergyModules(this Gun gun, Synergy s, params ProjectileModule[] modules)
@@ -3499,13 +3445,6 @@ public static class Extensions
       p.m_healthHaverHitCount = 0;
   }
 
-  //WARNING: this doesn't actually work ):
-  /// <summary>Force a sprite to use an unlit shader</summary>
-  public static void ForceUnlit(this tk2dBaseSprite s)
-  {
-    s.renderer.material.shader = ShaderCache.Acquire("Brave/UnlitTintableCutoutColorEmissive") ;
-  }
-
   /// <summary>Get the radius of an enemy's sprite in game units.</summary>
   public static float SpriteRadius(this AIActor enemy)
   {
@@ -3621,7 +3560,7 @@ public static class Extensions
   }
 
   /// <summary>Immediately release all shoot buttons as far as the game is concerned.</summary>
-  public static void StopFiringImmediately(this PlayerController pc)
+  public static void StopFiringImmediately(this PlayerController pc) // REFACTOR: make noAutofire aa boolean on our guns
   {
     if (BraveInput.GetInstanceForPlayer(pc.PlayerIDX) is not BraveInput input)
       return;
@@ -3665,7 +3604,7 @@ public static class Extensions
   }
 
   /// <summary>Immediately sets a gun's ammo to a value without playing animations on the UI</summary>
-  public static void SetAmmoAndClearUICache(this Gun gun, int newAmmo)
+  public static void SetAmmoAndClearUICache(this Gun gun, int newAmmo) // REFACTOR: use this move often when playing with ammo
   {
       gun.CurrentAmmo = 0;
       if (gun.m_owner is not PlayerController pc)
@@ -3808,6 +3747,7 @@ public static class Extensions
   }
 
   /// <summary>Print pixel collider debug info</summary>
+  [System.Diagnostics.Conditional("DEBUG")]
   public static void DebugColliders(this SpeculativeRigidbody body)
   {
     for (int i = 0; i < body.PixelColliders.Count; ++i)
@@ -3888,12 +3828,6 @@ public static class Extensions
     return v.FloorToInt().ToIntVector2().QuantizeRound(scale);
   }
 
-  /// <summary>Invert a color componentwise, besides alpha</summary>
-  public static Color Invert(this Color c)
-  {
-    return new Color(1f - c.r, 1f - c.g, 1f - c.b, c.a);
-  }
-
   //REFACTOR: use this for Leafblower
   /// <summary>Apply knockback to a KnockbackDoer from a continuous, known source (used by, e.g., Leafblower, Fluxfist, Newton's Apple)</summary>
   public static void ApplyContinuousSourcedKnockback(this AIActor enemy, GameObject source, Dictionary<AIActor, ActiveKnockbackData> activeKbs, Vector2 velocity)
@@ -3926,7 +3860,7 @@ public static class Extensions
   }
 
   /// <summary>Detach a sprite from that of its SpeculativeRigidBody so its transform can be independently modified</summary>
-  public static tk2dSprite DecoupleSprite(this SpeculativeRigidbody body)
+  public static tk2dSprite DecoupleSpriteFromCollider(this SpeculativeRigidbody body)
   {
     tk2dSprite oldSprite = body.gameObject.GetComponent<tk2dSprite>();
     tk2dSprite newSprite = new GameObject("decoupled sprite").AddComponent<tk2dSprite>();
