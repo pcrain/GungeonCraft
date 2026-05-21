@@ -232,7 +232,7 @@ public class WhipChainStart : MonoBehaviour
         bool mastered = this._owner.HasSynergy(Synergy.MASTERY_PISTOL_WHIP);
         Vector2 start  = this._owner.primaryHand.transform.position;
         Vector2 end    = start + whipRange * this._owner.m_currentGunAngle.ToVector();
-        AIActor target = Lazy.NearestEnemyInLineOfSight(start: start, end: end, canBeNeutral: true);
+        AIActor target = Lazy.NearestEnemyInLineOfSight(start: start, end: end);
         if (target)
             whipRange = Mathf.Max(1f, (target.CenterPosition - start).magnitude - 1.0f);
         for (float elapsed = 0f; elapsed < TOTAL_TIME; elapsed += BraveTime.DeltaTime)

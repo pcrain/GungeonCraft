@@ -151,7 +151,6 @@ public class RetinaHUD : MonoBehaviour
   private float _shwoop             = 0.0f;    // percent of HUD that's visible
   private List<Geometry> _geometry = new();   // all shapes rendered by the HUD
   private List<dfLabel> _labels    = new();   // all labels rendered by the HUD
-  private List<AIActor> _targetedEnemies = new();
 
   private CameraController _camera;
   private Vector2 _worldBottomLeft;
@@ -432,11 +431,11 @@ public class RetinaHUD : MonoBehaviour
     BraveTime.SetTimeScaleMultiplier(Mathf.Lerp(1.0f, MIN_TIMESCALE, ease), base.gameObject);
 
     // determine target and compute some HUD parameters
-    this._gun.gun.AllEnemiesInLineOfSight(ref _targetedEnemies, accountForWalls: true, sort: true);
+    List<AIActor> targetedEnemies = this._gun.gun.AllEnemiesInLineOfSight(accountForWalls: true, sort: true);
     float now         = Time.realtimeSinceStartup;
     Vector2 bpos      = this._gun.gun.barrelOffset.position.XY();
     float gunAngle    = this._gun.gun.CurrentAngle;
-    AIActor target    = (_targetedEnemies.Count > 0) ? _targetedEnemies[0] : null;
+    AIActor target    = (targetedEnemies.Count > 0) ? targetedEnemies[0] : null;
     string targetName = target ? target.AmmonomiconName() : string.Empty;
     Vector2 delta     = target ? target.CenterPosition - bpos : Vector2.right;
     int dAngle        = Mathf.RoundToInt(delta.ToAngle().AbsAngleTo(gunAngle));
@@ -446,7 +445,7 @@ public class RetinaHUD : MonoBehaviour
     float healthAlpha = 0.85f * Mathf.Clamp01((this._shwoop - _SHWOOP_TIME) / _FADE_TIME);
     Color healthColor = Color.Lerp(Color.green, Color.red, Mathf.Abs(Mathf.Sin(9f * now))).WithAlpha(healthAlpha);
     string status     = Status(target, out float projectedDamage);
-    string collateral = target ? _CollateralLabels[Mathf.Clamp(_targetedEnemies.Count - 1, 0, _CollateralLabels.Length - 1)] : string.Empty;
+    string collateral = target ? _CollateralLabels[Mathf.Clamp(targetedEnemies.Count - 1, 0, _CollateralLabels.Length - 1)] : string.Empty;
 
     // place individual elements in screen space
     // Place(this._base, Vector2.zero, Vector2.one);
@@ -479,7 +478,7 @@ public class RetinaHUD : MonoBehaviour
     // handle additional target renders
     for (int ti = 0; ti < MAX_TARGETS; ++ti)
     {
-      AIActor extraTarget = (_targetedEnemies.Count > ti) ? _targetedEnemies[ti] : null;
+      AIActor extraTarget = (targetedEnemies.Count > ti) ? targetedEnemies[ti] : null;
       if (fullyShwooped && extraTarget && extraTarget.sprite is tk2dSprite enemySprite)
       {
         this._extraTargetSprites[ti].renderer.enabled = true;

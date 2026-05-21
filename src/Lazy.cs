@@ -571,41 +571,29 @@ public static class Lazy
     /// <summary>Determine whether any enemy is in an line between start and end</summary>
     public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
-        AllEnemiesInLineOfSight(ref _TempNearbyEnemies, out _, start, end, canBeNeutral, accountForWalls, sort: false, stopAfterFindingOne: true);
+        AllEnemiesInLineOfSightInternal(ref _TempNearbyEnemies, out _, start, end, canBeNeutral, accountForWalls, sort: false, stopAfterFindingOne: true);
         return _TempNearbyEnemies.Count > 0;
     }
 
     /// <summary>Determine whether any enemy is in an line between start and end</summary>
     public static AIActor NearestEnemyInLineOfSight(out Vector2 ipoint, Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
-        AllEnemiesInLineOfSight(ref _TempNearbyEnemies, out ipoint, start, end, canBeNeutral, accountForWalls, sort: true);
+        AllEnemiesInLineOfSightInternal(ref _TempNearbyEnemies, out ipoint, start, end, canBeNeutral, accountForWalls, sort: true);
         return (_TempNearbyEnemies.Count > 0) ? _TempNearbyEnemies[0] : null; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
     }
 
     /// <summary>Determine whether any enemy is in an line between start and end</summary>
     public static AIActor NearestEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
-        AllEnemiesInLineOfSight(ref _TempNearbyEnemies, out _, start, end, canBeNeutral, accountForWalls, sort: true);
+        AllEnemiesInLineOfSightInternal(ref _TempNearbyEnemies, out _, start, end, canBeNeutral, accountForWalls, sort: true);
         return (_TempNearbyEnemies.Count > 0) ? _TempNearbyEnemies[0] : null; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
-    }
-
-    /// <summary>Determine which enemies are in a line between start and end</summary>
-    public static void AllEnemiesInLineOfSight(ref List<AIActor> enemies, Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
-    {
-        AllEnemiesInLineOfSight(ref enemies, out _, start, end, canBeNeutral, accountForWalls, sort);
-    }
-
-    /// <summary>Returns a list of enemies in a gun's direct line of sight</summary>
-    public static void AllEnemiesInLineOfSight(this Gun gun, ref List<AIActor> enemies, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
-    {
-        Vector2 gpos = gun.barrelOffset.transform.position.XY();
-        AllEnemiesInLineOfSight(ref enemies, out _, gpos, gpos + gun.CurrentAngle.ToVector(100f), canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
     }
 
     /// <summary>Returns a list of enemies in a gun's direct line of sight</summary>
     public static List<AIActor> AllEnemiesInLineOfSight(this Gun gun, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
     {
-        gun.AllEnemiesInLineOfSight(ref _TempNearbyEnemies, canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
+        Vector2 gpos = gun.barrelOffset.transform.position.XY();
+        AllEnemiesInLineOfSightInternal(ref _TempNearbyEnemies, out _, gpos, gpos + gun.CurrentAngle.ToVector(100f), canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
         return _TempNearbyEnemies;
     }
 
@@ -676,7 +664,7 @@ public static class Lazy
     }
 
     /// <summary>Determine which enemies are in a line between start and end</summary>
-    public static void AllEnemiesInLineOfSight(ref List<AIActor> enemies, out Vector2 ipoint, Vector2 start, Vector2 end, bool canBeNeutral = true,
+    private static void AllEnemiesInLineOfSightInternal(ref List<AIActor> enemies, out Vector2 ipoint, Vector2 start, Vector2 end, bool canBeNeutral = true,
       bool accountForWalls = false, bool sort = false, bool stopAfterFindingOne = false)
     {
         GetAllNearbyEnemiesInternal(ref _TempNearbyEnemies, start, 100f, ignoreWalls: !accountForWalls, includeInvulnerable: true);
