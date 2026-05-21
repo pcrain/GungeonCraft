@@ -658,10 +658,8 @@ public class MinesweeperGame : MonoBehaviour
             return;
 
         // check if any enemies are standing on unrevealed mines if we've fully finished populating the minefield
-        foreach (AIActor enemy in this._gameRoom.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(this._player.CenterPosition, ignoreWalls: true, includeInvulnerable: true))
         {
-            if (!enemy || !enemy.isActiveAndEnabled || enemy.IsGone || !enemy.IsValid || enemy.healthHaver is not HealthHaver hh || hh.IsDead)
-                continue;
             if (enemy.specRigidbody is not SpeculativeRigidbody body)
                 continue;
             MinesweeperTile enemyTile = null;

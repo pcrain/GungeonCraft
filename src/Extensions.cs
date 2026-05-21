@@ -2607,14 +2607,13 @@ public static class Extensions
     return false; //TODO: originally needed so Frisbee couldn't clip behind Bello's shop, but that was fixed...should still be implemented at some point
   }
 
-  private static readonly List<AIActor> _NoEnemies = [];
   private static List<AIActor> _RefEnemies = new();
   /// <summary>Get all active enemies in a room, returning an empty list instead of null when the target is invalid</summary>
   public static List<AIActor> SafeGetEnemiesInRoom(this RoomHandler room)
   {
-    if (room == null)
-      return _NoEnemies;
-    room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref _RefEnemies);
+    _RefEnemies.Clear();
+    if (room != null)
+      room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref _RefEnemies);
     return _RefEnemies;
   }
 
