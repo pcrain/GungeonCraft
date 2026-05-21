@@ -92,7 +92,6 @@ public class LightString : MonoBehaviour
 
     private static List<LightString> _ExtantChainsOnFloor = new();
     private static ListDictionary _Attachments = new();
-    private static List<AIActor> _AnchorTargets = new(); // temporary list for storing extra targets for mastery
 
     private void Start()
     {
@@ -190,9 +189,9 @@ public class LightString : MonoBehaviour
         return true;
 
       // if mastered, attempt to find another enemy to anchor onto
-      Lazy.GetAllNearbyEnemies(ref _AnchorTargets, enemy.CenterPosition, 12f, ignoreWalls: false);
-      _AnchorTargets.Shuffle();
-      foreach (AIActor newTarget in _AnchorTargets)
+      List<AIActor> anchorTargets = enemy.CenterPosition.GetAllNearbyEnemies(radius: 12f, ignoreWalls: false);
+      anchorTargets.Shuffle();
+      foreach (AIActor newTarget in anchorTargets)
       {
         if (this._enemyChain.Contains(newTarget) || newTarget.specRigidbody is not SpeculativeRigidbody newBody)
           continue;

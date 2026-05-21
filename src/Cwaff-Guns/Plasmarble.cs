@@ -112,8 +112,6 @@ public class PlasmarbleProjectile : MonoBehaviour
     private const float _BOUNCE_FRICTION    = 0.75f;
     private const float _ZAP_FREQUENCY      = 0.25f;
 
-    private static List<AIActor> _ZappableEnemies = new();
-
     private Projectile _projectile          = null;
     private PlayerController _owner         = null;
     private FancyGrenadeProjectile _grenade = null;
@@ -151,13 +149,13 @@ public class PlasmarbleProjectile : MonoBehaviour
     internal static void ZapRandomEnemies(Projectile proj, int numZaps = 1, bool attachToProjectile = true, float? overrideAngle = null)
     {
         Vector2 pos = proj.specRigidbody.UnitCenter;
-        Lazy.GetAllNearbyEnemies(ref _ZappableEnemies, pos, ignoreWalls: false);
-        int numZappableEnemies = _ZappableEnemies.Count;
+        List<AIActor> zappableEnemies = pos.GetAllNearbyEnemies(ignoreWalls: false);
+        int numZappableEnemies = zappableEnemies.Count;
         if (numZappableEnemies > numZaps) // don't bother shuffling the list if we're going to use the whole thing
-            _ZappableEnemies.Shuffle();
+            zappableEnemies.Shuffle();
         for (int i = 0; i < numZaps; ++i)
         {
-            AIActor enemy = (i < numZappableEnemies) ? _ZappableEnemies[i] : null;
+            AIActor enemy = (i < numZappableEnemies) ? zappableEnemies[i] : null;
             Vector2 zapPos = enemy ? enemy.CenterPosition : proj.specRigidbody.UnitCenter.ToNearestWall(overrideAngle ?? Lazy.RandomAngle());
             OwnerConnectLightningModifier zap = (attachToProjectile ? proj.gameObject : new GameObject("lightningboi"))
               .AddComponent<OwnerConnectLightningModifier>();

@@ -348,7 +348,6 @@ public class XelsiorHoveringGun : MonoBehaviour
     private const float _GUN_DIST = 3.5f;
     private const float _AUTOFIRE_REDUCTION = 2.5f;
 
-    private static List<AIActor> _TargetableEnemies = new();
     private static VFXPool _MuzzleVFX = null;
 
     public float curAngle    = 90f;
@@ -452,8 +451,7 @@ public class XelsiorHoveringGun : MonoBehaviour
 
     private void DoAutoTarget()
     {
-        Lazy.GetAllNearbyEnemies(ref _TargetableEnemies, this._owner.CenterPosition, ignoreWalls: true);
-        if (_TargetableEnemies.Count > 0 && _TargetableEnemies.ChooseRandom() is AIActor newTarget)
+        if (this._owner.CenterPosition.GetAllNearbyEnemies().ChooseRandom() is AIActor newTarget)
             SetTarget(newTarget, autoTarget: true);
     }
 

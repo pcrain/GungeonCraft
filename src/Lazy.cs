@@ -635,7 +635,7 @@ public static class Lazy
     public static List<AIActor> GetAllNearbyEnemies(this Vector2 center, float radius = 100f, bool ignoreWalls = true,
       bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true, bool includeHarmless = false)
     {
-        GetAllNearbyEnemies(ref _TempNearbyEnemies, center, radius, ignoreWalls, includeDead, includeGone, includeInvulnerable, limitToCurrentRoom, includeHarmless);
+        GetAllNearbyEnemiesInternal(ref _TempNearbyEnemies, center, radius, ignoreWalls, includeDead, includeGone, includeInvulnerable, limitToCurrentRoom, includeHarmless);
         return _TempNearbyEnemies; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
     }
 
@@ -664,7 +664,7 @@ public static class Lazy
     private static IEnumerable<ActorPosData> AllEnemiesWithinConeOfVisionInternal(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f,
       bool ignoreWalls = false, bool includeInvulnerable = true)
     {
-        GetAllNearbyEnemies(ref _TempNearbyEnemies, start, maxDistance, ignoreWalls, includeInvulnerable: includeInvulnerable);
+        GetAllNearbyEnemiesInternal(ref _TempNearbyEnemies, start, maxDistance, ignoreWalls, includeInvulnerable: includeInvulnerable);
         foreach (AIActor enemy in _TempNearbyEnemies)
         {
             Vector2 delta = (enemy.CenterPosition - start);
@@ -679,7 +679,7 @@ public static class Lazy
     public static void AllEnemiesInLineOfSight(ref List<AIActor> enemies, out Vector2 ipoint, Vector2 start, Vector2 end, bool canBeNeutral = true,
       bool accountForWalls = false, bool sort = false, bool stopAfterFindingOne = false)
     {
-        GetAllNearbyEnemies(ref _TempNearbyEnemies, start, 100f, ignoreWalls: !accountForWalls, includeInvulnerable: true);
+        GetAllNearbyEnemiesInternal(ref _TempNearbyEnemies, start, 100f, ignoreWalls: !accountForWalls, includeInvulnerable: true);
         enemies.Clear();
         _ActorDistances.Clear();
         ipoint = default;
@@ -702,10 +702,10 @@ public static class Lazy
           ipoint = _ActorDistances[0].ipoint;
     }
 
-    private static List<AIActor> _TempEnemies = new(); // generic temporary list for holding all enemies under consideration | WARNING: ONLY for use directly in GetAllNearbyEnemies
+    private static List<AIActor> _TempEnemies = new(); // generic temporary list for holding all enemies under consideration | WARNING: ONLY for use directly in GetAllNearbyEnemiesInternal
 
     /// <summary>Determine all enemies within a radius of a point.</summary>
-    public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = -1f, bool ignoreWalls = true,
+    private static void GetAllNearbyEnemiesInternal(ref List<AIActor> enemies, Vector2 center, float radius = -1f, bool ignoreWalls = true,
       bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true, bool includeHarmless = false)
     {
         float sqrRadius = radius * radius;
