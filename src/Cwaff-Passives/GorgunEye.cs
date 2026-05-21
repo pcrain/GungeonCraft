@@ -51,17 +51,12 @@ public class GorgunEye : CwaffPassive
         float gunAngle       = player.m_currentGunAngle;
         AIActor closestEnemy = null;
         float closestDist    = 999999f;
-        foreach(AIActor enemy in player.CurrentRoom.SafeGetEnemiesInRoom())
+        foreach(AIActor enemy in ppos.AllEnemiesWithinConeOfVision(coneAngle: gunAngle, maxDeviation: _CONE_RADIUS, ignoreWalls: false, includeInvulnerable: true))
         {
-            if (!enemy || !enemy.IsHostileAndNotABoss(canBeNeutral: true))
+            if (enemy.IsABoss())
                 continue; // enemy is not one we should be targeting
             if (!enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
                 continue; // enemy cannot be stunned
-
-            Vector2 epos  = enemy.CenterPosition;
-            Vector2 delta = epos - ppos;
-            if (!delta.IsNearAngle(gunAngle, _CONE_RADIUS))
-                continue; // enemy is not within our vision range
 
             if (pierces)
             {
@@ -69,14 +64,9 @@ public class GorgunEye : CwaffPassive
                 continue;
             }
 
-            float dist = delta.sqrMagnitude;
+            float dist = (enemy.CenterPosition - ppos).sqrMagnitude;
             if (dist >= closestDist)
                 continue; // enemy is not the closest enemy we've encountered
-
-            // Make sure we're not going through walls
-            Vector2 target = Raycast.ToNearestWallOrObject(ppos, gunAngle, minDistance: 0);
-            if ((target-ppos).sqrMagnitude < dist)
-                continue; // wall obstructs our view of the enemy
 
             closestEnemy = enemy;
             closestDist  = dist;

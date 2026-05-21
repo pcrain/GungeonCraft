@@ -36,7 +36,7 @@ public class SlappProjectile : MonoBehaviour
     private const float _SLAPPP_FORCE         = 300f;
     private const float _SLAPPP_STUN          = 2f;
     private const float _CLAPPP_STUN          = 10f;
-    private const float _SLAPP_RADIUS_SQUARED = 9f;
+    private const float _SLAPP_RADIUS         = 3f;
 
     private Projectile _projectile = null;
     private AIActor    _slapVictim = null;
@@ -94,21 +94,11 @@ public class SlappProjectile : MonoBehaviour
         PlayerController owner = this._projectile.Owner as PlayerController;
         Vector2 victimPos = this._slapVictim.CenterPosition;
         Vector2 impactPos = this._vfx.GetComponent<tk2dSprite>().WorldCenter;
-        List<AIActor> enemies;
-        if (owner.CurrentRoom != null)
-          enemies = owner.CurrentRoom.SafeGetEnemiesInRoom();
-        else
-          enemies = [];
+        List<AIActor> enemies = owner.CenterPosition.GetAllNearbyEnemies(radius: _SLAPP_RADIUS);
         enemies.AddUnique(this._slapVictim); // even if our room is null, make sure we hit our original victim
         foreach (AIActor enemy in enemies)
         {
-            if (!enemy || !enemy.isActiveAndEnabled)
-                continue;
-            if ((enemy.CenterPosition - victimPos).sqrMagnitude > _SLAPP_RADIUS_SQUARED)
-                continue;
-            if (enemy.healthHaver is not HealthHaver hh)
-                continue;
-
+            HealthHaver hh = enemy.healthHaver;
             hh.ApplyDamage(this._slapDamage, Vector2.zero, "SLAPPP", CoreDamageTypes.None, DamageCategory.Collision, true);
             if (!hh.IsBoss && !hh.IsSubboss && enemy.knockbackDoer is KnockbackDoer kb)
                 kb.ApplyKnockback(this._slapAngle, _SLAPPP_FORCE * (owner ? owner.KnockbackMult() : 1f));

@@ -77,7 +77,7 @@ public class EmergencySiren : CwaffActive
           return;
         this._anyEnemyInRoomDied = false;
         this._anyGunFiredInRoom = false;
-        foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in this._owner.CenterPosition.GetAllNearbyEnemies(includeGone: true, includeInvulnerable: true, includeHarmless: true))
             enemy.healthHaver.OnPreDeath += OnEnemyKilled;
     }
 
@@ -107,10 +107,8 @@ public class EmergencySiren : CwaffActive
         RoomHandler room = user.CurrentRoom;
         room.UnsealRoom();
 
-        foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in user.CenterPosition.GetAllNearbyEnemies(includeGone: true, includeInvulnerable: true))
         {
-            if (!enemy)
-                continue; // stupid grenades D:
             if (enemy.behaviorSpeculator)
                 enemy.behaviorSpeculator.InterruptAndDisable();
             if (enemy.knockbackDoer)

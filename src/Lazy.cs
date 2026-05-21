@@ -633,9 +633,9 @@ public static class Lazy
 
     /// <summary>Returns a list of all enemies within a radius of a point.</summary>
     public static List<AIActor> GetAllNearbyEnemies(this Vector2 center, float radius = 100f, bool ignoreWalls = true,
-      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true)
+      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true, bool includeHarmless = false)
     {
-        GetAllNearbyEnemies(ref _TempNearbyEnemies, center, radius, ignoreWalls, includeDead, includeGone, includeInvulnerable, limitToCurrentRoom);
+        GetAllNearbyEnemies(ref _TempNearbyEnemies, center, radius, ignoreWalls, includeDead, includeGone, includeInvulnerable, limitToCurrentRoom, includeHarmless);
         return _TempNearbyEnemies; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
     }
 
@@ -706,7 +706,7 @@ public static class Lazy
 
     /// <summary>Determine all enemies within a radius of a point.</summary>
     public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = -1f, bool ignoreWalls = true,
-      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true)
+      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true, bool includeHarmless = false)
     {
         float sqrRadius = radius * radius;
         enemies.Clear();
@@ -718,7 +718,7 @@ public static class Lazy
             room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref _TempEnemies);
         foreach (AIActor enemy in _TempEnemies)
         {
-            if (!enemy || !enemy.isActiveAndEnabled || (!includeGone && enemy.IsGone) || !enemy.IsHostile(canBeNeutral: true))
+            if (!enemy || !enemy.isActiveAndEnabled || (!includeGone && enemy.IsGone) || (!includeHarmless && !enemy.IsHostile(canBeNeutral: true)))
                 continue;
             HealthHaver hh = enemy.healthHaver;
             if (!includeDead && (!hh || hh.IsDead))

@@ -97,13 +97,12 @@ public class DecoyEcho : MonoBehaviour
 
         this._room = room;
         SpeculativeRigidbody body = base.gameObject.GetComponent<SpeculativeRigidbody>();
-        foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in body.UnitCenter.GetAllNearbyEnemies())
         {
-            if (!enemy || !enemy.IsHostile(canBeNeutral: true) || (!this.mastered && enemy.IsABoss()))
-                continue;
-
             if (!this.mastered)
             {
+                if (enemy.IsABoss())
+                    continue;
                 float dist = (base.transform.position.XY() - enemy.CenterPosition).magnitude;
                 if (dist > _DECOY_MAX_DIST)
                     continue;

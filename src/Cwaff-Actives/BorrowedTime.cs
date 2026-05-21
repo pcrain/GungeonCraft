@@ -125,9 +125,7 @@ public class BorrowedTime : CwaffActive
 
     private bool CheckIfBossIsPresent()
     {
-        if (!this._owner || this._owner.CurrentRoom is not RoomHandler room)
-            return false;
-        return room.SafeGetEnemiesInRoom().Any(enemy => enemy && enemy.healthHaver && enemy.healthHaver.IsBoss);
+        return this._owner && this._owner.CenterPosition.GetAllNearbyEnemies().Any(enemy => enemy.healthHaver.IsBoss);
     }
 
     public override void DoEffect(PlayerController user)
@@ -141,7 +139,7 @@ public class BorrowedTime : CwaffActive
         if (curRoom == null || curRoom != this._lastCheckedRoom)
             return; // this should never happen in theory
 
-        List<AIActor> activeEnemies = curRoom.SafeGetEnemiesInRoom();
+        List<AIActor> activeEnemies = user.CenterPosition.GetAllNearbyEnemies();
         if (activeEnemies.Count == 0)
         {
             if (this._borrowedEnemies.Count > 0 && user.GetAbsoluteParentRoom() != null)
@@ -155,7 +153,7 @@ public class BorrowedTime : CwaffActive
         for (int n = activeEnemies.Count - 1; n >= 0; --n)
         {
             AIActor otherEnemy = activeEnemies[n];
-            if (!otherEnemy || !otherEnemy.IsHostileAndNotABoss() || otherEnemy.IsBlackPhantom)
+            if (otherEnemy.IsABoss() || otherEnemy.IsBlackPhantom)
                 continue;
 
             Vector2 center = otherEnemy.CenterPosition;

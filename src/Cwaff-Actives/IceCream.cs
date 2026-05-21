@@ -26,8 +26,8 @@ public class IceCream : CwaffActive
     public override bool CanBeUsed(PlayerController user)
     {
         Vector2 ppos = user.CenterPosition;
-        foreach (AIActor enemy in user.CurrentRoom.SafeGetEnemiesInRoom())
-            if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.CenterPosition - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
+        foreach (AIActor enemy in ppos.GetAllNearbyEnemies(radius: HappyIceCreamHaver._SHARE_RANGE))
+            if (HappyIceCreamHaver.NeedsIceCream(enemy))
                 return base.CanBeUsed(user);
 
         return false;
@@ -36,8 +36,8 @@ public class IceCream : CwaffActive
     public override void DoEffect(PlayerController user)
     {
         Vector2 ppos = user.CenterPosition;
-        foreach (AIActor enemy in user.CurrentRoom.SafeGetEnemiesInRoom())
-            if (HappyIceCreamHaver.NeedsIceCream(enemy) && ((enemy.CenterPosition - ppos).sqrMagnitude <= HappyIceCreamHaver._SHARE_RANGE_SQUARED))
+        foreach (AIActor enemy in ppos.GetAllNearbyEnemies(radius: HappyIceCreamHaver._SHARE_RANGE))
+            if (HappyIceCreamHaver.NeedsIceCream(enemy))
                 HappyIceCreamHaver.ShareIceCream(enemy);
     }
 }
@@ -59,7 +59,8 @@ public class IceCreamGun : CwaffGun
 
 public class HappyIceCreamHaver : MonoBehaviour
 {
-    internal const float _SHARE_RANGE_SQUARED = 6f;
+    internal const float _SHARE_RANGE = 2.5f;
+    internal const float _SHARE_RANGE_SQUARED = _SHARE_RANGE * _SHARE_RANGE;
     internal const float _SEEK_PLAYER_RANGE_SQUARED = 16f;
 
     private const float _TARGET_SWITCH_RATE = 1.00f;

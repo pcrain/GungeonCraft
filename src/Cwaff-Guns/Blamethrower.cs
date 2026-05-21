@@ -83,18 +83,15 @@ public class Blamethrower : CwaffGun
                 this._candidateScapegoat.gameObject.GetOrAddComponent<ScapeGoat>().Setup(this.Mastered);
             return;
         }
-        if (player.CurrentRoom.SafeGetEnemiesInRoom() is not List<AIActor> enemies)
-            return;
-        if (enemies.Count == 0)
+
+        if (player.CenterPosition.GetAllNearbyEnemies() is not List<AIActor> enemies || enemies.Count == 0)
             return;
 
         const int TRIES = 10;
         for (int i = 0; i < TRIES; ++i)
         {
             AIActor enemy = enemies.ChooseRandom();
-            if (!enemy || !enemy.gameObject || !enemy.IsHostileAndNotABoss())
-                continue;
-            if (enemy.GetComponent<EnemyBlamedBehavior>())
+            if (enemy.IsABoss() || enemy.GetComponent<EnemyBlamedBehavior>())
                 continue;  // can't scapegoat the same enemy twice
             enemy.gameObject.GetOrAddComponent<ScapeGoat>().Setup(this.Mastered);
             break;

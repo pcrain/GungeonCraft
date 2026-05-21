@@ -87,8 +87,8 @@ public class BulletThatCanKillTheFuture : CwaffActive
     private static List<AIActor> CheckForValidEnemies(PlayerController player)
     {
         List<AIActor> candidates    = new List<AIActor>();
-        foreach (AIActor otherEnemy in player.GetAbsoluteParentRoom().SafeGetEnemiesInRoom())
-            if (otherEnemy.IsHostileAndNotABoss())
+        foreach (AIActor otherEnemy in player.CenterPosition.GetAllNearbyEnemies(includeInvulnerable: true))
+            if (!otherEnemy.IsABoss())
                 candidates.Add(otherEnemy);
         return candidates;
     }

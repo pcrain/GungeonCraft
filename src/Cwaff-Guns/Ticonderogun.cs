@@ -151,8 +151,8 @@ public class Ticonderogun : CwaffGun
             return;
 
         List<AIActor> theEncircled = new();
-        foreach (AIActor enemy in this.PlayerOwner.CurrentRoom.SafeGetEnemiesInRoom())
-            if (enemy && enemy.IsHostile(canBeNeutral: true) && enemy.CenterPosition.IsPointInPolygonHull(this._extantPoints))
+        foreach (AIActor enemy in this.PlayerOwner.CenterPosition.GetAllNearbyEnemies())
+            if (enemy.CenterPosition.IsPointInPolygonHull(this._extantPoints))
                 theEncircled.Add(enemy);
         if (theEncircled.Count == 0)
             return;  // return early if we haven't actually done anything

@@ -44,10 +44,8 @@ public class StopSign : CwaffActive
     public override void DoEffect(PlayerController user)
     {
         bool didAnything = false;
-        foreach (AIActor enemy in user.CurrentRoom.SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in user.CenterPosition.GetAllNearbyEnemies())
         {
-            if (!enemy || !enemy.IsHostile(canBeNeutral: true))
-                continue;
             if (!enemy.behaviorSpeculator || enemy.behaviorSpeculator.ImmuneToStun)
                 continue;
             if (enemy.VoluntaryMovementVelocity.magnitude < 0.1f)

@@ -774,15 +774,11 @@ public static class SlashDoer // stolen from NN
     }
     private static void DealDamageToEnemiesInArc(GameActor owner, Vector2 arcOrigin, float arcAngle, float arcRadius, SlashData slashParameters, List<SpeculativeRigidbody> alreadyHit = null)
     {
-        RoomHandler roomHandler = arcOrigin.GetAbsoluteRoom();
-        if (roomHandler == null) return;
         if (SlasherIsPlayerOrFriendly(owner))
         {
-            List<AIActor> activeEnemies = roomHandler.SafeGetEnemiesInRoom();
-            for (int i = 0; i < activeEnemies.Count; i++)
+            foreach (AIActor aiactor in arcOrigin.GetAllNearbyEnemies())
             {
-                AIActor aiactor = activeEnemies[i];
-                if (!(aiactor && aiactor.specRigidbody && aiactor.IsNormalEnemy && !aiactor.IsGone && aiactor.healthHaver))
+                if (!aiactor.IsNormalEnemy || !aiactor.specRigidbody)
                     continue;
                 if (alreadyHit != null && alreadyHit.Contains(aiactor.specRigidbody))
                     continue;

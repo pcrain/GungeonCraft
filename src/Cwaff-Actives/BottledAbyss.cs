@@ -110,9 +110,10 @@ public class BottledAbyss : CwaffActive
                 return;
 
             float sqrRadius = dangerRadius * dangerRadius;
-            foreach (AIActor enemy in this._room.SafeGetEnemiesInRoom())
+            foreach (AIActor enemy in base.gameObject.transform.position.XY().GetAllNearbyEnemies(radius: dangerRadius, includeDead: true,
+              includeInvulnerable: true, limitToCurrentRoom: false, includeHarmless: true))
             {
-                if (!enemy || enemy.IsFalling || !enemy.IsGrounded || !enemy.HasBeenEngaged || enemy.State != AIActor.ActorState.Normal)
+                if (enemy.IsFalling || !enemy.IsGrounded || !enemy.HasBeenEngaged || enemy.State != AIActor.ActorState.Normal)
                     continue;
                 if (enemy.healthHaver is not HealthHaver hh || hh.IsBoss || hh.IsSubboss)
                     continue;
@@ -120,8 +121,6 @@ public class BottledAbyss : CwaffActive
                     continue;
                 if (this._doStun && enemy.behaviorSpeculator is BehaviorSpeculator bs && !bs.ImmuneToStun)
                   bs.Stun(0.1f);
-                if ((this._pos - srb.UnitBottomCenter).sqrMagnitude > sqrRadius)
-                    continue;
                 enemy.ForceFall();
             }
 

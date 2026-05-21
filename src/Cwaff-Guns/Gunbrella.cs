@@ -148,20 +148,8 @@ public class GunbrellaProjectile : MonoBehaviour
         if (!this._naturalSpawn)
         {
             this._extraDelay = _DELAY * (_LastLaunchIndex++);
-            AIActor target   = null;
-            List<AIActor> enemies = this._owner.CurrentRoom.SafeGetEnemiesInRoom();
-            if (enemies.Count > 0)
-            {
-                const int TRIES = 10;
-                for (int i = 0; i < TRIES; ++i)
-                {
-                    AIActor enemy = enemies.ChooseRandom();
-                    if (!enemy || !enemy.healthHaver || enemy.healthHaver.IsDead)
-                        continue;
-                    target = enemy;
-                    break;
-                }
-            }
+            List<AIActor> enemies = this._owner.CenterPosition.GetAllNearbyEnemies();
+            AIActor target = (enemies.Count > 0) ? enemies.ChooseRandom() : null;
             this._exactTarget = target ? target.CenterPosition : this._owner.CenterPosition;
         }
 

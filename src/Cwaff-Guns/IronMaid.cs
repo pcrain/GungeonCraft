@@ -108,24 +108,8 @@ public class IronMaid : CwaffGun
     {
         if (this.PlayerOwner is not PlayerController pc)
             return null;
-
-        AIActor target = null;
-        float closest = _MAX_AIM_DEV;
         Vector2 gunPos = this.gun.barrelOffset.PositionVector2();
-        float aimAngle = pc.m_currentGunAngle;
-        foreach (AIActor enemy in pc.CurrentRoom.SafeGetEnemiesInRoom())
-        {
-            if (!enemy.IsHostile(canBeNeutral: true))
-                continue;
-            Vector2 delta = (enemy.CenterPosition - gunPos);
-            float angleFromAim = Mathf.Abs(delta.ToAngle().RelAngleTo(aimAngle));
-            if (angleFromAim > closest)
-                continue;
-
-            target = enemy;
-            closest = angleFromAim;
-        }
-        return target;
+        return gunPos.NearestEnemyWithinConeOfVision(coneAngle: pc.m_currentGunAngle, maxDeviation: _MAX_AIM_DEV, ignoreWalls: true, includeInvulnerable: true);
     }
 
     public override void Update()

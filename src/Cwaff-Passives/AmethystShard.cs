@@ -214,15 +214,11 @@ public class AllayCompanion : CwaffCompanionController
             AIActor nearest = null;
             float nearestDist = 999f;
 
-            foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
+            foreach (AIActor enemy in myPos.GetAllNearbyEnemies())
             {
-                if (!enemy || !enemy.isActiveAndEnabled || enemy == this._lastDroppedActor)
+                if (enemy == this._lastDroppedActor || enemy.IsFlying || enemy.FallingProhibited || enemy.IsFalling)
                     continue;
-                if (!enemy.IsWorthShootingAt || enemy.IsFlying || enemy.FallingProhibited || enemy.IsFalling)
-                    continue;
-                if (enemy.healthHaver is not HealthHaver hh || hh.maximumHealth >= maxHealth)
-                    continue;
-                if (hh.IsDead || hh.IsBoss || hh.IsSubboss || !hh.IsVulnerable)
+                if (enemy.healthHaver is not HealthHaver hh || hh.maximumHealth >= maxHealth || hh.IsBoss || hh.IsSubboss)
                     continue;
                 if (enemy.specRigidbody is not SpeculativeRigidbody body || !body.CanBeCarried)
                     continue;
