@@ -359,7 +359,6 @@ def getNPCs():
       "npcname"     : "Cammy",
       "icon"        : imageFor("cammy_icon.png"),
       "type"        : "Shopkeeper",
-      "condition"   : "Guaranteed to spawn in Keep of the Lead Lord.",
       "description" : "Sells 3 random unlocked companions at a 30% discount. Cannot be stolen from.",
     },
     "bart" : {
@@ -367,7 +366,6 @@ def getNPCs():
       "npcname"     : "Bart",
       "icon"        : imageFor("bart_icon.png"),
       "type"        : "Shopkeeper",
-      "condition"   : "Guaranteed to spawn in the Gungeon Proper or Mines.",
       "description" : "Barters 3 random D-A quality items for any higher-tiered item. Bartering is done by dropping a single item on the floor within the shop room and attempting to purchase an item. Bartered items are destroyed upon a successful trade.",
     },
     "kevlar" : {
@@ -375,15 +373,20 @@ def getNPCs():
       "npcname"     : "Kevlar",
       "icon"        : imageFor("kevlar_icon.png"),
       "type"        : "Shopkeeper",
-      "condition"   : "Guaranteed to spawn when entering a floor while possessing an {{Quality|S}} or {{Quality|A}} quality item.",
       "description" : "Sells Insurance Policies for 30 casings each. Insurance Policies can be used on any grounded item or gun to insure it, making the item spawn in a special chest at the beginning of your next run.",
+    },
+    "don" : {
+      "filename"    : imageFor("don_idle_001.png"),
+      "npcname"     : "Don",
+      "icon"        : imageFor("don_icon.png"),
+      "type"        : "Pizza Kitchen Owner",
+      "description" : "Hires part time employees to deliver pizza to hungry Bullet Kin.",
     },
     "skeleton" : {
       "filename"    : "",
       "npcname"     : "???",
       "icon"        : "",
       "type"        : "Friend? Enemy?",
-      "condition"   : "Maybe Bello knows something?",
       "description" : "A mysterious figure from a different time and place that somehow ended up in the Gungeon.",
     },
   }
@@ -461,7 +464,6 @@ NPC_TEMPLATE='''
 |{npcname}
 |<div style="transform-origin: center; transform: scale(2);">{icon}</div>
 |{type}
-|{condition}
 |{description}
 '''
 
@@ -556,11 +558,10 @@ WIKI_TEMPLATE='''
 == NPCs ==
 
 {{| {tablestyle}
-!style="font-weight: bold; width: 112px;"|Icon
+!style="font-weight: bold; width: 160px;"|Icon
 !Name
 !Room Icon
 !Type
-!Spawn Condition (Classic)
 !style="width: 50%"|Description
 {npcs}
 |}}

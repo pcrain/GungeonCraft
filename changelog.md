@@ -1,31 +1,40 @@
 # Changelog
 
-## 1.31.0 (TBD)
+## 1.31.0 (2026-05-20)
 
-- Synchronized [REDACTED]'s and [REDACTED]'s speech audio to match their dialogue better
-- Added new NPC: Don
-	- Don has a 6% chance of spawning in his pizza kitchen at some point during any run
-	- Talking with Don now triggers the pizza minigame formerly handled by the Domino item
-- Reworked Domino: now guarantees Don's pizza kitchen will spawn on every subsequent main floor
-- Overhauled pizza minigame
-	- Hungry Bullet Kin can no longer receive knockback
-	- Fixed bug with chest rewards being granted when delivering under 50% of pizzas
-	- Fixed Shmuppies being able to spawn during pizza minigame
-	- Added failsafe ending the pizza minigame if the player ever takes damage
-	- All Bullet Kin are despawned at the end of the pizza minigame, rather than just the ones without pizza
-	- Adjusted Bullet Kin placement to better avoid being hidden by walls
-	- Chest rewards from the pizza minigame now spawn unlocked
-	- Tweaked text on reward note for successful pizza minigame completion
+#### Features:
+
 - Added Nightlighter, Gadulo, Vengeful Spirit, and Death Note
 	- Nightlighter sprite thanks to [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)!
 	- Vengeful Spirit and Death Note sprites thanks to [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)!
+- Added new NPC: Don
+	- Don has a 6% chance of spawning in his pizza kitchen at some point during any run
+	- Talking with Don now triggers a pizza delivery minigame (formerly tied to the Domino item)
+	- Don sprites also thanks to Nevernamed!
 - Added masteries for Nightlighter, Gadulo, and Death Note
 - Added 4 new synergies
+
+#### Balance Changes and Polish:
+
+- Overhauled pizza delivery minigame
+	- Chest rewards for the pizza minigame now spawn unlocked
+	- Hungry Bullet Kin can no longer receive knockback
+	- All Bullet Kin are despawned at the end of the pizza minigame, rather than just the ones without pizza
+	- Adjusted Bullet Kin placement to better avoid being hidden by walls
+	- Added failsafe ending the pizza minigame if the player ever takes damage
+	- Tweaked text on reward note for successful pizza minigame completion
+- Reworked Domino: now guarantees Don's pizza kitchen will spawn on every subsequent main floor
+- Synchronized [REDACTED]'s and [REDACTED]'s speech audio to match their dialogue better
+- Added proper lore for Retina instead of having placeholder text copy-pasted from Cleansweep
+
+#### Bugfixes and Misc:
+
+- Fixed bug with chest rewards being granted when delivering under 50% of pizzas during pizza minigame
+- Fixed Shmuppies being able to spawn during pizza minigame
 - Fixed Shmuppies spawning too close to doorways and causing various issues with other mods
+- Fixed Shmuppy's Fortune's Favor effect triggering when standing right next to them even when they're supposed to be vulnerable
 - Fixed (for the 3rd time) gun sprites being partially white in synergy notifications
 - Optimized Retina's HUD to not be destroyed and recreated every time it's dismissed
-- Added proper lore for Retina instead of having placeholder text copy-pasted from Cleansweep
-- Fixed Shmuppy's Fortune's Favor effect triggering when standing right next to them even when they're supposed to be vulnerable
 - Prevented Ticonderogun from being Duct Taped to other guns (at least until I can figure out a nice way to make it work)
 
 ## 1.30.1 (2026-05-14)
