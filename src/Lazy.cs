@@ -553,12 +553,6 @@ public static class Lazy
         return debris;
     }
 
-    /// <summary>Get the current room of the game's best active player</summary>
-    public static RoomHandler CurrentRoom()
-    {
-        return GameManager.Instance.BestActivePlayer.CurrentRoom;
-    }
-
     private static Projectile _NullProjectilePrefab = null;
     /// <summary>Return a dummy projectile for instances where we need a projectile but don't want it to do anything</summary>
     public static Projectile NoProjectile()
@@ -578,105 +572,59 @@ public static class Lazy
         return _NullProjectilePrefab;
     }
 
-    private static List<AIActor> _TempEnemies = new();
-    private static List<AIActor> _TempNearbyEnemies = new();
+    private static List<AIActor> _TempEnemies = new(); // generic temporary list for holding all enemies under consideration
+    private static List<AIActor> _TempNearbyEnemies = new(); // generic temporary list for holding all nearby enemies
+    private static readonly List<ActorPosData> _ActorDistances = new(); // generic temporary list for holding actor positional information
+
+    /// <summary>Convenience structure for holding temporary actor positional and line of sight data</summary>
+    private struct ActorPosData
+    {
+      public AIActor actor;
+      public float sqrDistance;
+      public float angle;
+      public Vector2 ipoint;
+
+      public ActorPosData(AIActor actor, float sqrDistance, float angle = default, Vector2 ipoint = default)
+      {
+        this.actor = actor;
+        this.sqrDistance = sqrDistance;
+        this.angle = angle;
+        this.ipoint = ipoint;
+      }
+    }
+
     /// <summary>Determine whether any enemy is in an line between start and end</summary>
     public static bool AnyEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
-        start.SafeGetEnemiesInRoom(ref _TempEnemies);
-        foreach (AIActor enemy in _TempEnemies)
-        {
-            if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
-                continue;
-            PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
-            if (accountForWalls && !start.HasLineOfSight(collider.UnitCenter))
-                continue;
-            if (BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
-                return true;
-        }
-        return false;
+        AllEnemiesInLineOfSight(ref _TempNearbyEnemies, out _, start, end, canBeNeutral, accountForWalls, sort: false, stopAfterFindingOne: true);
+        return _TempNearbyEnemies.Count > 0;
     }
 
     /// <summary>Determine whether any enemy is in an line between start and end</summary>
     public static AIActor NearestEnemyInLineOfSight(out Vector2 ipoint, Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
-        AIActor nearest = null;
-        float nearestSqrDist = float.MaxValue;
-        start.SafeGetEnemiesInRoom(ref _TempEnemies);
-        ipoint = Vector2.zero;
-        foreach (AIActor enemy in _TempEnemies)
-        {
-            if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
-                continue;
-            PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
-            if (accountForWalls && !start.HasLineOfSight(collider.UnitCenter))
-                continue;
-            if (!BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
-                continue;
-            float sqrDist = (enemy.CenterPosition - start).sqrMagnitude;
-            if (sqrDist > nearestSqrDist)
-                continue;
-            ipoint = intersection;
-            nearestSqrDist = sqrDist;
-            nearest = enemy;
-        }
-        return nearest;
+        AllEnemiesInLineOfSight(ref _TempNearbyEnemies, out ipoint, start, end, canBeNeutral, accountForWalls, sort: true);
+        return (_TempNearbyEnemies.Count > 0) ? _TempNearbyEnemies[0] : null; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
     }
 
     /// <summary>Determine whether any enemy is in an line between start and end</summary>
     public static AIActor NearestEnemyInLineOfSight(Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false)
     {
-        return NearestEnemyInLineOfSight(out _, start, end, canBeNeutral, accountForWalls);
+        AllEnemiesInLineOfSight(ref _TempNearbyEnemies, out _, start, end, canBeNeutral, accountForWalls, sort: true);
+        return (_TempNearbyEnemies.Count > 0) ? _TempNearbyEnemies[0] : null; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
     }
 
-    private static List<Tuple<float, AIActor>> _ActorDistances = new();
     /// <summary>Determine which enemies are in a line between start and end</summary>
     public static void AllEnemiesInLineOfSight(ref List<AIActor> enemies, Vector2 start, Vector2 end, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
     {
-        start.SafeGetEnemiesInRoom(ref _TempEnemies);
-        enemies.Clear();
-        _ActorDistances.Clear();
-        foreach (AIActor enemy in _TempEnemies)
-        {
-            if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
-                continue;
-            PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
-            if (accountForWalls && !start.HasLineOfSight(collider.UnitCenter))
-                continue;
-            if (BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
-              _ActorDistances.Add(new((intersection - start).sqrMagnitude, enemy));
-        }
-        if (sort)
-          _ActorDistances.Sort((x, y) => x.First.CompareTo(y.First));
-        foreach (var pair in _ActorDistances)
-          enemies.Add(pair.Second);
-    }
-
-    /// <summary>Returns a list of enemies in the player's direct line of sight</summary>
-    public static void AllEnemiesInLineOfSight(this PlayerController player, ref List<AIActor> enemies, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
-    {
-      if (!player)
-        return;
-      enemies.Clear();
-      Vector2 ppos = player.CenterPosition;
-      AllEnemiesInLineOfSight(ref enemies, ppos, ppos + player.m_currentGunAngle.ToVector(100f), canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
-    }
-
-    /// <summary>Returns a list of enemies in the player's direct line of sight</summary>
-    public static List<AIActor> AllEnemiesInLineOfSight(this PlayerController player, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
-    {
-      player.AllEnemiesInLineOfSight(ref _TempNearbyEnemies, canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
-      return _TempNearbyEnemies;
+      AllEnemiesInLineOfSight(ref enemies, out _, start, end, canBeNeutral, accountForWalls, sort);
     }
 
     /// <summary>Returns a list of enemies in a gun's direct line of sight</summary>
     public static void AllEnemiesInLineOfSight(this Gun gun, ref List<AIActor> enemies, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
     {
-      if (!gun)
-        return;
-      enemies.Clear();
       Vector2 gpos = gun.barrelOffset.transform.position.XY();
-      AllEnemiesInLineOfSight(ref enemies, gpos, gpos + gun.CurrentAngle.ToVector(100f), canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
+      AllEnemiesInLineOfSight(ref enemies, out _, gpos, gpos + gun.CurrentAngle.ToVector(100f), canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
     }
 
     /// <summary>Returns a list of enemies in a gun's direct line of sight</summary>
@@ -684,66 +632,6 @@ public static class Lazy
     {
       gun.AllEnemiesInLineOfSight(ref _TempNearbyEnemies, canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
       return _TempNearbyEnemies;
-    }
-
-    /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
-    public static IEnumerable<AIActor> AllEnemiesWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool ignoreWalls = false)
-    {
-        float maxSqrDist = maxDistance * maxDistance;
-        start.SafeGetEnemiesInRoom(ref _TempEnemies);
-        foreach (AIActor enemy in _TempEnemies)
-        {
-            if (!enemy.IsHostile(canBeNeutral: true))
-                continue;
-            Vector2 tentativeTarget = enemy.CenterPosition;
-            if (!ignoreWalls && !start.HasLineOfSight(tentativeTarget))
-                continue;
-            Vector2 delta        = (tentativeTarget - start);
-            float angle          = delta.ToAngle().Clamp360();
-            float angleDeviation = Mathf.Abs((coneAngle - angle).Clamp180());
-            if (angleDeviation > maxDeviation)
-                continue;
-            float sqrDist        = delta.sqrMagnitude;
-            if (sqrDist > maxSqrDist)
-                continue;
-            yield return enemy;
-        }
-        yield break;
-    }
-
-    /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
-    public static AIActor NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
-    {
-        float bestAngle    = maxDeviation;
-        float maxSqrDist   = maxDistance * maxDistance;
-        float bestSqrDist  = maxSqrDist;
-        AIActor bestEnemy  = null;
-        start.SafeGetEnemiesInRoom(ref _TempEnemies);
-        foreach (AIActor enemy in _TempEnemies)
-        {
-            if (!enemy.IsHostile(canBeNeutral: true))
-                continue;
-            Vector2 tentativeTarget = enemy.CenterPosition;
-            if (!ignoreWalls && !start.HasLineOfSight(tentativeTarget))
-                continue;
-            Vector2 delta        = (tentativeTarget - start);
-            float angle          = delta.ToAngle().Clamp360();
-            float angleDeviation = Mathf.Abs((coneAngle - angle).Clamp180());
-            if (angleDeviation > maxDeviation)
-                continue;
-            float sqrDist        = delta.sqrMagnitude;
-            if (sqrDist > maxSqrDist)
-                continue;
-            bool bestSoFar       = useNearestAngleInsteadOfDistance
-                ? (angleDeviation < bestAngle)
-                : (sqrDist < bestSqrDist);
-            if (!bestSoFar)
-                continue;
-            bestEnemy   = enemy;
-            bestAngle   = angleDeviation;
-            bestSqrDist = sqrDist;
-        }
-        return bestEnemy;
     }
 
     /// <summary>Determine position of the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
@@ -768,14 +656,104 @@ public static class Lazy
             useNearestAngleInsteadOfDistance: false, ignoreWalls: ignoreWalls);
     }
 
+    /// <summary>Returns a list of all enemies within a radius of a point.</summary>
+    public static List<AIActor> GetAllNearbyEnemies(Vector2 center, float radius = 100f, bool ignoreWalls = false,
+      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true)
+    {
+        GetAllNearbyEnemies(ref _TempNearbyEnemies, center, radius, ignoreWalls, includeDead, includeGone, includeInvulnerable, limitToCurrentRoom);
+        return _TempNearbyEnemies; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
+    }
+
+    /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
+    public static AIActor NearestEnemyWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool useNearestAngleInsteadOfDistance = true, bool ignoreWalls = false)
+    {
+        _ActorDistances.Clear();
+        foreach (ActorPosData data in AllEnemiesWithinConeOfVisionInternal(start, coneAngle, maxDeviation, maxDistance, ignoreWalls))
+          _ActorDistances.Add(data);
+        if (_ActorDistances.Count == 0)
+          return null;
+        if (useNearestAngleInsteadOfDistance)
+          return _ActorDistances.GetMinimum((a, b) => a.angle < b.angle).actor;
+        return _ActorDistances.GetMinimum((a, b) => a.sqrDistance < b.sqrDistance).actor;
+    }
+
+    /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
+    public static IEnumerable<AIActor> AllEnemiesWithinConeOfVision(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool ignoreWalls = false)
+    {
+        foreach (ActorPosData data in AllEnemiesWithinConeOfVisionInternal(start, coneAngle, maxDeviation, maxDistance, ignoreWalls))
+            yield return data.actor;
+        yield break;
+    }
+
+    /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>
+    private static IEnumerable<ActorPosData> AllEnemiesWithinConeOfVisionInternal(Vector2 start, float coneAngle, float maxDeviation, float maxDistance = 100f, bool ignoreWalls = false)
+    {
+        float maxSqrDist = maxDistance * maxDistance;
+        start.SafeGetEnemiesInRoom(ref _TempEnemies);
+        foreach (AIActor enemy in _TempEnemies)
+        {
+            if (!enemy.IsHostile(canBeNeutral: true))
+                continue;
+            Vector2 tentativeTarget = enemy.CenterPosition;
+            if (!ignoreWalls && !start.HasLineOfSight(tentativeTarget))
+                continue;
+            Vector2 delta        = (tentativeTarget - start);
+            float angle          = delta.ToAngle().Clamp360();
+            float angleDeviation = Mathf.Abs((coneAngle - angle).Clamp180());
+            if (angleDeviation > maxDeviation)
+                continue;
+            float sqrDist        = delta.sqrMagnitude;
+            if (sqrDist > maxSqrDist)
+                continue;
+            yield return new(actor: enemy, sqrDistance: sqrDist, angle: angleDeviation, ipoint: default);
+        }
+        yield break;
+    }
+
+    /// <summary>Determine which enemies are in a line between start and end</summary>
+    public static void AllEnemiesInLineOfSight(ref List<AIActor> enemies, out Vector2 ipoint, Vector2 start, Vector2 end, bool canBeNeutral = true,
+      bool accountForWalls = false, bool sort = false, bool stopAfterFindingOne = false)
+    {
+        start.SafeGetEnemiesInRoom(ref _TempEnemies);
+        enemies.Clear();
+        _ActorDistances.Clear();
+        ipoint = default;
+        foreach (AIActor enemy in _TempEnemies)
+        {
+            if (!enemy.IsHostile(canBeNeutral: canBeNeutral) || !enemy.specRigidbody)
+                continue;
+            PixelCollider collider = enemy.specRigidbody.HitboxPixelCollider;
+            if (accountForWalls && !start.HasLineOfSight(collider.UnitCenter))
+                continue;
+            if (!BraveUtility.LineIntersectsAABB(start, end, collider.UnitBottomLeft, collider.UnitDimensions, out Vector2 intersection))
+              continue;
+            _ActorDistances.Add(new(actor: enemy, sqrDistance: (intersection - start).sqrMagnitude, angle: default, ipoint: intersection));
+            if (stopAfterFindingOne)
+              return;
+        }
+        if (sort)
+          _ActorDistances.Sort((x, y) => x.sqrDistance.CompareTo(y.sqrDistance));
+        foreach (var triple in _ActorDistances)
+          enemies.Add(triple.actor);
+        if (_ActorDistances.Count > 0)
+          ipoint = _ActorDistances[0].ipoint;
+    }
+
     /// <summary>Determine all enemies within a radius of a point.</summary>
     public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = -1f, bool ignoreWalls = false,
-      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false)
+      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false, bool limitToCurrentRoom = true)
     {
         float sqrRadius = radius * radius;
         enemies.Clear();
 
-        center.SafeGetEnemiesInRoom(ref _TempEnemies);
+        if (limitToCurrentRoom)
+          center.SafeGetEnemiesInRoom(ref _TempEnemies);
+        else
+        {
+          _TempEnemies.Clear();
+          foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
+            _TempEnemies.Add(enemy);
+        }
         foreach (AIActor enemy in _TempEnemies)
         {
             if (!enemy || !enemy.isActiveAndEnabled || (!includeGone && enemy.IsGone) || !enemy.IsHostile(canBeNeutral: true))
@@ -788,17 +766,10 @@ public static class Lazy
             Vector2 tentativeTarget = enemy.CenterPosition;
             if ((radius > 0) && ((tentativeTarget - center).sqrMagnitude > sqrRadius))
                 continue;
-            if (ignoreWalls || center.HasLineOfSight(tentativeTarget))
-                enemies.Add(enemy);
+            if (!ignoreWalls && !center.HasLineOfSight(tentativeTarget))
+                continue;
+            enemies.Add(enemy);
         }
-    }
-
-    /// <summary>Returns a list of all enemies within a radius of a point.</summary>
-    public static List<AIActor> GetAllNearbyEnemies(Vector2 center, float radius = 100f, bool ignoreWalls = false,
-      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false)
-    {
-        GetAllNearbyEnemies(ref _TempNearbyEnemies, center, radius, ignoreWalls, includeDead, includeGone, includeInvulnerable);
-        return _TempNearbyEnemies; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
     }
 
     /// <summary>Spawn a chest with a single guaranteed item inside of it</summary>

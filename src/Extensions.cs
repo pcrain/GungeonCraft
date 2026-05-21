@@ -4035,5 +4035,15 @@ public static class Extensions
       self.Remove(key as K);
     _TempBehavs.Clear();
   }
-}
 
+  /// <summary>Select the minimium element of a List according to some custom comparator.</summary>
+  public static T GetMinimum<T>(this List<T> self, Func<T, T, bool> lessThan)
+  {
+    if (self.Count == 0)
+      return default;
+    T result = self[0];
+    for (int i = 1; i < self.Count; ++i)
+      result = lessThan(self[i], result) ? self[i] : result;
+    return result;
+  }
+}

@@ -73,9 +73,11 @@ public class EmergencySiren : CwaffActive
 
     private void OnEnteredCombat()
     {
+        if (!this._owner || this._owner.CurrentRoom is not RoomHandler room)
+          return;
         this._anyEnemyInRoomDied = false;
         this._anyGunFiredInRoom = false;
-        foreach (AIActor enemy in Lazy.CurrentRoom().SafeGetEnemiesInRoom())
+        foreach (AIActor enemy in room.SafeGetEnemiesInRoom())
             enemy.healthHaver.OnPreDeath += OnEnemyKilled;
     }
 
