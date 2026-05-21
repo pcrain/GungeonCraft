@@ -230,7 +230,7 @@ public class TargetPourSoulsWithoutIceCreamBehavior : TargetBehaviorBase  //TODO
         Vector2 pos = iceCreamHaver.CenterPosition;
         GameActor target = null;
         float bestDist = 9999f;
-        foreach (AIActor other in pos.SafeGetEnemiesInRoom())
+        foreach (AIActor other in pos.GetAllNearbyEnemies())
         {
             if (other == iceCreamHaver)
                 continue;

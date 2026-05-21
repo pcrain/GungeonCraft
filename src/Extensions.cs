@@ -2607,7 +2607,7 @@ public static class Extensions
     return false; //TODO: originally needed so Frisbee couldn't clip behind Bello's shop, but that was fixed...should still be implemented at some point
   }
 
-  private static readonly List<AIActor> _NoEnemies = Enumerable.Empty<AIActor>().ToList();
+  private static readonly List<AIActor> _NoEnemies = [];
   private static List<AIActor> _RefEnemies = new();
   /// <summary>Get all active enemies in a room, returning an empty list instead of null when the target is invalid</summary>
   public static List<AIActor> SafeGetEnemiesInRoom(this RoomHandler room)
@@ -2616,35 +2616,6 @@ public static class Extensions
       return _NoEnemies;
     room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref _RefEnemies);
     return _RefEnemies;
-  }
-
-  /// <summary>Get all active enemies in a room given a Vector2 position, returning an empty list instead of null when the target is invalid</summary>
-  public static List<AIActor> SafeGetEnemiesInRoom(this Vector2 pos)
-  {
-    if (GameManager.Instance.Dungeon is not Dungeon d || d.data == null)
-      return _NoEnemies;
-    if (pos.GetAbsoluteRoom() is not RoomHandler room)
-      return _NoEnemies;
-    room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref _RefEnemies);
-    return _RefEnemies;
-  }
-
-  /// <summary>Get all active enemies in a room, returning an empty list instead of null when the target is invalid</summary>
-  public static void SafeGetEnemiesInRoom(this RoomHandler room, ref List<AIActor> refList)
-  {
-    refList.Clear();
-    if (room != null)
-      room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref refList);
-  }
-
-  /// <summary>Get all active enemies in a room given a Vector2 position, returning an empty list instead of null when the target is invalid</summary>
-  public static void SafeGetEnemiesInRoom(this Vector2 pos, ref List<AIActor> refList)
-  {
-    refList.Clear();
-    if (GameManager.Instance.Dungeon is not Dungeon d || d.data == null)
-      return;
-    if (pos.GetAbsoluteRoom() is RoomHandler room)
-      room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref refList);
   }
 
   /// <summary>Adds an item to a list if it doesn't already contain it</summary>
@@ -2678,7 +2649,7 @@ public static class Extensions
         ? PhysicsEngine.UnitToPixel(ppos.ToNearestWall(out Vector2 normal, angle, minDistance: 1) - ppos)
         : PhysicsEngine.UnitToPixel(angle.ToVector(20f));
       PixelCollider projectileCollider = projectile.specRigidbody.PrimaryPixelCollider;
-      foreach (AIActor enemy in ppos.SafeGetEnemiesInRoom())
+      foreach (AIActor enemy in ppos.GetAllNearbyEnemies())
       {
           if (!enemy.IsHostile(canBeNeutral: true) || !enemy.specRigidbody)
               continue;

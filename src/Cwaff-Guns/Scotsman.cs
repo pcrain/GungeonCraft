@@ -160,7 +160,6 @@ public class Scotsman : CwaffGun
             pc.gameObject.Play("stickybomblauncher_det");
     }
 
-    private List<AIActor> _activeEnemiesInRoom = new();
     private bool DetonateTheWorld(PlayerController pc)
     {
         if (!this.Mastered || !this.gun || !this.gun.barrelOffset || pc.CurrentRoom is not RoomHandler room)
@@ -216,10 +215,10 @@ public class Scotsman : CwaffGun
         }
 
         // Nuke the enemies
-        room.SafeGetEnemiesInRoom(ref this._activeEnemiesInRoom);
-        for (int j = this._activeEnemiesInRoom.Count - 1; j >= 0; j--)
+        List<AIActor> activeEnemiesInRoom = room.SafeGetEnemiesInRoom();
+        for (int j = activeEnemiesInRoom.Count - 1; j >= 0; j--)
         {
-            AIActor enemy = this._activeEnemiesInRoom[j];
+            AIActor enemy = activeEnemiesInRoom[j];
             if (!enemy || enemy.IsSignatureEnemy)
                 continue;
             if (enemy.healthHaver is not HealthHaver healthHaver || healthHaver.IsDead || healthHaver.IsBoss)

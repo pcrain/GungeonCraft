@@ -86,7 +86,6 @@ public class SlappProjectile : MonoBehaviour
         this._projectile.DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
     }
 
-    private static List<AIActor> _Enemies = new();
     private void SlapppEvent(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frame)
     {
         this._vfx.transform.parent = null; // don't follow the enemy after we've followed through on the slap
@@ -95,11 +94,13 @@ public class SlappProjectile : MonoBehaviour
         PlayerController owner = this._projectile.Owner as PlayerController;
         Vector2 victimPos = this._slapVictim.CenterPosition;
         Vector2 impactPos = this._vfx.GetComponent<tk2dSprite>().WorldCenter;
-        _Enemies.Clear();
+        List<AIActor> enemies;
         if (owner.CurrentRoom != null)
-            owner.CurrentRoom.SafeGetEnemiesInRoom(ref _Enemies);
-        _Enemies.AddUnique(this._slapVictim); // even if our room is null, make sure we hit our original victim
-        foreach (AIActor enemy in _Enemies)
+          enemies = owner.CurrentRoom.SafeGetEnemiesInRoom();
+        else
+          enemies = [];
+        enemies.AddUnique(this._slapVictim); // even if our room is null, make sure we hit our original victim
+        foreach (AIActor enemy in enemies)
         {
             if (!enemy || !enemy.isActiveAndEnabled)
                 continue;
