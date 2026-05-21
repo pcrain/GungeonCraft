@@ -421,9 +421,7 @@ public class RoundLaser : Projectile
             if (_hitEnemies.Contains(enemy))
                 continue;
             _hitEnemies.Add(enemy);
-            if (enemy.healthHaver is not HealthHaver hh || !hh.IsVulnerable)
-                continue;
-            hh.ApplyDamage(base.baseData.damage, (enemy.CenterPosition - pos).normalized, Gradius.ItemName);
+            enemy.healthHaver.ApplyDamage(base.baseData.damage, (enemy.CenterPosition - pos).normalized, Gradius.ItemName);
             CwaffVFX.Spawn(Gradius._JadeRingImpactVFX, enemy.CenterPosition);
             enemy.gameObject.Play("gradius_round_laser_impact_sound");
         }

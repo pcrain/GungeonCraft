@@ -119,8 +119,6 @@ public class Entropynnium : CwaffGun
               );
             foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(ppos, this._manaRadius, ignoreWalls: true))
             {
-                if (!enemy || !enemy.isActiveAndEnabled || enemy.healthHaver is not HealthHaver hh || !hh.IsAlive)
-                    continue;
                 tk2dBaseSprite dupe = enemy.DuplicateInWorld(copyShader: false);
                 dupe.ApplyShader(CwaffShaders.WiggleShader, enemy.optionalPalette);
                 dupe.StartCoroutine(dupe.PhaseOut(Lazy.RandomVector(), 32f, 200f, 0.75f));
@@ -394,10 +392,10 @@ public class ManaExplosionProjectile : Projectile
         boom.force = force;
 
         bool anythingDetonated = false;
-        foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(ppos, this._radius, ignoreWalls: true))
+        foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(ppos, this._radius, ignoreWalls: true, includeInvulnerable: true))
         {
-            if (!enemy || !enemy.isActiveAndEnabled || enemy.healthHaver is not HealthHaver hh || !hh.IsAlive)
-                continue;
+            if (enemy.healthHaver is not HealthHaver hh)
+              continue;
             boom.damage = Mathf.Max(damage, hh.AdjustedMaxHealth * potency * ((hh.IsBoss || hh.IsSubboss) ? 0.5f : 1.0f));
             Exploder.Explode(
                 position         : enemy.CenterPosition,

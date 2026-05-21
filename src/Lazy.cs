@@ -769,7 +769,8 @@ public static class Lazy
     }
 
     /// <summary>Determine all enemies within a radius of a point.</summary>
-    public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = -1f, bool ignoreWalls = false)
+    public static void GetAllNearbyEnemies(ref List<AIActor> enemies, Vector2 center, float radius = -1f, bool ignoreWalls = false,
+      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false)
     {
         float sqrRadius = radius * radius;
         enemies.Clear();
@@ -777,7 +778,12 @@ public static class Lazy
         center.SafeGetEnemiesInRoom(ref _TempEnemies);
         foreach (AIActor enemy in _TempEnemies)
         {
-            if (!enemy.IsHostile(canBeNeutral: true))
+            if (!enemy || !enemy.isActiveAndEnabled || (!includeGone && enemy.IsGone) || !enemy.IsHostile(canBeNeutral: true))
+                continue;
+            HealthHaver hh = enemy.healthHaver;
+            if (!includeDead && (!hh || hh.IsDead))
+                continue;
+            if (!includeInvulnerable && (!hh || !hh.IsVulnerable))
                 continue;
             Vector2 tentativeTarget = enemy.CenterPosition;
             if ((radius > 0) && ((tentativeTarget - center).sqrMagnitude > sqrRadius))
@@ -788,9 +794,10 @@ public static class Lazy
     }
 
     /// <summary>Returns a list of all enemies within a radius of a point.</summary>
-    public static List<AIActor> GetAllNearbyEnemies(Vector2 center, float radius = 100f, bool ignoreWalls = false)
+    public static List<AIActor> GetAllNearbyEnemies(Vector2 center, float radius = 100f, bool ignoreWalls = false,
+      bool includeDead = false, bool includeGone = false, bool includeInvulnerable = false)
     {
-        GetAllNearbyEnemies(ref _TempNearbyEnemies, center, radius, ignoreWalls);
+        GetAllNearbyEnemies(ref _TempNearbyEnemies, center, radius, ignoreWalls, includeDead, includeGone, includeInvulnerable);
         return _TempNearbyEnemies; //NOTE: need a separate list since GetAllNearbyEnemies() already uses _TempEnemies
     }
 

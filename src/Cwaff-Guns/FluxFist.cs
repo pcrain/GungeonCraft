@@ -358,10 +358,6 @@ public class MagnetBall : MonoBehaviour
       Vector2 basePos = this._body.UnitCenter;
       foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(basePos, _MAX_RADIUS, ignoreWalls: true))
       {
-        if (!enemy || enemy.IsGone)
-          continue;
-        if (enemy.healthHaver is not HealthHaver hh || hh.IsDead || !hh.IsVulnerable)
-          continue;
         if (enemy.gameObject.GetComponent<MagnetizedEnemyBehavior>() is not MagnetizedEnemyBehavior meb)
           continue;
         if (meb.polarity == 0.0f)
@@ -376,7 +372,7 @@ public class MagnetBall : MonoBehaviour
         float kbstrength = ((meb.polarity > 0) ? -_FORCE : _FORCE) * influence;
         float damageStrength = _DAMAGE * influence * dtime;
         enemy.ApplyContinuousSourcedKnockback(base.gameObject, _KnockbackDict, kbstrength * towardsMagnetBall.normalized);
-        hh.ApplyDamage(damageStrength, Vector2.zero, "Flux Field", CoreDamageTypes.None, DamageCategory.Environment);
+        enemy.healthHaver.ApplyDamage(damageStrength, Vector2.zero, "Flux Field", CoreDamageTypes.None, DamageCategory.Environment);
         meb.HandleInfluenceParticles(basePos, 1f - Mathf.Sqrt(1f - influence));
         didAnything = true;
       }

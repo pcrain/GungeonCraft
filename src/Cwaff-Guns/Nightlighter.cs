@@ -194,7 +194,7 @@ public class LightString : MonoBehaviour
       _AnchorTargets.Shuffle();
       foreach (AIActor newTarget in _AnchorTargets)
       {
-        if (!newTarget || this._enemyChain.Contains(newTarget) || newTarget.specRigidbody is not SpeculativeRigidbody newBody)
+        if (this._enemyChain.Contains(newTarget) || newTarget.specRigidbody is not SpeculativeRigidbody newBody)
           continue;
         // fire the projectile and register the current enemy as a collision exception
         Vector2 delta = (newTarget.CenterPosition - enemy.CenterPosition);
