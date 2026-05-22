@@ -377,9 +377,9 @@ public class WayfarerProjectile : MonoBehaviour
       {
         Vector2 tempNormal = this.normal.Rotate(90f * i);
         scanPoint = this._projectile.sprite.WorldCenter + tempNormal;
-        if (Lazy.NearestEnemyPos(scanPoint) is not Vector2 tempEnemyPos)
+        if (Lazy.NearestEnemy(scanPoint) is not AIActor tempEnemy)
             continue;
-        enemyPos = tempEnemyPos;
+        enemyPos = tempEnemy.CenterPosition;
         this.normal = tempNormal;
         this.normalAngle = this.normal.ToAngle();
         foundEnemy = true;

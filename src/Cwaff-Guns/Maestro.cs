@@ -134,7 +134,7 @@ public class Maestro : CwaffGun
     {
         if (this.PlayerOwner is not PlayerController pc || !pc.AcceptingNonMotionInput)
             return null;
-        List<AIActor> enemiesInRoom = pc.CenterPosition.GetAllNearbyEnemies();
+        ReadOnlyCollection<AIActor> enemiesInRoom = pc.CenterPosition.GetAllNearbyEnemies();
 
         AIActor target = null;
         float closest = float.MaxValue;

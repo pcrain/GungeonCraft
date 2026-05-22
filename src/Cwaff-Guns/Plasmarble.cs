@@ -149,13 +149,12 @@ public class PlasmarbleProjectile : MonoBehaviour
     internal static void ZapRandomEnemies(Projectile proj, int numZaps = 1, bool attachToProjectile = true, float? overrideAngle = null)
     {
         Vector2 pos = proj.specRigidbody.UnitCenter;
-        List<AIActor> zappableEnemies = pos.GetAllNearbyEnemies(ignoreWalls: false);
+        ReadOnlyCollection<AIActor> zappableEnemies = pos.GetAllNearbyEnemies(ignoreWalls: false);
         int numZappableEnemies = zappableEnemies.Count;
-        if (numZappableEnemies > numZaps) // don't bother shuffling the list if we're going to use the whole thing
-            zappableEnemies.Shuffle();
+        IEnumerator<AIActor> randomEnemies = zappableEnemies.InRandomOrder().GetEnumerator();
         for (int i = 0; i < numZaps; ++i)
         {
-            AIActor enemy = (i < numZappableEnemies) ? zappableEnemies[i] : null;
+            AIActor enemy = randomEnemies.Advance();
             Vector2 zapPos = enemy ? enemy.CenterPosition : proj.specRigidbody.UnitCenter.ToNearestWall(overrideAngle ?? Lazy.RandomAngle());
             OwnerConnectLightningModifier zap = (attachToProjectile ? proj.gameObject : new GameObject("lightningboi"))
               .AddComponent<OwnerConnectLightningModifier>();

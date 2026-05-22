@@ -218,7 +218,7 @@ public class ShmuppyCompanion : CwaffCompanionController
             if (!owner.IsInCombat)
               return;
 
-            List<AIActor> enemies = m_aiActor.CenterPosition.GetAllNearbyEnemies(radius: 16f);
+            ReadOnlyCollection<AIActor> enemies = m_aiActor.CenterPosition.GetAllNearbyEnemies(radius: 16f);
             if (enemies.Count == 0 || enemies.ChooseRandom() is not AIActor enemy)
               return;
 

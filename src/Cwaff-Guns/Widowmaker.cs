@@ -187,19 +187,19 @@ public class Crawlyboi : MonoBehaviour
             return;
 
         Vector2 shootPoint = base.transform.position.XY() + this._wallNormal;
-        Vector2? enemyPos = Lazy.NearestEnemyPosWithinConeOfVision(
+        AIActor enemy = Lazy.NearestEnemyWithinConeOfVision(
             start                            : shootPoint,
             coneAngle                        : this._wallNormal.ToAngle(),
             maxDeviation                     : _SIGHT_CONE,
             maxDistance                      : _SIGHT_DIST,
             useNearestAngleInsteadOfDistance : true);
-        if (!enemyPos.HasValue)
+        if (!enemy)
             return;
 
         Projectile proj = SpawnManager.SpawnProjectile(
             prefab   : (this._mastered ? Widowmaker._WidowTurretLaser : Widowmaker._WidowTurretProjectile).gameObject,
             position : shootPoint,
-            rotation : (enemyPos.Value - shootPoint).EulerZ()).GetComponent<Projectile>();
+            rotation : (enemy.CenterPosition - shootPoint).EulerZ()).GetComponent<Projectile>();
         proj.baseData.damage     = this._damage;
         proj.SetOwnerAndStats(this._owner);
         this._owner.DoPostProcessProjectile(proj);

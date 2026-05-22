@@ -472,10 +472,8 @@ public class BilliardBall : MonoBehaviour
     {
         const float _MAX_RADIUS = 20f;
         Vector2 pos = self._sprite.WorldCenter;
-        float origAngle = origDir.ToAngle();
-        Vector2? nearest = Lazy.NearestEnemyPosWithinConeOfVision(start: pos, coneAngle: origAngle, maxDeviation: _MAX_ADJUST, maxDistance: _MAX_RADIUS);
-        if (nearest.HasValue)
-            return (nearest.Value - pos);
+        if (Lazy.NearestEnemyWithinConeOfVision(start: pos, coneAngle: origDir.ToAngle(), maxDeviation: _MAX_ADJUST, maxDistance: _MAX_RADIUS) is AIActor enemy)
+            return (enemy.CenterPosition - pos);
         return origDir;
     }
 

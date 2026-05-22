@@ -135,7 +135,7 @@ public class Starmageddon : CwaffGun
         if (!this.PlayerOwner)
             return null;
 
-        List<AIActor> roomEnemies = this.PlayerOwner.CenterPosition.GetAllNearbyEnemies();
+        ReadOnlyCollection<AIActor> roomEnemies = this.PlayerOwner.CenterPosition.GetAllNearbyEnemies();
         _EnemyWeights.Clear();
         for (int i = 0; i < roomEnemies.Count; ++i)
         {

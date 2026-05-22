@@ -84,7 +84,7 @@ public class Blamethrower : CwaffGun
             return;
         }
 
-        if (player.CenterPosition.GetAllNearbyEnemies() is not List<AIActor> enemies || enemies.Count == 0)
+        if (player.CenterPosition.GetAllNearbyEnemies() is not ReadOnlyCollection<AIActor> enemies || enemies.Count == 0)
             return;
 
         const int TRIES = 10;

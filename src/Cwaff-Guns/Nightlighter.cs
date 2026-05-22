@@ -189,9 +189,8 @@ public class LightString : MonoBehaviour
         return true;
 
       // if mastered, attempt to find another enemy to anchor onto
-      List<AIActor> anchorTargets = enemy.CenterPosition.GetAllNearbyEnemies(radius: 12f, ignoreWalls: false);
-      anchorTargets.Shuffle();
-      foreach (AIActor newTarget in anchorTargets)
+      ReadOnlyCollection<AIActor> anchorTargets = enemy.CenterPosition.GetAllNearbyEnemies(radius: 12f, ignoreWalls: false);
+      foreach (AIActor newTarget in anchorTargets.InRandomOrder())
       {
         if (this._enemyChain.Contains(newTarget) || newTarget.specRigidbody is not SpeculativeRigidbody newBody)
           continue;

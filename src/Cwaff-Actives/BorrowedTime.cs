@@ -139,7 +139,7 @@ public class BorrowedTime : CwaffActive
         if (curRoom == null || curRoom != this._lastCheckedRoom)
             return; // this should never happen in theory
 
-        List<AIActor> activeEnemies = user.CenterPosition.GetAllNearbyEnemies();
+        ReadOnlyCollection<AIActor> activeEnemies = user.CenterPosition.GetAllNearbyEnemies();
         if (activeEnemies.Count == 0)
         {
             if (this._borrowedEnemies.Count > 0 && user.GetAbsoluteParentRoom() != null)

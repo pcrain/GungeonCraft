@@ -654,6 +654,25 @@ public static class Extensions
       }
   }
 
+  private static readonly List<int> _Indices = new();
+  /// <summary>Return the elements of a ReadOnlyCollection in a random order.</summary>
+  public static IEnumerable<T> InRandomOrder<T>(this ReadOnlyCollection<T> self)
+  {
+    int count = self.Count;
+    _Indices.Clear();
+    for (int i = 0; i < count; ++i)
+      _Indices.Add(i);
+    _Indices.Shuffle();
+    foreach (int i in _Indices)
+      yield return self[i];
+  }
+
+  /// <summary>Advances an IEnumerator and returns the next element, or the default if none is available.</summary>
+  public static T Advance<T>(this IEnumerator<T> self)
+  {
+    return self.MoveNext() ? self.Current : default;
+  }
+
   /// <summary>Copy and shuffle a list</summary>
   public static List<T> CopyAndShuffle<T>(this List<T> list)
   {
@@ -702,6 +721,14 @@ public static class Extensions
 
   /// <summary>Select a random element from a list</summary>
   public static T ChooseRandom<T>(this List<T> source)
+  {
+      if (source == null || source.Count == 0)
+        return default(T);
+      return source[UnityEngine.Random.Range(0,source.Count)];
+  }
+
+  /// <summary>Select a random element from a ReadOnlyCollection</summary>
+  public static T ChooseRandom<T>(this ReadOnlyCollection<T> source)
   {
       if (source == null || source.Count == 0)
         return default(T);

@@ -148,7 +148,7 @@ public class GunbrellaProjectile : MonoBehaviour
         if (!this._naturalSpawn)
         {
             this._extraDelay = _DELAY * (_LastLaunchIndex++);
-            List<AIActor> enemies = this._owner.CenterPosition.GetAllNearbyEnemies();
+            ReadOnlyCollection<AIActor> enemies = this._owner.CenterPosition.GetAllNearbyEnemies();
             AIActor target = (enemies.Count > 0) ? enemies.ChooseRandom() : null;
             this._exactTarget = target ? target.CenterPosition : this._owner.CenterPosition;
         }

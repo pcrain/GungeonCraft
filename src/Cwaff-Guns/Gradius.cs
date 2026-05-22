@@ -582,12 +582,9 @@ public class GradiusShip : MonoBehaviour
         const float ARC = 90f;
         AIActor target = null;
         float minHealth = float.MaxValue;
-        foreach (AIActor a in Lazy.AllEnemiesWithinConeOfVision(pos, rot.eulerAngles.z, ARC))
+        foreach (AIActor a in Lazy.AllEnemiesWithinConeOfVision(pos, rot.eulerAngles.z, ARC, includeInvulnerable: false))
         {
-            if (a.healthHaver is not HealthHaver hh)
-                continue;
-            if (!hh.IsVulnerable)
-                continue;
+            HealthHaver hh = a.healthHaver;
             if (hh.currentHealth >= minHealth)
                 continue;
             minHealth = hh.currentHealth;
