@@ -80,45 +80,29 @@ public class ExorcismJuice : MonoBehaviour
         pc.ownerlessStatModifiers.Add(StatType.Curse.Add(-0.5f));
         pc.stats.RecalculateStats(pc);
 
-        Texture2D ghostSprite;
-        if (HolyWaterGun._GhostTextures.ContainsKey(enemy.EnemyGuid)) //TODO: why am i not just setting the alpha here???
-            ghostSprite = HolyWaterGun._GhostTextures[enemy.EnemyGuid]; // If we've already computed a texture for this enemy, don't do it again
-        else
-        {
-            ghostSprite = Lazy.GetTexturedEnemyIdleAnimation(enemy, new Color(1f,1f,1f,1f), 0.3f);
-            HolyWaterGun._GhostTextures[enemy.EnemyGuid] = ghostSprite; // Cache the texture for this enemy for later
-        }
-        Vector3 pos                         = enemy.CenterPosition.ToVector3ZisY(-10f);
-        GameObject g                        = UnityEngine.Object.Instantiate(new GameObject(), pos, Quaternion.identity);
-        tk2dSpriteCollectionData collection = SpriteBuilder.ConstructCollection(g, "ghostcollection");
-        int spriteId                        = SpriteBuilder.AddSpriteToCollection(ghostSprite, collection, "ghostsprite");  //NOTE: this doesn't use PackerHelper since it's done at runtime
-        tk2dBaseSprite sprite               = g.AddComponent<tk2dSprite>();
-            sprite.SetSprite(collection, spriteId);
-            sprite.FlipX = enemy.sprite.FlipX;
-            sprite.FlipY = enemy.sprite.FlipY;
-            sprite.transform.localScale = enemy.sprite.transform.localScale;
-            sprite.transform.rotation = enemy.sprite.transform.rotation;
-            sprite.PlaceAtRotatedPositionByAnchor(pos, Anchor.MiddleCenter);
-        g.AddComponent<GhostlyDeath>().Setup(beam.Direction);
+        tk2dBaseSprite sprite = enemy.sprite.DuplicateInWorld(enemy.optionalPalette);
+        sprite.ApplyShader(CwaffShaders.DesatShader, enemy.optionalPalette);
+        sprite.renderer.material.SetFloat(CwaffVFX._SaturationId, 0f);
+        sprite.renderer.material.SetFloat(CwaffVFX._FadeId, 1f);
+        sprite.gameObject.AddComponent<GhostlyDeath>().Setup(beam.Direction);
 
-        if (this._mastered)
-        {
-            pc.gameObject.Play("holy_sound");
-            if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.HolyGoop) is DeadlyDeadlyGoopManager holyGooper)
-                holyGooper.AddGoopCircle(pos, _HOLY_GOOP_RADIUS);
-        }
+        if (!this._mastered)
+            return;
+
+        pc.gameObject.Play("holy_sound");
+        if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.HolyGoop) is DeadlyDeadlyGoopManager holyGooper)
+            holyGooper.AddGoopCircle(enemy.CenterPosition, _HOLY_GOOP_RADIUS);
     }
 }
 
 public class Exorcisable : MonoBehaviour
 {
-    internal const float _EXORCISM_DPS  = 15.0f; // damage per second
+    internal const float _EXORCISM_DPS = 15.0f; // damage per second
     private const float _EXORCISM_POWER = _EXORCISM_DPS / C.FPS; // damage per frame
 
     private AIActor _enemy;
     private void Start()
     {
-
         this._enemy = base.GetComponent<AIActor>();
         this._enemy.specRigidbody.OnBeamCollision += this.CheckForHolyWater;
     }
@@ -131,11 +115,9 @@ public class Exorcisable : MonoBehaviour
             return;
 
         // Create particles
-        if (UnityEngine.Random.Range(0f, 1f) < 0.25f)
+        if (UnityEngine.Random.value < 0.25f)
         {
-            Vector2 ppos = this._enemy.CenterPosition;
-            float angle = Lazy.RandomAngle();
-            Vector2 finalpos = ppos + BraveMathCollege.DegreesToVector(angle, magnitude: 1f);
+            Vector2 finalpos = this._enemy.CenterPosition + BraveMathCollege.DegreesToVector(Lazy.RandomAngle(), magnitude: 1f);
             CwaffVFX.Spawn(HolyWaterGun._ExorcismParticleVFX, finalpos.ToVector3ZisY(-1f), Lazy.RandomEulerZ(),
                 velocity: Lazy.RandomVector(0.5f), lifetime: 0.34f, fadeOutTime: 0.34f);
         }
@@ -145,7 +127,6 @@ public class Exorcisable : MonoBehaviour
     }
 }
 
-// REFACTOR: get rid of all of this! GetTexturedEnemyIdleAnimation() is slow and gross
 public class GhostlyDeath : MonoBehaviour
 {
     private const float _FADE_TIME   = 2.5f;
@@ -160,8 +141,6 @@ public class GhostlyDeath : MonoBehaviour
         Vector2 normdir = direction.normalized;
         this._velocity = _DRIFT_SPEED * (new Vector3(normdir.x, normdir.y, 0f));
         this._sprite = base.gameObject.GetComponent<tk2dSprite>();
-        if (this._velocity.x < 0)
-            this._sprite.transform.localScale = new Vector3(-1f, 1f, 1f);
         this._lifetime = 0.0f;
     }
 
@@ -179,7 +158,7 @@ public class GhostlyDeath : MonoBehaviour
             return;
         }
         this._sprite.transform.position += this._velocity;
-        this._sprite.renderer.SetAlpha(1f - (this._lifetime / _FADE_TIME));
+        this._sprite.renderer.material.SetFloat(CwaffVFX._FadeId, 1f - (this._lifetime / _FADE_TIME));
     }
 }
 

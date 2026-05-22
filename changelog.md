@@ -5,6 +5,8 @@
 - Prevented Ignizol from trying to jump towards enemies behind walls
 - Fixed Holy Water Gun not actually dealing any extra damage to Jammed
 - Reverted Holy Water Gun's damage to Jammed from 8x to 4x (which was only changed because it wasn't working in the first place)
+- Fixed Shotgun Kin's ghosts being completely red when exorcised with Holy Water Gun
+- Updated ghosts from Holy Water Gun's exorcisms to use proper shaders
 
 ## 1.31.0 (2026-05-20)
 
