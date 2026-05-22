@@ -431,7 +431,7 @@ public class RetinaHUD : MonoBehaviour
     BraveTime.SetTimeScaleMultiplier(Mathf.Lerp(1.0f, MIN_TIMESCALE, ease), base.gameObject);
 
     // determine target and compute some HUD parameters
-    List<AIActor> targetedEnemies = this._gun.gun.AllEnemiesInLineOfSight(accountForWalls: true, sort: true);
+    ReadOnlyCollection<AIActor> targetedEnemies = this._gun.gun.AllEnemiesInLineOfSight(accountForWalls: true, sort: true);
     float now         = Time.realtimeSinceStartup;
     Vector2 bpos      = this._gun.gun.barrelOffset.position.XY();
     float gunAngle    = this._gun.gun.CurrentAngle;

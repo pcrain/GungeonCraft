@@ -549,6 +549,7 @@ public static class Lazy
     }
 
     private static List<AIActor> _TempNearbyEnemies = new(); // generic temporary list for holding all nearby enemies
+    private static readonly ReadOnlyCollection<AIActor> _ReadOnlyEnemies = new(_TempNearbyEnemies); // read-only wrapper around _TempNearbyEnemies
     private static readonly List<ActorPosData> _ActorDistances = new(); // generic temporary list for holding actor positional information
 
     /// <summary>Convenience structure for holding temporary actor positional and line of sight data</summary>
@@ -590,11 +591,11 @@ public static class Lazy
     }
 
     /// <summary>Returns a list of enemies in a gun's direct line of sight</summary>
-    public static List<AIActor> AllEnemiesInLineOfSight(this Gun gun, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
+    public static ReadOnlyCollection<AIActor> AllEnemiesInLineOfSight(this Gun gun, bool canBeNeutral = true, bool accountForWalls = false, bool sort = false)
     {
         Vector2 gpos = gun.barrelOffset.transform.position.XY();
         AllEnemiesInLineOfSightInternal(ref _TempNearbyEnemies, out _, gpos, gpos + gun.CurrentAngle.ToVector(100f), canBeNeutral: canBeNeutral, accountForWalls: accountForWalls, sort: sort);
-        return _TempNearbyEnemies;
+        return _ReadOnlyEnemies;
     }
 
     /// <summary>Determine position of the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>

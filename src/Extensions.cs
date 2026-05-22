@@ -2566,13 +2566,14 @@ public static class Extensions
   }
 
   private static List<AIActor> _RefEnemies = new();
+  private static readonly ReadOnlyCollection<AIActor> _ReadOnlyEnemies = new(_RefEnemies);
   /// <summary>Get all active enemies in a room, returning an empty list instead of null when the target is invalid</summary>
-  public static List<AIActor> SafeGetEnemiesInRoom(this RoomHandler room)
+  public static ReadOnlyCollection<AIActor> SafeGetEnemiesInRoom(this RoomHandler room)
   {
     _RefEnemies.Clear();
     if (room != null)
       room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All, ref _RefEnemies);
-    return _RefEnemies;
+    return _ReadOnlyEnemies;
   }
 
   /// <summary>Adds an item to a list if it doesn't already contain it</summary>
