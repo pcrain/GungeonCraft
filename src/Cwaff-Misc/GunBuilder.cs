@@ -47,7 +47,6 @@ public sealed class GunData
   public IntVector2? overrideColliderPixelSizes;
   public IntVector2? overrideColliderOffsets;
   public float bossDamageMult;
-  public float jammedDamageMult;
   public string destroySound;
   public bool? shouldRotate;
   public int barrageSize;
@@ -154,7 +153,6 @@ public sealed class GunData
   /// <param name="overrideColliderPixelSizes">If set, manually adjusts the size of the projectile's hitbox.</param>
   /// <param name="overrideColliderOffsets">If set, manually adjusts the offset of the projectile's hitbox.</param>
   /// <param name="bossDamageMult">Multiplier for damage done to bosses.</param>
-  /// <param name="jammedDamageMult">Multiplier for damage done to jammed enemies.</param>
   /// <param name="destroySound">Sound event for when projectile is destroyed.</param>
   /// <param name="shouldRotate">Whether the projectile should rotate based on its velocity.</param>
   /// <param name="barrageSize">The number of projectiles to fire simultaenously.</param>
@@ -231,7 +229,7 @@ public sealed class GunData
     float poison = 0.0f, float fire = 0.0f, float freeze = 0.0f, float slow = 0.0f, bool? collidesWithEnemies = null, bool? ignoreDamageCaps = null,
     bool? collidesWithProjectiles = null, bool? surviveRigidbodyCollisions = null, bool? collidesWithTilemap = null, string sprite = null, int fps = 2,
     Anchor anchor = Anchor.MiddleCenter, float scale = 1.0f, bool anchorsChangeColliders = true, bool fixesScales = true, IntVector2? overrideColliderPixelSizes = null,
-    IntVector2? overrideColliderOffsets = null, float bossDamageMult = 1.0f, float jammedDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
+    IntVector2? overrideColliderOffsets = null, float bossDamageMult = 1.0f, string destroySound = null, bool? shouldRotate = null, int barrageSize = 1,
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null,
     bool? stopSoundOnDeath = null, bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null,
     float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null, string hitSound = null, string hitEnemySound = null, string hitWallSound = null,
@@ -279,7 +277,6 @@ public sealed class GunData
       _Instance.overrideColliderPixelSizes        = overrideColliderPixelSizes;
       _Instance.overrideColliderOffsets           = overrideColliderOffsets;
       _Instance.bossDamageMult                    = bossDamageMult;
-      _Instance.jammedDamageMult                  = jammedDamageMult;
       _Instance.destroySound                      = destroySound;
       _Instance.shouldRotate                      = shouldRotate;
       _Instance.barrageSize                       = barrageSize;
@@ -502,7 +499,6 @@ public static class GunBuilder
 
     // Non-defaulted
     p.BossDamageMultiplier         = b.bossDamageMult;
-    p.BlackPhantomDamageMultiplier = b.jammedDamageMult;
     p.onDestroyEventName           = b.destroySound;
     p.enemyImpactEventName         = b.hitEnemySound ?? b.hitSound;
     p.objectImpactEventName        = b.hitWallSound ?? b.hitSound;

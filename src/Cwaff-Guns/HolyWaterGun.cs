@@ -7,7 +7,7 @@ public class HolyWaterGun : CwaffGun
     public static string LongDescription  = "Deals 8x damage to the Jammed. Killing a Jammed enemy reduces curse by 0.5.";
     public static string Lore             = "Rumored to have been used in exorcisms by the High Priest back while he was still the Low Priest. While the exact composition of the holy water is unknown, scientists have been able to reasonably ascertain the fluid contains koi pond water, primer, rat saliva, and moonshine. In any case, it has proven extremely effective at exorcising the Jammed and nauseating everyone else.";
 
-    internal const float _JAMMED_DAMAGE_MULT = 8f;
+    internal const float _JAMMED_DAMAGE_MULT = 4f;
     internal const float _MASTERY_JAMMED_DAMAGE_MULT = 16f;
 
     internal static Dictionary<string, Texture2D> _GhostTextures = new();
@@ -19,7 +19,7 @@ public class HolyWaterGun : CwaffGun
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 1.0f, ammo: 100, audioFrom: Items.MegaDouser, defaultAudio: true)
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .AddToShop(ItemBuilder.ShopType.Goopton)
-          .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam, jammedDamageMult: _JAMMED_DAMAGE_MULT,
+          .InitProjectile(GunData.New(baseProjectile: Items.MegaDouser.Projectile(), clipSize: -1, shootStyle: ShootStyle.Beam,
             customClip: true, damage: Exorcisable._EXORCISM_DPS, speed: 50.0f, force: 15.0f, beamSprite: "holy_water_gun",
             beamFps: 20, beamEmission: 15f, beamInterpolate: false, beamStartIsMuzzle: true))
           .Attach<ExorcismJuice>();
@@ -58,6 +58,8 @@ public class ExorcismJuice : MonoBehaviour
         this._mastered = this._owner && this._owner.HasSynergy(Synergy.MASTERY_HOLY_WATER_GUN);
         if (this._mastered)
             this._projectile.BlackPhantomDamageMultiplier = HolyWaterGun._MASTERY_JAMMED_DAMAGE_MULT;
+          else
+            this._projectile.BlackPhantomDamageMultiplier = HolyWaterGun._JAMMED_DAMAGE_MULT;
 
         this._projectile.OnHitEnemy += ExorciseTheJammed;
     }
