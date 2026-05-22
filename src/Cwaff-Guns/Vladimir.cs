@@ -23,7 +23,7 @@ public class Vladimir : CwaffGun
         Lazy.SetupGun<Vladimir>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.1f, ammo: 100,
             infiniteAmmo: true, canReloadNoMatterAmmo: true, fireAudio: "vladimir_fire_sound", muzzleVFX: "muzzle_vladimir",
-            muzzleFps: 30, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, curse: 1f, dynamicBarrelOffsets: true)
+            muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter, curse: 1f, dynamicBarrelOffsets: true)
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 7.0f, speed: 1f, range: 0.01f, sprite: "vladimir_hitbox", hideAmmo: true))  // low range ensures the projectile dissipates swiftly

@@ -22,7 +22,7 @@ public class Bouncer : CwaffGun
           .AddToShop(ModdedShopType.Boomhildr)
           .AddToShop(ModdedShopType.Rusty)
           .InitProjectile(GunData.New(clipSize: 6, cooldown: 0.16f, shootStyle: ShootStyle.SemiAutomatic, damage: _ACCELERATION, speed: _ACCELERATION,
-            range: 9999f, sprite: "energy_bounce", fps: 10, scale: 0.2f, anchor: Anchor.MiddleCenter, customClip: true,
+            range: 9999f, sprite: "energy_bounce", fps: 10, anchor: Anchor.MiddleCenter, customClip: true,
             overrideColliderPixelSizes: new IntVector2(1,1))) // 1-pixel collider for accurate bounce animation
           .Attach<BounceProjModifier>(bounce => {
             bounce.numberOfBounces = 3;
