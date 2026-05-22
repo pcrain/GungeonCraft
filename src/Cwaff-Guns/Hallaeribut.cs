@@ -55,7 +55,7 @@ public class Hallaeribut : CwaffGun
             gun.Volley.projectiles.Add(newMod);
         } //REFACTOR: burst builder
 
-        _BiteVFX = VFX.Create("bite_vfx", fps: 40, loops: false, scale: 0.33f);
+        _BiteVFX = VFX.Create("bite_vfx", fps: 40, loops: false);
     }
 
     public override void Update()

@@ -32,7 +32,7 @@ public class WarriorsGi : CwaffPassive
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
 
         _SaiyanSpark = VFX.Create("saiyan_spark", fps: 12, loops: false, scale: 0.5f);
-        _ZenkaiAura  = VFX.Create("zenkai_aura", fps: 12, anchor: Anchor.LowerCenter, scale: 0.4f, emissivePower: 5f, emissiveColour: Color.yellow);
+        _ZenkaiAura  = VFX.Create("zenkai_aura", fps: 12, anchor: Anchor.LowerCenter, emissivePower: 5f, emissiveColour: Color.yellow);
     }
 
     public override void Pickup(PlayerController player)

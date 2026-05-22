@@ -7,6 +7,7 @@
 - Reverted Holy Water Gun's damage to Jammed from 8x to 4x (which was only changed because it wasn't working in the first place)
 - Fixed Shotgun Kin's ghosts being completely red when exorcised with Holy Water Gun
 - Updated ghosts from Holy Water Gun's exorcisms to use proper shaders
+- Pre-scaled a few VFX sprites that were scaled-down in game to make them look a little nicer and save texture atlas space
 
 ## 1.31.0 (2026-05-20)
 
