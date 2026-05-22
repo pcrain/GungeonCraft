@@ -445,7 +445,7 @@ public class SuncasterPrism : MonoBehaviour, IPlayerInteractable
         if (this._body.Velocity.sqrMagnitude < 1f)
           this._body.Velocity = Vector2.zero;
         else
-          this._body.Velocity *= (float)Lazy.FastPow(_FRICTION, C.FPS * BraveTime.DeltaTime);
+          this._body.Velocity *= Mathf.Pow(_FRICTION, C.FPS * BraveTime.DeltaTime);
     }
 
     public void SetTarget(SuncasterPrism prism) => this.target = prism;

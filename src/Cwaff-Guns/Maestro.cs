@@ -119,8 +119,7 @@ public class Maestro : CwaffGun
                 float angleFromAim = Mathf.Abs(delta.ToAngle().RelAngleTo(aimAngle));
                 if (angleFromAim > _MAX_PROJECTILE_TARGET_ANGLE)
                     continue;
-                float distFromGun = (float)Lazy.FastSqrt(delta.sqrMagnitude);
-                closenessWeight = distFromGun * angleFromAim; // weight using both angle and distance -> can still hit far away projectiles, but need accurate aim
+                closenessWeight = delta.sqrMagnitude * angleFromAim * angleFromAim; // weight using both angle and distance -> can still hit far away projectiles, but need accurate aim
             }
             if (closenessWeight > closest)
                 continue;

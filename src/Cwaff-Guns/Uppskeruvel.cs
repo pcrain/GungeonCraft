@@ -394,7 +394,7 @@ public class UppskeruvelLostSoul : MonoBehaviour
 
         if (this._velocity.sqrMagnitude > 1f)
         {
-            this._velocity *= (float)Lazy.FastPow(_FRICTION, C.FPS * dtime);
+            this._velocity *= Mathf.Pow(_FRICTION, C.FPS * dtime); //NOTE: if this becomes a performance issue, can compute this once per frame
             this._basePos += (this._velocity * dtime).ToVector3ZUp();
         }
         else
