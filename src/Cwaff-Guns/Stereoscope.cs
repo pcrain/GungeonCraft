@@ -43,11 +43,11 @@ public class Stereoscope : CwaffGun
             _FreqColors[i] = Color.HSVToRGB(((8 + i) % 12) / 12f, 1f, 1f);
     }
 
-    private void Resonate(Vector2 pos, int freq)
+    private void Resonate(Vector2 pos, int freq, Transform anchor = null)
     {
         CwaffVFX.SpawnBurst(prefab: _ResonancePrefab, numToSpawn: 6, basePosition: pos, positionVariance: 0.4f, velocityVariance: 10f,
             velType: CwaffVFX.Vel.AwayRadial, rotType: CwaffVFX.Rot.Position, lifetime: 0.25f, fadeOutTime: 0.25f, uniform: true,
-            startScale: 1.0f, endScale: 0.1f, specificFrame: freq + 6, height: 8f);
+            startScale: 1.0f, endScale: 0.1f, specificFrame: freq + 6, height: 8f, anchorTransform: anchor);
     }
 
     public override void OnPlayerPickup(PlayerController player)
@@ -201,10 +201,10 @@ public class Stereoscope : CwaffGun
                 in_gameObjectID: this.PlayerOwner.gameObject,
                 in_uFlags: (uint)AkCallbackType.AK_EnableGetSourcePlayPosition);
             if (isCurrentGun)
-                Resonate(this.gun.sprite.WorldCenter, this._frequency);
+                Resonate(this.gun.sprite.WorldCenter, this._frequency, this.gun.transform);
             if (this._extantStereo)
             {
-                Resonate(this._extantStereo.pos, this._extantStereo.freq);
+                Resonate(this._extantStereo.pos, this._extantStereo.freq, this._extantStereo.transform);
                 if (isCurrentGun && (this._frequency != this._extantStereo.freq))
                     this._extantStereo.gameObject.Play(GetSoundForFrequency(this._extantStereo.freq));
             }
@@ -245,7 +245,7 @@ public class Stereoscope : CwaffGun
             if (!bs.ImmuneToStun)
                 bs.Stun(_STUN_LINGER_TIME, createVFX: true);
             if (playedSoundThisFrame)
-                Resonate(enemy.CenterPosition, resonantFrequency);
+                Resonate(enemy.CenterPosition, resonantFrequency, enemy.transform);
         }
     }
 

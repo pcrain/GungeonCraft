@@ -17,6 +17,7 @@
 - Increased Chain Driver's ammo from 1 to 200 to compensate
 - Decreased Cleansweeper's initial Minesweeper grid ammo cost from 20 to 10
 - Decreased Cleansweeper's regenerated Minesweeper grid ammo cost from 40 to 20
+- Synchronized position of Stereoscope's VFX with Stereoscope itself while the player is moving
 
 ## 1.31.0 (2026-05-20)
 
