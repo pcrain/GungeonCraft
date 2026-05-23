@@ -352,10 +352,15 @@ public class ChainkLink : MonoBehaviour
       }
       if (!this._setup || BraveTime.DeltaTime == 0.0f || GameManager.Instance.IsPaused)
         return;
-      if (this._connectedToGun && (!this._owner || !this._gun || !this._gun.gun || this._owner.CurrentGun != this._gun.gun))
+      if (this._connectedToGun)
       {
-        Disconnect();
-        return;
+        if (!this._owner || !this._gun || !this._gun.gun)
+        {
+          Disconnect();
+          return;
+        }
+        if (this._owner.CurrentGun != this._gun.gun)
+          this._connectedToGun = false;
       }
       if (this._connectedToProjectile && !this._projectile)
       {
@@ -369,7 +374,7 @@ public class ChainkLink : MonoBehaviour
       }
 
       // always update start position if we're connected to a gun
-      if (this._gun)
+      if (this._connectedToGun && this._gun)
         this._mesh.startPos = this._gun.gun.barrelOffset.transform.position;
 
       // if the other end is connected to a projectile, follow it

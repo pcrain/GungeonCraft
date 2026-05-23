@@ -11,6 +11,7 @@
 - Fixed null deref caused by Chain Driver's projectiles checking for their owner's synergies without a valid owner
 - Fixed Nightlighter's projectiles rendering as solid white glowing ropes when spawned from sources other than Nightlighter
 - Reduced fire rate on Fuel Rod Gun from 0.1 seconds to 0.5 seconds (rarely comes into play since clip size is 1)
+- Fixed Chain Driver's projectile turning invisible and becoming disconnected from its chain when switching guns
 
 ## 1.31.0 (2026-05-20)
 
