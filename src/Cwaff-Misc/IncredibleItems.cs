@@ -49,11 +49,11 @@ public static class IncredibleItems
       return item;
     }
 
-    public static PassiveItem SetupPassive<T>(string ItemName, string ShortDescription, string LongDescription, string Lore) where T : PassiveItem
-      => Lazy.SetupPassive<T>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true).SetupIncredibleItem();
+    public static PassiveItem SetupPassive<T>(string ItemName, string ShortDescription, string LongDescription) where T : PassiveItem
+      => Lazy.SetupPassive<T>(ItemName, ShortDescription, LongDescription, string.Empty, hideFromAmmonomicon: true).SetupIncredibleItem();
 
-    public static PlayerItem SetupActive<T>(string ItemName, string ShortDescription, string LongDescription, string Lore) where T : PlayerItem
-      => Lazy.SetupActive<T>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true).SetupIncredibleItem();
+    public static PlayerItem SetupActive<T>(string ItemName, string ShortDescription, string LongDescription) where T : PlayerItem
+      => Lazy.SetupActive<T>(ItemName, ShortDescription, LongDescription, string.Empty, hideFromAmmonomicon: true).SetupIncredibleItem();
 
     public static Chest SpawnPaperChest()
     {
@@ -109,11 +109,10 @@ public class GunCarryingCase : CwaffPassive
     public static string ItemName         = "Gun Carrying Case";
     public static string ShortDescription = "Portable and Convenient";
     public static string LongDescription  = "Increases gun carrying capacity by 1.";
-    public static string Lore             = "";
 
     public static void Init()
     {
-        PassiveItem item  = IncredibleItems.SetupPassive<GunCarryingCase>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = IncredibleItems.SetupPassive<GunCarryingCase>(ItemName, ShortDescription, LongDescription);
         item.passiveStatModifiers = [StatType.AdditionalGunCapacity.Add(1f)];
     }
 }
@@ -123,11 +122,10 @@ public class WWIRations : CwaffActive
     public static string ItemName         = "WWI Rations";
     public static string ShortDescription = "20 Year Shelf Life";
     public static string LongDescription  = "Restores 3 hearts if consumed before January 1st, 1939.";
-    public static string Lore             = "";
 
     public static void Init()
     {
-        PlayerItem item  = IncredibleItems.SetupActive<WWIRations>(ItemName, ShortDescription, LongDescription, Lore);
+        PlayerItem item  = IncredibleItems.SetupActive<WWIRations>(ItemName, ShortDescription, LongDescription);
     }
 
     public override void DoEffect(PlayerController user)
@@ -143,14 +141,13 @@ public class Headstone : CwaffPassive
     public static string ItemName         = "Headstone";
     public static string ShortDescription = "Proper Burial";
     public static string LongDescription  = "Reduces curse to 0 while dead.";
-    public static string Lore             = "";
 
     private HealthHaver lastOwner = null;
     private StatModifier _curseMod = null;
 
     public static void Init()
     {
-        PassiveItem item  = IncredibleItems.SetupPassive<Headstone>(ItemName, ShortDescription, LongDescription, Lore);
+        PassiveItem item  = IncredibleItems.SetupPassive<Headstone>(ItemName, ShortDescription, LongDescription);
     }
 
     public override void Pickup(PlayerController player)
@@ -187,5 +184,39 @@ public class Headstone : CwaffPassive
         this.lastOwner.m_player.stats.RecalculateStats(this.lastOwner.m_player);
         this._curseMod = null;
         this.lastOwner = null;
+    }
+}
+
+public class AssassinBullets : CwaffPassive
+{
+    public static string ItemName         = "Assassin Bullets";
+    public static string ShortDescription = "Silent But Deadly";
+    public static string LongDescription  = "On dealing fatal damage to an enemy, instantly kill that enemy, unless it is already dead.";
+
+    public static void Init()
+    {
+        PassiveItem item  = IncredibleItems.SetupPassive<AssassinBullets>(ItemName, ShortDescription, LongDescription);
+    }
+
+    public override void Pickup(PlayerController player)
+    {
+        base.Pickup(player);
+        player.OnAnyEnemyReceivedDamage -= OnAnyEnemyReceivedDamage;
+        player.OnAnyEnemyReceivedDamage += OnAnyEnemyReceivedDamage;
+    }
+
+    public override void DisableEffect(PlayerController player)
+    {
+        base.DisableEffect(player);
+        if (player)
+          player.OnAnyEnemyReceivedDamage -= OnAnyEnemyReceivedDamage;
+    }
+
+    private static void OnAnyEnemyReceivedDamage(float damage, bool fatal, HealthHaver enemy)
+    {
+      if (!fatal)
+        return;
+      enemy.currentHealth = 0f;
+      enemy.currentArmor = 0f;
     }
 }

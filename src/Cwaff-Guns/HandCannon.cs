@@ -92,15 +92,15 @@ public class SlappProjectile : MonoBehaviour
         if (!this._slapVictim)
             return;
         PlayerController owner = this._projectile.Owner as PlayerController;
+        float knockback = _SLAPPP_FORCE * (owner ? owner.KnockbackMult() : 1f);
         Vector2 victimPos = this._slapVictim.CenterPosition;
         Vector2 impactPos = this._vfx.GetComponent<tk2dSprite>().WorldCenter;
-        ReadOnlyCollection<AIActor> enemies = victimPos.GetAllNearbyEnemies(radius: _SLAPP_RADIUS, includeInvulnerable: true);
-        foreach (AIActor enemy in enemies)
+        foreach (AIActor enemy in victimPos.GetAllNearbyEnemies(radius: _SLAPP_RADIUS, includeInvulnerable: true))
         {
             HealthHaver hh = enemy.healthHaver;
             hh.ApplyDamage(this._slapDamage, Vector2.zero, "SLAPPP", CoreDamageTypes.None, DamageCategory.Collision, true);
             if (!hh.IsBoss && !hh.IsSubboss && enemy.knockbackDoer is KnockbackDoer kb)
-                kb.ApplyKnockback(this._slapAngle, _SLAPPP_FORCE * (owner ? owner.KnockbackMult() : 1f));
+                kb.ApplyKnockback(this._slapAngle, knockback);
             if (enemy.behaviorSpeculator && !enemy.behaviorSpeculator.ImmuneToStun)
                 enemy.behaviorSpeculator.Stun(this._isMastered ? _CLAPPP_STUN : _SLAPPP_STUN);
             GameObject go = SpawnManager.SpawnVFX(HandCannon._ClapppShockwave, victimPos, Quaternion.identity, ignoresPools: true);

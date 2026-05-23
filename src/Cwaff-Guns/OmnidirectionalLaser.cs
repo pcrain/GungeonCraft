@@ -51,12 +51,10 @@ public class OmnidirectionalLaser : CwaffGun
           .InitProjectile(GunData.New(sprite: "omnilaser_projectile", clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
             angleVariance: 0.0f, speed: 200f, damage: 16f, spawnSound: "omnilaser_shoot_sound", uniqueSounds: true, customClip: true))
           .Attach<OmnidirectionalProjectile>(o => o.mastered = false)
-          .Assign(out Projectile proj);
-
-        Widowmaker._WidowTurretLaser = proj;
+          .Assign(out Widowmaker._WidowTurretLaser);
 
         ProjectileModule[] masteryModules = new ProjectileModule[_NUM_MASTERY_PROJ];
-        Projectile masteryProj = proj.Clone(GunData.New(sprite: "omnilaser_mastered_projectile"))
+        Projectile masteryProj = Widowmaker._WidowTurretLaser.Clone(GunData.New(sprite: "omnilaser_mastered_projectile"))
           .Attach<OmnidirectionalProjectile>(o => o.mastered = true);
         for (int i = 0; i < _NUM_MASTERY_PROJ; ++i)
           masteryModules[i] = new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, ammoCost: 0, clipSize: -1, cooldown: 0.1f,

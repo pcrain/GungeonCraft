@@ -123,67 +123,99 @@ public static class Extensions
   /// <summary>Convert degrees to a Vector2 angle</summary>
   public static Vector2 ToVector(this float self, float magnitude = 1f)
   {
-    return magnitude * (Vector2)(Quaternion.Euler(0f, 0f, self) * Vector2.right);
+    float f = self * ((float)Math.PI / 180f);
+    return new Vector2(magnitude * Mathf.Cos(f), magnitude * Mathf.Sin(f));
   }
 
   /// <summary>Convert degrees to a Vector3 angle</summary>
   public static Vector3 ToVector3(this float self, float magnitude = 1f)
   {
-    return magnitude * (Quaternion.Euler(0f, 0f, self) * Vector3.right);
+    float f = self * ((float)Math.PI / 180f);
+    return new Vector3(magnitude * Mathf.Cos(f), magnitude * Mathf.Sin(f), 0f);
   }
 
   /// <summary>Rotate a Vector2 by specified number of degrees</summary>
   public static Vector2 Rotate(this Vector2 self, float rotation)
   {
-    return (Vector2)(Quaternion.Euler(0f, 0f, rotation) * self);
+    Vector3 v = (Quaternion.Euler(0f, 0f, rotation) * self);
+    return new Vector2(v.x, v.y);
   }
 
   /// <summary>Clamp a floating point number between -absoluteMax and absoluteMax</summary>
   public static float ClampAbsolute(this float self, float absoluteMax)
   {
-    return (Mathf.Abs(self) <= absoluteMax) ? self : Mathf.Sign(self)*absoluteMax;
+    return (self < -absoluteMax) ? -absoluteMax : (self > absoluteMax) ? absoluteMax : self;
   }
 
   /// <summary>Clamp a floating point angle in degrees to [-180,180]</summary>
   public static float Clamp180(this float self)
   {
-    return BraveMathCollege.ClampAngle180(self);
+    self %= 360f;
+    if (self < -180f)
+      self += 360f;
+    else if (self > 180f)
+      self -= 360f;
+    return self;
   }
 
   /// <summary>Clamp a floating point angle in degrees to [0,360]</summary>
   public static float Clamp360(this float self)
   {
-    return BraveMathCollege.ClampAngle360(self);
+    self %= 360f;
+    if (self < 0f)
+      self += 360f;
+    return self;
   }
 
   /// <summary>Determine the relative angle (in degrees) between two angles</summary>
   public static float RelAngleTo(this float angle, float other)
   {
-    return (other - angle).Clamp180();
+    float f = (other - angle) % 360f;
+    if (f < -180f)
+      f += 360f;
+    else if (f > 180f)
+      f -= 360f;
+    return f;
   }
 
   /// <summary>Determine the absolute angle (in degrees) between two angles</summary>
   public static float AbsAngleTo(this float angle, float other)
   {
-    return Mathf.Abs((other - angle).Clamp180());
+    float f = (other - angle) % 360f;
+    if (f < -180f)
+      f += 360f;
+    else if (f > 180f)
+      f -= 360f;
+    return (f < 0) ? -f : f;
   }
 
   /// <summary>Determine whether an angle is within a degree tolerance of a floating point angle</summary>
   public static bool IsNearAngle(this float angle, float other, float tolerance)
   {
-    return angle.AbsAngleTo(other) <= tolerance;
+    float f = (other - angle) % 360f;
+    if (f < -180f)
+      f += 360f;
+    else if (f > 180f)
+      f -= 360f;
+    return -tolerance <= f && f <= tolerance;
   }
 
   /// <summary>Determine whether a Vector is within a degree tolerance of a floating point angle</summary>
-  public static bool IsNearAngle(this Vector2 v, float angle, float tolerance)
+  public static bool IsNearAngle(this Vector2 v, float other, float tolerance)
   {
-    return v.ToAngle().IsNearAngle(angle, tolerance);
+    float f = (other - (Mathf.Atan2(v.y, v.x) * 57.29578f)) % 360f;
+    if (f < -180f)
+      f += 360f;
+    else if (f > 180f)
+      f -= 360f;
+    return -tolerance <= f && f <= tolerance;
   }
 
   /// <summary>Get a bullet's direction to the primary player</summary>
   public static float DirToNearestPlayer(this Bullet self)
   {
-    return (GameManager.Instance.GetPlayerClosestToPoint(self.Position).CenterPosition - self.Position).ToAngle();
+    Vector2 v = (GameManager.Instance.GetPlayerClosestToPoint(self.Position).CenterPosition - self.Position);
+    return Mathf.Atan2(v.y, v.x) * 57.29578f;
   }
 
   /// <summary>Get a bullet's current velocity (because Velocity doesn't work)</summary>
@@ -201,7 +233,7 @@ public static class Extensions
   /// <summary>Get a Quaternion representing a vector rotated on the Z axis</summary>
   public static Quaternion EulerZ(this Vector2 self)
   {
-    return Quaternion.Euler(0f, 0f, BraveMathCollege.Atan2Degrees(self));
+    return Quaternion.Euler(0f, 0f, Mathf.Atan2(self.y, self.x) * 57.29578f);
   }
 
   /// <summary>Loop a gun's animation</summary>
