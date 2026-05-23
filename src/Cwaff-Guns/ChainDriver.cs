@@ -16,7 +16,7 @@ public class ChainDriver : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<ChainDriver>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 1, shootFps: 30, reloadFps: 4,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 200, shootFps: 30, reloadFps: 4,
             muzzleFrom: Items.Mailbox, fireAudio: "chain_launch_sound", canGainAmmo: false, suppressReloadLabel: true, curse: 1f)
           .InitProjectile(GunData.New(clipSize: 1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic, invisibleProjectile: true,
             damage: 5.5f, speed: 75f, range: 18f, force: 12f, pierceBreakables: true, hitSound: "chain_impact_sound_b", customClip: true))
@@ -61,16 +61,6 @@ public class ChainDriver : CwaffGun
           player.SuppressThisClick = true; // can't fire more than one chain at once
     }
 
-    public override void Update()
-    {
-        base.Update();
-        if (this.gun.ammo == 0 && !AnyAttachedChains())
-        {
-          this.gun.CurrentAmmo  = 1;
-          this.gun.MoveBulletsIntoClip(1);
-        }
-    }
-
     public static void DoChainDebrisAt(Vector2 pos, int num)
     {
       for (int i = 0; i < num; ++i)
@@ -100,11 +90,6 @@ public class ChainDriver : CwaffGun
     internal void DeregisterChain(ChainkLink chain)
     {
       this._attachedLinks.Remove(chain);
-      if (this._attachedLinks.Count > 0)
-        return;
-
-      this.gun.CurrentAmmo  = 1;
-      this.gun.MoveBulletsIntoClip(1);
     }
 }
 

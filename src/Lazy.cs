@@ -620,9 +620,9 @@ public static class Lazy
         _ActorDistances.Clear();
         foreach (ActorPosData data in AllEnemiesWithinConeOfVisionInternal(start, coneAngle, maxDeviation, maxDistance, ignoreWalls, includeInvulnerable))
             _ActorDistances.Add(data);
-        return _ActorDistances.Count > 0 ? _ActorDistances.GetMinimum(useNearestAngleInsteadOfDistance
+        return _ActorDistances.Count == 0 ? null : _ActorDistances.GetMinimum(useNearestAngleInsteadOfDistance
           ? (a, b) => a.angle < b.angle
-          : (a, b) => a.sqrDistance < b.sqrDistance).actor : null;
+          : (a, b) => a.sqrDistance < b.sqrDistance).actor;
     }
 
     /// <summary>Determine the nearest enemy inside a cone of vision from position start within maxDeviation degree of coneAngle</summary>

@@ -292,6 +292,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
 
   public override void Update()
   {
+    base.Update();
     if (this.gun && !this.gun.IsReloading)
         this._hasReloaded = true;
     if (this._usesDynamicBarrelPosition)

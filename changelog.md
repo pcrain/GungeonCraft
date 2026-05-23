@@ -13,6 +13,10 @@
 - Reduced fire rate on Fuel Rod Gun from 0.1 seconds to 0.5 seconds (rarely comes into play since clip size is 1)
 - Fixed Chain Driver's projectile turning invisible and becoming disconnected from its chain when switching guns
 - Fixed Nightlighter's projectiles being visually attached to the actual gun when fired by an orbiting gun from the Friend to Gun and Bullet synergy
+- Made Chain Driver no longer infinitely regenerate ammo when chains are disconnected
+- Increased Chain Driver's ammo from 1 to 200 to compensate
+- Decreased Cleansweeper's initial Minesweeper grid ammo cost from 20 to 10
+- Decreased Cleansweeper's regenerated Minesweeper grid ammo cost from 40 to 20
 
 ## 1.31.0 (2026-05-20)
 

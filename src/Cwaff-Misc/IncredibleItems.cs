@@ -178,6 +178,7 @@ public class Headstone : CwaffPassive
 
     public override void Update()
     {
+        base.Update();
         if (this._curseMod == null || !this.lastOwner || this.lastOwner.IsDead)
           return;
         this.lastOwner.m_player.ownerlessStatModifiers.Remove(this._curseMod);

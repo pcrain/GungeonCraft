@@ -8,8 +8,8 @@ public class Cleansweep : CwaffGun
     public static string Lore             = "A groundbreaking achievement in landmine clearing technology, this was the weapon of choice for infantrymen in the 999 Second War. Historical evidence is inconclusive regarding against whom or for what reason this war was fought, with recent research even suggesting the entire war was manufactured by ACNE corporation for the sole purpose of selling their latest mine-clearing lineup.";
 
     private const float _MINE_EXPLOSION_DAMAGE = 100f;
-    private const int _GAME_AMMO_COST          = 20;
-    private const int _RESTART_AMMO_COST       = 40;
+    private const int _GAME_AMMO_COST          = 10;
+    private const int _RESTART_AMMO_COST       = 20;
     private const float _RESET_DELAY           = 1.0f; // minimum time between being allowed to reset the minesweeper grid in a room
 
     internal static ExplosionData _MineExplosion = null;
