@@ -34,7 +34,7 @@ public class FuelRodGun : CwaffGun
           .AddToShop(ItemBuilder.ShopType.Trorc)
           .Attach<FuelRodGunAmmoDisplay>()
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(sprite: "fuel_rod_cannon_projectile_empty", clipSize: 1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic,
+          .InitProjectile(GunData.New(sprite: "fuel_rod_cannon_projectile_empty", clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 40.0f, speed: 50f, range: 100f, force: 25f, recoil: 20f, shouldRotate: true, customClip: true, pierceBreakables: true,
             glowColor: ExtendedColours.lime, glowAmount: 100f, becomeDebris: true))
           .AttachTrail("fuel_rod_trail", fps: 120, timeTillAnimStart: 0.00f, glowAmount: 55f,
