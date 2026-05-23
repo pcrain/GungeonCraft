@@ -12,6 +12,7 @@
 - Fixed Nightlighter's projectiles rendering as solid white glowing ropes when spawned from sources other than Nightlighter
 - Reduced fire rate on Fuel Rod Gun from 0.1 seconds to 0.5 seconds (rarely comes into play since clip size is 1)
 - Fixed Chain Driver's projectile turning invisible and becoming disconnected from its chain when switching guns
+- Fixed Nightlighter's projectiles being visually attached to the actual gun when fired by an orbiting gun from the Friend to Gun and Bullet synergy
 
 ## 1.31.0 (2026-05-20)
 

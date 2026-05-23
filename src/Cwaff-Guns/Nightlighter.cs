@@ -45,16 +45,7 @@ public class LightStringDoer : MonoBehaviour
   public void Setup(Nightlighter gun, AIActor anchorEnemy = null, List<AIActor> enemyChain = null)
   {
     if (base.gameObject.GetComponent<Projectile>() is Projectile proj)
-    {
-      if (!gun && proj.Owner is PlayerController player)
-      {
-        if (player.CurrentGun is Gun cgun)
-          gun = cgun.gameObject.GetComponent<Nightlighter>();
-        if (!gun && player.CurrentSecondaryGun is Gun cgun2)
-          gun = cgun2.gameObject.GetComponent<Nightlighter>();
-      }
       new GameObject("lightstring").AddComponent<LightString>().Setup(proj, gun, anchorEnemy, enemyChain);
-    }
     this._setup = true;
   }
 
