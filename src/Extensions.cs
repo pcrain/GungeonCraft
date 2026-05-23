@@ -492,7 +492,7 @@ public static class Extensions
   }
 
   /// <summary>New, better version of SetGlowiness based on better understanding of shaders</summary>
-  public static void MakeGlowyBetter(this tk2dBaseSprite sprite, float? glowAmount = null, Color? glowColor = null, float? glowColorPower = null)
+  public static void MakeGlowyBetter(this tk2dBaseSprite sprite, float? glowAmount = null, Color? glowColor = null, float? glowColorPower = null, float sensitivity = 0.5f)
   {
       sprite.usesOverrideMaterial = true;
       Material newMat = sprite.renderer.material;
@@ -510,12 +510,12 @@ public static class Extensions
 
       newMat.SetFloat("_Cutoff", 0.5f);
       newMat.SetFloat("_EmissiveGlowToggle", 0f);
-      newMat.SetFloat("_EmissiveThresholdSensitivity", 0.5f);
       newMat.SetFloat("_Perpendicular", 1f);
       newMat.SetFloat("_RectangleAmount", 0f);
       newMat.SetFloat("_ValueMaximum", 0.97f);
       newMat.SetFloat("_ValueMinimum", 0.7f);
 
+      newMat.SetFloat("_EmissiveThresholdSensitivity", sensitivity);
       if (glowAmount.HasValue)
         newMat.SetFloat("_EmissivePower", glowAmount.Value);
       if (glowColorPower.HasValue)
@@ -1163,7 +1163,7 @@ public static class Extensions
   /// <summary>Create a prefab trail, add it to a prefab projectile, and return the projectile.</summary>
   public static Projectile AttachTrail(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
     float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null,
-    Vector2? boneSpawnOffset = null, float? glowAmount = null)
+    Vector2? boneSpawnOffset = null, float? emissivePower = null, float? emissiveColorPower = null, Color? emissiveColor = null)
   {
       CwaffTrailController trail = VFX.CreateSpriteTrailObject(
           spriteName         : spriteName,
@@ -1177,8 +1177,8 @@ public static class Extensions
           );
       trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
       trail.gameObject.transform.parent = target.transform;
-      if (glowAmount is float glowAmountv)
-        trail.gameObject.SetGlowiness(glowAmountv);
+      if (emissivePower.HasValue || emissiveColorPower.HasValue || emissiveColor.HasValue)
+        trail.gameObject.GetComponent<tk2dBaseSprite>().MakeGlowyBetter(glowAmount: emissivePower, glowColorPower: emissiveColorPower, glowColor: emissiveColor);
       trail.boneSpawnOffset = boneSpawnOffset ?? Vector2.zero;
       return target;
   }

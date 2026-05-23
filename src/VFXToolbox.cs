@@ -80,7 +80,8 @@ public static class VFX
     public static void RegisterVFX(string name, List<string> spritePaths, float fps = 2, bool loops = true, int loopStart = -1,
         float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter, IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0,
         bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned, float emissivePower = -1, float emissiveColorPower = -1f, Color? emissiveColour = null,
-        bool orphaned = false, bool attached = true, bool unlit = false, float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float lightFadeTime = 0f)
+        bool orphaned = false, bool attached = true, bool unlit = false, float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float lightFadeTime = 0f,
+        bool useBetterEmission = false)
     {
         if (animations.ContainsKey(name))
         {
@@ -109,20 +110,27 @@ public static class VFX
 
         tk2dSpriteAnimationClip clip = vfxEffect.NewAnimation(animName: name, spritePaths: spritePaths, fps: fps, loops: loops, loopStart: loopStart,
             anchor: anchor, emissivePower: emissivePower, emissiveColour: emissiveColour);
-        if (emissivePower > 0) {
-            sprite.renderer.material.shader = ShaderCache.Acquire(unlit
-                ? "Brave/UnlitTintableCutoutColorEmissive" : "Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-            sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, emissivePower);
-            sprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, (emissiveColorPower >= 0f) ? emissiveColorPower : 1.55f);
-        }
-        else
+        if (useBetterEmission)
         {
-            sprite.renderer.material.shader = ShaderCache.Acquire(unlit ? "Brave/PlayerShader" : "tk2d/CutoutVertexColorTilted");
+          sprite.MakeGlowyBetter(emissivePower >= 0 ? emissivePower : null, emissiveColour, emissiveColorPower >= 0 ? emissiveColorPower : null);
         }
-        if (emissiveColour != null)
+        else //REFACTOR: phase all of this out in favor of new emission system
         {
-            sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive"); //NOTE: tintable version doesn't have an _EmissiveColor property
-            sprite.renderer.material.SetColor(CwaffVFX._EmissiveColorId, (Color)emissiveColour);
+          if (emissivePower > 0) {
+              sprite.renderer.material.shader = ShaderCache.Acquire(unlit
+                  ? "Brave/UnlitTintableCutoutColorEmissive" : "Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+              sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, emissivePower);
+              sprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, (emissiveColorPower >= 0f) ? emissiveColorPower : 1.55f);
+          }
+          else
+          {
+              sprite.renderer.material.shader = ShaderCache.Acquire(unlit ? "Brave/PlayerShader" : "tk2d/CutoutVertexColorTilted");
+          }
+          if (emissiveColour != null)
+          {
+              sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive"); //NOTE: tintable version doesn't have an _EmissiveColor property
+              sprite.renderer.material.SetColor(CwaffVFX._EmissiveColorId, (Color)emissiveColour);
+          }
         }
 
         animation.clips            = new tk2dSpriteAnimationClip[1]{clip};
@@ -180,7 +188,7 @@ public static class VFX
     public static GameObject Create(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter,
         IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
         float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
-        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f)
+        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f, bool useBetterEmission = false)
     {
         RegisterVFX(
             name           : name,
@@ -204,7 +212,8 @@ public static class VFX
             lightRange     : lightRange,
             lightColor     : lightColor,
             emissiveColorPower: emissiveColorPower,
-            lightFadeTime: lightFadeTime
+            lightFadeTime: lightFadeTime,
+            useBetterEmission : useBetterEmission
             );
         return animations[name];
     }
@@ -215,7 +224,7 @@ public static class VFX
     public static VFXPool CreatePool(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter,
         IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
         float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
-        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f)
+        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f, bool useBetterEmission = false)
     {
         RegisterVFX(
             name           : name,
@@ -239,7 +248,8 @@ public static class VFX
             lightRange     : lightRange,
             lightColor     : lightColor,
             emissiveColorPower: emissiveColorPower,
-            lightFadeTime: lightFadeTime
+            lightFadeTime: lightFadeTime,
+            useBetterEmission : useBetterEmission
             );
         return vfxpool[name];
     }
@@ -250,7 +260,7 @@ public static class VFX
     public static VFXComplex CreateComplex(string name, float fps = 2, bool loops = true, int loopStart = -1, float scale = 1.0f, Anchor anchor = Anchor.MiddleCenter,
         IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
         float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
-        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f)
+        float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f, bool useBetterEmission = false)
     {
         RegisterVFX(
             name           : name,
@@ -274,7 +284,8 @@ public static class VFX
             lightRange     : lightRange,
             lightColor     : lightColor,
             emissiveColorPower: emissiveColorPower,
-            lightFadeTime: lightFadeTime
+            lightFadeTime: lightFadeTime,
+            useBetterEmission : useBetterEmission
             );
         return vfxcomplex[name];
     }

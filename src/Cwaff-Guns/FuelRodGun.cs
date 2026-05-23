@@ -37,7 +37,8 @@ public class FuelRodGun : CwaffGun
           .InitProjectile(GunData.New(sprite: "fuel_rod_cannon_projectile_empty", clipSize: 1, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 40.0f, speed: 50f, range: 100f, force: 25f, recoil: 20f, shouldRotate: true, customClip: true, pierceBreakables: true,
             glowColor: ExtendedColours.lime, glowAmount: 100f, becomeDebris: true))
-          .AttachTrail("fuel_rod_trail", fps: 120, timeTillAnimStart: 0.00f, glowAmount: 55f,
+          .AttachTrail("fuel_rod_trail", fps: 120, timeTillAnimStart: 0.00f,
+            emissivePower: 10.0f, emissiveColorPower: 7.0f, emissiveColor: new Color(0.5f, 0.6f, 0.0f),
             destroyOnEmpty: true, dispersalPrefab: Lazy.DispersalParticles(ExtendedColours.lime))
           .Attach<ExplosiveModifier>(ex => ex.explosionData = Explosions.DefaultLarge.Scale(1.5f))
           .Assign(out Projectile baseProj);

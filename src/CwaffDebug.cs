@@ -414,3 +414,120 @@ public class Distortyboi : MonoBehaviour
       }
     }
 }
+
+/// <summary>Class for checking shader emission settings</summary>
+public static class EmissionTester
+{
+  private static tk2dSprite _TestSprite = null;
+  private static readonly string _DataFile = "shadertest.txt";
+  private static readonly string _DataFilePath = Path.Combine(Paths.BepInExRootPath, _DataFile);
+  private static FileSystemWatcher _Watcher = null;
+
+  public static void FileChangedCallback(object sender, FileSystemEventArgs e)
+  {
+    UpdateFromFile();
+  }
+
+  public static void UpdateFromFile()
+  {
+    if (!File.Exists(_DataFilePath))
+    {
+      using (StreamWriter writer = File.CreateText(_DataFilePath))
+      {
+        writer.WriteLine("sprite: ");
+        writer.WriteLine("emissivePower: ");
+        writer.WriteLine("emissiveColorPower: ");
+        writer.WriteLine("sensitivity: ");
+        writer.WriteLine("red: ");
+        writer.WriteLine("green: ");
+        writer.WriteLine("blue: ");
+      }
+    }
+    if (_Watcher == null)
+    {
+      _Watcher = new FileSystemWatcher(Paths.BepInExRootPath);
+      _Watcher.Filter = _DataFile;
+      _Watcher.NotifyFilter = NotifyFilters.LastWrite;
+      _Watcher.Changed += FileChangedCallback; // auto refresh on file change
+      _Watcher.EnableRaisingEvents = true;
+    }
+    if (_TestSprite == null)
+    {
+      _TestSprite = Lazy.SpriteObject(VFX.Collection, 0);
+      _TestSprite.PlaceAtPositionByAnchor(GameManager.Instance.PrimaryPlayer.sprite.WorldTopCenter, Anchor.LowerCenter);
+    }
+
+    tk2dSpriteDefinition def = null;
+    string path = null;
+    float emissivePower = 0.0f;
+    float emissiveColorPower = 0.0f;
+    float red = 1.0f;
+    float green = 1.0f;
+    float blue = 1.0f;
+    float sensitivity = 0.5f;
+
+    using (StreamReader reader = File.OpenText(_DataFilePath))
+    {
+      string s = "";
+      while ((s = reader.ReadLine()) != null)
+      {
+          string[] tokens = s.Split(':');
+          if (tokens.Length != 2)
+            continue;
+          string key = tokens[0].Trim();
+          string value = tokens[1].Trim();
+          if (key == "sprite")
+          {
+            if (!AtlasHelper._PackedTextures.TryGetValue(value, out def))
+              Lazy.DebugConsoleLog($"couldn't find sprite def {value} in atlas");
+            else
+              path = value;
+          }
+          else if (key == "emissivePower")
+          {
+             if (!float.TryParse(value, out emissivePower))
+              Lazy.DebugConsoleLog($"couldn't parse emissivePower {value}");
+          }
+          else if (key == "emissiveColorPower")
+          {
+             if (!float.TryParse(value, out emissiveColorPower))
+              Lazy.DebugConsoleLog($"couldn't parse emissiveColorPower {value}");
+          }
+          else if (key == "sensitivity")
+          {
+             if (!float.TryParse(value, out sensitivity))
+              Lazy.DebugConsoleLog($"couldn't parse sensitivity {value}");
+          }
+          else if (key == "red")
+          {
+             if (!float.TryParse(value, out red))
+              Lazy.DebugConsoleLog($"couldn't parse red {value}");
+          }
+          else if (key == "green")
+          {
+             if (!float.TryParse(value, out green))
+              Lazy.DebugConsoleLog($"couldn't parse green {value}");
+          }
+          else if (key == "blue")
+          {
+             if (!float.TryParse(value, out blue))
+              Lazy.DebugConsoleLog($"couldn't parse blue {value}");
+          }
+      }
+    }
+
+    if (def == null)
+    {
+      Lazy.DebugConsoleLog($"no valid sprite def");
+      return;
+    }
+
+    Lazy.DebugConsoleLog($"updating {path} with settings {emissivePower}, {emissiveColorPower}, ({red},{green},{blue})");
+    if (!_DebugSpriteIds.TryGetValue(path, out int spriteId))
+      spriteId = _DebugSpriteIds[path] = AtlasHelper.AddSpritesToCollection([path], VFX.Collection, copyMaterialSettings: true).x;
+    _TestSprite.SetSprite(VFX.Collection, spriteId);
+    _TestSprite.MakeGlowyBetter(glowAmount: emissivePower, glowColorPower: emissiveColorPower, glowColor: new Color(red, green, blue), sensitivity: sensitivity);
+  }
+
+  private static Dictionary<string, int> _DebugSpriteIds = new();
+}
