@@ -8,6 +8,7 @@
 - Fixed Shotgun Kin's ghosts being completely red when exorcised with Holy Water Gun
 - Updated ghosts from Holy Water Gun's exorcisms to use proper shaders
 - Pre-scaled a few VFX sprites that were scaled-down in game to make them look a little nicer and save texture atlas space
+- Fixed null deref caused by Chain Driver's projectiles checking for their owner's synergies without a valid owner
 
 ## 1.31.0 (2026-05-20)
 

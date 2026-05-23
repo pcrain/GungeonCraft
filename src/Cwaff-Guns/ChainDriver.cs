@@ -183,7 +183,7 @@ public class ChainkLink : MonoBehaviour
 
       this._owner                 = owner;
       this._forceMultiplier       = owner ? owner.DamageMult() : 1.0f;
-      if (owner.HasSynergy(Synergy.CHAIN_SMOKER))
+      if (this._owner && owner.HasSynergy(Synergy.CHAIN_SMOKER))
         this._forceMultiplier += 0.1f * Mathf.Max(owner.Coolness(), 0);
       this._gun                   = gun;
       if (this._gun)
