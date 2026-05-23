@@ -94,7 +94,7 @@ public class SlappProjectile : MonoBehaviour
         PlayerController owner = this._projectile.Owner as PlayerController;
         Vector2 victimPos = this._slapVictim.CenterPosition;
         Vector2 impactPos = this._vfx.GetComponent<tk2dSprite>().WorldCenter;
-        ReadOnlyCollection<AIActor> enemies = owner.CenterPosition.GetAllNearbyEnemies(radius: _SLAPP_RADIUS, includeInvulnerable: true);
+        ReadOnlyCollection<AIActor> enemies = victimPos.GetAllNearbyEnemies(radius: _SLAPP_RADIUS, includeInvulnerable: true);
         foreach (AIActor enemy in enemies)
         {
             HealthHaver hh = enemy.healthHaver;
