@@ -522,7 +522,7 @@ public static class EmissionTester
       return;
     }
 
-    Lazy.DebugConsoleLog($"updating {path} with settings {emissivePower}, {emissiveColorPower}, ({red},{green},{blue})");
+    Lazy.DebugConsoleLog($"updating {path} with power {emissivePower}, colorpower {emissiveColorPower}, color ({red},{green},{blue}), and sensitivity {sensitivity}");
     if (!_DebugSpriteIds.TryGetValue(path, out int spriteId))
       spriteId = _DebugSpriteIds[path] = AtlasHelper.AddSpritesToCollection([path], VFX.Collection, copyMaterialSettings: true).x;
     _TestSprite.SetSprite(VFX.Collection, spriteId);

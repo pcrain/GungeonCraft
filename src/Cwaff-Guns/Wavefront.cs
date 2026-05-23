@@ -20,7 +20,7 @@ public class Wavefront : CwaffGun
             customClip: true, sprite: "wavefront_projectile_alt", scale: 0.25f, fps: 24, glowAmount: 4f, glowColor: Color.cyan, lightStrength: 10f, lightRange: 1f,
             lightColor: Color.white, hitEnemySound: "wavefront_projectile_zap_sound", uniqueSounds: true))
           .SetEnemyImpactVFX(VFX.CreatePool("wavefront_impact_particles", fps: 24, loops: false, anchor: Anchor.MiddleCenter, lightColor: Color.cyan,
-            lightRange: 1.5f, lightStrength: 3.0f, emissivePower: 0.5f, emissiveColorPower: 0.5f, emissiveColour: ExtendedColours.purple))
+            lightRange: 1.5f, lightStrength: 3.0f, emissivePower: 7.0f, emissiveColorPower: 9.0f, emissiveColour: new Color(0.5f, 0.5f, 1.0f), emissiveSensitivity: 0.35f))
           .Attach<TeslaProjectileBehavior>();
 
       _LinkVFXPrefab = VFX.Create("wavefront_lightning", fps: 60, loops: true, anchor: Anchor.MiddleLeft).MakeChainLightingVFX();

@@ -36,7 +36,7 @@ public class AimuHakurei : CwaffGun
 
         _ProjBase = gun.InitFirstProjectile(GunData.New(damage: 8f, speed: 44f, range: 100f, force: 3f, sprite: "aimu_projectile", scale: 0.625f));
         Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f, spawnSound: "aimu_beam_sound_2"))
-          .SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false, useBetterEmission: true,
+          .SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false,
             emissivePower: 2.0f, emissiveColorPower: 8.0f, emissiveColour: new Color(1.0f, 0.5f, 0.75f)))
           .AttachTrail("aimu_beam_mid", fps: 60, startAnim: "aimu_beam_start", softMaxLength: 1f, cascadeTimer: C.FRAME, destroyOnEmpty: true,
             dispersalPrefab: Lazy.DispersalParticles(ExtendedColours.pink),

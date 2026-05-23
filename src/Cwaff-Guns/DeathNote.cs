@@ -318,17 +318,17 @@ public class ShinigamiVisit : MonoBehaviour
     const float GLOW_TIME = 0.2f;
     const float FADE_TIME = 1.0f;
     const float LERP_OUT_RATE = 3.0f;
-    this._shinigami.MakeGlowyBetter(glowColor: Color.red, glowAmount: 2f, glowColorPower: 10.0f);
+    this._shinigami.MakeGlowyBetter(glowColor: Color.red, glowAmount: 2f, glowColorPower: 10.0f, skipSetup: true);
     for (float elapsed = 0f; elapsed < GLOW_TIME; elapsed += BraveTime.DeltaTime)
     {
         float percentDone = elapsed / GLOW_TIME;
-        this._shinigami.MakeGlowyBetter(glowAmount: Mathf.Lerp(2f, 20f, Ease.OutQuad(percentDone)));
+        this._shinigami.MakeGlowyBetter(glowAmount: Mathf.Lerp(2f, 20f, Ease.OutQuad(percentDone)), skipSetup: true);
         yield return null;
     }
     for (float elapsed = 0f; elapsed < GLOW_TIME; elapsed += BraveTime.DeltaTime)
     {
         float percentDone = elapsed / GLOW_TIME;
-        this._shinigami.MakeGlowyBetter(glowAmount: Mathf.Lerp(20f, 2f, Ease.OutQuad(percentDone)));
+        this._shinigami.MakeGlowyBetter(glowAmount: Mathf.Lerp(20f, 2f, Ease.OutQuad(percentDone)), skipSetup: true);
         yield return null;
     }
     for (float elapsed = 0f; elapsed < FADE_TIME; elapsed += BraveTime.DeltaTime)

@@ -492,36 +492,38 @@ public static class Extensions
   }
 
   /// <summary>New, better version of SetGlowiness based on better understanding of shaders</summary>
-  public static void MakeGlowyBetter(this tk2dBaseSprite sprite, float? glowAmount = null, Color? glowColor = null, float? glowColorPower = null, float sensitivity = 0.5f)
+  public static void MakeGlowyBetter(this tk2dBaseSprite sprite, float? glowAmount = null, Color? glowColor = null, float? glowColorPower = null,
+    float sensitivity = 0.5f, bool skipSetup = false)
   {
-      sprite.usesOverrideMaterial = true;
       Material newMat = sprite.renderer.material;
+      if (!skipSetup)
+      {
+        sprite.usesOverrideMaterial = true;
 
-      // copy some defaults from Gun Nut
-      newMat.shader = ShaderCache.Acquire("Brave/LitCutoutUber_ColorEmissive");
-      newMat.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
-      newMat.EnableKeyword("BRIGHTNESS_CLAMP_ON");
-      newMat.DisableKeyword("EMISSIVE_OFF");
-      newMat.EnableKeyword("EMISSIVE_ON");
-      newMat.DisableKeyword("TINTING_OFF");
-      newMat.EnableKeyword("TINTING_ON");
-      newMat.DisableKeyword("PALETTE_ON");
-      newMat.EnableKeyword("PALETTE_OFF");
+        // copy some defaults from Gun Nut
+        newMat.shader = ShaderCache.Acquire("Brave/LitCutoutUber_ColorEmissive");
+        newMat.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
+        newMat.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+        newMat.DisableKeyword("EMISSIVE_OFF");
+        newMat.EnableKeyword("EMISSIVE_ON");
+        newMat.DisableKeyword("TINTING_OFF");
+        newMat.EnableKeyword("TINTING_ON");
+        newMat.DisableKeyword("PALETTE_ON");
+        newMat.EnableKeyword("PALETTE_OFF");
 
-      newMat.SetFloat("_Cutoff", 0.5f);
-      newMat.SetFloat("_EmissiveGlowToggle", 0f);
-      newMat.SetFloat("_Perpendicular", 1f);
-      newMat.SetFloat("_RectangleAmount", 0f);
-      newMat.SetFloat("_ValueMaximum", 0.97f);
-      newMat.SetFloat("_ValueMinimum", 0.7f);
+        newMat.SetFloat(CwaffVFX._PerpendicularId, 1f);
+        newMat.SetFloat(CwaffVFX._CutoffId, 0.5f);
+        newMat.SetFloat(CwaffVFX._ValueMinId, 0.7f);
+        newMat.SetFloat(CwaffVFX._ValueMaxId, 0.97f);
+      }
 
-      newMat.SetFloat("_EmissiveThresholdSensitivity", sensitivity);
+      newMat.SetFloat(CwaffVFX._SensitivityId, sensitivity);
       if (glowAmount.HasValue)
-        newMat.SetFloat("_EmissivePower", glowAmount.Value);
+        newMat.SetFloat(CwaffVFX._EmissivePowerId, glowAmount.Value);
       if (glowColorPower.HasValue)
-        newMat.SetFloat("_EmissiveColorPower", glowColorPower.Value);
+        newMat.SetFloat(CwaffVFX._EmissiveColorPowerId, glowColorPower.Value);
       if (glowColor.HasValue)
-        newMat.SetColor("_EmissiveColor", glowColor.Value);
+        newMat.SetColor(CwaffVFX._EmissiveColorId, glowColor.Value);
   }
 
   /// <summary>Randomly add or subtract an amount from an angle</summary>
@@ -872,7 +874,7 @@ public static class Extensions
 
     gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
       loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower, emissiveColour: emissiveColor,
-      emissiveColorPower: emissiveColorPower, unlit: unlit, lightStrength: lightStrength, lightRange: lightRange, lightColor: lightColor);
+      emissiveColorPower: emissiveColorPower, unlit: unlit, lightStrength: lightStrength, lightRange: lightRange, lightColor: lightColor, useBetterEmission: false);
     gun.usesContinuousMuzzleFlash = continuous;
     return gun;
   }

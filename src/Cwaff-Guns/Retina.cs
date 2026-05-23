@@ -24,7 +24,8 @@ public class Retina : CwaffGun
           .Attach<RetinaProjectile>()
           .Assign(out Projectile proj);
 
-        VFXPool impactPool = VFX.CreatePool("retina_impact_vfx", fps: 30, loops: false, emissivePower: 1f);
+        VFXPool impactPool = VFX.CreatePool("retina_impact_vfx", fps: 30, loops: false, emissivePower: 2f,
+          emissiveColorPower: 10.0f, emissiveColour: new Color(1.0f, 0.85f, 0.5f), emissiveSensitivity: 0.6f);
         impactPool.effects[0].effects[0].effect.AddComponent<RetinaLightburstDoer>();
         proj.SetAllImpactVFX(impactPool);
     }

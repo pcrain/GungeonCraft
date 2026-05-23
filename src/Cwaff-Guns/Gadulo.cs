@@ -27,7 +27,8 @@ public class Gadulo : CwaffGun
           .Attach<SuperCombiner>()
           .AttachTrail("needle_rifle_trail", fps: 60, destroyOnEmpty: true, cascadeTimer: 0.5f * C.FRAME, softMaxLength: 1f,
             emissivePower: 10.0f, emissiveColorPower: 8.0f, emissiveColor: new Color(1.0f, 0.5f, 0.5f))
-          .SetAllImpactVFX(VFX.CreatePool("needle_rifle_impact_vfx", fps: 60, loops: false, emissivePower: 30f))
+          .SetAllImpactVFX(VFX.CreatePool("needle_rifle_impact_vfx", fps: 60, loops: false,
+            emissivePower: 75f, emissiveColorPower: 2, emissiveColour: new Color(1.0f, 0.3f, 1.0f)))
           .StickToEnemies<NoKillHealthModificationBuff>(
             glowAmount: 10f, deathVFX: Items.CatClaw.DefaultProjectile().GetComponent<DelayedExplosiveBuff>().explosionData.effect.CreatePoolFromVFXGameObject(),
             setupFunc: b => { b.vfx.AddComponent<CrystalFlicker>(); });

@@ -45,7 +45,8 @@ public class KiBlast : CwaffGun
             customClip: true, damage: 4.0f, range: 1000.0f, speed: 50.0f, sprite: "ki_blast", fps: 12, scale: 0.25f,
             ignoreDamageCaps: true, hitSound: "ki_blast_explode_sound", spawnSound: "ki_blast_sound",
             glowAmount: 50.0f, lightStrength: 2.1f, lightRange: 2.4f, lightColor: Color.cyan))
-          .SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f, emissivePower: 10f))
+          .SetAllImpactVFX(VFX.CreatePool("ki_explosion", fps: 20, loops: false, scale: 0.5f,
+            emissivePower: 0.75f, emissiveColorPower: 20.0f, emissiveColour: new Color(0.8f, 0.8f, 1.0f)))
           .Attach<EasyTrailBullet>(trail => {
             trail.TrailPos   = trail.transform.position;
             trail.StartWidth = 0.2f;

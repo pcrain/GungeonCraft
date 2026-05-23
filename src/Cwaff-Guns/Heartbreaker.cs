@@ -37,7 +37,7 @@ public class Heartbreaker : CwaffGun
             angleVariance: 30f, damage: 5.5f, speed: 25f, range: 1000f, force: 9f, shootStyle: ShootStyle.Burst, hitEnemySound: "heartbreaker_impact_sound",
             lightStrength: 8f, lightRange: 0.75f, lightColor: ExtendedColours.vibrantOrange, glowAmount: 30f, customClip: true))
           .SetAllImpactVFX(VFX.CreatePool("heartbreak_projectile_impact_vfx", fps: 60, loops: false, anchor: Anchor.MiddleCenter,
-            emissivePower: 0.5f, emissiveColorPower: 1.5f, emissiveColour: ExtendedColours.vibrantOrange,
+            emissivePower: 6.5f, emissiveColorPower: 10.0f, emissiveColour: new Color(1.0f, 0.85f, 0,5f),
             lightColor: ExtendedColours.vibrantOrange, lightRange: 1.5f, lightStrength: 7.0f))
           .AttachTrail("heartbreaker_trail", fps: 60, cascadeTimer: 0.5f * C.FRAME, softMaxLength: 0.25f);
 

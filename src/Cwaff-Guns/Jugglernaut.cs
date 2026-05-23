@@ -85,12 +85,12 @@ public class Jugglernaut : CwaffGun
         _JugglingBallProjectile = Items.Ak47.CloneProjectile(GunData.New(
             sprite: "jugglernaut_ball_gray_projectile", damage: 2.0f, speed: 50.0f, force: 2.0f, range: 80.0f, glowAmount: _DEBRIS_GLOW));
 
-        _ImpactVFX[0] = VFX.CreatePool("jugglernaut_impact_vfx_red", fps: 60, loops: false, emissivePower: 1.5f);
-        _ImpactVFX[1] = VFX.CreatePool("jugglernaut_impact_vfx_blue", fps: 60, loops: false, emissivePower: 1.5f);
-        _ImpactVFX[2] = VFX.CreatePool("jugglernaut_impact_vfx_yellow", fps: 60, loops: false, emissivePower: 1.5f);
-        _ImpactVFX[3] = VFX.CreatePool("jugglernaut_impact_vfx_green", fps: 60, loops: false, emissivePower: 1.5f);
-        _ImpactVFX[4] = VFX.CreatePool("jugglernaut_impact_vfx_purple", fps: 60, loops: false, emissivePower: 1.5f);
-        _ImpactVFX[5] = VFX.CreatePool("jugglernaut_impact_vfx_orange", fps: 60, loops: false, emissivePower: 1.5f);
+        List<string> impactStrings = ["jugglernaut_impact_vfx_red", "jugglernaut_impact_vfx_blue", "jugglernaut_impact_vfx_yellow",
+          "jugglernaut_impact_vfx_green", "jugglernaut_impact_vfx_purple", "jugglernaut_impact_vfx_orange"];
+
+        for (int i = 0; i < 6; ++i)
+          _ImpactVFX[i] = VFX.CreatePool(impactStrings[i], fps: 60, loops: false, emissivePower: 10.0f,
+            emissiveColorPower: 10.0f, emissiveColour: new Color(0.5f, 0.5f, 0.5f), emissiveSensitivity: 1.0f);
     }
 
     /// <summary>Make sure Jugglernaut appears correctly in the weapons panel</summary>
