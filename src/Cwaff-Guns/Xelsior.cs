@@ -148,7 +148,7 @@ public class Xelsior : CwaffGun
             return;
 
         Vector2 start = beam.Origin;
-        Vector2 end = start + beam.Direction.normalized * beam.m_currentBeamDistance;
+        Vector2 end = beam.Endpoint();
         Gun targetGun = null;
         foreach (var ix in RoomHandler.unassignedInteractableObjects)
         {

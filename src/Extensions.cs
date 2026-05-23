@@ -3970,4 +3970,10 @@ public static class Extensions
       result = lessThan(self[i], result) ? self[i] : result;
     return result;
   }
+
+  /// <summary>Get the endpoint of a beam</summary>
+  public static Vector2 Endpoint(this BasicBeamController beam)
+  {
+    return beam.Origin + beam.Direction.normalized * beam.m_currentBeamDistance;
+  }
 }

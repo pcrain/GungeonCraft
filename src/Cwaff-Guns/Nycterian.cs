@@ -124,8 +124,6 @@ public class DecoyEcho : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (this._room == null)
-            return;
         SpeculativeRigidbody body = base.gameObject.GetComponent<SpeculativeRigidbody>();
         foreach (AIActor enemy in body.UnitCenter.GetAllNearbyEnemies())
             if (enemy.OverrideTarget == body)

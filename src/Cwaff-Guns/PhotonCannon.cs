@@ -42,10 +42,6 @@ public class PhotonCannon : CwaffGun
           UnityEngine.Object.Destroy(this._glassLight.gameObject);
           this._glassLight = null;
         }
-    }
-
-    private void LateUpdate()
-    {
         if (!this.gun.IsFiring)
           base.gameObject.Play("photon_beam_sound_stop");
         else
@@ -78,11 +74,11 @@ public class MagnifyingRay : MonoBehaviour
       if (!this._light)
         this._light = EasyLight.Create(
           parent     : this._beam.transform,
-          pos        : this._beam.Origin + this._beam.Direction.normalized * this._beam.m_currentBeamDistance,
+          pos        : this._beam.Endpoint(),
           color      : ExtendedColours.honeyYellow,
           radius     : 4f,
           brightness : this._mastered ? PhotonCannon._BRIGHTNESS_MASTERED : PhotonCannon._BRIGHTNESS);
-      this._light.gameObject.transform.position = this._beam.Origin + this._beam.Direction.normalized * this._beam.m_currentBeamDistance;
+      this._light.gameObject.transform.position = this._beam.Endpoint();
     }
 }
 
@@ -126,10 +122,5 @@ public class AntBurningEffect : GameActorEffect
             damageTypes      : CoreDamageTypes.Fire,
             damageCategory   : DamageCategory.DamageOverTime,
             ignoreDamageCaps : true);
-    }
-
-    public override void OnEffectRemoved(GameActor actor, RuntimeGameActorEffectData effectData)
-    {
-        base.OnEffectRemoved(actor, effectData);
     }
 }

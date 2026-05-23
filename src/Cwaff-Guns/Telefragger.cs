@@ -132,7 +132,7 @@ public class Telefragger : CwaffGun
         if (GetExtantBeam() is not BasicBeamController beam || beam.State != BeamState.Firing)
             return;
         this._teleportReady = false;
-        TeleportPlayerToPosition(player, beam.Origin + beam.m_currentBeamDistance * beam.Direction.normalized);
+        TeleportPlayerToPosition(player, beam.Endpoint());
     }
 
     // TODO: something in this method causes a _StencilVal warning in the debug log
