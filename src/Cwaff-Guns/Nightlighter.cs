@@ -85,7 +85,6 @@ public class LightString : MonoBehaviour
     private bool _connectedToProjectile = false;
     private bool _connectedToEnemy = false;
     private bool _anchoredToEnemy = false;
-    private bool _setGlowiness = false;
     private bool _mastered = false;
     private bool _setup = false;
     private bool _active = false;
@@ -133,6 +132,7 @@ public class LightString : MonoBehaviour
         animation: Nightlighter._LightString, startPos: endPos, endPos: endPos, numSegments: SEGMENTS,
         stretchPolicy: CwaffingTheGungy.RopeSim.StretchPolicy.GROWPERMANENT);
       this._mesh.sprite.HeightOffGround = -10f; // draw behind most things
+      this._mesh.sprite.SetGlowiness(50f, glowColor: Color.white, glowColorPower: 10f);
       this._active                = true;
       this._setup                 = true;
     }
@@ -217,12 +217,6 @@ public class LightString : MonoBehaviour
     {
       const float DESPAWN_RADIUS = 30.0f;
       const float DESPAWN_RADIUS_SQR = DESPAWN_RADIUS * DESPAWN_RADIUS;
-
-      if (!this._setGlowiness)
-      {
-        this._mesh.sprite.SetGlowiness(50f, glowColor: Color.white, glowColorPower: 10f);
-        this._setGlowiness = true;
-      }
 
       if (!this._active)
       {

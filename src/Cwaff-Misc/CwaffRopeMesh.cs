@@ -32,7 +32,9 @@ public class CwaffRopeMesh : MonoBehaviour
       mesh.animation       = animation;
       mesh.startPos        = startPos;
       mesh.endPos          = endPos;
-      mesh.sprite          = mesh.GetOrAddComponent<tk2dTiledSprite>();
+      mesh._boneManager    = mesh.gameObject.AddComponent<CwaffBoneManager>();
+      mesh._boneManager.Setup(animation: animation);
+      mesh.sprite          = mesh.GetComponent<tk2dTiledSprite>(); // guaranteed set up by CwaffBoneManager.Setup()
       mesh._segLength      = SEGLENGTH;
       mesh._ropePrevPoints = new();
       mesh._ropePoints     = new();
@@ -48,6 +50,7 @@ public class CwaffRopeMesh : MonoBehaviour
       mesh.locked = false;
       mesh.animateWhileLocked = false;
       mesh._lockThreshold = 0f;
+      mesh._updateTimer = 0.0f;
       return mesh;
   }
 
@@ -55,13 +58,6 @@ public class CwaffRopeMesh : MonoBehaviour
   {
     this._lockThreshold = threshold;
     this.animateWhileLocked = keepAnimating;
-  }
-
-  private void Start()
-  {
-    this._boneManager = base.gameObject.AddComponent<CwaffBoneManager>();
-    this._boneManager.Setup(animation: animation);
-    _updateTimer = 0.0f;
   }
 
   private void Update()
