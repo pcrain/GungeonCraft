@@ -35,6 +35,7 @@ public static class IncredibleItems
         GunCarryingCase.Init();
         WWIRations.Init();
         Headstone.Init();
+        AssassinBullets.Init();
     }
 
     private static T SetupIncredibleItem<T>(this T item) where T : PickupObject

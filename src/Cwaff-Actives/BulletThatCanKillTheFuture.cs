@@ -375,7 +375,8 @@ public class BulletThatCanKillTheFuture : CwaffActive
     public static void Memorialize(AIActor enemy)
     {
         tk2dSprite sprite = new GameObject().AddComponent<tk2dSprite>();
-        sprite.SetSprite(enemy.sprite.collection, Lazy.GetIdForBestIdleAnimation(enemy));
+        Lazy.GetCollectionAndIdForBestIdleAnimation(enemy, out tk2dSpriteCollectionData col, out int spriteId);
+        sprite.SetSprite(col, spriteId);
         sprite.FlipX = enemy.sprite.FlipX;
         sprite.PlaceAtPositionByAnchor(enemy.sprite.transform.position, sprite.FlipX ? Anchor.LowerRight : Anchor.LowerLeft);
         sprite.StartCoroutine(Flicker(sprite));

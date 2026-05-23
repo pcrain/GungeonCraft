@@ -18,6 +18,7 @@
 - Decreased Cleansweeper's initial Minesweeper grid ammo cost from 20 to 10
 - Decreased Cleansweeper's regenerated Minesweeper grid ammo cost from 40 to 20
 - Synchronized position of Stereoscope's VFX with Stereoscope itself while the player is moving
+- Fixed index out of range exception caused by Chroma, Sunderbuss, and Stereoscope failing to look up sprite palette information for modded enemies
 
 ## 1.31.0 (2026-05-20)
 

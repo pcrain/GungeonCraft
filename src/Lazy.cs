@@ -367,7 +367,8 @@ public static class Lazy
     public static Texture2D GetTexturedEnemyIdleAnimation(AIActor enemy, Color blendColor, float blendAmount, Color? sheenColor = null, float sheenWidth = 20.0f)
     {
         // Get the best idle sprite for the enemy
-        tk2dSpriteDefinition bestIdleSprite = enemy.sprite.collection.spriteDefinitions[GetIdForBestIdleAnimation(enemy)];
+        GetCollectionAndIdForBestIdleAnimation(enemy, out tk2dSpriteCollectionData collection, out int spriteId);
+        tk2dSpriteDefinition bestIdleSprite = collection.spriteDefinitions[spriteId];
         // If the x coordinate of the first two UVs match, we're using a rotated sprite
         bool isRotated = (bestIdleSprite.uvs[0].x == bestIdleSprite.uvs[1].x);
         // Remove the texture from the sprite sheet
@@ -1032,7 +1033,7 @@ public static class Lazy
     }
 
     /// <summary>Gets the best idle animation for the given enemy</summary>
-    public static int GetIdForBestIdleAnimation(AIActor enemy)
+    public static void GetCollectionAndIdForBestIdleAnimation(AIActor enemy, out tk2dSpriteCollectionData spriteCol, out int spriteId)
     {
         int bestMatchStrength = 0;
         int bestSpriteId = -1;
@@ -1042,13 +1043,17 @@ public static class Lazy
             && animator.IdleAnimation.Type != DirectionalAnimation.DirectionType.None)
         {
             string idleName = animator.IdleAnimation.GetInfo(270f).name;
-            // Lazy.DebugLog($"  found idle clip name {idleName}");
             tk2dSpriteAnimationClip idleClip = spriteAnimator.GetClipByName(idleName);
             if (idleClip != null && idleClip.frames != null && idleClip.frames.Length > 0)
-                return idleClip.frames[0].spriteId;
+            {
+                spriteCol = idleClip.frames[0].spriteCollection;
+                spriteId = idleClip.frames[0].spriteId;
+                return;
+            }
         }
 
-        tk2dSpriteDefinition[] defs = enemy.sprite.collection.spriteDefinitions;
+        spriteCol = enemy.sprite.collection;
+        tk2dSpriteDefinition[] defs = spriteCol.spriteDefinitions;
         for (int i = 0; i < defs.Length; ++i)
         {
             tk2dSpriteDefinition sd = defs[i];
@@ -1075,9 +1080,8 @@ public static class Lazy
             }
         }
 
-        if (bestSpriteId >= 0)
-            return bestSpriteId;
-        return enemy.sprite.collection.FirstValidDefinitionIndex;
+        spriteId = (bestSpriteId >= 0) ? bestSpriteId : spriteCol.FirstValidDefinitionIndex;
+        return;
     }
 
 
@@ -1193,9 +1197,8 @@ public static class Lazy
     public static Color[] GetPixelColorsForEnemy(string guid)
     {
         AIActor prefab = EnemyDatabase.GetOrLoadByGuid(guid);
-        // Lazy.DebugLog($"looking up pigment for {prefab.ActorName}");
-        tk2dSpriteDefinition def = prefab.GetComponent<tk2dSprite>().collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(prefab)];
-        // Lazy.DebugLog($"  got def {def.name}");
+        Lazy.GetCollectionAndIdForBestIdleAnimation(prefab, out tk2dSpriteCollectionData collection, out int spriteId);
+        tk2dSpriteDefinition def = collection.spriteDefinitions[spriteId];
 
         Texture mainTex = def.material.mainTexture;
         if (!_ReadableTexes.TryGetValue(mainTex, out Texture2D tex))

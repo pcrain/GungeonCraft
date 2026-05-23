@@ -63,7 +63,8 @@ public class AlienNailgun : CwaffGun
             this._preview.SafeDestroy();
 
         AIActor actor = EnemyDatabase.GetOrLoadByGuid(guid);
-        tk2dSprite sprite = Lazy.SpriteObject(actor.sprite.collection, Lazy.GetIdForBestIdleAnimation(actor));
+        Lazy.GetCollectionAndIdForBestIdleAnimation(actor, out tk2dSpriteCollectionData col, out int spriteId);
+        tk2dSprite sprite = Lazy.SpriteObject(col, spriteId);
             sprite.PlaceAtPositionByAnchor(pc.sprite.WorldTopCenter + new Vector2(0f, 0.5f), Anchor.LowerCenter);
             sprite.MakeHolographic(green: true);
 
@@ -234,8 +235,7 @@ public class AlienNailgun : CwaffGun
     private static GameObject CreateEnemyFragment(string guid, int index, Vector2 targetPosition, Vector2 startPosition, float travelTime, float delay = 0.0f, bool autoDestroy = false)
     {
         AIActor enemy                 = EnemyDatabase.GetOrLoadByGuid(guid);
-        int bestSpriteId              = Lazy.GetIdForBestIdleAnimation(enemy);
-        tk2dSpriteCollectionData coll = enemy.sprite.collection;
+        Lazy.GetCollectionAndIdForBestIdleAnimation(enemy, out tk2dSpriteCollectionData coll, out int bestSpriteId);
         tk2dSpriteDefinition baseDef  = coll.spriteDefinitions[bestSpriteId];
         tk2dSpriteDefinition fragDef  = Lazy.GetSpriteFragment(
             orig     : baseDef,

@@ -339,7 +339,8 @@ public class RetinaHUD : MonoBehaviour
     scale = 1f;
     if (enemy.sprite.collection.spriteDefinitions != null)
     {
-      tk2dSpriteDefinition idleDef = enemy.sprite.collection.spriteDefinitions[Lazy.GetIdForBestIdleAnimation(enemy)];
+      Lazy.GetCollectionAndIdForBestIdleAnimation(enemy, out tk2dSpriteCollectionData collection, out int spriteId);
+      tk2dSpriteDefinition idleDef = collection.spriteDefinitions[spriteId];
       Vector3 extents = idleDef.boundsDataExtents;
       float maxSpriteSide = C.PIXELS_PER_TILE * Mathf.Max(extents.x, extents.y);
       scale = (maxSpriteSide < 40f) ? 2f : (maxSpriteSide < 80f) ? 1f : 0.5f;
