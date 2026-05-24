@@ -76,7 +76,6 @@ public class CwaffRopeMesh : MonoBehaviour
     this._updateTimer -= UPDATE_RATE;
 
     UpdateRope();
-    this._boneManager.RecomputeNormals();
   }
 
   private void LateUpdate()
@@ -149,6 +148,7 @@ public class CwaffRopeMesh : MonoBehaviour
       segLength: this._segLength, deltaTime: UPDATE_RATE);
     // ropesimWatch.Stop(); System.Console.WriteLine($"    {ropesimWatch.ElapsedTicks,6} ticks ropesim of size {this._ropePoints.Count}");
     this._boneManager.ReplaceBones(this._ropePoints);
+    this._boneManager.RecomputeNormals();
     if (this._lockThreshold > 0f)
     {
       float maxMovement = 0.0f;

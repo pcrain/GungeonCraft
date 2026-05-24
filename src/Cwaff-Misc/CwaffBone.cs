@@ -252,6 +252,10 @@ public class CwaffBoneManager : BraveBehaviour
           if (i == totalSpritesToDraw - 1 && lastBoneIndex % numSubtilesInSprite != 0)
             lastSubtileIndex = lastBoneIndex % numSubtilesInSprite - 1;
           float numSpritesDrawn = 0f;
+          float nextWorldX1 = (nextBoneX + (nextNormX * ssy0));
+          float nextWorldY1 = (nextBoneY + (nextNormY * ssy0));
+          float nextWorldX2 = (nextBoneX + (nextNormX * ssy2));
+          float nextWorldY2 = (nextBoneY + (nextNormY * ssy2));
           for (int j = 0; j <= lastSubtileIndex; j++)
           {
             curBone   = nextBone;
@@ -279,32 +283,32 @@ public class CwaffBoneManager : BraveBehaviour
             float maxUVx = ssuv2x + ssuvdxMax * maxT;
             float maxUVy = ssuv2y + ssuvdyMax * maxT;
 
-            ppos->x = (curBoneX + (curNormX * ssy0));
-            ppos->y = (curBoneY + (curNormY * ssy0));
+            ppos->x = nextWorldX1;
+            ppos->y = nextWorldY1;
             ppos->z = 0;
             ++ppos;
             puv->x  = minUVx;
             puv->y  = minUVy;
             ++puv;
 
-            ppos->x = (nextBoneX + (nextNormX * ssy1));
-            ppos->y = (nextBoneY + (nextNormY * ssy1));
+            ppos->x = nextWorldX1 = (nextBoneX + (nextNormX * ssy1));
+            ppos->y = nextWorldY1 = (nextBoneY + (nextNormY * ssy1));
             ppos->z = 0;
             ++ppos;
             puv->x  = maxUVx;
             puv->y  = minUVy;
             ++puv;
 
-            ppos->x = (curBoneX + (curNormX * ssy2));
-            ppos->y = (curBoneY + (curNormY * ssy2));
+            ppos->x = nextWorldX2;
+            ppos->y = nextWorldY2;
             ppos->z = 0;
             ++ppos;
             puv->x  = minUVx;
             puv->y  = maxUVy;
             ++puv;
 
-            ppos->x = (nextBoneX + (nextNormX * ssy3));
-            ppos->y = (nextBoneY + (nextNormY * ssy3));
+            ppos->x = nextWorldX2 = (nextBoneX + (nextNormX * ssy3));
+            ppos->y = nextWorldY2 = (nextBoneY + (nextNormY * ssy3));
             ppos->z = 0;
             ++ppos;
             puv->x  = maxUVx;
