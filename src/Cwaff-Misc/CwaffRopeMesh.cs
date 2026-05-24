@@ -8,6 +8,8 @@ public class CwaffRopeMesh : MonoBehaviour
   private const float UPDATE_RATE = 1.0f / 60.0f; // seconds between rope updates (needs to be fixed due to verlet integration)
   private const float SEGLENGTH   = 0.25f; // should always be 1/4 since sprites are divided into 4 subtiles
 
+  private static readonly FieldInfo _PointsBackingArray = typeof(List<Vector2>).GetField("_items", BindingFlags.NonPublic | BindingFlags.Instance);
+
   public tk2dSpriteAnimationClip animation;
   public Vector2 startPos;
   public Vector2 endPos;
@@ -17,6 +19,8 @@ public class CwaffRopeMesh : MonoBehaviour
 
   private List<Vector2> _ropePrevPoints;
   private List<Vector2> _ropePoints;
+  private Vector2[] _ropePrevPointsBacking;
+  private Vector2[] _ropePointsBacking;
   private float _segLength;
   private float _updateTimer;
   private StretchPolicy _stretchPolicy;
@@ -24,6 +28,7 @@ public class CwaffRopeMesh : MonoBehaviour
   private int _numSegments;
   private float _lockThreshold; // if > 0, locks the rope once it's stopped moving
   private CwaffBoneManager _boneManager;
+  private int _cachedCapacity = -1;
 
   public static CwaffRopeMesh Create(tk2dSpriteAnimationClip animation, Vector2 startPos, Vector2 endPos, int numSegments,
     string name = null, StretchPolicy stretchPolicy = StretchPolicy.STRETCH)
@@ -133,11 +138,16 @@ public class CwaffRopeMesh : MonoBehaviour
       default:
         break;
     }
-    // System.Diagnostics.Stopwatch ropesimeWatch = System.Diagnostics.Stopwatch.StartNew();
-    RopeSim.SimulateRope(curStartPos, curEndPos, this._ropePoints, this._ropePrevPoints, segLength: this._segLength, deltaTime: UPDATE_RATE);
-    // ropesimeWatch.Stop(); System.Console.WriteLine($"    {ropesimeWatch.ElapsedTicks,6} ticks ropesim of size {this._ropePoints.Count}");
-    // for (int j = 0; j < this._ropePoints.Count; j++)
-    //   this._boneManager.RentBone(this._ropePoints[j]);
+    // System.Diagnostics.Stopwatch ropesimWatch = System.Diagnostics.Stopwatch.StartNew();
+    if (this._cachedCapacity != this._ropePoints.Capacity)
+    {
+      this._ropePrevPointsBacking = (Vector2[])_PointsBackingArray.GetValue(this._ropePrevPoints);
+      this._ropePointsBacking = (Vector2[])_PointsBackingArray.GetValue(this._ropePoints);
+      this._cachedCapacity = this._ropePoints.Capacity;
+    }
+    RopeSim.SimulateRope(curStartPos, curEndPos, this._ropePointsBacking, this._ropePrevPointsBacking, numPoints: this._ropePoints.Count,
+      segLength: this._segLength, deltaTime: UPDATE_RATE);
+    // ropesimWatch.Stop(); System.Console.WriteLine($"    {ropesimWatch.ElapsedTicks,6} ticks ropesim of size {this._ropePoints.Count}");
     this._boneManager.ReplaceBones(this._ropePoints);
     if (this._lockThreshold > 0f)
     {
@@ -170,78 +180,91 @@ public static class RopeSim
     /// the list of previous and current intermediate rope points with the specified physics parameters. Uses
     /// default physics parameters if nothing is passed.
     /// </summary>
-    public static void SimulateRope(Vector2 start, Vector2 end, List<Vector2> points, List<Vector2> prevPoints, float segLength = 100.0f, float deltaTime = 1.0f / 60.0f,
+    public static void SimulateRope(Vector2 start, Vector2 end, Vector2[] pointsArray, Vector2[] prevPointsArray, int numPoints, float segLength = 100.0f, float deltaTime = 1.0f / 60.0f,
       int verletIters = DEFAULT_VERLET_ITERATIONS, float damping = DEFAULT_DAMPING, float gravX = DEFAULT_GRAVITY_X, float gravY = DEFAULT_GRAVITY_Y)
     {
         const float VERLET_THRESHOLD = 0.01f; // if no point moves more than this much, end verlet iteration early
-
-        // setup config
-        int last           = points.Count - 1;
-        int secondlast     = last - 1;
-        float segLengthSqr = segLength * segLength;
-        float thresholdLength = segLength + VERLET_THRESHOLD;
+        // set up some local constants
+        int last                 = numPoints - 1;
+        int secondlast           = last - 1;
+        float segLengthSqr       = segLength * segLength;
+        float thresholdLength    = segLength + VERLET_THRESHOLD;
         float thresholdLengthSqr = thresholdLength * thresholdLength;
-
-        // do verlet integration
-        float dt2         = deltaTime * deltaTime;
-        Vector2 sqrdtgrav = new Vector2(dt2 * gravX, dt2 * gravY);
-        for (int i = 1; i < last; i++)
+        float dt2                = deltaTime * deltaTime;
+        float sqrdtgravX         = dt2 * gravX;
+        float sqrdtgravY         = dt2 * gravY;
+        pointsArray[0]           = prevPointsArray[0]    = start; // pin start
+        pointsArray[last]        = prevPointsArray[last] = end;   // pin end
+        unsafe
         {
-            Vector2 velocity = (points[i] - prevPoints[i]) * damping;
-            prevPoints[i] = points[i];
-            points[i] += velocity + sqrdtgrav;
-        }
-
-        // pin endpoints
-        points[0]    = prevPoints[0]    = start;
-        points[last] = prevPoints[last] = end;
-
-        // constraint solve with optimized math
-        float d2, dx, dy, invD, dirX, dirY;
-        bool doneEarly;
-        for (int it = 0; it != verletIters; it++)
-        {
-            doneEarly = true;
-
-            dx = points[1].x - points[0].x;
-            dy = points[1].y - points[0].y;
-            d2 = dx * dx + dy * dy;
-            if (d2 > segLengthSqr)
+            fixed (Vector2* points = pointsArray)
+            fixed (Vector2* prev = prevPointsArray)
             {
-              invD      = 1f - segLength / Mathf.Sqrt(d2);
-              points[1] = new Vector2(points[1].x - invD * dx, points[1].y - invD * dy);
-            }
-
-            for (int i = 1; i != secondlast; i++)
-            {
-                dx = points[i + 1].x - points[i].x;
-                dy = points[i + 1].y - points[i].y;
-                d2 = dx * dx + dy * dy;
-                if (d2 > segLengthSqr)
+                float d2, dx, dy, vx, vy, invD, dirX, dirY;
+                Vector2* b, p;
+                bool doneEarly;
+                // verlet integration
+                for (int i = 1; i < last; ++i)
                 {
-                  if (d2 > thresholdLengthSqr)
-                      doneEarly = false;
-                  invD          = 0.5f * (1f - segLength / Mathf.Sqrt(d2));
-                  dirX          = invD * dx;
-                  dirY          = invD * dy;
-                  points[i]     = new Vector2(points[i].x + dirX, points[i].y + dirY);
-                  points[i + 1] = new Vector2(points[i + 1].x - dirX, points[i + 1].y - dirY);
+                    p    = points + i;
+                    b    = prev + i;
+                    vx   = (p->x - b->x) * damping;
+                    vy   = (p->y - b->y) * damping;
+                    *b   = *p;
+                    p->x += vx + sqrdtgravX;
+                    p->y += vy + sqrdtgravY;
+                }
+                // constraint solve with optimized math
+                for (int it = 0; it != verletIters; it++)
+                {
+                    doneEarly = true;
+                    b         = points;
+                    p         = points + 1;
+                    dx        = p->x - b->x;
+                    dy        = p->y - b->y;
+                    d2        = dx * dx + dy * dy;
+                    if (d2 > segLengthSqr)
+                    {
+                      invD = 1f - segLength / Mathf.Sqrt(d2);
+                      p->x -= invD * dx;
+                      p->y -= invD * dy;
+                    }
+                    for (int i = 1; i != secondlast; i++)
+                    {
+                        b  = p;
+                        p  += 1;
+                        dx = p->x - b->x;
+                        dy = p->y - b->y;
+                        d2 = dx * dx + dy * dy;
+                        if (d2 > segLengthSqr)
+                        {
+                          if (d2 > thresholdLengthSqr)
+                              doneEarly = false; // speedup + avoids stretching the rope at the beginning
+                          invD = 0.5f * (1f - segLength / Mathf.Sqrt(d2));
+                          dirX = invD * dx;
+                          dirY = invD * dy;
+                          b->x += dirX;
+                          b->y += dirY;
+                          p->x -= dirX;
+                          p->y -= dirY;
+                        }
+                    }
+                    b  = p;
+                    p  += 1;
+                    dx = p->x - b->x;
+                    dy = p->y - b->y;
+                    d2 = dx * dx + dy * dy;
+                    if (d2 > segLengthSqr)
+                    {
+                      invD = 1f - segLength / Mathf.Sqrt(d2);
+                      b->x += invD * dx;
+                      b->y += invD * dy;
+                    }
+                    if (doneEarly)
+                      return; // early break if few adjustments needed to be made
                 }
             }
-
-            dx = points[last].x - points[secondlast].x;
-            dy = points[last].y - points[secondlast].y;
-            d2 = dx * dx + dy * dy;
-            if (d2 > segLengthSqr)
-            {
-              invD               = 1f - segLength / Mathf.Sqrt(d2);
-              points[secondlast] = new Vector2(points[secondlast].x + invD * dx, points[secondlast].y + invD * dy);
-            }
-
-            if (doneEarly)
-              return; // early break if few adjustments needed to be made
         }
-
         return;
     }
 }
