@@ -193,8 +193,6 @@ public static class RopeSim
         float dt2                = deltaTime * deltaTime;
         float sqrdtgravX         = dt2 * gravX;
         float sqrdtgravY         = dt2 * gravY;
-        pointsArray[0]           = prevPointsArray[0]    = start; // pin start
-        pointsArray[last]        = prevPointsArray[last] = end;   // pin end
         unsafe
         {
             fixed (Vector2* points = pointsArray)
@@ -203,6 +201,13 @@ public static class RopeSim
                 float d2, dx, dy, vx, vy, invD, dirX, dirY;
                 Vector2* b, p;
                 bool doneEarly;
+                // pin endpoints
+                points->x = prev->x = start.x;
+                points->y = prev->y = start.y;
+                p         = points + last;
+                b         = prev + last;
+                p->x      = b->x = end.x;
+                p->y      = b->y = end.y;
                 // verlet integration
                 for (int i = 1; i < last; ++i)
                 {
