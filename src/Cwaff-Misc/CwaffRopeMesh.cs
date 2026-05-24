@@ -61,7 +61,7 @@ public class CwaffRopeMesh : MonoBehaviour
 
   public void LockWhenStationary(float threshold = 0.01f, bool keepAnimating = false)
   {
-    this._lockThreshold = threshold;
+    this._lockThreshold = threshold * threshold;
     this.animateWhileLocked = keepAnimating;
   }
 
@@ -149,14 +149,15 @@ public class CwaffRopeMesh : MonoBehaviour
     // ropesimWatch.Stop(); System.Console.WriteLine($"    {ropesimWatch.ElapsedTicks,6} ticks ropesim of size {this._ropePoints.Count}");
     this._boneManager.ReplaceBones(this._ropePoints);
     this._boneManager.RecomputeNormals();
-    if (this._lockThreshold > 0f)
-    {
-      float maxMovement = 0.0f;
-      for (int i = this._ropePoints.Count - 1; i >= 0; --i)
-        maxMovement = Mathf.Max(maxMovement, (this._ropePoints[i] - this._ropePrevPoints[i]).sqrMagnitude);
-      if (maxMovement <= (this._lockThreshold * this._lockThreshold))
-        this.locked = true;
-    }
+    if (this._lockThreshold <= 0f)
+      return;
+
+    // check if we need to lock further updates
+    for (int i = this._ropePoints.Count - 1; i >= 0; --i)
+      if ((this._ropePoints[i] - this._ropePrevPoints[i]).sqrMagnitude > this._lockThreshold)
+        return;
+
+    this.locked = true; // if we didn't find a rope segment with square movement higher than this._lockThreshold, lock further updates
   }
 }
 
