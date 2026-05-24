@@ -32,7 +32,8 @@ public class Alligator : CwaffGun
     {
         Lazy.SetupGun<Alligator>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 2.0f, ammo: 300, shootFps: 20, reloadFps: 16,
-            muzzleVFX: "muzzle_alligator", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 50f,
+            muzzleVFX: "muzzle_alligator", muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 5.0f,
+            muzzleEmissionColorPower: 10.0f, muzzleEmissionColor: new Color(0.85f, 0.85f, 0.9f), muzzleEmissionSensitivity: 0.75f,
             fireAudio: "alligator_shoot_sound", reloadAudio: "alligator_reload_sound", dynamicBarrelOffsets: true)
           .AddDualWieldSynergy(Synergy.CABLE_MANAGEMENT)
           .Attach<AlligatorAmmoDisplay>()

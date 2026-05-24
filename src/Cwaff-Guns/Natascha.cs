@@ -21,8 +21,8 @@ public class Natascha : CwaffGun
         Lazy.SetupGun<Natascha>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 1500,
             shootFps: (int)((float)_FIRE_ANIM_FRAMES / _BASE_COOLDOWN) + 1, rampUpFireRate: true,
-            muzzleVFX: "muzzle_natascha", muzzleFps: 60, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmissionColor: Color.white,
-            muzzleLightStrength: 15.0f, muzzleLightRange: 0.375f, muzzleEmission: 34.77f, muzzleEmissionColorPower: 24.9f)
+            muzzleVFX: "muzzle_natascha", muzzleFps: 60, muzzleScale: 0.3f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmissionColor: new Color(0.95f, 0.95f, 0.95f),
+            muzzleLightStrength: 15.0f, muzzleLightRange: 0.375f, muzzleEmission: 12.0f, muzzleEmissionColorPower: 12.0f, muzzleEmissionSensitivity: 0.85f)
           .Attach<NataschaAmmoDisplay>()
           .SetCasing(Items.Ak47)
           .AddToShop(ItemBuilder.ShopType.Trorc)

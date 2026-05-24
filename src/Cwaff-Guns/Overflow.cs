@@ -34,7 +34,8 @@ public class Overflow : CwaffGun
         Lazy.SetupGun<Overflow>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 250, shootFps: 60, reloadFps: 4,
             fireAudio: "overflow_shoot_sound", rampUpFireRate: true, modulesAreTiers: true, muzzleVFX: "muzzle_overflow", muzzleFps: 120,
-            muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 10f)
+            muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, muzzleEmission: 20.0f, muzzleEmissionColorPower: 10.0f,
+            muzzleEmissionColor: new Color(0.55f, 0.55f, 0.95f), muzzleEmissionSensitivity: 0.5f)
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .Attach<OverflowAmmoDisplay>()
           .AssignGun(out Gun gun)

@@ -21,6 +21,7 @@
 - Fixed index out of range exception caused by Chroma, Sunderbuss, and Stereoscope failing to look up sprite palette information for modded enemies
 - Improved lighting on trails for projectiles from Aimu Hakurei, Fuel Rod Gun, and Gadulo
 - Improved lighting on impact VFX for Retina, Ki Blast, Wavefront, Heartbreaker, Gradius, Gadulo, Aimu Hakurei, and Jugglernaut
+- Improved lighting on muzzle VFX for Alyx, Natascha, Overflow, Platinum Star, Wavefront, and Alligator
 
 ## 1.31.0 (2026-05-20)
 

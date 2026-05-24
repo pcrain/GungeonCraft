@@ -222,7 +222,7 @@ public static class VFX
         IntVector2? dimensions = null, bool usesZHeight = false, float zHeightOffset = 0, bool persist = false, VFXAlignment alignment = VFXAlignment.NormalAligned,
         float emissivePower = -1, Color? emissiveColour = null, bool orphaned = false, bool attached = true, bool unlit = false,
         float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveColorPower = -1f, float lightFadeTime = 0f,
-        bool useBetterEmission = true, float emissiveSensitivity = 0.5f)
+        float emissiveSensitivity = 0.5f)
     {
         RegisterVFX(
             name           : name,
@@ -248,7 +248,7 @@ public static class VFX
             emissiveColorPower: emissiveColorPower,
             lightFadeTime: lightFadeTime,
             emissiveSensitivity: emissiveSensitivity,
-            useBetterEmission : useBetterEmission
+            useBetterEmission : true
             );
         return vfxpool[name];
     }

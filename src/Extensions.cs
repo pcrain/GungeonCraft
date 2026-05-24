@@ -864,7 +864,7 @@ public static class Extensions
   }
   public static Gun SetMuzzleVFX(this Gun gun, string resPath = null, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft,
     bool orphaned = false, float emissivePower = -1, float emissiveColorPower = -1f, Color? emissiveColor = null, bool continuous = false, bool unlit = true,
-    float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null)
+    float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveSensitivity = 0.5f)
   {
     if (string.IsNullOrEmpty(resPath))
     {
@@ -874,7 +874,7 @@ public static class Extensions
 
     gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
       loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower, emissiveColour: emissiveColor,
-      emissiveColorPower: emissiveColorPower, unlit: unlit, lightStrength: lightStrength, lightRange: lightRange, lightColor: lightColor, useBetterEmission: false);
+      emissiveColorPower: emissiveColorPower, unlit: unlit, lightStrength: lightStrength, lightRange: lightRange, lightColor: lightColor, emissiveSensitivity: emissiveSensitivity);
     gun.usesContinuousMuzzleFlash = continuous;
     return gun;
   }
@@ -1041,6 +1041,7 @@ public static class Extensions
   /// <param name="canAttackWhileRolling">If true, the gun can be fired while dodge rolling.</param>
   /// <param name="isStarterGun">If true, the gun is marked as a starter gun for Paradox / achievement purposes.</param>
   /// <param name="preventDuctTape">If true, prevents Duct Tape from being used on this item.</param>
+  /// <param name="muzzleEmissionSensitivity">The emissive sensitivity of the lighting produced by the muzzle.</param>
   public static Gun SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
@@ -1050,7 +1051,7 @@ public static class Extensions
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
     bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f, bool canAttackWhileRolling = false,
-    bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f, bool preventDuctTape = false)
+    bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f, bool preventDuctTape = false, float muzzleEmissionSensitivity = 0.5f)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -1146,6 +1147,7 @@ public static class Extensions
         emissivePower      : muzzleEmission,
         emissiveColor      : muzzleEmissionColor,
         emissiveColorPower : muzzleEmissionColorPower,
+        emissiveSensitivity: muzzleEmissionSensitivity,
         loops              : false,
         orphaned           : false,
         continuous         : false,
