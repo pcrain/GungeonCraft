@@ -190,54 +190,135 @@ public class CwaffBoneManager : BraveBehaviour
 
   private void SetTiledSpriteGeom(Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
   {
-    int spritePixelLength = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
-    int numSubtilesInSprite = spritePixelLength / _SUBTILE_PIXEL_LENGTH;
-    int lastBoneIndex = Mathf.Max(_bones.Count - 1, 0);
-    int totalSpritesToDraw = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
     boundsCenter = 0.5f * (_maxBonePosition + _minBonePosition);
     boundsExtents = 0.5f * (_maxBonePosition - _minBonePosition);
-    int animationFrame = Mathf.FloorToInt(Mathf.Repeat(_globalTimer * _animation.fps, _animation.frames.Length));
-    tk2dSpriteAnimationFrame frame = _animation.frames[animationFrame];
+    if (_bones.Count < 2)
+      return;
+
+    // System.Diagnostics.Stopwatch geomWatch = System.Diagnostics.Stopwatch.StartNew();
+
+    int spritePixelLength              = Mathf.RoundToInt(spriteDef.untrimmedBoundsDataExtents.x / spriteDef.texelSize.x);
+    int numSubtilesInSprite            = spritePixelLength / _SUBTILE_PIXEL_LENGTH;
+    int lastBoneIndex                  = _bones.Count - 1;
+    int lastSubtileIndex               = numSubtilesInSprite - 1;
+    int totalSpritesToDraw             = Mathf.CeilToInt((float)lastBoneIndex / (float)numSubtilesInSprite);
+    int animationFrame                 = Mathf.FloorToInt(Mathf.Repeat(_globalTimer * _animation.fps, _animation.frames.Length));
+    tk2dSpriteAnimationFrame frame     = _animation.frames[animationFrame];
     tk2dSpriteDefinition segmentSprite = frame.spriteCollection.spriteDefinitions[frame.spriteId];
+
     // precompute some common variables
-    float ssy0 = segmentSprite.position0.y;
-    float ssy1 = segmentSprite.position1.y;
-    float ssy2 = segmentSprite.position2.y;
-    float ssy3 = segmentSprite.position3.y;
-    Vector2 ssuv0 = segmentSprite.uvs[0];
-    Vector2 ssuv1 = segmentSprite.uvs[1];
-    Vector2 ssuv2 = segmentSprite.uvs[2];
-    Vector2 ssuv3 = segmentSprite.uvs[3];
+    float invSubW   = 1f / _spriteSubtileWidth;
+    float ssy0      = segmentSprite.position0.y;
+    float ssy1      = segmentSprite.position1.y;
+    float ssy2      = segmentSprite.position2.y;
+    float ssy3      = segmentSprite.position3.y;
+    Vector2 ssuv0   = segmentSprite.uvs[0];
+    Vector2 ssuv1   = segmentSprite.uvs[1];
+    Vector2 ssuv2   = segmentSprite.uvs[2];
+    Vector2 ssuv3   = segmentSprite.uvs[3];
+    float ssuv0x    = ssuv0.x;
+    float ssuv2x    = ssuv2.x;
+    float ssuv0y    = ssuv0.y;
+    float ssuv2y    = ssuv2.y;
+    float ssuvdxMin = ssuv1.x - ssuv0x;
+    float ssuvdxMax = ssuv3.x - ssuv2x;
+    float ssuvdyMin = ssuv1.y - ssuv0y;
+    float ssuvdyMax = ssuv3.y - ssuv2y;
+    float minBoneX  = _minBonePosition.x;
+    float minBoneY  = _minBonePosition.y;
+    float subSize   = 1f / numSubtilesInSprite;
+
     // handle actual vertex updating logic
-    int uvCurrent = offset;
     LinkedListNode<CwaffBone> bone = _bones.First;
-    for (int i = 0; i < totalSpritesToDraw; i++)
+    CwaffBone nextBone = bone.Value;
+    float nextBoneX    = nextBone.pos.x - minBoneX;
+    float nextBoneY    = nextBone.pos.y - minBoneY;
+    float nextNormX    = nextBone.normal.x;
+    float nextNormY    = nextBone.normal.y;
+    CwaffBone curBone;
+    float curBoneX;
+    float curBoneY;
+    float curNormX;
+    float curNormY;
+    unsafe
     {
-      int lastSubtileIndex = numSubtilesInSprite - 1;
-      if (i == totalSpritesToDraw - 1 && lastBoneIndex % numSubtilesInSprite != 0)
-        lastSubtileIndex = lastBoneIndex % numSubtilesInSprite - 1;
-      float numSpritesDrawn = 0f;
-      for (int j = 0; j <= lastSubtileIndex; j++)
+      fixed (Vector3* posPtr = pos)
+      fixed (Vector2* uvPtr = uv)
       {
-        float fractionOfSubtileToDraw = 1f;
-        CwaffBone curBone = bone.Value;
-        CwaffBone nextBone = bone.Next.Value;
-        if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex)
-          fractionOfSubtileToDraw = Vector2.Distance(nextBone.pos, curBone.pos);
-        Vector2 minUV = Vector2.Lerp(ssuv0, ssuv1, numSpritesDrawn);
-        Vector2 maxUV = Vector2.Lerp(ssuv2, ssuv3, numSpritesDrawn + fractionOfSubtileToDraw / numSubtilesInSprite);
-        pos[uvCurrent] = (curBone.pos  + curBone.normal  * ssy0 - _minBonePosition).ToVector3ZUp(0f);
-        uv[uvCurrent++] = minUV;
-        pos[uvCurrent] = (nextBone.pos + nextBone.normal * ssy1 - _minBonePosition).ToVector3ZUp(0f);
-        uv[uvCurrent++] = new Vector2(maxUV.x, minUV.y);
-        pos[uvCurrent] = (curBone.pos  + curBone.normal  * ssy2 - _minBonePosition).ToVector3ZUp(0f);
-        uv[uvCurrent++] = new Vector2(minUV.x, maxUV.y);
-        pos[uvCurrent] = (nextBone.pos + nextBone.normal * ssy3 - _minBonePosition).ToVector3ZUp(0f);
-        uv[uvCurrent++] = maxUV;
-        numSpritesDrawn += fractionOfSubtileToDraw / _spriteSubtileWidth;
-        bone = bone.Next;
+        Vector3* ppos = posPtr;
+        Vector2* puv  = uvPtr;
+        for (int i = 0; i < totalSpritesToDraw; i++)
+        {
+          if (i == totalSpritesToDraw - 1 && lastBoneIndex % numSubtilesInSprite != 0)
+            lastSubtileIndex = lastBoneIndex % numSubtilesInSprite - 1;
+          float numSpritesDrawn = 0f;
+          for (int j = 0; j <= lastSubtileIndex; j++)
+          {
+            curBone   = nextBone;
+            curBoneX  = nextBoneX;
+            curBoneY  = nextBoneY;
+            curNormX  = nextNormX;
+            curNormY  = nextNormY;
+            bone      = bone.Next;
+            nextBone  = bone.Value;
+            nextBoneX = nextBone.pos.x - minBoneX;
+            nextBoneY = nextBone.pos.y - minBoneY;
+            nextNormX = nextBone.normal.x;
+            nextNormY = nextBone.normal.y;
+
+            if (i == totalSpritesToDraw - 1 && j == lastSubtileIndex) // only happens on final iteration
+            {
+              float dx = nextBoneX - curBoneX;
+              float dy = nextBoneY - curBoneY;
+              subSize = Mathf.Sqrt(dx * dx + dy * dy) / numSubtilesInSprite;
+            }
+
+            float minUVx = ssuv0x + ssuvdxMin * numSpritesDrawn;
+            float minUVy = ssuv0y + ssuvdyMin * numSpritesDrawn;
+            float maxT   = numSpritesDrawn + subSize;
+            float maxUVx = ssuv2x + ssuvdxMax * maxT;
+            float maxUVy = ssuv2y + ssuvdyMax * maxT;
+
+            ppos->x = (curBoneX + (curNormX * ssy0));
+            ppos->y = (curBoneY + (curNormY * ssy0));
+            ppos->z = 0;
+            ++ppos;
+            puv->x  = minUVx;
+            puv->y  = minUVy;
+            ++puv;
+
+            ppos->x = (nextBoneX + (nextNormX * ssy1));
+            ppos->y = (nextBoneY + (nextNormY * ssy1));
+            ppos->z = 0;
+            ++ppos;
+            puv->x  = maxUVx;
+            puv->y  = minUVy;
+            ++puv;
+
+            ppos->x = (curBoneX + (curNormX * ssy2));
+            ppos->y = (curBoneY + (curNormY * ssy2));
+            ppos->z = 0;
+            ++ppos;
+            puv->x  = minUVx;
+            puv->y  = maxUVy;
+            ++puv;
+
+            ppos->x = (nextBoneX + (nextNormX * ssy3));
+            ppos->y = (nextBoneY + (nextNormY * ssy3));
+            ppos->z = 0;
+            ++ppos;
+            puv->x  = maxUVx;
+            puv->y  = maxUVy;
+            ++puv;
+
+            //NOTE: observation: the only time fractionOfSubtileToDraw isn't exactly 1 is in the very last iteration where numSpritesDrawn isn't used anyway
+            // numSpritesDrawn += fractionOfSubtileToDraw / _spriteSubtileWidth;
+            numSpritesDrawn += invSubW;
+          }
+        }
       }
     }
+    // geomWatch.Stop(); System.Console.WriteLine($"    {geomWatch.ElapsedTicks,6} ticks geom for {totalSpritesToDraw} sprites ({(geomWatch.ElapsedTicks / totalSpritesToDraw)} avg)");
   }
 
   public void SetStartAnimatedTiledSpriteGeom(Vector3[] pos, Vector2[] uv, int offset, out Vector3 boundsCenter, out Vector3 boundsExtents, tk2dSpriteDefinition spriteDef, Vector3 scale, Vector2 dimensions, tk2dBaseSprite.Anchor anchor, float colliderOffsetZ, float colliderExtentZ)
