@@ -1,28 +1,36 @@
 # Changelog
 
-## 1.31.1 (TBD)
+## 1.31.1 (2026-05-23)
 
-- Prevented Ignizol from trying to jump towards enemies behind walls
-- Fixed Holy Water Gun not actually dealing any extra damage to Jammed
+#### Balance Changes:
+
 - Reverted Holy Water Gun's damage to Jammed from 8x to 4x (which was only changed because it wasn't working in the first place)
-- Fixed Shotgun Kin's ghosts being completely red when exorcised with Holy Water Gun
-- Updated ghosts from Holy Water Gun's exorcisms to use proper shaders
-- Pre-scaled a few VFX sprites that were scaled-down in game to make them look a little nicer and save texture atlas space
-- Fixed null deref caused by Chain Driver's projectiles checking for their owner's synergies without a valid owner
-- Fixed Nightlighter's projectiles rendering as solid white glowing ropes when spawned from sources other than Nightlighter
 - Reduced fire rate on Fuel Rod Gun from 0.1 seconds to 0.5 seconds (rarely comes into play since clip size is 1)
-- Fixed Chain Driver's projectile turning invisible and becoming disconnected from its chain when switching guns
-- Fixed Nightlighter's projectiles being visually attached to the actual gun when fired by an orbiting gun from the Friend to Gun and Bullet synergy
 - Made Chain Driver no longer infinitely regenerate ammo when chains are disconnected
 - Increased Chain Driver's ammo from 1 to 200 to compensate
 - Decreased Cleansweeper's initial Minesweeper grid ammo cost from 20 to 10
 - Decreased Cleansweeper's regenerated Minesweeper grid ammo cost from 40 to 20
+
+#### Polish:
+
+- Updated ghosts from Holy Water Gun's exorcisms to use proper shaders
 - Synchronized position of Stereoscope's VFX with Stereoscope itself while the player is moving
-- Fixed index out of range exception caused by Chroma, Sunderbuss, and Stereoscope failing to look up sprite palette information for modded enemies
 - Improved lighting on trails for projectiles from Aimu Hakurei, Fuel Rod Gun, and Gadulo
 - Improved lighting on impact VFX for Retina, Ki Blast, Wavefront, Heartbreaker, Gradius, Gadulo, Aimu Hakurei, and Jugglernaut
 - Improved lighting on muzzle VFX for Alyx, Natascha, Overflow, Platinum Star, Wavefront, and Alligator
-- Improved lighting on VFX for Camping Supplies' campfire, Fuel Rod Gun's ammo cells
+- Improved lighting on VFX for Camping Supplies' campfire and Fuel Rod Gun's ammo cells
+- Pre-scaled a few VFX sprites that were scaled-down in game to make them look a little nicer and save texture atlas space
+
+#### Bugfixes and Misc:
+
+- Fixed Holy Water Gun not actually dealing any extra damage to Jammed
+- Fixed Nightlighter's projectiles rendering as solid white glowing ropes when spawned from sources other than Nightlighter
+- Fixed Nightlighter's projectiles being visually attached to the actual gun when fired by an orbiting gun from the Friend to Gun and Bullet synergy
+- Fixed Chain Driver's projectile turning invisible and becoming disconnected from its chain when switching guns
+- Fixed Shotgun Kin's ghosts being completely red when exorcised with Holy Water Gun
+- Fixed index out of range exception caused by Chroma, Sunderbuss, and Stereoscope failing to look up sprite palette information for modded enemies
+- Fixed null deref caused by Chain Driver's projectiles checking for their owner's synergies without a valid owner
+- Prevented Ignizol from trying to jump towards enemies behind walls
 
 ## 1.31.0 (2026-05-20)
 
