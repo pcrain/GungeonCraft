@@ -34,12 +34,12 @@ public class CampingSupplies : CwaffPassive
 
         _SmokePrefab     = ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof") as GameObject;
         _BonfirePrefab   = (ItemHelper.Get(Items.GunSoul) as ExtraLifeItem).BonfireSynergyBonfire;
-        _CampfirePrefabs = new GameObject[]{
-            VFX.Create("campfire_a", fps: 8, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 0.1f), // level 0 (unused)
-            VFX.Create("campfire_b", fps: 8, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 0.5f), // level 1
-            VFX.Create("campfire_c", fps: 8, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 1.0f), // level 2
-            VFX.Create("campfire_d", fps: 8, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 2.0f), // level 3
-        };
+        _CampfirePrefabs = new GameObject[4];
+
+        List<string> fires = ["campfire_a", "campfire_b", "campfire_c", "campfire_d"];
+        for (int i = 0; i < 4; ++i)
+            _CampfirePrefabs[i] = VFX.Create(fires[i], fps: 8, anchor: Anchor.LowerCenter, scale: 0.5f, emissivePower: 10.0f, emissiveColorPower: 10.0f,
+              emissiveColour: new Color(1.0f, 1.0f, 0.2f), useBetterEmission: true);
 
         _SodaCanPrefabs  = new GameObject[] {
             VFX.Create("can_of_coke",   scale: 0.5f),

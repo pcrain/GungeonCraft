@@ -22,6 +22,7 @@
 - Improved lighting on trails for projectiles from Aimu Hakurei, Fuel Rod Gun, and Gadulo
 - Improved lighting on impact VFX for Retina, Ki Blast, Wavefront, Heartbreaker, Gradius, Gadulo, Aimu Hakurei, and Jugglernaut
 - Improved lighting on muzzle VFX for Alyx, Natascha, Overflow, Platinum Star, Wavefront, and Alligator
+- Improved lighting on VFX for Camping Supplies' campfire, Fuel Rod Gun's ammo cells
 
 ## 1.31.0 (2026-05-20)
 

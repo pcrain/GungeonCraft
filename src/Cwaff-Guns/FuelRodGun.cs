@@ -45,19 +45,23 @@ public class FuelRodGun : CwaffGun
 
         // WATER
         _Rods.Add(baseProj.Clone(GunData.New(sprite: "fuel_rod_cannon_projectile_water")).MakeFuelRodProjectile(goop: EasyGoopDefinitions.WaterGoop));
-        _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_water", emissivePower: 100f));
+        _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_water", emissivePower: 10.0f, emissiveColorPower: 5.0f, emissiveSensitivity: 0.1f,
+          emissiveColour: new Color(0.0f, 0.5f, 1.0f), useBetterEmission: true));
         _AmmoSprites.Add(Lazy.SetupCustomAmmoClip("fuel_rod_gun_water"));
         // EXPLOSIVE
         _Rods.Add(baseProj.Clone(GunData.New(sprite: "fuel_rod_cannon_projectile_fire")).MakeFuelRodProjectile(power: 2.0f));
-        _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_fire", emissivePower: 100f));
+        _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_fire", emissivePower: 10.0f, emissiveColorPower: 5.0f, emissiveSensitivity: 0.1f,
+          emissiveColour: new Color(1.0f, 0.0f, 0.0f), useBetterEmission: true));
         _AmmoSprites.Add(Lazy.SetupCustomAmmoClip("fuel_rod_gun_fire"));
         // OIL
         _Rods.Add(baseProj.Clone(GunData.New(sprite: "fuel_rod_cannon_projectile_oil")).MakeFuelRodProjectile(goop: EasyGoopDefinitions.OilDef));
-        _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_oil", emissivePower: 100f));
+        _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_oil", emissivePower: 10.0f, emissiveColorPower: 5.0f, emissiveSensitivity: 0.1f,
+          emissiveColour: new Color(0.5f, 0.0f, 1.0f), useBetterEmission: true));
         _AmmoSprites.Add(Lazy.SetupCustomAmmoClip("fuel_rod_gun_oil"));
         // POISON
         _Rods.Add(baseProj.Clone(GunData.New(sprite: "fuel_rod_cannon_projectile_poison")).MakeFuelRodProjectile(goop: EasyGoopDefinitions.PoisonDef));
-        _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_poison", emissivePower: 100f));
+        _AmmoCells.Add(VFX.Create("fuel_rod_cannon_ammo_poison", emissivePower: 10.0f, emissiveColorPower: 5.0f, emissiveSensitivity: 0.1f,
+          emissiveColour: new Color(0.9f, 0.9f, 0.0f), useBetterEmission: true));
         _AmmoSprites.Add(Lazy.SetupCustomAmmoClip("fuel_rod_gun_poison"));
     }
 
