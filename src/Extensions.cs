@@ -4012,4 +4012,12 @@ public static class Extensions
   {
     return beam.Origin + beam.Direction.normalized * beam.m_currentBeamDistance;
   }
+
+  //WARNING: this is very very very rarely worth is, the JIT will do this better 99 times out of 100. i've tried using this twice and it's worse
+  /// <summary>Get underlying backing array for a list</summary>
+  public static T[] GetBackingArray<T>(this List<T> list)
+  {
+      FieldInfo itemsField = typeof(List<T>).GetField("_items", BindingFlags.NonPublic | BindingFlags.Instance);
+      return (T[])itemsField.GetValue(list);
+  }
 }
