@@ -21,8 +21,6 @@ public class C // constants and common variables
 
 public static class ResMap // Resource map from PNG stem names to lists of paths to all PNGs with those names (i.e., animation frames)
 {
-    private static Regex _NumberAtEnd = new Regex(@"^(.*?)(_?)([0-9]+)$",
-      RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static Dictionary<string, List<string>> _ResMap = new();
 
     // Gets a list of resource paths with numbered sprites from the resource's base name
@@ -54,22 +52,26 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
         // Get the name of each PNG resource and stuff it into a sorted array by its index number
         foreach(string s in AtlasHelper._PackedTextures.Keys)
         {
-            Match match = _NumberAtEnd.Match(s);
+            int ci = s.Length - 1;
+            char lastChar = s[ci];
             // If we aren't numbered at the end, we're just a singular sprite
-            if (!match.Success)
+            if (lastChar < '0' || lastChar > '9')
             {
-                string baseName = s.Substring(s.LastIndexOf('.') + 1);
-                if (!tempMap.ContainsKey(baseName))
-                    tempMap[baseName] = new string[1];
-                tempMap[baseName][0] = s.Replace('.','/');
+                _ResMap[s] = new List<string>{s};
                 continue;
             }
-            string name = match.Groups[1].Value;
-            if (name.Length == 0)
-                continue; // don't allow 0-length keys
-            int index = Int32.Parse(match.Groups[3].Value);
-            if (index == 0)
-                continue; // don't allow 0 for an index
+            // Parse the number at the end of the string
+            int index = 0;
+            int mult = 1;
+            while (lastChar >= '0' && lastChar <= '9')
+            {
+              index += mult * (int)(lastChar - '0');
+              mult *= 10;
+              lastChar = s[--ci];
+            }
+            if (s[ci] == '_')
+              --ci; // the last underscore isn't a part of the sprite name proper
+            string name = s.Substring(0, ci + 1);
             if (!tempMap.ContainsKey(name))
                 tempMap[name] = new string[index];
             if (index > tempMap[name].Length)
@@ -78,7 +80,7 @@ public static class ResMap // Resource map from PNG stem names to lists of paths
                 Array.Resize(ref arr, index);
                 tempMap[name] = arr;
             }
-            tempMap[name][index - 1] = s.Replace('.','/');
+            tempMap[name][index - 1] = s;
         }
 
         // Convert our arrays to lists
