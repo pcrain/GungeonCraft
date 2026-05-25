@@ -8,8 +8,11 @@ public class Nightlighter : CwaffGun
     public static string Lore             = "The LED light string is an iconic staple of many a festivity and celebration. They're cheap, pretty, and easy to set up...at least the first time. When it comes time to tear them down, they have a propensity for magically tangling themselves up and becoming impossible to untangle the next time you want to use them. At least you can put this magical self-tangling to use in the Gungeon.";
 
     internal static tk2dSpriteAnimationClip _LightString = null;
+    internal static tk2dSpriteAnimationClip _ShinyLightString = null;
 
     internal static Projectile _NightlighterProjectile = null;
+
+    internal static bool _UseFancyLights = false;
 
     public static void Init()
     {
@@ -28,6 +31,7 @@ public class Nightlighter : CwaffGun
           .Assign(out _NightlighterProjectile);
 
         _LightString = VFX.Create("nightlighter_light_string", fps: 12).DefaultAnimation();
+        _ShinyLightString = VFX.Create("nightlighter_light_string_shiny", fps: 12).DefaultAnimation();
     }
 
     public override void PostProcessProjectile(Projectile projectile)
@@ -79,6 +83,9 @@ public class LightString : MonoBehaviour
     private bool _mastered = false;
     private bool _setup = false;
     private bool _active = false;
+    private Material _mat = null;
+    private float _lifetime = 0.0f;
+    private bool _fancy = false;
 
     private static List<LightString> _ExtantChainsOnFloor = new();
     private static ListDictionary _Attachments = new();
@@ -119,11 +126,16 @@ public class LightString : MonoBehaviour
       if (this._mastered)
         proj.pierceMinorBreakables = true;
       Vector2 endPos              = anchorEnemy ? this._anchorEnemyBody.UnitCenter : (gun ? gun.gun.barrelOffset.transform.position : proj.SafeCenter);
+      this._fancy = Nightlighter._UseFancyLights;
       this._mesh                  = CwaffRopeMesh.Create(
-        animation: Nightlighter._LightString, startPos: endPos, endPos: endPos, numSegments: SEGMENTS,
-        stretchPolicy: CwaffingTheGungy.RopeSim.StretchPolicy.GROWPERMANENT);
+        animation: this._fancy ? Nightlighter._ShinyLightString : Nightlighter._LightString, startPos: endPos, endPos: endPos,
+        numSegments: SEGMENTS, stretchPolicy: CwaffingTheGungy.RopeSim.StretchPolicy.GROWPERMANENT);
       this._mesh.sprite.HeightOffGround = -10f; // draw behind most things
-      this._mesh.sprite.SetGlowiness(50f, glowColor: Color.white, glowColorPower: 10f);
+      if (this._fancy)
+        this._mesh.sprite.MakeGlowyBetter(glowAmount: 10.0f, glowColorPower: 10.0f, sensitivity: 0.125f);
+      else
+        this._mesh.sprite.SetGlowiness(50f, glowColor: Color.white, glowColorPower: 10f);
+      this._mat = this._mesh.sprite.renderer.material;
       this._active                = true;
       this._setup                 = true;
     }
@@ -204,10 +216,33 @@ public class LightString : MonoBehaviour
         rigidbody.Velocity *= _SPEED_MULT_PER_CHAIN;
     }
 
+    private static readonly List<Color> _ColorsPerFrame = [
+      new Color(1.00f, 0.45f, 0.40f),
+      new Color(1.00f, 0.50f, 0.25f),
+      new Color(1.00f, 0.85f, 0.00f),
+      new Color(0.40f, 1.00f, 0.35f),
+      new Color(0.60f, 0.85f, 1.00f),
+      new Color(1.00f, 0.45f, 1.00f),
+    ];
+
     private void LateUpdate()
     {
       const float DESPAWN_RADIUS = 30.0f;
       const float DESPAWN_RADIUS_SQR = DESPAWN_RADIUS * DESPAWN_RADIUS;
+      const float FPS = 5.0f;
+
+      float dtime = BraveTime.DeltaTime;
+      if (this._fancy)
+      {
+        this._lifetime += dtime;
+        float frame = FPS * this._lifetime;
+        int wholeFrame = (int)frame;
+        float brightness = frame - wholeFrame;
+        if (brightness > 0.5f)
+          brightness = 1.0f - brightness;
+        this._mat.SetFloat(CwaffVFX._EmissivePowerId, 50f * brightness);
+        this._mat.SetColor(CwaffVFX._EmissiveColorId, _ColorsPerFrame[wholeFrame % 6]);
+      }
 
       if (!this._active)
       {
@@ -227,7 +262,7 @@ public class LightString : MonoBehaviour
           UnityEngine.Object.Destroy(base.gameObject);
         return;
       }
-      if (!this._setup || BraveTime.DeltaTime == 0.0f || GameManager.Instance.IsPaused)
+      if (!this._setup || dtime == 0.0f || GameManager.Instance.IsPaused)
         return;
       if (this._anchoredToEnemy && (!this._anchorEnemy || !this._anchorEnemyBody || !this._anchorEnemyBody.enabled || this._anchorEnemy.IsGone || (this._anchorEnemy.healthHaver is HealthHaver hha && hha.IsDead)))
       {

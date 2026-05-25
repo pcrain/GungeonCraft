@@ -4,6 +4,8 @@
 
 - Updated Cleansweeper's description to match ammo changes introduced in previous update
 - Optimized code for rendering Chain Driver's and Nightlighter's rope projectiles so more can be on-screen without lagging the game
+- Made Nighlighter light strings have nicer looking LEDs
+- Added a config option to tone down Nightlighter's LEDs back to their original version
 
 ## 1.31.1 (2026-05-23)
 

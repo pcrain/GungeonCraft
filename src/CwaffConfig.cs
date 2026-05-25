@@ -8,6 +8,7 @@ public static class CwaffConfig
   internal const string _SECONDARY_RELOAD = "Secondary Reload Button";
   internal const string _SPICE_SHADERS = "Enable Spice Shaders";
   internal const string _BULLET_HELL_SHADERS = "Enable Bullet Hell Shaders";
+  internal const string _MUTED_NIGHTLIGHTER = "Reduce Nightlighter Visuals";
   internal const string _FUN_CHEST_SOUNDS = "Enable Fun Chest Sounds";
 
   public enum SecondaryReloadKey { None, Left, Right }
@@ -70,10 +71,14 @@ public static class CwaffConfig
 
     _Gunfig.AddToggle(_SPICE_SHADERS, enabled: true, callback: OnSpiceShadersChanged); //BUG: gunfig doesn't set the new value until AFTER the callback is called
     _Gunfig.AddToggle(_BULLET_HELL_SHADERS, enabled: true, callback: OnBulletHellShadersChanged); //BUG: gunfig doesn't set the new value until AFTER the callback is called
+    _Gunfig.AddToggle(_MUTED_NIGHTLIGHTER, enabled: false, callback: OnNightlighterVisualsChanged);
     _Gunfig.AddToggle(_FUN_CHEST_SOUNDS, enabled: false);
 
     // Make sure our initial keybind preferences are set up for seconday reload button
     OnSecondaryReloadChange(_SECONDARY_RELOAD, _Gunfig.Value(_SECONDARY_RELOAD));
+
+    // Initialize some variables
+    Nightlighter._UseFancyLights = CwaffConfig._Gunfig.Disabled(CwaffConfig._MUTED_NIGHTLIGHTER);
   }
 
   private static void OnSpiceShadersChanged(string key, string value)
@@ -84,6 +89,11 @@ public static class CwaffConfig
   private static void OnBulletHellShadersChanged(string key, string value)
   {
     CwaffShaders.CheckBulletHellShaders(enabled: value == "1");
+  }
+
+  private static void OnNightlighterVisualsChanged(string key, string value)
+  {
+    Nightlighter._UseFancyLights = value == "0";
   }
 
   private static void OnSecondaryReloadChange(string key, string value)
