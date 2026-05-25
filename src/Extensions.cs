@@ -2325,19 +2325,23 @@ public static class Extensions
   }
 
   /// <summary>Retrieves a field from within an enumerator</summary>
-  private static Regex rx_enum_field = new Regex(@"^<?([^>]+)(>__[0-9]+)?$", RegexOptions.Compiled);
+  private static string _SearchString = null;
+  private static bool EnumeratorFieldFinder(FieldInfo f)
+  {
+    string fname = f.Name;
+    if (fname == _SearchString)
+      return true;
+    if (fname[0] != '<')
+      return false;
+    int gtPos = fname.IndexOf('>');
+    int slen = _SearchString.Length;
+    return (gtPos > 0) && (gtPos - 1 == slen) && string.Compare(fname, 1, _SearchString, 0, slen) == 0;
+  }
+
   public static FieldInfo GetEnumeratorField(this Type t, string s)
   {
-      return AccessTools.GetDeclaredFields(t).Find(f => {
-          // ETGModConsole.Log($"{f.Name}");
-          foreach (Match match in rx_enum_field.Matches(f.Name))
-          {
-            // ETGModConsole.Log($"  {match.Groups[1].Value}");
-            if (match.Groups[1].Value == s)
-              return true;
-          }
-          return false;
-      });
+      _SearchString = s;
+      return AccessTools.GetDeclaredFields(t).Find(EnumeratorFieldFinder);
   }
 
   public static string GetEnumeratorFieldName(this Type t, string s)
