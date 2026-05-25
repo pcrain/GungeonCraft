@@ -2071,10 +2071,6 @@ public static class Extensions
       // default sprite should be the first frame of the idle animation
       gun.DefaultSpriteID = clips[0].frames[0].spriteId;
       gun.GetSprite().SetSprite(collection, gun.DefaultSpriteID);
-
-      Array.Resize(ref gun.spriteAnimator.Library.clips, gun.spriteAnimator.Library.clips.Length + clips.Count);
-      for(int i = 0; i < clips.Count; i++)
-          gun.spriteAnimator.Library.clips[gun.spriteAnimator.Library.clips.Length - clips.Count + i] = clips[i];
   }
 
   /// <summary>Faster version of the MtG API equivalent using our ResMap()</summary>
@@ -2090,15 +2086,9 @@ public static class Extensions
         wrapMode = returnToIdle ? tk2dSpriteAnimationClip.WrapMode.Once : default,
         frames   = collection.CreateAnimationFrames(frameNames),
       };
-
-      if(clipsToAddLater == null)
-      {
-          Array.Resize(ref gun.spriteAnimator.Library.clips, gun.spriteAnimator.Library.clips.Length + 1);
-          gun.spriteAnimator.Library.clips[gun.spriteAnimator.Library.clips.Length - 1] = clip;
-      }
-      else
+      gun.spriteAnimator.Library.clips[Lazy._CurrentGunClips++] = clip;
+      if(clipsToAddLater != null)
           clipsToAddLater.Add(clip);
-
       return clipName;
   }
 

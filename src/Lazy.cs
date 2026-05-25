@@ -230,6 +230,27 @@ public static class Lazy
         return gun;
     }
 
+    internal static int _CurrentGunClips = 0;
+    internal static int _MaxGunClips = 0;
+
+    public static void PrepareAnimationLibraries()
+    {
+      const int MAX_NUMBER_OF_CLIPS_OUR_MOD_ADDS = 1000; // should be good enough for now, change later if needed
+      tk2dSpriteAnimation gunLibrary = ItemHelper.Get(Items.PeaShooter).gameObject.GetComponent<Gun>().spriteAnimator.Library;
+      _CurrentGunClips = gunLibrary.clips.Length;
+      _MaxGunClips = _CurrentGunClips + MAX_NUMBER_OF_CLIPS_OUR_MOD_ADDS;
+      Array.Resize(ref gunLibrary.clips, _MaxGunClips);
+      // Lazy.DebugConsoleLog($"  started with {_CurrentGunClips} gun animation clips, allowing up to {_MaxGunClips}");
+    }
+
+    public static void FinalizeAnimationLibraries()
+    {
+        // shrink the size of the gun animation library's clips (must be done after all other item setup since some passives init guns too)
+        tk2dSpriteAnimation gunLibrary = ItemHelper.Get(Items.PeaShooter).gameObject.GetComponent<Gun>().spriteAnimator.Library;
+        // Lazy.DebugConsoleLog($"  shrinking size of gun animation clips from {_MaxGunClips} to {_CurrentGunClips}");
+        Array.Resize(ref gunLibrary.clips, _CurrentGunClips);
+    }
+
     public static void FinalizeGuns()
     {
         foreach (Gun gun in _GunsToFinalize) // fix displayed shoot styles in ammonomicon

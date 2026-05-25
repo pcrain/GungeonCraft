@@ -166,6 +166,8 @@ public class Initialisation : BaseUnityPlugin
                 IncredibleItems.Init();
                 // Midrun data
                 CwaffRunData.Init();
+                // Make sure our animation clip collections are resized exactly once at the beginning
+                Lazy.PrepareAnimationLibraries();
                 setupConfigWatch.Stop();
             #endregion
 
@@ -473,6 +475,12 @@ public class Initialisation : BaseUnityPlugin
                 setupShopsWatch.Stop();
             #endregion
 
+            #region Miscellaneous Cleanup
+                System.Diagnostics.Stopwatch awaitMiscWatch = System.Diagnostics.Stopwatch.StartNew();
+                Lazy.FinalizeAnimationLibraries(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
+                awaitMiscWatch.Stop();
+            #endregion
+
             #region Wait for remaining async stuff to finish up
                 System.Diagnostics.Stopwatch awaitAsyncWatch = System.Diagnostics.Stopwatch.StartNew();
                 setupAudioThread.Join();
@@ -498,6 +506,7 @@ public class Initialisation : BaseUnityPlugin
                 ETGModConsole.Log($"  {setupBossesWatch.ElapsedMilliseconds,       5}ms       setupBosses      ");
                 ETGModConsole.Log($"  {setupSynergiesWatch.ElapsedMilliseconds,    5}ms       setupSynergies   ");
                 ETGModConsole.Log($"  {setupShopsWatch.ElapsedMilliseconds,        5}ms       setupShops       ");
+                ETGModConsole.Log($"  {awaitMiscWatch.ElapsedMilliseconds,         5}ms       awaitMisc        ");
                 ETGModConsole.Log($"  {awaitAsyncWatch.ElapsedMilliseconds,        5}ms       awaitAsync       ");
                 long newMemory = currentProcess.WorkingSet64;
                 ETGModConsole.Log($"allocated {(newMemory - oldMemory).ToString("N0")} bytes of memory along the way");
