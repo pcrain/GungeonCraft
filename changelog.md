@@ -1,17 +1,22 @@
 # Changelog
 
-## 1.31.2 (TBD)
+## 1.31.2 (2026-05-25)
 
-- Updated Cleansweeper's description to match ammo changes introduced in previous update
-- Optimized code for rendering Chain Driver's and Nightlighter's rope projectiles so more can be on-screen without lagging the game
-- Made Nighlighter light strings have nicer looking LEDs
-- Added a config option to tone down Nightlighter's LEDs back to their original version
-- Increased Gadulo's ammo from 90 to 150
-- Changed Death Note's mastery from allowing typos to slowing time in non-boss rooms
+#### Balance Changes and Polish:
+
 - Made typos no longer reset progress on non-boss names when using Death Note
-- Fixed Chain Driver being unable to gain ammo from ammo boxes
+- Made Death Note's mastery slow time in non-boss rooms since the old mastery is now basic behavior
+- Increased Gadulo's ammo from 90 to 150
+- Made Nighlighter's light strings have nicer looking LEDs
+- Added a config option to tone down Nightlighter's LEDs back to their original appearance
 - Cleaned up sprites for Zag and Telefragger
+
+#### Bugfixes and Misc:
+
+- Fixed Chain Driver being unable to gain ammo from ammo boxes
 - Fixed graphical glitch involving misplaced warning zone sprite during [REDACTED] fight
+- Optimized code for rendering Chain Driver's chains and Nightlighter's LED strings so more can be on-screen without lagging the game
+- Updated Cleansweeper's description to match ammo changes introduced in previous update
 
 ## 1.31.1 (2026-05-23)
 
