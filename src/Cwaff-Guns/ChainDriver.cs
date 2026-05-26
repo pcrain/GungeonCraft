@@ -17,7 +17,7 @@ public class ChainDriver : CwaffGun
     {
         Lazy.SetupGun<ChainDriver>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 200, shootFps: 30, reloadFps: 4,
-            muzzleFrom: Items.Mailbox, fireAudio: "chain_launch_sound", canGainAmmo: false, suppressReloadLabel: true, curse: 1f)
+            muzzleFrom: Items.Mailbox, fireAudio: "chain_launch_sound", suppressReloadLabel: true, curse: 1f)
           .InitProjectile(GunData.New(clipSize: 1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic, invisibleProjectile: true,
             damage: 5.5f, speed: 75f, range: 18f, force: 12f, pierceBreakables: true, hitSound: "chain_impact_sound_b", customClip: true))
           .Attach<ChainLinkDoer>();

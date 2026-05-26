@@ -9,6 +9,7 @@
 - Increased Gadulo's ammo from 90 to 150
 - Changed Death Note's mastery from allowing typos to slowing time in non-boss rooms
 - Made typos no longer reset progress on non-boss names when using Death Note
+- Fixed Chain Driver being unable to gain ammo from ammo boxes
 
 ## 1.31.1 (2026-05-23)
 
