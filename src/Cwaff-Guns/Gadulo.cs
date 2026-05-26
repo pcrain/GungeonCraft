@@ -15,7 +15,7 @@ public class Gadulo : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Gadulo>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.25f, ammo: 90, smoothReload: 0.1f,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 1.25f, ammo: 150, smoothReload: 0.1f,
             fireAudio: "needle_rifle_fire_sound")
           .SetReloadAudio("needle_rifle_reload_hatch_sound")
           .SetReloadAudio("needle_rifle_reload_plant_sound", 5)

@@ -4,7 +4,7 @@ public class DeathNote : CwaffGun
 {
     public static string ItemName         = "Death Note";
     public static string ShortDescription = "You Will Know Their Names";
-    public static string LongDescription  = "Use to see enemies' names. Writing a name ensures the namebearer's untimely death. Increases Curse by 3.";
+    public static string LongDescription  = "Use to see enemies' names. Writing a name ensures the namebearer's untimely death. Boss names cannot have typos. Increases Curse by 3.";
     public static string Lore             = "\"A seemingly empty notebook with an impossibly dark cover. Holding it open in your hands fills you with a sense of control over everyone's fate except your own.\" ~ An edgy quote scribbled on the back of what is obviously a 5th-grader's school notebook.";
 
     internal static GameObject _ReaperVFX = null;
@@ -80,6 +80,8 @@ public class DeathNote : CwaffGun
         {
           gun.PlayIfExists("death_note_open", restartIfPlaying: true);
           this._hud.Toggle();
+          if (this.Mastered)
+            SetFocus(true);
         }
         return;
       }
@@ -90,7 +92,7 @@ public class DeathNote : CwaffGun
     {
       base.gameObject.Play("death_note_write_sound");
       char letter = DeathNoteHUD._NAME_LETTERS[DeathNoteHUD.LetterIndexForAngle(player.AimAngleFromCenterOfScreen())];
-      DeathNoteNameHandler.WriteLetter(letter, player, this.Mastered);
+      DeathNoteNameHandler.WriteLetter(letter, player);
       CwaffVFX.SpawnBurst(
         prefab           : _Scribbles,
         numToSpawn       : 4,
@@ -143,6 +145,8 @@ public class DeathNote : CwaffGun
 
     private void OnEnteredCombat()
     {
+      if (this.PlayerOwner.InBossRoom())
+        BraveTime.SetTimeScaleMultiplier(1.0f, base.gameObject);
       if (this.PlayerOwner is PlayerController player && player.CurrentGun == this.gun && player.HasSynergy(Synergy.ILL_TAKE_A_POTATO_CHIP))
         BecomeInvisible(player);
     }
@@ -177,10 +181,8 @@ public class DeathNote : CwaffGun
     {
       if (!this._hud || !this._hud.Active)
         return true;
-      gun.PlayIfExists("death_note_close", restartIfPlaying: true);
       base.gameObject.Play("death_note_close_sound");
-      // SpawnManager.SpawnVFX(GameManager.Instance.Dungeon.dungeonDustups.rollLandDustup, gun.barrelOffset.position, Quaternion.identity);
-      this._hud.Dismiss();
+      DismissHUD();
       return false;
     }
 
@@ -227,6 +229,11 @@ public class DeathNote : CwaffGun
         return;
       gun.PlayIfExists("death_note_close", restartIfPlaying: true);
       this._hud.Dismiss();
+    }
+
+    internal void SetFocus(bool focus)
+    {
+      BraveTime.SetTimeScaleMultiplier((focus && !this.PlayerOwner.InBossRoom()) ? 0.5f : 1.0f, base.gameObject);
     }
 }
 
@@ -368,7 +375,6 @@ public class DeathNoteNameHandler
 
   private Dictionary<AIActor,DeathNoteNametag> _nametags = null;
   private char _queuedLetter = '\0';
-  private bool _preventReset = false;
   private List<char> _bestLetters = null;
   private bool _needsReset = false;
   private PlayerController _owner = null;
@@ -423,11 +429,10 @@ public class DeathNoteNameHandler
     return name;
   }
 
-  public static void WriteLetter(char c, PlayerController owner, bool preventReset)
+  public static void WriteLetter(char c, PlayerController owner)
   {
     _Instance._queuedLetter = c;
     _Instance._owner = owner;
-    _Instance._preventReset = preventReset;
   }
 
   public static bool OneGoodLetter() => _Instance._bestLetters.Count == 1;
@@ -476,7 +481,7 @@ public class DeathNoteNameHandler
       if (resetNames)
         tag.ResetName();
       if (newLetter)
-        tag.HandleLetter(this._queuedLetter, this._owner, this._preventReset);
+        tag.HandleLetter(this._queuedLetter, this._owner);
       if (tag.nextLetter < tag.nameLength) // if our name isn't completely spelled out
       {
         if (tag.nextLetter > longestName)
@@ -521,24 +526,24 @@ public class DeathNoteNametag
       return tag;
   }
 
-  public void HandleLetter(char c, PlayerController owner, bool preventReset)
+  public void HandleLetter(char c, PlayerController owner)
   {
     if (this._dying || !hh || !actor)
       return;
-
-    this._dirty = true;
     if (c != this.uppername[nextLetter])
     {
-      if (!preventReset)
-        nextLetter = 0;
+      if (hh.IsBoss || hh.IsSubboss)
+        nextLetter = 0; // bosses always have their names reset on typos
       return;
     }
+
+    this._dirty = true;
     ++nextLetter;
     if (nextLetter != nameLength)
       return;
 
-    if (!preventReset)
-      DeathNoteNameHandler.ResetNameProgress(); // once an enemy has been killed, reset progress on all other names
+    if (hh.IsBoss || hh.IsSubboss)
+      DeathNoteNameHandler.ResetNameProgress(); // bosses always have their names reset on typos
 
     this._dying = true;
     if (owner)
@@ -655,6 +660,7 @@ public class DeathNoteHUD : MonoBehaviour
     if (!this._active && !force)
       return;
 
+
     foreach (Geometry g in this._geometry)
       if (g)
           g.Disable();
@@ -682,6 +688,8 @@ public class DeathNoteHUD : MonoBehaviour
       this._active = false;
       // BraveTime.SetTimeScaleMultiplier(1.0f, base.gameObject);
       base.gameObject.RelinquishCameraControl();
+      if (this._gun)
+        this._gun.SetFocus(false);
     }
   }
 

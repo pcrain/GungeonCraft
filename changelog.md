@@ -6,6 +6,9 @@
 - Optimized code for rendering Chain Driver's and Nightlighter's rope projectiles so more can be on-screen without lagging the game
 - Made Nighlighter light strings have nicer looking LEDs
 - Added a config option to tone down Nightlighter's LEDs back to their original version
+- Increased Gadulo's ammo from 90 to 150
+- Changed Death Note's mastery from allowing typos to slowing time in non-boss rooms
+- Made typos no longer reset progress on non-boss names when using Death Note
 
 ## 1.31.1 (2026-05-23)
 

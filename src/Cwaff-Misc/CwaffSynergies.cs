@@ -384,7 +384,7 @@ public static class CwaffSynergies
         NewMastery<MasteryOfNightlighter>(MASTERY_NIGHTLIGHTER, Nightlighter.ItemName);
         // Needles stick to enemies that aren't instantly killed, and supercombine to kill enemies once their total damage exceeds the enemy's health.
         NewMastery<MasteryOfGadulo>(MASTERY_GADULO, Gadulo.ItemName);
-        // Names are no longer reset when entering an incorrect character.
+        // Time flows at half speed while Death Note is open, except in boss rooms.
         NewMastery<MasteryOfDeathNote>(MASTERY_DEATH_NOTE, DeathNote.ItemName);
       #endregion
 
