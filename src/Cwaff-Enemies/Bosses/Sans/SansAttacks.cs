@@ -761,7 +761,7 @@ public partial class SansBoss : AIActor
       float offset         = base.roomBulletBounds.width / (float)COUNT;
       float angle          = reverse ? 90f : -90f;
       List<Vector2> points = new List<Vector2>();
-      for (float j = (reverse ? 0.5f : 0); j < COUNT; j++)
+      for (float j = (reverse ? 0.75f : 0.25f); j < COUNT; j++)
         points.Add(new Vector2(base.roomBulletBounds.xMin + j*offset, reverse ? base.roomBulletBounds.yMin : base.roomBulletBounds.yMax));
 
       for(int i = 0; i < points.Count; ++i)
