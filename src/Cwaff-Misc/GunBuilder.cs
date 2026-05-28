@@ -82,6 +82,7 @@ public sealed class GunData
   public int beamStartFps;
   public int beamEndFps;
   public int beamChargeFps;
+  public int beamMuzzleFps;
   public int beamImpactFps;
   public bool beamLoopCharge;
   public float beamEmission;
@@ -117,6 +118,7 @@ public sealed class GunData
   public float beamImpactEmission;
   public float stunChance;
   public float stunDuration;
+  public float beamEmissionSensitivity;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -188,6 +190,7 @@ public sealed class GunData
   /// <param name="beamStartFps">The framerate for the beam's start animation.</param>
   /// <param name="beamEndFps">The framerate for the beam's end animation.</param>
   /// <param name="beamChargeFps">The framerate for the beam's charge animation.</param>
+  /// <param name="beamMuzzleFps">The framerate for the beam's muzzle animation.</param>
   /// <param name="beamImpactFps">The framerate for the beam's impact animation.</param>
   /// <param name="beamLoopCharge">Whether the beam's charge amimation should be looped.</param>
   /// <param name="beamEmission">The emissive power of the beam sprites.</param>
@@ -219,10 +222,11 @@ public sealed class GunData
   /// <param name="chargeSound">The sound a charged projectile should play when its charge level has been reached.</param>
   /// <param name="damagesWalls">Whether the projectile creates damaged wall decals on impact.</param>
   /// <param name="beamEmissionColor">If set, determines the emissive color of beam sprites.</param>
-  /// <param name="beamEmissionColorPower">Determines the emissive color power of bream sprites.</param>
+  /// <param name="beamEmissionColorPower">Determines the emissive color power of beam sprites.</param>
   /// <param name="beamImpactEmission">If >= 0, determines emissive power of beam impact sprite (uses beam emission otherwise).</param>
   /// <param name="stunChance">The chance for the projectile to apply stun to its target.</param>
   /// <param name="stunDuration">The duration of stun to apply.</param>
+  /// <param name="beamEmissionSensitivity">Determines the emissive sensitivity of beam sprites.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -235,13 +239,13 @@ public sealed class GunData
     float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null, string hitSound = null, string hitEnemySound = null, string hitWallSound = null,
     bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false, bool? electric = null, float? burstCooldown = null,
     bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null, bool? doBeamSetup = null,
-    string beamSprite = null, int beamFps = -1, int beamStartFps = -1, int beamEndFps = -1, int beamChargeFps = -1, int beamImpactFps = -1, bool beamLoopCharge = true,
+    string beamSprite = null, int beamFps = -1, int beamStartFps = -1, int beamEndFps = -1, int beamChargeFps = -1, int beamMuzzleFps = -1, int beamImpactFps = -1, bool beamLoopCharge = true,
     float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f, GoopDefinition beamGoop = null, bool? beamInterpolate = null,
     int beamPiercing = -1, bool? beamPiercesCover = null, bool? beamContinueToWall = null, bool? beamIsRigid = null, float beamKnockback = -1f,
     BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
     bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, float? glowColorPower = null,
     int beamDissipateFps = -1, float? spinRate = null, float? lightStrength = null, float? lightRange = null, Color? lightColor = null, string chargeSound = null, bool? damagesWalls = null,
-    Color? beamEmissionColor = null, float beamEmissionColorPower = 1.55f, float beamImpactEmission = -1f, float stunChance = 0f, float stunDuration = -1f)
+    Color? beamEmissionColor = null, float beamEmissionColorPower = 1.55f, float beamImpactEmission = -1f, float stunChance = 0f, float stunDuration = -1f, float beamEmissionSensitivity = -1f)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -312,6 +316,7 @@ public sealed class GunData
       _Instance.beamStartFps                      = beamStartFps;
       _Instance.beamEndFps                        = beamEndFps;
       _Instance.beamChargeFps                     = beamChargeFps;
+      _Instance.beamMuzzleFps                     = beamMuzzleFps;
       _Instance.beamImpactFps                     = beamImpactFps;
       _Instance.beamLoopCharge                    = beamLoopCharge;
       _Instance.beamEmission                      = beamEmission;
@@ -347,6 +352,7 @@ public sealed class GunData
       _Instance.beamImpactEmission                = beamImpactEmission;
       _Instance.stunChance                        = stunChance;
       _Instance.stunDuration                      = stunDuration;
+      _Instance.beamEmissionSensitivity           = beamEmissionSensitivity;
       return _Instance;
   }
 }
@@ -552,6 +558,7 @@ public static class GunBuilder
           endFps       : b.beamEndFps,
           startFps     : b.beamStartFps,
           chargeFps    : b.beamChargeFps,
+          muzzleFps    : b.beamMuzzleFps,
           loopCharge   : b.beamLoopCharge,
           dissipateFps : b.beamDissipateFps);
 
@@ -562,11 +569,54 @@ public static class GunBuilder
       }
       if (b.beamEmission > 0f)
       {
-        beamComp.sprite.usesOverrideMaterial = true;
-        //TODO: verify this change doesn't break things
-        // beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutoutEmissive");
-        beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-        beamComp.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, b.beamEmission);
+        if (b.beamEmissionSensitivity >= 0.0f)
+        {
+          //REFACTOR: use new emissive shader for all beams
+          beamComp.sprite.MakeGlowyBetter(b.beamEmission, b.beamEmissionColor, b.beamEmissionColorPower, b.beamEmissionSensitivity);
+        }
+        else
+        {
+          beamComp.sprite.usesOverrideMaterial = true;
+          beamComp.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+          beamComp.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, b.beamEmission);
+        }
+        if (beamComp.UsesChargeSprite || beamComp.UsesMuzzleSprite)
+        {
+          if (beamComp.transform.Find("beam muzzle flare") is not Transform flareTransform)
+          {
+            GameObject flareVfx = new GameObject("beam muzzle flare");
+            flareTransform = flareVfx.transform;
+            flareTransform.parent = beamComp.transform;
+            flareTransform.localPosition = new Vector3(0f, 0f, 0.05f);
+            tk2dTiledSprite m_beamSprite = beamComp.gameObject.GetComponent<tk2dTiledSprite>();
+            tk2dSprite m_beamMuzzleSprite = flareVfx.AddComponent<tk2dSprite>();
+            m_beamMuzzleSprite.SetSprite(m_beamSprite.Collection, m_beamSprite.spriteId);
+            tk2dSpriteAnimator m_beamMuzzleAnimator = flareVfx.AddComponent<tk2dSpriteAnimator>();
+            m_beamMuzzleAnimator.SetSprite(m_beamSprite.Collection, m_beamSprite.spriteId);
+            m_beamMuzzleAnimator.Library = beamComp.gameObject.GetComponent<tk2dSpriteAnimator>().Library;
+            m_beamSprite.AttachRenderer(m_beamMuzzleSprite);
+            m_beamMuzzleSprite.HeightOffGround = 0.05f;
+            m_beamMuzzleSprite.IsPerpendicular = false;
+            m_beamMuzzleSprite.usesOverrideMaterial = true;
+          }
+          tk2dSprite chargeSprite = flareTransform.GetComponent<tk2dSprite>();
+          if (b.beamEmissionSensitivity >= 0.0f)
+          {
+            //REFACTOR: use new emissive shader for all beams
+            chargeSprite.MakeGlowyBetter(b.beamEmission, b.beamEmissionColor, b.beamEmissionColorPower, b.beamEmissionSensitivity);
+          }
+          else
+          {
+            chargeSprite.usesOverrideMaterial = true;
+            chargeSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+            chargeSprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, b.beamEmission);
+            if (b.beamEmissionColor.HasValue)
+            {
+              chargeSprite.renderer.material.SetColor(CwaffVFX._EmissiveColorId, b.beamEmissionColor.Value);
+              chargeSprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, b.beamEmissionColorPower);
+            }
+          }
+        }
         if (beamComp.UsesImpactSprite)
         {
           //NOTE: stolen from basegame BasicBeamController.Start()
@@ -588,14 +638,23 @@ public static class GunBuilder
             m_impactSprite.usesOverrideMaterial = true;
           }
           tk2dSprite impactSprite = impactTransform.GetComponent<tk2dSprite>();
-          impactSprite.usesOverrideMaterial = true;
-          impactSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-          impactSprite.renderer.material.SetFloat(
-            CwaffVFX._EmissivePowerId, (b.beamImpactEmission >= 0f) ? b.beamImpactEmission : b.beamEmission);
-          if (b.beamEmissionColor.HasValue)
+          if (b.beamEmissionSensitivity >= 0.0f)
           {
-            impactSprite.renderer.material.SetColor(CwaffVFX._EmissiveColorId, b.beamEmissionColor.Value);
-            impactSprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, b.beamEmissionColorPower);
+            //REFACTOR: use new emissive shader for all beams
+            impactSprite.MakeGlowyBetter((b.beamImpactEmission >= 0f) ? b.beamImpactEmission : b.beamEmission,
+              b.beamEmissionColor, b.beamEmissionColorPower, b.beamEmissionSensitivity);
+          }
+          else
+          {
+            impactSprite.usesOverrideMaterial = true;
+            impactSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+            impactSprite.renderer.material.SetFloat(
+              CwaffVFX._EmissivePowerId, (b.beamImpactEmission >= 0f) ? b.beamImpactEmission : b.beamEmission);
+            if (b.beamEmissionColor.HasValue)
+            {
+              impactSprite.renderer.material.SetColor(CwaffVFX._EmissiveColorId, b.beamEmissionColor.Value);
+              impactSprite.renderer.material.SetFloat(CwaffVFX._EmissiveColorPowerId, b.beamEmissionColorPower);
+            }
           }
         }
       }

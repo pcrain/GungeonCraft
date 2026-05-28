@@ -423,3 +423,5 @@ death_note_close_sound,5.0,1,sound,0
 akelus_impact_sound,5.0,1,sound,0
 akelus_lunge_sound,5.0,1,sound,0
 akelus_return_sound,4.0,1,sound,0
+focus_rifle_fire_sound,-3.0,0,sound,0
+mtara_impact_sound,2.0,0,sound,1

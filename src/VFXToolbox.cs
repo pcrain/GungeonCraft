@@ -597,7 +597,7 @@ public static class VFX
         List<string> endVFXAnimationPaths = null, int beamEndFPS = -1, List<string> startVFXAnimationPaths = null, int beamStartFPS = -1, bool glows = false,
         bool canTelegraph = false, List<string> beamTelegraphAnimationPaths = null, int beamtelegraphFPS = -1, List<string> beamStartTelegraphAnimationPaths = null, int beamStartTelegraphFPS = -1, List<string> beamEndTelegraphAnimationPaths = null, int beamEndTelegraphFPS = -1, float telegraphTime = 1,
         bool canDissipate = false, List<string> beamDissipateAnimationPaths = null, int beamDissipateFPS = -1, List<string> beamStartDissipateAnimationPaths = null, int beamStartDissipateFPS = -1, List<string> beamEndDissipateAnimationPaths = null, int beamEndDissipateFPS = -1, float dissipateTime = 1,
-        List<string> chargeVFXAnimationPaths = null, int beamChargeFPS = -1, bool loopCharge = true)
+        List<string> chargeVFXAnimationPaths = null, int beamChargeFPS = -1, bool loopCharge = true, List<string> muzzleVFXAnimationPaths = null, int beamMuzzleFPS = -1)
     {
         try
         {
@@ -684,6 +684,16 @@ public static class VFX
                 SetupBeamPart(animation, chargeVFXAnimationPaths, "beam_charge", beamChargeFPS, null, null, def.colliderVertices, anchorOverride: Anchor.MiddleCenter,
                     wrapMode: loopCharge ? tk2dSpriteAnimationClip.WrapMode.Loop : tk2dSpriteAnimationClip.WrapMode.Once);
                 beamController.chargeAnimation = "beam_charge";
+            }
+            else
+                beamController.chargeAnimation = null;
+
+            //---------------Sets up the animaton for the muzzle VFX that plays after the beam has charged
+            if (muzzleVFXAnimationPaths != null)
+            {
+                SetupBeamPart(animation, muzzleVFXAnimationPaths, "beam_muzzle", beamMuzzleFPS, null, null, def.colliderVertices, anchorOverride: Anchor.MiddleCenter,
+                    wrapMode: tk2dSpriteAnimationClip.WrapMode.Loop);
+                beamController.muzzleAnimation = "beam_muzzle";
             }
             else
                 beamController.chargeAnimation = null;

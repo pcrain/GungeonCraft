@@ -219,6 +219,27 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
       if (!string.IsNullOrEmpty(cp.chargeSound))
         __instance.gameObject.Play(cp.chargeSound);
     }
+
+    /// <summary>Loop enemy impact sounds upon hitting an enemy.</summary>
+    [HarmonyPatch(typeof(BasicBeamController), nameof(BasicBeamController.HandleBeamFrame))]
+    [HarmonyPostfix]
+    private static void BasicBeamControllerHandleBeamFramePatch(BasicBeamController __instance, ref List<SpeculativeRigidbody> __result)
+    {
+      string enemyImpactSound = __instance.projectile.enemyImpactEventName;
+      if (string.IsNullOrEmpty(enemyImpactSound))
+        return;
+      if (__instance.gameObject.GetComponent<CwaffProjectile>() is not CwaffProjectile cp)
+        return; // don't apply this behavior to vanilla projectiles
+
+      bool hitAnEnemy = false;
+      foreach (SpeculativeRigidbody body in __result)
+        if (body && body.aiActor)
+        {
+          hitAnEnemy = true;
+          break;
+        }
+      cp.LoopSoundIf(hitAnEnemy, __instance.projectile.enemyImpactEventName);
+    }
 }
 
 /// <summary>Special class for projectiles that do something weird when spawned in and die immediately.</summary>

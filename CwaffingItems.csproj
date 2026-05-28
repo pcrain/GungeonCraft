@@ -228,6 +228,7 @@
     <Compile Include="src\Cwaff-Guns\RLTSRTSGTSBTSLB.cs"/>
     <Compile Include="src\Cwaff-Guns\SchrodingersGat.cs"/>
     <Compile Include="src\Cwaff-Guns\Gradius.cs"/>
+    <Compile Include="src\Cwaff-Guns\Mtara.cs"/>
     <Compile Include="src\Cwaff-Guns\KingsLaw.cs"/>
     <Compile Include="src\Cwaff-Guns\Cleansweep.cs"/>
     <Compile Include="src\Cwaff-Guns\ChainDriver.cs"/>

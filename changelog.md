@@ -2,7 +2,7 @@
 
 ## 1.32.0 (TBD)
 
-- Added Akelus
+- Added Akelus and M'tara
 - Clarified in Vengeful Spirit's description that double damage applies to enemy types, not individual enemies
 - Fixed bug where Groundhog would not damage enemies that were right on top of the detonation point
 - Improved Groundhog's enemy launch effect to be less janky
