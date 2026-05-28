@@ -3,7 +3,7 @@
 // dummy class used by AllowMoreThan30KnockbackPatch to uncap maximum knockback
 public class KnockbackUnleasher : MonoBehaviour
 {
-  public const float UNLEASHED_KNOCKBACK_CAP = 10000f;
+  public float knockbackCap = 10000f;
 }
 
 // invisible, collisionless projectile used for calculating other objects as if they were projectiles

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.32.0 (TBD)
+
+- Added Akelus
+- Clarified in Vengeful Spirit's description that double damage applies to enemy types, not individual enemies
+- Fixed bug where Groundhog would not damage enemies that were right on top of the detonation point
+- Improved Groundhog's enemy launch effect to be less janky
+- Made Groundhog's shockwave deal damage to chests and other major breakable objects
+- Prevented attack effects from several guns and items from affecting the player's companions
+
 ## 1.31.2 (2026-05-25)
 
 #### Balance Changes and Polish:

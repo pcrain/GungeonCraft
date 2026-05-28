@@ -71,7 +71,7 @@ public class DeathNote : CwaffGun
       player.SuppressThisClick = true; // always suppress this gun's attacks, for now
       if (player.IsDodgeRolling || player.CurrentInputState != PlayerInputState.AllInput)
         return; // inactive, do normal firing stuff
-      if (this.gun.IsReloading || this.gun.CurrentAmmo == 0)
+      if (this.gun.IsReloading)
         return; // inactive, do normal firing stuff
       if (!this._hud || !this._hud.Active)
       {

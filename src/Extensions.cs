@@ -399,7 +399,7 @@ public static class Extensions
     if (!e || !e.isActiveAndEnabled)
       return false;
     HealthHaver h = e.healthHaver;
-    return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && (canBeDead || h.IsAlive) && !h.isPlayerCharacter;
+    return e && !e.IsGone && e.IsNormalEnemy && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && (canBeDead || h.IsAlive) && !h.isPlayerCharacter;
   }
 
   /// <summary>Check if an enemy is hostile and a non-boss</summary>
@@ -408,7 +408,7 @@ public static class Extensions
     if (!e || !e.isActiveAndEnabled)
       return false;
     HealthHaver h = e.healthHaver;
-    return e && !e.IsGone && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || h.IsAlive) && !h.isPlayerCharacter;
+    return e && !e.IsGone && e.IsNormalEnemy && e.IsWorthShootingAt && (canBeNeutral || !e.IsHarmlessEnemy) && h && !h.IsBoss && !h.IsSubboss &&  (canBeDead || h.IsAlive) && !h.isPlayerCharacter;
   }
 
   /// <summary>Check if an enemy is a boss</summary>
@@ -1726,6 +1726,9 @@ public static class Extensions
   /// <summary>Get the player's current gun fire rate multiplier</summary>
   public static float FireRateMult(this PlayerController p) => p.stats.GetStatValue(StatType.RateOfFire);
 
+  /// <summary>Get the player's current gun reload rate multiplier</summary>
+  public static float ReloadRateMult(this PlayerController p) => p.stats.GetStatValue(StatType.ReloadSpeed);
+
   /// <summary>Get the player's current curse level</summary>
   public static float Curse(this PlayerController p) => p.stats.GetStatValue(StatType.Curse);
 
@@ -2457,6 +2460,19 @@ public static class Extensions
   public static tk2dMeshSprite DuplicateInWorldAsMesh(this AIActor actor, bool pointMesh = true)
   {
     return actor.sprite.DuplicateInWorldAsMesh(pointMesh: pointMesh, optionalPalette: actor.optionalPalette);
+  }
+
+  /// <summary>Sets an optional palette on a sprite</summary>
+  public static void SetOptionalPalette(this tk2dSprite sprite, Texture2D optionalPalette)
+  {
+    Material mat = sprite.renderer.material;
+    sprite.usesOverrideMaterial = true;
+    // if (!mat.HasProperty("_PaletteTex"))
+    // {
+    //   mat.shader = osprite.renderer.material.shader;
+    // }
+    mat.SetFloat("_UsePalette", 1f);
+    mat.SetTexture("_PaletteTex", optionalPalette);
   }
 
   /// <summary>Freezes a projectile and launches it with a short delay</summary>
@@ -3923,6 +3939,7 @@ public static class Extensions
     tk2dSprite oldSprite = body.gameObject.GetComponent<tk2dSprite>();
     tk2dSprite newSprite = new GameObject("decoupled sprite").AddComponent<tk2dSprite>();
     newSprite.SetSprite(oldSprite.collection, oldSprite.spriteId);
+    newSprite.renderer.material.shader = oldSprite.renderer.material.shader;
     oldSprite.renderer.enabled = false;
     newSprite.transform.position = oldSprite.transform.position;
     newSprite.transform.parent = oldSprite.transform;
@@ -4013,5 +4030,42 @@ public static class Extensions
   {
       FieldInfo itemsField = typeof(List<T>).GetField("_items", BindingFlags.NonPublic | BindingFlags.Instance);
       return (T[])itemsField.GetValue(list);
+  }
+
+  /// <summary>Fix being unable to use dodge rolls after passing over tables.</summary>
+  public static void ClearTableSlides(this PlayerController player)
+  {
+      player.m_dodgeRollState = PlayerController.DodgeRollState.None;
+      player.m_hasFiredWhileSliding = false;
+      player.TablesDamagedThisSlide.Clear();
+      player.IsSlidingOverSurface = false;
+      player.m_dodgeRollTimer = 0f;
+      player.ToggleHandRenderers(true, "dodgeroll");
+      player.ToggleGunRenderers(true, "dodgeroll");
+      player.m_handlingQueuedAnimation = false;
+  }
+
+  /// <summary>Do VFX for a 180-degree swing for a hammer-like weapon based on its current position.</summary>
+  public static void DoSwingVFX(this Gun gun, bool reverse = false)
+  {
+    const int IMAGES = 9;
+    const float GAP = 180f / IMAGES;
+    const float FADE_TIME = 0.35f;
+    // Vector2 rotationPoint = gun.PrimaryHandAttachPoint.position;
+    Vector2 rotationPoint = gun.SecondaryHandAttachPoint.position;
+    for (int i = 0; i < IMAGES; ++i)
+    {
+      tk2dBaseSprite dupe = gun.sprite.DuplicateInWorld(copyShader: true);
+      float rot = reverse ? (i * GAP) : (180f - i * GAP);
+      dupe.transform.RotateAround(rotationPoint, Vector3.forward, dupe.FlipY ? -rot : rot);
+      float fadeTime = FADE_TIME * ((float)(i + 1) / IMAGES);
+      dupe.gameObject.ExpireIn(fadeTime, fadeTime);
+    }
+  }
+
+  /// <summary>Returns the sprite animation clip for a player's dodge roll given a direction</summary>
+  public static tk2dSpriteAnimationClip DodgeRollClipForDirection(this PlayerController player, Vector2 direction)
+  {
+    return ((!(Mathf.Abs(direction.x) < 0.1f)) ? player.spriteAnimator.GetClipByName(((!(direction.y > 0.1f)) ? "dodge_left" : "dodge_left_bw") + ((!player.UseArmorlessAnim) ? string.Empty : "_armorless")) : player.spriteAnimator.GetClipByName(((!(direction.y > 0.1f)) ? "dodge" : "dodge_bw") + ((!player.UseArmorlessAnim) ? string.Empty : "_armorless")));
   }
 }

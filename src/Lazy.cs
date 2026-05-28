@@ -1634,4 +1634,104 @@ public static class Lazy
       return cc.data.nameShort.Replace("_", "");
     return player.name.Replace("_", ""); // best effort for unknown custom characters
   }
+
+  private static readonly int _IgnoreLaunchCollisions = CollisionMask.LayerToMask(
+    CollisionLayer.Projectile, CollisionLayer.PlayerHitBox, CollisionLayer.PlayerCollider, CollisionLayer.LowObstacle);
+
+  /// <summary>Launch all enemies skyward.</summary>
+  public static void LaunchAllEnemiesAroundPoint(float damage, float force, Vector2 shockwaveCenter, float minRange, float maxRange, float horizontalForce, bool doFlips)
+  {
+    const string LAUNCH_REASON = "Uppies! :D";
+
+    float minRangeSqr = minRange * minRange;
+    float maxRangeSqr = maxRange * maxRange;
+    foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(shockwaveCenter, maxRange, includeInvulnerable: true, limitToCurrentRoom: false))
+    {
+      if (enemy.healthHaver is not HealthHaver hh || (enemy.CenterPosition - shockwaveCenter).sqrMagnitude < minRangeSqr)
+        continue;
+      if (enemy.behaviorSpeculator is not BehaviorSpeculator bs || bs.ImmuneToStun || hh.IsBoss || hh.IsSubboss)
+        enemy.healthHaver.ApplyDamage(damage, Vector2.zero, LAUNCH_REASON, CoreDamageTypes.None, DamageCategory.Collision);
+      else
+        enemy.StartCoroutine(LaunchTime(enemy, shockwaveCenter, damage, force, horizontalForce, doFlips));
+    }
+
+    static IEnumerator LaunchTime(AIActor enemy, Vector2 center, float damage, float force, float horizontalForce, bool doFlips)
+    {
+      // prevent enemy from moving or taking damage normally
+      int originalLayer = enemy.gameObject.layer;
+      enemy.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
+      if (enemy.behaviorSpeculator)
+        enemy.behaviorSpeculator.Stun(3f, false);
+      if (enemy.healthHaver)
+        enemy.healthHaver.vulnerable = false;
+      if (enemy.knockbackDoer)
+      {
+        if (horizontalForce > 0)
+        {
+          //NOTE: I tried leaving this completely uncapped and enemies could be whacked clear out of the room
+          enemy.gameObject.AddComponent<KnockbackUnleasher>().knockbackCap = 50f; // allow above-average max knockback for enemies hit by Akelus
+          enemy.knockbackDoer.ApplyKnockback((enemy.CenterPosition - center).normalized, horizontalForce, immutable: true);
+        }
+        else
+          enemy.knockbackDoer.SetImmobile(true, LAUNCH_REASON);
+      }
+
+      SpeculativeRigidbody body = enemy.specRigidbody;
+      body.AddCollisionLayerIgnoreOverride(_IgnoreLaunchCollisions);
+      // body.CollideWithOthers = false;
+      enemy.ToggleRenderers(false);
+      tk2dSprite tempSprite = body.DecoupleSpriteFromCollider();
+      if (enemy.optionalPalette)
+        tempSprite.SetOptionalPalette(enemy.optionalPalette);
+      tempSprite.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
+
+      // launch enemy into the air
+      const float GRAVITY = 60f;
+      float launchSpeed = force;
+      float yOffset = 0f;
+      float angle = 0f;
+      Transform t = tempSprite.transform;
+      Vector2 centerOfGravity = body.UnitCenter - t.position.XY();
+      float startY = body.UnitBottomCenter.y;
+      while (true)
+      {
+          float dtime = BraveTime.DeltaTime;
+          launchSpeed -= GRAVITY * dtime;
+          yOffset += launchSpeed * dtime;
+          if (yOffset < 0f)
+              break;
+
+          Vector2 bodyCenter = new Vector2(body.UnitCenter.x, body.UnitBottomCenter.y + yOffset);
+          if (doFlips)
+              angle += 1440f * dtime;
+          Quaternion rotation = Quaternion.Euler(0f, 0f, angle);
+          Vector2 rotatedOffset = (rotation * centerOfGravity).XY();
+          t.position = bodyCenter - rotatedOffset;
+          t.rotation = rotation;
+          yield return null;
+      }
+
+      // restore once we touch down
+      enemy.sprite.renderer.enabled = true;
+      body.RemoveCollisionLayerIgnoreOverride(_IgnoreLaunchCollisions);
+      enemy.ToggleRenderers(true);
+      // enemy.ToggleShadowVisiblity(true);
+      UnityEngine.Object.Destroy(tempSprite.gameObject);
+      enemy.gameObject.SetLayerRecursively(originalLayer);
+      if (enemy.healthHaver)
+      {
+        enemy.healthHaver.vulnerable = true;
+        enemy.healthHaver.ApplyDamage(damage, (enemy.CenterPosition - center).normalized, LAUNCH_REASON, CoreDamageTypes.None, DamageCategory.Collision);
+      }
+      if (horizontalForce <= 0.0f && enemy.knockbackDoer)
+        enemy.knockbackDoer.SetImmobile(false, LAUNCH_REASON);
+      if (body)
+      {
+        body.CollideWithOthers = true;
+        // body.CollideWithTileMap = true;
+        // body.enabled = true;
+      }
+    }
+  }
+
 }

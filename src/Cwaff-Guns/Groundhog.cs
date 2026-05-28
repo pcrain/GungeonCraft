@@ -104,14 +104,14 @@ public class Groundhog : CwaffGun
           GameObject shockwave = new GameObject("groundhog shockwave");
           shockwave.transform.position = this.SafeCenter;
           GroundhogShockwaveDoer sd = shockwave.AddComponent<GroundhogShockwaveDoer>();
-          sd.StartCoroutine(sd.GroundhogShockwaveCR(baseData.damage, baseData.force, baseData.range));
+          sd.StartCoroutine(sd.GroundhogShockwaveCR(baseData.damage, baseData.force, baseData.range, 0.0f));
           DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
         }
     }
 
-    private class GroundhogShockwaveDoer : MonoBehaviour
+    public class GroundhogShockwaveDoer : MonoBehaviour
     {
-        public IEnumerator GroundhogShockwaveCR(float damage, float force, float sqrRange)
+        public IEnumerator GroundhogShockwaveCR(float damage, float force, float sqrRange, float horizontalForce)
         {
           float range = Mathf.Min(Mathf.Sqrt(sqrRange), 10);
           int intRange = 2 * Mathf.FloorToInt(range);
@@ -119,8 +119,9 @@ public class Groundhog : CwaffGun
           for (int i = 1; i < intRange; ++i)
           {
             base.gameObject.Play("earthquake_sound");
-            LaunchAllEnemiesInRoom(damage, force, shockwaveCenter, i - 1.5f, i + 0.5f);
+            Lazy.LaunchAllEnemiesAroundPoint(damage, force, shockwaveCenter, Mathf.Max(i - 1.5f, 0), i + 0.5f, horizontalForce, false);
             Exploder.DoRadialMinorBreakableBreak(shockwaveCenter, i);
+            Exploder.DoRadialMajorBreakableDamage(damage, shockwaveCenter, intRange);
             Exploder.DoRadialPush(shockwaveCenter, force, i);
             GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f, 6f, 0.5f, 0f), shockwaveCenter);
             CwaffVFX.SpawnBurst(
@@ -139,74 +140,7 @@ public class Groundhog : CwaffGun
               );
             yield return new WaitForSeconds(0.025f);
           }
-        }
-
-        private static void LaunchAllEnemiesInRoom(float damage, float force, Vector2 shockwaveCenter, float minRange, float maxRange)
-        {
-          float minRangeSqr = minRange * minRange;
-          float maxRangeSqr = maxRange * maxRange;
-          foreach (AIActor enemy in StaticReferenceManager.AllEnemies)
-          {
-            if (!enemy || enemy.healthHaver is not HealthHaver hh || !hh.IsVulnerable || hh.IsDead || hh.PreventAllDamage || !enemy.specRigidbody/* || enemy.IsFlying*/)
-              continue;
-            float sqrDist = (enemy.CenterPosition - shockwaveCenter).sqrMagnitude;
-            if (sqrDist < minRangeSqr || sqrDist > maxRangeSqr)
-              continue;
-            if (enemy.behaviorSpeculator is not BehaviorSpeculator bs || bs.ImmuneToStun || hh.IsBoss || hh.IsSubboss)
-              enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.None, DamageCategory.Collision);
-            else
-              enemy.StartCoroutine(LaunchTime(enemy, shockwaveCenter, damage, force));
-          }
-        }
-
-        private static IEnumerator LaunchTime(AIActor enemy, Vector2 center, float damage, float force)
-        {
-          // prevent enemy from moving or taking damage normally
-          int originalLayer = enemy.gameObject.layer;
-          enemy.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
-          if (enemy.behaviorSpeculator)
-            enemy.behaviorSpeculator.Stun(3f, true);
-          if (enemy.healthHaver)
-            enemy.healthHaver.vulnerable = false;
-          if (enemy.knockbackDoer)
-            enemy.knockbackDoer.SetImmobile(true, ItemName);
-
-          SpeculativeRigidbody body = enemy.specRigidbody;
-          body.enabled = false;
-          body.CollideWithOthers = false;
-          body.CollideWithTileMap = false;
-
-          // launch enemy into the air
-          const float gravity = 60f;
-          float launchSpeed = force;
-          Transform t = enemy.sprite.transform;
-          float startY = t.position.y;
-          float yOffset = 0f;
-          while (true)
-          {
-            launchSpeed -= BraveTime.DeltaTime * gravity;
-            yOffset += launchSpeed * BraveTime.DeltaTime;
-            if (yOffset < 0)
-              break;
-            t.position = t.position.WithY(startY + yOffset); //TODO: doesn't work quite right for ball and chain gun nuts
-            yield return null;
-          }
-
-          // restore once we touch down
-          enemy.gameObject.SetLayerRecursively(originalLayer);
-          if (enemy.healthHaver)
-          {
-            enemy.healthHaver.vulnerable = true;
-            enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.None, DamageCategory.Collision);
-          }
-          if (enemy.knockbackDoer)
-            enemy.knockbackDoer.SetImmobile(false, ItemName);
-          if (body)
-          {
-            body.CollideWithOthers = true;
-            body.CollideWithTileMap = true;
-            body.enabled = true;
-          }
+          UnityEngine.Object.Destroy(base.gameObject);;
         }
     }
 }

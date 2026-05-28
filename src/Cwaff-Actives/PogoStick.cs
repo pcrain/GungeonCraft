@@ -478,7 +478,7 @@ public class PogoDodgeRoll : CustomDodgeRoll
             this._owner.OnRolledIntoEnemy -= this.DoPogoStomp;
             this._owner.SetIsFlying(false, PogoStick.ItemName, adjustShadow: false);
             this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreProjectiles);
-            ClearTableSlides();
+            this._owner.ClearTableSlides();
             didRebound = true;
           #endregion
 
@@ -527,7 +527,7 @@ public class PogoDodgeRoll : CustomDodgeRoll
             this._pogoKnockbackId = -1;
         }
         this._owner.SetIsFlying(false, PogoStick.ItemName, adjustShadow: false);
-        ClearTableSlides();
+        this._owner.ClearTableSlides();
         this._owner.OnReceivedDamage -= this.OnReceivedDamage;
         this._owner.OnRolledIntoEnemy -= this.DoPogoStomp;
         this._owner.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreCollisions);
@@ -536,19 +536,6 @@ public class PogoDodgeRoll : CustomDodgeRoll
         this._chargeRadius.Disable();
         this._chargeTarget.Disable();
         this._state = State.INACTIVE;
-    }
-
-    // Fix being unable to use dodge rolls after passing over tables
-    private void ClearTableSlides()
-    {
-        this._owner.m_dodgeRollState = PlayerController.DodgeRollState.None;
-        this._owner.m_hasFiredWhileSliding = false;
-        this._owner.TablesDamagedThisSlide.Clear();
-        this._owner.IsSlidingOverSurface = false;
-        this._owner.m_dodgeRollTimer = 0f;
-        this._owner.ToggleHandRenderers(true, "dodgeroll");
-        this._owner.ToggleGunRenderers(true, "dodgeroll");
-        this._owner.m_handlingQueuedAnimation = false;
     }
 
     private void OnDestroy()

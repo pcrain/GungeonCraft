@@ -449,9 +449,9 @@ static class AllowMoreThan30KnockbackPatch
   {
     if (magnitude < oldKnockbackCap)
       return oldKnockbackCap;
-    if (!self.gameObject.GetComponent<KnockbackUnleasher>())
+    if (self.gameObject.GetComponent<KnockbackUnleasher>() is not KnockbackUnleasher kbu)
       return oldKnockbackCap;
-    return KnockbackUnleasher.UNLEASHED_KNOCKBACK_CAP;
+    return kbu.knockbackCap;
   }
 }
 

@@ -16,7 +16,18 @@ public class Commands
     {
         if (!C.DEBUG_BUILD)
             return; // do nothing in non-debug builds
-        //
+
+        ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
+        {
+            DebrisObject debris = LootEngine.SpawnItem(
+                PickupObjectDatabase.GetById(Lazy.PickupId<Akelus>()).gameObject,
+                // PickupObjectDatabase.GetById(IDs.Pickups["bubblebeam"]).gameObject,
+                GameManager.Instance.PrimaryPlayer.CenterPosition,
+                Vector2.zero,
+                0);
+            MasteryRitualComponent.PrepareDroppedItemForMasteryRitual(debris.GetComponent<DebrisObject>());
+            // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
+        });
         // Base command for doing whatever I'm testing at the moment
         ETGModConsole.Commands.AddGroup("hh", delegate (string[] args)
         {
@@ -86,17 +97,6 @@ public class Commands
             // {
             //   Lazy.DebugConsoleLog($"COMMAND ERROR: {e.Message}");
             // }
-        });
-        ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
-        {
-            DebrisObject debris = LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(Lazy.PickupId<Nightlighter>()).gameObject,
-                // PickupObjectDatabase.GetById(IDs.Pickups["bubblebeam"]).gameObject,
-                GameManager.Instance.PrimaryPlayer.CenterPosition,
-                Vector2.zero,
-                0);
-            MasteryRitualComponent.PrepareDroppedItemForMasteryRitual(debris.GetComponent<DebrisObject>());
-            // ETGModConsole.Log("<size=100><color=#ff0000ff>Please specify a command. Type 'nn help' for a list of commands.</color></size>", false);
         });
         ETGModConsole.Commands.AddGroup("oo", delegate (string[] args)
         {//

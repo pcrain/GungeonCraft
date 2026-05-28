@@ -682,7 +682,7 @@ public class GradiusShip : MonoBehaviour
         this._sprite = base.gameObject.GetComponent<tk2dBaseSprite>();
 
         this._level = this._gun.shipLevels[(int)this._shipType];
-        this._cooldown = this._owner.FireRateMult() * GetCooldown();
+        this._cooldown = GetCooldown() / this._owner.FireRateMult();
 
         this._phase = Mathf.PI * UnityEngine.Random.value;
         base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unpixelated"));
