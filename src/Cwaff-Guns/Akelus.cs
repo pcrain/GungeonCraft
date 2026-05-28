@@ -15,7 +15,7 @@ public class Akelus : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Akelus>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, infiniteAmmo: true, ammo: 20,
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.SILLY, reloadTime: 0.0f, infiniteAmmo: true, ammo: 20,
             shootFps: 30, reloadFps: 4, dynamicBarrelOffsets: true,
             muzzleFrom: Items.Mailbox, fireAudio: "chain_launch_sound", suppressReloadLabel: true, curse: 1f)
           .AssignGun(out Gun gun)
@@ -59,6 +59,7 @@ public class Akelus : CwaffGun
       const float LANDING_TIME = 0.05f;
       const float JUMP_DISTANCE = 6f;
       const float RECOVERY_TIME = 0.5f;
+      const float DESTROY_BULLET_RADIUS = 2f;
       const float LAUNCH_RADIUS = 4f;
       const float LAUNCH_RADIUS_SQR = LAUNCH_RADIUS * LAUNCH_RADIUS;
 
@@ -107,7 +108,7 @@ public class Akelus : CwaffGun
       Vector2 hammerPos = this.gun.barrelOffset.position;
       Lazy.ScorchGroundAt(hammerPos);
       Exploder.DoDistortionWave(center: hammerPos, distortionIntensity: 1.25f, distortionRadius: 0.5f, maxRadius: 1.5f, duration: 0.175f);
-      SilencerInstance.DestroyBulletsInRange(hammerPos, LAUNCH_RADIUS + 0.5f, true, false, player);
+      SilencerInstance.DestroyBulletsInRange(hammerPos, DESTROY_BULLET_RADIUS, true, false, player);
       GameObject shockwave = new GameObject("akelus shockwave");
       shockwave.transform.position = hammerPos;
       AkelusShockwaveDoer asd = shockwave.AddComponent<AkelusShockwaveDoer>();
@@ -145,7 +146,8 @@ public class AkelusShockwaveDoer : MonoBehaviour
       float range = Mathf.Min(Mathf.Sqrt(sqrRange), 10);
       Vector2 shockwaveCenter = base.transform.position;
       base.gameObject.Play("akelus_impact_sound");
-      Lazy.LaunchAllEnemiesAroundPoint(damage, force, shockwaveCenter, 0, range, horizontalForce, true);
+      Lazy.LaunchAllEnemiesAroundPoint(damage, force, shockwaveCenter, 0, range, horizontalForce,
+        flipPotency: 0.85f, potencyAtMaxRange: 0.30f);
       Exploder.DoRadialMinorBreakableBreak(shockwaveCenter, range);
       Exploder.DoRadialMajorBreakableDamage(damage, shockwaveCenter, range);
       Exploder.DoRadialPush(shockwaveCenter, force, range);

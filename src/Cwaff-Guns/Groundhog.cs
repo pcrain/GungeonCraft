@@ -119,7 +119,7 @@ public class Groundhog : CwaffGun
           for (int i = 1; i < intRange; ++i)
           {
             base.gameObject.Play("earthquake_sound");
-            Lazy.LaunchAllEnemiesAroundPoint(damage, force, shockwaveCenter, Mathf.Max(i - 1.5f, 0), i + 0.5f, horizontalForce, false);
+            Lazy.LaunchAllEnemiesAroundPoint(damage, force, shockwaveCenter, Mathf.Max(i - 1.5f, 0), i + 0.5f, horizontalForce);
             Exploder.DoRadialMinorBreakableBreak(shockwaveCenter, i);
             Exploder.DoRadialMajorBreakableDamage(damage, shockwaveCenter, intRange);
             Exploder.DoRadialPush(shockwaveCenter, force, i);

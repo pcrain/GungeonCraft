@@ -1639,20 +1639,25 @@ public static class Lazy
     CollisionLayer.Projectile, CollisionLayer.PlayerHitBox, CollisionLayer.PlayerCollider, CollisionLayer.LowObstacle);
 
   /// <summary>Launch all enemies skyward.</summary>
-  public static void LaunchAllEnemiesAroundPoint(float damage, float force, Vector2 shockwaveCenter, float minRange, float maxRange, float horizontalForce, bool doFlips)
+  public static void LaunchAllEnemiesAroundPoint(float damage, float force, Vector2 shockwaveCenter, float minRange, float maxRange, float horizontalForce,
+    float flipPotency = 1.0f, float potencyAtMaxRange = 1.0f)
   {
     const string LAUNCH_REASON = "Uppies! :D";
 
     float minRangeSqr = minRange * minRange;
     float maxRangeSqr = maxRange * maxRange;
+    float deltaRangeSqr = (maxRange - minRange) * (maxRange - minRange);
     foreach (AIActor enemy in Lazy.GetAllNearbyEnemies(shockwaveCenter, maxRange, includeInvulnerable: true, limitToCurrentRoom: false))
     {
-      if (enemy.healthHaver is not HealthHaver hh || (enemy.CenterPosition - shockwaveCenter).sqrMagnitude < minRangeSqr)
+      float sqrDist = (enemy.CenterPosition - shockwaveCenter).sqrMagnitude;
+      if (enemy.healthHaver is not HealthHaver hh || sqrDist < minRangeSqr)
         continue;
+
+      float potency = 1f - (1f - potencyAtMaxRange) * Mathf.InverseLerp(minRangeSqr, maxRangeSqr, sqrDist);
       if (enemy.behaviorSpeculator is not BehaviorSpeculator bs || bs.ImmuneToStun || hh.IsBoss || hh.IsSubboss)
-        enemy.healthHaver.ApplyDamage(damage, Vector2.zero, LAUNCH_REASON, CoreDamageTypes.None, DamageCategory.Collision);
+        enemy.healthHaver.ApplyDamage(potency * damage, Vector2.zero, LAUNCH_REASON, CoreDamageTypes.None, DamageCategory.Collision);
       else
-        enemy.StartCoroutine(LaunchTime(enemy, shockwaveCenter, damage, force, horizontalForce, doFlips));
+        enemy.StartCoroutine(LaunchTime(enemy, shockwaveCenter, potency * damage, potency * force, potency * horizontalForce, potency > flipPotency));
     }
 
     static IEnumerator LaunchTime(AIActor enemy, Vector2 center, float damage, float force, float horizontalForce, bool doFlips)
