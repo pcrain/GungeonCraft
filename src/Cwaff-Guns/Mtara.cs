@@ -34,16 +34,26 @@ public class Mtara : CwaffGun
         player.SuppressThisClick = true;
     }
 
+    private void Start()
+    {
+        gun.sprite.MakeGlowyBetter(0.9f, new Color(0.0f, 0.7f, 0.5f), 20.0f, 0.1f);
+    }
+
     public override void Update()
     {
         base.Update();
+        Material mat = gun.sprite.renderer.material;
+        mat.SetFloat(CwaffVFX._EmissivePowerId, 0.1f);
         if (this.PlayerOwner is not PlayerController player)
             return;
         bool isActuallyFiring = this.gun && this.gun.IsFiring && !player.IsDodgeRolling;
         UpdateHeat(isActuallyFiring);
         this.gun.LoopSoundIf(isActuallyFiring, "focus_rifle_fire_sound", loopPointMs: 800, rewindAmountMs: 800 - 601);
         if (GetExtantBeam() is BasicBeamController beam && beam.State == BeamState.Firing)
+        {
             UpdateLights();
+            mat.SetFloat(CwaffVFX._EmissivePowerId, 0.9f + 0.8f * Mathf.Abs(Mathf.Sin(15f * BraveTime.ScaledTimeSinceStartup)));
+        }
     }
 
     private float HeatPercent() => this._heat / _OVERHEAT_TIME;
