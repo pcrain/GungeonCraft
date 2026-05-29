@@ -94,7 +94,9 @@ public static class Lazy
             item = obj.AddComponent<TItemSpecific>();
         }
 
+        item.name = internalName; // NOTE: small hack to make sure the ammonomicon key includes our mod prefix to avoid conflating ammonomicon entries
         ETGMod.Databases.Items.SetupItem(item, itemName);
+        item.name = baseItemName; // set the item name back to what it was
         if (!hideFromAmmonomicon || C.DEBUG_BUILD) // only allow spawning hidden items through console in debug mode
             Gungeon.Game.Items.Add(internalName, item);
 
