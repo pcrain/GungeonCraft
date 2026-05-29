@@ -8,6 +8,7 @@
 - Improved Groundhog's enemy launch effect to be less janky
 - Made Groundhog's shockwave deal damage to chests and other major breakable objects
 - Prevented attack effects from several guns and items from affecting the player's companions
+- Fixed Shmuppy's Fortune's Favor effect blocking beams even when they're supposed to be vulnerable
 
 ## 1.31.2 (2026-05-25)
 

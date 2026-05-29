@@ -131,17 +131,37 @@ public class ShmuppyCompanion : CwaffCompanionController
             m_aiActor.MovementSpeed = _SPEED;
             this._hh = m_aiActor.gameObject.GetComponent<HealthHaver>();
             if (!_isCompanion)
-            {
-              this._uff = m_aiActor.gameObject.AddComponent<UltraFortunesFavor>();
-              this._uff.sparkOctantVFX      = CwaffCompanionAndEnemyBuilder.FortunesFavorVFX;
-              this._uff.vfxOffset           = 0.625f;
-              this._uff.bulletRadius        = 2f;
-              this._uff.bulletSpeedModifier = 0.8f;
-              this._uff.beamRadius          = 2f;
-              this._uff.goopRadius          = 2f;
-              this._uff.enabled             = false;
               m_aiActor.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
-            }
+        }
+
+        private void SetupUltraFortunesFavor()
+        {
+          if (this._uff)
+            return;
+
+          this._uff = m_aiActor.gameObject.AddComponent<UltraFortunesFavor>();
+          this._uff.sparkOctantVFX      = CwaffCompanionAndEnemyBuilder.FortunesFavorVFX;
+          this._uff.vfxOffset           = 0.625f;
+          this._uff.bulletRadius        = 2f;
+          this._uff.bulletSpeedModifier = 0.8f;
+          this._uff.beamRadius          = 2f;
+          this._uff.goopRadius          = 2f;
+          this._uff.enabled             = true;
+          this.m_aiActor.RegenerateCache();
+        }
+
+        private void DismissUltraFortunesFavor()
+        {
+          if (!this._uff)
+            return;
+
+          if (this._uff.m_bulletBlocker != null)
+            base.m_aiActor.specRigidbody.PixelColliders.Remove(this._uff.m_bulletBlocker);
+          if (this._uff.m_beamReflector != null)
+            base.m_aiActor.specRigidbody.PixelColliders.Remove(this._uff.m_beamReflector);
+          UnityEngine.Object.Destroy(this._uff);
+          this._uff = null;
+          this.m_aiActor.RegenerateCache();
         }
 
         private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -157,6 +177,7 @@ public class ShmuppyCompanion : CwaffCompanionController
             base.m_aiAnimator.EndAnimation();
             if (this._targetActor is AIActor enemy && enemy.OverrideTarget == this.m_aiActor.specRigidbody)
               enemy.OverrideTarget = null;
+            DismissUltraFortunesFavor();
         }
 
         private AIActor FindNearbyBulletKin()
@@ -183,8 +204,8 @@ public class ShmuppyCompanion : CwaffCompanionController
         protected override void TickMovement(ref Vector2 voluntaryVel, ref Vector2 involuntaryVel)
         {
             base.TickMovement(ref voluntaryVel, ref involuntaryVel);
-            if (this._state != BARK && this._uff)
-              this._uff.enabled = false;
+            if (this._state != BARK)
+              DismissUltraFortunesFavor();
             else if (this._state == BARK && this._targetActor)
             {
               float targetDir = (this._targetActor.CenterPosition - m_aiActor.CenterPosition).ToAngle();
@@ -311,7 +332,7 @@ public class ShmuppyCompanion : CwaffCompanionController
                       }
                   this._state = BARK;
                   if (!this._isCompanion)
-                    this._uff.enabled = true;
+                    SetupUltraFortunesFavor();
                   this.m_stateTimer = 3.0f;
                   if (this._targetActor is AIActor enemy && enemy.OverrideTarget == null)
                     enemy.OverrideTarget = this.m_aiActor.specRigidbody;

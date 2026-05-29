@@ -483,23 +483,47 @@ static class BeamApplyArbitraryStatusEffectPatch
     }
 }
 
-/// <summary>Fixes issue with UltraFortunesFavor causing IsGunBlocked() to return true even when disabled</summary>
-[HarmonyPatch(typeof(Gun), nameof(Gun.IsGunBlocked))]
-static class GunIsGunBlockedPatch
-{
-  [HarmonyILManipulator]
-  private static void GunIsGunBlockedPatchIL(ILContext il)
-  {
-      ILCursor cursor = new ILCursor(il);
-      if (!cursor.TryGotoNext(MoveType.After,
-        instr => instr.MatchLdloc((byte)8),
-        instr => instr.MatchCall<UnityEngine.Object>("op_Implicit")
-        )) // V_8 == ultraFortunesFavor
-          return;
+//NOTE: even with both of these patches enabled, Shmuppy's hitbox collider was still distorted due to the circular collider of
+//      the disabled UltraFortunesFavor component. So, we're just destroying / recreating it as needed, and to heck with these patches
+// /// <summary>Fixes issue with UltraFortunesFavor causing IsGunBlocked() to return true even when disabled</summary>
+// [HarmonyPatch(typeof(Gun), nameof(Gun.IsGunBlocked))]
+// static class GunIsGunBlockedPatch
+// {
+//   [HarmonyILManipulator]
+//   private static void GunIsGunBlockedPatchIL(ILContext il)
+//   {
+//       ILCursor cursor = new ILCursor(il);
+//       if (!cursor.TryGotoNext(MoveType.After,
+//         instr => instr.MatchLdloc((byte)8),
+//         instr => instr.MatchCall<UnityEngine.Object>("op_Implicit")
+//         )) // V_8 == ultraFortunesFavor
+//           return;
 
-      cursor.Emit(OpCodes.Ldloc_S, (byte)8); // V_8 == ultraFortunesFavor
-      cursor.CallPrivate(typeof(GunIsGunBlockedPatch), nameof(IsUFFEnabled));
-  }
+//       cursor.Emit(OpCodes.Ldloc_S, (byte)8); // V_8 == ultraFortunesFavor
+//       cursor.CallPrivate(typeof(GunIsGunBlockedPatch), nameof(IsUFFEnabled));
+//   }
 
-  private static bool IsUFFEnabled(bool origValue, UltraFortunesFavor uff) => origValue && uff.enabled;
-}
+//   private static bool IsUFFEnabled(bool origValue, UltraFortunesFavor uff) => origValue && uff.enabled;
+// }
+
+// /// <summary>Fixes issue with UltraFortunesFavor causing beams to fail to make contact even when disabled</summary>
+// [HarmonyPatch]
+// static class BasicBeamControllerHandleBeamFramePatch
+// {
+//   [HarmonyPatch(typeof(BasicBeamController), nameof(BasicBeamController.HandleBeamFrame))]
+//   [HarmonyILManipulator]
+//   private static void BasicBeamControllerHandleBeamFramePatchIL(ILContext il)
+//   {
+//       ILCursor cursor = new ILCursor(il);
+//       if (!cursor.TryGotoNext(MoveType.After,
+//         instr => instr.MatchLdloc((byte)61), // hitRigidbody
+//         instr => instr.MatchCallvirt<BraveBehaviour>("get_ultraFortunesFavor")
+//         ))
+//           return;
+
+//       cursor.CallPrivate(typeof(BasicBeamControllerHandleBeamFramePatch), nameof(NullIfDisabled));
+//       Lazy.DebugConsoleLog($"  doop time");
+//   }
+
+//   private static UltraFortunesFavor NullIfDisabled(UltraFortunesFavor uff) => (uff && uff.enabled) ? uff : null;
+// }
