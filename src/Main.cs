@@ -403,6 +403,7 @@ public class Initialisation : BaseUnityPlugin
             #region Custom Character Initialization
                 System.Diagnostics.Stopwatch setupCharactersWatch = System.Diagnostics.Stopwatch.StartNew();
                 Rogo.Init();
+                Rancher.Init();
                 setupCharactersWatch.Stop();
             #endregion
 

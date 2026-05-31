@@ -100,6 +100,7 @@
     <Compile Include="src\Lazy.cs"/>
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\Cwaff-Characters\Rogo\PogoGun.cs"/>
+    <Compile Include="src\Cwaff-Characters\Rogo\Rancher.cs"/>
     <Compile Include="src\Cwaff-Characters\Rogo\Rogo.cs"/>
     <Compile Include="src\Cwaff-Characters\CwaffCharacterCore.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\BuildABoss.cs"/>
@@ -324,7 +325,9 @@
     <EmbeddedResource Include="Resources\Atlases\atlas_1.atlas"/>
     <EmbeddedResource Include="Resources\shmuppy_portrait.png"/>
     <EmbeddedResource Include="Resources\cwaffshaders-windows"/>
+    <EmbeddedResource Include="Resources\rancher_victory.png"/>
     <EmbeddedResource Include="Resources\rogo_bosscard.png"/>
+    <EmbeddedResource Include="Resources\rancher_bosscard.png"/>
     <EmbeddedResource Include="Resources\rogo_victory.png"/>
     <EmbeddedResource Include="Resources\Rooms\shuffle_puzzle.newroom"/>
     <EmbeddedResource Include="Resources\Rooms\floor_puzzle.newroom"/>

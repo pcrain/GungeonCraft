@@ -13,7 +13,7 @@ public static class CwaffCharacter
 
   public static PlayerController MakeNewCustomCharacter(this CustomCharacterData data)
   {
-    data.nameInternal = data.name.ToLower();
+    data.nameInternal = data.nameShort.ToLower();
     data.collection = Collection;
     data.normalMaterial = new Material(ShaderCache.Acquire("Brave/PlayerShader"));
     data.characterID = CharacterBuilder.storedCharacters.Count;
@@ -36,6 +36,8 @@ public static class CwaffCharacter
     pc.minimapIconPrefab = UnityEngine.GameObject.Instantiate(pc.minimapIconPrefab);
     GameObject.DontDestroyOnLoad(pc.minimapIconPrefab);
     int minimapSpriteId = Collection.GetSpriteIdByName($"{data.nameInternal}_minimap_icon", -1);
+    if (minimapSpriteId < 0)
+      minimapSpriteId = Collection.GetSpriteIdByName($"{data.nameInternal}_minimap_icon_001", -1);
     if (minimapSpriteId >= 0)
     {
       Collection.spriteDefinitions[minimapSpriteId].BetterConstructOffsetsFromAnchor(Anchor.MiddleCenter);
@@ -111,19 +113,44 @@ public static class CwaffCharacter
     }
     int clipId = animator.Library.GetClipIdByName(animName);
     if (clipId >= 0)
+    {
       animator.Library.clips[clipId] = newClip;
+      // Lazy.DebugLog($"  replaced animation {animName} with {spriteName}");
+    }
     else
+    {
       Lazy.Append(ref animator.Library.clips, newClip);
+      // Lazy.DebugLog($"  added animation {animName} from {spriteName}");
+    }
     return animator;
   }
 
-  public static tk2dSpriteAnimator InitAnimations(this PlayerController pc, CustomCharacterData data, Dictionary<string, float> fpsDict)
+  public static tk2dSpriteAnimator RemoveAnimation(this tk2dSpriteAnimator animator, string animName)
+  {
+    tk2dSpriteCollectionData col = Collection;
+    int clipId = animator.Library.GetClipIdByName(animName);
+    if (clipId < 0)
+    {
+      Lazy.DebugWarn($"could not find animation {animName}");
+      return animator;
+    }
+    int newLength = animator.Library.clips.Length - 1;
+    animator.Library.clips[clipId] = animator.Library.clips[newLength];
+    Array.Resize(ref animator.Library.clips, newLength);
+    // Lazy.DebugLog($"  removed animation {animName}");
+    return animator;
+  }
+
+  public static tk2dSpriteAnimator InitAnimations(this PlayerController pc, CustomCharacterData data, Dictionary<string, float> fpsDict, List<string> remove = null)
   {
     tk2dSpriteCollectionData col = Collection;
     pc.spriteAnimator.Library = UnityEngine.Object.Instantiate(pc.spriteAnimator.Library);
     pc.spriteAnimator.library.name = $"{data.nameInternal} library";
     GameObject.DontDestroyOnLoad(pc.spriteAnimator.Library);
-    tk2dSpriteAnimationClip[] clips = pc.spriteAnimator.Library.clips;
+    if (remove != null)
+      foreach (string animToRemove in remove)
+        pc.spriteAnimator.RemoveAnimation(animToRemove);
+    tk2dSpriteAnimationClip[] clips = pc.spriteAnimator.Library.clips; //NOTE: do this AFTER removing animations so we have an up to date reference
     for (int i = 0; i < clips.Length; ++i)
     {
       tk2dSpriteAnimationClip clip = clips[i];
@@ -152,7 +179,7 @@ public static class CwaffCharacter
         }
       }
 
-      // System.Console.WriteLine($"  updated animations for {clip.name} a.k.a. {frameName} with framerate {newClip.fps}");
+      // Lazy.DebugLog($"  updated animations for {clip.name} a.k.a. {frameName} with framerate {newClip.fps}");
       clips[i] = newClip;
     }
 
