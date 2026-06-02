@@ -280,7 +280,8 @@ public static class CwaffCompanionAndEnemyBuilder
         return friend;
     }
 
-    public static AIActor InitEnemy(this string enemyName, int health, string shortDesc, string longDesc, int baseFps = 4, List<string> extraAnims = null, bool autoRigidBody = true, bool doCorpse = true)
+    public static AIActor InitEnemy(this string enemyName, int health, string shortDesc = null, string longDesc = null, int baseFps = 4, List<string> extraAnims = null,
+      bool autoRigidBody = true, bool doCorpse = true)
     {
         string name = enemyName.ToID();
         if (ResMap.Get($"{name}_idle") == null)
@@ -308,7 +309,8 @@ public static class CwaffCompanionAndEnemyBuilder
         if (FortunesFavorVFX == null)
           FortunesFavorVFX = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
 
-        actor.SetupAmmonomiconEntry(shortDesc: shortDesc, longDesc: longDesc, EnemyName: enemyName);
+        if (!string.IsNullOrEmpty(shortDesc) && !string.IsNullOrEmpty(longDesc))
+          actor.SetupAmmonomiconEntry(shortDesc: shortDesc, longDesc: longDesc, EnemyName: enemyName);
         Game.Enemies.Add($"{C.MOD_PREFIX}:{name}", actor);
         return actor;
     }

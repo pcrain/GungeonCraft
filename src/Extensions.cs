@@ -3906,7 +3906,7 @@ public static class Extensions
   }
 
   //REFACTOR: use this for Leafblower
-  /// <summary>Apply knockback to a KnockbackDoer from a continuous, known source (used by, e.g., Leafblower, Fluxfist, Newton's Apple)</summary>
+  /// <summary>Apply knockback to a KnockbackDoer from a continuous, known source (used by, e.g., Leafblower, Fluxfist, Newton's Apple, Vacpack)</summary>
   public static void ApplyContinuousSourcedKnockback(this AIActor enemy, GameObject source, Dictionary<AIActor, ActiveKnockbackData> activeKbs, Vector2 velocity)
   {
     float force = velocity.magnitude;

@@ -922,11 +922,12 @@ public partial class CwaffVFX // public
     /// <param name="spriteId">The sprite id to use if not passing a prefab.</param>
     /// <param name="animator">The animator to use if not passing a prefab.</param>
     /// <param name="unoccluded">If true, sprite is rendered on the unoccluded layer.</param>
+    /// <param name="copyShaders">If true, copies shaders from the prefab.</param>
     public static void Spawn(GameObject prefab = null, Vector3 position = default, Quaternion? rotation = null,
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null,
         bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1,
         bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f,
-        tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null, bool unoccluded = false)
+        tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null, bool unoccluded = false, bool copyShaders = false)
     {
         if (_DespawnedVFX.Count == 0)
         {
@@ -961,7 +962,8 @@ public partial class CwaffVFX // public
             spriteCol       : spriteCol,
             spriteId        : spriteId,
             animator        : animator,
-            unoccluded      : unoccluded
+            unoccluded      : unoccluded,
+            copyShaders     : copyShaders
             );
     }
 
@@ -1007,11 +1009,12 @@ public partial class CwaffVFX // public
     /// <param name="lifetimeVariance">Adds up to this much time at random to individual particles.</param>
     /// <param name="minVariance">If positionVariance is set, positionVariance will be at least minVariance.</param>
     /// <param name="unoccluded">If true, sprite is rendered on the unoccluded layer.</param>
+    /// <param name="copyShaders">If true, copies shaders from the prefab.</param>
     public static void SpawnBurst(GameObject prefab = null, int numToSpawn = 1, Vector2 basePosition = default, float positionVariance = 0f, Vector2? baseVelocity = null, float minVelocity = 0f, float velocityVariance = 0f,
         Vel velType = Vel.Random, Rot rotType = Rot.None, float lifetime = 0, float? fadeOutTime = null, float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false,
         bool uniform = false, float? startScale = null, float? endScale = null, float? height = null, bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false,
         Transform anchorTransform = null, Color? overrideColor = null, float emitColorPower = 1.55f, float spread = 0f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, float lifetimeVariance = 0f,
-        float minVariance = 0f, bool unoccluded = false)
+        float minVariance = 0f, bool unoccluded = false, bool copyShaders = false)
     {
         Vector2 realBaseVelocity = baseVelocity ?? Vector2.zero;
         float baseAngle = Lazy.RandomAngle();
@@ -1066,7 +1069,8 @@ public partial class CwaffVFX // public
                 emitColorPower  : emitColorPower,
                 spriteCol       : spriteCol,
                 spriteId        : spriteId,
-                unoccluded      : unoccluded
+                unoccluded      : unoccluded,
+                copyShaders     : copyShaders
                 );
         }
     }
@@ -1217,7 +1221,8 @@ public partial class CwaffVFX // private
         Vector2? velocity = null, float lifetime = 0, float? fadeOutTime = null,
         float emissivePower = 0, Color? emissiveColor = null, bool fadeIn = false, float? startScale = null, float? endScale = null, float? height = null,
         bool randomFrame = false, int specificFrame = -1, bool flipX = false, bool flipY = false, Transform anchorTransform = null, Color? overrideColor = null,
-        float emitColorPower = 1.55f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null, bool unoccluded = false)
+        float emitColorPower = 1.55f, tk2dSpriteCollectionData spriteCol = null, int spriteId = -1, tk2dSpriteAnimator animator = null, bool unoccluded = false,
+        bool copyShaders = false)
     {
         this._shouldDespawn = false;
         this._vfx.SetActive(true);
@@ -1300,7 +1305,12 @@ public partial class CwaffVFX // private
         this._sprite.OverrideMaterialMode = SpriteMaterialOverrideMode.OVERRIDE_MATERIAL_COMPLEX;
         this._material = this._sprite.renderer.material;
         this._sprite.ApplyEmissivePropertyBlock = false;
-        if (emissivePower > 0)
+        if (copyShaders)
+        {
+          this._material = this._sprite.renderer.material = prefab.gameObject.GetComponent<tk2dSprite>().renderer.material;
+          // this._sprite.MakeGlowyBetter(100.0f, Color.white, 100.0f, sensitivity: 2.0f);
+        }
+        else if (emissivePower > 0)
         {
             this._material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
             this._material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");

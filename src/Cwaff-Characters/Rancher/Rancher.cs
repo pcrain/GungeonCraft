@@ -22,7 +22,13 @@ public class Rancher
 
   public static void Init()
   {
-    // Basic setup
+    // Enemy Setup
+    Slimybois.Init();
+
+    // Gun Setup
+    Vacpack.Init();
+
+    // Character setup
     CustomCharacterData data = new() {
       baseCharacter     = PlayableCharacters.Robot,
       identity          = Character,
@@ -33,8 +39,7 @@ public class Rancher
       armor             = 0,
       foyerPos          = new Vector3(25.25f, 22.25f),
       loadout           = new(){
-        new(Lazy.Pickup<PogoGun>(), false),
-        new(Lazy.Pickup<PogoStick>(), false),
+        new(Lazy.Pickup<Vacpack>(), false),
       },
       idleDoer          = new GameObject().RegisterPrefab().InitComponent<CharacterSelectIdleDoer>(i => {
           i.phases = new CharacterSelectIdlePhase[]{
@@ -43,7 +48,7 @@ public class Rancher
       }),
     };
     PlayerController pc = data.MakeNewCustomCharacter();
-    pc.gunAttachPoint.localPosition = new Vector3(0.5f, 0.375f, 0.0f); // NOTE: fix wonky hand offset, integrate directly into MakeNewCustomCharacter
+    pc.gunAttachPoint.localPosition = new Vector3(0.5f, 0.5f, 0.0f); // NOTE: fix wonky hand offset, integrate directly into MakeNewCustomCharacter
 
     // Sprite setup
     pc.InitAnimations(data, _AnimFPS, remove: ["select_stargaze", "select_casing", "select_stargaze_cry", "select_headspin", "spinfall"])

@@ -425,3 +425,8 @@ akelus_lunge_sound,5.0,1,sound,0
 akelus_return_sound,4.0,1,sound,0
 focus_rifle_fire_sound,-3.0,0,sound,0
 mtara_impact_sound,2.0,0,sound,1
+vacpack_fire_sound,8.0,0,sound,1
+slime_shoot_sound,5.0,1,sound,1
+slime_vacuum_sound,5.0,1,sound,1
+slime_death_sound_a,5.0,1,sound,1
+slime_death_sound_b,5.0,1,sound,1
