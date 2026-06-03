@@ -12,6 +12,8 @@
 - Fixed ammonomicon conflicts with items from other mods due to having identical ammonomicon entry lookup keys
 - Fixed broken line of sight detection code preventing Retina's ammo display from updating
 - Fixed broken line of sight detection code rendering Chekhov's Gun, Deadline, and Pistol Whip unusable
+- Fixed outline artifacts on Pogo Stick's sprite when active
+- Fixed bad sprite alignment when Rogo is riding on Pogo Stick
 
 ## 1.31.2 (2026-05-25)
 

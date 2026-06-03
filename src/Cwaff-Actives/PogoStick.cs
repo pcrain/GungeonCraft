@@ -236,12 +236,15 @@ public class PogoStick : CwaffDodgeRollActiveItem
             playerSprite.UpdateZDepth();
         }
         this._inFrontOfPlayer = (this._owner.m_currentGunAngle > 155f || this._owner.m_currentGunAngle < 25f);
-        Vector2 basePos = playerSprite.WorldBottomCenter.Quantize(0.0625f, VectorConversions.Floor);
+        Vector2 basePos = playerSprite.WorldBottomCenter.Quantize(0.0625f, VectorConversions.Ceil);
         string playerSpriteName = playerSprite.CurrentSprite.name;
-        if (playerSprite.FlipX && !playerSpriteName.Contains("front") && !playerSpriteName.Contains("back"))
-            basePos += new Vector2(-1/16f, 0f); //HACK: one pixel off when facing left
+        if (playerSprite.FlipX && playerSpriteName.Contains("back_right"))
+          basePos += new Vector2(1/16f, 0f); //HACK: one pixel off when facing back left
+        else if (!playerSprite.FlipX && playerSpriteName.Contains("front_right"))
+          basePos += new Vector2(1/16f, 0f); //HACK: one pixel off when facing front right
+        // basePos += new Vector2(-1/32f, 0f);
         this._attachedPogo.transform.position = (basePos + _OFFSET).ToVector3ZisY(this._inFrontOfPlayer ? SOUTH_DEPTH : NORTH_DEPTH);
-        // System.Console.WriteLine($"  now at {this._attachedPogo.transform.position} (local: {this._attachedPogo.transform.localPosition}) (scale: {newPlayerSprite.scale})");
+        // System.Console.WriteLine($"  now at {this._attachedPogo.transform.position.x} (local: {this._attachedPogo.transform.localPosition.x})");
     }
 
     // [HarmonyPatch]

@@ -7,8 +7,8 @@ public class PogoGun : CwaffGun
     public static string LongDescription  = "Fires ordinary projectiles via extraordinary mechanisms. Cannot be fired while being ridden. Infinite ammo. Does not reveal secret walls.";
     public static string Lore             = "Rogo's trusty pogo, versatile as both a weapon and a mode of transportation. He never goes anywhere without it.";
 
-    private static readonly Vector3 _PogoLeftHandOffset = new Vector3(-3/16f, 17/16f, 0f);
-    private static readonly Vector3 _PogoRightHandOffset = new Vector3(4/16f, 17/16f, 0f);
+    private static readonly Vector3 _PogoLeftHandOffset = new Vector3(-4/16f, 17/16f, 0f);
+    private static readonly Vector3 _PogoRightHandOffset = new Vector3(3/16f, 17/16f, 0f);
 
     private PogoStick  _pogoItem  = null;
     private tk2dSprite _leftHand  = null;
