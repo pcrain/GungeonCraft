@@ -16,6 +16,7 @@
 - Fixed bad sprite alignment when Rogo is riding on Pogo Stick
 - Fixed overdraw on Pogo Stick's targeting reticle adding an extra wedge of color where it shouldn't have been
 - Removed a misplaced extra frame that found its way into one of Rogo's co-op ghost animations
+- Added mod prefix to Shmuppy's game enemy database entry for better compatibility
 
 ## 1.31.2 (2026-05-25)
 
