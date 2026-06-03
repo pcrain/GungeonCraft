@@ -1,20 +1,24 @@
 # Changelog
 
-## 1.32.0 (TBD)
+## 1.31.3 (2026-06-02)
 
-- Added Akelus and M'tara
-- Clarified in Vengeful Spirit's description that double damage applies to enemy types, not individual enemies
-- Fixed bug where Groundhog would not damage enemies that were right on top of the detonation point
-- Improved Groundhog's enemy launch effect to be less janky
+#### Balance Changes and Polish:
+
 - Made Groundhog's shockwave deal damage to chests and other major breakable objects
-- Prevented attack effects from several guns and items from affecting the player's companions
-- Fixed Shmuppy's Fortune's Favor effect blocking beams even when they're supposed to be vulnerable
-- Fixed ammonomicon conflicts with items from other mods due to having identical ammonomicon entry lookup keys
+- Improved Groundhog's enemy launch effect to be less janky
+
+#### Bugfixes and Misc:
+
 - Fixed broken line of sight detection code preventing Retina's ammo display from updating
 - Fixed broken line of sight detection code rendering Chekhov's Gun, Deadline, and Pistol Whip unusable
+- Fixed Shmuppy's Fortune's Favor effect blocking beams even when they're supposed to be vulnerable
+- Fixed ammonomicon conflicts with items from other mods due to having identical ammonomicon entry lookup keys
+- Fixed bug where Groundhog would not damage enemies that were right on top of the detonation point
 - Fixed outline artifacts on Pogo Stick's sprite when active
 - Fixed bad sprite alignment when Rogo is riding on Pogo Stick
 - Fixed overdraw on Pogo Stick's targeting reticle adding an extra wedge of color where it shouldn't have been
+- Prevented attack effects from several guns and items from affecting the player's companions
+- Clarified in Vengeful Spirit's description that double damage applies to enemy types, not individual enemies
 - Removed a misplaced extra frame that found its way into one of Rogo's co-op ghost animations
 - Added mod prefix to Shmuppy's game enemy database entry for better compatibility
 
