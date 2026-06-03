@@ -108,22 +108,16 @@ public class Vacpack : CwaffGun
     public void ProcessSlime(SlimyboiController sloim)
     {
         base.gameObject.PlayUnique("slime_vacuum_sound");
+        Vector2 pos = (this.PlayerOwner.CurrentGun is Gun gun) ? gun.barrelOffset.position : sloim.aiActor.CenterPosition;
         sloim.aiActor.EraseFromExistence(suppressDeathSounds: true);
-        CwaffVFX.SpawnBurst(
-          prefab           : _VacpackVFX,
-          numToSpawn       : 8,
-          basePosition     : this.gun.barrelOffset.position,
-          positionVariance : 0.5f,
-          baseVelocity     : null,
-          minVelocity      : 4f,
-          velocityVariance : 4f,
-          velType          : CwaffVFX.Vel.Away,
-          rotType          : CwaffVFX.Rot.Random,
-          lifetime         : 0.5f,
-          fadeOutTime      : 0.5f,
-          startScale       : 1.0f,
-          endScale         : 0.1f
-          );
+        for (int i = 0; i < 10; ++i)
+        {
+          DebrisObject debris = UnityEngine.Object.Instantiate(
+            Slimybois._SlimeGoopDebris, pos, Quaternion.identity).GetComponent<DebrisObject>();
+          debris.GravityOverride = 30.0f;
+          debris.Trigger(Lazy.RandomVector(3f * UnityEngine.Random.value).ToVector3ZUp(4f), 0.25f);
+          debris.sprite.MakeGlowyBetter(glowAmount: 10.0f, glowColor: new Color(1.0f, 0.75f, 0.9f), glowColorPower: 20.0f, sensitivity: 0.3f);
+        }
     }
 }
 
