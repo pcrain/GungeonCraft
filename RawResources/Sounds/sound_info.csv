@@ -431,3 +431,4 @@ slime_vacuum_sound,5.0,1,sound,1
 slime_death_sound_a,5.0,1,sound,1
 slime_death_sound_b,5.0,1,sound,1
 slime_attack_sound,4.0,1,sound,1
+slime_launch_sound,3.0,1,sound,1

@@ -24,11 +24,53 @@ public class Vacpack : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Vacpack>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.EXCLUDED, gunClass: CwaffGunClass.UTILITY, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
-            chargeFps: 16, banFromBlessedRuns: true)
+          .SetAttributes(quality: ItemQuality.EXCLUDED, gunClass: CwaffGunClass.UTILITY, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true, modulesAreTiers: true,
+            chargeFps: 16, banFromBlessedRuns: true, isStarterGun: true, doesScreenShake: false) // TODO: verify this doesn't break paradox
+          .Attach<VacpackAmmoDisplay>()
+          .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, hideAmmo: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
+        ProjectileModule shootMod = new ProjectileModule().InitSpecialSingleProjectileModule<SlimeProjectile>(GunData.New(
+          gun: gun, baseProjectile: Items._38Special.Projectile(), clipSize: -1, cooldown: 0.11f, shootStyle: ShootStyle.SemiAutomatic,
+          damage: 3.0f, speed: 100f, range: 9999f, force: 12f,  hitSound: "generic_bullet_impact", angleVariance: 10.0f
+          ));
+        gun.Volley.projectiles.Add(shootMod);
+
         _VacpackVFX = VFX.Create("vacpack_wind_sprite_a", fps: 30, loopStart: 6, scale: 0.5f);
+    }
+
+    private class SlimeProjectile : WeirdProjectile
+    {
+        private static void BecomeSlime(Projectile proj)
+        {
+          AIActor newSlime = AIActor.Spawn(
+            prefabActor     : Slimybois.PinkSlimeEnemyPrefab,
+            position        : proj.SafeCenter,
+            source          : proj.SafeCenter.GetAbsoluteRoom(),
+            awakenAnimType  : AIActor.AwakenAnimationType.Spawn,
+            correctForWalls : true);
+          newSlime.SpawnInInstantly(isReinforcement: true);
+          newSlime.gameObject.AddComponent<KnockbackUnleasher>();
+          newSlime.knockbackDoer.ApplySourcedKnockback(
+            direction: proj.transform.right, time: 1.0f, source: newSlime.gameObject,
+            force: proj.baseData.speed * UnityEngine.Random.Range(0.8f, 1.2f));
+          newSlime.gameObject.GetComponent<SlimyboiController>().HandleFiredFromVacpack();
+        }
+
+        protected override void OnFiredByAnything()
+        {
+          BecomeSlime(this);
+          DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
+        }
+    }
+
+    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    {
+        base.OnReloadPressed(player, gun, manualReload);
+        if (!manualReload || !player.AcceptingNonMotionInput || gun.IsFiring)
+            return;
+        this.gun.CurrentStrengthTier = (this.gun.CurrentStrengthTier + 1) % 2;
+        ClearCachedShootData(); // reset particle effects
     }
 
     public override void Update()
@@ -39,10 +81,13 @@ public class Vacpack : CwaffGun
           this.gun.LoopSoundIf(false, "vacpack_fire_sound");
           return;
         }
-        bool isCharging = this.gun.IsCharging;
+        bool isCharging = this.gun.IsCharging && this.gun.m_currentStrengthTier == 0;
         this.gun.LoopSoundIf(isCharging, "vacpack_fire_sound", loopPointMs: 3898, rewindAmountMs: 3898 - 1855);
         if (!isCharging)
         {
+            foreach (SlimyboiController sloim in this._vacSlimes)
+              if (sloim)
+                sloim.HandleNoLongerVacuumedByVacpack();
             this._vacSlimes.Clear();
             return;
         }
@@ -74,6 +119,7 @@ public class Vacpack : CwaffGun
               continue;
             if (towardsGunAngle.AbsAngleTo(towardsGun.ToAngle()) > _SPREAD)
               continue;
+            sloim.HandleVacuumedByVacpack();
             this._vacSlimes.Add(sloim);
           }
           if (sqrMagnitude < _SQR_ABSORB_RANGE)
@@ -117,6 +163,32 @@ public class Vacpack : CwaffGun
           debris.GravityOverride = 30.0f;
           debris.Trigger(Lazy.RandomVector(3f * UnityEngine.Random.value).ToVector3ZUp(4f), 0.25f);
           debris.sprite.MakeGlowyBetter(glowAmount: 10.0f, glowColor: new Color(1.0f, 0.75f, 0.9f), glowColorPower: 20.0f, sensitivity: 0.3f);
+        }
+    }
+
+    private class VacpackAmmoDisplay : CustomAmmoDisplay
+    {
+        private Gun _gun;
+        private Vacpack _vac;
+        private PlayerController _owner;
+
+        private void Start()
+        {
+            this._gun   = base.GetComponent<Gun>();
+            this._vac   = this._gun.GetComponent<Vacpack>();
+            this._owner = this._gun.CurrentOwner as PlayerController;
+        }
+
+        public override bool DoCustomAmmoDisplay(GameUIAmmoController uic)
+        {
+            if (!this._owner)
+                return false;
+
+            if (this._gun.m_currentStrengthTier == 0)
+                uic.GunAmmoCountLabel.Text = "Vac";
+            else
+                uic.GunAmmoCountLabel.Text = $"Shoot";
+            return true;
         }
     }
 }

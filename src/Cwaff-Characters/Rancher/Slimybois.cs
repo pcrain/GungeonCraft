@@ -1,5 +1,12 @@
 namespace CwaffingTheGungy;
 
+/* TODO:
+    - give slimes blank immunity
+    - give slimes boss death controller immunity
+    - particle effects when being launched
+    - better particle effects upon collision
+*/
+
 public static class Slimybois
 {
   public static AIActor PinkSlimeEnemyPrefab = null;
@@ -89,7 +96,11 @@ public class SlimeData
 
 public class SlimyboiController : BraveBehaviour
 {
+  private const string VACPACK_FLYING_REASON = "Vacpack";
+
   public SlimyboiFlags attributes;
+
+  private bool _activelyBeingLaunched;
 
   private void Start()
   {
@@ -103,11 +114,69 @@ public class SlimyboiController : BraveBehaviour
     actor.CanTargetPlayers = false;
     actor.HitByEnemyBullets = true; // NOTE: no effect once AIActor.Start() is called, so needs to be manually overridden
     actor.IgnoreForRoomClear = true;
+    actor.IsHarmlessEnemy = true;
 
     SpeculativeRigidbody body = base.specRigidbody;
     body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
     body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile)); // NOTE: HitByEnemyBullets does this already in theory, but old start was already called
     body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+  }
+
+  public void HandleFiredFromVacpack()
+  {
+    this._activelyBeingLaunched = true;
+    base.gameObject.Play("slime_launch_sound");
+    base.aiActor.SetIsFlying(true, VACPACK_FLYING_REASON, adjustShadow: false, modifyPathing: false);
+    base.aiActor.CollisionDamage = 1.0f; // TODO: don't hardcode this, should be double the value from the charge behavior
+    base.specRigidbody.OnCollision += this.OnCollisionAfterBeingShot;
+  }
+
+  private void HandleNoLongerFiredFromVacpack()
+  {
+    this._activelyBeingLaunched = false;
+    if (base.gameObject.AddComponent<KnockbackUnleasher>() is KnockbackUnleasher kbu)
+      UnityEngine.Object.Destroy(kbu);
+    base.aiActor.SetIsFlying(false, VACPACK_FLYING_REASON, adjustShadow: false, modifyPathing: false);
+    base.aiActor.CollisionDamage = 0.0f;
+    base.specRigidbody.OnCollision -= this.OnCollisionAfterBeingShot;
+    PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(base.specRigidbody);
+  }
+
+  public void HandleVacuumedByVacpack()
+  {
+    base.aiActor.SetIsFlying(true, VACPACK_FLYING_REASON, adjustShadow: false, modifyPathing: false);
+    base.specRigidbody.CollideWithOthers = false;
+  }
+
+  public void HandleNoLongerVacuumedByVacpack()
+  {
+    base.aiActor.SetIsFlying(false, VACPACK_FLYING_REASON, adjustShadow: false, modifyPathing: false);
+    base.specRigidbody.CollideWithOthers = true;
+    PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(base.specRigidbody);
+  }
+
+  private void Update()
+  {
+    if (this._activelyBeingLaunched)
+    {
+      KnockbackDoer kbd = base.knockbackDoer;
+      if (!kbd.CheckSourceInKnockbacks(base.gameObject))
+      {
+        HandleNoLongerFiredFromVacpack();
+        return;
+      }
+      //TODO: VFX burst
+    }
+  }
+
+  private void OnCollisionAfterBeingShot(CollisionData data)
+  {
+    base.specRigidbody.OnCollision -= this.OnCollisionAfterBeingShot;
+    HandleNoLongerFiredFromVacpack();
+    base.knockbackDoer.m_activeKnockbacks.Clear();
+    base.knockbackDoer.ApplyKnockback(data.Normal, 2f * base.specRigidbody.Velocity.magnitude);
+    base.specRigidbody.Velocity = Vector2.zero;
+    base.gameObject.Play("slime_attack_sound");
   }
 
   private void OnDeath(Vector2 vector)
@@ -141,6 +210,11 @@ public class SlimyboiController : BraveBehaviour
     {
       if (enemy.gameObject.GetComponent<SlimyboiController>())
         PhysicsEngine.SkipCollision = true; // don't collide with other slimybois
+      return;
+    }
+    if (this._activelyBeingLaunched)
+    {
+      PhysicsEngine.SkipCollision = true; // don't collide with anything other than the tilemap while being launched
       return;
     }
     if (otherRigidbody.projectile is Projectile proj)
@@ -182,8 +256,9 @@ public class SlimyboiChargeBehavior : ChargeBehavior
   {
     base.Init(gameObject, aiActor, aiShooter);
     SpeculativeRigidbody specRigidbody = m_aiActor.specRigidbody;
-    specRigidbody.OnCollision -= base.OnCollision; // remove ChargeBehavior.OnCollision() because we call it manually...
-    specRigidbody.OnCollision += this.OnOverrideCollision; //...with OnOverrideCollision()
+    specRigidbody.OnCollision -= base.OnCollision; // remove ChargeBehavior.OnCollision() because we call it manually with OnOverrideCollision()
+    specRigidbody.OnCollision -= this.OnOverrideCollision;
+    specRigidbody.OnCollision += this.OnOverrideCollision;
     m_initialized = true;
   }
 

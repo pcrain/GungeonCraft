@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.32.0 (TBD)
+
+- Added Akelus and M'tara
+
 ## 1.31.3 (2026-06-02)
 
 #### Balance Changes and Polish:
