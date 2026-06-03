@@ -229,13 +229,13 @@ public partial class Geometry : MonoBehaviour
             case Shape.FILLEDCIRCLE:
                 this._vertices[0] = basePos;
                 float startF = (this.angle - 0.5f * this.arc).Clamp360();
-                float gapF = this.arc / (_CIRCLE_SEGMENTS - 1);
+                float gapF = this.arc / _CIRCLE_SEGMENTS;
                 for (int i = 0; i <= _CIRCLE_SEGMENTS; ++i)
                     this._vertices[i + 1] = basePos + (startF + i * gapF).ToVector3(this.radius);
                 break;
             case Shape.RING:
                 float rstart = (this.angle - 0.5f * this.arc).Clamp360();
-                float rgap = this.arc / (_CIRCLE_SEGMENTS - 1);
+                float rgap = this.arc / _CIRCLE_SEGMENTS;
                 for (int i = 0; i <= _CIRCLE_SEGMENTS; ++i)
                 {
                     float angle = (rstart + i * rgap);
@@ -245,7 +245,7 @@ public partial class Geometry : MonoBehaviour
                 break;
             case Shape.CIRCLE:
                 float start = (this.angle - 0.5f * this.arc).Clamp360();
-                float gap = this.arc / (_CIRCLE_SEGMENTS - 1);
+                float gap = this.arc / _CIRCLE_SEGMENTS;
                 for (int i = 0; i <= _CIRCLE_SEGMENTS; ++i)
                     this._vertices[i] = basePos + (start + i * gap).ToVector3(this.radius);
                 break;

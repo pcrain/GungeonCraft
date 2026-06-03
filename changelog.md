@@ -14,6 +14,7 @@
 - Fixed broken line of sight detection code rendering Chekhov's Gun, Deadline, and Pistol Whip unusable
 - Fixed outline artifacts on Pogo Stick's sprite when active
 - Fixed bad sprite alignment when Rogo is riding on Pogo Stick
+- Fixed overdraw on Pogo Stick's targeting reticle adding an extra wedge of color where it shouldn't have been
 
 ## 1.31.2 (2026-05-25)
 
