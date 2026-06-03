@@ -10,6 +10,8 @@
 - Prevented attack effects from several guns and items from affecting the player's companions
 - Fixed Shmuppy's Fortune's Favor effect blocking beams even when they're supposed to be vulnerable
 - Fixed ammonomicon conflicts with items from other mods due to having identical ammonomicon entry lookup keys
+- Fixed broken line of sight detection code preventing Retina's ammo display from updating
+- Fixed broken line of sight detection code rendering Chekhov's Gun, Deadline, and Pistol Whip unusable
 
 ## 1.31.2 (2026-05-25)
 
