@@ -1,12 +1,5 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - give slimes blank immunity
-    - give slimes boss death controller immunity
-    - particle effects when being launched
-    - better particle effects upon collision
-*/
-
 public static class Slimybois
 {
   public static AIActor PinkSlimeEnemyPrefab = null;
@@ -97,10 +90,16 @@ public class SlimeData
 public class SlimyboiController : BraveBehaviour
 {
   private const string VACPACK_FLYING_REASON = "Vacpack";
+  private const float VFX_GAP = 0.1f;
+  private const float JUMP_TIME = 0.3f;
 
   public SlimyboiFlags attributes;
 
   private bool _activelyBeingLaunched;
+  private float _vfxTimer = 0.0f;
+  private float _jumpTimer = 0.0f;
+  private tk2dSprite _trueSprite = null;
+  private tk2dSprite _renderSprite = null;
 
   private void Start()
   {
@@ -115,11 +114,16 @@ public class SlimyboiController : BraveBehaviour
     actor.HitByEnemyBullets = true; // NOTE: no effect once AIActor.Start() is called, so needs to be manually overridden
     actor.IgnoreForRoomClear = true;
     actor.IsHarmlessEnemy = true;
+    actor.IsNormalEnemy = false; // TODO: setting this might make setting some other things redundant
+    actor.PreventAutoKillOnBossDeath = true;
 
     SpeculativeRigidbody body = base.specRigidbody;
     body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
     body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile)); // NOTE: HitByEnemyBullets does this already in theory, but old start was already called
     body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
+
+    this._vfxTimer = VFX_GAP;
+    this._trueSprite = body.sprite as tk2dSprite;
   }
 
   public void HandleFiredFromVacpack()
@@ -155,8 +159,33 @@ public class SlimyboiController : BraveBehaviour
     PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(base.specRigidbody);
   }
 
+  public void Jump()
+  {
+    this._jumpTimer = JUMP_TIME;
+  }
+
   private void Update()
   {
+    const float JUMP_HEIGHT = 1.25f;
+    float dtime = BraveTime.DeltaTime;
+
+    if (!this._renderSprite)
+      this._renderSprite = base.specRigidbody.DecoupleSpriteFromCollider();
+    this._renderSprite.collection = this._trueSprite.collection;
+    this._renderSprite.spriteId = this._trueSprite.spriteId;
+    Vector3 renderPos = this._trueSprite.transform.position;
+
+    if (this._jumpTimer > 0)
+    {
+      this._jumpTimer = Mathf.Max(0.0f, this._jumpTimer - dtime);
+      Vector3 spritePos = this._trueSprite.transform.position;
+      float jumpY = JUMP_HEIGHT * Mathf.Sin(Mathf.PI * (1f - this._jumpTimer / JUMP_TIME));
+      this._trueSprite.spriteAnimator.UpdateAnimation(dtime);
+      renderPos.y += jumpY;
+    }
+
+    this._renderSprite.transform.position = renderPos.Quantize(0.0625f);
+
     if (this._activelyBeingLaunched)
     {
       KnockbackDoer kbd = base.knockbackDoer;
@@ -165,7 +194,24 @@ public class SlimyboiController : BraveBehaviour
         HandleNoLongerFiredFromVacpack();
         return;
       }
-      //TODO: VFX burst
+      if ((this._vfxTimer -= dtime) <= 0.0f)
+      {
+        this._vfxTimer = VFX_GAP;
+        CwaffVFX.SpawnBurst(
+          prefab           : Slimybois._SlimeDeathVFX,
+          numToSpawn       : 2,
+          basePosition     : base.aiActor.CenterPosition,
+          positionVariance : 0.5f,
+          baseVelocity     : null,
+          velocityVariance : 2f,
+          velType          : CwaffVFX.Vel.Away,
+          rotType          : CwaffVFX.Rot.Random,
+          lifetime         : 0.5f,
+          startScale       : 1.0f,
+          endScale         : 0.1f,
+          copyShaders      : true
+          );
+      }
     }
   }
 
@@ -177,6 +223,7 @@ public class SlimyboiController : BraveBehaviour
     base.knockbackDoer.ApplyKnockback(data.Normal, 2f * base.specRigidbody.Velocity.magnitude);
     base.specRigidbody.Velocity = Vector2.zero;
     base.gameObject.Play("slime_attack_sound");
+    Jump();
   }
 
   private void OnDeath(Vector2 vector)
@@ -293,6 +340,8 @@ public class SlimyboiChargeBehavior : ChargeBehavior
 
       m_aiActor.gameObject.Play("slime_attack_sound");
       m_aiActor.knockbackDoer.ApplyKnockback(data.Normal, 25f);
+      if (m_aiActor.gameObject.GetComponent<SlimyboiController>() is SlimyboiController sloim)
+        sloim.Jump();
     }
     base.OnCollision(data); // run ChargeBehavior.OnCollision() as normal
   }

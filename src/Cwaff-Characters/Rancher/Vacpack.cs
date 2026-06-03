@@ -25,7 +25,7 @@ public class Vacpack : CwaffGun
     {
         Lazy.SetupGun<Vacpack>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.EXCLUDED, gunClass: CwaffGunClass.UTILITY, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true, modulesAreTiers: true,
-            chargeFps: 16, banFromBlessedRuns: true, isStarterGun: true, doesScreenShake: false) // TODO: verify this doesn't break paradox
+            chargeFps: 16, banFromBlessedRuns: true, isStarterGun: true, doesScreenShake: false, muzzleFrom: Items.Mailbox) // TODO: verify this doesn't break paradox
           .Attach<VacpackAmmoDisplay>()
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, hideAmmo: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
@@ -110,6 +110,8 @@ public class Vacpack : CwaffGun
         {
           if (!enemy || enemy.gameObject.GetComponent<SlimyboiController>() is not SlimyboiController sloim)
             continue;
+          if (player.IsInCombat && sloim.healthHaver.GetCurrentHealthPercentage() < 1.0f)
+            continue; // no vacuuming injured slimes in combat
 
           Vector2 towardsGun = gunpos - enemy.CenterPosition;
           float sqrMagnitude = towardsGun.sqrMagnitude;
