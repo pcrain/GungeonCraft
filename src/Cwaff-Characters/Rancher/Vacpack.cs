@@ -18,8 +18,14 @@ public class Vacpack : CwaffGun
     internal const float _SQR_REACH        = _REACH * _REACH;
     internal const float _SQR_ABSORB_RANGE = _ABSORB_RANGE * _ABSORB_RANGE;
 
+    private const float _HUD_HOLD_TIME = 0.25f;
+
     private Dictionary<AIActor, ActiveKnockbackData> _KnockbackDict = new();
     private List<SlimyboiController> _vacSlimes = new();
+    private VacpackHUD _hud = null;
+    private int _curSlime = -1;
+    private int _lastSlime = 0;
+    private float _hudHoldTimer = 0.0f;
 
     public static void Init()
     {
@@ -64,23 +70,68 @@ public class Vacpack : CwaffGun
         }
     }
 
-    public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
+    public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        base.OnReloadPressed(player, gun, manualReload);
-        if (!manualReload || !player.AcceptingNonMotionInput || gun.IsFiring)
-            return;
-        this.gun.CurrentStrengthTier = (this.gun.CurrentStrengthTier + 1) % 2;
-        ClearCachedShootData(); // reset particle effects
+      base.OnTriedToInitiateAttack(player);
+      if (this._hud && this._hud.Active)
+      {
+        DoSlimeSelection();
+        DismissHUD();
+        player.SuppressThisClick = true;
+      }
+    }
+
+    public override bool OnManualReloadAttempted(PlayerController player)
+    {
+      if (!player.AcceptingNonMotionInput || gun.IsFiring)
+          return true;
+      CreateHUDIfNecessary();
+      if (this._hud.Active)
+          return true;
+
+      this._hudHoldTimer = _HUD_HOLD_TIME;
+      return false;
+    }
+
+    public void DoSlimeSelection(int slimeIndex = -2)
+    {
+        if (slimeIndex == -2)
+          this._lastSlime = slimeIndex = VacpackHUD.SlimeIndexForAngle(this.PlayerOwner.AimAngleFromCenterOfScreen());
+        this._curSlime = slimeIndex;
+        int newTier = slimeIndex >= 0 ? 1 : 0;
+        if (newTier != this.gun.m_currentStrengthTier)
+        {
+          this.gun.CurrentStrengthTier = newTier;
+          ClearCachedShootData(); // reset particle effects
+        }
     }
 
     public override void Update()
     {
         base.Update();
-        if (this.PlayerOwner is not PlayerController player || BraveTime.DeltaTime == 0.0f)
+        float dtime = BraveTime.DeltaTime;
+        if (this.PlayerOwner is not PlayerController player || dtime == 0.0f)
         {
           this.gun.LoopSoundIf(false, "vacpack_fire_sound");
           return;
         }
+
+        if (this._hudHoldTimer > 0.0f)
+        {
+          if (!player.m_activeActions.ReloadAction.IsPressed) // quick select
+          {
+            this._hudHoldTimer = 0.0f;
+            DoSlimeSelection(this._curSlime == -1 ? this._lastSlime : -1);
+            base.gameObject.Play("replicant_select_sound");
+          }
+          else if ((this._hudHoldTimer -= dtime) <= 0.0f)
+          {
+            this._hudHoldTimer = 0.0f;
+            this._hud.Engage();
+            SetFocus(true);
+          }
+        }
+
         bool isCharging = this.gun.IsCharging && this.gun.m_currentStrengthTier == 0;
         this.gun.LoopSoundIf(isCharging, "vacpack_fire_sound", loopPointMs: 3898, rewindAmountMs: 3898 - 1855);
         if (!isCharging)
@@ -118,9 +169,9 @@ public class Vacpack : CwaffGun
           if (!this._vacSlimes.Contains(sloim)) // we can skip checks for slimes that have been in range at least once
           {
             if (sqrMagnitude >= _SQR_REACH)
-              continue;
+              continue; // don't absorb new slimes outside our reach
             if (towardsGunAngle.AbsAngleTo(towardsGun.ToAngle()) > _SPREAD)
-              continue;
+              continue; // don't absorb new slimes outside our cone of influence
             sloim.HandleVacuumedByVacpack();
             this._vacSlimes.Add(sloim);
           }
@@ -168,6 +219,55 @@ public class Vacpack : CwaffGun
         }
     }
 
+    private void OnReceivedDamage(PlayerController player)
+    {
+      DismissHUD();
+    }
+
+    public override void OnSwitchedToThisGun()
+    {
+      base.OnSwitchedToThisGun();
+      CreateHUDIfNecessary();
+    }
+
+    public override void OnSwitchedAwayFromThisGun()
+    {
+        DismissHUD();
+        base.OnSwitchedAwayFromThisGun();
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+        base.OnDroppedByPlayer(player);
+        DismissHUD();
+    }
+
+    public override void OnDestroy()
+    {
+        DismissHUD();
+        base.OnDestroy();
+    }
+
+    private void CreateHUDIfNecessary()
+    {
+      if (this._hud)
+        return;
+      this._hud = base.gameObject.AddComponent<VacpackHUD>();
+      this._hud.Setup();
+    }
+
+    private void DismissHUD()
+    {
+      if (!this._hud || !this._hud.Active)
+        return;
+      this._hud.Dismiss();
+    }
+
+    internal void SetFocus(bool focus)
+    {
+      BraveTime.SetTimeScaleMultiplier(focus ? 0.1f : 1.0f, base.gameObject); //TODO: use vanilla metalgear time slowdown factor
+    }
+
     private class VacpackAmmoDisplay : CustomAmmoDisplay
     {
         private Gun _gun;
@@ -189,7 +289,7 @@ public class Vacpack : CwaffGun
             if (this._gun.m_currentStrengthTier == 0)
                 uic.GunAmmoCountLabel.Text = "Vac";
             else
-                uic.GunAmmoCountLabel.Text = $"Shoot";
+                uic.GunAmmoCountLabel.Text = "Shoot";
             return true;
         }
     }
@@ -257,4 +357,208 @@ public class VacpackParticle : MonoBehaviour
         this._spriteCenter += (this._velocity * C.FPS * BraveTime.DeltaTime);
         this._sprite.PlaceAtRotatedPositionByAnchor(this._spriteCenter, Anchor.MiddleCenter);
     }
+}
+
+public class VacpackHUD : MonoBehaviour
+{
+  internal const string _NAME_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  private const int _NUM_LETTERS = 26;
+  private const float _WEDGE_ARC = 360f / _NUM_LETTERS;
+  private const float _SHWOOP_TIME = 0.3f;
+  private const float _BASE_GEOM_ALPHA = 0.3f;
+
+  private static readonly Color _GeomColor1 = new Color(0.25f, 0.25f, 0.25f);
+  private static readonly Color _GeomColor2 = new Color(0.35f, 0.35f, 0.35f);
+
+  private bool _setup                 = false;   // whether we're set up
+  private float _shwoop               = 0.0f;    // whether we're shwooped open
+  private bool _active                = false;   // whether we're active
+  private Vacpack _gun              = null;      // gun we're attached to
+  private List<Geometry> _geometry    = new();   // all shapes rendered by the HUD
+  private Geometry       _selector    = new();   // extra selector rendered by the HUD
+  private List<dfLabel> _labels       = new();   // all letter labels rendered by the HUD
+  private dfLabel       _nameLabel    = null;    // extra name line for currently selected slime rendered by the HUD
+  private dfLabel       _countLabel   = null;    // extra count line for currently selected slime rendered by the HUD
+
+  private CameraController _camera;
+  private Vector2 _worldBottomLeft;
+  private Vector2 _worldTopRight;
+  // private Vector2 _basePos;
+
+  public bool Active => this._active;
+
+  public void Setup()
+  {
+    this._gun = this.gameObject.GetComponent<Vacpack>();
+
+    this._selector = Geometry.Create(Geometry.Shape.RING).Place(color: Color.red.WithAlpha(_BASE_GEOM_ALPHA)).UseGUILayer();
+    for (int i = 0; i < _NUM_LETTERS; ++i)
+    {
+      this._geometry.Add(Geometry.Create(Geometry.Shape.RING).Place(color: ((i % 2 == 0) ? _GeomColor1 : _GeomColor2).WithAlpha(_BASE_GEOM_ALPHA)).UseGUILayer());
+      this._labels.Add(EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Center));
+      this._labels[i].Text = "[sprite \"mana_ui\"]";
+      this._labels[i].Pivot = dfPivotPoint.MiddleCenter;
+    }
+    this._nameLabel = EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Center);
+    this._countLabel = EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Center);
+
+    Dismiss(force: true);
+    this._setup = true;
+
+    this._camera = GameManager.Instance.MainCameraController;
+    if (this._camera)
+    {
+      this._camera.OnFinishedFrame -= this.OnFinishedFrame;
+      this._camera.OnFinishedFrame += this.OnFinishedFrame; // synchronize HUD elements with camera for pseudo-overlay effect
+    }
+  }
+
+  public void Toggle()
+  {
+    if (this._active)
+      Dismiss();
+    else
+      Engage();
+  }
+
+  public void Engage()
+  {
+    if (this._active)
+      return;
+
+    this._active = true;
+    this._shwoop = 0.0f;
+    if (base.gameObject.RequestCameraControl())
+      GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
+    base.gameObject.Play("death_note_open_sound");
+  }
+
+  public void Dismiss(bool force = false, bool deactivate = true)
+  {
+    if (!this._active && !force)
+      return;
+
+    foreach (Geometry g in this._geometry)
+      if (g)
+          g.Disable();
+    if (this._selector)
+      this._selector.Disable();
+
+    foreach (dfLabel label in this._labels)
+    {
+      if (label == null)
+        continue;
+      label.Opacity = 0.0f;
+      label.IsVisible = false;
+    }
+    if (this._nameLabel)
+    {
+      this._nameLabel.Opacity = 0.0f;
+      this._nameLabel.IsVisible = false;
+    }
+    if (this._countLabel)
+    {
+      this._countLabel.Opacity = 0.0f;
+      this._countLabel.IsVisible = false;
+    }
+
+    if (deactivate)
+    {
+      this._active = false;
+      base.gameObject.RelinquishCameraControl();
+      if (this._gun)
+        this._gun.SetFocus(false);
+    }
+  }
+
+  private void Update()
+  {
+    if (!this._setup)
+      return;
+    if (!this._camera || !this._gun || this._gun.gun is not Gun gun || this._gun.PlayerOwner is not PlayerController player)
+    {
+      Dismiss();
+      UnityEngine.Object.Destroy(this);
+    }
+    else if (GameManager.Instance.IsPaused)
+      Dismiss(deactivate: false);
+    else if (player.CurrentInputState != PlayerInputState.AllInput || gun.IsReloading || GameManager.IsBossIntro)
+      Dismiss();
+    else if (this._active)
+    {
+      base.gameObject.RequestCameraControl();
+      if (base.gameObject.HasControlOverCamera())
+        GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
+    }
+  }
+
+  private void OnFinishedFrame()
+  {
+    if (!this._setup || !this._active || !this._camera || GameManager.Instance.IsPaused || !this._gun || !this._gun.PlayerOwner || this._gun.PlayerOwner.CurrentInputState != PlayerInputState.AllInput)
+      return;
+
+    Engage();
+    // UpdateLabelsForUISize();
+    if (this._active)
+      PlaceHUDElements();
+  }
+
+  internal static int SlimeIndexForAngle(float angle)
+    => Mathf.FloorToInt((angle.Clamp360() + 0.5f * _WEDGE_ARC) / _WEDGE_ARC) % _NUM_LETTERS;
+
+  private void PlaceHUDElements()
+  {
+    PlayerController player = this._gun.PlayerOwner;
+    if (!player || player.CurrentGun != this._gun.gun)
+    {
+      Dismiss();
+      return;
+    }
+
+    float gunAngle = player.AimAngleFromCenterOfScreen().Clamp360();
+    int curSegment = SlimeIndexForAngle(gunAngle);
+
+    this._shwoop = Mathf.Clamp01(this._shwoop + Time.unscaledDeltaTime / _SHWOOP_TIME);
+    float ease = Ease.OutQuad(this._shwoop);
+
+    this._worldBottomLeft = this._camera.MinVisiblePoint;
+    this._worldTopRight   = this._camera.MaxVisiblePoint;
+    Vector2 screenCenter = 0.5f * (this._worldBottomLeft + this._worldTopRight);
+    float screenHeight = this._camera.MaxVisiblePoint.y - this._camera.MinVisiblePoint.y;
+    float shwoopHeight = ease * screenHeight;
+    float geomAlpha = _BASE_GEOM_ALPHA * ease;
+    float innerRadius = 0.225f * screenHeight;
+    float outerRadius = innerRadius + 0.04f * shwoopHeight;
+    float labelRadius = 0.5f * (innerRadius + outerRadius);
+
+    this._selector.Disable();
+    for (int i = 0; i < _NUM_LETTERS; ++i)
+    {
+      bool sel = (i == curSegment);
+      bool goodLetter = DeathNoteNameHandler.IsGoodLetter(_NAME_LETTERS[i]);
+      this._geometry[i].Place(pos: screenCenter, angle: _WEDGE_ARC * i, arc: _WEDGE_ARC,
+        radiusInner: innerRadius, radius: outerRadius * (sel ? 1.125f : 1.0f),
+        color: (sel ? Color.white : (i % 2 == 0) ? _GeomColor1 : _GeomColor2).WithAlpha(geomAlpha));
+      Vector2 labelPos = screenCenter + (_WEDGE_ARC * i).ToVector(labelRadius);
+      if (sel)
+      {
+        this._nameLabel.Text = $"Slime {i}";
+        this._nameLabel.Opacity = ease;
+        this._nameLabel.Place(pos: screenCenter);
+
+        this._countLabel.Text = $"x100";
+        this._countLabel.Opacity = ease;
+        this._countLabel.Place(pos: screenCenter + new Vector2(0.0f, -this._countLabel.Height / 32f));
+      }
+      if (goodLetter && DeathNoteNameHandler.OneGoodLetter())
+        this._selector.Place(pos: screenCenter, angle: _WEDGE_ARC * i, arc: _WEDGE_ARC,
+          radiusInner: innerRadius * 0.3f, radius: innerRadius * 0.9f,
+          color: (Color.Lerp(Color.red, ExtendedColours.pink, Mathf.Abs(Mathf.Sin(12f * BraveTime.ScaledTimeSinceStartup)))).WithAlpha(geomAlpha));
+      this._labels[i].Color = (sel ? Color.black : goodLetter ? Color.red : Color.white).WithAlpha(Mathf.Clamp01(2f * ease - 1f));
+      this._labels[i].OutlineColor = (sel ? Color.white : Color.black).WithAlpha(Mathf.Clamp01(2f * ease - 1f));
+      this._labels[i].Opacity = ease;
+      this._labels[i].Place(labelPos);
+    }
+  }
 }
