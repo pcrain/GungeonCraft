@@ -23,7 +23,7 @@ public static class Slimybois
 
     float attackRange = sd.overrideAttackRange ?? 3.0f;
     BehaviorSpeculator bs = actor.gameObject.GetComponent<BehaviorSpeculator>();
-    bs.TargetBehaviors.Add(new SlimyboiTargetingBehavior(){ Radius = 35.0f, LineOfSight = false });
+    bs.TargetBehaviors.Add(new SlimyboiTargetingBehavior(){ Radius = 35.0f, LineOfSight = false, ObjectPermanence = false });
     bs.MovementBehaviors.Add(new SeekTargetBehavior(){ StopWhenInRange = true, CustomRange = 2.0f, PathInterval = 0.5f });
     bs.MovementBehaviors.Add(new MoveErraticallyBehavior { PathInterval = 0.5f, StayOnScreen = false, UseTargetsRoom = false, AvoidTarget = false });
     bs.AttackBehaviors.Add(new SlimyboiChargeBehavior(){ chargeDamage = sd.overrideContactDamage ?? 0.5f, chargeKnockback = 5.0f, chargeSpeed = 30.0f,

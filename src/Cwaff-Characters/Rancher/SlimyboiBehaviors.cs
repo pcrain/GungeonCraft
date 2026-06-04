@@ -1,9 +1,5 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - fix issue with slimes being unable to target enemies directly on top of them
-*/
-
 /// <summary>Main controller class for Slimes</summary>
 public class SlimyboiController : BraveBehaviour
 {
@@ -60,7 +56,7 @@ public class SlimyboiController : BraveBehaviour
     if (base.gameObject.AddComponent<KnockbackUnleasher>() is KnockbackUnleasher kbu)
       UnityEngine.Object.Destroy(kbu);
     base.aiActor.SetIsFlying(false, VACPACK_FLYING_REASON, adjustShadow: false, modifyPathing: false);
-    base.aiActor.CollisionDamage = 0.0f;
+    ResetCollisionDamage();
     base.specRigidbody.OnCollision -= this.OnCollisionAfterBeingShot;
     PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(base.specRigidbody);
   }
@@ -83,10 +79,21 @@ public class SlimyboiController : BraveBehaviour
     this._jumpDuration = this._jumpTimer = Mathf.Max(0.6f * (this.slimeType.Data().overrideAttackCooldown ?? Slimybois._DEFAULT_COOLDOWN), 0.15f);
   }
 
+  private void ResetCollisionDamage()
+  {
+    base.aiActor.CollisionDamage = 0.0f;
+    foreach (AttackBehaviorBase attack in base.behaviorSpeculator.AttackBehaviors)
+      if (attack is SlimyboiChargeBehavior charge)
+        charge.m_cachedDamage = 0.0f;
+  }
+
   private void Update()
   {
     const float JUMP_HEIGHT = 1.25f;
     float dtime = BraveTime.DeltaTime;
+
+    SlimyboiChargeBehavior charge = base.behaviorSpeculator.AttackBehaviors[0] as SlimyboiChargeBehavior;
+    // base.aiActor.DebugNametag($"{(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\n{charge.State}\n{base.aiActor.CollisionDamage}\n{charge.m_cachedDamage}");
 
     if (!this._renderSprite)
       this._renderSprite = base.specRigidbody.DecoupleSpriteFromCollider();
@@ -298,7 +305,7 @@ public class SlimyboiChargeBehavior : ChargeBehavior
   }
 }
 
-// same as TargetPlayerBehavior, but cannot target other slimes
+// same as TargetPlayerBehavior, but cannot target other slimes or things we can't reach
 public class SlimyboiTargetingBehavior : TargetBehaviorBase
 {
   private const float PLAYER_REFRESH_TIMER = 1f;
@@ -331,6 +338,44 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
     DecrementTimer(ref m_coopRefreshSearchTimer);
   }
 
+  private bool ShouldResetTarget(out bool skipRemainingBehaviors)
+  {
+    skipRemainingBehaviors = false;
+
+    if (!m_aiActor)
+      return true;
+    if (m_behaviorSpeculator.PlayerTarget is not GameActor target)
+      return true;
+
+    if (target.IsFalling || (target.healthHaver is HealthHaver thh && (thh.IsDead || thh.PreventAllDamage)))
+    {
+      if (m_aiActor)
+        m_aiActor.ClearPath();
+      skipRemainingBehaviors = true;
+      return true;
+    }
+
+    if (!ObjectPermanence)
+      return true;
+    if (m_aiActor.Path != null && !m_aiActor.Path.WillReachFinalGoal)
+      return true; // NOTE: repath if we can't reach our target
+    if (target.IsStealthed)
+      return true;
+    if (GameManager.Instance.AllPlayers.Length > 1 && m_coopRefreshSearchTimer <= 0f)
+      return true;
+    if (target is not AIActor)
+      return false;
+
+    float distance = Vector2.Distance(m_specRigidbody.UnitCenter, target.specRigidbody.UnitCenter);
+    bool targetMovedFarAway = m_prevDistToTarget + 3f < distance;
+    m_prevDistToTarget = distance;
+    if (targetMovedFarAway)
+      return true;
+    if (!m_aiActor.IsNormalEnemy && m_aiActor.CompanionOwner && target.GetAbsoluteParentRoom() != m_aiActor.CompanionOwner.CurrentRoom)
+      return true;
+    return false;
+  }
+
   public override BehaviorResult Update()
   {
     BehaviorResult behaviorResult = base.Update();
@@ -339,39 +384,21 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
     if (m_losTimer > 0f)
       return BehaviorResult.Continue;
     m_losTimer = SearchInterval;
-    if (m_behaviorSpeculator.PlayerTarget)
-    {
-      if (m_behaviorSpeculator.PlayerTarget.IsFalling || (m_behaviorSpeculator.PlayerTarget.healthHaver && (m_behaviorSpeculator.PlayerTarget.healthHaver.IsDead || m_behaviorSpeculator.PlayerTarget.healthHaver.PreventAllDamage)))
-      {
-        m_behaviorSpeculator.PlayerTarget = null;
-        if ((bool)m_aiActor)
-          m_aiActor.ClearPath();
-        return BehaviorResult.SkipRemainingClassBehaviors;
-      }
-    }
-    else
-      m_behaviorSpeculator.PlayerTarget = null;
 
-    if (!ObjectPermanence)
-      m_behaviorSpeculator.PlayerTarget = null;
-    if (m_behaviorSpeculator.PlayerTarget != null && m_behaviorSpeculator.PlayerTarget.IsStealthed)
-      m_behaviorSpeculator.PlayerTarget = null;
-    if (GameManager.Instance.AllPlayers.Length > 1 && m_coopRefreshSearchTimer <= 0f)
-      m_behaviorSpeculator.PlayerTarget = null;
-    if (m_behaviorSpeculator.PlayerTarget is AIActor)
+    if (ShouldResetTarget(out bool skipRemainingBehaviors))
     {
-      float num = Vector2.Distance(m_specRigidbody.UnitCenter, m_behaviorSpeculator.PlayerTarget.specRigidbody.UnitCenter);
-      if (m_prevDistToTarget + 3f < num)
-        m_behaviorSpeculator.PlayerTarget = null;
-      m_prevDistToTarget = num;
-      if ((bool)m_aiActor && !m_aiActor.IsNormalEnemy && (bool)m_aiActor.CompanionOwner && m_behaviorSpeculator.PlayerTarget is AIActor && m_behaviorSpeculator.PlayerTarget.GetAbsoluteParentRoom() != m_aiActor.CompanionOwner.CurrentRoom)
-        m_behaviorSpeculator.PlayerTarget = null;
+      m_behaviorSpeculator.PlayerTarget = null;
+      if (skipRemainingBehaviors)
+        return BehaviorResult.SkipRemainingClassBehaviors;
     }
-    if (m_behaviorSpeculator.PlayerTarget != null)
+
+    if (m_behaviorSpeculator.PlayerTarget)
       return BehaviorResult.Continue;
+
     PlayerController playerController = GameManager.Instance.GetActivePlayerClosestToPoint(m_specRigidbody.UnitCenter);
-    if ((bool)m_aiActor && m_aiActor.SuppressTargetSwitch)
+    if (m_aiActor && m_aiActor.SuppressTargetSwitch)
       playerController = m_previousPlayer;
+
     if (!m_aiActor || (m_aiActor.CanTargetPlayers && !m_aiActor.CanTargetEnemies))
     {
       if (playerController == null)
@@ -385,44 +412,76 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
       List<AIActor> activeEnemies = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(m_aiActor.GridPosition).GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
       if (activeEnemies != null && activeEnemies.Count > 0)
       {
-        AIActor aIActor = null;
-        float num2 = -1f;
+        AIActor closestTarget = null;
+        float closest = -1f;
         if (!m_aiActor || m_aiActor.IsNormalEnemy || !m_aiActor.CompanionOwner || !m_aiActor.CompanionOwner.IsStealthed)
         {
           for (int i = 0; i < activeEnemies.Count; i++)
           {
             AIActor candidate = activeEnemies[i];
-            if (candidate && candidate.IsNormalEnemy && !candidate.gameObject.GetComponent<SlimyboiController>() && !candidate.IsGone && !candidate.IsHarmlessEnemy && !(candidate == m_aiActor) && (!candidate.healthHaver || !candidate.healthHaver.PreventAllDamage))
-            {
-              float num3 = Vector2.Distance(m_specRigidbody.UnitCenter, candidate.specRigidbody.UnitCenter);
-              if (aIActor == null || num3 < num2)
-              {
-                aIActor = candidate;
-                num2 = num3;
-              }
-            }
+            // NOTE: allow attacking harmless enemies like key bullet kin and chance kin
+            if (!candidate || !candidate.IsNormalEnemy || candidate.gameObject.GetComponent<SlimyboiController>() || candidate.IsGone || candidate == m_aiActor || candidate.healthHaver && candidate.healthHaver.PreventAllDamage)
+                continue;
+            float sqrdist = (m_specRigidbody.UnitCenter - candidate.specRigidbody.UnitCenter).sqrMagnitude;
+            if (closestTarget != null && sqrdist >= closest)
+              continue;
+            closestTarget = candidate;
+            closest = sqrdist;
           }
         }
-        if ((bool)aIActor)
+        if (closestTarget)
         {
-          m_behaviorSpeculator.PlayerTarget = aIActor;
-          m_prevDistToTarget = num2;
+          m_behaviorSpeculator.PlayerTarget = closestTarget;
+          m_prevDistToTarget = closest;
         }
       }
     }
     if (m_aiShooter != null && m_behaviorSpeculator.PlayerTarget != null)
       m_aiShooter.AimAtPoint(m_behaviorSpeculator.PlayerTarget.CenterPosition);
-    if ((bool)m_aiActor && PauseOnTargetSwitch && m_aiActor.HasBeenEngaged && (bool)m_previousPlayer && (bool)playerController && m_previousPlayer != playerController)
+    if (m_aiActor && PauseOnTargetSwitch && m_aiActor.HasBeenEngaged && m_previousPlayer && playerController && m_previousPlayer != playerController)
     {
       m_aiActor.behaviorSpeculator.AttackCooldown = Mathf.Max(m_aiActor.behaviorSpeculator.AttackCooldown, PauseTime);
       return BehaviorResult.SkipAllRemainingBehaviors;
     }
     m_previousPlayer = playerController;
-    if ((bool)m_aiActor && !m_aiActor.HasBeenEngaged)
+    if (m_aiActor && !m_aiActor.HasBeenEngaged)
     {
       m_aiActor.HasBeenEngaged = true;
       return BehaviorResult.SkipAllRemainingBehaviors;
     }
     return BehaviorResult.SkipRemainingClassBehaviors;
+  }
+}
+
+[HarmonyPatch]
+internal static class SlimyboiPatches
+{
+  /// <summary>Patches to make slime collision damage ignore boss damage caps</summary>
+  private static bool _NextAttackIgnoresDamageCaps = false;
+  private static void SlimyboiControllerIgnoreDamageCaps(AIActor actor)
+  {
+    if (actor && actor.gameObject.GetComponent<SlimyboiController>())
+      _NextAttackIgnoresDamageCaps = true;
+  }
+  [HarmonyPatch(typeof(HealthHaver), nameof(HealthHaver.ApplyDamage))]
+  [HarmonyPrefix]
+  private static void HealthHaverApplyDamagePatch(HealthHaver __instance, float damage, Vector2 direction, string sourceName, CoreDamageTypes damageTypes, DamageCategory damageCategory, bool ignoreInvulnerabilityFrames, PixelCollider hitPixelCollider, ref bool ignoreDamageCaps)
+  {
+    if (_NextAttackIgnoresDamageCaps)
+      ignoreDamageCaps = true;
+    _NextAttackIgnoresDamageCaps = false;
+  }
+  [HarmonyPatch(typeof(AIActor), nameof(AIActor.OnCollision))]
+  [HarmonyILManipulator]
+  private static void AIActorOnCollisionPatchIL(ILContext il)
+  {
+      ILCursor cursor = new ILCursor(il);
+      if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<AIActor>("CollisionDamageTypes")))
+        return;
+      if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<HealthHaver>(nameof(HealthHaver.ApplyDamage))))
+        return;
+
+      cursor.Emit(OpCodes.Ldarg_0);
+      cursor.CallPrivate(typeof(SlimyboiPatches), nameof(SlimyboiControllerIgnoreDamageCaps));
   }
 }
