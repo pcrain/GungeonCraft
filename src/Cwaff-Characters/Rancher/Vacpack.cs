@@ -24,7 +24,7 @@ public class Vacpack : CwaffGun
     private List<SlimyboiController> _vacSlimes = new();
     private VacpackHUD _hud = null;
     private int _curSlime = -1;
-    private int _lastSlime = 0;
+    private int _lastSlime = (int)SlimyboiType.Pink;
     private float _hudHoldTimer = 0.0f;
 
     public static void Init()
@@ -49,8 +49,16 @@ public class Vacpack : CwaffGun
     {
         private static void BecomeSlime(Projectile proj)
         {
+          int slimeType = (int)SlimyboiType.Pink; // fallback in case fired from an unknown source
+          if (proj.PossibleSourceGun is Gun gun && gun.gameObject.GetComponent<Vacpack>() is Vacpack vp)
+            slimeType = vp._lastSlime;
+          if (slimeType < 0 && slimeType >= Slimybois.NumSlimes)
+          {
+            Lazy.DebugWarn("TRIED TO FIRE A NONEXISTENT SLIME TYPE, THIS SHOULD NEVER HAPPEN");
+            slimeType = (int)SlimyboiType.Pink;
+          }
           AIActor newSlime = AIActor.Spawn(
-            prefabActor     : Slimybois.PinkSlimeEnemyPrefab,
+            prefabActor     : Slimybois.SlimeData[slimeType].prefab,
             position        : proj.SafeCenter,
             source          : proj.SafeCenter.GetAbsoluteRoom(),
             awakenAnimType  : AIActor.AwakenAnimationType.Spawn,
@@ -61,6 +69,7 @@ public class Vacpack : CwaffGun
             direction: proj.transform.right, time: 1.0f, source: newSlime.gameObject,
             force: proj.baseData.speed * UnityEngine.Random.Range(0.8f, 1.2f));
           newSlime.gameObject.GetComponent<SlimyboiController>().HandleFiredFromVacpack();
+          proj.gameObject.Play("slime_spawn_sound");
         }
 
         protected override void OnFiredByAnything()
@@ -104,6 +113,7 @@ public class Vacpack : CwaffGun
           this.gun.CurrentStrengthTier = newTier;
           ClearCachedShootData(); // reset particle effects
         }
+        base.gameObject.Play("vacpack_select_sound");
     }
 
     public override void Update()
@@ -122,7 +132,6 @@ public class Vacpack : CwaffGun
           {
             this._hudHoldTimer = 0.0f;
             DoSlimeSelection(this._curSlime == -1 ? this._lastSlime : -1);
-            base.gameObject.Play("replicant_select_sound");
           }
           else if ((this._hudHoldTimer -= dtime) <= 0.0f)
           {
@@ -130,6 +139,11 @@ public class Vacpack : CwaffGun
             this._hud.Engage();
             SetFocus(true);
           }
+        }
+        if (this._hud && this._hud.Active && !player.m_activeActions.ReloadAction.IsPressed)
+        {
+          DoSlimeSelection();
+          DismissHUD();
         }
 
         bool isCharging = this.gun.IsCharging && this.gun.m_currentStrengthTier == 0;
@@ -212,7 +226,7 @@ public class Vacpack : CwaffGun
         for (int i = 0; i < 10; ++i)
         {
           DebrisObject debris = UnityEngine.Object.Instantiate(
-            Slimybois._SlimeGoopDebris, pos, Quaternion.identity).GetComponent<DebrisObject>();
+            SlimyboiType.Pink.Data().debris, pos, Quaternion.identity).GetComponent<DebrisObject>();
           debris.GravityOverride = 30.0f;
           debris.Trigger(Lazy.RandomVector(3f * UnityEngine.Random.value).ToVector3ZUp(4f), 0.25f);
           debris.sprite.MakeGlowyBetter(glowAmount: 10.0f, glowColor: new Color(1.0f, 0.75f, 0.9f), glowColorPower: 20.0f, sensitivity: 0.3f);
@@ -289,7 +303,7 @@ public class Vacpack : CwaffGun
             if (this._gun.m_currentStrengthTier == 0)
                 uic.GunAmmoCountLabel.Text = "Vac";
             else
-                uic.GunAmmoCountLabel.Text = "Shoot";
+                uic.GunAmmoCountLabel.Text = $"[sprite \"slime_{Slimybois.SlimeData[this._vac._curSlime].slimeName}_ui\"]\nx10000";
             return true;
         }
     }
@@ -363,10 +377,9 @@ public class VacpackHUD : MonoBehaviour
 {
   internal const string _NAME_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-  private const int _NUM_LETTERS = 26;
-  private const float _WEDGE_ARC = 360f / _NUM_LETTERS;
-  private const float _SHWOOP_TIME = 0.3f;
-  private const float _BASE_GEOM_ALPHA = 0.3f;
+  private static float _WedgeArc = 360f / Slimybois.NumSlimes;
+  private static float _SHWOOP_TIME = 0.3f;
+  private static float _BASE_GEOM_ALPHA = 0.3f;
 
   private static readonly Color _GeomColor1 = new Color(0.25f, 0.25f, 0.25f);
   private static readonly Color _GeomColor2 = new Color(0.35f, 0.35f, 0.35f);
@@ -393,11 +406,11 @@ public class VacpackHUD : MonoBehaviour
     this._gun = this.gameObject.GetComponent<Vacpack>();
 
     this._selector = Geometry.Create(Geometry.Shape.RING).Place(color: Color.red.WithAlpha(_BASE_GEOM_ALPHA)).UseGUILayer();
-    for (int i = 0; i < _NUM_LETTERS; ++i)
+    for (int i = 0; i < Slimybois.NumSlimes; ++i)
     {
       this._geometry.Add(Geometry.Create(Geometry.Shape.RING).Place(color: ((i % 2 == 0) ? _GeomColor1 : _GeomColor2).WithAlpha(_BASE_GEOM_ALPHA)).UseGUILayer());
       this._labels.Add(EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Center));
-      this._labels[i].Text = "[sprite \"mana_ui\"]";
+      this._labels[i].Text = $"[sprite \"slime_{Slimybois.SlimeData[i].slimeName}_ui\"]";
       this._labels[i].Pivot = dfPivotPoint.MiddleCenter;
     }
     this._nameLabel = EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Center);
@@ -431,7 +444,7 @@ public class VacpackHUD : MonoBehaviour
     this._shwoop = 0.0f;
     if (base.gameObject.RequestCameraControl())
       GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
-    base.gameObject.Play("death_note_open_sound");
+    base.gameObject.Play("vacpack_menu_sound");
   }
 
   public void Dismiss(bool force = false, bool deactivate = true)
@@ -505,7 +518,7 @@ public class VacpackHUD : MonoBehaviour
   }
 
   internal static int SlimeIndexForAngle(float angle)
-    => Mathf.FloorToInt((angle.Clamp360() + 0.5f * _WEDGE_ARC) / _WEDGE_ARC) % _NUM_LETTERS;
+    => Mathf.FloorToInt((angle.Clamp360() + 0.5f * _WedgeArc) / _WedgeArc) % Slimybois.NumSlimes;
 
   private void PlaceHUDElements()
   {
@@ -528,34 +541,30 @@ public class VacpackHUD : MonoBehaviour
     float screenHeight = this._camera.MaxVisiblePoint.y - this._camera.MinVisiblePoint.y;
     float shwoopHeight = ease * screenHeight;
     float geomAlpha = _BASE_GEOM_ALPHA * ease;
-    float innerRadius = 0.225f * screenHeight;
-    float outerRadius = innerRadius + 0.04f * shwoopHeight;
+    float innerRadius = 0.3f * screenHeight;
+    float outerRadius = innerRadius + 0.1f * shwoopHeight;
     float labelRadius = 0.5f * (innerRadius + outerRadius);
 
     this._selector.Disable();
-    for (int i = 0; i < _NUM_LETTERS; ++i)
+    for (int i = 0; i < Slimybois.NumSlimes; ++i)
     {
       bool sel = (i == curSegment);
       bool goodLetter = DeathNoteNameHandler.IsGoodLetter(_NAME_LETTERS[i]);
-      this._geometry[i].Place(pos: screenCenter, angle: _WEDGE_ARC * i, arc: _WEDGE_ARC,
+      this._geometry[i].Place(pos: screenCenter, angle: _WedgeArc * i, arc: _WedgeArc,
         radiusInner: innerRadius, radius: outerRadius * (sel ? 1.125f : 1.0f),
         color: (sel ? Color.white : (i % 2 == 0) ? _GeomColor1 : _GeomColor2).WithAlpha(geomAlpha));
-      Vector2 labelPos = screenCenter + (_WEDGE_ARC * i).ToVector(labelRadius);
+      Vector2 labelPos = screenCenter + (_WedgeArc * i).ToVector(labelRadius);
       if (sel)
       {
-        this._nameLabel.Text = $"Slime {i}";
+        this._nameLabel.Text = Slimybois.SlimeData[i].fullName;
         this._nameLabel.Opacity = ease;
         this._nameLabel.Place(pos: screenCenter);
 
-        this._countLabel.Text = $"x100";
+        this._countLabel.Text = $"x10000";
         this._countLabel.Opacity = ease;
         this._countLabel.Place(pos: screenCenter + new Vector2(0.0f, -this._countLabel.Height / 32f));
       }
-      if (goodLetter && DeathNoteNameHandler.OneGoodLetter())
-        this._selector.Place(pos: screenCenter, angle: _WEDGE_ARC * i, arc: _WEDGE_ARC,
-          radiusInner: innerRadius * 0.3f, radius: innerRadius * 0.9f,
-          color: (Color.Lerp(Color.red, ExtendedColours.pink, Mathf.Abs(Mathf.Sin(12f * BraveTime.ScaledTimeSinceStartup)))).WithAlpha(geomAlpha));
-      this._labels[i].Color = (sel ? Color.black : goodLetter ? Color.red : Color.white).WithAlpha(Mathf.Clamp01(2f * ease - 1f));
+      // this._labels[i].Color = (sel ? Color.black : goodLetter ? Color.red : Color.white).WithAlpha(Mathf.Clamp01(2f * ease - 1f));
       this._labels[i].OutlineColor = (sel ? Color.white : Color.black).WithAlpha(Mathf.Clamp01(2f * ease - 1f));
       this._labels[i].Opacity = ease;
       this._labels[i].Place(labelPos);

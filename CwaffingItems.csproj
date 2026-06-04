@@ -104,6 +104,7 @@
     <Compile Include="src\Cwaff-Characters\Rancher\Vacpack.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\Rancher.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\Slimybois.cs"/>
+    <Compile Include="src\Cwaff-Characters\Rancher\SlimyboiBehaviors.cs"/>
     <Compile Include="src\Cwaff-Characters\CwaffCharacterCore.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\BuildABoss.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\Armistice\ArmisticeNPC.cs"/>
