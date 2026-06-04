@@ -65,10 +65,11 @@ public class Vacpack : CwaffGun
             correctForWalls : true);
           newSlime.SpawnInInstantly(isReinforcement: true);
           newSlime.gameObject.AddComponent<KnockbackUnleasher>();
+          Vector2 dir = proj.transform.right;
           newSlime.knockbackDoer.ApplySourcedKnockback(
             direction: proj.transform.right, time: 1.0f, source: newSlime.gameObject,
             force: proj.baseData.speed * UnityEngine.Random.Range(0.8f, 1.2f));
-          newSlime.gameObject.GetComponent<SlimyboiController>().HandleFiredFromVacpack();
+          newSlime.gameObject.GetComponent<SlimyboiController>().HandleFiredFromVacpack(dir);
           proj.gameObject.Play("slime_spawn_sound");
         }
 

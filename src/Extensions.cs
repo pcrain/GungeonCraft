@@ -497,9 +497,16 @@ public static class Extensions
   {
       Material newMat = sprite.renderer.material;
       if (!skipSetup)
-      {
         sprite.usesOverrideMaterial = true;
+      newMat.MakeGlowyBetter(glowAmount, glowColor, glowColorPower, sensitivity, skipSetup);
+  }
 
+  /// <summary>New, better version of SetGlowiness based on better understanding of shaders</summary>
+  public static void MakeGlowyBetter(this Material newMat, float? glowAmount = null, Color? glowColor = null, float? glowColorPower = null,
+    float sensitivity = 0.5f, bool skipSetup = false)
+  {
+      if (!skipSetup)
+      {
         // copy some defaults from Gun Nut
         newMat.shader = ShaderCache.Acquire("Brave/LitCutoutUber_ColorEmissive");
         newMat.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
@@ -4070,5 +4077,72 @@ public static class Extensions
   public static tk2dSpriteAnimationClip DodgeRollClipForDirection(this PlayerController player, Vector2 direction)
   {
     return ((!(Mathf.Abs(direction.x) < 0.1f)) ? player.spriteAnimator.GetClipByName(((!(direction.y > 0.1f)) ? "dodge_left" : "dodge_left_bw") + ((!player.UseArmorlessAnim) ? string.Empty : "_armorless")) : player.spriteAnimator.GetClipByName(((!(direction.y > 0.1f)) ? "dodge" : "dodge_bw") + ((!player.UseArmorlessAnim) ? string.Empty : "_armorless")));
+  }
+
+  /// <summary>Given a Vector pos, returns the closest point on collider to pos.</summary>
+  public static Vector2 ClosestPointOnCollider(this Vector2 pos, PixelCollider collider)
+  {
+    Vector2 min = collider.UnitBottomLeft;
+    Vector2 max = collider.UnitTopRight;
+    return new Vector2(Mathf.Clamp(pos.x, min.x, max.x), Mathf.Clamp(pos.y, min.y, max.y));
+  }
+
+  private static LinkedList<IntVector2> _FrontierCells = new();
+  private static Dictionary<RoomHandler, Dictionary<IntVector2, int>> _PitMaps = new();
+  /// <summary>Check if a pit separates two positions</summary>
+  public static bool SeparatedByPit(this RoomHandler room, Vector2 a, Vector2 b)
+  {
+    if (!_PitMaps.TryGetValue(room, out var pitmap))
+      pitmap = BuildPitMap(room);
+    IntVector2 ai = a.ToIntVector2(VectorConversions.Floor);
+    IntVector2 bi = b.ToIntVector2(VectorConversions.Floor);
+    if (!pitmap.TryGetValue(ai, out int sectionA))
+      return true;
+    if (!pitmap.TryGetValue(bi, out int sectionB))
+      return true;
+    return sectionA != sectionB;
+
+    /// <summary>Flood fill algorithm for finding contiguous cells not separated by pits</summary>
+    static Dictionary<IntVector2, int> BuildPitMap(RoomHandler room)
+    {
+      Lazy.DebugConsoleLog($"building pit map for room with {room.roomCells.Count} cells");
+      Dictionary<IntVector2, int> pitmap = _PitMaps[room] = new();
+      int sectionIndex = 0;
+      DungeonData dd = GameManager.Instance.Dungeon.data;
+      CellData[][] allCells = dd.cellData;
+      foreach (IntVector2 cell in room.roomCells)
+      {
+        if (pitmap.ContainsKey(cell))
+          continue;
+        pitmap[cell] = -1;
+        _FrontierCells.AddLast(cell);
+        int cellsInSection = 0;
+        while (_FrontierCells.First != null)
+        {
+          IntVector2 nextCell = _FrontierCells.First.Value;
+          _FrontierCells.RemoveFirst();
+          CellData cellData = allCells[nextCell.x][nextCell.y];
+          if (cellData.type != CellType.FLOOR)
+            continue;
+          pitmap[nextCell] = sectionIndex;
+          ++cellsInSection;
+          foreach (IntVector2 compassDir in IntVector2.Cardinals)
+          {
+            IntVector2 neighbor = nextCell + compassDir;
+            if (!dd.CheckInBounds(neighbor.x, neighbor.y))
+              continue; // not a valid floor cell
+            if (!room.rawRoomCells.Contains(neighbor))
+              continue; // not a valid room cell
+            if (pitmap.ContainsKey(neighbor))
+              continue; // already processed cell
+            pitmap[neighbor] = -1;
+            _FrontierCells.AddLast(neighbor);
+          }
+        }
+        if (cellsInSection > 0)
+          ++sectionIndex; // increment section index for next batch of cells
+      }
+      return pitmap;
+    }
   }
 }

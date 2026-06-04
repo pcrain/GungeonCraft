@@ -4,17 +4,17 @@ namespace CwaffingTheGungy;
 public class SlimyboiController : BraveBehaviour
 {
   private const string VACPACK_FLYING_REASON = "Vacpack";
-  private const float VFX_GAP = 0.1f;
 
   public SlimyboiFlags attributes;
   public SlimyboiType slimeType;
+  public SlimeData slimeData;
 
   private bool _activelyBeingLaunched;
-  private float _vfxTimer = 0.0f;
   private float _jumpDuration = 1.0f;
   private float _jumpTimer = 0.0f;
   private tk2dSprite _trueSprite = null;
   private tk2dSprite _renderSprite = null;
+  private ParticleSystem _ps = null;
 
   private void Start()
   {
@@ -37,17 +37,42 @@ public class SlimyboiController : BraveBehaviour
     body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.Projectile)); // NOTE: HitByEnemyBullets does this already in theory, but old start was already called
     body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
 
-    this._vfxTimer = VFX_GAP;
     this._trueSprite = body.sprite as tk2dSprite;
   }
 
-  public void HandleFiredFromVacpack()
+  public void HandleFiredFromVacpack(Vector2 dir)
   {
     this._activelyBeingLaunched = true;
     base.gameObject.Play("slime_launch_sound");
     base.aiActor.SetIsFlying(true, VACPACK_FLYING_REASON, adjustShadow: false, modifyPathing: false);
     base.aiActor.CollisionDamage = 1.0f; // TODO: don't hardcode this, should be double the value from the charge behavior
     base.specRigidbody.OnCollision += this.OnCollisionAfterBeingShot;
+    RecreateParticleSystem(dir);
+  }
+
+  private void RecreateParticleSystem(Vector2 dir)
+  {
+    if (this._ps)
+      DestroyParticleSystem();
+    GameObject psObj = UnityEngine.Object.Instantiate(Slimybois.SlimeParticleSystem);
+    psObj.transform.position = base.aiActor.sprite.WorldCenter;
+    psObj.transform.parent   = base.gameObject.transform;
+    psObj.transform.localRotation = dir.EulerZ();
+    this._ps = psObj.GetComponent<ParticleSystem>();
+  }
+
+  private void DestroyParticleSystem(bool immediate = false)
+  {
+    if (!this._ps)
+      return;
+
+    this._ps.Stop(true, immediate ? ParticleSystemStopBehavior.StopEmittingAndClear : ParticleSystemStopBehavior.StopEmitting);
+    this._ps.gameObject.transform.parent = null;
+    if (immediate)
+      UnityEngine.Object.Destroy(this._ps.gameObject);
+    else
+      UnityEngine.Object.Destroy(this._ps.gameObject, Mathf.Min(3.0f, this._ps.main.duration + this._ps.main.startLifetime.constantMax));
+    this._ps = null;
   }
 
   private void HandleNoLongerFiredFromVacpack()
@@ -59,6 +84,7 @@ public class SlimyboiController : BraveBehaviour
     ResetCollisionDamage();
     base.specRigidbody.OnCollision -= this.OnCollisionAfterBeingShot;
     PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(base.specRigidbody);
+    DestroyParticleSystem();
   }
 
   public void HandleVacuumedByVacpack()
@@ -92,8 +118,8 @@ public class SlimyboiController : BraveBehaviour
     const float JUMP_HEIGHT = 1.25f;
     float dtime = BraveTime.DeltaTime;
 
-    SlimyboiChargeBehavior charge = base.behaviorSpeculator.AttackBehaviors[0] as SlimyboiChargeBehavior;
-    // base.aiActor.DebugNametag($"{(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\n{charge.State}\n{base.aiActor.CollisionDamage}\n{charge.m_cachedDamage}");
+    // SlimyboiChargeBehavior charge = base.behaviorSpeculator.AttackBehaviors[0] as SlimyboiChargeBehavior;
+    // base.aiActor.DebugNametag($"target: {(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\nstate: {charge.State}\nready: {charge.IsReady()}\nlastcharge: {Time.frameCount - charge._LastUpdateFrame}\nattackcooldown: {base.aiActor.behaviorSpeculator.m_attackCooldownTimer}");
 
     if (!this._renderSprite)
       this._renderSprite = base.specRigidbody.DecoupleSpriteFromCollider();
@@ -112,33 +138,8 @@ public class SlimyboiController : BraveBehaviour
 
     this._renderSprite.transform.position = renderPos.Quantize(0.0625f);
 
-    if (this._activelyBeingLaunched)
-    {
-      KnockbackDoer kbd = base.knockbackDoer;
-      if (!kbd.CheckSourceInKnockbacks(base.gameObject))
-      {
-        HandleNoLongerFiredFromVacpack();
-        return;
-      }
-      if ((this._vfxTimer -= dtime) <= 0.0f)
-      {
-        this._vfxTimer = VFX_GAP;
-        CwaffVFX.SpawnBurst(
-          prefab           : Slimybois._SlimeDeathVFX,
-          numToSpawn       : 2,
-          basePosition     : base.aiActor.CenterPosition,
-          positionVariance : 0.5f,
-          baseVelocity     : null,
-          velocityVariance : 2f,
-          velType          : CwaffVFX.Vel.Away,
-          rotType          : CwaffVFX.Rot.Random,
-          lifetime         : 0.5f,
-          startScale       : 1.0f,
-          endScale         : 0.1f,
-          copyShaders      : true
-          );
-      }
-    }
+    if (this._activelyBeingLaunched && !base.knockbackDoer.CheckSourceInKnockbacks(base.gameObject))
+      HandleNoLongerFiredFromVacpack();
   }
 
   private void OnCollisionAfterBeingShot(CollisionData data)
@@ -154,9 +155,10 @@ public class SlimyboiController : BraveBehaviour
 
   private void OnDeath(Vector2 vector)
   {
+    DestroyParticleSystem(true);
+
     if (base.aiActor.StealthDeath)
       return;
-
 
     base.gameObject.Play(Lazy.CoinFlip() ? "slime_death_sound_a" : "slime_death_sound_b");
     CwaffVFX.SpawnBurst(
@@ -174,6 +176,12 @@ public class SlimyboiController : BraveBehaviour
       endScale         : 0.1f,
       copyShaders      : true
       );
+  }
+
+  public override void OnDestroy()
+  {
+    DestroyParticleSystem(true);
+    base.OnDestroy();
   }
 
   private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
@@ -218,12 +226,12 @@ public class SlimyboiController : BraveBehaviour
   }
 }
 
-// same as ChargeBehavior, but with a max range constraint
+// same as ChargeBehavior, but with a max range constraint and better range detection to detect large bosses
 public class SlimyboiChargeBehavior : ChargeBehavior
 {
-  // private static GameObject _ContactVFX = null;
-
   public float maxRange = 3f;
+
+  // internal float _LastUpdateFrame = 0;
 
   public override void Init(GameObject gameObject, AIActor aiActor, AIShooter aiShooter)
   {
@@ -240,26 +248,12 @@ public class SlimyboiChargeBehavior : ChargeBehavior
     //REFACTOR: use hitVfx
     if (this.State == FireState.Charging && data.OtherRigidbody is SpeculativeRigidbody body && body.aiActor && m_aiActor && !m_aiActor.healthHaver.IsDead)
     {
-
-      // if (_ContactVFX == null)
-      //   _ContactVFX = Items.Glacier.AsGun().muzzleFlashEffects.effects[0].effects[0].effect;
-      // tk2dSprite vfx = SpawnManager.SpawnVFX(_ContactVFX, data.Contact, data.Normal.EulerZ()).GetComponent<tk2dSprite>();
-      // vfx.HeightOffGround = 10.0f;
-      // vfx.UpdateZDepth();
-
-      CwaffVFX.SpawnBurst(
-        prefab           : Slimybois._SlimeDeathVFX, // TODO: better particle
-        numToSpawn       : 3,
-        basePosition     : data.Contact,
-        positionVariance : 0.5f,
-        minVelocity      : 4f,
-        velocityVariance : 4f,
-        velType          : CwaffVFX.Vel.Away,
-        rotType          : CwaffVFX.Rot.Random,
-        lifetime         : 0.4f,
-        // fadeOutTime      : 0.2f,
-        startScale       : 1.0f,
-        endScale         : 0.1f,
+      float vfxAngle = (-m_aiActor.specRigidbody.Velocity).ToAngle().AddRandomSpread(10f);
+      CwaffVFX.Spawn(
+        prefab           : Slimybois._SlimeImpactVFX, // TODO: better particle
+        position         : data.Contact + Lazy.RandomVector(0.25f),
+        velocity         : vfxAngle.ToVector(UnityEngine.Random.Range(5.0f, 8.0f)),
+        rotation         : vfxAngle.EulerZ(),
         height           : 8.0f,
         copyShaders      : true
         );
@@ -274,8 +268,10 @@ public class SlimyboiChargeBehavior : ChargeBehavior
     base.OnCollision(data); // run ChargeBehavior.OnCollision() as normal
   }
 
+  /// <summary>Changed to use distance to hitbox rectangel</summary>
   public override BehaviorResult Update()
   {
+    // _LastUpdateFrame = Time.frameCount;
     if (!m_initialized)
     {
       SpeculativeRigidbody specRigidbody = m_aiActor.specRigidbody;
@@ -284,14 +280,21 @@ public class SlimyboiChargeBehavior : ChargeBehavior
     }
     if (!IsReady() || !m_aiActor.TargetRigidbody)
       return BehaviorResult.Continue;
+
     Vector2 myCenter = m_aiActor.specRigidbody.UnitCenter;
-    Vector2 targetCenter = m_aiActor.TargetRigidbody.specRigidbody.GetUnitCenter(ColliderType.HitBox);
+    PixelCollider targetCollider = m_aiActor.TargetRigidbody.specRigidbody.GetPixelCollider(ColliderType.HitBox);
+    if (targetCollider == null)
+      return BehaviorResult.Continue;
+
+    // NOTE: better tracking using closest point on collider rather than center (fixes tracking issues with large enemies like Bullet King)
+    Vector2 targetCenter = myCenter.ClosestPointOnCollider(targetCollider);
     if (leadAmount > 0f)
     {
       Vector2 vector2 = targetCenter + m_aiActor.TargetRigidbody.specRigidbody.Velocity * 0.75f;
       vector2 = BraveMathCollege.GetPredictedPosition(targetCenter, m_aiActor.TargetVelocity, myCenter, chargeSpeed);
       targetCenter = Vector2.Lerp(targetCenter, vector2, leadAmount);
     }
+
     float sqrDist = (myCenter - targetCenter).sqrMagnitude;
     if (sqrDist <= (minRange * minRange) || sqrDist >= (maxRange * maxRange))
       return BehaviorResult.Continue;
@@ -409,11 +412,13 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
     }
     else if (m_aiActor.CanTargetEnemies && !m_aiActor.CanTargetPlayers)
     {
-      List<AIActor> activeEnemies = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(m_aiActor.GridPosition).GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+      RoomHandler myRoom = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(m_aiActor.GridPosition);
+      List<AIActor> activeEnemies = (myRoom != null) ? myRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All) : null;
       if (activeEnemies != null && activeEnemies.Count > 0)
       {
         AIActor closestTarget = null;
         float closest = -1f;
+        Vector2 myPos = m_specRigidbody.UnitCenter;
         if (!m_aiActor || m_aiActor.IsNormalEnemy || !m_aiActor.CompanionOwner || !m_aiActor.CompanionOwner.IsStealthed)
         {
           for (int i = 0; i < activeEnemies.Count; i++)
@@ -422,9 +427,15 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
             // NOTE: allow attacking harmless enemies like key bullet kin and chance kin
             if (!candidate || !candidate.IsNormalEnemy || candidate.gameObject.GetComponent<SlimyboiController>() || candidate.IsGone || candidate == m_aiActor || candidate.healthHaver && candidate.healthHaver.PreventAllDamage)
                 continue;
-            float sqrdist = (m_specRigidbody.UnitCenter - candidate.specRigidbody.UnitCenter).sqrMagnitude;
+            Vector2 epos = candidate.specRigidbody.UnitCenter;
+            float sqrdist = (myPos - epos).sqrMagnitude;
             if (closestTarget != null && sqrdist >= closest)
               continue;
+            if (!m_aiActor.IsFlying && myRoom.SeparatedByPit(myPos, epos))
+            {
+              // Lazy.DebugConsoleLog($"can't target across pit");
+              continue;
+            }
             closestTarget = candidate;
             closest = sqrdist;
           }
