@@ -7,6 +7,8 @@ namespace CwaffingTheGungy;
 /// <summary>Main controller class for Slimes</summary>
 public class SlimyboiController : BraveBehaviour
 {
+  internal static List<SlimyboiController> _AllActiveSlimes = new();
+
   private const string VACPACK_FLYING_REASON = "Vacpack";
   private const float IFRAME_LENGTH = 0.25f;
 
@@ -45,6 +47,8 @@ public class SlimyboiController : BraveBehaviour
     body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
 
     this._trueSprite = body.sprite as tk2dSprite;
+
+    _AllActiveSlimes.Add(this);
   }
 
   private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
@@ -218,6 +222,7 @@ public class SlimyboiController : BraveBehaviour
   public override void OnDestroy()
   {
     DestroyParticleSystem(true);
+    _AllActiveSlimes.Remove(this);
     base.OnDestroy();
   }
 
@@ -525,5 +530,27 @@ internal static class SlimyboiPatches
 
       cursor.Emit(OpCodes.Ldarg_0);
       cursor.CallPrivate(typeof(SlimyboiPatches), nameof(SlimyboiControllerIgnoreDamageCaps));
+  }
+
+  /// <summary>Patch to make player-owned beams not hit slimes.</summary>
+  private static SpeculativeRigidbody[] _IgnoredBodiesPlusSlimes = new SpeculativeRigidbody[0];
+  [HarmonyPatch(typeof(BeamController), nameof(BeamController.GetIgnoreRigidbodies))]
+  [HarmonyPostfix]
+  private static void BeamControllerGetIgnoreRigidbodiesPatch(BeamController __instance, ref SpeculativeRigidbody[] __result)
+  {
+      int numSlimes = SlimyboiController._AllActiveSlimes.Count;
+      if (numSlimes == 0 || __instance.Owner is not PlayerController)
+        return; // shortcut if no slimes are active or if the beam is not player-owned
+
+      int numOtherBodies = __result.Length; // get the older number of ignored bodies
+      int totalIgnoredBodies = numSlimes + numOtherBodies; // total ignored bodies is the old number + the number of slimes
+      if (totalIgnoredBodies != _IgnoredBodiesPlusSlimes.Length)
+        _IgnoredBodiesPlusSlimes = new SpeculativeRigidbody[totalIgnoredBodies]; // don't reallocate unless we absolutely need to
+      int i;
+      for (i = 0; i < numOtherBodies; ++i)
+        _IgnoredBodiesPlusSlimes[i] = __result[i]; // copy the result array over
+      foreach (SlimyboiController sloim in SlimyboiController._AllActiveSlimes)
+        _IgnoredBodiesPlusSlimes[i++] = sloim ? sloim.specRigidbody : null; // add rigidbodies for the slimes in as necessary
+      __result = _IgnoredBodiesPlusSlimes; // replace the result with the slimes
   }
 }
