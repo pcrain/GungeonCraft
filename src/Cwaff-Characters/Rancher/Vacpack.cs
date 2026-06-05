@@ -3,6 +3,7 @@ namespace CwaffingTheGungy;
 /* TODO:
     - actual slime storage (including counts and health)
     - fix firing when holding fire while switching modes
+    - make undroppable
 */
 
 public class Vacpack : CwaffGun
@@ -244,9 +245,16 @@ public class Vacpack : CwaffGun
       DismissHUD();
     }
 
+    public override void OnPlayerPickup(PlayerController player)
+    {
+      base.OnPlayerPickup(player);
+      SlimyboiManager.EnsureInstance();
+    }
+
     public override void OnSwitchedToThisGun()
     {
       base.OnSwitchedToThisGun();
+      SlimyboiManager.EnsureInstance();
       CreateHUDIfNecessary();
     }
 

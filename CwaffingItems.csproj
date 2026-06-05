@@ -101,6 +101,7 @@
     <Compile Include="src\Commands.cs"/>
     <Compile Include="src\Cwaff-Characters\Rogo\PogoGun.cs"/>
     <Compile Include="src\Cwaff-Characters\Rogo\Rogo.cs"/>
+    <Compile Include="src\Cwaff-Characters\Rancher\SlimyboiManager.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\Vacpack.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\Rancher.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\Slimybois.cs"/>

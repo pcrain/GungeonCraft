@@ -2,30 +2,43 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - fix targeting invulnerable chancellor (check for BulletKingToadieController and m_isCrazed)
+    - fix slimers occasionally spawning in with door sprite from wrong sprite collection when spawned offscreen
 */
 
 /// <summary>Main controller class for Slimes</summary>
 public class SlimyboiController : BraveBehaviour
 {
-  internal static List<SlimyboiController> _AllActiveSlimes = new();
-
   private const string VACPACK_FLYING_REASON = "Vacpack";
   private const float IFRAME_LENGTH = 0.25f;
 
   public SlimyboiFlags attributes;
   public SlimyboiType slimeType;
-  public SlimeData slimeData;
 
+  private SlimeData _slimeData;
   private bool _activelyBeingLaunched;
   private float _jumpDuration = 1.0f;
   private float _jumpTimer = 0.0f;
+  private float _growDuration = 1.0f;
+  private float _growTimer = 0.0f;
   private float _projectileIframeTimer = 0.0f;
   private tk2dSprite _trueSprite = null;
   private tk2dSprite _renderSprite = null;
   private ParticleSystem _ps = null;
+  private bool _appearOutOfNowhere = true;
+  private bool _setup = false;
 
   private void Start()
   {
+    Setup();
+  }
+
+  private void Setup()
+  {
+    if (this._setup)
+      return;
+
+    this._slimeData = this.slimeType.Data(); // NOTE: can't serialize this because broken ):
+
     HealthHaver hh = base.healthHaver;
     hh.SuppressDeathSounds = true;
     hh.OnDeath += this.OnDeath;
@@ -48,12 +61,21 @@ public class SlimyboiController : BraveBehaviour
 
     this._trueSprite = body.sprite as tk2dSprite;
 
-    _AllActiveSlimes.Add(this);
+    SlimyboiManager.RegisterSlime(this);
+
+    this._setup = true;
   }
 
   private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
   {
-      this._projectileIframeTimer = IFRAME_LENGTH;
+    this._projectileIframeTimer = IFRAME_LENGTH;
+  }
+
+  public void HandleRoomSpawn()
+  {
+    base.gameObject.Play("slime_vacuum_sound");
+    this._appearOutOfNowhere = true;
+    Setup();
   }
 
   public void HandleFiredFromVacpack(Vector2 dir)
@@ -116,9 +138,15 @@ public class SlimyboiController : BraveBehaviour
     PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(base.specRigidbody);
   }
 
-  public void Jump()
+  public void Jump(float? overideDuration = null, bool growIn = false)
   {
-    this._jumpDuration = this._jumpTimer = Mathf.Max(0.6f * (this.slimeType.Data().overrideAttackCooldown ?? Slimybois._DEFAULT_COOLDOWN), 0.15f);
+    this._jumpTimer = overideDuration ?? Mathf.Max(0.6f * (this.slimeType.Data().overrideAttackCooldown ?? Slimybois._DEFAULT_COOLDOWN), 0.15f);
+    this._jumpDuration = this._jumpTimer;
+    if (growIn)
+    {
+      this._growTimer = 0.5f * this._jumpTimer;
+      this._growDuration = this._growTimer;
+    }
   }
 
   private void ResetCollisionDamage()
@@ -138,7 +166,25 @@ public class SlimyboiController : BraveBehaviour
     // base.aiActor.DebugNametag($"target: {(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\nstate: {charge.State}\nready: {charge.IsReady()}\nlastcharge: {Time.frameCount - charge._LastUpdateFrame}\nattackcooldown: {base.aiActor.behaviorSpeculator.m_attackCooldownTimer}");
 
     if (!this._renderSprite)
+    {
       this._renderSprite = base.specRigidbody.DecoupleSpriteFromCollider();
+      if (this._appearOutOfNowhere)
+      {
+        this._appearOutOfNowhere = false;
+        Vector2 pos = this._trueSprite.WorldCenter;
+        for (int i = 0; i < 10; ++i)
+        {
+          DebrisObject debris = UnityEngine.Object.Instantiate(
+            this._slimeData.debris, pos, Quaternion.identity).GetComponent<DebrisObject>();
+          debris.GravityOverride = 30.0f;
+          debris.Trigger(Lazy.RandomVector(3f * UnityEngine.Random.value).ToVector3ZUp(4f), 0.25f);
+          debris.sprite.MakeGlowyBetter(glowAmount: 10.0f, glowColor: new Color(1.0f, 0.75f, 0.9f), glowColorPower: 20.0f, sensitivity: 0.3f);
+        }
+        Jump(0.5f, growIn: true);
+        this._renderSprite.scale = new Vector3(0.0f, 0.0f, 1.0f);
+      }
+    }
+
     this._renderSprite.collection = this._trueSprite.collection;
     this._renderSprite.spriteId = this._trueSprite.spriteId;
     Vector3 renderPos = this._trueSprite.transform.position;
@@ -150,6 +196,14 @@ public class SlimyboiController : BraveBehaviour
       float jumpY = JUMP_HEIGHT * Mathf.Sin(Mathf.PI * (1f - this._jumpTimer / this._jumpDuration));
       this._trueSprite.spriteAnimator.UpdateAnimation(dtime);
       renderPos.y += jumpY;
+    }
+    if (this._growTimer > 0)
+    {
+      this._growTimer = Mathf.Max(0.0f, this._growTimer - dtime);
+      float scale = 1f - this._growTimer / this._growDuration;
+      this._renderSprite.scale = new Vector3(scale, scale, 1.0f);
+      renderPos -= this._renderSprite.GetRelativePositionFromAnchor(Anchor.LowerCenter).ToVector3ZUp();
+      renderPos += new Vector3(0.5f * this._renderSprite.GetCurrentSpriteDef().untrimmedBoundsDataExtents.x, 0.0f, 0.0f); // add half width of sprite
     }
 
     this._renderSprite.transform.position = renderPos.Quantize(0.0625f);
@@ -222,7 +276,7 @@ public class SlimyboiController : BraveBehaviour
   public override void OnDestroy()
   {
     DestroyParticleSystem(true);
-    _AllActiveSlimes.Remove(this);
+    SlimyboiManager.DeregisterSlime(this);
     base.OnDestroy();
   }
 
@@ -297,7 +351,12 @@ public class SlimyboiChargeBehavior : ChargeBehavior
   {
     //REFACTOR: use hitVfx
     if (this.State == FireState.Charging && data.OtherRigidbody is SpeculativeRigidbody body && body.aiActor && m_aiActor && !m_aiActor.healthHaver.IsDead && this._slime)
+    {
+      // NOTE: this makes enemies with guns almost unable to fire them due to being too close
+      // if (!body.aiActor.OverrideTarget)
+      //   body.aiActor.OverrideTarget = m_aiActor.specRigidbody;
       this._slime.OnAttackCollision(data, 25f); // TODO: figure out better way to set knockback
+    }
     base.OnCollision(data); // run ChargeBehavior.OnCollision() as normal
   }
 
@@ -538,10 +597,10 @@ internal static class SlimyboiPatches
   [HarmonyPostfix]
   private static void BeamControllerGetIgnoreRigidbodiesPatch(BeamController __instance, ref SpeculativeRigidbody[] __result)
   {
-      int numSlimes = SlimyboiController._AllActiveSlimes.Count;
-      if (numSlimes == 0 || __instance.Owner is not PlayerController)
+      if (!SlimyboiManager.AnyActiveSlimes() || __instance.Owner is not PlayerController)
         return; // shortcut if no slimes are active or if the beam is not player-owned
 
+      int numSlimes = SlimyboiManager.NumActiveSlimes();
       int numOtherBodies = __result.Length; // get the older number of ignored bodies
       int totalIgnoredBodies = numSlimes + numOtherBodies; // total ignored bodies is the old number + the number of slimes
       if (totalIgnoredBodies != _IgnoredBodiesPlusSlimes.Length)
@@ -549,7 +608,7 @@ internal static class SlimyboiPatches
       int i;
       for (i = 0; i < numOtherBodies; ++i)
         _IgnoredBodiesPlusSlimes[i] = __result[i]; // copy the result array over
-      foreach (SlimyboiController sloim in SlimyboiController._AllActiveSlimes)
+      foreach (SlimyboiController sloim in SlimyboiManager.ActiveSlimes)
         _IgnoredBodiesPlusSlimes[i++] = sloim ? sloim.specRigidbody : null; // add rigidbodies for the slimes in as necessary
       __result = _IgnoredBodiesPlusSlimes; // replace the result with the slimes
   }

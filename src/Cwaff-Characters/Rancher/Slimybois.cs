@@ -2,9 +2,8 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - spawn animations / sounds / vfx
-    - allow enemies to target slimes
+    - allow enemies to target slimes (chance of temporary override)
     - unique particles / vfx / sounds / potentially goops?
-    - prevent getting hit by players' beams
     - only use override sprite renderer when attacking
 */
 
@@ -74,7 +73,6 @@ public static class Slimybois
     goopDebris.usesLifespan = true;
 
     SlimyboiController controller = actor.gameObject.AddComponent<SlimyboiController>();
-    controller.slimeData = sd;
     controller.slimeType = sd.type;
     controller.attributes = sd.flags;
 
@@ -225,7 +223,7 @@ public enum SlimyboiType
 {
   Glitch,      // unimplemented
   Saber,       // unimplemented
-  Pink,
+  Pink,        // unfinished
   Honey,       // unimplemented
   Rad,         // unimplemented
   Tangle,      // unimplemented
@@ -233,7 +231,7 @@ public enum SlimyboiType
   Boom,        // unimplemented
   Rock,        // unimplemented
   Quantum,     // unimplemented
-  Phosphor,    // unimplemented
+  Phosphor,    // unfinished
   Mosaic,      // unimplemented
   Dervish,     // unimplemented
   Tabby,       // unimplemented
@@ -268,9 +266,13 @@ public class SlimeData
 [Flags]
 public enum SlimyboiFlags // : ulong
 {
-  None              = 0,
-  Allied            = 1 << 0, // if set, slime is allied and cannot hurt or be hurt by player characters
-  CanFly            = 1 << 1, // if set, slime can fly and path over pits and other hazards
-  ExplodesOnDeath   = 1 << 2, // if set, slime exploded upon dying
-  ExtraCasingOnKill = 1 << 3, // if set, slime spawns an extra casing upon killing an enemy
+  None               = 0,
+  Allied             = 1 << 0, // if set, slime is allied and cannot hurt or be hurt by player characters
+  CanFly             = 1 << 1, // if set, slime can fly and path over pits and other hazards
+  ExplodesOnDeath    = 1 << 2, // if set, slime exploded upon dying
+  ExtraCasingOnKill  = 1 << 3, // if set, slime spawns an extra casing upon killing an enemy
+  FireImmunity       = 1 << 4,
+  PoisonImmunity     = 1 << 5,
+  ExplosionImmunity  = 1 << 6,
+  ProjectileImmunity = 1 << 7,
 }
