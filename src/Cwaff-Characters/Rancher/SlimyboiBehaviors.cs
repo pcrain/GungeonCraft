@@ -1,9 +1,14 @@
 namespace CwaffingTheGungy;
 
+/* TODO:
+    - fix targeting invulnerable chancellor (check for BulletKingToadieController and m_isCrazed)
+*/
+
 /// <summary>Main controller class for Slimes</summary>
 public class SlimyboiController : BraveBehaviour
 {
   private const string VACPACK_FLYING_REASON = "Vacpack";
+  private const float IFRAME_LENGTH = 0.25f;
 
   public SlimyboiFlags attributes;
   public SlimyboiType slimeType;
@@ -12,6 +17,7 @@ public class SlimyboiController : BraveBehaviour
   private bool _activelyBeingLaunched;
   private float _jumpDuration = 1.0f;
   private float _jumpTimer = 0.0f;
+  private float _projectileIframeTimer = 0.0f;
   private tk2dSprite _trueSprite = null;
   private tk2dSprite _renderSprite = null;
   private ParticleSystem _ps = null;
@@ -21,6 +27,7 @@ public class SlimyboiController : BraveBehaviour
     HealthHaver hh = base.healthHaver;
     hh.SuppressDeathSounds = true;
     hh.OnDeath += this.OnDeath;
+    hh.OnDamaged += this.OnDamaged;
 
     this.attributes |= SlimyboiFlags.Allied;
     AIActor actor = base.aiActor;
@@ -38,6 +45,11 @@ public class SlimyboiController : BraveBehaviour
     body.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
 
     this._trueSprite = body.sprite as tk2dSprite;
+  }
+
+  private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
+  {
+      this._projectileIframeTimer = IFRAME_LENGTH;
   }
 
   public void HandleFiredFromVacpack(Vector2 dir)
@@ -140,6 +152,14 @@ public class SlimyboiController : BraveBehaviour
 
     if (this._activelyBeingLaunched && !base.knockbackDoer.CheckSourceInKnockbacks(base.gameObject))
       HandleNoLongerFiredFromVacpack();
+
+    // invulnerability flicker
+    // TODO: this doesn't work quite right if other things disable our renderer
+    this._projectileIframeTimer = Mathf.Max(this._projectileIframeTimer - dtime, 0.0f);
+    if (Mathf.FloorToInt(this._projectileIframeTimer * 20.0f) % 2 == 1)
+      this._renderSprite.renderer.enabled = false;
+    else
+      this._renderSprite.renderer.enabled = true;
   }
 
   private void OnCollisionAfterBeingShot(CollisionData data)
@@ -147,10 +167,27 @@ public class SlimyboiController : BraveBehaviour
     base.specRigidbody.OnCollision -= this.OnCollisionAfterBeingShot;
     HandleNoLongerFiredFromVacpack();
     base.knockbackDoer.m_activeKnockbacks.Clear();
-    Jump();
-    base.knockbackDoer.ApplyKnockback(data.Normal, 2f * base.specRigidbody.Velocity.magnitude, time: this._jumpDuration);
     base.specRigidbody.Velocity = Vector2.zero;
-    base.gameObject.Play("slime_attack_sound");
+    OnAttackCollision(data, knockback: 2f * base.specRigidbody.Velocity.magnitude);
+  }
+
+  public void OnAttackCollision(CollisionData data, float knockback)
+  {
+      float vfxAngle = (-base.specRigidbody.Velocity).ToAngle().AddRandomSpread(10f);
+      CwaffVFX.Spawn(
+        prefab           : Slimybois._SlimeImpactVFX, // TODO: better particle
+        position         : data.Contact + Lazy.RandomVector(0.25f),
+        velocity         : vfxAngle.ToVector(UnityEngine.Random.Range(5.0f, 8.0f)),
+        rotation         : vfxAngle.EulerZ(),
+        height           : 8.0f,
+        copyShaders      : true
+        );
+
+      // NOTE: attempt to prevent getting stuck inside enemies and dealing ridiculous damage
+      base.specRigidbody.RegisterTemporaryCollisionException(data.OtherRigidbody, 0.01f);
+      base.gameObject.Play("slime_attack_sound");
+      base.knockbackDoer.ApplyKnockback(data.Normal, knockback, time: this._jumpDuration);
+      Jump();
   }
 
   private void OnDeath(Vector2 vector)
@@ -186,6 +223,11 @@ public class SlimyboiController : BraveBehaviour
 
   private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
   {
+    if (this._projectileIframeTimer > 0 && otherRigidbody.projectile)
+    {
+      PhysicsEngine.SkipCollision = true; // don't collide with projectiles while iframes are active
+      return;
+    }
     GameActor actor = otherRigidbody.gameActor;
     if (actor is AIActor enemy)
     {
@@ -195,7 +237,7 @@ public class SlimyboiController : BraveBehaviour
     }
     if (this._activelyBeingLaunched)
     {
-      PhysicsEngine.SkipCollision = true; // don't collide with anything other than the tilemap while being launched
+      PhysicsEngine.SkipCollision = true; // don't collide with anything other than the tilemap and enemies while being launched
       return;
     }
     if (otherRigidbody.projectile is Projectile proj)
@@ -231,12 +273,15 @@ public class SlimyboiChargeBehavior : ChargeBehavior
 {
   public float maxRange = 3f;
 
+  private SlimyboiController _slime = null;
+
   // internal float _LastUpdateFrame = 0;
 
   public override void Init(GameObject gameObject, AIActor aiActor, AIShooter aiShooter)
   {
     base.Init(gameObject, aiActor, aiShooter);
     SpeculativeRigidbody specRigidbody = m_aiActor.specRigidbody;
+    this._slime = base.m_aiActor.gameObject.GetComponent<SlimyboiController>();
     specRigidbody.OnCollision -= base.OnCollision; // remove ChargeBehavior.OnCollision() because we call it manually with OnOverrideCollision()
     specRigidbody.OnCollision -= this.OnOverrideCollision;
     specRigidbody.OnCollision += this.OnOverrideCollision;
@@ -246,25 +291,8 @@ public class SlimyboiChargeBehavior : ChargeBehavior
   private void OnOverrideCollision(CollisionData data)
   {
     //REFACTOR: use hitVfx
-    if (this.State == FireState.Charging && data.OtherRigidbody is SpeculativeRigidbody body && body.aiActor && m_aiActor && !m_aiActor.healthHaver.IsDead)
-    {
-      float vfxAngle = (-m_aiActor.specRigidbody.Velocity).ToAngle().AddRandomSpread(10f);
-      CwaffVFX.Spawn(
-        prefab           : Slimybois._SlimeImpactVFX, // TODO: better particle
-        position         : data.Contact + Lazy.RandomVector(0.25f),
-        velocity         : vfxAngle.ToVector(UnityEngine.Random.Range(5.0f, 8.0f)),
-        rotation         : vfxAngle.EulerZ(),
-        height           : 8.0f,
-        copyShaders      : true
-        );
-
-      // NOTE: attempt to prevent getting stuck inside enemies and dealing ridiculous damage
-      m_aiActor.specRigidbody.RegisterTemporaryCollisionException(body, 0.01f);
-      m_aiActor.gameObject.Play("slime_attack_sound");
-      m_aiActor.knockbackDoer.ApplyKnockback(data.Normal, 25f);
-      if (m_aiActor.gameObject.GetComponent<SlimyboiController>() is SlimyboiController sloim)
-        sloim.Jump();
-    }
+    if (this.State == FireState.Charging && data.OtherRigidbody is SpeculativeRigidbody body && body.aiActor && m_aiActor && !m_aiActor.healthHaver.IsDead && this._slime)
+      this._slime.OnAttackCollision(data, 25f); // TODO: figure out better way to set knockback
     base.OnCollision(data); // run ChargeBehavior.OnCollision() as normal
   }
 
@@ -350,7 +378,8 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
     if (m_behaviorSpeculator.PlayerTarget is not GameActor target)
       return true;
 
-    if (target.IsFalling || (target.healthHaver is HealthHaver thh && (thh.IsDead || thh.PreventAllDamage)))
+    HealthHaver thh = target.healthHaver;
+    if (target.IsFalling || (thh && (thh.IsDead || thh.PreventAllDamage)))
     {
       if (m_aiActor)
         m_aiActor.ClearPath();
@@ -364,6 +393,8 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
       return true; // NOTE: repath if we can't reach our target
     if (target.IsStealthed)
       return true;
+    if (thh && !thh.IsVulnerable)
+      return true; // NOTE: don't attack invulnerable targets
     if (GameManager.Instance.AllPlayers.Length > 1 && m_coopRefreshSearchTimer <= 0f)
       return true;
     if (target is not AIActor)

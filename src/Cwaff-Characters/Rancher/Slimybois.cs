@@ -1,5 +1,13 @@
 namespace CwaffingTheGungy;
 
+/* TODO:
+    - spawn animations / sounds / vfx
+    - allow enemies to target slimes
+    - unique particles / vfx / sounds / potentially goops?
+    - prevent getting hit by players' beams
+    - only use override sprite renderer when attacking
+*/
+
 public static class Slimybois
 {
   internal const float _DEFAULT_COOLDOWN = 0.5f;
@@ -16,7 +24,7 @@ public static class Slimybois
     if (string.IsNullOrEmpty(sd.slimeName))
       sd.slimeName = Enum.GetName(typeof(SlimyboiType), sd.type).ToLower();
     sd.fullName = sd.slimeName.ToTitleCaseInvariant() + " Slime";
-    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? 40, baseFps: 12, doCorpse: false);
+    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? 16, baseFps: 12, doCorpse: false);
     actor.procedurallyOutlined       = false; // TODO: remove outlines from sprites later
     actor.MovementSpeed              = sd.overrideSpeed ?? 4.5f;
     actor.CollisionDamage            = 0.0f; // Overridden by SlimyboiChargeBehavior at charge time
@@ -41,14 +49,14 @@ public static class Slimybois
     AIAnimator aiAnim = actor.gameObject.GetComponent<AIAnimator>();
     aiAnim.facingType = AIAnimator.FacingType.Movement;
 
-    GoopDoer gd = actor.gameObject.AddComponent<GoopDoer>();
-    gd.goopDefinition     = EasyGoopDefinitions.BlobulonGoopDef;
-    gd.positionSource     = GoopDoer.PositionSource.HitBoxCenter;
-    gd.updateTiming       = GoopDoer.UpdateTiming.Always;
-    gd.updateFrequency    = 0.05f;
-    gd.defaultGoopRadius  = 1f;
-    gd.radiusMin          = 0.25f;
-    gd.radiusMax          = 0.75f;
+    // GoopDoer gd = actor.gameObject.AddComponent<GoopDoer>();
+    // gd.goopDefinition     = EasyGoopDefinitions.BlobulonGoopDef;
+    // gd.positionSource     = GoopDoer.PositionSource.HitBoxCenter;
+    // gd.updateTiming       = GoopDoer.UpdateTiming.Always;
+    // gd.updateFrequency    = 0.05f;
+    // gd.defaultGoopRadius  = 1f;
+    // gd.radiusMin          = 0.25f;
+    // gd.radiusMax          = 0.75f;
 
     DebrisObject goopDebris = BreakableAPIToolbox.GenerateDebrisObject(
       shardSpritePath         : $"slime_debris",
@@ -59,7 +67,7 @@ public static class Slimybois
       AngularVelocityVariance : 0,
       DebrisBounceCount       : 1,
       DoesGoopOnRest          : true,
-      GoopType                : gd.goopDefinition,
+      GoopType                : EasyGoopDefinitions.BlobulonGoopDef,
       GoopRadius              : 0.5f,
       Mass                    : 1.0f);
     goopDebris.decayOnBounce = 0.8f;

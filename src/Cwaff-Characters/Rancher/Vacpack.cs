@@ -1,5 +1,10 @@
 namespace CwaffingTheGungy;
 
+/* TODO:
+    - actual slime storage (including counts and health)
+    - fix firing when holding fire while switching modes
+*/
+
 public class Vacpack : CwaffGun
 {
     public static string ItemName         = "Vacpack";
@@ -37,7 +42,7 @@ public class Vacpack : CwaffGun
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, hideAmmo: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
         ProjectileModule shootMod = new ProjectileModule().InitSpecialSingleProjectileModule<SlimeProjectile>(GunData.New(
-          gun: gun, baseProjectile: Items._38Special.Projectile(), clipSize: -1, cooldown: 0.11f, shootStyle: ShootStyle.SemiAutomatic,
+          gun: gun, baseProjectile: Items._38Special.Projectile(), clipSize: -1, cooldown: 0.45f, shootStyle: ShootStyle.SemiAutomatic,
           damage: 3.0f, speed: 100f, range: 9999f, force: 12f,  hitSound: "generic_bullet_impact", angleVariance: 10.0f
           ));
         gun.Volley.projectiles.Add(shootMod);
