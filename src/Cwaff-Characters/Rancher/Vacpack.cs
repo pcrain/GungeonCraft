@@ -1,9 +1,9 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - actual slime storage (including counts and health)
+    - actual slime storage
     - fix firing when holding fire while switching modes
-    - make undroppable
+    - fix slimes that dodge the vacuum wave getting stuck to walls until retriggering vacuum
 */
 
 public class Vacpack : CwaffGun
@@ -63,10 +63,12 @@ public class Vacpack : CwaffGun
             Lazy.DebugWarn("TRIED TO FIRE A NONEXISTENT SLIME TYPE, THIS SHOULD NEVER HAPPEN");
             slimeType = (int)SlimyboiType.Pink;
           }
+          SlimeData sd = Slimybois.SlimeData[slimeType];
+          Vector2 ppos = proj.SafeCenter;
           AIActor newSlime = AIActor.Spawn(
-            prefabActor     : Slimybois.SlimeData[slimeType].prefab,
-            position        : proj.SafeCenter,
-            source          : proj.SafeCenter.GetAbsoluteRoom(),
+            prefabActor     : sd.prefab,
+            position        : ppos,
+            source          : ppos.GetAbsoluteRoom(),
             awakenAnimType  : AIActor.AwakenAnimationType.Spawn,
             correctForWalls : true);
           newSlime.SpawnInInstantly(isReinforcement: true);
@@ -76,6 +78,15 @@ public class Vacpack : CwaffGun
             direction: proj.transform.right, time: 1.0f, source: newSlime.gameObject,
             force: proj.baseData.speed * UnityEngine.Random.Range(0.8f, 1.2f));
           newSlime.gameObject.GetComponent<SlimyboiController>().HandleFiredFromVacpack(dir);
+
+          for (int i = 0; i < 10; ++i)
+          {
+            DebrisObject debris = UnityEngine.Object.Instantiate(sd.debris, ppos, Quaternion.identity).GetComponent<DebrisObject>();
+            debris.GravityOverride = 30.0f;
+            debris.Trigger((3f * dir + Lazy.RandomVector(2f * UnityEngine.Random.value)).ToVector3ZUp(4f), 0.25f);
+            debris.sprite.MakeGlowyBetter(glowAmount: 10.0f, glowColor: new Color(1.0f, 0.75f, 0.9f), glowColorPower: 20.0f, sensitivity: 0.3f);
+          }
+
           proj.gameObject.Play("slime_spawn_sound");
         }
 
@@ -245,10 +256,36 @@ public class Vacpack : CwaffGun
       DismissHUD();
     }
 
+    private void DeregisterEvents(PlayerController player)
+    {
+      player.OnRoomClearEvent -= SlimyboiManager.OnCombatRoomClear;
+      CustomActions.OnAnyPlayerCollectedAmmo -= SlimyboiManager.OnAmmoCollected;
+      CustomActions.OnAnyPlayerCollectedBlank -= SlimyboiManager.OnBlankCollected;
+      CustomActions.OnAnyHealthHaverDie -= SlimyboiManager.OnAnyHealthHaverDie;
+      CustomActions.OnAnyPlayerCollectedHealth -= SlimyboiManager.OnAnyPlayerCollectedHealth;
+      CustomActions.OnMinorBreakableShattered -= SlimyboiManager.OnMinorBreakableShattered;
+      CwaffEvents.OnWillPickUpCurrency -= SlimyboiManager.OnWillPickUpCurrency;
+      CwaffEvents.OnWillPickUpAnyPassive -= SlimyboiManager.OnWillPickUpAnyPassive;
+    }
+
+    private void RegisterEvents(PlayerController player)
+    {
+      DeregisterEvents(player);
+      player.OnRoomClearEvent += SlimyboiManager.OnCombatRoomClear;
+      CustomActions.OnAnyPlayerCollectedAmmo += SlimyboiManager.OnAmmoCollected;
+      CustomActions.OnAnyPlayerCollectedBlank += SlimyboiManager.OnBlankCollected;
+      CustomActions.OnAnyHealthHaverDie += SlimyboiManager.OnAnyHealthHaverDie;
+      CustomActions.OnAnyPlayerCollectedHealth += SlimyboiManager.OnAnyPlayerCollectedHealth;
+      CustomActions.OnMinorBreakableShattered += SlimyboiManager.OnMinorBreakableShattered;
+      CwaffEvents.OnWillPickUpCurrency += SlimyboiManager.OnWillPickUpCurrency;
+      CwaffEvents.OnWillPickUpAnyPassive += SlimyboiManager.OnWillPickUpAnyPassive;
+    }
+
     public override void OnPlayerPickup(PlayerController player)
     {
       base.OnPlayerPickup(player);
       SlimyboiManager.EnsureInstance();
+      RegisterEvents(player);
     }
 
     public override void OnSwitchedToThisGun()
@@ -266,12 +303,15 @@ public class Vacpack : CwaffGun
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
+        DeregisterEvents(player);
         base.OnDroppedByPlayer(player);
         DismissHUD();
     }
 
     public override void OnDestroy()
     {
+        if (this.PlayerOwner is PlayerController player)
+          DeregisterEvents(player);
         DismissHUD();
         base.OnDestroy();
     }

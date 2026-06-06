@@ -8,7 +8,7 @@ namespace CwaffingTheGungy;
 
 public static class Slimybois
 {
-  internal const float _DEFAULT_COOLDOWN = 0.5f;
+  internal const float _DEFAULT_COOLDOWN = 2.0f;
 
   public static readonly int NumSlimes = Enum.GetNames(typeof(SlimyboiType)).Length;
   public static SlimeData[] SlimeData = null;
@@ -22,7 +22,7 @@ public static class Slimybois
     if (string.IsNullOrEmpty(sd.slimeName))
       sd.slimeName = Enum.GetName(typeof(SlimyboiType), sd.type).ToLower();
     sd.fullName = sd.slimeName.ToTitleCaseInvariant() + " Slime";
-    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? 16, baseFps: 12, doCorpse: false);
+    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? 12, baseFps: 12, doCorpse: false);
     actor.procedurallyOutlined       = false; // TODO: remove outlines from sprites later
     actor.MovementSpeed              = sd.overrideSpeed ?? 4.5f;
     actor.CollisionDamage            = 0.0f; // Overridden by SlimyboiChargeBehavior at charge time
@@ -37,7 +37,7 @@ public static class Slimybois
     bs.TargetBehaviors.Add(new SlimyboiTargetingBehavior(){ Radius = 35.0f, LineOfSight = false, ObjectPermanence = false });
     bs.MovementBehaviors.Add(new SeekTargetBehavior(){ StopWhenInRange = true, CustomRange = 2.0f, PathInterval = 0.5f });
     bs.MovementBehaviors.Add(new MoveErraticallyBehavior { PathInterval = 0.5f, StayOnScreen = false, UseTargetsRoom = false, AvoidTarget = false });
-    bs.AttackBehaviors.Add(new SlimyboiChargeBehavior(){ chargeDamage = sd.overrideContactDamage ?? 0.5f, chargeKnockback = 5.0f, chargeSpeed = 30.0f,
+    bs.AttackBehaviors.Add(new SlimyboiChargeBehavior(){ chargeDamage = sd.overrideContactDamage ?? 0.6f, chargeKnockback = 5.0f, chargeSpeed = 30.0f,
       minRange = 0.0f, maxRange = attackRange, Cooldown = sd.overrideAttackCooldown ?? _DEFAULT_COOLDOWN, maxChargeDistance = attackRange + 0.5f }); //NOTE: chargeDamage multiplied by 5 on enemies for some reason
 
     KnockbackDoer kbd = actor.gameObject.GetComponent<KnockbackDoer>();
@@ -98,7 +98,6 @@ public static class Slimybois
       //NOTE: look at CombineSparks.prefab for reference
       //NOTE: uses shader https://github.com/googlearchive/soundstagevr/blob/master/Assets/third_party/Sonic%20Ether/Shaders/SEParticlesAdditive.shader
       ParticleSystem ps = psnewPrefab.GetComponent<ParticleSystem>();
-      // ETGModConsole.Log($"was using shader {psObj.GetComponent<ParticleSystemRenderer>().material.shader.name}");
 
       float arcSpeed = 2f;
 
@@ -127,7 +126,6 @@ public static class Slimybois
       vcurve.AddKey(1.0f, 0.0f);
       vel.x = vel.y = vel.z = new ParticleSystem.MinMaxCurve(40.0f, vcurve);
       vel.xMultiplier = vel.yMultiplier = vel.zMultiplier = 1.0f;
-      // vel.xMultiplier = 0.0f;
       vel.yMultiplier = 0.0f;
 
       ParticleSystem.RotationOverLifetimeModule rotl = ps.rotationOverLifetime;
@@ -138,7 +136,7 @@ public static class Slimybois
 
       Gradient g = new Gradient();
       g.SetKeys(
-          new GradientColorKey[] { new GradientColorKey(particleColor, 0.0f) },
+          new GradientColorKey[] {},
           new GradientAlphaKey[] { new GradientAlphaKey(1f, 0.0f), new GradientAlphaKey(0.5f, 0.25f), new GradientAlphaKey(0.15f, 0.5f),  new GradientAlphaKey(0.01f, 0.75f), new GradientAlphaKey(0.01f, 1.0f) }
       );
       ParticleSystem.ColorOverLifetimeModule colm = ps.colorOverLifetime;
@@ -148,14 +146,11 @@ public static class Slimybois
       em.rateOverTime = 42f;
 
       ParticleSystemRenderer psr = psnewPrefab.GetComponent<ParticleSystemRenderer>();
-      // psr.sortingLayerName = "Foreground";
       psr.sortingLayerName = "Background";
       psr.material.SetFloat("_InvFade", 3.0f);
       psr.material.SetFloat("_EmissionGain", 0.75f);
-      // psr.material.SetColor("_EmissionColor", particleColor);
       psr.material.SetColor("_EmissionColor", Color.white);
       psr.material.SetColor("_DiffuseColor", Color.white);
-      // psr.material.MakeGlowyBetter(glowAmount: 100.0f, glowColorPower: 100.0f, glowColor: Color.white, sensitivity: 2.0f);
 
       ParticleSystem.SizeOverLifetimeModule psz = ps.sizeOverLifetime;
       psz.enabled = true;
@@ -189,7 +184,6 @@ public static class Slimybois
       ivcurve.AddKey(0.0f, 1.0f);
       ivcurve.AddKey(0.05f, 0.0f);
       iv.curve = new ParticleSystem.MinMaxCurve(1.0f, ivcurve);
-      // iv.enabled = false;
 
       return psnewPrefab;
   }
@@ -200,7 +194,7 @@ public static class Slimybois
     SlimeData = new SlimeData[NumSlimes];
 
     // set up individual defs
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.15f, overrideSpeed = 12f });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.5f, overrideSpeed = 12f });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = SlimyboiFlags.CanFly });
 
     // pad out unfinished defs
@@ -266,12 +260,18 @@ public class SlimeData
 public enum SlimyboiFlags // : ulong
 {
   None               = 0,
-  Allied             = 1 << 0, // if set, slime is allied and cannot hurt or be hurt by player characters
-  CanFly             = 1 << 1, // if set, slime can fly and path over pits and other hazards
-  ExplodesOnDeath    = 1 << 2, // if set, slime exploded upon dying
-  ExtraCasingOnKill  = 1 << 3, // if set, slime spawns an extra casing upon killing an enemy
-  FireImmunity       = 1 << 4,
-  PoisonImmunity     = 1 << 5,
-  ExplosionImmunity  = 1 << 6,
-  ProjectileImmunity = 1 << 7,
+  Allied             = 1 << 0,  // if set, slime is allied and cannot hurt or be hurt by player characters
+  CanFly             = 1 << 1,  // if set, slime can fly and path over pits and other hazards
+  ExplodesOnDeath    = 1 << 2,  // [unimplemented] if set, slime exploded upon dying
+  ExtraCasingOnKill  = 1 << 3,  // [unimplemented] if set, slime spawns an extra casing upon killing an enemy
+  PitImmunity        = 1 << 4,  // [unimplemented] immune to pits, but can't fly per se (vulnerable to other hazards)
+  FireImmunity       = 1 << 5,  // [unimplemented]
+  PoisonImmunity     = 1 << 6,  // [unimplemented]
+  ExplosionImmunity  = 1 << 7,  // [unimplemented]
+  ProjectileImmunity = 1 << 8,  // [unimplemented]
+  QuantumInstability = 1 << 9,  // [unimplemented]
+  Immobile           = 1 << 10, // [unimplemented]
+  Absorbant          = 1 << 11, // [unimplemented]
+  PassivelyGoops     = 1 << 12, // [unimplemented]
+  DodgesProjectiles  = 1 << 13, // [unimplemented]
 }

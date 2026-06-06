@@ -4089,8 +4089,56 @@ public static class Extensions
     return new Vector2(Mathf.Clamp(pos.x, min.x, max.x), Mathf.Clamp(pos.y, min.y, max.y));
   }
 
+
   private static LinkedList<IntVector2> _FrontierCells = new();
   private static Dictionary<RoomHandler, Dictionary<IntVector2, int>> _PitMaps = new();
+  private static Dictionary<RoomHandler, int> _PitCounts = new();
+
+  /// <summary>Flood fill algorithm for finding contiguous cells not separated by pits</summary>
+  private static Dictionary<IntVector2, int> BuildPitMap(RoomHandler room)
+  {
+    // Lazy.DebugConsoleLog($"building pit map for room with {room.roomCells.Count} cells");
+    Dictionary<IntVector2, int> pitmap = _PitMaps[room] = new();
+    int pitCount = 0;
+    int sectionIndex = 0;
+    DungeonData dd = GameManager.Instance.Dungeon.data;
+    CellData[][] allCells = dd.cellData;
+    foreach (IntVector2 cell in room.roomCells)
+    {
+      if (pitmap.ContainsKey(cell))
+        continue;
+      pitmap[cell] = -1;
+      _FrontierCells.AddLast(cell);
+      int cellsInSection = 0;
+      while (_FrontierCells.First != null)
+      {
+        IntVector2 nextCell = _FrontierCells.First.Value;
+        _FrontierCells.RemoveFirst();
+        CellData cellData = allCells[nextCell.x][nextCell.y];
+        if (cellData.type != CellType.FLOOR)
+          continue;
+        pitmap[nextCell] = sectionIndex;
+        ++cellsInSection;
+        foreach (IntVector2 compassDir in IntVector2.Cardinals)
+        {
+          IntVector2 neighbor = nextCell + compassDir;
+          if (!dd.CheckInBounds(neighbor.x, neighbor.y))
+            continue; // not a valid floor cell
+          if (!room.rawRoomCells.Contains(neighbor))
+            continue; // not a valid room cell
+          if (pitmap.ContainsKey(neighbor))
+            continue; // already processed cell
+          pitmap[neighbor] = -1;
+          _FrontierCells.AddLast(neighbor);
+        }
+      }
+      if (cellsInSection > 0)
+        ++sectionIndex; // increment section index for next batch of cells
+    }
+    _PitCounts[room] = pitCount;
+    return pitmap;
+  }
+
   /// <summary>Check if a pit separates two positions</summary>
   public static bool SeparatedByPit(this RoomHandler room, Vector2 a, Vector2 b)
   {
@@ -4103,48 +4151,13 @@ public static class Extensions
     if (!pitmap.TryGetValue(bi, out int sectionB))
       return true;
     return sectionA != sectionB;
+  }
 
-    /// <summary>Flood fill algorithm for finding contiguous cells not separated by pits</summary>
-    static Dictionary<IntVector2, int> BuildPitMap(RoomHandler room)
-    {
-      Lazy.DebugConsoleLog($"building pit map for room with {room.roomCells.Count} cells");
-      Dictionary<IntVector2, int> pitmap = _PitMaps[room] = new();
-      int sectionIndex = 0;
-      DungeonData dd = GameManager.Instance.Dungeon.data;
-      CellData[][] allCells = dd.cellData;
-      foreach (IntVector2 cell in room.roomCells)
-      {
-        if (pitmap.ContainsKey(cell))
-          continue;
-        pitmap[cell] = -1;
-        _FrontierCells.AddLast(cell);
-        int cellsInSection = 0;
-        while (_FrontierCells.First != null)
-        {
-          IntVector2 nextCell = _FrontierCells.First.Value;
-          _FrontierCells.RemoveFirst();
-          CellData cellData = allCells[nextCell.x][nextCell.y];
-          if (cellData.type != CellType.FLOOR)
-            continue;
-          pitmap[nextCell] = sectionIndex;
-          ++cellsInSection;
-          foreach (IntVector2 compassDir in IntVector2.Cardinals)
-          {
-            IntVector2 neighbor = nextCell + compassDir;
-            if (!dd.CheckInBounds(neighbor.x, neighbor.y))
-              continue; // not a valid floor cell
-            if (!room.rawRoomCells.Contains(neighbor))
-              continue; // not a valid room cell
-            if (pitmap.ContainsKey(neighbor))
-              continue; // already processed cell
-            pitmap[neighbor] = -1;
-            _FrontierCells.AddLast(neighbor);
-          }
-        }
-        if (cellsInSection > 0)
-          ++sectionIndex; // increment section index for next batch of cells
-      }
-      return pitmap;
-    }
+  /// <summary>Determine the percentage of a room covered in pits</summary>
+  public static float GetPitCoverage(this RoomHandler room)
+  {
+    if (!_PitMaps.TryGetValue(room, out var pitmap))
+      pitmap = BuildPitMap(room);
+    return (float)_PitCounts[room] / room.roomCells.Count;
   }
 }

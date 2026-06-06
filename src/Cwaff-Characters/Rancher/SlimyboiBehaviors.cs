@@ -23,7 +23,7 @@ public class SlimyboiController : BraveBehaviour
   private tk2dSprite _trueSprite = null;
   private tk2dSprite _renderSprite = null;
   private ParticleSystem _ps = null;
-  private bool _appearOutOfNowhere = true;
+  private bool _appearOutOfNowhere = false;
   private bool _setup = false;
 
   private void Start()
@@ -139,7 +139,7 @@ public class SlimyboiController : BraveBehaviour
 
   public void Jump(float? overideDuration = null, bool growIn = false)
   {
-    this._jumpTimer = overideDuration ?? Mathf.Max(0.6f * (this.slimeType.Data().overrideAttackCooldown ?? Slimybois._DEFAULT_COOLDOWN), 0.15f);
+    this._jumpTimer = overideDuration ?? Mathf.Clamp(0.6f * (this.slimeType.Data().overrideAttackCooldown ?? Slimybois._DEFAULT_COOLDOWN), 0.15f, 0.5f);
     this._jumpDuration = this._jumpTimer;
     if (growIn)
     {
@@ -610,5 +610,21 @@ internal static class SlimyboiPatches
       foreach (SlimyboiController sloim in SlimyboiManager.ActiveSlimes)
         _IgnoredBodiesPlusSlimes[i++] = sloim ? sloim.specRigidbody : null; // add rigidbodies for the slimes in as necessary
       __result = _IgnoredBodiesPlusSlimes; // replace the result with the slimes
+  }
+
+  /// <summary>Patch to detect rooms that spawn with traps</summary>
+  [HarmonyPatch(typeof(TrapController), nameof(TrapController.InstantiateObject))]
+  [HarmonyPostfix]
+  private static void TrapControllerInstantiateObjectPatch(TrapController __instance, RoomHandler targetRoom, IntVector2 loc, bool deferConfiguration)
+  {
+    SlimyboiManager.RegisterTrap(__instance, targetRoom);
+  }
+
+  /// <summary>Patch to detect flipped tables</summary>
+  [HarmonyPatch(typeof(FlippableCover), nameof(FlippableCover.Flip), typeof(DungeonData.Direction))]
+  [HarmonyPostfix]
+  private static void FlippableCoverFlipPatch(FlippableCover __instance, DungeonData.Direction flipDirection)
+  {
+    SlimyboiManager.HandleTableFlip(__instance);
   }
 }

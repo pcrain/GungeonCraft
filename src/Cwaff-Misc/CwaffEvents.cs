@@ -36,6 +36,10 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action<PlayerController, AIActor> OnWillApplyRollDamage;
     // Run right before a player will definitively pick up armor, health, ammo, keys, or blanks
     public static Action<PlayerController, PickupObject> OnWillPickUpMinorInteractible;
+    // Run right before a player will definitively pick any pickup (including minor interactibles)
+    public static Action<PlayerController, PickupObject> OnWillPickUpAnyPassive;
+    // Run right before a player will pick up currency
+    public static Action<PlayerController, CurrencyPickup> OnWillPickUpCurrency;
 
     internal static bool _OnFirstFloor = false;
     internal static bool _RunJustStarted = false;
@@ -271,7 +275,8 @@ public static class CwaffEvents // global custom events we can listen for
         [HarmonyPatch(typeof(HealthPickup), nameof(HealthPickup.Pickup))]
         [HarmonyPatch(typeof(KeyBulletPickup), nameof(KeyBulletPickup.Pickup))]
         [HarmonyPatch(typeof(SilencerItem), nameof(SilencerItem.Pickup))]
-        private static void Prefix(PickupObject __instance, PlayerController player)
+        [HarmonyPrefix]
+        private static void PickUpMinorInteractiblePrefix(PickupObject __instance, PlayerController player)
         {
             if (CwaffEvents.OnWillPickUpMinorInteractible == null)
                 return;
@@ -282,6 +287,30 @@ public static class CwaffEvents // global custom events we can listen for
             if (__instance is AmmoPickup ammo && ammo.m_pickedUp)
                 return;
             CwaffEvents.OnWillPickUpMinorInteractible(player, __instance);
+        }
+
+
+        [HarmonyPatch(typeof(PassiveItem), nameof(PassiveItem.Pickup))]
+        [HarmonyPrefix]
+        private static void PickUpAnyPassiveItemPrefix(PassiveItem __instance, PlayerController player)
+        {
+            if (CwaffEvents.OnWillPickUpAnyPassive == null)
+                return;
+            if (player.IsGhost)
+                return;
+            CwaffEvents.OnWillPickUpAnyPassive(player, __instance);
+        }
+    }
+
+    [HarmonyPatch]
+    private static class PickUpCurrencyPatch
+    {
+        [HarmonyPatch(typeof(CurrencyPickup), nameof(CurrencyPickup.Pickup))]
+        [HarmonyPrefix]
+        private static void CurrencyPickupPickupPatch(CurrencyPickup __instance, PlayerController player)
+        {
+            if (CwaffEvents.OnWillPickUpCurrency != null)
+                CwaffEvents.OnWillPickUpCurrency(player, __instance);
         }
     }
 }

@@ -1538,6 +1538,8 @@ public static class Lazy
   public static IntVector2? RandomCellForEnemySpawn(this AIActor enemyPrefab, RoomHandler room, bool spawnFarFromPlayer = false, IntVector2? targetCenter = null, int? overrideClearance = null)
   {
       const float MIN_PLAYER_SQR_DIST = 64f; // don't spawn within eight tiles of the player
+      if (room == null)
+        return null;
       int xClearance = overrideClearance ?? enemyPrefab.Clearance.x;
       int yClearance = overrideClearance ?? enemyPrefab.Clearance.y;
       Pathfinding.CellValidator cellValidator = (IntVector2 c) => {
