@@ -2,7 +2,6 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - fix targeting invulnerable chancellor (check for BulletKingToadieController and m_isCrazed)
-    - fix slimers occasionally spawning in with door sprite from wrong sprite collection when spawned offscreen
 */
 
 /// <summary>Main controller class for Slimes</summary>

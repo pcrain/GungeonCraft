@@ -3948,7 +3948,9 @@ public static class Extensions
   {
     tk2dSprite oldSprite = body.gameObject.GetComponent<tk2dSprite>();
     tk2dSprite newSprite = new GameObject("decoupled sprite").AddComponent<tk2dSprite>();
-    newSprite.SetSprite(oldSprite.collection, oldSprite.spriteId);
+    newSprite.SetSprite(
+      oldSprite.hasOffScreenCachedUpdate ? oldSprite.offScreenCachedCollection : oldSprite.collection,
+      oldSprite.hasOffScreenCachedUpdate ? oldSprite.offScreenCachedID : oldSprite.spriteId);
     newSprite.renderer.material.shader = oldSprite.renderer.material.shader;
     oldSprite.renderer.enabled = false;
     newSprite.transform.position = oldSprite.transform.position;

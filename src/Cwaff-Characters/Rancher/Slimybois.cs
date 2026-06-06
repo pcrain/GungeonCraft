@@ -1,7 +1,6 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - spawn animations / sounds / vfx
     - allow enemies to target slimes (chance of temporary override)
     - unique particles / vfx / sounds / potentially goops?
     - only use override sprite renderer when attacking
