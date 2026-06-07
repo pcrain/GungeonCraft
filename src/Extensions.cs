@@ -3914,18 +3914,21 @@ public static class Extensions
 
   //REFACTOR: use this for Leafblower
   /// <summary>Apply knockback to a KnockbackDoer from a continuous, known source (used by, e.g., Leafblower, Fluxfist, Newton's Apple, Vacpack)</summary>
-  public static void ApplyContinuousSourcedKnockback(this AIActor enemy, GameObject source, Dictionary<AIActor, ActiveKnockbackData> activeKbs, Vector2 velocity)
+  public static void ApplyContinuousSourcedKnockback(this AIActor enemy, GameObject source, Dictionary<AIActor, ActiveKnockbackData> activeKbs, Vector2 velocity, bool overwrite = false)
   {
-    float force = velocity.magnitude;
-    KnockbackDoer kb = enemy.knockbackDoer;
-    if (!kb)
+    if (enemy.knockbackDoer is not KnockbackDoer kbd)
       return;
-    if (kb.ApplySourcedKnockback(velocity, force, source) is ActiveKnockbackData data)
+    float force = velocity.magnitude;
+    if (kbd.ApplySourcedKnockback(velocity, force, source) is ActiveKnockbackData data)
         activeKbs[enemy] = data;
     else if (activeKbs.TryGetValue(enemy, out ActiveKnockbackData previousData))
     {
         // fancy logic for replacing the old knockback
-        previousData.knockback = Lazy.MaxMagnitude(previousData.knockback, velocity.normalized * (force / (kb.weight / 10f)));
+        Vector2 newKb = velocity.normalized * (force / (kbd.weight / 10f));
+        if (overwrite)
+          previousData.knockback = newKb;
+        else
+          previousData.knockback = Lazy.MaxMagnitude(previousData.knockback, newKb);
         previousData.initialKnockback = previousData.knockback;
         previousData.elapsedTime = 0.0f;
     }

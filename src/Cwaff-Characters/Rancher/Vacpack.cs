@@ -1,9 +1,7 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - save serialization for stored slimes
     - fix firing when holding fire while switching modes
-    - fix slimes that dodge the vacuum wave and get stuck to walls in their initial velocity direction until retriggering vacuum
     - prevent volley modifications such as Scattershot
 */
 
@@ -106,15 +104,34 @@ public class Vacpack : CwaffGun
 
     private void Start()
     {
-      if (slimeCounts == null || slimeCounts.Count == 0)
-      {
-        Lazy.DebugConsoleLog($" initializing slime counts");
-        int cap = Slimybois.NumSlimes;
-        slimeCounts = new(cap);
-        for (int i = 0; i < cap; ++i)
-          slimeCounts.Add(0);
-        slimeCounts[(int)SlimyboiType.Pink] = 8;
-      }
+      EnsureSlimeCounts();
+    }
+
+    private void EnsureSlimeCounts()
+    {
+      if (this.slimeCounts != null && this.slimeCounts.Count > 0)
+        return;
+      Lazy.DebugConsoleLog($" initializing slime counts");
+      int cap = Slimybois.NumSlimes;
+      this.slimeCounts = new(cap);
+      for (int i = 0; i < cap; ++i)
+        this.slimeCounts.Add(0);
+      this.slimeCounts[(int)SlimyboiType.Pink] = 8;
+    }
+
+    public override void MidGameSerialize(List<object> data, int i)
+    {
+      base.MidGameSerialize(data, i);
+      for (int n = 0; n < Slimybois.NumSlimes; ++n)
+        data.Add(this.slimeCounts[n]);
+    }
+
+    public override void MidGameDeserialize(List<object> data, ref int i)
+    {
+      base.MidGameDeserialize(data, ref i);
+      EnsureSlimeCounts();
+      for (int n = 0; n < Slimybois.NumSlimes; ++n)
+        this.slimeCounts[n] = (int)data[i++];
     }
 
     public override void OnTriedToInitiateAttack(PlayerController player)
@@ -218,8 +235,8 @@ public class Vacpack : CwaffGun
         {
           if (!enemy || enemy.gameObject.GetComponent<SlimyboiController>() is not SlimyboiController sloim)
             continue;
-          if (player.IsInCombat && sloim.healthHaver.GetCurrentHealthPercentage() < 1.0f)
-            continue; // no vacuuming injured slimes in combat
+          if (player.IsInCombat && (sloim.Attribute(SlimyboiFlags.CantVacInCombat) || sloim.healthHaver.GetCurrentHealthPercentage() < 1.0f))
+            continue;
 
           Vector2 towardsGun = gunpos - enemy.CenterPosition;
           float sqrMagnitude = towardsGun.sqrMagnitude;
@@ -239,7 +256,7 @@ public class Vacpack : CwaffGun
           }
           enemy.behaviorSpeculator.Stun(0.1f, false);
           float influence = Mathf.Max(0.1f, 1f - sqrMagnitude / _SQR_REACH);
-          enemy.ApplyContinuousSourcedKnockback(base.gameObject, _KnockbackDict, (_SUCK_FORCE * influence) * towardsGun.normalized);
+          enemy.ApplyContinuousSourcedKnockback(base.gameObject, _KnockbackDict, (_SUCK_FORCE * influence) * towardsGun.normalized, overwrite: true);
           if (isParticleFrame)
             CwaffVFX.SpawnBurst(
               prefab           : _VacpackVFX,
