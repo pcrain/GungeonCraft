@@ -276,3 +276,80 @@ public enum SlimyboiFlags // : ulong
   DodgesProjectiles  = 1 << 13, // [unimplemented]
   ContactImmunity    = 1 << 14, // [unimplemented] (used for immunity to rolling spike logs / PathingTrapControllers)
 }
+
+[HarmonyPatch]
+internal static class SlimyboiPatches
+{
+  /// <summary>Patches to make slime collision damage ignore boss damage caps</summary>
+  private static bool _NextAttackIgnoresDamageCaps = false;
+  private static void SlimyboiControllerIgnoreDamageCaps(AIActor actor)
+  {
+    if (actor && actor.gameObject.GetComponent<SlimyboiController>())
+      _NextAttackIgnoresDamageCaps = true;
+  }
+  [HarmonyPatch(typeof(HealthHaver), nameof(HealthHaver.ApplyDamage))]
+  [HarmonyPrefix]
+  private static void HealthHaverApplyDamagePatch(HealthHaver __instance, float damage, Vector2 direction, string sourceName, CoreDamageTypes damageTypes, DamageCategory damageCategory, bool ignoreInvulnerabilityFrames, PixelCollider hitPixelCollider, ref bool ignoreDamageCaps)
+  {
+    if (_NextAttackIgnoresDamageCaps)
+      ignoreDamageCaps = true;
+    _NextAttackIgnoresDamageCaps = false;
+  }
+  [HarmonyPatch(typeof(AIActor), nameof(AIActor.OnCollision))]
+  [HarmonyILManipulator]
+  private static void AIActorOnCollisionPatchIL(ILContext il)
+  {
+      ILCursor cursor = new ILCursor(il);
+      if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<AIActor>("CollisionDamageTypes")))
+        return;
+      if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<HealthHaver>(nameof(HealthHaver.ApplyDamage))))
+        return;
+
+      cursor.Emit(OpCodes.Ldarg_0);
+      cursor.CallPrivate(typeof(SlimyboiPatches), nameof(SlimyboiControllerIgnoreDamageCaps));
+  }
+
+  /// <summary>Patch to make player-owned beams not hit slimes.</summary>
+  private static SpeculativeRigidbody[] _IgnoredBodiesPlusSlimes = new SpeculativeRigidbody[0];
+  [HarmonyPatch(typeof(BeamController), nameof(BeamController.GetIgnoreRigidbodies))]
+  [HarmonyPostfix]
+  private static void BeamControllerGetIgnoreRigidbodiesPatch(BeamController __instance, ref SpeculativeRigidbody[] __result)
+  {
+      if (!SlimyboiManager.AnyActiveSlimes() || __instance.Owner is not PlayerController)
+        return; // shortcut if no slimes are active or if the beam is not player-owned
+
+      int numSlimes = SlimyboiManager.NumActiveSlimes();
+      int numOtherBodies = __result.Length; // get the older number of ignored bodies
+      int totalIgnoredBodies = numSlimes + numOtherBodies; // total ignored bodies is the old number + the number of slimes
+      if (totalIgnoredBodies != _IgnoredBodiesPlusSlimes.Length)
+        _IgnoredBodiesPlusSlimes = new SpeculativeRigidbody[totalIgnoredBodies]; // don't reallocate unless we absolutely need to
+      int i;
+      for (i = 0; i < numOtherBodies; ++i)
+        _IgnoredBodiesPlusSlimes[i] = __result[i]; // copy the result array over
+      foreach (SlimyboiController sloim in SlimyboiManager.ActiveSlimes)
+        _IgnoredBodiesPlusSlimes[i++] = sloim ? sloim.specRigidbody : null; // add rigidbodies for the slimes in as necessary
+      __result = _IgnoredBodiesPlusSlimes; // replace the result with the slimes
+  }
+
+  /// <summary>Patches to detect rooms that spawn with traps</summary>
+  [HarmonyPatch(typeof(PathingTrapController), nameof(PathingTrapController.Start))]
+  [HarmonyPostfix]
+  private static void PathingTrapControllerStartPatch(PathingTrapController __instance)
+  {
+    SlimyboiManager.RegisterTrap(__instance, __instance.m_parentRoom);
+  }
+  [HarmonyPatch(typeof(BasicTrapController), nameof(BasicTrapController.Start))]
+  [HarmonyPostfix]
+  private static void BasicTrapControllerStartPatch(BasicTrapController __instance)
+  {
+    SlimyboiManager.RegisterTrap(__instance, __instance.m_parentRoom);
+  }
+
+  /// <summary>Patch to detect flipped tables</summary>
+  [HarmonyPatch(typeof(FlippableCover), nameof(FlippableCover.Flip), typeof(DungeonData.Direction))]
+  [HarmonyPostfix]
+  private static void FlippableCoverFlipPatch(FlippableCover __instance, DungeonData.Direction flipDirection)
+  {
+    SlimyboiManager.HandleTableFlip(__instance);
+  }
+}
