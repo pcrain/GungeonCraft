@@ -1535,13 +1535,15 @@ public static class Lazy
     return res;
   }
 
-  public static IntVector2? RandomCellForEnemySpawn(this AIActor enemyPrefab, RoomHandler room, bool spawnFarFromPlayer = false, IntVector2? targetCenter = null, int? overrideClearance = null)
+  public static IntVector2? RandomCellForEnemySpawn(this AIActor enemyPrefab, RoomHandler room, bool spawnFarFromPlayer = false, IntVector2? targetCenter = null, int? overrideClearance = null, float minDist = 4f, float maxDist = 20f)
   {
       const float MIN_PLAYER_SQR_DIST = 64f; // don't spawn within eight tiles of the player
       if (room == null)
         return null;
-      int xClearance = overrideClearance ?? enemyPrefab.Clearance.x;
-      int yClearance = overrideClearance ?? enemyPrefab.Clearance.y;
+      int xClearance = overrideClearance ?? 2; // NOTE: used to be enemyPrefab.Clearance, but prefabs don't have a serialized clearance...whoops
+      int yClearance = overrideClearance ?? 2;
+      float minSqrDist = minDist * minDist;
+      float maxSqrDist = maxDist * maxDist;
       Pathfinding.CellValidator cellValidator = (IntVector2 c) => {
         if (spawnFarFromPlayer && Lazy.SquareDistanceToNearestActivePlayer(c.ToVector2()) < MIN_PLAYER_SQR_DIST)
           return false;
@@ -1553,16 +1555,16 @@ public static class Lazy
               return false;
             if (!targetCenter.HasValue)
               continue;
-            if (IntVector2.DistanceSquared(targetCenter.Value, c.x + k, c.y + l) < 16f)
+            if (minSqrDist > 0 && IntVector2.DistanceSquared(targetCenter.Value, c.x + k, c.y + l) < minSqrDist)
               return false;
-            if (IntVector2.DistanceSquared(targetCenter.Value, c.x + k, c.y + l) > 400f)
+            if (IntVector2.DistanceSquared(targetCenter.Value, c.x + k, c.y + l) > maxSqrDist)
               return false;
           }
         }
         return true;
       };
       return room.GetRandomAvailableCell(
-        new IntVector2(xClearance, yClearance), enemyPrefab.PathableTiles, canPassOccupied: false, cellValidator);
+        footprint: new IntVector2(xClearance, yClearance), passableCellTypes: enemyPrefab.PathableTiles, canPassOccupied: false, cellValidator: cellValidator);
   }
 
   public static DirectionalAnimation.DirectionType AutoDetectDirectionFromSpriteName(string name)

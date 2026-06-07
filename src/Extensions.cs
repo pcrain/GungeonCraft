@@ -4160,4 +4160,22 @@ public static class Extensions
       pitmap = BuildPitMap(room);
     return (float)_PitCounts[room] / room.roomCells.Count;
   }
+
+  /// <summary>Add a value to a list multiple times.</summary>
+  public static void AddMultiple<T>(this List<T> list, T item, int count)
+  {
+    for (int i = count; i > 0; --i)
+      list.Add(item);
+  }
+
+  /// <summary>Returns true if a room has an unfinished combat encounter</summary>
+  public static bool IsUnclearedCombatRoom(this RoomHandler room)
+  {
+    if (!room.EverHadEnemies)
+      return false;
+    for (int i = 0; i < room.activeEnemies.Count; i++)
+      if (!room.activeEnemies[i].IgnoreForRoomClear)
+        return true;
+    return false;
+  }
 }
