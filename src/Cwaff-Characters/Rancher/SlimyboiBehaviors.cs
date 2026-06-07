@@ -558,6 +558,7 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
   }
 }
 
+// REFACTOR: relocate to Slimyboi.cs
 [HarmonyPatch]
 internal static class SlimyboiPatches
 {
@@ -612,12 +613,18 @@ internal static class SlimyboiPatches
       __result = _IgnoredBodiesPlusSlimes; // replace the result with the slimes
   }
 
-  /// <summary>Patch to detect rooms that spawn with traps</summary>
-  [HarmonyPatch(typeof(TrapController), nameof(TrapController.InstantiateObject))]
+  /// <summary>Patches to detect rooms that spawn with traps</summary>
+  [HarmonyPatch(typeof(PathingTrapController), nameof(PathingTrapController.Start))]
   [HarmonyPostfix]
-  private static void TrapControllerInstantiateObjectPatch(TrapController __instance, RoomHandler targetRoom, IntVector2 loc, bool deferConfiguration)
+  private static void PathingTrapControllerStartPatch(PathingTrapController __instance)
   {
-    SlimyboiManager.RegisterTrap(__instance, targetRoom);
+    SlimyboiManager.RegisterTrap(__instance, __instance.m_parentRoom);
+  }
+  [HarmonyPatch(typeof(BasicTrapController), nameof(BasicTrapController.Start))]
+  [HarmonyPostfix]
+  private static void BasicTrapControllerStartPatch(BasicTrapController __instance)
+  {
+    SlimyboiManager.RegisterTrap(__instance, __instance.m_parentRoom);
   }
 
   /// <summary>Patch to detect flipped tables</summary>

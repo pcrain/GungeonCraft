@@ -22,7 +22,7 @@ public static class Slimybois
     if (string.IsNullOrEmpty(sd.slimeName))
       sd.slimeName = Enum.GetName(typeof(SlimyboiType), sd.type).ToLower();
     sd.fullName = sd.slimeName.ToTitleCaseInvariant() + " Slime";
-    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? 12, baseFps: 12, doCorpse: false);
+    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? 10, baseFps: 12, doCorpse: false);
     actor.procedurallyOutlined       = false; // TODO: remove outlines from sprites later
     actor.MovementSpeed              = sd.overrideSpeed ?? 4.5f;
     actor.CollisionDamage            = 0.0f; // Overridden by SlimyboiChargeBehavior at charge time
@@ -274,4 +274,5 @@ public enum SlimyboiFlags // : ulong
   Absorbant          = 1 << 11, // [unimplemented]
   PassivelyGoops     = 1 << 12, // [unimplemented]
   DodgesProjectiles  = 1 << 13, // [unimplemented]
+  ContactImmunity    = 1 << 14, // [unimplemented] (used for immunity to rolling spike logs / PathingTrapControllers)
 }

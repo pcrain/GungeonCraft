@@ -6,7 +6,7 @@ public class SlimyboiManager : MonoBehaviour
   //NOTE: use _Instance where possible so we don't actually create a SlimyboiManager if we don't have one
   private static SlimyboiManager _Instance = null;
   // NOTE: needs to be static so it can happen at room processing time
-  private static Dictionary<RoomHandler, List<TrapController>> _TrapMap;
+  private static Dictionary<RoomHandler, List<TrapController>> _TrapMap = new();
 
   private int _enemiesExplodedThisRoom;
   private HashSet<RoomHandler> _processedRooms;
@@ -36,8 +36,8 @@ public class SlimyboiManager : MonoBehaviour
       CwaffEvents.OnCleanStart += OnCleanStart;
       CwaffEvents.OnChangedRooms -= OnChangedRooms;
       CwaffEvents.OnChangedRooms += OnChangedRooms;
-      CwaffEvents.OnNewFloorFullyLoaded -= OnNewFloorFullyLoaded;
-      CwaffEvents.OnNewFloorFullyLoaded += OnNewFloorFullyLoaded;
+      CwaffEvents.OnFloorEnded -= OnFloorEnded;
+      CwaffEvents.OnFloorEnded += OnFloorEnded;
 
       #if DEBUG
         Commands._OnDebugKeyPressed -= DebugSlimeSpawn;
@@ -76,7 +76,7 @@ public class SlimyboiManager : MonoBehaviour
 
   public static bool AnyActiveSlimes() => _Instance && _Instance._allActiveSlimes.Count > 0;
   public static int NumActiveSlimes() => _Instance ? _Instance._allActiveSlimes.Count : 0;
-  private static void OnNewFloorFullyLoaded()
+  private static void OnFloorEnded()
   {
     _TrapMap.Clear();
     if (_Instance)
@@ -87,12 +87,13 @@ public class SlimyboiManager : MonoBehaviour
 
   internal static void RegisterTrap(TrapController trap, RoomHandler room)
   {
-    if (room == null)
+    if (room == null || !trap)
       return;
-    if (!_TrapMap.TryGetValue(room, out List<TrapController> roomTraps))
+    if (!_TrapMap.TryGetValue(room, out List<TrapController> roomTraps) || roomTraps == null)
       roomTraps = _TrapMap[room] = new();
     roomTraps.Add(trap);
-    Lazy.DebugConsoleLog($" added trap {trap.gameObject.name} to room {room.area.prototypeRoom.name}");
+    string roomName = ((room.area != null && room.area.prototypeRoom != null) ? room.area.prototypeRoom.name : "unknown room");
+    // Lazy.DebugConsoleLog($" added trap {trap.gameObject.name} to room {roomName}");
   }
 
   private static void SpawnSingleSlime(SlimyboiType sloim, RoomHandler room = null, IntVector2? spawnPos = null, PlayerController player = null)
@@ -152,7 +153,13 @@ public class SlimyboiManager : MonoBehaviour
       if (room.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.SECRET) // secret room
         sloims.AddMultiple(SlimyboiType.Quantum, 2);
       else if (room.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.REWARD) // chest room
-        sloims.AddMultiple(SlimyboiType.Phosphor, 2); // TODO: more slimes depending on chest tier
+      {
+        int slimesByChestTier = 1;
+        foreach (IPlayerInteractable ix in room.GetRoomInteractables())
+          if (ix is Chest chest && chest && !chest.IsBroken)
+            slimesByChestTier = Mathf.Max(slimesByChestTier, chest.EstimateValue());
+        sloims.AddMultiple(SlimyboiType.Phosphor, slimesByChestTier);
+      }
       else if (room.IsShop) // shop room
       {
         bool isBelloShop = false;
@@ -166,22 +173,22 @@ public class SlimyboiManager : MonoBehaviour
     // scan for traps
     float pitCoverage = room.GetPitCoverage();
     int numSpikeTraps = CountSpikeTraps(room);
+    // Lazy.DebugConsoleLog($" scanned room with pit coverage {pitCoverage} and {numSpikeTraps} spikes, category {room.area.PrototypeRoomCategory} / {room.area.PrototypeRoomNormalSubcategory}");
     int oldSlimeCount = sloims.Count;
     if (pitCoverage > 0.0f)
       sloims.Add(SlimyboiType.Dervish);
     if (pitCoverage > 0.2f)
       sloims.Add(SlimyboiType.Dervish);
     if (numSpikeTraps > 0)
-      sloims.Add(SlimyboiType.Crystal);
-    if (numSpikeTraps > 5)
-      sloims.Add(SlimyboiType.Crystal);
+      sloims.AddMultiple(SlimyboiType.Crystal, Mathf.CeilToInt((numSpikeTraps + 1) / 5.0f));
     if (!wasCombatEncounter)
     {
-      if (room.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.NORMAL && room.area.PrototypeRoomNormalSubcategory == PrototypeDungeonRoom.RoomNormalSubCategory.TRAP)
+      if (room.area.PrototypeRoomNormalSubcategory == PrototypeDungeonRoom.RoomNormalSubCategory.TRAP)
       {
+        const int MIN_TRAP_ROOM_SLIMES = 3;
         int trapSlimesAdded = sloims.Count - oldSlimeCount;
-        if (trapSlimesAdded < 2)
-          sloims.AddMultiple(SlimyboiType.Honey, trapSlimesAdded - 2); // add honey slimes to trap rooms without spikes or pits
+        if (trapSlimesAdded < MIN_TRAP_ROOM_SLIMES)
+          sloims.AddMultiple(SlimyboiType.Honey, trapSlimesAdded - MIN_TRAP_ROOM_SLIMES); // add honey slimes to trap rooms without sufficient spikes or pits
       }
       return sloims; // nothing else to do in non-combat rooms
     }
@@ -198,6 +205,7 @@ public class SlimyboiManager : MonoBehaviour
     {
       if ((_Instance._enemyKillTimes[i] - _Instance._enemyKillTimes[i - 2]) > 1.0f)
         continue;
+      // Lazy.DebugConsoleLog($"killed 3 enemies within {(_Instance._enemyKillTimes[i] - _Instance._enemyKillTimes[i - 2])} seconds");
       sloims.Add(SlimyboiType.Quicksilver);
       break;
     }
@@ -244,7 +252,9 @@ public class SlimyboiManager : MonoBehaviour
   private static void HandleSlimeSpawns(PlayerController player, RoomHandler room, bool combatEnded)
   {
     const float GLITCH_SLIME_CHANCE = 0.005f;
-    if (!_Instance || room == null || room.area == null || (!combatEnded && room.IsUnclearedCombatRoom()) || _Instance._processedRooms.Contains(room))
+    if (!_Instance || room == null || room.area == null || _Instance._processedRooms.Contains(room))
+      return;
+    if (!combatEnded && room.IsUnclearedCombatRoom())
       return;
 
     _Instance._processedRooms.Add(room);

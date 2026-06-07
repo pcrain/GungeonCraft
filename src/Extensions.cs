@@ -4115,6 +4115,8 @@ public static class Extensions
         IntVector2 nextCell = _FrontierCells.First.Value;
         _FrontierCells.RemoveFirst();
         CellData cellData = allCells[nextCell.x][nextCell.y];
+        if (cellData.type == CellType.PIT)
+          ++pitCount;
         if (cellData.type != CellType.FLOOR)
           continue;
         pitmap[nextCell] = sectionIndex;
@@ -4177,5 +4179,17 @@ public static class Extensions
       if (!room.activeEnemies[i].IgnoreForRoomClear)
         return true;
     return false;
+  }
+
+  /// <summary>Get the quality of a chest as an integer</summary>
+  public static int EstimateValue(this Chest chest)
+  {
+    if (chest.lootTable is not LootData loot)
+      return 3; // throw our hands up and guess
+    float lootWeight = loot.S_Chance + loot.A_Chance + loot.B_Chance + loot.C_Chance + loot.D_Chance;
+    if (lootWeight == 0)
+      return 3; // throw our hands up and guess
+    int estimatedValue = Mathf.RoundToInt((5f * loot.S_Chance + 4f * loot.A_Chance + 3f * loot.B_Chance + 2f * loot.C_Chance+ 1f * loot.D_Chance) / lootWeight);
+    return (estimatedValue > 0) ? estimatedValue : 3;
   }
 }

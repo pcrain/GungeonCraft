@@ -1,9 +1,10 @@
 namespace CwaffingTheGungy;
 
 /* TODO:
-    - actual slime storage
+    - save serialization for stored slimes
     - fix firing when holding fire while switching modes
-    - fix slimes that dodge the vacuum wave getting stuck to walls until retriggering vacuum
+    - fix slimes that dodge the vacuum wave and get stuck to walls in their initial velocity direction until retriggering vacuum
+    - prevent volley modifications such as Scattershot
 */
 
 public class Vacpack : CwaffGun
@@ -25,6 +26,8 @@ public class Vacpack : CwaffGun
     internal const float _SQR_ABSORB_RANGE = _ABSORB_RANGE * _ABSORB_RANGE;
 
     private const float _HUD_HOLD_TIME = 0.25f;
+
+    public List<int> slimeCounts;
 
     private Dictionary<AIActor, ActiveKnockbackData> _KnockbackDict = new();
     private List<SlimyboiController> _vacSlimes = new();
@@ -57,7 +60,11 @@ public class Vacpack : CwaffGun
         {
           int slimeType = (int)SlimyboiType.Pink; // fallback in case fired from an unknown source
           if (proj.PossibleSourceGun is Gun gun && gun.gameObject.GetComponent<Vacpack>() is Vacpack vp)
+          {
             slimeType = vp._lastSlime;
+            if (vp.slimeCounts[slimeType] > 0)
+              --vp.slimeCounts[slimeType];
+          }
           if (slimeType < 0 && slimeType >= Slimybois.NumSlimes)
           {
             Lazy.DebugWarn("TRIED TO FIRE A NONEXISTENT SLIME TYPE, THIS SHOULD NEVER HAPPEN");
@@ -97,6 +104,19 @@ public class Vacpack : CwaffGun
         }
     }
 
+    private void Start()
+    {
+      if (slimeCounts == null || slimeCounts.Count == 0)
+      {
+        Lazy.DebugConsoleLog($" initializing slime counts");
+        int cap = Slimybois.NumSlimes;
+        slimeCounts = new(cap);
+        for (int i = 0; i < cap; ++i)
+          slimeCounts.Add(0);
+        slimeCounts[(int)SlimyboiType.Pink] = 8;
+      }
+    }
+
     public override void OnTriedToInitiateAttack(PlayerController player)
     {
       base.OnTriedToInitiateAttack(player);
@@ -104,6 +124,11 @@ public class Vacpack : CwaffGun
       {
         DoSlimeSelection();
         DismissHUD();
+        player.SuppressThisClick = true;
+      }
+      else if (this._curSlime >= 0 && this.slimeCounts[this._curSlime] == 0)
+      {
+        base.gameObject.Play("vacpack_empty_sound");
         player.SuppressThisClick = true;
       }
     }
@@ -239,6 +264,7 @@ public class Vacpack : CwaffGun
     public void ProcessSlime(SlimyboiController sloim)
     {
         base.gameObject.PlayUnique("slime_vacuum_sound");
+        ++this.slimeCounts[(int)sloim.slimeType];
         Vector2 pos = (this.PlayerOwner.CurrentGun is Gun gun) ? gun.barrelOffset.position : sloim.aiActor.CenterPosition;
         sloim.aiActor.EraseFromExistence(suppressDeathSounds: true);
         for (int i = 0; i < 10; ++i)
@@ -342,6 +368,10 @@ public class Vacpack : CwaffGun
         private Vacpack _vac;
         private PlayerController _owner;
 
+        private int _cachedIndex = -1;
+        private int _cachedCount = -1;
+        private string _cachedAmmoString = string.Empty;
+
         private void Start()
         {
             this._gun   = base.GetComponent<Gun>();
@@ -354,10 +384,20 @@ public class Vacpack : CwaffGun
             if (!this._owner)
                 return false;
 
-            if (this._gun.m_currentStrengthTier == 0)
+            int index = this._vac._curSlime;
+            if (index < 0)
                 uic.GunAmmoCountLabel.Text = "Vac";
             else
-                uic.GunAmmoCountLabel.Text = $"[sprite \"slime_{Slimybois.SlimeData[this._vac._curSlime].slimeName}_ui\"]\nx10000";
+            {
+                int count = this._vac.slimeCounts[index];
+                if (index != this._cachedIndex || count != this._cachedCount)
+                {
+                  this._cachedIndex = index;
+                  this._cachedCount = count;
+                  this._cachedAmmoString = $"[sprite \"slime_{Slimybois.SlimeData[index].slimeName}_ui\"]\nx{count}";
+                }
+                uic.GunAmmoCountLabel.Text = this._cachedAmmoString;
+            }
             return true;
         }
     }
@@ -614,11 +654,11 @@ public class VacpackHUD : MonoBehaviour
         this._nameLabel.Opacity = ease;
         this._nameLabel.Place(pos: screenCenter);
 
-        this._countLabel.Text = $"x10000";
+        this._countLabel.Text = this._gun.slimeCounts[i].ToString();
         this._countLabel.Opacity = ease;
         this._countLabel.Place(pos: screenCenter + new Vector2(0.0f, -this._countLabel.Height / 32f));
       }
-      // this._labels[i].Color = (sel ? Color.black : goodLetter ? Color.red : Color.white).WithAlpha(Mathf.Clamp01(2f * ease - 1f));
+      this._labels[i].Color = ((this._gun.slimeCounts[i] == 0) ? Color.black : Color.white);
       this._labels[i].OutlineColor = (sel ? Color.white : Color.black).WithAlpha(Mathf.Clamp01(2f * ease - 1f));
       this._labels[i].Opacity = ease;
       this._labels[i].Place(labelPos);
