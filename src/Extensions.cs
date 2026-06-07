@@ -4173,10 +4173,10 @@ public static class Extensions
   /// <summary>Returns true if a room has an unfinished combat encounter</summary>
   public static bool IsUnclearedCombatRoom(this RoomHandler room)
   {
-    if (!room.EverHadEnemies)
+    if (room == null || !room.EverHadEnemies || room.activeEnemies == null)
       return false;
     for (int i = 0; i < room.activeEnemies.Count; i++)
-      if (!room.activeEnemies[i].IgnoreForRoomClear)
+      if (room.activeEnemies[i] && !room.activeEnemies[i].IgnoreForRoomClear)
         return true;
     return false;
   }

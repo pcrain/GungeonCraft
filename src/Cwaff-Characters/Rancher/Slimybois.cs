@@ -4,11 +4,17 @@ namespace CwaffingTheGungy;
     - allow enemies to target slimes (chance of temporary override)
     - unique particles / vfx / sounds / potentially goops?
     - only use override sprite renderer when attacking
+    - make slimes avoid staying right on top of targets when too close
 */
 
 public static class Slimybois
 {
   internal const float _DEFAULT_COOLDOWN = 2.0f;
+  internal const int _BASE_HEALTH = 10;
+  internal const float _BASE_DAMAGE = 0.6f; //NOTE: chargeDamage multiplied by 5 on enemies for some reason
+  internal const float _BASE_ATTACK_RANGE = 3.0f;
+  internal const float _BASE_ATTACK_KB = 5.0f;
+  internal const float _BASE_WEIGHT = 40.0f;
 
   public static readonly int NumSlimes = Enum.GetNames(typeof(SlimyboiType)).Length;
   public static SlimeData[] SlimeData = null;
@@ -22,27 +28,26 @@ public static class Slimybois
     if (string.IsNullOrEmpty(sd.slimeName))
       sd.slimeName = Enum.GetName(typeof(SlimyboiType), sd.type).ToLower();
     sd.fullName = sd.slimeName.ToTitleCaseInvariant() + " Slime";
-    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? 10, baseFps: 12, doCorpse: false);
+    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? _BASE_HEALTH, baseFps: 12, doCorpse: false);
     actor.procedurallyOutlined       = false; // TODO: remove outlines from sprites later
     actor.MovementSpeed              = sd.overrideSpeed ?? 4.5f;
     actor.CollisionDamage            = 0.0f; // Overridden by SlimyboiChargeBehavior at charge time
-    actor.CollisionKnockbackStrength = 0.0f; // Overridden by SlimyboiChargeBehavior at charge time
-    actor.AvoidRadius                = 4.0f;
+    actor.CollisionKnockbackStrength = 0.0f; // slimes do no knockback by default
     if ((sd.flags & SlimyboiFlags.CanFly) > 0)
       actor.PathableTiles |= CellTypes.PIT;
 
-    float attackRange = sd.overrideAttackRange ?? 3.0f;
+    float attackRange = sd.overrideAttackRange ?? _BASE_ATTACK_RANGE;
     BehaviorSpeculator bs = actor.gameObject.GetComponent<BehaviorSpeculator>();
     bs.InstantFirstTick = true; // NOTE: fixes delays between being able to attack after spawning in
     bs.TargetBehaviors.Add(new SlimyboiTargetingBehavior(){ Radius = 35.0f, LineOfSight = false, ObjectPermanence = false });
-    bs.MovementBehaviors.Add(new SeekTargetBehavior(){ StopWhenInRange = true, CustomRange = 2.0f, PathInterval = 0.5f });
+    bs.MovementBehaviors.Add(new SlimyboiSeekBehavior(){ StopWhenInRange = true, CustomMinRange = 1.75f, CustomRange = 2.75f, PathInterval = 0.5f });
     bs.MovementBehaviors.Add(new MoveErraticallyBehavior { PathInterval = 0.5f, StayOnScreen = false, UseTargetsRoom = false, AvoidTarget = false });
-    bs.AttackBehaviors.Add(new SlimyboiChargeBehavior(){ chargeDamage = sd.overrideContactDamage ?? 0.6f, chargeKnockback = 5.0f, chargeSpeed = 30.0f,
-      minRange = 0.0f, maxRange = attackRange, Cooldown = sd.overrideAttackCooldown ?? _DEFAULT_COOLDOWN, maxChargeDistance = attackRange + 0.5f }); //NOTE: chargeDamage multiplied by 5 on enemies for some reason
+    bs.AttackBehaviors.Add(new SlimyboiChargeBehavior(){ chargeDamage = sd.overrideContactDamage ?? _BASE_DAMAGE, chargeKnockback = _BASE_ATTACK_KB, chargeSpeed = 30.0f,
+      minRange = 0.0f, maxRange = attackRange, Cooldown = sd.overrideAttackCooldown ?? _DEFAULT_COOLDOWN, maxChargeDistance = attackRange + 0.5f });
 
     KnockbackDoer kbd = actor.gameObject.GetComponent<KnockbackDoer>();
-    kbd.weight = sd.overrideWeight ?? 40.0f;
-    kbd.deathMultiplier = 3.0f;
+    kbd.weight = sd.overrideWeight ?? _BASE_WEIGHT;
+    // kbd.deathMultiplier = 3.0f;
 
     AIAnimator aiAnim = actor.gameObject.GetComponent<AIAnimator>();
     aiAnim.facingType = AIAnimator.FacingType.Movement;

@@ -373,7 +373,7 @@ public class SlimyboiChargeBehavior : ChargeBehavior
       return BehaviorResult.Continue;
 
     Vector2 myCenter = m_aiActor.specRigidbody.UnitCenter;
-    PixelCollider targetCollider = m_aiActor.TargetRigidbody.specRigidbody.GetPixelCollider(ColliderType.HitBox);
+    PixelCollider targetCollider = m_aiActor.TargetRigidbody.GetPixelCollider(ColliderType.HitBox);
     if (targetCollider == null)
       return BehaviorResult.Continue;
 
@@ -381,7 +381,7 @@ public class SlimyboiChargeBehavior : ChargeBehavior
     Vector2 targetCenter = myCenter.ClosestPointOnCollider(targetCollider);
     if (leadAmount > 0f)
     {
-      Vector2 vector2 = targetCenter + m_aiActor.TargetRigidbody.specRigidbody.Velocity * 0.75f;
+      Vector2 vector2 = targetCenter + m_aiActor.TargetRigidbody.Velocity * 0.75f;
       vector2 = BraveMathCollege.GetPredictedPosition(targetCenter, m_aiActor.TargetVelocity, myCenter, chargeSpeed);
       targetCenter = Vector2.Lerp(targetCenter, vector2, leadAmount);
     }
@@ -396,6 +396,57 @@ public class SlimyboiChargeBehavior : ChargeBehavior
       State = FireState.Charging;
     m_updateEveryFrame = true;
     return BehaviorResult.RunContinuous;
+  }
+}
+
+// mostly the same as SeekTargetBehavior, but uses better distance metrics and enforces a minimum distance to the target
+public class SlimyboiSeekBehavior : SeekTargetBehavior
+{
+  public float CustomMinRange = 0.0f;
+
+  public override BehaviorResult Update()
+  {
+    if (m_aiActor.TargetRigidbody is not SpeculativeRigidbody targetRigidbody)
+    {
+      if (m_state == State.PathingToTarget)
+      {
+        m_aiActor.ClearPath();
+        m_state = State.Idle;
+      }
+      else if (m_state == State.ReturningToSpawn && m_aiActor.PathComplete)
+        m_state = State.Idle;
+      return BehaviorResult.Continue;
+    }
+
+    Vector2 myCenter = m_aiActor.specRigidbody.UnitCenter;
+    PixelCollider targetCollider = targetRigidbody.GetPixelCollider(ColliderType.HitBox);
+    Vector2 targetCenter = targetCollider != null ? myCenter.ClosestPointOnCollider(targetCollider) : targetRigidbody.UnitCenter;
+    Vector2 targetDelta = targetCenter - myCenter;
+    float targetSqrDist = targetDelta.sqrMagnitude;
+
+    m_state = State.PathingToTarget;
+    if (ExternalCooldownSource)
+    {
+      m_aiActor.ClearPath();
+      return BehaviorResult.Continue;
+    }
+    if (targetSqrDist < (CustomMinRange * CustomMinRange))
+    {
+      if (m_repathTimer <= 0f)
+        m_aiActor.PathfindToPosition(targetRigidbody.UnitCenter - (CustomMinRange + 0.5f) * targetDelta.normalized, null, true, null);
+      return BehaviorResult.SkipRemainingClassBehaviors;
+    }
+    if (StopWhenInRange && targetSqrDist <= (CustomRange * CustomRange) && (!LineOfSight || m_aiActor.HasLineOfSightToTarget || (targetRigidbody.aiActor && !targetRigidbody.CollideWithOthers)))
+    {
+      m_aiActor.ClearPath();
+      return BehaviorResult.Continue;
+    }
+    if (m_repathTimer <= 0f)
+    {
+      m_aiActor.PathfindToPosition(targetCenter, null, true, null);
+      m_repathTimer = PathInterval;
+    }
+    return BehaviorResult.SkipRemainingClassBehaviors;
   }
 }
 
@@ -460,12 +511,15 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
       return true; // NOTE: don't attack invulnerable targets
     if (GameManager.Instance.AllPlayers.Length > 1 && m_coopRefreshSearchTimer <= 0f)
       return true;
-    if (target is not AIActor)
+    if (target is not AIActor || target.specRigidbody is not SpeculativeRigidbody targetRigidbody)
       return false;
 
-    float distance = Vector2.Distance(m_specRigidbody.UnitCenter, target.specRigidbody.UnitCenter);
-    bool targetMovedFarAway = m_prevDistToTarget + 3f < distance;
-    m_prevDistToTarget = distance;
+    Vector2 myPos = m_specRigidbody.UnitCenter;
+    PixelCollider targetCollider = targetRigidbody.GetPixelCollider(ColliderType.HitBox);
+    Vector2 epos = targetCollider != null ? myPos.ClosestPointOnCollider(targetCollider) : targetRigidbody.UnitCenter;
+    float sqrdist = (myPos - epos).sqrMagnitude;
+    bool targetMovedFarAway = m_prevDistToTarget + 9f < sqrdist;
+    m_prevDistToTarget = sqrdist;
     if (targetMovedFarAway)
       return true;
     if (!m_aiActor.IsNormalEnemy && m_aiActor.CompanionOwner && target.GetAbsoluteParentRoom() != m_aiActor.CompanionOwner.CurrentRoom)
@@ -521,7 +575,11 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
             // NOTE: allow attacking harmless enemies like key bullet kin and chance kin
             if (!candidate || !candidate.IsNormalEnemy || candidate.gameObject.GetComponent<SlimyboiController>() || candidate.IsGone || candidate == m_aiActor || candidate.healthHaver && candidate.healthHaver.PreventAllDamage)
                 continue;
-            Vector2 epos = candidate.specRigidbody.UnitCenter;
+            if (candidate.specRigidbody is not SpeculativeRigidbody targetRigidbody)
+                continue;
+
+            PixelCollider targetCollider = targetRigidbody.GetPixelCollider(ColliderType.HitBox);
+            Vector2 epos = targetCollider != null ? myPos.ClosestPointOnCollider(targetCollider) : targetRigidbody.UnitCenter;
             float sqrdist = (myPos - epos).sqrMagnitude;
             if (closestTarget != null && sqrdist >= closest)
               continue;

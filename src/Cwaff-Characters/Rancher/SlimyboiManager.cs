@@ -172,7 +172,8 @@ public class SlimyboiManager : MonoBehaviour
 
     // scan for traps
     float pitCoverage = room.GetPitCoverage();
-    int numSpikeTraps = CountSpikeTraps(room);
+    int numSpikeTraps = CountSpikeTraps(room, out int numTotalTraps);
+    int numNonSpikeTraps = numTotalTraps - numSpikeTraps;
     // Lazy.DebugConsoleLog($" scanned room with pit coverage {pitCoverage} and {numSpikeTraps} spikes, category {room.area.PrototypeRoomCategory} / {room.area.PrototypeRoomNormalSubcategory}");
     int oldSlimeCount = sloims.Count;
     if (pitCoverage > 0.0f)
@@ -181,17 +182,10 @@ public class SlimyboiManager : MonoBehaviour
       sloims.Add(SlimyboiType.Dervish);
     if (numSpikeTraps > 0)
       sloims.AddMultiple(SlimyboiType.Crystal, Mathf.CeilToInt((numSpikeTraps + 1) / 5.0f));
+    if (numNonSpikeTraps > 0)
+      sloims.AddMultiple(SlimyboiType.Honey, Mathf.CeilToInt(numNonSpikeTraps / 10.0f));
     if (!wasCombatEncounter)
-    {
-      if (room.area.PrototypeRoomNormalSubcategory == PrototypeDungeonRoom.RoomNormalSubCategory.TRAP)
-      {
-        const int MIN_TRAP_ROOM_SLIMES = 3;
-        int trapSlimesAdded = sloims.Count - oldSlimeCount;
-        if (trapSlimesAdded < MIN_TRAP_ROOM_SLIMES)
-          sloims.AddMultiple(SlimyboiType.Honey, trapSlimesAdded - MIN_TRAP_ROOM_SLIMES); // add honey slimes to trap rooms without sufficient spikes or pits
-      }
       return sloims; // nothing else to do in non-combat rooms
-    }
 
     // check boss clears
     if (room.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.BOSS)
@@ -228,11 +222,15 @@ public class SlimyboiManager : MonoBehaviour
     return sloims;
   }
 
-  private static int CountSpikeTraps(RoomHandler room)
+  private static int CountSpikeTraps(RoomHandler room, out int totalTraps)
   {
     if (!_Instance || room == null || !_TrapMap.TryGetValue(room, out List<TrapController> roomTraps))
+    {
+      totalTraps = 0;
       return 0;
+    }
     int spikeCount = 0;
+    totalTraps = roomTraps.Count;
     foreach (TrapController trap in roomTraps)
     {
       if (trap is BasicTrapController basicTrap && basicTrap.TrapSwitchState == "spikes")
