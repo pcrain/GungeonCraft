@@ -15,6 +15,8 @@ public class SlimyboiController : BraveBehaviour
   private const float _AURA_THICKNESS = 0.05f;
   private const float _AURA_RADIUS_SQR = _AURA_RADIUS * _AURA_RADIUS;
   private const float _AURA_PERSIST_TIME = 2.0f;
+  private const float _REFLECT_GLOW_TIME = 1.0f;
+  private const float _REFLECT_GLOW_STRENGTH = 10.0f;
 
   public SlimyboiFlags attributes;
   public SlimyboiType slimeType;
@@ -22,6 +24,7 @@ public class SlimyboiController : BraveBehaviour
   internal float _dodgeCooldown = 0.0f;
   internal Vector2 _dodgeVector = default;
   internal bool _queuedDodge = false;
+  internal PlayerController _owner = null;
 
   private SlimeData _slimeData;
   private bool _activelyBeingLaunched;
@@ -29,6 +32,7 @@ public class SlimyboiController : BraveBehaviour
   private float _jumpTimer = 0.0f;
   private float _growDuration = 1.0f;
   private float _growTimer = 0.0f;
+  private float _reflectGlowTimer = 0.0f;
   private float _projectileIframeTimer = 0.0f;
   private tk2dSprite _trueSprite = null;
   private tk2dSprite _renderSprite = null;
@@ -112,9 +116,10 @@ public class SlimyboiController : BraveBehaviour
     Setup();
   }
 
-  public void HandleFiredFromVacpack(Vector2 dir)
+  public void HandleFiredFromVacpack(Vector2 dir, PlayerController owner)
   {
     this._activelyBeingLaunched = true;
+    this._owner = owner;
     base.gameObject.Play("slime_launch_sound");
     base.aiActor.SetIsFlying(true, VACPACK_FLYING_REASON, adjustShadow: false, modifyPathing: false);
     base.aiActor.CollisionDamage = 1.0f; // TODO: don't hardcode this, should be double the value from the charge behavior
@@ -279,6 +284,13 @@ public class SlimyboiController : BraveBehaviour
         HandleAuraEffect();
         break;
       }
+      case SlimyboiType.Crystal:
+      {
+        float extraGlow = _REFLECT_GLOW_STRENGTH * (this._reflectGlowTimer / _REFLECT_GLOW_TIME);
+        HandleGlow(color: new Color(0.6f, 0.8f, 0.8f), lightColor: null, flickerRate: 10.0f, brightness: 0.0f,
+          glowColorPower: 15.0f, minGlow: extraGlow +0.1f, maxGlow: extraGlow + 3.1f, sensitivity: 0.5f);
+        break;
+      }
     }
   }
 
@@ -296,7 +308,8 @@ public class SlimyboiController : BraveBehaviour
 
   private void UpdateTimers(float dtime)
   {
-    this._dodgeCooldown = Mathf.Max(this._dodgeCooldown - dtime, 0.0f); // dodge cooldown
+    TickAndCheck(ref this._dodgeCooldown, dtime); // dodge cooldown
+    TickAndCheck(ref this._reflectGlowTimer, dtime); // reflect glow cooldown
     if (TickAndCheck(ref this._immuneToPoisonTimer, dtime))
     {
       base.healthHaver.damageTypeModifiers.Remove(this._poisonImmunity);
@@ -473,9 +486,28 @@ public class SlimyboiController : BraveBehaviour
 
   private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
   {
-    if (this._projectileIframeTimer > 0 && otherRigidbody.projectile)
+    if (otherRigidbody.projectile is Projectile proj)
     {
-      PhysicsEngine.SkipCollision = true; // don't collide with projectiles while iframes are active
+      if (this.attributes.IsSet(SlimyboiFlags.ReflectsProjectiles))
+      {
+        PhysicsEngine.SkipCollision = true;
+        if (proj.isActiveAndEnabled && proj.Owner is not PlayerController)
+        {
+            base.gameObject.PlayUnique("slime_reflect_sound");
+            PassiveReflectItem.ReflectBullet(proj, retargetReflectedBullet: false, newOwner: this._owner, minReflectedBulletSpeed: 25.0f);
+            proj.Direction = (proj.SafeCenter - myRigidbody.UnitCenter).normalized;
+            this._reflectGlowTimer = _REFLECT_GLOW_TIME;
+        }
+      }
+      else if (this._projectileIframeTimer > 0)
+        PhysicsEngine.SkipCollision = true; // don't collide with projectiles while iframes are active
+      else if (proj.Owner is PlayerController playerOwner && playerOwner && !base.aiActor.CanTargetPlayers)
+        PhysicsEngine.SkipCollision = true; // don't collide with player projectiles when allied
+      else if (this._dodgeCooldown <= 0.0f && this.attributes.IsSet(SlimyboiFlags.DodgesProjectiles))
+      {
+        PhysicsEngine.SkipCollision = true;
+        HandleProjetileDodge(proj);
+      }
       return;
     }
     GameActor actor = otherRigidbody.gameActor;
@@ -490,16 +522,13 @@ public class SlimyboiController : BraveBehaviour
       PhysicsEngine.SkipCollision = true; // don't collide with anything other than the tilemap and enemies while being launched
       return;
     }
-    if (otherRigidbody.projectile is Projectile proj)
+    if (this.attributes.IsSet(SlimyboiFlags.ImmuneToMovingTraps))
     {
-      if (proj.Owner is PlayerController playerOwner && playerOwner && !base.aiActor.CanTargetPlayers)
-        PhysicsEngine.SkipCollision = true; // don't collide with player projectiles when allied
-      else if (this._dodgeCooldown <= 0.0f && this.attributes.IsSet(SlimyboiFlags.DodgesProjectiles))
+      if (otherRigidbody.gameObject.GetComponent<PathingTrapController>() is PathingTrapController)
       {
-        PhysicsEngine.SkipCollision = true;
-        HandleProjetileDodge(proj);
+        PhysicsEngine.SkipCollision = true; // don't collide with traps
+        return;
       }
-      return;
     }
     if (actor is not PlayerController pc)
       return;
@@ -810,6 +839,26 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
       return BehaviorResult.SkipAllRemainingBehaviors;
     }
     return BehaviorResult.SkipRemainingClassBehaviors;
+  }
+}
+
+public class SlimyboiImmobileInCombatBehavior : OverrideBehaviorBase
+{
+  private SlimyboiController _sloim;
+  private PlayerController _owner;
+
+  public override void Init(GameObject gameObject, AIActor aiActor, AIShooter aiShooter)
+  {
+    base.Init(gameObject, aiActor, aiShooter);
+    this._sloim = gameObject.GetComponent<SlimyboiController>();
+    this._owner = this._sloim ? this._sloim._owner : null;
+  }
+
+  public override BehaviorResult Update()
+  {
+    if (!this._owner || !this._owner.IsInCombat || !this._sloim.attributes.IsSet(SlimyboiFlags.ImmobileInCombat) )
+      return BehaviorResult.Continue;
+    return BehaviorResult.SkipAllRemainingBehaviors;
   }
 }
 

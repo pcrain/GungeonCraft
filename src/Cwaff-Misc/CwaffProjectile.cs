@@ -257,6 +257,7 @@ public class WeirdProjectile : Projectile
   internal static Stack<Gun>              _CurrentProjectileGun = new(); //NOTE: used by a patch in CwaffPatches
   internal static Stack<ProjectileModule> _CurrentProjectileMod = new(); //NOTE: used by a patch in CwaffPatches
 
+  public GameActor sourceOwner      { get; private set; } // actor that spawned the projectile
   public Gun sourceGun              { get; private set; } // gun that spawned the projectile
   public ProjectileModule sourceMod { get; private set; } // projectile module that spawned the projectile
   public FiredBy firedBy            { get; private set; } // means by which the projectile was spawned
@@ -336,6 +337,7 @@ public class WeirdProjectile : Projectile
       return;
     }
 
+    this.sourceOwner = actor;
     this.sourceGun = gun;
     this.sourceMod = _CurrentProjectileMod.Peek();
     if (actor is AIActor enemy)

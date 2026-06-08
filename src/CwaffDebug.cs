@@ -444,6 +444,7 @@ public static class EmissionTester
         writer.WriteLine("ored: ");
         writer.WriteLine("ogreen: ");
         writer.WriteLine("oblue: ");
+        writer.WriteLine("oalpha: ");
       }
     }
     if (_Watcher == null)
@@ -470,6 +471,7 @@ public static class EmissionTester
     float ored = 1.0f;
     float ogreen = 1.0f;
     float oblue = 1.0f;
+    float oalpha = 0.0f;
     float sensitivity = 0.5f;
 
     using (StreamReader reader = File.OpenText(_DataFilePath))
@@ -534,6 +536,11 @@ public static class EmissionTester
              if (!float.TryParse(value, out oblue))
               Lazy.DebugConsoleLog($"couldn't parse oblue {value}");
           }
+          else if (key == "oalpha")
+          {
+             if (!float.TryParse(value, out oalpha))
+              Lazy.DebugConsoleLog($"couldn't parse oalpha {value}");
+          }
       }
     }
 
@@ -548,7 +555,7 @@ public static class EmissionTester
       spriteId = _DebugSpriteIds[path] = AtlasHelper.AddSpritesToCollection([path], VFX.Collection, copyMaterialSettings: true).x;
     _TestSprite.SetSprite(VFX.Collection, spriteId);
     _TestSprite.MakeGlowyBetter(glowAmount: emissivePower, glowColorPower: emissiveColorPower,
-      glowColor: new Color(red, green, blue), sensitivity: sensitivity, overrideColor: new Color(ored, ogreen, oblue));
+      glowColor: new Color(red, green, blue), sensitivity: sensitivity, overrideColor: new Color(ored, ogreen, oblue, oalpha));
   }
 
   private static Dictionary<string, int> _DebugSpriteIds = new();

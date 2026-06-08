@@ -437,3 +437,4 @@ vacpack_select_sound,4.0,1,sound,1
 vacpack_menu_sound,3.0,1,sound,1
 vacpack_empty_sound,9.0,1,sound,1
 slime_dodge_sound,7.0,1,sound,2
+slime_reflect_sound,3.0,1,sound,1

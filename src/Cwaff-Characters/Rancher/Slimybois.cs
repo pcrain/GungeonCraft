@@ -1,5 +1,7 @@
 namespace CwaffingTheGungy;
 
+using static SlimyboiFlags;
+
 /* TODO:
     - allow enemies to target slimes (chance of temporary override)
     - unique particles / vfx / sounds / potentially goops?
@@ -32,11 +34,13 @@ public static class Slimybois
 
     // set up individual defs
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.5f, overrideSpeed = 12f, goopColor = Color.white });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = SlimyboiFlags.CanFly, goopColor = Color.cyan });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly, goopColor = Color.cyan });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = SlimyboiFlags.DodgesProjectiles });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = SlimyboiFlags.AttacksPoison | SlimyboiFlags.PoisonImmunity });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Fire, goopColor = Color.red, flags = SlimyboiFlags.AttacksIgnite | SlimyboiFlags.FireImmunity });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = DodgesProjectiles });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = AttacksPoison | PoisonImmunity });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Fire, goopColor = Color.red, flags = AttacksIgnite | FireImmunity });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Crystal, goopColor = Color.blue, overrideWeight = _BASE_WEIGHT * 4f,
+      flags = ImmobileInCombat | ReflectsProjectiles | ImmuneToMovingTraps });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
@@ -71,6 +75,7 @@ public static class Slimybois
     float attackRange = sd.overrideAttackRange ?? _BASE_ATTACK_RANGE;
     BehaviorSpeculator bs = actor.gameObject.GetComponent<BehaviorSpeculator>();
     bs.InstantFirstTick = true; // NOTE: fixes delays between being able to attack after spawning in
+    bs.OverrideBehaviors.Add(new SlimyboiImmobileInCombatBehavior(){ });
     bs.OverrideBehaviors.Add(new SlimyboiDodgeBehavior(){ });
     bs.TargetBehaviors.Add(new SlimyboiTargetingBehavior(){ Radius = 35.0f, LineOfSight = false, ObjectPermanence = false });
     bs.MovementBehaviors.Add(new SlimyboiSeekBehavior(){ StopWhenInRange = true, CustomMinRange = 1.75f, CustomRange = 2.75f, PathInterval = 0.5f });
@@ -284,23 +289,24 @@ public class SlimeData
 [Flags]
 public enum SlimyboiFlags // : ulong
 {
-  None               = 0,
-  Allied             = 1 << 0,  // if set, slime is allied and cannot hurt or be hurt by player characters
-  CanFly             = 1 << 1,  // if set, slime can fly and path over pits and other hazards
-  ExplodesOnDeath    = 1 << 2,  // [unimplemented] if set, slime exploded upon dying
-  ExtraCasingOnKill  = 1 << 3,  // [unimplemented] if set, slime spawns an extra casing upon killing an enemy
-  PitImmunity        = 1 << 4,  // [unimplemented] immune to pits, but can't fly per se (vulnerable to other hazards)
-  FireImmunity       = 1 << 5,  //
-  PoisonImmunity     = 1 << 6,  //
-  ExplosionImmunity  = 1 << 7,  // [unimplemented]
-  ProjectileImmunity = 1 << 8,  // [unimplemented]
-  QuantumInstability = 1 << 9,  // [unimplemented]
-  Immobile           = 1 << 10, // [unimplemented]
-  Absorbant          = 1 << 11, // [unimplemented]
-  PassivelyGoops     = 1 << 12, // [unimplemented]
-  DodgesProjectiles  = 1 << 13, // [unimplemented]
-  ContactImmunity    = 1 << 14, // [unimplemented] (used for immunity to rolling spike logs / PathingTrapControllers)
-  CantVacInCombat    = 1 << 15, // if set, slime can not be vacuumed while in combat
-  AttacksPoison      = 1 << 16, // if set, slime's attacks poison enemies
-  AttacksIgnite      = 1 << 17, // if set, slime's attacks ignite enemies
+  None                   = 0,
+  Allied                 = 1 << 0,  // if set, slime is allied and cannot hurt or be hurt by player characters
+  CanFly                 = 1 << 1,  // if set, slime can fly and path over pits and other hazards
+  ExplodesOnDeath        = 1 << 2,  // [unimplemented] if set, slime exploded upon dying
+  ExtraCasingOnKill      = 1 << 3,  // [unimplemented] if set, slime spawns an extra casing upon killing an enemy
+  PitImmunity            = 1 << 4,  // [unimplemented] immune to pits, but can't fly per se (vulnerable to other hazards)
+  FireImmunity           = 1 << 5,  // if set, slime is not affected by fire or fire damage
+  PoisonImmunity         = 1 << 6,  // if set, slime is not affected by poison or poison damage
+  ExplosionImmunity      = 1 << 7,  // [unimplemented]
+  ProjectileImmunity     = 1 << 8,  // [unimplemented]
+  QuantumInstability     = 1 << 9,  // [unimplemented]
+  ImmobileInCombat       = 1 << 10, // if set, slime will not attempt to move while in combat
+  Absorbant              = 1 << 11, // [unimplemented]
+  PassivelyGoops         = 1 << 12, // [unimplemented]
+  DodgesProjectiles      = 1 << 13, // [unimplemented]
+  ImmuneToMovingTraps    = 1 << 14, // if set, slime can not collide with moving traps
+  CantVacInCombat        = 1 << 15, // if set, slime can not be vacuumed while in combat
+  AttacksPoison          = 1 << 16, // if set, slime's attacks poison enemies
+  AttacksIgnite          = 1 << 17, // if set, slime's attacks ignite enemies
+  ReflectsProjectiles    = 1 << 18, // if set, slime will reflect all enemy projectiles
 }

@@ -45,7 +45,7 @@ public class Vacpack : CwaffGun
 
         ProjectileModule shootMod = new ProjectileModule().InitSpecialSingleProjectileModule<SlimeProjectile>(GunData.New(
           gun: gun, baseProjectile: Items._38Special.Projectile(), clipSize: -1, cooldown: 0.45f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 3.0f, speed: 100f, range: 9999f, force: 12f,  hitSound: "generic_bullet_impact", angleVariance: 10.0f
+          damage: 3.0f, speed: 300f, range: 9999f, force: 12f,  hitSound: "generic_bullet_impact", angleVariance: 10.0f
           ));
         gun.Volley.projectiles.Add(shootMod);
 
@@ -54,10 +54,17 @@ public class Vacpack : CwaffGun
 
     private class SlimeProjectile : WeirdProjectile
     {
-        private static void BecomeSlime(Projectile proj)
+        private static readonly AnimationCurve _KnockbackCurve = new AnimationCurve(
+          new Keyframe(0.0f, 1.0f),
+          new Keyframe(0.25f, 0.3f),
+          new Keyframe(0.5f, 0.1f),
+          new Keyframe(1.0f, 0.0f)
+        );
+
+        private void BecomeSlime()
         {
           int slimeType = (int)SlimyboiType.Pink; // fallback in case fired from an unknown source
-          if (proj.PossibleSourceGun is Gun gun && gun.gameObject.GetComponent<Vacpack>() is Vacpack vp)
+          if (base.PossibleSourceGun is Gun gun && gun.gameObject.GetComponent<Vacpack>() is Vacpack vp)
           {
             slimeType = vp._lastSlime;
             if (vp.slimeCounts[slimeType] > 0)
@@ -69,7 +76,7 @@ public class Vacpack : CwaffGun
             slimeType = (int)SlimyboiType.Pink;
           }
           SlimeData sd = Slimybois.SlimeData[slimeType];
-          Vector2 ppos = proj.SafeCenter;
+          Vector2 ppos = base.SafeCenter;
           AIActor newSlime = AIActor.Spawn(
             prefabActor     : sd.prefab,
             position        : ppos,
@@ -78,11 +85,11 @@ public class Vacpack : CwaffGun
             correctForWalls : true);
           newSlime.SpawnInInstantly(isReinforcement: true);
           newSlime.gameObject.AddComponent<KnockbackUnleasher>();
-          Vector2 dir = proj.transform.right;
+          Vector2 dir = base.transform.right;
           newSlime.knockbackDoer.ApplySourcedKnockback(
-            direction: proj.transform.right, time: 1.0f, source: newSlime.gameObject,
-            force: proj.baseData.speed * UnityEngine.Random.Range(0.8f, 1.2f));
-          newSlime.gameObject.GetComponent<SlimyboiController>().HandleFiredFromVacpack(dir);
+            direction: base.transform.right, time: 0.75f, source: newSlime.gameObject,
+            force: base.baseData.speed * UnityEngine.Random.Range(0.8f, 1.0f), customFalloff: _KnockbackCurve);
+          newSlime.gameObject.GetComponent<SlimyboiController>().HandleFiredFromVacpack(dir, this.sourceOwner as PlayerController);
 
           for (int i = 0; i < 10; ++i)
           {
@@ -92,12 +99,12 @@ public class Vacpack : CwaffGun
             debris.sprite.MakeGlowyBetter(glowAmount: 50.0f, glowColor: Color.white, glowColorPower: 100.0f, sensitivity: 0.5f, overrideColor: sd.goopColor);
           }
 
-          proj.gameObject.Play("slime_spawn_sound");
+          base.gameObject.Play("slime_spawn_sound");
         }
 
         protected override void OnFiredByAnything()
         {
-          BecomeSlime(this);
+          BecomeSlime();
           DieInAir(suppressInAirEffects: true, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
         }
     }
