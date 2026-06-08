@@ -22,6 +22,35 @@ public static class Slimybois
   internal static GameObject _SlimeDeathVFX;
   internal static GameObject _SlimeImpactVFX;
 
+  internal static GameActorEffect _SlimePoisonEffect;
+
+  public static void Init()
+  {
+    // set up array
+    SlimeData = new SlimeData[NumSlimes];
+
+    // set up individual defs
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.5f, overrideSpeed = 12f, goopColor = Color.white });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = SlimyboiFlags.CanFly, goopColor = Color.cyan });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = SlimyboiFlags.DodgesProjectiles });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = SlimyboiFlags.AttackDoesPoison | SlimyboiFlags.PoisonImmunity });
+
+    // pad out unfinished defs
+    foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
+      if (SlimeData[(int)t] == null)
+        SlimeData.SetupEntry(new SlimeData{ type = t }); // TODO: make them unique
+
+    // shared
+    _SlimeImpactVFX = VFX.Create("slime_impact_vfx", fps: 60, loops: false);
+    _SlimeImpactVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 5.0f, glowColorPower: 5.0f, glowColor: Color.white);
+    _SlimeDeathVFX = VFX.Create("slime_death_vfx");
+    _SlimeDeathVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 100.0f, glowColorPower: 100.0f, glowColor: Color.white);
+    SlimeParticleSystem = MakeSlimeParticleSystem(Color.white);
+
+    _SlimePoisonEffect = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
+  }
+
   private static SlimeData Init(this SlimeData sd)
   {
     if (string.IsNullOrEmpty(sd.slimeName))
@@ -202,30 +231,6 @@ public static class Slimybois
 
       return psnewPrefab;
   }
-
-  public static void Init()
-  {
-    // set up array
-    SlimeData = new SlimeData[NumSlimes];
-
-    // set up individual defs
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.5f, overrideSpeed = 12f, goopColor = Color.white });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = SlimyboiFlags.CanFly, goopColor = Color.cyan });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = SlimyboiFlags.DodgesProjectiles });
-
-    // pad out unfinished defs
-    foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
-      if (SlimeData[(int)t] == null)
-        SlimeData.SetupEntry(new SlimeData{ type = t }); // TODO: make them unique
-
-    // shared
-    _SlimeImpactVFX = VFX.Create("slime_impact_vfx", fps: 60, loops: false);
-    _SlimeImpactVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 5.0f, glowColorPower: 5.0f, glowColor: Color.white);
-    _SlimeDeathVFX = VFX.Create("slime_death_vfx");
-    _SlimeDeathVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 100.0f, glowColorPower: 100.0f, glowColor: Color.white);
-    SlimeParticleSystem = MakeSlimeParticleSystem(Color.white);
-  }
 }
 
 // NOTE: these are in the same order they appear in the aseprite file, can only change if we manage that better
@@ -262,7 +267,7 @@ public class SlimeData
   public GameObject debris;
 
   public SlimyboiFlags flags;
-  public Color goopColor;
+  public Color goopColor = Color.white;
   public int? overrideHealth;
   public float? overrideWeight;
   public float? overrideSpeed;
@@ -293,4 +298,5 @@ public enum SlimyboiFlags // : ulong
   DodgesProjectiles  = 1 << 13, // [unimplemented]
   ContactImmunity    = 1 << 14, // [unimplemented] (used for immunity to rolling spike logs / PathingTrapControllers)
   CantVacInCombat    = 1 << 15, // if set, slime can not be vacuumed while in combat
+  AttackDoesPoison   = 1 << 16, // if set, slime's attacks poison enemies
 }

@@ -243,6 +243,7 @@ public class Scotsman : CwaffGun
         if (!this || this.PlayerOwner is not PlayerController player || player.CurrentGun != this.gun)
             return;
 
+        // REFACTOR: use Geometry
         if (!this._coneMeshObject || !this._mesh || !this._meshRenderer)
         {
             this._coneMeshObject = new GameObject("scotsman_targeting_cone");

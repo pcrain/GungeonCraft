@@ -4210,4 +4210,20 @@ public static class Extensions
     int estimatedValue = Mathf.RoundToInt((5f * loot.S_Chance + 4f * loot.A_Chance + 3f * loot.B_Chance + 2f * loot.C_Chance+ 1f * loot.D_Chance) / lootWeight);
     return (estimatedValue > 0) ? estimatedValue : 3;
   }
+
+  /// <summary>Get an active effect on a game actor, including implied effects from identifier strings</summary>
+  public static GameActorEffect GetEffectBetter(this AIActor actor, EffectResistanceType resistanceType)
+  {
+    string resistanceString = resistanceType switch {
+      EffectResistanceType.Poison => "poison",
+      EffectResistanceType.Fire   => "fire",
+      EffectResistanceType.Freeze => "freeze",
+      EffectResistanceType.Charm  => "charm",
+      _                           => string.Empty,
+    };
+    for (int i = 0; i < actor.m_activeEffects.Count; i++)
+      if (actor.m_activeEffects[i].resistanceType == resistanceType || actor.m_activeEffects[i].effectIdentifier == resistanceString)
+        return actor.m_activeEffects[i];
+    return null;
+  }
 }

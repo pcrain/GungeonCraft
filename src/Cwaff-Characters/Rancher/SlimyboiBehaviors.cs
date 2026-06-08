@@ -11,6 +11,10 @@ public class SlimyboiController : BraveBehaviour
   private const float _IFRAME_LENGTH = 0.25f;
   private const float _DODGE_COOLDOWN = 1.0f;
   private const float _DODGE_LENGTH = 2.0f;
+  private const float _AURA_RADIUS = 6.0f;
+  private const float _AURA_THICKNESS = 0.05f;
+  private const float _AURA_RADIUS_SQR = _AURA_RADIUS * _AURA_RADIUS;
+  private const float _AURA_PERSIST_TIME = 2.0f;
 
   public SlimyboiFlags attributes;
   public SlimyboiType slimeType;
@@ -29,8 +33,13 @@ public class SlimyboiController : BraveBehaviour
   private tk2dSprite _trueSprite = null;
   private tk2dSprite _renderSprite = null;
   private ParticleSystem _ps = null;
+  private Geometry _aura = null;
+  private EasyLight _light = null;
   private bool _appearOutOfNowhere = false;
   private bool _setup = false;
+
+  private DamageTypeModifier _poisonImmunity;
+  private float _immuneToPoisonTimer = 0.0f;
 
   private void Start()
   {
@@ -58,6 +67,17 @@ public class SlimyboiController : BraveBehaviour
     actor.IsHarmlessEnemy = true;
     actor.IsNormalEnemy = false; // TODO: setting this might make setting some other things redundant
     actor.PreventAutoKillOnBossDeath = true;
+
+    this._poisonImmunity = new(){damageType = CoreDamageTypes.Poison, damageMultiplier = 0f};
+    if (hh.damageTypeModifiers == null)
+      hh.damageTypeModifiers = new();
+    if (actor.EffectResistances == null)
+      actor.EffectResistances = new ActorEffectResistance[0];
+    if (this._slimeData.flags.IsSet(SlimyboiFlags.PoisonImmunity))
+    {
+      hh.damageTypeModifiers.Add(this._poisonImmunity);
+      actor.SetResistance(EffectResistanceType.Poison, 1.0f);
+    }
 
     SpeculativeRigidbody body = base.specRigidbody;
     body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
@@ -228,8 +248,106 @@ public class SlimyboiController : BraveBehaviour
     else
       this._renderSprite.renderer.enabled = true;
 
-    // dodge cooldown
-    this._dodgeCooldown = Mathf.Max(this._dodgeCooldown - dtime, 0.0f);
+    UpdateTimers(dtime);
+    UpdateSlimeSpecificBehaviors();
+  }
+
+  private void UpdateSlimeSpecificBehaviors()
+  {
+    switch (this.slimeType)
+    {
+      case SlimyboiType.Rad:
+      {
+        HandleGlow(new Color(0.5f, 0.85f, 0.1f));
+        HandleAuraEffect();
+        break;
+      }
+    }
+  }
+
+  /// <summary>Tick down a timer and check if it's expired/</summary>
+  private static bool TickAndCheck(ref float timer, float dtime)
+  {
+    if (timer <= 0.0f)
+      return false; // was already expired
+    timer -= dtime;
+    if (timer > 0.0f)
+      return false;
+    timer = 0.0f;
+    return true;
+  }
+
+  private void UpdateTimers(float dtime)
+  {
+    this._dodgeCooldown = Mathf.Max(this._dodgeCooldown - dtime, 0.0f); // dodge cooldown
+    if (TickAndCheck(ref this._immuneToPoisonTimer, dtime))
+    {
+      base.healthHaver.damageTypeModifiers.Remove(this._poisonImmunity);
+      base.aiActor.SetResistance(EffectResistanceType.Poison, 0.0f);
+    }
+  }
+
+  private void HandleGlow(Color color)
+  {
+    if (!this._renderSprite)
+      return;
+
+    float glowamount = Mathf.Abs(Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup));
+    this._renderSprite.MakeGlowyBetter(glowAmount: 5.0f + 10f * glowamount, glowColor: color, glowColorPower: 10.0f, skipSetup: false);
+    if (!this._light)
+      this._light = EasyLight.Create(base.aiActor.CenterPosition, base.transform, color, radius: 0f, brightness: 5.0f);
+    this._light.SetRadius(1f + 2f * glowamount);
+  }
+
+  private void HandleAuraEffect()
+  {
+    Vector2 pos = base.aiActor.CenterPosition;
+
+    if (!this._aura)
+    {
+      this._aura = Geometry.Create(Geometry.Shape.RING);
+      this._aura.Place(pos: pos, color: this._slimeData.goopColor.WithAlpha(0.04f), radius: _AURA_RADIUS, radiusInner: _AURA_RADIUS - _AURA_THICKNESS);
+    }
+    this._aura.Place(pos: pos);
+
+    float x = pos.x;
+    float y = pos.y;
+    foreach (SlimyboiController sloim in SlimyboiManager.ActiveSlimes)
+    {
+      if (!sloim || sloim == this)
+        continue;
+
+      Vector2 opos = sloim.aiActor.CenterPosition;
+      float dx = x - opos.x;
+      float dy = y - opos.y;
+      if ((dx * dx + dy * dy) > _AURA_RADIUS_SQR)
+        continue;
+
+      ApplyAuraEffect(sloim);
+    }
+  }
+
+  private void ApplyAuraEffect(SlimyboiController sloim)
+  {
+    switch (this.slimeType)
+    {
+      case SlimyboiType.Rad:
+      {
+        bool currentlyImmuneToPoison = sloim.attributes.IsSet(SlimyboiFlags.PoisonImmunity);
+        if (sloim._immuneToPoisonTimer > 0.0f || !currentlyImmuneToPoison)
+        {
+          if (!currentlyImmuneToPoison)
+          {
+            sloim.healthHaver.damageTypeModifiers.Add(this._poisonImmunity);
+            sloim.aiActor.SetResistance(EffectResistanceType.Poison, 1.0f);
+            if (sloim.aiActor.GetEffectBetter(EffectResistanceType.Poison) is GameActorEffect activePoison)
+              sloim.aiActor.RemoveEffect(activePoison);
+          }
+          sloim._immuneToPoisonTimer = _AURA_PERSIST_TIME;
+        }
+        break;
+      }
+    }
   }
 
   private void OnCollisionAfterBeingShot(CollisionData data)
@@ -258,6 +376,12 @@ public class SlimyboiController : BraveBehaviour
       base.gameObject.Play("slime_attack_sound");
       base.knockbackDoer.ApplyKnockback(data.Normal, knockback, time: this._jumpDuration);
       Jump();
+
+      if (data.OtherRigidbody is SpeculativeRigidbody otherBody && otherBody.aiActor is AIActor enemy)
+      {
+        if (this.attributes.IsSet(SlimyboiFlags.AttackDoesPoison))
+          enemy.ApplyEffect(Slimybois._SlimePoisonEffect);
+      }
   }
 
   private void OnDeath(Vector2 vector)
@@ -289,6 +413,8 @@ public class SlimyboiController : BraveBehaviour
   {
     DestroyParticleSystem(true);
     SlimyboiManager.DeregisterSlime(this);
+    if (this._aura)
+      UnityEngine.Object.Destroy(this._aura.gameObject);
     base.OnDestroy();
   }
 
