@@ -441,6 +441,9 @@ public static class EmissionTester
         writer.WriteLine("red: ");
         writer.WriteLine("green: ");
         writer.WriteLine("blue: ");
+        writer.WriteLine("ored: ");
+        writer.WriteLine("ogreen: ");
+        writer.WriteLine("oblue: ");
       }
     }
     if (_Watcher == null)
@@ -464,6 +467,9 @@ public static class EmissionTester
     float red = 1.0f;
     float green = 1.0f;
     float blue = 1.0f;
+    float ored = 1.0f;
+    float ogreen = 1.0f;
+    float oblue = 1.0f;
     float sensitivity = 0.5f;
 
     using (StreamReader reader = File.OpenText(_DataFilePath))
@@ -513,6 +519,21 @@ public static class EmissionTester
              if (!float.TryParse(value, out blue))
               Lazy.DebugConsoleLog($"couldn't parse blue {value}");
           }
+          else if (key == "ored")
+          {
+             if (!float.TryParse(value, out ored))
+              Lazy.DebugConsoleLog($"couldn't parse ored {value}");
+          }
+          else if (key == "ogreen")
+          {
+             if (!float.TryParse(value, out ogreen))
+              Lazy.DebugConsoleLog($"couldn't parse ogreen {value}");
+          }
+          else if (key == "oblue")
+          {
+             if (!float.TryParse(value, out oblue))
+              Lazy.DebugConsoleLog($"couldn't parse oblue {value}");
+          }
       }
     }
 
@@ -526,7 +547,8 @@ public static class EmissionTester
     if (!_DebugSpriteIds.TryGetValue(path, out int spriteId))
       spriteId = _DebugSpriteIds[path] = AtlasHelper.AddSpritesToCollection([path], VFX.Collection, copyMaterialSettings: true).x;
     _TestSprite.SetSprite(VFX.Collection, spriteId);
-    _TestSprite.MakeGlowyBetter(glowAmount: emissivePower, glowColorPower: emissiveColorPower, glowColor: new Color(red, green, blue), sensitivity: sensitivity);
+    _TestSprite.MakeGlowyBetter(glowAmount: emissivePower, glowColorPower: emissiveColorPower,
+      glowColor: new Color(red, green, blue), sensitivity: sensitivity, overrideColor: new Color(ored, ogreen, oblue));
   }
 
   private static Dictionary<string, int> _DebugSpriteIds = new();

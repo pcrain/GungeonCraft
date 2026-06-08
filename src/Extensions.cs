@@ -493,17 +493,17 @@ public static class Extensions
 
   /// <summary>New, better version of SetGlowiness based on better understanding of shaders</summary>
   public static void MakeGlowyBetter(this tk2dBaseSprite sprite, float? glowAmount = null, Color? glowColor = null, float? glowColorPower = null,
-    float sensitivity = 0.5f, bool skipSetup = false)
+    float sensitivity = 0.5f, Color? overrideColor = null, bool skipSetup = false)
   {
       Material newMat = sprite.renderer.material;
       if (!skipSetup)
         sprite.usesOverrideMaterial = true;
-      newMat.MakeGlowyBetter(glowAmount, glowColor, glowColorPower, sensitivity, skipSetup);
+      newMat.MakeGlowyBetter(glowAmount, glowColor, glowColorPower, sensitivity, overrideColor, skipSetup);
   }
 
   /// <summary>New, better version of SetGlowiness based on better understanding of shaders</summary>
   public static void MakeGlowyBetter(this Material newMat, float? glowAmount = null, Color? glowColor = null, float? glowColorPower = null,
-    float sensitivity = 0.5f, bool skipSetup = false)
+    float sensitivity = 0.5f, Color? overrideColor = null, bool skipSetup = false)
   {
       if (!skipSetup)
       {
@@ -531,6 +531,8 @@ public static class Extensions
         newMat.SetFloat(CwaffVFX._EmissiveColorPowerId, glowColorPower.Value);
       if (glowColor.HasValue)
         newMat.SetColor(CwaffVFX._EmissiveColorId, glowColor.Value);
+      if (overrideColor.HasValue)
+        newMat.SetColor(CwaffVFX._OverrideColorId, overrideColor.Value);
   }
 
   /// <summary>Randomly add or subtract an amount from an angle</summary>
@@ -2007,22 +2009,34 @@ public static class Extensions
 
   //WARNING: only works with our VFX and sprites, can't be used with basegame sprites or results in wonky hitboxes
   /// <summary>Set up a SpeculativeRigidBody for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
-  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false, float height = 1.0f, bool keepExistingColliders = false)
+  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, CollisionLayer clayer = CollisionLayer.HighObstacle, bool canBePushed = false,
+    float height = 1.0f, bool keepExistingColliders = false, IntVector2? bodyDims = null, bool useUntrimmedBounds = false)
   {
     SpeculativeRigidbody body = g.GetOrAddComponent<SpeculativeRigidbody>();
     tk2dBaseSprite sprite     = g.GetComponent<tk2dBaseSprite>();
-    var bounds                = sprite.GetBounds();
+    var bounds                = useUntrimmedBounds ? sprite.GetUntrimmedBounds() : sprite.GetBounds();
     IntVector2 spriteSize     = (C.PIXELS_PER_TILE * bounds.size.XY()).ToIntVector2();
     IntVector2 spriteOffsets  = (C.PIXELS_PER_TILE * bounds.min.XY()).ToIntVector2();
+
+    int x = spriteOffsets.x;
+    int y = spriteOffsets.y;
+    int w = spriteSize.x;
+    int h = Mathf.CeilToInt(height * spriteSize.y);
+    if (bodyDims is IntVector2 overrideDims)
+    {
+      x = (x + w - overrideDims.x) / 2; // use lower center as anchor
+      w = overrideDims.x;
+      h = overrideDims.y;
+    }
 
     if (!keepExistingColliders)
       body.PixelColliders = new List<PixelCollider>();
     body.PixelColliders.Add(new(){
       ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Manual,
-      ManualOffsetX          = spriteOffsets.x,
-      ManualOffsetY          = spriteOffsets.y,
-      ManualWidth            = spriteSize.x,
-      ManualHeight           = Mathf.CeilToInt(height * spriteSize.y),
+      ManualOffsetX          = x,
+      ManualOffsetY          = y,
+      ManualWidth            = w,
+      ManualHeight           = h,
       CollisionLayer         = clayer,
       Enabled                = true,
       IsTrigger              = false,
@@ -2033,13 +2047,14 @@ public static class Extensions
   }
 
   /// <summary>Set up a SpeculativeRigidBody with multiple collision layers for a VFX sprite based on the sprite's dimensions, FlipX status, and Anchor</summary>
-  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, List<CollisionLayer> clayers, bool canBePushed = false, float height = 1.0f, bool keepExistingColliders = false)
+  public static SpeculativeRigidbody AutoRigidBody(this GameObject g, List<CollisionLayer> clayers, bool canBePushed = false,
+    float height = 1.0f, bool keepExistingColliders = false, IntVector2? bodyDims = null, bool useUntrimmedBounds = false)
   {
     bool first = true;
     SpeculativeRigidbody body = null;
     foreach (CollisionLayer clayer in clayers)
     {
-      body = g.AutoRigidBody(clayer, canBePushed, height, !first);
+      body = g.AutoRigidBody(clayer, canBePushed, height, !first, bodyDims, useUntrimmedBounds);
       first = false;
     }
     return body;

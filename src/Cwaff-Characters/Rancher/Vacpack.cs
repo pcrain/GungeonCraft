@@ -89,7 +89,7 @@ public class Vacpack : CwaffGun
             DebrisObject debris = UnityEngine.Object.Instantiate(sd.debris, ppos, Quaternion.identity).GetComponent<DebrisObject>();
             debris.GravityOverride = 30.0f;
             debris.Trigger((3f * dir + Lazy.RandomVector(2f * UnityEngine.Random.value)).ToVector3ZUp(4f), 0.25f);
-            debris.sprite.MakeGlowyBetter(glowAmount: 10.0f, glowColor: new Color(1.0f, 0.75f, 0.9f), glowColorPower: 20.0f, sensitivity: 0.3f);
+            debris.sprite.MakeGlowyBetter(glowAmount: 50.0f, glowColor: Color.white, glowColorPower: 100.0f, sensitivity: 0.5f, overrideColor: sd.goopColor);
           }
 
           proj.gameObject.Play("slime_spawn_sound");
@@ -284,13 +284,14 @@ public class Vacpack : CwaffGun
         ++this.slimeCounts[(int)sloim.slimeType];
         Vector2 pos = (this.PlayerOwner.CurrentGun is Gun gun) ? gun.barrelOffset.position : sloim.aiActor.CenterPosition;
         sloim.aiActor.EraseFromExistence(suppressDeathSounds: true);
+        SlimeData sd = Slimybois.SlimeData[(int)sloim.slimeType];
         for (int i = 0; i < 10; ++i)
         {
           DebrisObject debris = UnityEngine.Object.Instantiate(
             SlimyboiType.Pink.Data().debris, pos, Quaternion.identity).GetComponent<DebrisObject>();
           debris.GravityOverride = 30.0f;
           debris.Trigger(Lazy.RandomVector(3f * UnityEngine.Random.value).ToVector3ZUp(4f), 0.25f);
-          debris.sprite.MakeGlowyBetter(glowAmount: 10.0f, glowColor: new Color(1.0f, 0.75f, 0.9f), glowColorPower: 20.0f, sensitivity: 0.3f);
+          debris.sprite.MakeGlowyBetter(glowAmount: 100.0f, glowColor: Color.white, glowColorPower: 100.0f, sensitivity: 0.2f, overrideColor: sd.goopColor);
         }
     }
 
@@ -329,6 +330,17 @@ public class Vacpack : CwaffGun
       base.OnPlayerPickup(player);
       SlimyboiManager.EnsureInstance();
       RegisterEvents(player);
+      #if DEBUG
+        Commands._OnDebugKeyPressed -= InfiniteSlimes;
+        Commands._OnDebugKeyPressed += InfiniteSlimes;
+      #endif
+    }
+
+    private void InfiniteSlimes()
+    {
+      int cap = Slimybois.NumSlimes;
+      for (int i = 0; i < cap; ++i)
+        this.slimeCounts[i] = 10000;
     }
 
     public override void OnSwitchedToThisGun()

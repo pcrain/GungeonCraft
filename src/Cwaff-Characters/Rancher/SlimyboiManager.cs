@@ -39,10 +39,10 @@ public class SlimyboiManager : MonoBehaviour
       CwaffEvents.OnFloorEnded -= OnFloorEnded;
       CwaffEvents.OnFloorEnded += OnFloorEnded;
 
-      #if DEBUG
-        Commands._OnDebugKeyPressed -= DebugSlimeSpawn;
-        Commands._OnDebugKeyPressed += DebugSlimeSpawn;
-      #endif
+      // #if DEBUG
+      //   Commands._OnDebugKeyPressed -= DebugSlimeSpawn;
+      //   Commands._OnDebugKeyPressed += DebugSlimeSpawn;
+      // #endif
 
       return _Instance;
     }

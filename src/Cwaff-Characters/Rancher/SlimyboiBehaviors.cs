@@ -8,10 +8,16 @@ namespace CwaffingTheGungy;
 public class SlimyboiController : BraveBehaviour
 {
   private const string VACPACK_FLYING_REASON = "Vacpack";
-  private const float IFRAME_LENGTH = 0.25f;
+  private const float _IFRAME_LENGTH = 0.25f;
+  private const float _DODGE_COOLDOWN = 1.0f;
+  private const float _DODGE_LENGTH = 2.0f;
 
   public SlimyboiFlags attributes;
   public SlimyboiType slimeType;
+
+  internal float _dodgeCooldown = 0.0f;
+  internal Vector2 _dodgeVector = default;
+  internal bool _queuedDodge = false;
 
   private SlimeData _slimeData;
   private bool _activelyBeingLaunched;
@@ -67,7 +73,7 @@ public class SlimyboiController : BraveBehaviour
 
   private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
   {
-    this._projectileIframeTimer = IFRAME_LENGTH;
+    this._projectileIframeTimer = _IFRAME_LENGTH;
   }
 
   public void HandleRoomSpawn()
@@ -89,6 +95,7 @@ public class SlimyboiController : BraveBehaviour
 
   private void RecreateParticleSystem(Vector2 dir)
   {
+    Setup();
     if (this._ps)
       DestroyParticleSystem();
     GameObject psObj = UnityEngine.Object.Instantiate(Slimybois.SlimeParticleSystem);
@@ -96,6 +103,8 @@ public class SlimyboiController : BraveBehaviour
     psObj.transform.parent   = base.gameObject.transform;
     psObj.transform.localRotation = dir.EulerZ();
     this._ps = psObj.GetComponent<ParticleSystem>();
+    ParticleSystem.MainModule main = this._ps.main;
+    main.startColor = this._slimeData.goopColor;
   }
 
   private void DestroyParticleSystem(bool immediate = false)
@@ -162,7 +171,8 @@ public class SlimyboiController : BraveBehaviour
     float dtime = BraveTime.DeltaTime;
 
     // SlimyboiChargeBehavior charge = base.behaviorSpeculator.AttackBehaviors[0] as SlimyboiChargeBehavior;
-    // base.aiActor.DebugNametag($"target: {(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\nstate: {charge.State}\nready: {charge.IsReady()}\nlastcharge: {Time.frameCount - charge._LastUpdateFrame}\nattackcooldown: {base.aiActor.behaviorSpeculator.m_attackCooldownTimer}");
+    // base.aiActor.DebugNametag($"target: {(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\ntargetPos: {base.aiActor.Path.Positions.Last.Value}");
+    // base.specRigidbody.DrawDebugHitbox();
 
     if (!this._renderSprite)
     {
@@ -217,6 +227,9 @@ public class SlimyboiController : BraveBehaviour
       this._renderSprite.renderer.enabled = false;
     else
       this._renderSprite.renderer.enabled = true;
+
+    // dodge cooldown
+    this._dodgeCooldown = Mathf.Max(this._dodgeCooldown - dtime, 0.0f);
   }
 
   private void OnCollisionAfterBeingShot(CollisionData data)
@@ -279,6 +292,14 @@ public class SlimyboiController : BraveBehaviour
     base.OnDestroy();
   }
 
+  private void HandleProjetileDodge(Projectile proj)
+  {
+    this._projectileIframeTimer = _IFRAME_LENGTH;
+    this._dodgeCooldown = _DODGE_COOLDOWN;
+    this._dodgeVector = _DODGE_LENGTH * proj.Direction.normalized.Rotate(UnityEngine.Random.Range(90f, 270f));
+    this._queuedDodge = true;
+  }
+
   private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
   {
     if (this._projectileIframeTimer > 0 && otherRigidbody.projectile)
@@ -302,6 +323,11 @@ public class SlimyboiController : BraveBehaviour
     {
       if (proj.Owner is PlayerController playerOwner && playerOwner && !base.aiActor.CanTargetPlayers)
         PhysicsEngine.SkipCollision = true; // don't collide with player projectiles when allied
+      else if (this._dodgeCooldown <= 0.0f && this.attributes.IsSet(SlimyboiFlags.DodgesProjectiles))
+      {
+        PhysicsEngine.SkipCollision = true;
+        HandleProjetileDodge(proj);
+      }
       return;
     }
     if (actor is not PlayerController pc)
@@ -613,5 +639,49 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
       return BehaviorResult.SkipAllRemainingBehaviors;
     }
     return BehaviorResult.SkipRemainingClassBehaviors;
+  }
+}
+
+public class SlimyboiDodgeBehavior : OverrideBehaviorBase
+{
+  private const float _DODGE_TIME = 0.2f;
+
+  private SlimyboiController _sloim;
+  private float _dodgeEndTime;
+
+  public override void Init(GameObject gameObject, AIActor aiActor, AIShooter aiShooter)
+  {
+    base.Init(gameObject, aiActor, aiShooter);
+    this._sloim = gameObject.GetComponent<SlimyboiController>();
+  }
+
+  public override BehaviorResult Update()
+  {
+    if (!this._sloim || !this._sloim._queuedDodge)
+      return BehaviorResult.Continue;
+
+    this._sloim._queuedDodge = false;
+    this._dodgeEndTime = BraveTime.ScaledTimeSinceStartup + _DODGE_TIME;
+    m_aiActor.gameObject.PlayUnique("slime_dodge_sound");
+    SpawnManager.SpawnVFX(GameManager.Instance.Dungeon.dungeonDustups.rollLandDustup, m_aiActor.CenterPosition, Lazy.RandomEulerZ());
+    m_aiActor.BehaviorOverridesVelocity = true;
+    m_aiActor.BehaviorVelocity = (1f / _DODGE_TIME) * this._sloim._dodgeVector;
+    m_updateEveryFrame = true;
+    return BehaviorResult.RunContinuous;
+  }
+
+  public override ContinuousBehaviorResult ContinuousUpdate()
+  {
+    if (BraveTime.ScaledTimeSinceStartup >= this._dodgeEndTime)
+      return ContinuousBehaviorResult.Finished;
+    return ContinuousBehaviorResult.Continue;
+  }
+
+  public override void EndContinuousUpdate()
+  {
+    base.EndContinuousUpdate();
+    m_aiActor.BehaviorOverridesVelocity = false;
+    m_aiActor.BehaviorVelocity = Vector2.zero;
+    m_updateEveryFrame = false;
   }
 }

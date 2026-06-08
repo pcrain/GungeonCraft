@@ -281,7 +281,7 @@ public static class CwaffCompanionAndEnemyBuilder
     }
 
     public static AIActor InitEnemy(this string enemyName, int health, string shortDesc = null, string longDesc = null, int baseFps = 4, List<string> extraAnims = null,
-      bool autoRigidBody = true, bool doCorpse = true)
+      bool autoRigidBody = true, bool doCorpse = true, IntVector2? bodyDims = null, bool useUntrimmedBounds = false)
     {
         string name = enemyName.ToID();
         if (ResMap.Get($"{name}_idle") == null)
@@ -299,7 +299,8 @@ public static class CwaffCompanionAndEnemyBuilder
         //NOTE: should use LowerLeft anchor if we have a SpeculativeRigidBody and MiddleCenter otherwise
         if (autoRigidBody)
         {
-          actor.gameObject.AutoRigidBody((List<CollisionLayer>)[CollisionLayer.EnemyCollider, CollisionLayer.EnemyHitBox]);
+          actor.gameObject.AutoRigidBody((List<CollisionLayer>)[CollisionLayer.EnemyCollider, CollisionLayer.EnemyHitBox],
+            bodyDims: bodyDims, useUntrimmedBounds: useUntrimmedBounds);
           actor.ActorShadowOffset = Vector2.zero;
         }
         else

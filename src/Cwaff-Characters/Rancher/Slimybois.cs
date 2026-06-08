@@ -27,7 +27,8 @@ public static class Slimybois
     if (string.IsNullOrEmpty(sd.slimeName))
       sd.slimeName = Enum.GetName(typeof(SlimyboiType), sd.type).ToLower();
     sd.fullName = sd.slimeName.ToTitleCaseInvariant() + " Slime";
-    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? _BASE_HEALTH, baseFps: 12, doCorpse: false);
+    AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? _BASE_HEALTH, baseFps: 12, doCorpse: false,
+      bodyDims: new IntVector2(16, 8), useUntrimmedBounds: true);
     actor.procedurallyOutlined       = false; // TODO: remove outlines from sprites later
     actor.MovementSpeed              = sd.overrideSpeed ?? 4.5f;
     actor.CollisionDamage            = 0.0f; // Overridden by SlimyboiChargeBehavior at charge time
@@ -38,6 +39,7 @@ public static class Slimybois
     float attackRange = sd.overrideAttackRange ?? _BASE_ATTACK_RANGE;
     BehaviorSpeculator bs = actor.gameObject.GetComponent<BehaviorSpeculator>();
     bs.InstantFirstTick = true; // NOTE: fixes delays between being able to attack after spawning in
+    bs.OverrideBehaviors.Add(new SlimyboiDodgeBehavior(){ });
     bs.TargetBehaviors.Add(new SlimyboiTargetingBehavior(){ Radius = 35.0f, LineOfSight = false, ObjectPermanence = false });
     bs.MovementBehaviors.Add(new SlimyboiSeekBehavior(){ StopWhenInRange = true, CustomMinRange = 1.75f, CustomRange = 2.75f, PathInterval = 0.5f });
     bs.MovementBehaviors.Add(new MoveErraticallyBehavior { PathInterval = 0.5f, StayOnScreen = false, UseTargetsRoom = false, AvoidTarget = false });
@@ -46,7 +48,6 @@ public static class Slimybois
 
     KnockbackDoer kbd = actor.gameObject.GetComponent<KnockbackDoer>();
     kbd.weight = sd.overrideWeight ?? _BASE_WEIGHT;
-    // kbd.deathMultiplier = 3.0f;
 
     AIAnimator aiAnim = actor.gameObject.GetComponent<AIAnimator>();
     aiAnim.facingType = AIAnimator.FacingType.Movement;
@@ -208,8 +209,10 @@ public static class Slimybois
     SlimeData = new SlimeData[NumSlimes];
 
     // set up individual defs
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.5f, overrideSpeed = 12f });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = SlimyboiFlags.CanFly });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.5f, overrideSpeed = 12f, goopColor = Color.white });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = SlimyboiFlags.CanFly, goopColor = Color.cyan });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = SlimyboiFlags.DodgesProjectiles });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
@@ -221,7 +224,7 @@ public static class Slimybois
     _SlimeImpactVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 5.0f, glowColorPower: 5.0f, glowColor: Color.white);
     _SlimeDeathVFX = VFX.Create("slime_death_vfx");
     _SlimeDeathVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 100.0f, glowColorPower: 100.0f, glowColor: Color.white);
-    SlimeParticleSystem = MakeSlimeParticleSystem(Color.magenta);
+    SlimeParticleSystem = MakeSlimeParticleSystem(Color.white);
   }
 }
 
