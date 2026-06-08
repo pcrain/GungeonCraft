@@ -23,6 +23,7 @@ public static class Slimybois
   internal static GameObject _SlimeImpactVFX;
 
   internal static GameActorEffect _SlimePoisonEffect;
+  internal static GameActorEffect _SlimeFireEffect;
 
   public static void Init()
   {
@@ -34,7 +35,8 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = SlimyboiFlags.CanFly, goopColor = Color.cyan });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = SlimyboiFlags.DodgesProjectiles });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = SlimyboiFlags.AttackDoesPoison | SlimyboiFlags.PoisonImmunity });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = SlimyboiFlags.AttacksPoison | SlimyboiFlags.PoisonImmunity });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Fire, goopColor = Color.red, flags = SlimyboiFlags.AttacksIgnite | SlimyboiFlags.FireImmunity });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
@@ -49,6 +51,7 @@ public static class Slimybois
     SlimeParticleSystem = MakeSlimeParticleSystem(Color.white);
 
     _SlimePoisonEffect = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
+    _SlimeFireEffect = ItemHelper.Get(Items.HotLead).GetComponent<BulletStatusEffectItem>().FireModifierEffect;
   }
 
   private static SlimeData Init(this SlimeData sd)
@@ -287,8 +290,8 @@ public enum SlimyboiFlags // : ulong
   ExplodesOnDeath    = 1 << 2,  // [unimplemented] if set, slime exploded upon dying
   ExtraCasingOnKill  = 1 << 3,  // [unimplemented] if set, slime spawns an extra casing upon killing an enemy
   PitImmunity        = 1 << 4,  // [unimplemented] immune to pits, but can't fly per se (vulnerable to other hazards)
-  FireImmunity       = 1 << 5,  // [unimplemented]
-  PoisonImmunity     = 1 << 6,  // [unimplemented]
+  FireImmunity       = 1 << 5,  //
+  PoisonImmunity     = 1 << 6,  //
   ExplosionImmunity  = 1 << 7,  // [unimplemented]
   ProjectileImmunity = 1 << 8,  // [unimplemented]
   QuantumInstability = 1 << 9,  // [unimplemented]
@@ -298,5 +301,6 @@ public enum SlimyboiFlags // : ulong
   DodgesProjectiles  = 1 << 13, // [unimplemented]
   ContactImmunity    = 1 << 14, // [unimplemented] (used for immunity to rolling spike logs / PathingTrapControllers)
   CantVacInCombat    = 1 << 15, // if set, slime can not be vacuumed while in combat
-  AttackDoesPoison   = 1 << 16, // if set, slime's attacks poison enemies
+  AttacksPoison      = 1 << 16, // if set, slime's attacks poison enemies
+  AttacksIgnite      = 1 << 17, // if set, slime's attacks ignite enemies
 }

@@ -35,11 +35,14 @@ public class SlimyboiController : BraveBehaviour
   private ParticleSystem _ps = null;
   private Geometry _aura = null;
   private EasyLight _light = null;
+  private bool _didGlowSetup = false;
   private bool _appearOutOfNowhere = false;
   private bool _setup = false;
 
   private DamageTypeModifier _poisonImmunity;
   private float _immuneToPoisonTimer = 0.0f;
+  private DamageTypeModifier _fireImmunity;
+  private float _immuneToFireTimer = 0.0f;
 
   private void Start()
   {
@@ -69,6 +72,7 @@ public class SlimyboiController : BraveBehaviour
     actor.PreventAutoKillOnBossDeath = true;
 
     this._poisonImmunity = new(){damageType = CoreDamageTypes.Poison, damageMultiplier = 0f};
+    this._fireImmunity = new(){damageType = CoreDamageTypes.Fire, damageMultiplier = 0f};
     if (hh.damageTypeModifiers == null)
       hh.damageTypeModifiers = new();
     if (actor.EffectResistances == null)
@@ -77,6 +81,11 @@ public class SlimyboiController : BraveBehaviour
     {
       hh.damageTypeModifiers.Add(this._poisonImmunity);
       actor.SetResistance(EffectResistanceType.Poison, 1.0f);
+    }
+    if (this._slimeData.flags.IsSet(SlimyboiFlags.FireImmunity))
+    {
+      hh.damageTypeModifiers.Add(this._fireImmunity);
+      actor.SetResistance(EffectResistanceType.Fire, 1.0f);
     }
 
     SpeculativeRigidbody body = base.specRigidbody;
@@ -258,7 +267,15 @@ public class SlimyboiController : BraveBehaviour
     {
       case SlimyboiType.Rad:
       {
-        HandleGlow(new Color(0.5f, 0.85f, 0.1f));
+        HandleGlow(color: new Color(0.5f, 0.85f, 0.1f), lightColor: null, flickerRate: 10.0f, brightness: 5.0f,
+          glowColorPower: 10.0f, minGlow: 5.0f, maxGlow: 15.0f, sensitivity: 0.5f);
+        HandleAuraEffect();
+        break;
+      }
+      case SlimyboiType.Fire:
+      {
+        HandleGlow(color: new Color(0.9f, 0.1f, 0.1f), lightColor: null, flickerRate: 15.0f, brightness: 0.0f,
+          glowColorPower: 8.0f, minGlow: 1.0f, maxGlow: 2.0f, sensitivity: 0.3f);
         HandleAuraEffect();
         break;
       }
@@ -285,18 +302,28 @@ public class SlimyboiController : BraveBehaviour
       base.healthHaver.damageTypeModifiers.Remove(this._poisonImmunity);
       base.aiActor.SetResistance(EffectResistanceType.Poison, 0.0f);
     }
+    if (TickAndCheck(ref this._immuneToFireTimer, dtime))
+    {
+      base.healthHaver.damageTypeModifiers.Remove(this._fireImmunity);
+      base.aiActor.SetResistance(EffectResistanceType.Fire, 0.0f);
+    }
   }
 
-  private void HandleGlow(Color color)
+  private void HandleGlow(Color color, Color? lightColor, float flickerRate, float brightness, float glowColorPower, float minGlow, float maxGlow, float sensitivity)
   {
     if (!this._renderSprite)
       return;
 
-    float glowamount = Mathf.Abs(Mathf.Sin(10f * BraveTime.ScaledTimeSinceStartup));
-    this._renderSprite.MakeGlowyBetter(glowAmount: 5.0f + 10f * glowamount, glowColor: color, glowColorPower: 10.0f, skipSetup: false);
-    if (!this._light)
-      this._light = EasyLight.Create(base.aiActor.CenterPosition, base.transform, color, radius: 0f, brightness: 5.0f);
-    this._light.SetRadius(1f + 2f * glowamount);
+    float glowamount = Mathf.Abs(Mathf.Sin(flickerRate * BraveTime.ScaledTimeSinceStartup));
+    this._renderSprite.MakeGlowyBetter(glowAmount: minGlow + (maxGlow - minGlow) * glowamount, glowColor: color,
+      glowColorPower: glowColorPower, skipSetup: this._didGlowSetup, sensitivity: sensitivity);
+    this._didGlowSetup = true;
+    if (brightness > 0.0f)
+    {
+      if (!this._light)
+        this._light = EasyLight.Create(base.aiActor.CenterPosition, base.transform, lightColor ?? color, radius: 0f, brightness: brightness);
+      this._light.SetRadius(1f + 2f * glowamount);
+    }
   }
 
   private void HandleAuraEffect()
@@ -347,6 +374,22 @@ public class SlimyboiController : BraveBehaviour
         }
         break;
       }
+      case SlimyboiType.Fire:
+      {
+        bool currentlyImmuneToFire = sloim.attributes.IsSet(SlimyboiFlags.FireImmunity);
+        if (sloim._immuneToFireTimer > 0.0f || !currentlyImmuneToFire)
+        {
+          if (!currentlyImmuneToFire)
+          {
+            sloim.healthHaver.damageTypeModifiers.Add(this._fireImmunity);
+            sloim.aiActor.SetResistance(EffectResistanceType.Fire, 1.0f);
+            if (sloim.aiActor.GetEffectBetter(EffectResistanceType.Fire) is GameActorEffect activeFire)
+              sloim.aiActor.RemoveEffect(activeFire);
+          }
+          sloim._immuneToPoisonTimer = _AURA_PERSIST_TIME;
+        }
+        break;
+      }
     }
   }
 
@@ -379,8 +422,10 @@ public class SlimyboiController : BraveBehaviour
 
       if (data.OtherRigidbody is SpeculativeRigidbody otherBody && otherBody.aiActor is AIActor enemy)
       {
-        if (this.attributes.IsSet(SlimyboiFlags.AttackDoesPoison))
+        if (this.attributes.IsSet(SlimyboiFlags.AttacksPoison))
           enemy.ApplyEffect(Slimybois._SlimePoisonEffect);
+        if (this.attributes.IsSet(SlimyboiFlags.AttacksIgnite))
+          enemy.ApplyEffect(Slimybois._SlimeFireEffect);
       }
   }
 
