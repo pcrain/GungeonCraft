@@ -16,6 +16,7 @@ public static class Slimybois
   internal const float _BASE_ATTACK_RANGE = 3.0f;
   internal const float _BASE_ATTACK_KB = 5.0f;
   internal const float _BASE_WEIGHT = 40.0f;
+  internal const float _BASE_SPEED = 4.5f;
 
   public static readonly int NumSlimes = Enum.GetNames(typeof(SlimyboiType)).Length;
   public static SlimeData[] SlimeData = null;
@@ -33,7 +34,10 @@ public static class Slimybois
     SlimeData = new SlimeData[NumSlimes];
 
     // set up individual defs
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.5f, overrideSpeed = 12f, goopColor = Color.white });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.25f * _DEFAULT_COOLDOWN,
+      overrideSpeed = _BASE_SPEED * 2.5f, goopColor = Color.white });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Dervish, flags = CanFly, goopColor = Color.gray,
+      overrideSpeed = _BASE_SPEED * 2.0f, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity, goopColor = Color.cyan,
       overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH / 2});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
@@ -67,7 +71,7 @@ public static class Slimybois
     AIActor actor = $"Slime {sd.slimeName}".InitEnemy(health: sd.overrideHealth ?? _BASE_HEALTH, baseFps: 12, doCorpse: false,
       bodyDims: new IntVector2(16, 8), useUntrimmedBounds: true);
     actor.procedurallyOutlined       = false; // TODO: remove outlines from sprites later
-    actor.MovementSpeed              = sd.overrideSpeed ?? 4.5f;
+    actor.MovementSpeed              = sd.overrideSpeed ?? _BASE_SPEED;
     actor.CollisionDamage            = 0.0f; // Overridden by SlimyboiChargeBehavior at charge time
     actor.CollisionKnockbackStrength = 0.0f; // slimes do no knockback by default
     if (sd.flags.IsSet(CanFly))

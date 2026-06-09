@@ -8,6 +8,8 @@ namespace CwaffingTheGungy;
 public class SlimyboiController : BraveBehaviour
 {
   private const string VACPACK_FLYING_REASON = "Vacpack";
+  private const string DERVISH_FLYING_REASON = "Dervish Aura";
+
   private const float _IFRAME_LENGTH = 0.25f;
   private const float _DODGE_COOLDOWN = 1.0f;
   private const float _DODGE_LENGTH = 2.0f;
@@ -52,6 +54,7 @@ public class SlimyboiController : BraveBehaviour
   private float _immuneToPoisonTimer = 0.0f;
   private DamageTypeModifier _fireImmunity;
   private float _immuneToFireTimer = 0.0f;
+  private float _flightTimer = 0.0f;
 
   private void Start()
   {
@@ -320,6 +323,11 @@ public class SlimyboiController : BraveBehaviour
         }
         break;
       }
+      case SlimyboiType.Dervish:
+      {
+        HandleAuraEffect();
+        break;
+      }
     }
   }
 
@@ -356,6 +364,10 @@ public class SlimyboiController : BraveBehaviour
     {
       base.healthHaver.damageTypeModifiers.Remove(this._fireImmunity);
       base.aiActor.SetResistance(EffectResistanceType.Fire, 0.0f);
+    }
+    if (TickAndCheck(ref this._flightTimer, dtime))
+    {
+      base.aiActor.SetIsFlying(false, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
     }
   }
 
@@ -428,34 +440,40 @@ public class SlimyboiController : BraveBehaviour
     {
       case SlimyboiType.Rad:
       {
-        bool currentlyImmuneToPoison = sloim.attributes.IsSet(SlimyboiFlags.PoisonImmunity);
-        if (sloim._immuneToPoisonTimer > 0.0f || !currentlyImmuneToPoison)
+        if (sloim.attributes.IsSet(SlimyboiFlags.PoisonImmunity))
+          break;
+        if (sloim._immuneToPoisonTimer <= 0.0f)
         {
-          if (!currentlyImmuneToPoison)
-          {
-            sloim.healthHaver.damageTypeModifiers.Add(this._poisonImmunity);
-            sloim.aiActor.SetResistance(EffectResistanceType.Poison, 1.0f);
-            if (sloim.aiActor.GetEffectBetter(EffectResistanceType.Poison) is GameActorEffect activePoison)
-              sloim.aiActor.RemoveEffect(activePoison);
-          }
-          sloim._immuneToPoisonTimer = _AURA_PERSIST_TIME;
+          sloim.healthHaver.damageTypeModifiers.Add(this._poisonImmunity);
+          sloim.aiActor.SetResistance(EffectResistanceType.Poison, 1.0f);
+          if (sloim.aiActor.GetEffectBetter(EffectResistanceType.Poison) is GameActorEffect activePoison)
+            sloim.aiActor.RemoveEffect(activePoison);
         }
+        sloim._immuneToPoisonTimer = _AURA_PERSIST_TIME;
         break;
       }
       case SlimyboiType.Fire:
       {
-        bool currentlyImmuneToFire = sloim.attributes.IsSet(SlimyboiFlags.FireImmunity);
-        if (sloim._immuneToFireTimer > 0.0f || !currentlyImmuneToFire)
+        if (sloim.attributes.IsSet(SlimyboiFlags.FireImmunity))
+          break;
+        if (sloim._immuneToFireTimer <= 0.0f)
         {
-          if (!currentlyImmuneToFire)
-          {
-            sloim.healthHaver.damageTypeModifiers.Add(this._fireImmunity);
-            sloim.aiActor.SetResistance(EffectResistanceType.Fire, 1.0f);
-            if (sloim.aiActor.GetEffectBetter(EffectResistanceType.Fire) is GameActorEffect activeFire)
-              sloim.aiActor.RemoveEffect(activeFire);
-          }
-          sloim._immuneToPoisonTimer = _AURA_PERSIST_TIME;
+          sloim.healthHaver.damageTypeModifiers.Add(this._fireImmunity);
+          sloim.aiActor.SetResistance(EffectResistanceType.Fire, 1.0f);
+          if (sloim.aiActor.GetEffectBetter(EffectResistanceType.Fire) is GameActorEffect activeFire)
+            sloim.aiActor.RemoveEffect(activeFire);
         }
+        sloim._immuneToFireTimer = _AURA_PERSIST_TIME;
+        break;
+      }
+      case SlimyboiType.Dervish:
+      {
+        if (sloim.attributes.IsSet(SlimyboiFlags.CanFly))
+          break;
+
+        if (sloim._flightTimer <= 0.0f)
+          sloim.aiActor.SetIsFlying(true, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
+        sloim._flightTimer = _AURA_PERSIST_TIME;
         break;
       }
     }
