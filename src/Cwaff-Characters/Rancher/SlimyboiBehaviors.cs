@@ -11,12 +11,16 @@ public class SlimyboiController : BraveBehaviour
   private const float _IFRAME_LENGTH = 0.25f;
   private const float _DODGE_COOLDOWN = 1.0f;
   private const float _DODGE_LENGTH = 2.0f;
+  private const float _HEAL_RADIUS = 7.5f;
+  private const float _HEAL_RADIUS_SQR = _HEAL_RADIUS * _HEAL_RADIUS;
   private const float _AURA_RADIUS = 6.0f;
-  private const float _AURA_THICKNESS = 0.05f;
   private const float _AURA_RADIUS_SQR = _AURA_RADIUS * _AURA_RADIUS;
+  private const float _AURA_THICKNESS = 0.05f;
   private const float _AURA_PERSIST_TIME = 2.0f;
   private const float _REFLECT_GLOW_TIME = 1.0f;
   private const float _REFLECT_GLOW_STRENGTH = 10.0f;
+  private const float _HEAL_COOLDOWN_TIME = 0.25f;
+  private const float _HEAL_AMOUNT = 1.0f;
 
   public SlimyboiFlags attributes;
   public SlimyboiType slimeType;
@@ -34,6 +38,7 @@ public class SlimyboiController : BraveBehaviour
   private float _growTimer = 0.0f;
   private float _reflectGlowTimer = 0.0f;
   private float _projectileIframeTimer = 0.0f;
+  private float _buffCooldownTimer = 0.0f;
   private tk2dSprite _trueSprite = null;
   private tk2dSprite _renderSprite = null;
   private ParticleSystem _ps = null;
@@ -263,24 +268,26 @@ public class SlimyboiController : BraveBehaviour
       this._renderSprite.renderer.enabled = true;
 
     UpdateTimers(dtime);
-    UpdateSlimeSpecificBehaviors();
+    UpdateSlimeSpecificBehaviors(dtime);
   }
 
-  private void UpdateSlimeSpecificBehaviors()
+  private void UpdateSlimeSpecificBehaviors(float dtime)
   {
     switch (this.slimeType)
     {
       case SlimyboiType.Rad:
       {
         HandleGlow(color: new Color(0.5f, 0.85f, 0.1f), lightColor: null, flickerRate: 10.0f, brightness: 5.0f,
-          glowColorPower: 10.0f, minGlow: 5.0f, maxGlow: 15.0f, sensitivity: 0.5f);
+          glowColorPower: 10.0f, minGlow: 5.0f, maxGlow: 15.0f, sensitivity: 0.5f, minLightRadius: 1.0f, maxLightRadius: 3.0f);
+        HandleAuraVisuals();
         HandleAuraEffect();
         break;
       }
       case SlimyboiType.Fire:
       {
         HandleGlow(color: new Color(0.9f, 0.1f, 0.1f), lightColor: null, flickerRate: 15.0f, brightness: 0.0f,
-          glowColorPower: 8.0f, minGlow: 1.0f, maxGlow: 2.0f, sensitivity: 0.3f);
+          glowColorPower: 8.0f, minGlow: 1.0f, maxGlow: 2.0f, sensitivity: 0.3f, minLightRadius: 1.0f, maxLightRadius: 3.0f);
+        HandleAuraVisuals();
         HandleAuraEffect();
         break;
       }
@@ -288,10 +295,40 @@ public class SlimyboiController : BraveBehaviour
       {
         float extraGlow = _REFLECT_GLOW_STRENGTH * (this._reflectGlowTimer / _REFLECT_GLOW_TIME);
         HandleGlow(color: new Color(0.6f, 0.8f, 0.8f), lightColor: null, flickerRate: 10.0f, brightness: 0.0f,
-          glowColorPower: 15.0f, minGlow: extraGlow +0.1f, maxGlow: extraGlow + 3.1f, sensitivity: 0.5f);
+          glowColorPower: 15.0f, minGlow: extraGlow +0.1f, maxGlow: extraGlow + 3.1f, sensitivity: 0.5f, minLightRadius: 1.0f, maxLightRadius: 3.0f);
+        break;
+      }
+      case SlimyboiType.Phosphor:
+      {
+        HandleAuraVisuals(radius: _HEAL_RADIUS);
+        HandleGlow(color: new Color(1.0f, 1.0f, 0.8f), lightColor: null, flickerRate: 0.0f, brightness: 3.0f,
+          glowColorPower: 8.0f, minGlow: 0.0f, maxGlow: 0.0f, sensitivity: 0.0f, minLightRadius: 5.0f, maxLightRadius: 5.0f);
+        if (this._buffCooldownTimer == 0.0f || TickAndCheck(ref this._buffCooldownTimer, dtime))
+        {
+          this._buffCooldownTimer = _HEAL_COOLDOWN_TIME;
+          if (base.healthHaver.currentHealth < base.healthHaver.AdjustedMaxHealth)
+          {
+            ApplyHealing(this); // prioritize self-healing
+            break;
+          }
+          foreach (SlimyboiController sloim in GetNearbySlimes(base.aiActor.CenterPosition, sqrRadius: _HEAL_RADIUS_SQR, shuffle: true))
+            if (sloim.healthHaver.currentHealth < sloim.healthHaver.AdjustedMaxHealth)
+            {
+              ApplyHealing(sloim);
+              break;
+            }
+        }
         break;
       }
     }
+  }
+
+  private void ApplyHealing(SlimyboiController sloim)
+  {
+    sloim.healthHaver.ApplyHealing(_HEAL_AMOUNT);
+    sloim.gameObject.PlayOnce("slime_heal_sound");
+    SpawnManager.SpawnVFX(VFX.MiniPickup, sloim.aiActor.CenterPosition, Lazy.RandomEulerZ());
+    SpawnManager.SpawnVFX(VFX.MiniPickup, base.aiActor.CenterPosition, Lazy.RandomEulerZ());
   }
 
   /// <summary>Tick down a timer and check if it's expired/</summary>
@@ -322,49 +359,67 @@ public class SlimyboiController : BraveBehaviour
     }
   }
 
-  private void HandleGlow(Color color, Color? lightColor, float flickerRate, float brightness, float glowColorPower, float minGlow, float maxGlow, float sensitivity)
+  private void HandleGlow(Color color, Color? lightColor, float flickerRate, float brightness, float glowColorPower, float minGlow, float maxGlow, float sensitivity,
+    float minLightRadius, float maxLightRadius)
   {
     if (!this._renderSprite)
       return;
 
     float glowamount = Mathf.Abs(Mathf.Sin(flickerRate * BraveTime.ScaledTimeSinceStartup));
-    this._renderSprite.MakeGlowyBetter(glowAmount: minGlow + (maxGlow - minGlow) * glowamount, glowColor: color,
-      glowColorPower: glowColorPower, skipSetup: this._didGlowSetup, sensitivity: sensitivity);
-    this._didGlowSetup = true;
+    if (maxGlow > 0.0f)
+    {
+      this._renderSprite.MakeGlowyBetter(glowAmount: minGlow + (maxGlow - minGlow) * glowamount, glowColor: color,
+        glowColorPower: glowColorPower, skipSetup: this._didGlowSetup, sensitivity: sensitivity);
+      this._didGlowSetup = true;
+    }
     if (brightness > 0.0f)
     {
       if (!this._light)
         this._light = EasyLight.Create(base.aiActor.CenterPosition, base.transform, lightColor ?? color, radius: 0f, brightness: brightness);
-      this._light.SetRadius(1f + 2f * glowamount);
+      this._light.SetRadius(minLightRadius + (maxLightRadius - minLightRadius) * glowamount);
     }
   }
 
-  private void HandleAuraEffect()
+  private static readonly List<SlimyboiController> _TempSlimes = new();
+  private static readonly ReadOnlyCollection<SlimyboiController> _TempSlimesRO = new(_TempSlimes);
+  private static ReadOnlyCollection<SlimyboiController> GetNearbySlimes(Vector2 pos, float sqrRadius = _AURA_RADIUS_SQR, bool shuffle = false)
   {
-    Vector2 pos = base.aiActor.CenterPosition;
-
-    if (!this._aura)
-    {
-      this._aura = Geometry.Create(Geometry.Shape.RING);
-      this._aura.Place(pos: pos, color: this._slimeData.goopColor.WithAlpha(0.04f), radius: _AURA_RADIUS, radiusInner: _AURA_RADIUS - _AURA_THICKNESS);
-    }
-    this._aura.Place(pos: pos);
+    _TempSlimes.Clear();
 
     float x = pos.x;
     float y = pos.y;
     foreach (SlimyboiController sloim in SlimyboiManager.ActiveSlimes)
     {
-      if (!sloim || sloim == this)
+      if (!sloim)
         continue;
-
       Vector2 opos = sloim.aiActor.CenterPosition;
       float dx = x - opos.x;
       float dy = y - opos.y;
-      if ((dx * dx + dy * dy) > _AURA_RADIUS_SQR)
-        continue;
-
-      ApplyAuraEffect(sloim);
+      if ((dx * dx + dy * dy) <= sqrRadius)
+        _TempSlimes.Add(sloim);
     }
+    if (shuffle)
+      _TempSlimes.Shuffle();
+
+    return _TempSlimesRO;
+  }
+
+  private void HandleAuraVisuals(float radius = _AURA_RADIUS)
+  {
+    Vector2 pos = base.aiActor.CenterPosition;
+    if (!this._aura)
+    {
+      this._aura = Geometry.Create(Geometry.Shape.RING);
+      this._aura.Place(pos: pos, color: this._slimeData.goopColor.WithAlpha(0.05f), radius: radius, radiusInner: radius - _AURA_THICKNESS);
+    }
+    this._aura.Place(pos: pos);
+  }
+
+  private void HandleAuraEffect(float radius = _AURA_RADIUS)
+  {
+    foreach (SlimyboiController sloim in GetNearbySlimes(base.aiActor.CenterPosition, sqrRadius: radius * radius, shuffle: false))
+      if (sloim != this)
+        ApplyAuraEffect(sloim);
   }
 
   private void ApplyAuraEffect(SlimyboiController sloim)

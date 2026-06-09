@@ -34,7 +34,8 @@ public static class Slimybois
 
     // set up individual defs
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.5f, overrideSpeed = 12f, goopColor = Color.white });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly, goopColor = Color.cyan });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity, goopColor = Color.cyan,
+      overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH / 2});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = DodgesProjectiles });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = AttacksPoison | PoisonImmunity });
@@ -69,8 +70,10 @@ public static class Slimybois
     actor.MovementSpeed              = sd.overrideSpeed ?? 4.5f;
     actor.CollisionDamage            = 0.0f; // Overridden by SlimyboiChargeBehavior at charge time
     actor.CollisionKnockbackStrength = 0.0f; // slimes do no knockback by default
-    if ((sd.flags & SlimyboiFlags.CanFly) > 0)
+    if (sd.flags.IsSet(CanFly))
       actor.PathableTiles |= CellTypes.PIT;
+    if (sd.flags.IsSet(FullStatusImmunity))
+      actor.ImmuneToAllEffects = true;
 
     float attackRange = sd.overrideAttackRange ?? _BASE_ATTACK_RANGE;
     BehaviorSpeculator bs = actor.gameObject.GetComponent<BehaviorSpeculator>();
@@ -309,4 +312,5 @@ public enum SlimyboiFlags // : ulong
   AttacksPoison          = 1 << 16, // if set, slime's attacks poison enemies
   AttacksIgnite          = 1 << 17, // if set, slime's attacks ignite enemies
   ReflectsProjectiles    = 1 << 18, // if set, slime will reflect all enemy projectiles
+  FullStatusImmunity     = 1 << 19, // if set, slime is immune to all status effects
 }
