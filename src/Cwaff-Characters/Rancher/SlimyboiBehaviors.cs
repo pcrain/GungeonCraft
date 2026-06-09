@@ -585,10 +585,11 @@ public class SlimyboiController : BraveBehaviour
   public void OnAttackCollision(CollisionData data, float knockback)
   {
       float vfxAngle = (-base.specRigidbody.Velocity).ToAngle().AddRandomSpread(10f);
+      bool explosiveAttacks = this.attributes.IsSet(SlimyboiFlags.ExplosiveAttacks);
       CwaffVFX.Spawn(
-        prefab           : Slimybois._SlimeImpactVFX, // TODO: better particle
+        prefab           : explosiveAttacks ? Slimybois._SlimeExplodeImpactVFX : Slimybois._SlimeImpactVFX, // TODO: better particle
         position         : data.Contact + Lazy.RandomVector(0.25f),
-        velocity         : vfxAngle.ToVector(UnityEngine.Random.Range(5.0f, 8.0f)),
+        velocity         : explosiveAttacks ? Vector2.zero : vfxAngle.ToVector(UnityEngine.Random.Range(5.0f, 8.0f)),
         rotation         : vfxAngle.EulerZ(),
         height           : 8.0f,
         copyShaders      : true
@@ -596,7 +597,7 @@ public class SlimyboiController : BraveBehaviour
 
       // NOTE: attempt to prevent getting stuck inside enemies and dealing ridiculous damage
       base.specRigidbody.RegisterTemporaryCollisionException(data.OtherRigidbody, 0.01f);
-      base.gameObject.Play("slime_attack_sound");
+      base.gameObject.Play(explosiveAttacks ? "slime_explode_attack_sound" : "slime_attack_sound");
       base.knockbackDoer.ApplyKnockback(data.Normal, knockback, time: this._jumpDuration);
       Jump();
 
@@ -606,6 +607,8 @@ public class SlimyboiController : BraveBehaviour
           enemy.ApplyEffect(Slimybois._SlimePoisonEffect);
         if (this.attributes.IsSet(SlimyboiFlags.AttacksIgnite))
           enemy.ApplyEffect(Slimybois._SlimeFireEffect);
+        if (this.attributes.IsSet(SlimyboiFlags.AttacksSlow))
+          enemy.ApplyEffect(Slimybois._SlimeSlowEffect);
       }
   }
 
@@ -615,6 +618,9 @@ public class SlimyboiController : BraveBehaviour
 
     if (base.aiActor.StealthDeath)
       return;
+
+    if (this.attributes.IsSet(SlimyboiFlags.ExplodesOnDeath))
+      Exploder.DoDefaultExplosion(base.aiActor.CenterPosition, Vector2.zero, ignoreQueues: true, ignoreDamageCaps: false);
 
     base.gameObject.Play(Lazy.CoinFlip() ? "slime_death_sound_a" : "slime_death_sound_b");
     CwaffVFX.SpawnBurst(

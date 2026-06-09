@@ -24,10 +24,12 @@ public static class Slimybois
 
   internal static GameObject _SlimeDeathVFX;
   internal static GameObject _SlimeImpactVFX;
+  internal static GameObject _SlimeExplodeImpactVFX;
   internal static tk2dSpriteAnimationClip _SlimeVineVFX;
 
   internal static GameActorEffect _SlimePoisonEffect;
   internal static GameActorEffect _SlimeFireEffect;
+  internal static GameActorEffect _SlimeSlowEffect;
 
   public static void Init()
   {
@@ -49,6 +51,14 @@ public static class Slimybois
       flags = ImmobileInCombat | ReflectsProjectiles | ImmuneToMovingTraps });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Tangle, goopColor = Color.green, overrideHealth = _BASE_HEALTH * 2 });
 
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Rock, goopColor = ExtendedColours.darkBrown, overrideHealth = _BASE_HEALTH * 5,
+      overrideSpeed = _BASE_SPEED * 0.5f, overrideAttackCooldown = _DEFAULT_COOLDOWN * 2.0f, overrideWeight = _BASE_WEIGHT * 2f });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Saber, goopColor = ExtendedColours.brown,
+      overrideSpeed = _BASE_SPEED * 0.75f, overrideAttackCooldown = _DEFAULT_COOLDOWN / 1.5f, overrideContactDamage = _BASE_DAMAGE * 1.5f });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Honey, goopColor = Color.yellow, overrideSpeed = _BASE_SPEED * 0.5f, flags = AttacksSlow });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Boom, goopColor = ExtendedColours.vibrantOrange, flags = ExplodesOnDeath | ExplosiveAttacks,
+      overrideContactDamage = _BASE_DAMAGE * 4.0f });
+
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
       if (SlimeData[(int)t] == null)
@@ -57,12 +67,15 @@ public static class Slimybois
     // shared
     _SlimeImpactVFX = VFX.Create("slime_impact_vfx", fps: 60, loops: false);
     _SlimeImpactVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 5.0f, glowColorPower: 5.0f, glowColor: Color.white);
+    _SlimeExplodeImpactVFX = VFX.Create("slime_explode_impact_vfx", fps: 30, loops: false);
+    _SlimeExplodeImpactVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 15.0f, glowColorPower: 5.0f, glowColor: Color.white);
     _SlimeDeathVFX = VFX.Create("slime_death_vfx");
     _SlimeDeathVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 100.0f, glowColorPower: 100.0f, glowColor: Color.white);
+    _SlimeVineVFX = VFX.Create("slime_vine_vfx", fps: 20).DefaultAnimation();
     SlimeParticleSystem = MakeSlimeParticleSystem(Color.white);
     _SlimePoisonEffect = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
     _SlimeFireEffect = ItemHelper.Get(Items.HotLead).GetComponent<BulletStatusEffectItem>().FireModifierEffect;
-    _SlimeVineVFX = VFX.Create("slime_vine_vfx", fps: 20).DefaultAnimation();
+    _SlimeSlowEffect = Items.TripleCrossbow.AsGun().DefaultModule.projectiles[0].speedEffect;
   }
 
   private static SlimeData Init(this SlimeData sd)
@@ -301,7 +314,7 @@ public enum SlimyboiFlags // : ulong
   None                   = 0,
   Allied                 = 1 << 0,  // if set, slime is allied and cannot hurt or be hurt by player characters
   CanFly                 = 1 << 1,  // if set, slime can fly and path over pits and other hazards
-  ExplodesOnDeath        = 1 << 2,  // [unimplemented] if set, slime exploded upon dying
+  ExplodesOnDeath        = 1 << 2,  // if set, slime exploded upon dying
   ExtraCasingOnKill      = 1 << 3,  // [unimplemented] if set, slime spawns an extra casing upon killing an enemy
   PitImmunity            = 1 << 4,  // [unimplemented] immune to pits, but can't fly per se (vulnerable to other hazards)
   FireImmunity           = 1 << 5,  // if set, slime is not affected by fire or fire damage
@@ -319,4 +332,6 @@ public enum SlimyboiFlags // : ulong
   AttacksIgnite          = 1 << 17, // if set, slime's attacks ignite enemies
   ReflectsProjectiles    = 1 << 18, // if set, slime will reflect all enemy projectiles
   FullStatusImmunity     = 1 << 19, // if set, slime is immune to all status effects
+  AttacksSlow            = 1 << 20, // if set, slime's attacks slow enemies down
+  ExplosiveAttacks       = 1 << 21, // if set, slime's attacks have an explosive effect
 }
