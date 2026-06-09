@@ -272,14 +272,14 @@ public class SlimyboiManager : MonoBehaviour
     HandleSlimeSpawns(player, newRoom, combatEnded: false);
   }
 
-  public static void OnAmmoCollected(AmmoPickup ammo, PlayerController player)
+  public static void OnKeyCollected(KeyBulletPickup key, PlayerController player)
   {
-    SpawnSlimes([SlimyboiType.Hunter, SlimyboiType.Hunter], player: player, pos: player.CenterPosition);
+    SpawnSlimes([SlimyboiType.Hunter, SlimyboiType.Hunter, SlimyboiType.Hunter], player: player, pos: player.CenterPosition);
   }
 
   public static void OnBlankCollected(SilencerItem blank, PlayerController player)
   {
-    SpawnSlimes([SlimyboiType.Tangle, SlimyboiType.Tangle], player: player, pos: player.CenterPosition);
+    SpawnSlimes([SlimyboiType.Tangle, SlimyboiType.Tangle, SlimyboiType.Tangle], player: player, pos: player.CenterPosition);
   }
 
   public static void OnAnyHealthHaverDie(HealthHaver hh)

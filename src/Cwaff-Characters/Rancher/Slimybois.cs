@@ -24,6 +24,7 @@ public static class Slimybois
 
   internal static GameObject _SlimeDeathVFX;
   internal static GameObject _SlimeImpactVFX;
+  internal static tk2dSpriteAnimationClip _SlimeVineVFX;
 
   internal static GameActorEffect _SlimePoisonEffect;
   internal static GameActorEffect _SlimeFireEffect;
@@ -46,6 +47,7 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Fire, goopColor = Color.red, flags = AttacksIgnite | FireImmunity });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Crystal, goopColor = Color.blue, overrideWeight = _BASE_WEIGHT * 4f,
       flags = ImmobileInCombat | ReflectsProjectiles | ImmuneToMovingTraps });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Tangle, goopColor = Color.green, overrideHealth = _BASE_HEALTH * 2 });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
@@ -58,9 +60,9 @@ public static class Slimybois
     _SlimeDeathVFX = VFX.Create("slime_death_vfx");
     _SlimeDeathVFX.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 100.0f, glowColorPower: 100.0f, glowColor: Color.white);
     SlimeParticleSystem = MakeSlimeParticleSystem(Color.white);
-
     _SlimePoisonEffect = ItemHelper.Get(Items.IrradiatedLead).GetComponent<BulletStatusEffectItem>().HealthModifierEffect;
     _SlimeFireEffect = ItemHelper.Get(Items.HotLead).GetComponent<BulletStatusEffectItem>().FireModifierEffect;
+    _SlimeVineVFX = VFX.Create("slime_vine_vfx", fps: 20).DefaultAnimation();
   }
 
   private static SlimeData Init(this SlimeData sd)
@@ -253,24 +255,24 @@ public enum SlimyboiType
 {
   Glitch,      // unimplemented
   Saber,       // unimplemented
-  Pink,        // unfinished
+  Pink,
   Honey,       // unimplemented
-  Rad,         // unimplemented
-  Tangle,      // unimplemented
-  Hunter,      // unimplemented
+  Rad,
+  Tangle,
+  Hunter,      // unfinished VFX
   Boom,        // unimplemented
   Rock,        // unimplemented
   Quantum,     // unimplemented
-  Phosphor,    // unfinished
+  Phosphor,
   Mosaic,      // unimplemented
-  Dervish,     // unimplemented
+  Dervish,     // unfinished
   Tabby,       // unimplemented
   Lucky,       // unimplemented
   Puddle,      // unimplemented
   Quicksilver, // unfinished
-  Fire,        // unimplemented
+  Fire,
   Gold,        // unimplemented
-  Crystal,     // unimplemented
+  Crystal,
 }
 
 public class SlimeData

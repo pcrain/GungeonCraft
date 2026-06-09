@@ -310,7 +310,7 @@ public class Vacpack : CwaffGun
     private void DeregisterEvents(PlayerController player)
     {
       player.OnRoomClearEvent -= SlimyboiManager.OnCombatRoomClear;
-      CustomActions.OnAnyPlayerCollectedAmmo -= SlimyboiManager.OnAmmoCollected;
+      CustomActions.OnAnyPlayerCollectedKey -= SlimyboiManager.OnKeyCollected;
       CustomActions.OnAnyPlayerCollectedBlank -= SlimyboiManager.OnBlankCollected;
       CustomActions.OnAnyHealthHaverDie -= SlimyboiManager.OnAnyHealthHaverDie;
       CustomActions.OnAnyPlayerCollectedHealth -= SlimyboiManager.OnAnyPlayerCollectedHealth;
@@ -323,7 +323,7 @@ public class Vacpack : CwaffGun
     {
       DeregisterEvents(player);
       player.OnRoomClearEvent += SlimyboiManager.OnCombatRoomClear;
-      CustomActions.OnAnyPlayerCollectedAmmo += SlimyboiManager.OnAmmoCollected;
+      CustomActions.OnAnyPlayerCollectedKey += SlimyboiManager.OnKeyCollected;
       CustomActions.OnAnyPlayerCollectedBlank += SlimyboiManager.OnBlankCollected;
       CustomActions.OnAnyHealthHaverDie += SlimyboiManager.OnAnyHealthHaverDie;
       CustomActions.OnAnyPlayerCollectedHealth += SlimyboiManager.OnAnyPlayerCollectedHealth;

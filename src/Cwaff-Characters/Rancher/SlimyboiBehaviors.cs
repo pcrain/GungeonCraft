@@ -14,15 +14,22 @@ public class SlimyboiController : BraveBehaviour
   private const float _DODGE_COOLDOWN = 1.0f;
   private const float _DODGE_LENGTH = 2.0f;
   private const float _HEAL_RADIUS = 7.5f;
-  private const float _HEAL_RADIUS_SQR = _HEAL_RADIUS * _HEAL_RADIUS;
   private const float _AURA_RADIUS = 6.0f;
-  private const float _AURA_RADIUS_SQR = _AURA_RADIUS * _AURA_RADIUS;
   private const float _AURA_THICKNESS = 0.05f;
   private const float _AURA_PERSIST_TIME = 2.0f;
   private const float _REFLECT_GLOW_TIME = 1.0f;
   private const float _REFLECT_GLOW_STRENGTH = 10.0f;
   private const float _HEAL_COOLDOWN_TIME = 0.25f;
   private const float _HEAL_AMOUNT = 1.0f;
+  private const float _VINE_ATTACK_TIME = 0.1f;
+  private const float _VINE_HOLD_TIME = 0.3f;
+  private const float _VINE_RETRACT_TIME = 0.1f;
+  private const float _VINE_RADIUS = 5.0f;
+
+  private const float _HEAL_RADIUS_SQR = _HEAL_RADIUS * _HEAL_RADIUS;
+  private const float _AURA_RADIUS_SQR = _AURA_RADIUS * _AURA_RADIUS;
+  private const float _VINE_RADIUS_SQR = _VINE_RADIUS * _VINE_RADIUS;
+  private const float _VINE_TOTAL_TIME = _VINE_ATTACK_TIME + _VINE_HOLD_TIME + _VINE_RETRACT_TIME;
 
   public SlimyboiFlags attributes;
   public SlimyboiType slimeType;
@@ -32,6 +39,7 @@ public class SlimyboiController : BraveBehaviour
   internal bool _queuedDodge = false;
   internal PlayerController _owner = null;
 
+  private bool _setup = false;
   private SlimeData _slimeData;
   private bool _activelyBeingLaunched;
   private float _jumpDuration = 1.0f;
@@ -48,7 +56,13 @@ public class SlimyboiController : BraveBehaviour
   private EasyLight _light = null;
   private bool _didGlowSetup = false;
   private bool _appearOutOfNowhere = false;
-  private bool _setup = false;
+
+  // Tangle specific
+  private CwaffRopeMesh _vineMesh = null;
+  private Projectile _vineTarget = null;
+  private Vector2? _vineTargetPos = null;
+  private float _vineTimer = 0.0f;
+  private float _vineDirection = 0.0f;
 
   private DamageTypeModifier _poisonImmunity;
   private float _immuneToPoisonTimer = 0.0f;
@@ -328,7 +342,87 @@ public class SlimyboiController : BraveBehaviour
         HandleAuraEffect();
         break;
       }
+      case SlimyboiType.Tangle:
+      {
+        HandleVineAttack(dtime);
+        break;
+      }
     }
+  }
+
+  private void HandleVineAttack(float dtime)
+  {
+    Vector2 slimeCenter = this._renderSprite.WorldCenter;
+    if (!this._vineMesh)
+    {
+      this._vineMesh = CwaffRopeMesh.Create(
+        animation: Slimybois._SlimeVineVFX, startPos: slimeCenter, endPos: slimeCenter,
+        numSegments: 8, stretchPolicy: CwaffingTheGungy.RopeSim.StretchPolicy.GROWTEMPORARY);
+      this._vineMesh.sprite.HeightOffGround = -10f; // draw behind most things
+    }
+    if (TickAndCheck(ref this._vineTimer, dtime))
+    {
+      this._vineTarget = null;
+      this._vineTargetPos = null;
+    }
+    if (this._vineTimer <= 0.0f)
+    {
+      this._vineTimer = _VINE_TOTAL_TIME;
+
+      Projectile nearestProj = null;
+      float nearest = _VINE_RADIUS_SQR;
+      ReadOnlyCollection<Projectile> allProj = StaticReferenceManager.AllProjectiles;
+      for (int j = allProj.Count - 1; j >= 0; j--)
+      {
+          Projectile p = allProj[j];
+          if (!p || p.Owner is PlayerController)
+              continue;
+
+          Vector2 ppos = p.SafeCenter;
+          Vector2 delta = ppos - slimeCenter;
+          float sqrDist = delta.sqrMagnitude;
+          if (sqrDist > nearest)
+              continue;
+
+          nearest = sqrDist;
+          nearestProj = p;
+      }
+      this._vineDirection = Lazy.CoinFlip() ? 1.0f : -1.0f;
+      this._vineTarget = nearestProj;
+      this._vineTargetPos = nearestProj
+        ? nearestProj.SafeCenter + (_VINE_ATTACK_TIME * nearestProj.m_currentSpeed) * nearestProj.m_currentDirection.normalized
+        : null;
+      if (nearestProj)
+        base.gameObject.PlayOnce("slime_vine_sound");
+    }
+    if (this._vineTargetPos is not Vector2 targetPos)
+    {
+      this._vineMesh.sprite.renderer.enabled = false;
+      return;
+    }
+    this._vineMesh.sprite.renderer.enabled = true;
+    this._vineMesh.startPos = slimeCenter;
+
+    float elapsed = _VINE_TOTAL_TIME - this._vineTimer;
+    if (elapsed > _VINE_ATTACK_TIME && this._vineTarget)
+    {
+      this._vineTarget.DieInAir(false, true, true, true);
+      this._vineTarget = null;
+    }
+    this._vineMesh.startPos = slimeCenter; // wiggle the vine around a bit
+    if (elapsed < _VINE_ATTACK_TIME)
+    {
+      const float AMP = 2f; // amplitude of vine-weaving curve
+      float ease = Ease.InOutQuad(elapsed / _VINE_ATTACK_TIME);
+      Vector2 perp = (targetPos - slimeCenter).normalized.Rotate(this._vineDirection * 90f);
+      this._vineMesh.endPos = Vector2.Lerp(slimeCenter, targetPos, ease);
+      // magic to make the vine weave out and in
+      this._vineMesh.endPos += (AMP * Mathf.Sin(ease * Mathf.PI)) * perp;
+    }
+    else if (elapsed > (_VINE_TOTAL_TIME - _VINE_RETRACT_TIME))
+      this._vineMesh.endPos = Vector2.Lerp(targetPos, slimeCenter, Ease.InOutQuad((elapsed - (_VINE_TOTAL_TIME - _VINE_RETRACT_TIME)) / _VINE_RETRACT_TIME));
+    else
+      this._vineMesh.endPos = targetPos;
   }
 
   private void ApplyHealing(SlimyboiController sloim)
@@ -544,6 +638,8 @@ public class SlimyboiController : BraveBehaviour
   {
     DestroyParticleSystem(true);
     SlimyboiManager.DeregisterSlime(this);
+    if (this._vineMesh)
+      UnityEngine.Object.Destroy(this._vineMesh.gameObject);
     if (this._aura)
       UnityEngine.Object.Destroy(this._aura.gameObject);
     base.OnDestroy();
