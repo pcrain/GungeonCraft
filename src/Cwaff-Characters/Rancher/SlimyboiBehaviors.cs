@@ -470,6 +470,7 @@ public class SlimyboiController : BraveBehaviour
         animation: Slimybois._SlimeVineVFX, startPos: slimeCenter, endPos: slimeCenter,
         numSegments: 8, stretchPolicy: CwaffingTheGungy.RopeSim.StretchPolicy.GROWTEMPORARY);
       this._vineMesh.sprite.HeightOffGround = -10f; // draw behind most things
+      this._vineMesh.sprite.MakeGlowyBetter(glowAmount: 7.0f, glowColor: new Color(0.35f, 0.70f, 0.10f), glowColorPower: 10.0f, sensitivity: 0.8f);
     }
     if (TickAndCheck(ref this._vineTimer, dtime))
     {
@@ -504,7 +505,10 @@ public class SlimyboiController : BraveBehaviour
         ? nearestProj.SafeCenter + (_VINE_ATTACK_TIME * nearestProj.m_currentSpeed) * nearestProj.m_currentDirection.normalized
         : null;
       if (nearestProj)
+      {
         base.gameObject.PlayOnce("slime_vine_sound");
+        this._vineMesh.ResetToPosition(slimeCenter);
+      }
     }
     if (this._vineTargetPos is not Vector2 targetPos)
     {

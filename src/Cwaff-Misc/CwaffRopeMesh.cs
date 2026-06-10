@@ -65,6 +65,15 @@ public class CwaffRopeMesh : MonoBehaviour
     this.animateWhileLocked = keepAnimating;
   }
 
+  public void ResetToPosition(Vector2 pos)
+  {
+    for (int i = this._ropePoints.Count - 1; i >= 0; --i)
+      this._ropePoints[i] = this._ropePrevPoints[i] = pos;
+    this._boneManager.ReplaceBones(this._ropePoints);
+    this._boneManager.RecomputeNormals();
+    // this._boneManager.ManualLateUpdate();
+  }
+
   private void Update()
   {
     if (this.locked)
