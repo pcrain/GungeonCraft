@@ -75,4 +75,13 @@ internal static class SlimyboiPatches
   {
     SlimyboiManager.HandleTableFlip(__instance);
   }
+
+  /// <summary>Allow slimes to collide with the Bullet King's / Old King's Chancellor</summary>
+  [HarmonyPatch(typeof(BulletKingToadieController), nameof(BulletKingToadieController.PreRigidbodyCollision))]
+  [HarmonyPostfix]
+  private static void BulletKingToadieControllerPreRigidbodyCollisionPatch(BulletKingToadieController __instance, SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+  {
+    if (otherRigidbody.gameObject.GetComponent<SlimyboiController>())
+      PhysicsEngine.SkipCollision = false;
+  }
 }
