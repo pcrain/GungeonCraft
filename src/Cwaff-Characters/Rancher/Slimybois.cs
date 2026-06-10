@@ -57,9 +57,10 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Boom, goopColor = ExtendedColours.vibrantOrange, flags = ExplodesOnDeath | ExplosiveAttacks,
       overrideContactDamage = _BASE_DAMAGE * 4.0f });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Puddle, goopColor = ExtendedColours.skyblue, flags = AbsorbsBullets | PassiveHealthDrain | FireImmunity });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quantum, goopColor = Color.white, flags = QuantumInstability | PassiveHealthDrain | FullStatusImmunity | CanFly });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Tabby, goopColor = Color.white, flags = FollowPlayer | CanAlwaysVac,
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quantum, goopColor = Color.white, flags = QuantumInstability | PassiveHealthDrain | FullStatusImmunity | CanFly | CantReceiveHealing });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Tabby, goopColor = Color.white, flags = FollowPlayer | CanAlwaysVac | CanFly,
       overrideHealth = _BASE_HEALTH * 2, overrideContactDamage = _BASE_DAMAGE * 0.5f, overrideAttackCooldown = _DEFAULT_COOLDOWN * 0.5f });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Gold, goopColor = ExtendedColours.paleYellow, flags = CanFly | CantReceiveHealing });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
@@ -325,7 +326,7 @@ public enum SlimyboiFlags // : ulong
   PoisonImmunity         = 1 << 6,  // if set, slime is not affected by poison or poison damage
   ExplosionImmunity      = 1 << 7,  // [unimplemented]
   ProjectileImmunity     = 1 << 8,  // if set, slime is not affected by projectiles
-  QuantumInstability     = 1 << 9,  // [unimplemented]
+  QuantumInstability     = 1 << 9,  // if set, slime is immune to all forms of damage and can only collide with enemies
   ImmobileInCombat       = 1 << 10, // if set, slime will not attempt to move while in combat
   AbsorbsBullets         = 1 << 11, // if set, slime restores health from bullets
   PassivelyGoops         = 1 << 12, // [unimplemented]
@@ -341,4 +342,5 @@ public enum SlimyboiFlags // : ulong
   PassiveHealthDrain     = 1 << 22, // if set, slime passively loses health
   FollowPlayer           = 1 << 23, // if set, slime prefers to stick close to the player
   CanAlwaysVac           = 1 << 24, // if set, slime can be vacuumed even while missing health in combat
+  CantReceiveHealing     = 1 << 25, // if set, slime can not be healed by, e.g., Phosphor Slimes
 }

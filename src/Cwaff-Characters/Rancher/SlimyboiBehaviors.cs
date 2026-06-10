@@ -73,6 +73,7 @@ public class SlimyboiController : BraveBehaviour
   private DamageTypeModifier _fireImmunity;
   private float _immuneToFireTimer = 0.0f;
   private float _flightTimer = 0.0f;
+  private float _goldTimer = 0.0f;
   private float _healthDrainTimer = 0.0f;
 
   private void Start()
@@ -353,7 +354,7 @@ public class SlimyboiController : BraveBehaviour
             break;
           }
           foreach (SlimyboiController sloim in GetNearbySlimes(base.aiActor.CenterPosition, sqrRadius: _HEAL_RADIUS_SQR, shuffle: true))
-            if (sloim.healthHaver.currentHealth < sloim.healthHaver.AdjustedMaxHealth && !sloim.attributes.IsSet(SlimyboiFlags.QuantumInstability))
+            if (sloim.healthHaver.currentHealth < sloim.healthHaver.AdjustedMaxHealth && !sloim.attributes.IsSet(SlimyboiFlags.CantReceiveHealing))
             {
               ApplyHealing(sloim);
               break;
@@ -363,12 +364,19 @@ public class SlimyboiController : BraveBehaviour
       }
       case SlimyboiType.Dervish:
       {
+        HandleAuraVisuals();
         HandleAuraEffect();
         break;
       }
       case SlimyboiType.Tangle:
       {
         HandleVineAttack(dtime);
+        break;
+      }
+      case SlimyboiType.Gold:
+      {
+        HandleAuraVisuals();
+        HandleAuraEffect();
         break;
       }
     }
@@ -488,6 +496,10 @@ public class SlimyboiController : BraveBehaviour
     {
       base.aiActor.SetIsFlying(false, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
     }
+    if (TickAndCheck(ref this._goldTimer, dtime))
+    {
+      EndGoldInvulnerability();
+    }
     if (this.attributes.IsSet(SlimyboiFlags.PassiveHealthDrain) && TickAndCheck(ref this._healthDrainTimer, dtime))
     {
       this._healthDrainTimer = _HEALTH_DRAIN_RATE;
@@ -504,6 +516,22 @@ public class SlimyboiController : BraveBehaviour
         base.healthHaver.PreventAllDamage = true;
       }
     }
+  }
+
+  private void BeginGoldInvulnerability()
+  {
+    base.healthHaver.IsVulnerable = false;
+    base.healthHaver.PreventAllDamage = true;
+    if (this._renderSprite)
+      SpriteOutlineManager.AddOutlineToSprite(this._renderSprite, ExtendedColours.paleYellow);
+  }
+
+  private void EndGoldInvulnerability()
+  {
+    base.healthHaver.IsVulnerable = true;
+    base.healthHaver.PreventAllDamage = false;
+    if (this._renderSprite)
+      SpriteOutlineManager.RemoveOutlineFromSprite(this._renderSprite);
   }
 
   private void HandleGlow(Color color, Color? lightColor, float flickerRate, float brightness, float glowColorPower, float minGlow, float maxGlow, float sensitivity,
@@ -609,6 +637,16 @@ public class SlimyboiController : BraveBehaviour
         if (sloim._flightTimer <= 0.0f)
           sloim.aiActor.SetIsFlying(true, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
         sloim._flightTimer = _AURA_PERSIST_TIME;
+        break;
+      }
+      case SlimyboiType.Gold:
+      {
+        if (sloim.slimeType == SlimyboiType.Gold)
+          break;
+
+        if (sloim._goldTimer <= 0.0f)
+          sloim.BeginGoldInvulnerability();
+        sloim._goldTimer = _AURA_PERSIST_TIME;
         break;
       }
     }
