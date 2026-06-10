@@ -20,7 +20,7 @@ public class SlimyboiController : BraveBehaviour
   private const float _AURA_PERSIST_TIME = 2.0f;
   private const float _REFLECT_GLOW_TIME = 1.0f;
   private const float _REFLECT_GLOW_STRENGTH = 10.0f;
-  private const float _HEAL_COOLDOWN_TIME = 0.25f;
+  private const float _HEAL_COOLDOWN_TIME = 0.33f;
   private const float _HEAL_AMOUNT = 1.0f;
   private const float _VINE_ATTACK_TIME = 0.1f;
   private const float _VINE_HOLD_TIME = 0.3f;
@@ -108,6 +108,11 @@ public class SlimyboiController : BraveBehaviour
       hh.damageTypeModifiers = new();
     if (actor.EffectResistances == null)
       actor.EffectResistances = new ActorEffectResistance[0];
+    if (this.attributes.IsSet(SlimyboiFlags.QuantumInstability))
+    {
+      hh.PreventAllDamage = true;
+      hh.IsVulnerable = false;
+    }
     if (this.attributes.IsSet(SlimyboiFlags.PassiveHealthDrain))
       this._healthDrainTimer = _HEALTH_DRAIN_RATE;
     if (this._slimeData.flags.IsSet(SlimyboiFlags.PoisonImmunity))
@@ -240,6 +245,18 @@ public class SlimyboiController : BraveBehaviour
     if (!this._renderSprite)
     {
       this._renderSprite = base.specRigidbody.DecoupleSpriteFromCollider();
+      if (this.attributes.IsSet(SlimyboiFlags.QuantumInstability))
+      {
+        this._renderSprite.usesOverrideMaterial = true;
+        Material mat = this._renderSprite.renderer.material;
+        mat.shader = CwaffShaders.WiggleShader;
+        mat.SetFloat("_Amplitude", 0.001f);
+        mat.SetFloat("_Distortion", 100.0f);
+        mat.SetFloat("_Speed", 10.0f);
+        mat.SetFloat("_Tearing", 0.0f);
+        mat.SetFloat("_FadeSpeed", 10.0f);
+        mat.SetFloat("_FadeAmp", 10.0f);
+      }
       if (this._appearOutOfNowhere)
       {
         this._appearOutOfNowhere = false;
@@ -336,7 +353,7 @@ public class SlimyboiController : BraveBehaviour
             break;
           }
           foreach (SlimyboiController sloim in GetNearbySlimes(base.aiActor.CenterPosition, sqrRadius: _HEAL_RADIUS_SQR, shuffle: true))
-            if (sloim.healthHaver.currentHealth < sloim.healthHaver.AdjustedMaxHealth)
+            if (sloim.healthHaver.currentHealth < sloim.healthHaver.AdjustedMaxHealth && !sloim.attributes.IsSet(SlimyboiFlags.QuantumInstability))
             {
               ApplyHealing(sloim);
               break;
@@ -474,8 +491,18 @@ public class SlimyboiController : BraveBehaviour
     if (this.attributes.IsSet(SlimyboiFlags.PassiveHealthDrain) && TickAndCheck(ref this._healthDrainTimer, dtime))
     {
       this._healthDrainTimer = _HEALTH_DRAIN_RATE;
+      if (slimeType == SlimyboiType.Quantum)
+      {
+        base.healthHaver.IsVulnerable = true;
+        base.healthHaver.PreventAllDamage = false;
+      }
       base.healthHaver.ApplyDamage(_HEALTH_DRAIN_AMOUNT, Vector2.zero, "Dehydration", CoreDamageTypes.None,
         DamageCategory.DamageOverTime, ignoreInvulnerabilityFrames: true);
+      if (slimeType == SlimyboiType.Quantum)
+      {
+        base.healthHaver.IsVulnerable = false;
+        base.healthHaver.PreventAllDamage = true;
+      }
     }
   }
 
@@ -675,6 +702,12 @@ public class SlimyboiController : BraveBehaviour
 
   private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
   {
+    if (this.attributes.IsSet(SlimyboiFlags.QuantumInstability))
+    {
+      if (!otherRigidbody.aiActor || otherRigidbody.aiActor.gameObject.GetComponent<SlimyboiController>())
+        PhysicsEngine.SkipCollision = true;
+      return;
+    }
     if (otherRigidbody.projectile is Projectile proj)
     {
       if (this.attributes.IsSet(SlimyboiFlags.AbsorbsBullets))

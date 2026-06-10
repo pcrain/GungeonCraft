@@ -231,6 +231,7 @@ public class SchrodingersStat : MonoBehaviour
             Observe();
     }
 
+    // REFACTOR: use version in Extensions
     internal static IEnumerator PhaseOut(tk2dBaseSprite sprite, Vector2 direction, float amplitude, float frequency, float lifetime)
     {
         Material mat = sprite.renderer.material;

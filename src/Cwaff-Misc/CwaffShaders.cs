@@ -72,7 +72,7 @@ public static class CwaffShaders
             DesatShader = shaderBundle.LoadAsset<Shader>("assets/desaturateshader.shader");
             PowerdownTexture = shaderBundle.LoadAsset<Texture2D>("assets/powerdown.png");
             PowerupTexture = shaderBundle.LoadAsset<Texture2D>("assets/powerup.png");
-            WiggleShader = shaderBundle.LoadAsset<Shader>("assets/wiggleshader.shader");
+            WiggleShader = shaderBundle.LoadAsset<Shader>("assets/wiggleshader.shader"); // Amplitude, Speed, Tearing, Distortion, FadeAmp, FadeSpeed, Fade
             ScreenWiggleShader = shaderBundle.LoadAsset<Shader>("assets/screenwiggleshader.shader");
             ScreenBasicShader = shaderBundle.LoadAsset<Shader>("assets/screenbasicshader.shader");
             ShatterShader = shaderBundle.LoadAsset<Shader>("assets/scattershader.shader");

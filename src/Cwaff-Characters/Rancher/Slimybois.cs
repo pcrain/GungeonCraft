@@ -41,8 +41,7 @@ public static class Slimybois
       overrideSpeed = _BASE_SPEED * 2.5f, goopColor = Color.white });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Dervish, flags = CanFly, goopColor = Color.gray,
       overrideSpeed = _BASE_SPEED * 2.0f, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN});
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity, goopColor = Color.cyan,
-      overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH * 2});
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity, goopColor = Color.cyan, overrideContactDamage = 0.2f});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = DodgesProjectiles });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = AttacksPoison | PoisonImmunity });
@@ -58,6 +57,7 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Boom, goopColor = ExtendedColours.vibrantOrange, flags = ExplodesOnDeath | ExplosiveAttacks,
       overrideContactDamage = _BASE_DAMAGE * 4.0f });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Puddle, goopColor = ExtendedColours.skyblue, flags = AbsorbsBullets | PassiveHealthDrain | FireImmunity });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quantum, goopColor = Color.white, flags = QuantumInstability | PassiveHealthDrain | FullStatusImmunity | CanFly });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
