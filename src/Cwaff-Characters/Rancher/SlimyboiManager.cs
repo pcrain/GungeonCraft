@@ -295,7 +295,7 @@ public class SlimyboiManager : MonoBehaviour
   public static void OnAnyPlayerCollectedHealth(HealthPickup health, PlayerController player)
   {
     if (health.armorAmount > 0)
-      SpawnSlimes([SlimyboiType.Rock], player: player, pos: player.CenterPosition);
+      SpawnSlimes([SlimyboiType.Rock, SlimyboiType.Rock], player: player, pos: player.CenterPosition);
   }
 
   public static void OnWillPickUpCurrency(PlayerController player, CurrencyPickup currency)

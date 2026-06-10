@@ -698,6 +698,12 @@ public class SlimyboiController : BraveBehaviour
           this._reflectGlowTimer = _REFLECT_GLOW_TIME;
         }
       }
+      else if (this.attributes.IsSet(SlimyboiFlags.ProjectileImmunity))
+      {
+        PhysicsEngine.SkipCollision = true;
+        if (proj.isActiveAndEnabled && proj.Owner is not PlayerController)
+          proj.DieInAir(false, true, true, true);
+      }
       else if (this._projectileIframeTimer > 0)
         PhysicsEngine.SkipCollision = true; // don't collide with projectiles while iframes are active
       else if (proj.Owner is PlayerController playerOwner && playerOwner && !base.aiActor.CanTargetPlayers)

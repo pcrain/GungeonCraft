@@ -42,7 +42,7 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Dervish, flags = CanFly, goopColor = Color.gray,
       overrideSpeed = _BASE_SPEED * 2.0f, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity, goopColor = Color.cyan,
-      overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH / 2});
+      overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH * 2});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = DodgesProjectiles });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = AttacksPoison | PoisonImmunity });
@@ -50,9 +50,8 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Crystal, goopColor = Color.blue, overrideWeight = _BASE_WEIGHT * 4f,
       flags = ImmobileInCombat | ReflectsProjectiles | ImmuneToMovingTraps });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Tangle, goopColor = Color.green, overrideHealth = _BASE_HEALTH * 2 });
-
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Rock, goopColor = ExtendedColours.darkBrown, overrideHealth = _BASE_HEALTH * 5,
-      overrideSpeed = _BASE_SPEED * 0.5f, overrideAttackCooldown = _DEFAULT_COOLDOWN * 2.0f, overrideWeight = _BASE_WEIGHT * 2f });
+      overrideSpeed = _BASE_SPEED * 0.5f, overrideAttackCooldown = _DEFAULT_COOLDOWN * 2.0f, overrideWeight = _BASE_WEIGHT * 2f, flags = ProjectileImmunity | FireImmunity });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Saber, goopColor = ExtendedColours.brown,
       overrideSpeed = _BASE_SPEED * 0.75f, overrideAttackCooldown = _DEFAULT_COOLDOWN / 1.5f, overrideContactDamage = _BASE_DAMAGE * 1.5f });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Honey, goopColor = Color.yellow, overrideSpeed = _BASE_SPEED * 0.5f, flags = AttacksSlow });
@@ -321,7 +320,7 @@ public enum SlimyboiFlags // : ulong
   FireImmunity           = 1 << 5,  // if set, slime is not affected by fire or fire damage
   PoisonImmunity         = 1 << 6,  // if set, slime is not affected by poison or poison damage
   ExplosionImmunity      = 1 << 7,  // [unimplemented]
-  ProjectileImmunity     = 1 << 8,  // [unimplemented]
+  ProjectileImmunity     = 1 << 8,  // if set, slime is not affected by projectiles
   QuantumInstability     = 1 << 9,  // [unimplemented]
   ImmobileInCombat       = 1 << 10, // if set, slime will not attempt to move while in combat
   AbsorbsBullets         = 1 << 11, // if set, slime restores health from bullets
