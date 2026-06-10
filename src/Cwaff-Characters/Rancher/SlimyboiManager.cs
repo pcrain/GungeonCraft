@@ -3,6 +3,8 @@ namespace CwaffingTheGungy;
 /// <summary>Class for managing Slime spawns throughout a run</summary>
 public class SlimyboiManager : MonoBehaviour
 {
+  private const float _SLIME_UNDER_TABLE_CHANCE = 0.25f;
+
   //NOTE: use _Instance where possible so we don't actually create a SlimyboiManager if we don't have one
   private static SlimyboiManager _Instance = null;
   // NOTE: needs to be static so it can happen at room processing time
@@ -172,8 +174,7 @@ public class SlimyboiManager : MonoBehaviour
 
     // scan for traps
     float pitCoverage = room.GetPitCoverage();
-    int numSpikeTraps = CountSpikeTraps(room, out int numTotalTraps);
-    int numNonSpikeTraps = numTotalTraps - numSpikeTraps;
+    int numSpikeTraps = CountSpikeTraps(room, out int numNonSpikeTraps);
     // Lazy.DebugConsoleLog($" scanned room with pit coverage {pitCoverage} and {numSpikeTraps} spikes, category {room.area.PrototypeRoomCategory} / {room.area.PrototypeRoomNormalSubcategory}");
     int oldSlimeCount = sloims.Count;
     if (pitCoverage > 0.0f)
@@ -222,15 +223,12 @@ public class SlimyboiManager : MonoBehaviour
     return sloims;
   }
 
-  private static int CountSpikeTraps(RoomHandler room, out int totalTraps)
+  private static int CountSpikeTraps(RoomHandler room, out int nonSpikeTraps)
   {
+    nonSpikeTraps = 0;
     if (!_Instance || room == null || !_TrapMap.TryGetValue(room, out List<TrapController> roomTraps))
-    {
-      totalTraps = 0;
       return 0;
-    }
     int spikeCount = 0;
-    totalTraps = roomTraps.Count;
     foreach (TrapController trap in roomTraps)
     {
       if (trap is BasicTrapController basicTrap && basicTrap.TrapSwitchState == "spikes")
@@ -242,7 +240,11 @@ public class SlimyboiManager : MonoBehaviour
           spikeCount += 2;
         else if (trapName.Contains("spinning_log"))
           spikeCount += 5;
+        else
+          ++nonSpikeTraps;
       }
+      else
+        ++nonSpikeTraps;
     }
     return spikeCount;
   }
@@ -313,7 +315,7 @@ public class SlimyboiManager : MonoBehaviour
 
   public static void HandleTableFlip(FlippableCover table)
   {
-    if (!_Instance)
+    if (!_Instance || UnityEngine.Random.value > _SLIME_UNDER_TABLE_CHANCE)
       return;
     SpawnSlimes([SlimyboiType.Saber], pos: table.transform.position);
   }

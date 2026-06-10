@@ -10,7 +10,7 @@ public class SlimyboiController : BraveBehaviour
   private const string VACPACK_FLYING_REASON = "Vacpack";
   private const string DERVISH_FLYING_REASON = "Dervish Aura";
 
-  private const float _IFRAME_LENGTH = 1.0f;
+  private const float _BASE_IFRAME_LENGTH = 1.0f;
   private const float _DODGE_IFRAME_LENGTH = 0.25f;
   private const float _DODGE_COOLDOWN = 1.0f;
   private const float _DODGE_LENGTH = 2.0f;
@@ -62,6 +62,7 @@ public class SlimyboiController : BraveBehaviour
   private bool _didGlowSetup = false;
   private bool _appearOutOfNowhere = false;
   private Color? _queuedOutlineColor = null;
+  private float _iframeLength = 1.0f;
 
   // Tangle specific
   private CwaffRopeMesh _vineMesh = null;
@@ -128,6 +129,7 @@ public class SlimyboiController : BraveBehaviour
       hh.damageTypeModifiers.Add(this._fireImmunity);
       actor.SetResistance(EffectResistanceType.Fire, 1.0f);
     }
+    this._iframeLength = GetIframesForFloor();
 
     SpeculativeRigidbody body = base.specRigidbody;
     body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
@@ -141,9 +143,15 @@ public class SlimyboiController : BraveBehaviour
     this._setup = true;
   }
 
+  private static float GetIframesForFloor()
+  {
+    float healthMod = AIActor.BaseLevelHealthModifier;
+    return Mathf.Clamp(_BASE_IFRAME_LENGTH / (healthMod * healthMod), 0.2f, 1.0f);
+  }
+
   private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
   {
-    this._projectileIframeTimer = _IFRAME_LENGTH;
+    this._projectileIframeTimer = this._iframeLength;
   }
 
   public void HandleRoomSpawn()
@@ -310,11 +318,11 @@ public class SlimyboiController : BraveBehaviour
 
     // invulnerability flicker
     // TODO: this doesn't work quite right if other things disable our renderer
-    this._projectileIframeTimer = Mathf.Max(this._projectileIframeTimer - dtime, 0.0f);
-    if (Mathf.CeilToInt(this._projectileIframeTimer * 20.0f) % 2 == 1)
-      this._renderSprite.renderer.enabled = false;
-    else
+    if (this._projectileIframeTimer == this._iframeLength || Mathf.CeilToInt(this._projectileIframeTimer * 20.0f) % 2 == 0)
       this._renderSprite.renderer.enabled = true;
+    else
+      this._renderSprite.renderer.enabled = false;
+    this._projectileIframeTimer = Mathf.Max(this._projectileIframeTimer - dtime, 0.0f);
 
     UpdateTimers(dtime);
     UpdateSlimeSpecificBehaviors(dtime);

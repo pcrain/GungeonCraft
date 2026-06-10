@@ -41,7 +41,8 @@ public static class Slimybois
       overrideSpeed = _BASE_SPEED * 2.5f, goopColor = Color.white });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Dervish, flags = CanFly, goopColor = Color.gray,
       overrideSpeed = _BASE_SPEED * 2.0f, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN});
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity, goopColor = Color.cyan, overrideContactDamage = 0.2f});
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity | CantReceiveHealing,
+      goopColor = Color.cyan, overrideContactDamage = 0.2f});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = DodgesProjectiles });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = AttacksPoison | PoisonImmunity });
