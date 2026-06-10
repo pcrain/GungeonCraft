@@ -62,6 +62,8 @@ public static class Slimybois
       overrideHealth = _BASE_HEALTH * 2, overrideContactDamage = _BASE_DAMAGE * 0.5f, overrideAttackCooldown = _DEFAULT_COOLDOWN * 0.5f });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Gold, goopColor = ExtendedColours.paleYellow, flags = CanFly | CantReceiveHealing });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Lucky, goopColor = Color.white, overrideHealth = _BASE_HEALTH * 2, flags = ExtraCasingOnKill });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Mosaic, goopColor = ExtendedColours.pink, flags = AttacksHealAllies,
+      overrideHealth = _BASE_HEALTH * 3, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
@@ -334,7 +336,7 @@ public enum SlimyboiFlags // : ulong
   ImmobileInCombat       = 1 << 10, // if set, slime will not attempt to move while in combat
   AbsorbsBullets         = 1 << 11, // if set, slime restores health from bullets
   PassivelyGoops         = 1 << 12, // [unimplemented]
-  DodgesProjectiles      = 1 << 13, // [unimplemented]
+  DodgesProjectiles      = 1 << 13, // if set, slime will attempt to dodge incoming projectiles on a cooldown
   ImmuneToMovingTraps    = 1 << 14, // if set, slime can not collide with moving traps
   CantVacInCombat        = 1 << 15, // if set, slime can not be vacuumed while in combat
   AttacksPoison          = 1 << 16, // if set, slime's attacks poison enemies
@@ -347,4 +349,5 @@ public enum SlimyboiFlags // : ulong
   FollowPlayer           = 1 << 23, // if set, slime prefers to stick close to the player
   CanAlwaysVac           = 1 << 24, // if set, slime can be vacuumed even while missing health in combat
   CantReceiveHealing     = 1 << 25, // if set, slime can not be healed by, e.g., Phosphor Slimes
+  AttacksHealAllies      = 1 << 26, // if set, slime's attacks heal all nearby allies
 }

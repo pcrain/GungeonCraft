@@ -29,6 +29,7 @@ public class SlimyboiController : BraveBehaviour
   private const float _HEALTH_FROM_BULLETS = 2.5f;
   private const float _HEALTH_DRAIN_RATE = 2.0f;
   private const float _HEALTH_DRAIN_AMOUNT = 1.0f;
+  private const float _MAX_GROUP_HEAL = 5.0f;
 
   private const float _HEAL_RADIUS_SQR = _HEAL_RADIUS * _HEAL_RADIUS;
   private const float _AURA_RADIUS_SQR = _AURA_RADIUS * _AURA_RADIUS;
@@ -379,6 +380,13 @@ public class SlimyboiController : BraveBehaviour
         HandleAuraEffect();
         break;
       }
+      case SlimyboiType.Mosaic:
+      {
+        float extraGlow = _REFLECT_GLOW_STRENGTH * (this._reflectGlowTimer / _REFLECT_GLOW_TIME);
+        HandleGlow(color: new Color(0.35f, 0.7f, 0.1f), lightColor: null, flickerRate: 20.0f, brightness: 0.0f,
+          glowColorPower: 10.0f, minGlow: extraGlow + 1.0f, maxGlow: extraGlow + 10.0f, sensitivity: 0.7f, minLightRadius: 1.0f, maxLightRadius: 3.0f);
+        break;
+      }
     }
   }
 
@@ -457,13 +465,12 @@ public class SlimyboiController : BraveBehaviour
       this._vineMesh.endPos = targetPos;
   }
 
-  private void ApplyHealing(SlimyboiController sloim, float healAmount = _HEAL_AMOUNT)
+  private void ApplyHealing(SlimyboiController sloim, float healAmount = _HEAL_AMOUNT, bool doSound = true)
   {
     sloim.healthHaver.ApplyHealing(healAmount);
-    sloim.gameObject.PlayOnce("slime_heal_sound");
-    if (sloim != this)
-      SpawnManager.SpawnVFX(VFX.MiniPickup, sloim.aiActor.CenterPosition, Lazy.RandomEulerZ());
-    SpawnManager.SpawnVFX(VFX.MiniPickup, base.aiActor.CenterPosition, Lazy.RandomEulerZ());
+    SpawnManager.SpawnVFX(VFX.MiniPickup, sloim.aiActor.CenterPosition, Lazy.RandomEulerZ());
+    if (doSound)
+      sloim.gameObject.PlayOnce("slime_heal_sound");
   }
 
   /// <summary>Tick down a timer and check if it's expired/</summary>
@@ -690,7 +697,34 @@ public class SlimyboiController : BraveBehaviour
           enemy.ApplyEffect(Slimybois._SlimeSlowEffect);
         if (this.attributes.IsSet(SlimyboiFlags.ExtraCasingOnKill))
           enemy.gameObject.GetOrAddComponent<LuckyCasingDrop>();
+        if (this.attributes.IsSet(SlimyboiFlags.AttacksHealAllies))
+          DoGroupHeal();
       }
+  }
+
+  private void DoGroupHeal()
+  {
+    float healingLeft = _MAX_GROUP_HEAL;
+    bool didHealing = false;
+    foreach (SlimyboiController sloim in GetNearbySlimes(base.aiActor.CenterPosition, sqrRadius: _HEAL_RADIUS_SQR, shuffle: false))
+    {
+      if (sloim.attributes.IsSet(SlimyboiFlags.CantReceiveHealing))
+        continue;
+      float missingHealth = sloim.healthHaver.AdjustedMaxHealth - sloim.healthHaver.currentHealth;
+      if (missingHealth <= 0.01f)
+        continue;
+      float healAmount = Mathf.Min(missingHealth, healingLeft);
+      healingLeft -= healAmount;
+      ApplyHealing(sloim, healAmount: healAmount, doSound: false);
+      didHealing = true;
+      if (healingLeft < 0.01f)
+        break;
+    }
+    if (didHealing)
+    {
+      base.gameObject.PlayUnique("slime_mosaic_heal_sound");
+      this._reflectGlowTimer = _REFLECT_GLOW_TIME;
+    }
   }
 
   public class LuckyCasingDrop : MonoBehaviour
