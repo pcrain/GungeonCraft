@@ -10,7 +10,8 @@ public class SlimyboiController : BraveBehaviour
   private const string VACPACK_FLYING_REASON = "Vacpack";
   private const string DERVISH_FLYING_REASON = "Dervish Aura";
 
-  private const float _IFRAME_LENGTH = 0.25f;
+  private const float _IFRAME_LENGTH = 1.0f;
+  private const float _DODGE_IFRAME_LENGTH = 0.25f;
   private const float _DODGE_COOLDOWN = 1.0f;
   private const float _DODGE_LENGTH = 2.0f;
   private const float _HEAL_RADIUS = 7.5f;
@@ -25,6 +26,9 @@ public class SlimyboiController : BraveBehaviour
   private const float _VINE_HOLD_TIME = 0.3f;
   private const float _VINE_RETRACT_TIME = 0.1f;
   private const float _VINE_RADIUS = 5.0f;
+  private const float _HEALTH_FROM_BULLETS = 2.5f;
+  private const float _HEALTH_DRAIN_RATE = 2.0f;
+  private const float _HEALTH_DRAIN_AMOUNT = 1.0f;
 
   private const float _HEAL_RADIUS_SQR = _HEAL_RADIUS * _HEAL_RADIUS;
   private const float _AURA_RADIUS_SQR = _AURA_RADIUS * _AURA_RADIUS;
@@ -69,6 +73,7 @@ public class SlimyboiController : BraveBehaviour
   private DamageTypeModifier _fireImmunity;
   private float _immuneToFireTimer = 0.0f;
   private float _flightTimer = 0.0f;
+  private float _healthDrainTimer = 0.0f;
 
   private void Start()
   {
@@ -103,6 +108,8 @@ public class SlimyboiController : BraveBehaviour
       hh.damageTypeModifiers = new();
     if (actor.EffectResistances == null)
       actor.EffectResistances = new ActorEffectResistance[0];
+    if (this.attributes.IsSet(SlimyboiFlags.PassiveHealthDrain))
+      this._healthDrainTimer = _HEALTH_DRAIN_RATE;
     if (this._slimeData.flags.IsSet(SlimyboiFlags.PoisonImmunity))
     {
       hh.damageTypeModifiers.Add(this._poisonImmunity);
@@ -425,11 +432,12 @@ public class SlimyboiController : BraveBehaviour
       this._vineMesh.endPos = targetPos;
   }
 
-  private void ApplyHealing(SlimyboiController sloim)
+  private void ApplyHealing(SlimyboiController sloim, float healAmount = _HEAL_AMOUNT)
   {
-    sloim.healthHaver.ApplyHealing(_HEAL_AMOUNT);
+    sloim.healthHaver.ApplyHealing(healAmount);
     sloim.gameObject.PlayOnce("slime_heal_sound");
-    SpawnManager.SpawnVFX(VFX.MiniPickup, sloim.aiActor.CenterPosition, Lazy.RandomEulerZ());
+    if (sloim != this)
+      SpawnManager.SpawnVFX(VFX.MiniPickup, sloim.aiActor.CenterPosition, Lazy.RandomEulerZ());
     SpawnManager.SpawnVFX(VFX.MiniPickup, base.aiActor.CenterPosition, Lazy.RandomEulerZ());
   }
 
@@ -462,6 +470,12 @@ public class SlimyboiController : BraveBehaviour
     if (TickAndCheck(ref this._flightTimer, dtime))
     {
       base.aiActor.SetIsFlying(false, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
+    }
+    if (this.attributes.IsSet(SlimyboiFlags.PassiveHealthDrain) && TickAndCheck(ref this._healthDrainTimer, dtime))
+    {
+      this._healthDrainTimer = _HEALTH_DRAIN_RATE;
+      base.healthHaver.ApplyDamage(_HEALTH_DRAIN_AMOUNT, Vector2.zero, "Dehydration", CoreDamageTypes.None,
+        DamageCategory.DamageOverTime, ignoreInvulnerabilityFrames: true);
     }
   }
 
@@ -653,7 +667,7 @@ public class SlimyboiController : BraveBehaviour
 
   private void HandleProjetileDodge(Projectile proj)
   {
-    this._projectileIframeTimer = _IFRAME_LENGTH;
+    this._projectileIframeTimer = _DODGE_IFRAME_LENGTH;
     this._dodgeCooldown = _DODGE_COOLDOWN;
     this._dodgeVector = _DODGE_LENGTH * proj.Direction.normalized.Rotate(UnityEngine.Random.Range(90f, 270f));
     this._queuedDodge = true;
@@ -663,15 +677,25 @@ public class SlimyboiController : BraveBehaviour
   {
     if (otherRigidbody.projectile is Projectile proj)
     {
-      if (this.attributes.IsSet(SlimyboiFlags.ReflectsProjectiles))
+      if (this.attributes.IsSet(SlimyboiFlags.AbsorbsBullets))
       {
         PhysicsEngine.SkipCollision = true;
         if (proj.isActiveAndEnabled && proj.Owner is not PlayerController)
         {
-            base.gameObject.PlayUnique("slime_reflect_sound");
-            PassiveReflectItem.ReflectBullet(proj, retargetReflectedBullet: false, newOwner: this._owner, minReflectedBulletSpeed: 25.0f);
-            proj.Direction = (proj.SafeCenter - myRigidbody.UnitCenter).normalized;
-            this._reflectGlowTimer = _REFLECT_GLOW_TIME;
+          proj.DieInAir(false, true, true, true);
+          ApplyHealing(this, _HEALTH_FROM_BULLETS);
+          this._healthDrainTimer = _HEALTH_DRAIN_RATE;
+        }
+      }
+      else if (this.attributes.IsSet(SlimyboiFlags.ReflectsProjectiles))
+      {
+        PhysicsEngine.SkipCollision = true;
+        if (proj.isActiveAndEnabled && proj.Owner is not PlayerController)
+        {
+          base.gameObject.PlayUnique("slime_reflect_sound");
+          PassiveReflectItem.ReflectBullet(proj, retargetReflectedBullet: false, newOwner: this._owner, minReflectedBulletSpeed: 25.0f);
+          proj.Direction = (proj.SafeCenter - myRigidbody.UnitCenter).normalized;
+          this._reflectGlowTimer = _REFLECT_GLOW_TIME;
         }
       }
       else if (this._projectileIframeTimer > 0)

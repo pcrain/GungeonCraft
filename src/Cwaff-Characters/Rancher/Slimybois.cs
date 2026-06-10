@@ -58,6 +58,7 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Honey, goopColor = Color.yellow, overrideSpeed = _BASE_SPEED * 0.5f, flags = AttacksSlow });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Boom, goopColor = ExtendedColours.vibrantOrange, flags = ExplodesOnDeath | ExplosiveAttacks,
       overrideContactDamage = _BASE_DAMAGE * 4.0f });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Puddle, goopColor = ExtendedColours.skyblue, flags = AbsorbsBullets | PassiveHealthDrain | FireImmunity });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
@@ -323,7 +324,7 @@ public enum SlimyboiFlags // : ulong
   ProjectileImmunity     = 1 << 8,  // [unimplemented]
   QuantumInstability     = 1 << 9,  // [unimplemented]
   ImmobileInCombat       = 1 << 10, // if set, slime will not attempt to move while in combat
-  Absorbant              = 1 << 11, // [unimplemented]
+  AbsorbsBullets         = 1 << 11, // if set, slime restores health from bullets
   PassivelyGoops         = 1 << 12, // [unimplemented]
   DodgesProjectiles      = 1 << 13, // [unimplemented]
   ImmuneToMovingTraps    = 1 << 14, // if set, slime can not collide with moving traps
@@ -334,4 +335,5 @@ public enum SlimyboiFlags // : ulong
   FullStatusImmunity     = 1 << 19, // if set, slime is immune to all status effects
   AttacksSlow            = 1 << 20, // if set, slime's attacks slow enemies down
   ExplosiveAttacks       = 1 << 21, // if set, slime's attacks have an explosive effect
+  PassiveHealthDrain     = 1 << 22, // if set, passively loses health
 }
