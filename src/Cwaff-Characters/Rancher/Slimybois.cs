@@ -58,6 +58,8 @@ public static class Slimybois
       overrideContactDamage = _BASE_DAMAGE * 4.0f });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Puddle, goopColor = ExtendedColours.skyblue, flags = AbsorbsBullets | PassiveHealthDrain | FireImmunity });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Quantum, goopColor = Color.white, flags = QuantumInstability | PassiveHealthDrain | FullStatusImmunity | CanFly });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Tabby, goopColor = Color.white, flags = FollowPlayer | CanAlwaysVac,
+      overrideHealth = _BASE_HEALTH * 2, overrideContactDamage = _BASE_DAMAGE * 0.5f, overrideAttackCooldown = _DEFAULT_COOLDOWN * 0.5f });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
@@ -101,6 +103,8 @@ public static class Slimybois
     bs.OverrideBehaviors.Add(new SlimyboiDodgeBehavior(){ });
     bs.TargetBehaviors.Add(new SlimyboiTargetingBehavior(){ Radius = 35.0f, LineOfSight = false, ObjectPermanence = false });
     bs.MovementBehaviors.Add(new SlimyboiSeekBehavior(){ StopWhenInRange = true, CustomMinRange = 1.75f, CustomRange = 2.75f, PathInterval = 0.5f });
+    if (sd.flags.IsSet(FollowPlayer))
+      bs.MovementBehaviors.Add(new SlimyboiFollowPlayerBehavior { PathInterval = 0.5f });
     bs.MovementBehaviors.Add(new MoveErraticallyBehavior { PathInterval = 0.5f, StayOnScreen = false, UseTargetsRoom = false, AvoidTarget = false });
     bs.AttackBehaviors.Add(new SlimyboiChargeBehavior(){ chargeDamage = sd.overrideContactDamage ?? _BASE_DAMAGE, chargeKnockback = _BASE_ATTACK_KB, chargeSpeed = 30.0f,
       minRange = 0.0f, maxRange = attackRange, Cooldown = sd.overrideAttackCooldown ?? _DEFAULT_COOLDOWN, maxChargeDistance = attackRange + 0.5f });
@@ -334,5 +338,7 @@ public enum SlimyboiFlags // : ulong
   FullStatusImmunity     = 1 << 19, // if set, slime is immune to all status effects
   AttacksSlow            = 1 << 20, // if set, slime's attacks slow enemies down
   ExplosiveAttacks       = 1 << 21, // if set, slime's attacks have an explosive effect
-  PassiveHealthDrain     = 1 << 22, // if set, passively loses health
+  PassiveHealthDrain     = 1 << 22, // if set, slime passively loses health
+  FollowPlayer           = 1 << 23, // if set, slime prefers to stick close to the player
+  CanAlwaysVac           = 1 << 24, // if set, slime can be vacuumed even while missing health in combat
 }

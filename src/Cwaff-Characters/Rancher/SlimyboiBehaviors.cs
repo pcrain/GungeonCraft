@@ -914,6 +914,57 @@ public class SlimyboiSeekBehavior : SeekTargetBehavior
   }
 }
 
+public class SlimyboiFollowPlayerBehavior : MovementBehaviorBase
+{
+  public float PathInterval = 0.5f;
+  public float ComfyDistanceToPlayer = 3.0f;
+  public float MaxDistanceToPlayer = 5.0f;
+
+  private SlimyboiController _sloim;
+  private PlayerController _owner;
+  private float m_repathTimer;
+  private bool _wasCloseToPlayer = false;
+
+  public override void Init(GameObject gameObject, AIActor aiActor, AIShooter aiShooter)
+  {
+    base.Init(gameObject, aiActor, aiShooter);
+    this._sloim = gameObject.GetComponent<SlimyboiController>();
+    this._owner = this._sloim ? this._sloim._owner : null;
+  }
+
+  public override void Upkeep()
+  {
+    base.Upkeep();
+    DecrementTimer(ref m_repathTimer);
+  }
+
+  public override BehaviorResult Update()
+  {
+    if (!this._sloim || !this._owner)
+      return BehaviorResult.Continue;
+
+    Vector2 ownerPos = this._owner.CenterPosition;
+    Vector2 myPos = m_aiActor.CenterPosition;
+    float sqrDistToPlayer = (ownerPos - myPos).sqrMagnitude;
+
+    if (sqrDistToPlayer < (this._wasCloseToPlayer ? (MaxDistanceToPlayer * MaxDistanceToPlayer) : (ComfyDistanceToPlayer * ComfyDistanceToPlayer)))
+    {
+      this._wasCloseToPlayer = true;
+      m_aiActor.ClearPath();
+      return BehaviorResult.Continue;
+    }
+
+    this._wasCloseToPlayer = false;
+    if (m_repathTimer <= 0f)
+    {
+      m_aiActor.PathfindToPosition(ownerPos, null, true, null);
+      m_repathTimer = PathInterval;
+    }
+
+    return BehaviorResult.SkipRemainingClassBehaviors;
+  }
+}
+
 // same as TargetPlayerBehavior, but cannot target other slimes or things we can't reach
 public class SlimyboiTargetingBehavior : TargetBehaviorBase
 {
