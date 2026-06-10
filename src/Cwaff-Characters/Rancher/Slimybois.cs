@@ -42,7 +42,7 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Dervish, flags = CanFly, goopColor = Color.gray,
       overrideSpeed = _BASE_SPEED * 2.0f, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity | CantReceiveHealing,
-      goopColor = Color.cyan, overrideContactDamage = 0.2f});
+      goopColor = Color.cyan, overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH * 2});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = DodgesProjectiles });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = AttacksPoison | PoisonImmunity });

@@ -30,6 +30,7 @@ public class SlimyboiController : BraveBehaviour
   private const float _HEALTH_DRAIN_RATE = 2.0f;
   private const float _HEALTH_DRAIN_AMOUNT = 1.0f;
   private const float _MAX_GROUP_HEAL = 5.0f;
+  private const float _MAX_STUCK_TIME = 0.25f;
 
   private const float _HEAL_RADIUS_SQR = _HEAL_RADIUS * _HEAL_RADIUS;
   private const float _AURA_RADIUS_SQR = _AURA_RADIUS * _AURA_RADIUS;
@@ -63,6 +64,9 @@ public class SlimyboiController : BraveBehaviour
   private bool _appearOutOfNowhere = false;
   private Color? _queuedOutlineColor = null;
   private float _iframeLength = 1.0f;
+  private Vector2 _lastPosition = default;
+  private float _stuckTime = 0.0f;
+  private SlimyboiChargeBehavior _chargeBehavior = null;
 
   // Tangle specific
   private CwaffRopeMesh _vineMesh = null;
@@ -130,6 +134,9 @@ public class SlimyboiController : BraveBehaviour
       actor.SetResistance(EffectResistanceType.Fire, 1.0f);
     }
     this._iframeLength = GetIframesForFloor();
+    int chargeIndex = base.behaviorSpeculator.AttackBehaviors.FindIndex(a => a is SlimyboiChargeBehavior);
+    if (chargeIndex >= 0)
+      this._chargeBehavior = base.behaviorSpeculator.AttackBehaviors[chargeIndex] as SlimyboiChargeBehavior;
 
     SpeculativeRigidbody body = base.specRigidbody;
     body.AddCollisionLayerOverride(CollisionMask.LayerToMask(CollisionLayer.EnemyHitBox));
@@ -249,14 +256,43 @@ public class SlimyboiController : BraveBehaviour
     float dtime = BraveTime.DeltaTime;
 
     // SlimyboiChargeBehavior charge = base.behaviorSpeculator.AttackBehaviors[0] as SlimyboiChargeBehavior;
-    // base.aiActor.DebugNametag($"target: {(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\ntargetPos: {base.aiActor.Path.Positions.Last.Value}");
+    // IntVector2? maybeTarget = base.aiActor.Path?.Positions?.Last?.Value;
+    // bool willReachTarget = base.aiActor.Path?.WillReachFinalGoal ?? false;
+    // bool canPathOverPits = (base.aiActor.PathableTiles & CellTypes.PIT) == CellTypes.PIT;
+    // float distance = maybeTarget.HasValue ? (maybeTarget.Value.ToVector2() - base.specRigidbody.UnitCenter).magnitude : 0.0f;
+    // if (willReachTarget)
+    //   base.aiActor.DebugNametag("");
+    // else
+    //   base.aiActor.DebugNametag($"target: {(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\ntargetPos: {(maybeTarget.HasValue ? maybeTarget.Value.ToString() : "nowhere")}\nwillReachTarget: {willReachTarget}\ndistance: {(willReachTarget ? distance.ToString() : "n/a")}\npathOverPits: {canPathOverPits}");
     // base.specRigidbody.DrawDebugHitbox();
 
     HandleRenderSprite(dtime);
+    HandleUnstick(dtime); // NOTE: fixes getting stuck in the Dragun's wings during the Dragun fight
     if (this._activelyBeingLaunched && !base.knockbackDoer.CheckSourceInKnockbacks(base.gameObject))
       HandleNoLongerFiredFromVacpack();
     UpdateTimers(dtime);
     UpdateSlimeSpecificBehaviors(dtime);
+  }
+
+  private void HandleUnstick(float dtime)
+  {
+    Vector2 lastPosition = this._lastPosition;
+    this._lastPosition = base.specRigidbody.UnitCenter;
+    if (this._lastPosition != lastPosition)
+    {
+      this._stuckTime = 0.0f;
+      return;
+    }
+    if ((this._stuckTime += dtime) < _MAX_STUCK_TIME)
+      return;
+    // two more checks to see if we're really stuck: see if we're trying to go anywhere
+    if (base.aiActor.Path is not Pathfinding.Path path || path.Positions == null || path.Positions.Last == null)
+    {
+      this._stuckTime = 0.0f;
+      return;
+    }
+    PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(base.specRigidbody);
+    this._stuckTime = 0.0f;
   }
 
   private void HandleRenderSprite(float dtime)
@@ -369,11 +405,6 @@ public class SlimyboiController : BraveBehaviour
         if (this._buffCooldownTimer == 0.0f || TickAndCheck(ref this._buffCooldownTimer, dtime))
         {
           this._buffCooldownTimer = _HEAL_COOLDOWN_TIME;
-          if (base.healthHaver.currentHealth < base.healthHaver.AdjustedMaxHealth)
-          {
-            ApplyHealing(this); // prioritize self-healing
-            break;
-          }
           foreach (SlimyboiController sloim in GetNearbySlimes(base.aiActor.CenterPosition, sqrRadius: _HEAL_RADIUS_SQR, shuffle: true))
             if (sloim.healthHaver.currentHealth < sloim.healthHaver.AdjustedMaxHealth && !sloim.attributes.IsSet(SlimyboiFlags.CantReceiveHealing))
             {
@@ -523,6 +554,8 @@ public class SlimyboiController : BraveBehaviour
     if (TickAndCheck(ref this._flightTimer, dtime))
     {
       base.aiActor.SetIsFlying(false, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
+      if (this._chargeBehavior != null)
+        this._chargeBehavior.m_cachedPathableTiles &= ~CellTypes.PIT;
       if (this._renderSprite)
         SpriteOutlineManager.RemoveOutlineFromSprite(this._renderSprite);
     }
@@ -669,6 +702,8 @@ public class SlimyboiController : BraveBehaviour
         if (sloim._flightTimer <= 0.0f)
         {
           sloim.aiActor.SetIsFlying(true, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
+          if (sloim._chargeBehavior != null)
+            sloim._chargeBehavior.m_cachedPathableTiles |= CellTypes.PIT;
           if (sloim._renderSprite)
             SpriteOutlineManager.AddOutlineToSprite(sloim._renderSprite, Color.white);
           else
