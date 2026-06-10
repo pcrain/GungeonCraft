@@ -246,16 +246,28 @@ public class SlimyboiController : BraveBehaviour
 
   private void Update()
   {
-    const float JUMP_HEIGHT = 1.25f;
     float dtime = BraveTime.DeltaTime;
-    float now = BraveTime.ScaledTimeSinceStartup;
 
     // SlimyboiChargeBehavior charge = base.behaviorSpeculator.AttackBehaviors[0] as SlimyboiChargeBehavior;
     // base.aiActor.DebugNametag($"target: {(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\ntargetPos: {base.aiActor.Path.Positions.Last.Value}");
     // base.specRigidbody.DrawDebugHitbox();
 
+    HandleRenderSprite(dtime);
+    if (this._activelyBeingLaunched && !base.knockbackDoer.CheckSourceInKnockbacks(base.gameObject))
+      HandleNoLongerFiredFromVacpack();
+    UpdateTimers(dtime);
+    UpdateSlimeSpecificBehaviors(dtime);
+  }
+
+  private void HandleRenderSprite(float dtime)
+  {
+    const float JUMP_HEIGHT = 1.25f;
+
+    float now = BraveTime.ScaledTimeSinceStartup;
     if (!this._renderSprite)
     {
+      if (!this._trueSprite || this._trueSprite.Collection != VFX.Collection)
+        return; // NOTE: VFX.Collection check is necessary to make sure we've updated our sprite properly. if not, we have no valid sprite yet
       this._renderSprite = base.specRigidbody.DecoupleSpriteFromCollider();
       if (this.attributes.IsSet(SlimyboiFlags.QuantumInstability))
       {
@@ -313,19 +325,13 @@ public class SlimyboiController : BraveBehaviour
 
     this._renderSprite.transform.position = renderPos.Quantize(0.0625f);
 
-    if (this._activelyBeingLaunched && !base.knockbackDoer.CheckSourceInKnockbacks(base.gameObject))
-      HandleNoLongerFiredFromVacpack();
-
     // invulnerability flicker
     // TODO: this doesn't work quite right if other things disable our renderer
     if (this._projectileIframeTimer == this._iframeLength || Mathf.CeilToInt(this._projectileIframeTimer * 20.0f) % 2 == 0)
       this._renderSprite.renderer.enabled = true;
     else
       this._renderSprite.renderer.enabled = false;
-    this._projectileIframeTimer = Mathf.Max(this._projectileIframeTimer - dtime, 0.0f);
 
-    UpdateTimers(dtime);
-    UpdateSlimeSpecificBehaviors(dtime);
   }
 
   private void UpdateSlimeSpecificBehaviors(float dtime)
@@ -501,6 +507,7 @@ public class SlimyboiController : BraveBehaviour
 
   private void UpdateTimers(float dtime)
   {
+    TickAndCheck(ref this._projectileIframeTimer, dtime);
     TickAndCheck(ref this._dodgeCooldown, dtime); // dodge cooldown
     TickAndCheck(ref this._reflectGlowTimer, dtime); // reflect glow cooldown
     if (TickAndCheck(ref this._immuneToPoisonTimer, dtime))
