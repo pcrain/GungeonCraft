@@ -16,46 +16,34 @@ public class SlimyboiManager : MonoBehaviour
   private List<float> _enemyKillTimes;
   private ReadOnlyCollection<SlimyboiController> _readOnlyActiveSlimes;
 
-  public static ReadOnlyCollection<SlimyboiController> ActiveSlimes => Instance._readOnlyActiveSlimes;
+  public static ReadOnlyCollection<SlimyboiController> ActiveSlimes => _Instance._readOnlyActiveSlimes;
 
-  public static SlimyboiManager Instance
+  public static void EnsureInstance()
   {
-    get
-    {
-      if (_Instance)
-        return _Instance;
+    if (_Instance)
+      return;
 
-      _Instance = GameManager.Instance.gameObject.AddComponent<SlimyboiManager>();
-      _Instance._enemiesExplodedThisRoom = 0;
-      _Instance._processedRooms = new();
-      _Instance._allActiveSlimes = new();
-      _Instance._enemyKillTimes = new();
-      _Instance._readOnlyActiveSlimes = new ReadOnlyCollection<SlimyboiController>(_Instance._allActiveSlimes);
+    _Instance = GameManager.Instance.gameObject.AddComponent<SlimyboiManager>();
+    _Instance._enemiesExplodedThisRoom = 0;
+    _Instance._processedRooms = new();
+    _Instance._allActiveSlimes = new();
+    _Instance._enemyKillTimes = new();
+    _Instance._readOnlyActiveSlimes = new ReadOnlyCollection<SlimyboiController>(_Instance._allActiveSlimes);
 
-      _TrapMap = new();
+    _TrapMap = new();
 
-      CwaffEvents.OnCleanStart -= OnCleanStart;
-      CwaffEvents.OnCleanStart += OnCleanStart;
-      CwaffEvents.OnChangedRooms -= OnChangedRooms;
-      CwaffEvents.OnChangedRooms += OnChangedRooms;
-      CwaffEvents.OnFloorEnded -= OnFloorEnded;
-      CwaffEvents.OnFloorEnded += OnFloorEnded;
+    CwaffEvents.OnCleanStart -= OnCleanStart;
+    CwaffEvents.OnCleanStart += OnCleanStart;
+    CwaffEvents.OnChangedRooms -= OnChangedRooms;
+    CwaffEvents.OnChangedRooms += OnChangedRooms;
+    CwaffEvents.OnFloorEnded -= OnFloorEnded;
+    CwaffEvents.OnFloorEnded += OnFloorEnded;
 
-      // #if DEBUG
-      //   Commands._OnDebugKeyPressed -= DebugSlimeSpawn;
-      //   Commands._OnDebugKeyPressed += DebugSlimeSpawn;
-      // #endif
-
-      return _Instance;
-    }
+    // #if DEBUG
+    //   Commands._OnDebugKeyPressed -= DebugSlimeSpawn;
+    //   Commands._OnDebugKeyPressed += DebugSlimeSpawn;
+    // #endif
   }
-
-  private void OnDestroy()
-  {
-    // not sure if we need anything here
-  }
-
-  public static void EnsureInstance() { var _ = Instance; }
 
   private static void OnCleanStart()
   {
