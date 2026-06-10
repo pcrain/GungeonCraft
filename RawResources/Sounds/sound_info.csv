@@ -440,3 +440,4 @@ slime_dodge_sound,7.0,1,sound,2
 slime_reflect_sound,3.0,1,sound,1
 slime_heal_sound,1.0,1,sound,1
 slime_vine_sound,-3.0,1,sound,1
+slime_coin_sound,2.0,1,sound,1

@@ -688,7 +688,21 @@ public class SlimyboiController : BraveBehaviour
           enemy.ApplyEffect(Slimybois._SlimeFireEffect);
         if (this.attributes.IsSet(SlimyboiFlags.AttacksSlow))
           enemy.ApplyEffect(Slimybois._SlimeSlowEffect);
+        if (this.attributes.IsSet(SlimyboiFlags.ExtraCasingOnKill))
+          enemy.gameObject.GetOrAddComponent<LuckyCasingDrop>();
       }
+  }
+
+  public class LuckyCasingDrop : MonoBehaviour
+  {
+    private void Start()
+    {
+      if (base.gameObject.GetComponent<AIActor>() is not AIActor enemy)
+        return;
+
+      base.gameObject.PlayUnique("slime_coin_sound");
+      LootEngine.SpawnCurrency(enemy.CenterPosition, 1, false, null, null);
+    }
   }
 
   private void OnDeath(Vector2 vector)

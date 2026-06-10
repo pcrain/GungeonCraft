@@ -61,11 +61,15 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Tabby, goopColor = Color.white, flags = FollowPlayer | CanAlwaysVac | CanFly,
       overrideHealth = _BASE_HEALTH * 2, overrideContactDamage = _BASE_DAMAGE * 0.5f, overrideAttackCooldown = _DEFAULT_COOLDOWN * 0.5f });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Gold, goopColor = ExtendedColours.paleYellow, flags = CanFly | CantReceiveHealing });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Lucky, goopColor = Color.white, overrideHealth = _BASE_HEALTH * 2, flags = ExtraCasingOnKill });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))
       if (SlimeData[(int)t] == null)
-        SlimeData.SetupEntry(new SlimeData{ type = t }); // TODO: make them unique
+      {
+        Lazy.DebugConsoleLog($" default SlimeData for {t}");
+        SlimeData.SetupEntry(new SlimeData{ type = t });
+      }
 
     // shared
     _SlimeImpactVFX = VFX.Create("slime_impact_vfx", fps: 60, loops: false);
@@ -320,7 +324,7 @@ public enum SlimyboiFlags // : ulong
   Allied                 = 1 << 0,  // if set, slime is allied and cannot hurt or be hurt by player characters
   CanFly                 = 1 << 1,  // if set, slime can fly and path over pits and other hazards
   ExplodesOnDeath        = 1 << 2,  // if set, slime exploded upon dying
-  ExtraCasingOnKill      = 1 << 3,  // [unimplemented] if set, slime spawns an extra casing upon killing an enemy
+  ExtraCasingOnKill      = 1 << 3,  // if set, every enemy the slime attacks will drop an extra casing on kill
   PitImmunity            = 1 << 4,  // [unimplemented] immune to pits, but can't fly per se (vulnerable to other hazards)
   FireImmunity           = 1 << 5,  // if set, slime is not affected by fire or fire damage
   PoisonImmunity         = 1 << 6,  // if set, slime is not affected by poison or poison damage
