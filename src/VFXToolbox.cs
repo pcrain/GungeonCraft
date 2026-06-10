@@ -1128,6 +1128,7 @@ public partial class CwaffVFX // private
     internal static readonly int _BinaryTexId          = Shader.PropertyToID("_BinaryTex");
     internal static readonly int _SaturationId         = Shader.PropertyToID("_Saturation");
     internal static readonly int _EmissionId           = Shader.PropertyToID("_Emission");
+    internal static readonly int _RandomSeedId         = Shader.PropertyToID("_RandomSeed");
 
     // pools
     private static readonly LinkedList<CwaffVFX> _SpawnedVFX = new();

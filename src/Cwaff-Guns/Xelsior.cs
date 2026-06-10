@@ -583,7 +583,7 @@ public class XelsiorHoveringGun : MonoBehaviour
             ms.FlipY = xg.sprite.FlipY;
             float percentLeft = 1f - elapsed / v;
             mat.SetFloat(CwaffVFX._FadeId, percentLeft);
-            mat.SetFloat("_Amplitude", 1f - percentLeft * percentLeft);
+            mat.SetFloat("_Amplitude", 1f - percentLeft * percentLeft); //REFACTOR: use shader properties
             yield return null;
         }
         UnityEngine.Object.Destroy(xg._mesh.gameObject);

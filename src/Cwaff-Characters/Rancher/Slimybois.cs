@@ -65,6 +65,8 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Lucky, goopColor = Color.white, overrideHealth = _BASE_HEALTH * 2, flags = ExtraCasingOnKill });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Mosaic, goopColor = ExtendedColours.pink, flags = AttacksHealAllies,
       overrideHealth = _BASE_HEALTH * 3, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Glitch, goopColor = Color.black, flags = AttacksPoison | AttacksIgnite | AttacksSlow | FullStatusImmunity,
+      overrideHealth = _BASE_HEALTH * 5 });
 
     // pad out unfinished defs
     foreach (SlimyboiType t in Enum.GetValues(typeof(SlimyboiType)))

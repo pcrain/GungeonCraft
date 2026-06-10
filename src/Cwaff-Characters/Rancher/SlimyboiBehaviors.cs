@@ -44,7 +44,7 @@ public class SlimyboiController : BraveBehaviour
   internal Vector2 _dodgeVector = default;
   internal bool _queuedDodge = false;
   internal PlayerController _owner = null;
-  internal tk2dSprite _renderSprite = null;
+  internal tk2dBaseSprite _renderSprite = null;
 
   private bool _setup = false;
   private SlimeData _slimeData;
@@ -305,7 +305,7 @@ public class SlimyboiController : BraveBehaviour
       if (!this._trueSprite || this._trueSprite.Collection != VFX.Collection)
         return; // NOTE: VFX.Collection check is necessary to make sure we've updated our sprite properly. if not, we have no valid sprite yet
       this._renderSprite = base.specRigidbody.DecoupleSpriteFromCollider();
-      if (this.attributes.IsSet(SlimyboiFlags.QuantumInstability))
+      if (this.slimeType == SlimyboiType.Quantum)
       {
         this._renderSprite.usesOverrideMaterial = true;
         Material mat = this._renderSprite.renderer.material;
@@ -316,6 +316,20 @@ public class SlimyboiController : BraveBehaviour
         mat.SetFloat("_Tearing", 0.0f);
         mat.SetFloat("_FadeSpeed", 10.0f);
         mat.SetFloat("_FadeAmp", 10.0f);
+      }
+      else if (this.slimeType == SlimyboiType.Glitch)
+      {
+        tk2dBaseSprite oldRenderSprite = this._renderSprite;
+        this._renderSprite = Lazy.CreateMeshSpriteObject(oldRenderSprite, oldRenderSprite.WorldCenter, pointMesh: true);
+        UnityEngine.Object.Destroy(oldRenderSprite.gameObject);
+        this._renderSprite.usesOverrideMaterial = true;
+        Material mat = this._renderSprite.renderer.material;
+        mat.shader = CwaffShaders.ShatterShader;
+        mat.SetFloat("_Progressive", 0.0f);
+        mat.SetFloat(CwaffVFX._FadeId, 0.0f);
+        // mat.SetFloat("_Amplitude", 0.125f);
+        mat.SetFloat("_Amplitude", 0.0625f);
+        mat.SetFloat(CwaffVFX._RandomSeedId, UnityEngine.Random.value);
       }
       if (this._appearOutOfNowhere)
       {
@@ -436,6 +450,12 @@ public class SlimyboiController : BraveBehaviour
         float extraGlow = _REFLECT_GLOW_STRENGTH * (this._reflectGlowTimer / _REFLECT_GLOW_TIME);
         HandleGlow(color: new Color(0.35f, 0.7f, 0.1f), lightColor: null, flickerRate: 20.0f, brightness: 0.0f,
           glowColorPower: 10.0f, minGlow: extraGlow + 1.0f, maxGlow: extraGlow + 10.0f, sensitivity: 0.7f, minLightRadius: 1.0f, maxLightRadius: 3.0f);
+        break;
+      }
+      case SlimyboiType.Glitch:
+      {
+        if (this._renderSprite)
+          this._renderSprite.renderer.material.SetFloat(CwaffVFX._RandomSeedId, UnityEngine.Random.value);
         break;
       }
     }
@@ -841,6 +861,8 @@ public class SlimyboiController : BraveBehaviour
       UnityEngine.Object.Destroy(this._vineMesh.gameObject);
     if (this._aura)
       UnityEngine.Object.Destroy(this._aura.gameObject);
+    if (this._renderSprite)
+      UnityEngine.Object.Destroy(this._renderSprite.gameObject);
     base.OnDestroy();
   }
 
