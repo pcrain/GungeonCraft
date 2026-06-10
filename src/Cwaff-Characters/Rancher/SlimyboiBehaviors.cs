@@ -43,6 +43,7 @@ public class SlimyboiController : BraveBehaviour
   internal Vector2 _dodgeVector = default;
   internal bool _queuedDodge = false;
   internal PlayerController _owner = null;
+  internal tk2dSprite _renderSprite = null;
 
   private bool _setup = false;
   private SlimeData _slimeData;
@@ -55,12 +56,12 @@ public class SlimyboiController : BraveBehaviour
   private float _projectileIframeTimer = 0.0f;
   private float _buffCooldownTimer = 0.0f;
   private tk2dSprite _trueSprite = null;
-  private tk2dSprite _renderSprite = null;
   private ParticleSystem _ps = null;
   private Geometry _aura = null;
   private EasyLight _light = null;
   private bool _didGlowSetup = false;
   private bool _appearOutOfNowhere = false;
+  private Color? _queuedOutlineColor = null;
 
   // Tangle specific
   private CwaffRopeMesh _vineMesh = null;
@@ -239,6 +240,7 @@ public class SlimyboiController : BraveBehaviour
   {
     const float JUMP_HEIGHT = 1.25f;
     float dtime = BraveTime.DeltaTime;
+    float now = BraveTime.ScaledTimeSinceStartup;
 
     // SlimyboiChargeBehavior charge = base.behaviorSpeculator.AttackBehaviors[0] as SlimyboiChargeBehavior;
     // base.aiActor.DebugNametag($"target: {(base.aiActor.PlayerTarget is AIActor a ? a.AmmonomiconName() : "null")}\ntargetPos: {base.aiActor.Path.Positions.Last.Value}");
@@ -274,6 +276,8 @@ public class SlimyboiController : BraveBehaviour
         Jump(0.5f, growIn: true);
         this._renderSprite.scale = new Vector3(0.0f, 0.0f, 1.0f);
       }
+      if (this._queuedOutlineColor is Color color)
+        SpriteOutlineManager.AddOutlineToSprite(this._renderSprite, color);
     }
 
     this._renderSprite.collection = this._trueSprite.collection;
@@ -296,6 +300,8 @@ public class SlimyboiController : BraveBehaviour
       renderPos -= this._renderSprite.GetRelativePositionFromAnchor(Anchor.LowerCenter).ToVector3ZUp();
       renderPos += new Vector3(0.5f * this._renderSprite.GetCurrentSpriteDef().untrimmedBoundsDataExtents.x, 0.0f, 0.0f); // add half width of sprite
     }
+    if (this.slimeType == SlimyboiType.Dervish || this._flightTimer > 0.0f)
+      renderPos.y += 0.125f * Mathf.Sin(12f * now);
 
     this._renderSprite.transform.position = renderPos.Quantize(0.0625f);
 
@@ -305,7 +311,7 @@ public class SlimyboiController : BraveBehaviour
     // invulnerability flicker
     // TODO: this doesn't work quite right if other things disable our renderer
     this._projectileIframeTimer = Mathf.Max(this._projectileIframeTimer - dtime, 0.0f);
-    if (Mathf.FloorToInt(this._projectileIframeTimer * 20.0f) % 2 == 1)
+    if (Mathf.CeilToInt(this._projectileIframeTimer * 20.0f) % 2 == 1)
       this._renderSprite.renderer.enabled = false;
     else
       this._renderSprite.renderer.enabled = true;
@@ -502,6 +508,8 @@ public class SlimyboiController : BraveBehaviour
     if (TickAndCheck(ref this._flightTimer, dtime))
     {
       base.aiActor.SetIsFlying(false, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
+      if (this._renderSprite)
+        SpriteOutlineManager.RemoveOutlineFromSprite(this._renderSprite);
     }
     if (TickAndCheck(ref this._goldTimer, dtime))
     {
@@ -531,6 +539,8 @@ public class SlimyboiController : BraveBehaviour
     base.healthHaver.PreventAllDamage = true;
     if (this._renderSprite)
       SpriteOutlineManager.AddOutlineToSprite(this._renderSprite, ExtendedColours.paleYellow);
+    else
+      this._queuedOutlineColor = ExtendedColours.paleYellow;
   }
 
   private void EndGoldInvulnerability()
@@ -642,7 +652,13 @@ public class SlimyboiController : BraveBehaviour
           break;
 
         if (sloim._flightTimer <= 0.0f)
+        {
           sloim.aiActor.SetIsFlying(true, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
+          if (sloim._renderSprite)
+            SpriteOutlineManager.AddOutlineToSprite(sloim._renderSprite, Color.white);
+          else
+            sloim._queuedOutlineColor = Color.white;
+        }
         sloim._flightTimer = _AURA_PERSIST_TIME;
         break;
       }
@@ -1240,8 +1256,11 @@ public class SlimyboiImmobileInCombatBehavior : OverrideBehaviorBase
 public class SlimyboiDodgeBehavior : OverrideBehaviorBase
 {
   private const float _DODGE_TIME = 0.2f;
+  private const int _NUM_AFTERIMAGES = 4;
 
   private SlimyboiController _sloim;
+  private int _afterimagesDone;
+  private float _dodgeStartTime;
   private float _dodgeEndTime;
 
   public override void Init(GameObject gameObject, AIActor aiActor, AIShooter aiShooter)
@@ -1256,7 +1275,9 @@ public class SlimyboiDodgeBehavior : OverrideBehaviorBase
       return BehaviorResult.Continue;
 
     this._sloim._queuedDodge = false;
-    this._dodgeEndTime = BraveTime.ScaledTimeSinceStartup + _DODGE_TIME;
+    this._afterimagesDone = 0;
+    this._dodgeStartTime = BraveTime.ScaledTimeSinceStartup;
+    this._dodgeEndTime = this._dodgeStartTime + _DODGE_TIME;
     m_aiActor.gameObject.PlayUnique("slime_dodge_sound");
     SpawnManager.SpawnVFX(GameManager.Instance.Dungeon.dungeonDustups.rollLandDustup, m_aiActor.CenterPosition, Lazy.RandomEulerZ());
     m_aiActor.BehaviorOverridesVelocity = true;
@@ -1267,8 +1288,16 @@ public class SlimyboiDodgeBehavior : OverrideBehaviorBase
 
   public override ContinuousBehaviorResult ContinuousUpdate()
   {
-    if (BraveTime.ScaledTimeSinceStartup >= this._dodgeEndTime)
+    float now = BraveTime.ScaledTimeSinceStartup;
+    if (now >= this._dodgeEndTime)
       return ContinuousBehaviorResult.Finished;
+
+    float percentDone = (now - this._dodgeStartTime) / _DODGE_TIME;
+    int afterimageNum = Mathf.FloorToInt(percentDone * _NUM_AFTERIMAGES);
+    if (afterimageNum > this._afterimagesDone)
+      this._sloim._renderSprite.DuplicateInWorld().gameObject.ExpireIn(0.2f, 0.2f, 0.5f);
+    this._afterimagesDone = afterimageNum;
+
     return ContinuousBehaviorResult.Continue;
   }
 
