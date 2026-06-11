@@ -667,13 +667,14 @@ public class SlimyboiController : BraveBehaviour
 
   private void HandleAuraVisuals(float radius = _AURA_RADIUS)
   {
-    Vector2 pos = base.aiActor.CenterPosition;
-    if (!this._aura)
-    {
-      this._aura = Geometry.Create(Geometry.Shape.RING);
-      this._aura.Place(pos: pos, color: this._slimeData.goopColor.WithAlpha(0.05f), radius: radius, radiusInner: radius - _AURA_THICKNESS);
-    }
-    this._aura.Place(pos: pos);
+    // NOTE: this was mostly used for debugging and is somewhat distracting in game, so commented out for now
+    // Vector2 pos = base.aiActor.CenterPosition;
+    // if (!this._aura)
+    // {
+    //   this._aura = Geometry.Create(Geometry.Shape.RING);
+    //   this._aura.Place(pos: pos, color: this._slimeData.goopColor.WithAlpha(0.05f), radius: radius, radiusInner: radius - _AURA_THICKNESS);
+    // }
+    // this._aura.Place(pos: pos);
   }
 
   private void HandleAuraEffect(float radius = _AURA_RADIUS)

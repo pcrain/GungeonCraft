@@ -23,7 +23,9 @@ public static class CwaffCharacter
     _CwaffCharacters.Add(data);
 
     GameObject gameObject = CharacterBuilder.GetPlayerPrefab(data.baseCharacter).ClonePrefab();
-    gameObject.AddComponent<CustomCharacter>().data = data;
+
+    CustomCharacter cc = gameObject.AddComponent<CustomCharacter>();
+    cc.data = data;
 
     PlayerController pc = gameObject.GetComponent<PlayerController>();
     pc.AllowZeroHealthState = data.health == 0;
@@ -62,6 +64,7 @@ public static class CwaffCharacter
       paradoxUsesSprites   : false
       );
     SetupPunchoutSprites(pc, data);
+    RegisterCharacterForPunchout.Invoke(null, [cc]);
     CharacterBuilder.storedCharacters.Add(data.nameInternal, new(data, pc.gameObject));
     ETGModConsole.Characters.Add(data.nameShort.ToLowerInvariant(), data.nameShort); //Adds characters to MTGAPIs character database
 
@@ -74,6 +77,8 @@ public static class CwaffCharacter
     typeof(Alexandria.CharacterAPI.SpriteHandler)
       .GetField("punchoutPlayerAnimInfo", BindingFlags.Static | BindingFlags.NonPublic)
       .GetValue(null);
+  private static readonly MethodInfo RegisterCharacterForPunchout =
+    typeof(Alexandria.CharacterAPI.Hooks).GetMethod("RegisterCharacterForPunchout", BindingFlags.NonPublic | BindingFlags.Static);
 
   private static void SetupPunchoutSprites(PlayerController pc, CustomCharacterData data)
   {

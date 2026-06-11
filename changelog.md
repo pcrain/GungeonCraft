@@ -11,6 +11,7 @@
 - Cleaned up outline on Chew Toy's sprite
 - Fixed rare null deref when creating synergy notifications when running other mods
 - Fixed camera stuttering when using Death Note
+- Fixed Rat Punchout breaking when using Rogo due to changes to Alexandria's API breaking some local reflection-based setup code
 
 ## 1.31.3 (2026-06-02)
 
