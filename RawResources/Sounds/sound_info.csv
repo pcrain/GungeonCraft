@@ -442,3 +442,6 @@ slime_heal_sound,1.0,1,sound,1
 slime_vine_sound,-3.0,1,sound,1
 slime_coin_sound,2.0,1,sound,1
 slime_mosaic_heal_sound,2.0,1,sound,1
+portable_hydro_turret_fire_sound,5.0,1,sound,0
+portable_hydro_turret_reload_sound,5.0,1,sound,0
+portable_hydro_turret_impact_sound,5.0,1,sound,0

@@ -27,6 +27,7 @@ public class Rancher
 
     // Gun Setup
     Vacpack.Init();
+    PortableHydroTurret.Init();
 
     // Character setup
     CustomCharacterData data = new() {
@@ -40,6 +41,7 @@ public class Rancher
       foyerPos          = new Vector3(25.25f, 22.25f),
       loadout           = new(){
         new(Lazy.Pickup<Vacpack>(), false),
+        new(Lazy.Pickup<PortableHydroTurret>(), false),
       },
       idleDoer          = new GameObject().RegisterPrefab().InitComponent<CharacterSelectIdleDoer>(i => {
           i.phases = new CharacterSelectIdlePhase[]{

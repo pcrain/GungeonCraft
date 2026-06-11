@@ -119,6 +119,8 @@ public sealed class GunData
   public float stunChance;
   public float stunDuration;
   public float beamEmissionSensitivity;
+  public bool useBetterEmissiveShader;
+  public float glowSensitivity;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -227,6 +229,8 @@ public sealed class GunData
   /// <param name="stunChance">The chance for the projectile to apply stun to its target.</param>
   /// <param name="stunDuration">The duration of stun to apply.</param>
   /// <param name="beamEmissionSensitivity">Determines the emissive sensitivity of beam sprites.</param>
+  /// <param name="useBetterEmissiveShader">If true, uses MakeGlowyBetter() instead of SetGlowiness() for projectile shading.</param>
+  /// <param name="glowSensitivity">The color sensitivity of the emissive shader to use on the projectile.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -245,7 +249,8 @@ public sealed class GunData
     BasicBeamController.BeamTileType? beamTiling = null, BasicBeamController.BeamEndType? beamEndType = null, bool? beamSeparation = null, bool beamStartIsMuzzle = false,
     bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, float? glowColorPower = null,
     int beamDissipateFps = -1, float? spinRate = null, float? lightStrength = null, float? lightRange = null, Color? lightColor = null, string chargeSound = null, bool? damagesWalls = null,
-    Color? beamEmissionColor = null, float beamEmissionColorPower = 1.55f, float beamImpactEmission = -1f, float stunChance = 0f, float stunDuration = -1f, float beamEmissionSensitivity = -1f)
+    Color? beamEmissionColor = null, float beamEmissionColorPower = 1.55f, float beamImpactEmission = -1f, float stunChance = 0f, float stunDuration = -1f, float beamEmissionSensitivity = -1f,
+    bool useBetterEmissiveShader = false, float glowSensitivity = 0.5f)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -353,6 +358,8 @@ public sealed class GunData
       _Instance.stunChance                        = stunChance;
       _Instance.stunDuration                      = stunDuration;
       _Instance.beamEmissionSensitivity           = beamEmissionSensitivity;
+      _Instance.useBetterEmissiveShader           = useBetterEmissiveShader;
+      _Instance.glowSensitivity                   = glowSensitivity;
       return _Instance;
   }
 }
@@ -543,7 +550,12 @@ public static class GunBuilder
 
     // Determine the emissive properties of the projectile
     if (b.glowAmount > 0f)
-      p.sprite.SetGlowiness(glowAmount: b.glowAmount, glowColor: b.glowColor, glowColorPower: b.glowColorPower);
+    {
+      if (b.useBetterEmissiveShader)
+        p.sprite.MakeGlowyBetter(glowAmount: b.glowAmount, glowColor: b.glowColor, glowColorPower: b.glowColorPower, sensitivity: b.glowSensitivity);
+      else
+        p.sprite.SetGlowiness(glowAmount: b.glowAmount, glowColor: b.glowColor, glowColorPower: b.glowColorPower);
+    }
 
     return p;
   }
