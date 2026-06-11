@@ -44,9 +44,9 @@ public class FloorPuzzleRoomController : MonoBehaviour
     else if (tileSet != GlobalDungeonData.ValidTilesets.MINEGEON && tileSet != GlobalDungeonData.ValidTilesets.CATACOMBGEON && tileSet != GlobalDungeonData.ValidTilesets.SEWERGEON)
       this._puzzleSize += 1;
 
-    #if DEBUG
-      this._puzzleSize = BASE_PUZZLE_SIZE + 1;
-    #endif
+    // #if DEBUG
+    //   this._puzzleSize = BASE_PUZZLE_SIZE + 1;
+    // #endif
 
     this._puzzleSize += ((int[])[-1, 0, 1]).ChooseRandom(); // randomly adjust difficulty by +/- 1
 

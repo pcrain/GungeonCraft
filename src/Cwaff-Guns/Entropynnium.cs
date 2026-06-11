@@ -35,7 +35,7 @@ public class Entropynnium : CwaffGun
         Lazy.SetupGun<Entropynnium>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.EXPLOSIVE, reloadTime: 0.0f, ammo: 720, shootFps: 20,
             chargeFps: 20, muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter,
-            attacksThroughWalls: true, canGainAmmo: false, canReloadNoMatterAmmo: true, infiniteAmmo: true)
+            attacksThroughWalls: true, canGainAmmo: false, canReloadNoMatterAmmo: true, infiniteAmmo: true, banFromBlessedRuns: true)
           .Attach<EntropynniumAmmoDisplay>()
           .AssignGun(out Gun gun)
           .InitSpecialProjectile<ManaExplosionProjectile>(GunData.New(clipSize: -1, cooldown: 0.15f, damage: 25f, hideAmmo: true,
