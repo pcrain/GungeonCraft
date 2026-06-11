@@ -393,6 +393,10 @@ public class Vacpack : CwaffGun
 
     internal void SetFocus(bool focus)
     {
+      // if (focus)
+      //   this.PlayerOwner.SetInputOverride(ItemName);
+      // else
+      //   this.PlayerOwner.ClearInputOverride(ItemName);
       BraveTime.SetTimeScaleMultiplier(focus ? 0.1f : 1.0f, base.gameObject); //TODO: use vanilla metalgear time slowdown factor
     }
 
@@ -613,7 +617,7 @@ public class VacpackHUD : MonoBehaviour
     }
   }
 
-  private void Update()
+  private void LateUpdate()
   {
     if (!this._setup)
       return;

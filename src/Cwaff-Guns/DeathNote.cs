@@ -693,7 +693,7 @@ public class DeathNoteHUD : MonoBehaviour
     }
   }
 
-  private void Update()
+  private void LateUpdate()
   {
     if (!this._setup)
       return;

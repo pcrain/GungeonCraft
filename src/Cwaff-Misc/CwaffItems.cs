@@ -825,7 +825,6 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   [HarmonyPatch(typeof(Gun), nameof(Gun.Reload))]
   private static class GunReloadPostfixToAppeaseTheHarmonyOverlords { public static void Postfix() { } }
 
-  //BUG: i don't think this patch actually gets applied
   /// <summary>Make sure mastery shader renderer is disabled with the gun's renderer</summary>
   [HarmonyPatch(typeof(Gun), nameof(Gun.OnDisable))]
   [HarmonyPostfix]

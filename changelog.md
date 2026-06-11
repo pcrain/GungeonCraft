@@ -10,6 +10,7 @@
 - Fixed getting stuck inside objects when using [REDACTED] while actively taking knockback
 - Cleaned up outline on Chew Toy's sprite
 - Fixed rare null deref when creating synergy notifications when running other mods
+- Fixed camera stuttering when using Death Note
 
 ## 1.31.3 (2026-06-02)
 
