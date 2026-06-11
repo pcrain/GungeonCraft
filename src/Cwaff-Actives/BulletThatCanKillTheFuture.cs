@@ -130,12 +130,16 @@ public class BulletThatCanKillTheFuture : CwaffActive
         interactor.SetInputOverride(ItemName);
         interactor.specRigidbody.CollideWithTileMap = false;
         interactor.specRigidbody.CollideWithOthers = false;
+        interactor.specRigidbody.Velocity = Vector2.zero;
+        interactor.knockbackDoer.SetImmobile(true, ItemName);
         PlayerController otherPlayer = GameManager.Instance.GetOtherPlayer(interactor);
         if (otherPlayer)
         {
             otherPlayer.SetInputOverride(ItemName);
             otherPlayer.specRigidbody.CollideWithTileMap = false;
             otherPlayer.specRigidbody.CollideWithOthers = false;
+            otherPlayer.specRigidbody.Velocity = Vector2.zero;
+            otherPlayer.knockbackDoer.SetImmobile(true, ItemName);
         }
 
         NoDamageBlankPatch.ForceNextBlankToDoNoDamage = true;
@@ -321,11 +325,13 @@ public class BulletThatCanKillTheFuture : CwaffActive
         interactor.ClearInputOverride(ItemName);
         interactor.specRigidbody.CollideWithTileMap = true;
         interactor.specRigidbody.CollideWithOthers = true;
+        interactor.knockbackDoer.SetImmobile(false, ItemName);
         if (otherPlayer)
         {
             otherPlayer.ClearInputOverride(ItemName);
             otherPlayer.specRigidbody.CollideWithTileMap = true;
             otherPlayer.specRigidbody.CollideWithOthers = true;
+            otherPlayer.knockbackDoer.SetImmobile(false, ItemName);
         }
         GameCursorController.CursorOverride.RemoveOverride(ItemName);
         Pixelator.Instance.DoFinalNonFadedLayer = false;
