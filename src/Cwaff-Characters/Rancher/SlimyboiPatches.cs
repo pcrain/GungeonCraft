@@ -84,4 +84,29 @@ internal static class SlimyboiPatches
     if (otherRigidbody.gameObject.GetComponent<SlimyboiController>())
       PhysicsEngine.SkipCollision = false;
   }
+
+  // WARNING: this "fixes" the camera, but Wallmongerer's behavior is just to teleport down to the player as soon as it gets unstuck...
+  //          unsure whether it's best to leave this in or not
+  private static Vector2 _PreAdjustCameraPos = default;
+  /// <summary>Fix camera drift as Wallmongerer gets pushed back.</summary>
+  [HarmonyPatch(typeof(DemonWallMovementBehavior), nameof(DemonWallMovementBehavior.Update))]
+  [HarmonyPrefix]
+  private static void DemonWallMovementBehaviorUpdatePrefixPatch(DemonWallMovementBehavior __instance)
+  {
+    if (!SlimyboiManager.HasInstance || __instance.m_deltaTime <= 0f || __instance.m_demonWallController is not DemonWallController wall || !wall.IsCameraLocked)
+      return;
+
+    _PreAdjustCameraPos = GameManager.Instance.MainCameraController.OverridePosition;
+  }
+  [HarmonyPatch(typeof(DemonWallMovementBehavior), nameof(DemonWallMovementBehavior.Update))]
+  [HarmonyPostfix]
+  private static void DemonWallMovementBehaviorUpdatePostfixPatch(DemonWallMovementBehavior __instance)
+  {
+    if (!SlimyboiManager.HasInstance || __instance.m_deltaTime <= 0f || __instance.m_demonWallController is not DemonWallController wall || !wall.IsCameraLocked)
+      return;
+
+    CameraController mainCameraController = GameManager.Instance.MainCameraController;
+    Vector2 offset = new Vector2(0f, wall.specRigidbody.HitboxPixelCollider.UnitDimensions.y - mainCameraController.Camera.orthographicSize + 0.5f);
+    mainCameraController.OverridePosition = Lazy.SmoothestLerp(_PreAdjustCameraPos, wall.specRigidbody.UnitCenter + offset, 2.0f);
+  }
 }

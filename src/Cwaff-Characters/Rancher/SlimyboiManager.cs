@@ -16,6 +16,7 @@ public class SlimyboiManager : MonoBehaviour
   private List<float> _enemyKillTimes;
   private ReadOnlyCollection<SlimyboiController> _readOnlyActiveSlimes;
 
+  public static bool HasInstance => _Instance;
   public static ReadOnlyCollection<SlimyboiController> ActiveSlimes => _Instance._readOnlyActiveSlimes;
 
   public static void EnsureInstance()
