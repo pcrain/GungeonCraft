@@ -25,7 +25,7 @@ public class SlimyboiController : BraveBehaviour
   private const float _HEALTH_FROM_BULLETS = 2.5f;
   private const float _HEALTH_DRAIN_RATE = 2.0f;
   private const float _HEALTH_DRAIN_AMOUNT = 1.0f;
-  private const float _MAX_GROUP_HEAL = 5.0f;
+  private const float _MAX_GROUP_HEAL = 10.0f;
   private const float _MAX_STUCK_TIME = 0.25f;
 
   private const float _HEAL_RADIUS_SQR = _HEAL_RADIUS * _HEAL_RADIUS;
@@ -483,7 +483,7 @@ public class SlimyboiController : BraveBehaviour
       for (int j = allProj.Count - 1; j >= 0; j--)
       {
           Projectile p = allProj[j];
-          if (!p || p.Owner is PlayerController)
+          if (!p || !p.isActiveAndEnabled || p.Owner is PlayerController)
               continue;
 
           Vector2 ppos = p.SafeCenter;

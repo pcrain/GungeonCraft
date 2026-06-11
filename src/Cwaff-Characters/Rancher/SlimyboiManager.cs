@@ -132,6 +132,8 @@ public class SlimyboiManager : MonoBehaviour
 
   private static void SpawnSlimes(List<SlimyboiType> slimes, PlayerController player = null, RoomHandler room = null, Vector2? pos = null)
   {
+    if (GameManager.Instance.IsFoyer)
+      return;
     _Instance.StartCoroutine(SpawnSlimesEnumerator(slimes, player, room, pos));
   }
 
@@ -240,7 +242,7 @@ public class SlimyboiManager : MonoBehaviour
   private static void HandleSlimeSpawns(PlayerController player, RoomHandler room, bool combatEnded)
   {
     const float GLITCH_SLIME_CHANCE = 0.005f;
-    if (!_Instance || room == null || room.area == null || _Instance._processedRooms.Contains(room))
+    if (!_Instance || room == null || room.area == null || _Instance._processedRooms.Contains(room) || GameManager.Instance.IsFoyer)
       return;
     if (!combatEnded && room.IsUnclearedCombatRoom())
       return;
@@ -315,13 +317,13 @@ public class SlimyboiManager : MonoBehaviour
     if (!breakable.goopsOnBreak || breakable.goopType is not GoopDefinition def)
       return;
     if (def.AppliesDamageOverTime)
-      SpawnSlimes([SlimyboiType.Rad], pos: breakable.transform.position);
+      SpawnSlimes([SlimyboiType.Rad, SlimyboiType.Rad, SlimyboiType.Rad, SlimyboiType.Rad], pos: breakable.transform.position);
     else if (def.UsesGreenFire)
-      SpawnSlimes([SlimyboiType.Fire, SlimyboiType.Fire], pos: breakable.transform.position);
+      SpawnSlimes([SlimyboiType.Fire, SlimyboiType.Fire, SlimyboiType.Rad, SlimyboiType.Rad], pos: breakable.transform.position);
     else if (def.isOily)
-      SpawnSlimes([SlimyboiType.Fire], pos: breakable.transform.position);
+      SpawnSlimes([SlimyboiType.Fire, SlimyboiType.Fire, SlimyboiType.Fire, SlimyboiType.Fire], pos: breakable.transform.position);
     else if (def.CanBeElectrified || def.CanBeFrozen)
-      SpawnSlimes([SlimyboiType.Puddle, SlimyboiType.Puddle, SlimyboiType.Puddle], pos: breakable.transform.position);
+      SpawnSlimes([SlimyboiType.Puddle, SlimyboiType.Puddle, SlimyboiType.Puddle, SlimyboiType.Puddle], pos: breakable.transform.position);
   }
 
   public static void OnWillPickUpAnyPassive(PlayerController player, PickupObject pickup)

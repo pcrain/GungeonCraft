@@ -35,7 +35,7 @@ public static class Slimybois
       overrideSpeed = _BASE_SPEED * 2.5f, goopColor = Color.white });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Dervish, flags = CanFly, goopColor = Color.gray,
       overrideSpeed = _BASE_SPEED * 2.0f, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN});
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity | CantReceiveHealing,
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity | FireImmunity | PoisonImmunity | CantReceiveHealing,
       goopColor = Color.cyan, overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH * 2});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = DodgesProjectiles });
@@ -52,14 +52,14 @@ public static class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Boom, goopColor = ExtendedColours.vibrantOrange, flags = ExplodesOnDeath | ExplosiveAttacks,
       overrideContactDamage = _BASE_DAMAGE * 4.0f });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Puddle, goopColor = ExtendedColours.skyblue, flags = AbsorbsBullets | PassiveHealthDrain | FireImmunity });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quantum, goopColor = Color.white, flags = QuantumInstability | PassiveHealthDrain | FullStatusImmunity | CanFly | CantReceiveHealing });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Quantum, goopColor = Color.white, flags = QuantumInstability | PassiveHealthDrain | FullStatusImmunity | FireImmunity | PoisonImmunity | CanFly | CantReceiveHealing });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Tabby, goopColor = Color.white, flags = FollowPlayer | CanAlwaysVac | CanFly,
       overrideHealth = _BASE_HEALTH * 2, overrideContactDamage = _BASE_DAMAGE * 0.5f, overrideAttackCooldown = _DEFAULT_COOLDOWN * 0.5f });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Gold, goopColor = ExtendedColours.paleYellow, flags = CanFly | CantReceiveHealing });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Lucky, goopColor = Color.white, overrideHealth = _BASE_HEALTH * 2, flags = ExtraCasingOnKill });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Mosaic, goopColor = ExtendedColours.pink, flags = AttacksHealAllies,
       overrideHealth = _BASE_HEALTH * 3, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Glitch, goopColor = Color.black, flags = AttacksPoison | AttacksIgnite | AttacksSlow | FullStatusImmunity,
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Glitch, goopColor = Color.black, flags = AttacksPoison | AttacksIgnite | AttacksSlow | FullStatusImmunity | FireImmunity | PoisonImmunity,
       overrideHealth = _BASE_HEALTH * 5 });
 
     // pad out unfinished defs
