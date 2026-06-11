@@ -96,8 +96,10 @@ public static class SetupSynergySpritePatch
     [HarmonyPatch(typeof(UINotificationController), nameof(UINotificationController.SetupSynergySprite))]
     static void Prefix(UINotificationController __instance, ref tk2dSpriteCollectionData collection, ref int spriteId)
     {
+        if (collection == null || collection.spriteDefinitions == null || collection.spriteDefinitions.Length <= spriteId)
+          return;
         string spriteName = collection.spriteDefinitions[spriteId].name;
-        if (!spriteName.EndsWith("_idle_001"))
+        if (string.IsNullOrEmpty(spriteName) || !spriteName.EndsWith("_idle_001"))
             return;
         string trimmedSpriteName = C.MOD_PREFIX + "_" + spriteName.Replace("_idle_001", "_ammonomicon");
         tk2dSpriteCollectionData ammonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
