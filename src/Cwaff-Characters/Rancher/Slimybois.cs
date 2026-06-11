@@ -2,12 +2,6 @@ namespace CwaffingTheGungy;
 
 using static SlimyboiFlags;
 
-/* TODO:
-    - allow enemies to target slimes (chance of temporary override)
-    - unique particles / vfx / sounds / potentially goops?
-    - only use override sprite renderer when attacking
-*/
-
 public static class Slimybois
 {
   internal const float _DEFAULT_COOLDOWN = 2.0f;
@@ -143,8 +137,8 @@ public static class Slimybois
       AngularVelocityVariance : 0,
       DebrisBounceCount       : 1,
       DoesGoopOnRest          : true,
-      GoopType                : EasyGoopDefinitions.BlobulonGoopDef,
-      GoopRadius              : 0.5f,
+      // GoopType                : EasyGoopDefinitions.BlobulonGoopDef,
+      // GoopRadius              : 0.5f,
       Mass                    : 1.0f);
     goopDebris.decayOnBounce = 0.8f;
     goopDebris.usesLifespan = true;

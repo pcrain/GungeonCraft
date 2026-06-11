@@ -1,9 +1,5 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - fix firing when holding fire while switching modes
-*/
-
 public class Vacpack : CwaffGun
 {
     public static string ItemName         = "Vacpack";
@@ -160,10 +156,11 @@ public class Vacpack : CwaffGun
     public override bool OnManualReloadAttempted(PlayerController player)
     {
       if (!player.AcceptingNonMotionInput || gun.IsFiring)
-          return true;
+          return false;
+
       CreateHUDIfNecessary();
       if (this._hud.Active)
-          return true;
+          return false;
 
       this._hudHoldTimer = _HUD_HOLD_TIME;
       return false;
