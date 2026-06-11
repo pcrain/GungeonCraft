@@ -3,6 +3,7 @@
 ## 1.32.0 (TBD)
 
 - Added Akelus and M'tara
+- Fixed several sprites that were an odd number of pixels wide from rendering with artifacts due to not being aligned to the pixel grid
 
 ## 1.31.3 (2026-06-02)
 

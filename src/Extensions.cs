@@ -2156,7 +2156,7 @@ public static class Extensions
       return clipName;
   }
 
-  /// <summary>Fixed version of Alexandria's ConstructOffsetsFromAnchor() to deal with atlas sprites correctly</summary>
+  /// <summary>Fixed version of Alexandria's ConstructOffsetsFromAnchor() to deal with atlas sprites and quantization errors correctly</summary>
   public static void BetterConstructOffsetsFromAnchor(this tk2dSpriteDefinition def, tk2dBaseSprite.Anchor anchor, Vector2? scale = null,
     bool fixesScale = false, bool changesCollider = true)
   {
@@ -2174,7 +2174,7 @@ public static class Extensions
           yOffset = -(0.5f * scaling.y);
       else if (anchor == tk2dBaseSprite.Anchor.UpperLeft || anchor == tk2dBaseSprite.Anchor.UpperCenter || anchor == tk2dBaseSprite.Anchor.UpperRight)
           yOffset = -scaling.y;
-      def.ShiftBy(new Vector3(xOffset, yOffset, 0f), false);
+      def.ShiftBy(new Vector3(xOffset.Quantize(0.0625f, VectorConversions.Ceil), yOffset.Quantize(0.0625f, VectorConversions.Ceil), 0f), false);
       if (changesCollider && def.colliderVertices != null && def.colliderVertices.Length > 0)
       {
           float colliderXOffset = 0;
@@ -2187,7 +2187,7 @@ public static class Extensions
               colliderYOffset = (scaling.y / 2f);
           else if (anchor == tk2dBaseSprite.Anchor.UpperLeft || anchor == tk2dBaseSprite.Anchor.UpperCenter || anchor == tk2dBaseSprite.Anchor.UpperRight)
               colliderYOffset = -(scaling.y / 2f);
-          def.colliderVertices[0] += new Vector3(colliderXOffset, colliderYOffset, 0);
+          def.colliderVertices[0] += new Vector3(colliderXOffset.Quantize(0.0625f, VectorConversions.Ceil), colliderYOffset.Quantize(0.0625f, VectorConversions.Ceil), 0);
       }
   }
 
