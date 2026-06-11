@@ -345,7 +345,12 @@ public class ChainkLink : MonoBehaviour
           return;
         }
         if (this._owner.CurrentGun != this._gun.gun)
-          this._connectedToGun = false;
+        {
+          if (this._connectedToEnemy)
+            Disconnect();
+          else
+            this._connectedToGun = false;
+        }
       }
       if (this._connectedToProjectile && !this._projectile)
       {
