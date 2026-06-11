@@ -8,6 +8,7 @@
 - Banned Entropynnium from Blessed Runs
 - Fixed Crapshooter (and probably other items) jittering when appearing from chests due to not being aligned to the pixel grid
 - Fixed getting stuck inside objects when using [REDACTED] while actively taking knockback
+- Cleaned up outline on Chew Toy's sprite
 
 ## 1.31.3 (2026-06-02)
 
