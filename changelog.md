@@ -6,6 +6,7 @@
 - Fixed several sprites that were an odd number of pixels wide from rendering with artifacts due to not being aligned to the pixel grid
 - Fixed Chain Driver's chains remaining player-controlled when switching guns while tethered to an enemy
 - Banned Entropynnium from Blessed Runs
+- Fixed Crapshooter (and probably other items) jittering when appearing from chests due to not being aligned to the pixel grid
 
 ## 1.31.3 (2026-06-02)
 

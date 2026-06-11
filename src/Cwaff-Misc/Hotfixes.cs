@@ -81,7 +81,7 @@ public static class BadItemOffsetsFromChestHotfix
         private static Vector3 DetermineActualOffset(Vector3 original, PickupObject p, tk2dSprite s)
         {
             if (p.gameObject.GetComponent<CwaffGun>())
-                return -s.GetRelativePositionFromAnchor(Anchor.LowerCenter);
+                return -s.GetRelativePositionFromAnchor(Anchor.LowerCenter).Quantize(0.0625f);
             return original;
         }
     }
