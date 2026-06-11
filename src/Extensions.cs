@@ -904,6 +904,12 @@ public static class Extensions
     return gun;
   }
 
+  public static Gun SetMuzzleVFX(this Gun gun, VFXPool muzzleVFX)
+  {
+    gun.muzzleFlashEffects = muzzleVFX;
+    return gun;
+  }
+
   public static Gun SetCasing(this Gun gun, Items otherGun)
   {
     gun.shellCasing = otherGun.AsGun().shellCasing;
