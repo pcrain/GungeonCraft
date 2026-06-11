@@ -2,7 +2,6 @@ namespace CwaffingTheGungy;
 
 /* TODO:
     - fix firing when holding fire while switching modes
-    - prevent volley modifications such as Scattershot
 */
 
 public class Vacpack : CwaffGun
@@ -38,7 +37,8 @@ public class Vacpack : CwaffGun
     {
         Lazy.SetupGun<Vacpack>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.EXCLUDED, gunClass: CwaffGunClass.UTILITY, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true, modulesAreTiers: true,
-            chargeFps: 16, banFromBlessedRuns: true, isStarterGun: true, doesScreenShake: false, muzzleFrom: Items.Mailbox) // TODO: verify this doesn't break paradox
+            chargeFps: 16, banFromBlessedRuns: true, isStarterGun: false, doesScreenShake: false, muzzleFrom: Items.Mailbox,
+            preventVolleyModifications: true) // TODO: not a starter gun so Paradox can't use it since it dramatically interferes with runs
           .Attach<VacpackAmmoDisplay>()
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, hideAmmo: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot

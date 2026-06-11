@@ -1051,6 +1051,7 @@ public static class Extensions
   /// <param name="isStarterGun">If true, the gun is marked as a starter gun for Paradox / achievement purposes.</param>
   /// <param name="preventDuctTape">If true, prevents Duct Tape from being used on this item.</param>
   /// <param name="muzzleEmissionSensitivity">The emissive sensitivity of the lighting produced by the muzzle.</param>
+  /// <param name="preventVolleyModifications">If true, prevents volley modification items such as Scattershot from being applied to the gun.</param>
   public static Gun SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
@@ -1060,7 +1061,7 @@ public static class Extensions
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
     bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f, bool canAttackWhileRolling = false,
-    bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f, bool preventDuctTape = false, float muzzleEmissionSensitivity = 0.5f)
+    bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f, bool preventDuctTape = false, float muzzleEmissionSensitivity = 0.5f, bool preventVolleyModifications = false)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -1108,6 +1109,7 @@ public static class Extensions
 
     cg.canAttackWhileRolling = canAttackWhileRolling;
     cg.preventDuctTape = preventDuctTape;
+    cg.preventVolleyModifications = preventVolleyModifications;
     cg.percentSpeedWhileCharging = percentSpeedWhileCharging;
     cg.percentSpeedWhileReloading = percentSpeedWhileReloading;
     cg.percentSpeedWhileFiring = percentSpeedWhileFiring;

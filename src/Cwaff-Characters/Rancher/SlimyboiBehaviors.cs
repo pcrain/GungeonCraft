@@ -1,9 +1,5 @@
 namespace CwaffingTheGungy;
 
-/* TODO:
-    - fix targeting invulnerable chancellor (check for BulletKingToadieController and m_isCrazed)
-*/
-
 /// <summary>Main controller class for Slimes</summary>
 public class SlimyboiController : BraveBehaviour
 {

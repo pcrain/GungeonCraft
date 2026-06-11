@@ -64,6 +64,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public  bool                              useSmoothReload            = false;  // if true, synchronize reload animation with reload speed
   public  float                             smoothReloadOffset         = 0f;     // time between reloading finishing visually and functionally
   public  bool                              canAttackWhileRolling      = false;  // if true, allows the player to fire the gun while dodge rolling
+  public  bool                              preventVolleyModifications = false;  // if true, prevents gun from applying volley modifications (e.g. Scattershot)
 
   public  bool                              Mastered {get; private set;}         // whether the gun has been mastered
 
@@ -824,6 +825,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   [HarmonyPatch(typeof(Gun), nameof(Gun.Reload))]
   private static class GunReloadPostfixToAppeaseTheHarmonyOverlords { public static void Postfix() { } }
 
+  //BUG: i don't think this patch actually gets applied
   /// <summary>Make sure mastery shader renderer is disabled with the gun's renderer</summary>
   [HarmonyPatch(typeof(Gun), nameof(Gun.OnDisable))]
   [HarmonyPostfix]
@@ -856,6 +858,42 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   //   // __instance.m_childSprite.usesOverrideMaterial = true;
   //   // AddMasteryShaders(__instance.m_childSprite.renderer.material);
   // }
+
+  /// <summary>Preclude all volley modications for certain guns</summary>
+  [HarmonyPatch]
+  private static class PrecludeVolleyModificationPatch
+  {
+    [HarmonyPatch(typeof(PlayerStats), nameof(PlayerStats.RebuildGunVolleys))]
+    [HarmonyILManipulator]
+    private static void PlayerStatsRebuildGunVolleysPatchIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+
+        // first, find the target of continue
+        if (!cursor.TryGotoNext(MoveType.AfterLabel,
+          instr => instr.MatchLdloc((byte)0),
+          instr => instr.MatchLdcI4(1),
+          instr => instr.MatchAdd(),
+          instr => instr.MatchStloc(0))
+          ) // Gun gun
+          return;
+        ILLabel loopContinue = cursor.MarkLabel();
+
+        //then , actually figure out which guns we need to skip
+        cursor.Index = 0;
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(1))) // Gun gun
+          return;
+
+        cursor.Emit(OpCodes.Ldloc_S, (byte)1); // Gun gun
+        cursor.CallPrivate(typeof(PrecludeVolleyModificationPatch), nameof(ShouldPrecludeVolleyModification));
+        cursor.Emit(OpCodes.Brtrue, loopContinue);
+    }
+
+    private static bool ShouldPrecludeVolleyModification(Gun gun)
+    {
+      return gun && gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.preventVolleyModifications;
+    }
+  }
 }
 
 public abstract class CwaffBlankModificationItem: BlankModificationItem, ICwaffItem

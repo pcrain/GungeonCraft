@@ -180,7 +180,7 @@ public static class Dissect // reflection helper methods for being a lazy dumdum
     public static void DumpIL(this ILCursor cursor)
     {
         foreach (Instruction c in cursor.Instrs)
-            DumpILInstruction(c);
+            Lazy.DebugConsoleLog(DumpILInstruction(c));
     }
 
     private static List<string> _Bundles = new(){
