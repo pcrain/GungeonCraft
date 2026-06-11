@@ -48,6 +48,11 @@ public class Rancher
             new(){ inAnimation = "select_slime",    holdMin = 0, holdMax = 0 },
           };
       }),
+      stats = new(){
+        {PlayerStats.StatType.RateOfFire, 0.5f },
+        {PlayerStats.StatType.ReloadSpeed, 2.0f },
+        {PlayerStats.StatType.Accuracy, 2.0f },
+      },
     };
     PlayerController pc = data.MakeNewCustomCharacter();
     pc.gunAttachPoint.localPosition = new Vector3(0.5f, 0.5f, 0.0f); // NOTE: fix wonky hand offset, integrate directly into MakeNewCustomCharacter
