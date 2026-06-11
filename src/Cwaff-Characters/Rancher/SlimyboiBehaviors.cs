@@ -558,7 +558,7 @@ public class SlimyboiController : BraveBehaviour
 
   private void UpdateTimers(float dtime)
   {
-    TickAndCheck(ref this._projectileIframeTimer, dtime);
+    TickAndCheck(ref this._projectileIframeTimer, dtime); // projectile iframe cooldown
     TickAndCheck(ref this._dodgeCooldown, dtime); // dodge cooldown
     TickAndCheck(ref this._reflectGlowTimer, dtime); // reflect glow cooldown
     if (TickAndCheck(ref this._immuneToPoisonTimer, dtime))
@@ -571,7 +571,8 @@ public class SlimyboiController : BraveBehaviour
       base.healthHaver.damageTypeModifiers.Remove(this._fireImmunity);
       base.aiActor.SetResistance(EffectResistanceType.Fire, 0.0f);
     }
-    if (TickAndCheck(ref this._flightTimer, dtime))
+    // NOTE: don't risk pathing over pits and falling into them outside combat
+    if (TickAndCheck(ref this._flightTimer, dtime) && this._owner && this._owner.IsInCombat)
     {
       base.aiActor.SetIsFlying(false, DERVISH_FLYING_REASON, adjustShadow: true, modifyPathing: true);
       if (this._chargeBehavior != null)
