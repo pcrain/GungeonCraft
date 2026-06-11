@@ -929,6 +929,11 @@ public class SlimyboiController : BraveBehaviour
         PhysicsEngine.SkipCollision = true; // don't collide with other slimybois
       return;
     }
+    if (otherRigidbody.gameObject.GetComponent<MineCartController>())
+    {
+      PhysicsEngine.SkipCollision = true; // don't collide with minecarts
+      return;
+    }
     if (this._activelyBeingLaunched)
     {
       PhysicsEngine.SkipCollision = true; // don't collide with anything other than the tilemap and enemies while being launched
@@ -942,7 +947,7 @@ public class SlimyboiController : BraveBehaviour
         return;
       }
     }
-    if (actor is not PlayerController pc)
+    if (!actor || actor is not PlayerController pc)
       return;
     if (!base.aiActor.CanTargetPlayers)
     {
