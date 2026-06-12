@@ -26,20 +26,61 @@ public class Akelus : CwaffGun
           emissivePower: 10.0f, emissiveColorPower: 10.0f, emissiveSensitivity: 1.0f, emissiveColour: new Color(0.5f, 0.5f, 1.0f));
     }
 
+    public override void OnPlayerPickup(PlayerController player)
+    {
+      base.OnPlayerPickup(player);
+      if (this.Mastered)
+        player.SetImmuneToExplosions(true, ItemName);
+    }
+
+    public override void OnSwitchedToThisGun()
+    {
+      base.OnSwitchedToThisGun();
+      if (this.Mastered && this.PlayerOwner)
+        this.PlayerOwner.SetImmuneToExplosions(true, ItemName);
+    }
+
+    public override void OnMasteryStatusChanged()
+    {
+      base.OnMasteryStatusChanged();
+      if (this.Mastered && this.PlayerOwner)
+        this.PlayerOwner.SetImmuneToExplosions(true, ItemName);
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+      player.SetImmuneToExplosions(false, ItemName);
+      base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+      if (this.PlayerOwner)
+        this.PlayerOwner.SetImmuneToExplosions(false, ItemName);
+      base.OnDestroy();
+    }
+
+    public override void OnSwitchedAwayFromThisGun()
+    {
+      if (this.PlayerOwner)
+        this.PlayerOwner.SetImmuneToExplosions(false, ItemName);
+      base.OnSwitchedAwayFromThisGun();
+    }
+
     public override void OnTriedToInitiateAttack(PlayerController player)
     {
-        base.OnTriedToInitiateAttack(player);
-        player.SuppressThisClick = true; // does not have a normal fire mode, so always suppress the attack
-        if (player.IsDodgeRolling || player.CurrentInputState != PlayerInputState.AllInput)
-          return; // inactive, do normal firing stuff
-        if (this.gun.IsReloading || (this.gun.CurrentAmmo == 0 && !this.gun.InfiniteAmmo))
-          return; // inactive, do normal firing stuff
-        if (this._isDoingAttack)
-          return; // already attacking, do nothing
-        this._isDoingAttack = true;
-        if (!this.gun.InfiniteAmmo)
-          this.gun.LoseAmmo(1);
-        player.StartCoroutine(LungeAttack(player));
+      base.OnTriedToInitiateAttack(player);
+      player.SuppressThisClick = true; // does not have a normal fire mode, so always suppress the attack
+      if (player.IsDodgeRolling || player.CurrentInputState != PlayerInputState.AllInput)
+        return; // inactive, do normal firing stuff
+      if (this.gun.IsReloading || (this.gun.CurrentAmmo == 0 && !this.gun.InfiniteAmmo))
+        return; // inactive, do normal firing stuff
+      if (this._isDoingAttack)
+        return; // already attacking, do nothing
+      this._isDoingAttack = true;
+      if (!this.gun.InfiniteAmmo)
+        this.gun.LoseAmmo(1);
+      player.StartCoroutine(LungeAttack(player));
     }
 
     private static readonly int _IgnoreCollisions = CollisionMask.LayerToMask(
@@ -47,7 +88,7 @@ public class Akelus : CwaffGun
 
     private static float GetHeight(float velocity, float gravity, float time)
     {
-        return velocity * time - 0.5f * gravity * time * time;
+      return velocity * time - 0.5f * gravity * time * time;
     }
 
     private IEnumerator LungeAttack(PlayerController player)
@@ -60,10 +101,14 @@ public class Akelus : CwaffGun
       const float JUMP_DISTANCE = 6f;
       const float RECOVERY_TIME = 0.5f;
       const float DESTROY_BULLET_RADIUS = 2f;
+      const float DESTROY_BULLET_RADIUS_MASTERED = 3f;
       const float LAUNCH_RADIUS = 4f;
+      const float LAUNCH_RADIUS_MASTERED = 5f;
       const float LAUNCH_RADIUS_SQR = LAUNCH_RADIUS * LAUNCH_RADIUS;
+      const float LAUNCH_RADIUS_MASTERED_SQR = LAUNCH_RADIUS_MASTERED * LAUNCH_RADIUS_MASTERED;
 
       bool delayInvulnerability = false;
+      bool mastered = this.Mastered;
       Vector2 lungeDirection = (player.unadjustedAimPoint.XY() - player.sprite.WorldCenter).normalized;
       player.lockedDodgeRollDirection = lungeDirection; // avoids some animation glitches
       player.SetIsFlying(true, Akelus.ItemName, adjustShadow: false);
@@ -99,20 +144,49 @@ public class Akelus : CwaffGun
       }
       player.m_handlingQueuedAnimation = false;
       kb.EndContinuousKnockback(this._leapKnockbackId);
+      kb.SetImmobile(true, ItemName);
       this._leapKnockbackId = -1;
       player.gameObject.SetLayerRecursively(originalLayer);
       this.gun.PlayIfExists(gun.shootAnimation);
       yield return null;
 
       this.gun.DoSwingVFX();
-      Vector2 hammerPos = this.gun.barrelOffset.position;
-      Lazy.ScorchGroundAt(hammerPos);
-      Exploder.DoDistortionWave(center: hammerPos, distortionIntensity: 1.25f, distortionRadius: 0.5f, maxRadius: 1.5f, duration: 0.175f);
-      SilencerInstance.DestroyBulletsInRange(hammerPos, DESTROY_BULLET_RADIUS, true, false, player);
-      GameObject shockwave = new GameObject("akelus shockwave");
-      shockwave.transform.position = hammerPos;
-      AkelusShockwaveDoer asd = shockwave.AddComponent<AkelusShockwaveDoer>();
-      asd.StartCoroutine(asd.AkelusShockwaveCR(150.0f * player.DamageMult(), 20.0f, LAUNCH_RADIUS_SQR, horizontalForce: 100.0f * player.KnockbackMult()));
+      Vector2 shockwaveCenter = this.gun.barrelOffset.position;
+      Lazy.ScorchGroundAt(shockwaveCenter);
+      Exploder.DoDistortionWave(center: shockwaveCenter, distortionIntensity: 1.25f, distortionRadius: 0.5f, maxRadius: 1.5f, duration: 0.175f);
+
+      float damage = 150.0f * player.DamageMult();
+      float force = 20.0f;
+      float sqrRange = mastered ? LAUNCH_RADIUS_MASTERED_SQR : LAUNCH_RADIUS_SQR;
+      float horizontalForce = 100.0f * player.KnockbackMult();
+      float range = Mathf.Min(Mathf.Sqrt(sqrRange), 10);
+
+      if (mastered)
+      {
+        PassiveReflectItem.ReflectBulletsInRange(shockwaveCenter, DESTROY_BULLET_RADIUS_MASTERED, false, player, 30.0f);
+        // if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.GreenFireDef) is DeadlyDeadlyGoopManager gooper)
+        //   gooper.AddGoopRing(shockwaveCenter, minRadius: LAUNCH_RADIUS_MASTERED, maxRadius: LAUNCH_RADIUS_MASTERED + 1f);
+      }
+      else
+        SilencerInstance.DestroyBulletsInRange(shockwaveCenter, DESTROY_BULLET_RADIUS, true, false, player);
+
+      base.gameObject.Play("akelus_impact_sound");
+      Lazy.LaunchAllEnemiesAroundPoint(damage, force, shockwaveCenter, 0, range, horizontalForce,
+        flipPotency: 0.85f, potencyAtMaxRange: 0.30f);
+      Exploder.DoRadialMinorBreakableBreak(shockwaveCenter, range);
+      Exploder.DoRadialMajorBreakableDamage(damage, shockwaveCenter, range);
+      Exploder.DoRadialPush(shockwaveCenter, force, range);
+      GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f, 2f, 0.1f, 0f), shockwaveCenter);
+      CwaffVFX.SpawnBurst(
+        prefab           : Akelus._ShockwaveVFX,
+        numToSpawn       : (int)(range * 12),
+        basePosition     : shockwaveCenter,
+        positionVariance : 0.95f * range,
+        velType          : CwaffVFX.Vel.AwayRadial,
+        velocityVariance : 5f,
+        rotType          : CwaffVFX.Rot.Velocity
+        );
+
       player.ClearTableSlides();
       for (float elapsed = 0f; elapsed < LANDING_TIME; elapsed += BraveTime.DeltaTime)
       {
@@ -134,34 +208,8 @@ public class Akelus : CwaffGun
       this.gun.DoSwingVFX(reverse: true);
       this.gun.PlayIdleAnimation();
       player.ClearInputOverride(Akelus.ItemName);
+      kb.SetImmobile(false, ItemName);
       this._isDoingAttack = false;
       yield break;
-    }
-}
-
-public class AkelusShockwaveDoer : MonoBehaviour
-{
-    public IEnumerator AkelusShockwaveCR(float damage, float force, float sqrRange, float horizontalForce)
-    {
-      float range = Mathf.Min(Mathf.Sqrt(sqrRange), 10);
-      Vector2 shockwaveCenter = base.transform.position;
-      base.gameObject.Play("akelus_impact_sound");
-      Lazy.LaunchAllEnemiesAroundPoint(damage, force, shockwaveCenter, 0, range, horizontalForce,
-        flipPotency: 0.85f, potencyAtMaxRange: 0.30f);
-      Exploder.DoRadialMinorBreakableBreak(shockwaveCenter, range);
-      Exploder.DoRadialMajorBreakableDamage(damage, shockwaveCenter, range);
-      Exploder.DoRadialPush(shockwaveCenter, force, range);
-      GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f, 2f, 0.1f, 0f), shockwaveCenter);
-      CwaffVFX.SpawnBurst(
-        prefab           : Akelus._ShockwaveVFX,
-        numToSpawn       : (int)(range * 12),
-        basePosition     : shockwaveCenter,
-        positionVariance : 0.95f * range,
-        velType          : CwaffVFX.Vel.AwayRadial,
-        velocityVariance : 5f,
-        rotType          : CwaffVFX.Rot.Velocity
-        );
-      yield return new WaitForSeconds(0.025f);
-      UnityEngine.Object.Destroy(base.gameObject);;
     }
 }

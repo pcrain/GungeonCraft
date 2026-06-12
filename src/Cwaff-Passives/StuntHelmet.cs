@@ -22,57 +22,20 @@ public class StuntHelmet : CwaffPassive
         item.AddToShop(ModdedShopType.Boomhildr);
     }
 
-    [HarmonyPatch(typeof(Exploder), nameof(Exploder.HandleExplosion), MethodType.Enumerator)]
-    private class StuntExplosionPatch
+    public override void Pickup(PlayerController player)
     {
-        [HarmonyILManipulator]
-        private static void StuntExplosionIL(ILContext il)
-        {
-            ILCursor cursor = new ILCursor(il);
-
-            VariableDefinition hasStuntHelmet = il.DeclareLocal<bool>(); // false by default
-
-            #region Determine if player is wearing stunt helmet
-                if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(13))) // PlayerController
-                    return;
-                cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
-                cursor.CallPrivate(typeof(StuntHelmet), nameof(PlayerHasStuntHelmet));
-                cursor.Emit(OpCodes.Stloc, hasStuntHelmet);
-            #endregion
-
-            #region Ignore all damage from explosions
-                if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<PlayerController>("IsEthereal")))
-                    return;
-                cursor.Emit(OpCodes.Ldloc, hasStuntHelmet);
-                cursor.CallPrivate(typeof(StuntExplosionPatch), nameof(Or));
-            #endregion
-
-            #region Override preventPlayerForce
-                if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<ExplosionData>("preventPlayerForce")))
-                    return;
-                cursor.Emit(OpCodes.Ldloc, hasStuntHelmet);
-                cursor.CallPrivate(typeof(StuntExplosionPatch), nameof(AndNot));
-            #endregion
-
-            #region Quadruple all knockback from explosions and provide a damage boost
-                if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<ExplosionData>("force")))
-                    return;
-                cursor.Emit(OpCodes.Ldloc, hasStuntHelmet);
-                cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
-                cursor.CallPrivate(typeof(StuntHelmet), nameof(DoStuntHelmetBoost));
-            #endregion
-        }
-
-        private static bool Or(bool val1, bool val2) => val1 || val2;
-        private static bool AndNot(bool val1, bool val2) => val1 && !val2;
+        base.Pickup(player);
+        player.SetImmuneToExplosions(true, ItemName);
     }
 
-    private static bool PlayerHasStuntHelmet(PlayerController player)
+    public override void DisableEffect(PlayerController player)
     {
-        return player && player.HasPassive<StuntHelmet>();
+        base.DisableEffect(player);
+        player.SetImmuneToExplosions(false, ItemName);
     }
 
-    private static float DoStuntHelmetBoost(float origForce, bool hasStuntHelment, PlayerController player)
+    //NOTE: used by HandleExplosionPatch in CwaffPatches
+    internal static float DoStuntHelmetBoost(float origForce, bool hasStuntHelment, PlayerController player)
     {
         if (!hasStuntHelment)
             return origForce;

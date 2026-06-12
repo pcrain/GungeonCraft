@@ -527,3 +527,54 @@ static class BeamApplyArbitraryStatusEffectPatch
 
 //   private static UltraFortunesFavor NullIfDisabled(UltraFortunesFavor uff) => (uff && uff.enabled) ? uff : null;
 // }
+
+//NOTE: used by Stunt Helmet and Akelus mastery
+[HarmonyPatch(typeof(Exploder), nameof(Exploder.HandleExplosion), MethodType.Enumerator)]
+internal static class HandleExplosionPatch
+{
+    [HarmonyILManipulator]
+    private static void StuntExplosionIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+
+        VariableDefinition hasStuntHelmet = il.DeclareLocal<bool>(); // false by default
+        VariableDefinition hasAkelus = il.DeclareLocal<bool>(); // false by default
+
+        // Determine if player is wearing stunt helmet or has Akelus
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(13))) // PlayerController
+            return;
+        cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
+        cursor.CallPrivate(typeof(HandleExplosionPatch), nameof(HandleExplosionPatch.PlayerHasStuntHelmet));
+        cursor.Emit(OpCodes.Stloc, hasStuntHelmet);
+
+        // Ignore all damage from explosions
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<PlayerController>("IsEthereal")))
+            return;
+        cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
+        cursor.CallPrivate(typeof(HandleExplosionPatch), nameof(CheckImmuneToExplosions));
+        cursor.CallPrivate(typeof(HandleExplosionPatch), nameof(Or));
+
+        // Override preventPlayerForce
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<ExplosionData>("preventPlayerForce")))
+            return;
+        cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
+        cursor.CallPrivate(typeof(HandleExplosionPatch), nameof(CheckImmuneToExplosions));
+        cursor.CallPrivate(typeof(HandleExplosionPatch), nameof(Or)); // NOTE: important this is applied first because we WANT stunt helmet to override it
+        cursor.Emit(OpCodes.Ldloc, hasStuntHelmet);
+        cursor.CallPrivate(typeof(HandleExplosionPatch), nameof(AndNot));
+
+        // Quadruple all knockback from explosions and provide a damage boost
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<ExplosionData>("force")))
+            return;
+        cursor.Emit(OpCodes.Ldloc, hasStuntHelmet);
+        cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
+        cursor.CallPrivate(typeof(StuntHelmet), nameof(StuntHelmet.DoStuntHelmetBoost));
+    }
+
+    private static bool PlayerHasStuntHelmet(PlayerController player) => player && player.HasPassive<StuntHelmet>();
+
+    private static bool CheckImmuneToExplosions(PlayerController player) => player && player.IsImmuneToExplosions();
+
+    private static bool Or(bool val1, bool val2) => val1 || val2;
+    private static bool AndNot(bool val1, bool val2) => val1 && !val2;
+}

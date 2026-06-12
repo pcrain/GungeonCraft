@@ -388,6 +388,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfDeathNote>(MASTERY_DEATH_NOTE, DeathNote.ItemName);
         // Mtara no longer has a speed penalty and can continue firing after overheating, inflicting green fire on enemies in the process.
         NewMastery<MasteryOfMtara>(MASTERY_MTARA, Mtara.ItemName);
+        // Akelus has a larger impact radius, reflects bullets in its range, and grants full immunity to explosions while held.
+        NewMastery<MasteryOfAkelus>(MASTERY_AKELUS, Akelus.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -699,6 +701,7 @@ internal class MasteryOfNightlighter         : MasteryDummyItem {}
 internal class MasteryOfGadulo               : MasteryDummyItem {}
 internal class MasteryOfDeathNote            : MasteryDummyItem {}
 internal class MasteryOfMtara                : MasteryDummyItem {}
+internal class MasteryOfAkelus               : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -872,4 +875,5 @@ public enum Synergy {
     MASTERY_GADULO,
     MASTERY_DEATH_NOTE,
     MASTERY_MTARA,
+    MASTERY_AKELUS,
 };
