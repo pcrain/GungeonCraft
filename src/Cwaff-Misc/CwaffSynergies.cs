@@ -386,6 +386,8 @@ public static class CwaffSynergies
         NewMastery<MasteryOfGadulo>(MASTERY_GADULO, Gadulo.ItemName);
         // Time flows at half speed while Death Note is open, except in boss rooms.
         NewMastery<MasteryOfDeathNote>(MASTERY_DEATH_NOTE, DeathNote.ItemName);
+        // Mtara no longer has a speed penalty and can continue firing after overheating, inflicting green fire on enemies in the process.
+        NewMastery<MasteryOfMtara>(MASTERY_MTARA, Mtara.ItemName);
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -696,6 +698,7 @@ internal class MasteryOfFuelRodGun           : MasteryDummyItem {}
 internal class MasteryOfNightlighter         : MasteryDummyItem {}
 internal class MasteryOfGadulo               : MasteryDummyItem {}
 internal class MasteryOfDeathNote            : MasteryDummyItem {}
+internal class MasteryOfMtara                : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -868,4 +871,5 @@ public enum Synergy {
     MASTERY_NIGHTLIGHTER,
     MASTERY_GADULO,
     MASTERY_DEATH_NOTE,
+    MASTERY_MTARA,
 };
