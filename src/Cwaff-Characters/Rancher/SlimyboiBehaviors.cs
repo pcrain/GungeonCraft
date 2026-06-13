@@ -331,14 +331,20 @@ public class SlimyboiController : BraveBehaviour
       {
         this._appearOutOfNowhere = false;
         Vector2 pos = this._trueSprite.WorldCenter;
-        for (int i = 0; i < 10; ++i)
-        {
-          DebrisObject debris = UnityEngine.Object.Instantiate(
-            this._slimeData.debris, pos, Quaternion.identity).GetComponent<DebrisObject>();
-          debris.GravityOverride = 30.0f;
-          debris.Trigger(Lazy.RandomVector(3f * UnityEngine.Random.value).ToVector3ZUp(4f), 0.25f);
-          debris.sprite.MakeGlowyBetter(glowAmount: 10.0f, glowColor: new Color(1.0f, 0.75f, 0.9f), glowColorPower: 20.0f, sensitivity: 0.3f);
-        }
+        CwaffVFX.SpawnBurst(
+            prefab           : this._slimeData.debris.gameObject,
+            numToSpawn       : 10,
+            basePosition     : pos,
+            positionVariance : 0.0f,
+            velocityVariance : 2f,
+            velType          : CwaffVFX.Vel.Random,
+            rotType          : CwaffVFX.Rot.Random,
+            lifetime         : 0.5f,
+            fadeOutTime      : 0.1f,
+            startScale       : 1.0f,
+            endScale         : 0.00f,
+            copyShaders      : true
+            );
         Jump(0.5f, growIn: true);
         this._renderSprite.scale = new Vector3(0.0f, 0.0f, 1.0f);
       }
@@ -850,7 +856,7 @@ public class SlimyboiController : BraveBehaviour
       rotType          : CwaffVFX.Rot.Random,
       lifetime         : 0.5f,
       startScale       : 1.0f,
-      endScale         : 0.1f,
+      endScale         : 0.00f,
       copyShaders      : true
       );
   }

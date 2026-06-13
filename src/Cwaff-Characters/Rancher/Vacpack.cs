@@ -87,14 +87,21 @@ public class Vacpack : CwaffGun
             force: base.baseData.speed * UnityEngine.Random.Range(0.8f, 1.0f), customFalloff: _KnockbackCurve);
           newSlime.gameObject.GetComponent<SlimyboiController>().HandleFiredFromVacpack(dir, this.sourceOwner as PlayerController);
 
-          for (int i = 0; i < 10; ++i)
-          {
-            DebrisObject debris = UnityEngine.Object.Instantiate(sd.debris, ppos, Quaternion.identity).GetComponent<DebrisObject>();
-            debris.GravityOverride = 30.0f;
-            debris.Trigger((3f * dir + Lazy.RandomVector(2f * UnityEngine.Random.value)).ToVector3ZUp(4f), 0.25f);
-            debris.sprite.MakeGlowyBetter(glowAmount: 50.0f, glowColor: Color.white, glowColorPower: 100.0f, sensitivity: 0.5f, overrideColor: sd.goopColor);
-          }
-
+          CwaffVFX.SpawnBurst(
+            prefab           : sd.debris.gameObject,
+            numToSpawn       : 10,
+            basePosition     : ppos,
+            positionVariance : 0.0f,
+            baseVelocity     : 3f * dir.normalized,
+            velocityVariance : 2f,
+            velType          : CwaffVFX.Vel.Random,
+            rotType          : CwaffVFX.Rot.Random,
+            lifetime         : 0.5f,
+            fadeOutTime      : 0.1f,
+            startScale       : 1.0f,
+            endScale         : 0.00f,
+            copyShaders      : true
+            );
           base.gameObject.Play("slime_spawn_sound");
         }
 
@@ -289,14 +296,20 @@ public class Vacpack : CwaffGun
         Vector2 pos = (this.PlayerOwner.CurrentGun is Gun gun) ? gun.barrelOffset.position : sloim.aiActor.CenterPosition;
         sloim.aiActor.EraseFromExistence(suppressDeathSounds: true);
         SlimeData sd = Slimybois.SlimeData[(int)sloim.slimeType];
-        for (int i = 0; i < 10; ++i)
-        {
-          DebrisObject debris = UnityEngine.Object.Instantiate(
-            SlimyboiType.Pink.Data().debris, pos, Quaternion.identity).GetComponent<DebrisObject>();
-          debris.GravityOverride = 30.0f;
-          debris.Trigger(Lazy.RandomVector(3f * UnityEngine.Random.value).ToVector3ZUp(4f), 0.25f);
-          debris.sprite.MakeGlowyBetter(glowAmount: 100.0f, glowColor: Color.white, glowColorPower: 100.0f, sensitivity: 0.2f, overrideColor: sd.goopColor);
-        }
+        CwaffVFX.SpawnBurst(
+          prefab           : sd.debris.gameObject,
+          numToSpawn       : 10,
+          basePosition     : pos,
+          velocityVariance : 2f,
+          velType          : CwaffVFX.Vel.Random,
+          rotType          : CwaffVFX.Rot.Random,
+          lifetime         : 0.5f,
+          fadeOutTime      : 0.1f,
+          copyShaders      : true,
+          startScale       : 1.0f,
+          endScale         : 0.00f,
+          minVelocity      : 3.0f
+          );
     }
 
     private void OnReceivedDamage(PlayerController player)

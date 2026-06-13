@@ -1245,11 +1245,21 @@ public partial class CwaffVFX // private
         bool animated = true;
         if (prefab)
         {
-            this._animator.defaultClipId = prefab.GetComponent<tk2dSpriteAnimator>().defaultClipId;
-            this._library.clips = prefab.GetComponent<tk2dSpriteAnimation>().clips;
+            if (prefab.GetComponent<tk2dSpriteAnimator>() is tk2dSpriteAnimator prefabAnimator)
+            {
+              this._animator.defaultClipId = prefabAnimator.defaultClipId;
+              this._library.clips = prefab.GetComponent<tk2dSpriteAnimation>().clips;
+              this._animator.playAutomatically = true;
+              this._animator.currentClip = this._animator.DefaultClip;
+            }
+            else
+            {
+              this._animator.defaultClipId = 0;
+              this._library.clips = null;
+              this._animator.playAutomatically = false;
+              animated = false;
+            }
             this._sprite.SetSprite(prefabSprite.collection, prefabSprite.spriteId);
-            this._animator.playAutomatically = true;
-            this._animator.currentClip = this._animator.DefaultClip;
         }
         else if (animator != null)
         {
@@ -1344,6 +1354,8 @@ public partial class CwaffVFX // private
                 this._animator.PlayFromFrame(0);
             }
         }
+        else
+          this._animator.Pause();
         this._lastSpriteId = this._sprite.spriteId;
         this._sprite.UpdateMaterial();
 
