@@ -183,7 +183,7 @@ public static partial class Slimybois
 
   public static string ProcessSlimeBlurb(string rawBlurb)
   {
-    return rawBlurb.Replace("[b]","[color #dd6666]").Replace("[g]","[color #66dd66]")+("[/color]");
+    return rawBlurb.Replace("[b]","[color #dd6666]").Replace("[g]","[color #66dd66]").Replace("[w]","[color #dddd66]")+("[/color]");
   }
 
   public static string ProcessSlimeBlurb(List<string> rawBlurb)
@@ -375,51 +375,60 @@ public static partial class Slimybois
   public static readonly List<string>[] RawSlimeBlurbs = [
     // Glitch
     [
-      "[g]Attacks Inflict Ignite, Poison, and Slow",
+      "[w]Found...Somewhere",
+      "[g]Attacks Inflict Fire, Poison, and Slow",
       "[g]5x Health",
       "[g]Immune to Status Effects",
       "[b]0.5x Move Speed",
     ],
     // Saber
     [
+      "[w]Found under Tables",
       "[g]1.5x Attack Speed",
       "[g]1.5x Attack Damage",
       "[b]0.75x Move Speed",
     ],
     // Pink
     [
+      "[w]Found near Normal Enemies",
       "[g]Is Pink :)",
     ],
     // Honey
     [
+      "[w]Found near Traps",
       "[g]Attacks Inflict Slow",
       "[b]0.5x Move Speed",
     ],
     // Rad
     [
+      "[w]Found in Poison Barrels",
       "[g]Attacks Inflict Poison",
       "[g]Immune to Poison",
       "[g]Grants Poison Immunity to Nearby Slimes",
     ],
     // Tangle
     [
+      "[w]Attracted by Blanks",
       "[g]Destroys Nearby Projectiles with Vines",
       "[g]2x Health",
     ],
     // Hunter
     [
+      "[w]Attracted by Keys",
       "[g]Will Attempt to Dodge Projectiles",
       "[g]2x Move Speed",
       "[g]1.5x Attack Speed",
     ],
     // Boom
     [
+      "[w]Attracted by Explosions",
       "[g]Explodes on Death",
       "[g]4x Attack Damage",
       "[b]Explosions Damage Nearby Slimes",
     ],
     // Rock
     [
+      "[w]Attracted by Armor",
       "[g]Immune to Projectiles",
       "[g]Immune to Fire",
       "[g]5x Health",
@@ -429,6 +438,7 @@ public static partial class Slimybois
     ],
     // Quantum
     [
+      "[w]Found in Hidden Rooms",
       "[g]Immune to All Damage",
       "[g]Can Fly",
       "[b]Perishes In 20 Seconds Unless Vacuumed",
@@ -436,6 +446,7 @@ public static partial class Slimybois
     ],
     // Phosphor
     [
+      "[w]Found in Treasure Rooms",
       "[g]Heals a Nearby Slime by 1HP Every 0.33 Seconds",
       "[g]Can Fly",
       "[g]Immune to Status Effects",
@@ -445,12 +456,14 @@ public static partial class Slimybois
     ],
     // Mosaic
     [
+      "[w]Attracted by Glass",
       "[g]Attacks Restore 5HP to a Nearby Slime",
       "[g]3x Health",
       "[g]2x Attack Speed",
     ],
     // Dervish
     [
+      "[w]Found near Pits",
       "[g]Can Fly",
       "[g]Grants Flight to Nearby Slimes",
       "[g]2x Move Speed",
@@ -458,6 +471,7 @@ public static partial class Slimybois
     ],
     // Tabby
     [
+      "[w]Found in Shops",
       "[g]Follows the Player When Not in Combat",
       "[g]Can Always Be Vacuumed",
       "[g]2x Health",
@@ -466,11 +480,13 @@ public static partial class Slimybois
     ],
     // Lucky
     [
+      "[w]Attracted by Currency",
       "[g]Attacked Enemies Drop an Extra Casing",
       "[g]2x Health",
     ],
     // Puddle
     [
+      "[w]Found in Ice and Water Barrels",
       "[g]Enemy Projectiles Restore Health",
       "[g]Immune to Fire",
       "[g]2x Health",
@@ -479,6 +495,7 @@ public static partial class Slimybois
     ],
     // Quicksilver
     [
+      "[w]Attracted by Speed",
       "[g]Can Fly",
       "[g]2.5x Move Speed",
       "[g]4x Attack Speed",
@@ -486,12 +503,14 @@ public static partial class Slimybois
     ],
     // Fire
     [
+      "[w]Found in Braziers and Oil Barrels",
       "[g]Attacks Inflict Fire",
       "[g]Immune to Fire",
       "[g]Grants Fire Immunity to Nearby Slimes",
     ],
     // Gold
     [
+      "[w]Found near Strong Enemies",
       "[g]Grants Invulnerability to Nearby Slimes",
       "[b]Cannot Become Invulnerable",
       "[b]Cannot Be Healed",
@@ -499,6 +518,7 @@ public static partial class Slimybois
     ],
     // Crystal
     [
+      "[w]Found near Spikes",
       "[g]Reflects Enemy Bullets",
       "[g]Immune to Spike Rollers",
       "[b]Cannot Move While in Combat",
