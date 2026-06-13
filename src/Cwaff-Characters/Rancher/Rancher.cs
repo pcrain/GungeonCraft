@@ -78,51 +78,15 @@ public class Rancher
       ;
 
     // Hat offset setup
-    pc.SetupHatOffsets(0, -2, 0, -7);
-    // pc.AddHatOffset("rogo_run_front_001",  1);
-    // pc.AddHatOffset("rogo_run_front_002",  2);
-    // pc.AddHatOffset("rogo_run_front_003",  1);
-    // pc.AddHatOffset("rogo_run_front_004",  0);
-    // pc.AddHatOffset("rogo_run_front_005", -1);
-    // pc.AddHatOffset("rogo_run_front_006", -2);
-    // pc.AddHatOffset("rogo_run_front_007", -1);
-    // pc.AddHatOffset("rogo_run_front_008",  0);
-    // pc.AddHatOffset("rogo_run_back_001",   1);
-    // pc.AddHatOffset("rogo_run_back_002",   2);
-    // pc.AddHatOffset("rogo_run_back_003",   1);
-    // pc.AddHatOffset("rogo_run_back_004",   0);
-    // pc.AddHatOffset("rogo_run_back_005",  -1);
-    // pc.AddHatOffset("rogo_run_back_006",  -2);
-    // pc.AddHatOffset("rogo_run_back_007",  -1);
-    // pc.AddHatOffset("rogo_run_back_008",   0);
-    // pc.AddHatOffset("rogo_run_side_001",   1);
-    // pc.AddHatOffset("rogo_run_side_002",   2);
-    // pc.AddHatOffset("rogo_run_side_003",   1);
-    // pc.AddHatOffset("rogo_run_side_004",   0);
-    // pc.AddHatOffset("rogo_run_side_005",  -1);
-    // pc.AddHatOffset("rogo_run_side_006",  -2);
-    // pc.AddHatOffset("rogo_run_side_007",  -1);
-    // pc.AddHatOffset("rogo_run_side_008",   0);
-    // pc.AddHatOffset("rogo_run_bw_001",     1);
-    // pc.AddHatOffset("rogo_run_bw_002",     2);
-    // pc.AddHatOffset("rogo_run_bw_003",     1);
-    // pc.AddHatOffset("rogo_run_bw_004",     0);
-    // pc.AddHatOffset("rogo_run_bw_005",    -1);
-    // pc.AddHatOffset("rogo_run_bw_006",    -2);
-    // pc.AddHatOffset("rogo_run_bw_007",    -1);
-    // pc.AddHatOffset("rogo_run_bw_008",     0);
-    // pc.AddHatOffset("rogo_item_get_001",   1);
-    // pc.AddHatOffset("rogo_item_get_002",   2);
-    // pc.AddHatOffset("rogo_item_get_003",   1);
-    // pc.AddHatOffset("rogo_item_get_004",  -1);
-    // pc.AddHatOffset("rogo_item_get_005",  -2);
-    // pc.AddHatOffset("rogo_item_get_006",  -1);
-    // pc.AddHatOffset("rogo_item_get_007",   1);
-    // pc.AddHatOffset("rogo_item_get_008",   2);
-    // pc.AddHatOffset("rogo_item_get_009",   1);
-    // pc.AddHatOffset("rogo_item_get_010",  -1);
-    // pc.AddHatOffset("rogo_item_get_011",  -2);
-    // pc.AddHatOffset("rogo_item_get_012",  -1);
+    pc.SetupHatOffsets(0, -6, 0, -11);
+    pc.AddHatOffset("rancher_run_side_002",  0, 1);
+    pc.AddHatOffset("rancher_run_side_003",  0, 1);
+    pc.AddHatOffset("rancher_run_side_005",  1, 1);
+    pc.AddHatOffset("rancher_run_side_006",  1, 0);
+    pc.AddHatOffset("rancher_run_bw_002",  0, 0);
+    pc.AddHatOffset("rancher_run_bw_003",  0, 1);
+    pc.AddHatOffset("rancher_run_bw_005",  1, 0);
+    pc.AddHatOffset("rancher_run_bw_006",  1, 1);
   }
 
   private static Dictionary<string, float> _AnimFPS = new()
