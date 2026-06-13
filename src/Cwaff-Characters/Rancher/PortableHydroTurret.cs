@@ -11,7 +11,7 @@ public class PortableHydroTurret : CwaffGun
     {
         Lazy.SetupGun<PortableHydroTurret>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.EXCLUDED, gunClass: GunClass.SHITTY, reloadTime: 0.5f, ammo: 100, shootFps: 30, smoothReload: 0.1f,
-            infiniteAmmo: true, fireAudio: "portable_hydro_turret_fire_sound", isStarterGun: true)
+            infiniteAmmo: true, fireAudio: "portable_hydro_turret_fire_sound", isStarterGun: true, undroppableStarter: true)
           .SetReloadAudio("portable_hydro_turret_reload_sound", 0, 2, 4, 6)
           .SetMuzzleVFX((ItemHelper.Get(Items.EyeOfTheBeholster) as Gun).DefaultModule.finalProjectile.hitEffects.enemy)
           .InitProjectile(GunData.New(sprite: "portable_hydro_turret_projectile", clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: false,

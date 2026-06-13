@@ -50,6 +50,7 @@ public class Rancher
       }),
       stats = new(){
         {PlayerStats.StatType.RateOfFire, 0.5f },
+        {PlayerStats.StatType.ChargeAmountMultiplier, 0.5f },
         {PlayerStats.StatType.ReloadSpeed, 2.0f },
         {PlayerStats.StatType.Accuracy, 2.0f },
       },
@@ -61,6 +62,7 @@ public class Rancher
     pc.InitAnimations(data, _AnimFPS, remove: ["select_stargaze", "select_casing", "select_stargaze_cry", "select_headspin", "spinfall"])
       .AddOrReplaceAnimation("doorway", "rancher_doorway", fps: 10, loopStart: 8)
       .AddOrReplaceAnimation("spinfall", "rancher_spinfall", fps: 16, loopStart: 0)
+      .AddOrReplaceAnimation("select_slime", "rancher_select_slime", fps: 11, loopStart: 0)
       .SetAudio("dodge",          "Play_Leap", 0)
       .SetAudio("dodge_bw",       "Play_Leap", 0)
       .SetAudio("dodge_left",     "Play_Leap", 0)
@@ -162,7 +164,7 @@ public class Rancher
     { "run_right_hand",       11 },
     { "run_up",               11 },
     { "run_up_hand",          11 },
-    { "select_choose",        9 },
+    { "select_choose",        12 },
     { "select_idle",          9 },
     { "slide_down",           8 },
     { "slide_right",          8 },

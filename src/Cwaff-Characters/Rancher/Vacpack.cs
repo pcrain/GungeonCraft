@@ -33,15 +33,15 @@ public class Vacpack : CwaffGun
     {
         Lazy.SetupGun<Vacpack>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.EXCLUDED, gunClass: CwaffGunClass.UTILITY, reloadTime: 0.0f, ammo: 999, infiniteAmmo: true, modulesAreTiers: true,
-            chargeFps: 16, banFromBlessedRuns: true, isStarterGun: false, doesScreenShake: false, muzzleFrom: Items.Mailbox,
-            preventVolleyModifications: true) // TODO: not a starter gun so Paradox can't use it since it dramatically interferes with runs
+            chargeFps: 16, banFromBlessedRuns: true, isStarterGun: false, doesScreenShake: false, muzzleFrom: Items.Mailbox, undroppableStarter: true,
+            preventVolleyModifications: true) // TODO: not a starter gun so Paradox can't use it -> it would dramatically interfere with runs
           .Attach<VacpackAmmoDisplay>()
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, hideAmmo: true, chargeTime: float.MaxValue)); // absurdly high charge value so we never actually shoot
 
         ProjectileModule shootMod = new ProjectileModule().InitSpecialSingleProjectileModule<SlimeProjectile>(GunData.New(
           gun: gun, baseProjectile: Items._38Special.Projectile(), clipSize: -1, cooldown: 0.225f, shootStyle: ShootStyle.SemiAutomatic,
-          damage: 3.0f, speed: 300f, range: 9999f, force: 12f,  hitSound: "generic_bullet_impact", angleVariance: 10.0f
+          damage: 3.0f, speed: 300f, range: 9999f, force: 12f,  hitSound: "generic_bullet_impact", angleVariance: 5.0f
           ));
         gun.Volley.projectiles.Add(shootMod);
 
