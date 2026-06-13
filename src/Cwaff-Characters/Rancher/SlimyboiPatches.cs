@@ -109,4 +109,11 @@ internal static class SlimyboiPatches
     Vector2 offset = new Vector2(0f, wall.specRigidbody.HitboxPixelCollider.UnitDimensions.y - mainCameraController.Camera.orthographicSize + 0.5f);
     mainCameraController.OverridePosition = Lazy.SmoothestLerp(_PreAdjustCameraPos, wall.specRigidbody.UnitCenter + offset, 2.0f);
   }
+
+  [HarmonyPatch(typeof(BrazierController), nameof(BrazierController.Interact))]
+  [HarmonyPostfix]
+  private static void BrazierControllerInteractPatch(BrazierController __instance, PlayerController interactor)
+  {
+    SlimyboiManager.HandleBrazierFlip(__instance);
+  }
 }

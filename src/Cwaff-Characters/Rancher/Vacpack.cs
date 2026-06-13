@@ -239,9 +239,8 @@ public class Vacpack : CwaffGun
         {
           if (!enemy || enemy.gameObject.GetComponent<SlimyboiController>() is not SlimyboiController sloim)
             continue;
-          if (!sloim.Attribute(SlimyboiFlags.CanAlwaysVac))
-            if (player.IsInCombat && (sloim.Attribute(SlimyboiFlags.CantVacInCombat) || sloim.healthHaver.GetCurrentHealthPercentage() < 1.0f))
-              continue;
+          if (player.IsInCombat && !sloim.Attribute(SlimyboiFlags.CanAlwaysVac))
+            continue;
 
           Vector2 towardsGun = gunpos - enemy.CenterPosition;
           float sqrMagnitude = towardsGun.sqrMagnitude;

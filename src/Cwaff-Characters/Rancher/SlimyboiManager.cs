@@ -3,7 +3,7 @@ namespace CwaffingTheGungy;
 /// <summary>Class for managing Slime spawns throughout a run</summary>
 public class SlimyboiManager : MonoBehaviour
 {
-  private const float _SLIME_UNDER_TABLE_CHANCE = 0.25f;
+  private const float _SLIME_UNDER_TABLE_CHANCE = 0.33f;
 
   //NOTE: use _Instance where possible so we don't actually create a SlimyboiManager if we don't have one
   private static SlimyboiManager _Instance = null;
@@ -267,12 +267,12 @@ public class SlimyboiManager : MonoBehaviour
 
   public static void OnKeyCollected(KeyBulletPickup key, PlayerController player)
   {
-    SpawnSlimes([SlimyboiType.Hunter, SlimyboiType.Hunter, SlimyboiType.Hunter], player: player, pos: player.CenterPosition);
+    SpawnSlimes([SlimyboiType.Hunter, SlimyboiType.Hunter], player: player, pos: player.CenterPosition);
   }
 
   public static void OnBlankCollected(SilencerItem blank, PlayerController player)
   {
-    SpawnSlimes([SlimyboiType.Tangle, SlimyboiType.Tangle, SlimyboiType.Tangle], player: player, pos: player.CenterPosition);
+    SpawnSlimes([SlimyboiType.Tangle], player: player, pos: player.CenterPosition);
   }
 
   public static void OnAnyHealthHaverDie(HealthHaver hh)
@@ -309,6 +309,11 @@ public class SlimyboiManager : MonoBehaviour
     if (!_Instance || UnityEngine.Random.value > _SLIME_UNDER_TABLE_CHANCE)
       return;
     SpawnSlimes([SlimyboiType.Saber], pos: table.transform.position);
+  }
+
+  public static void HandleBrazierFlip(BrazierController brazier)
+  {
+    SpawnSlimes([SlimyboiType.Fire], pos: brazier.transform.position);
   }
 
   public static void OnMinorBreakableShattered(MinorBreakable breakable)

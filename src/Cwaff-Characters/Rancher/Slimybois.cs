@@ -5,7 +5,7 @@ using static SlimyboiFlags;
 public static partial class Slimybois
 {
   internal const float _DEFAULT_COOLDOWN = 2.0f;
-  internal const int _BASE_HEALTH = 10;
+  internal const int _BASE_HEALTH = 6;
   internal const float _BASE_DAMAGE = 0.6f; //NOTE: chargeDamage multiplied by 5 on enemies for some reason
   internal const float _BASE_ATTACK_RANGE = 3.0f;
   internal const float _BASE_ATTACK_KB = 5.0f;
@@ -35,9 +35,9 @@ public static partial class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Quicksilver, overrideAttackCooldown = 0.25f * _DEFAULT_COOLDOWN,
       overrideSpeed = _BASE_SPEED * 2.5f, goopColor = Color.white });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Dervish, flags = CanFly, goopColor = Color.gray,
-      overrideSpeed = _BASE_SPEED * 2.0f, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN});
+      overrideSpeed = _BASE_SPEED * 2.0f, overrideContactDamage = _BASE_DAMAGE * 0.5f});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity | FireImmunity | PoisonImmunity | CantReceiveHealing,
-      goopColor = Color.cyan, overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH * 2});
+      goopColor = Color.cyan, overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH * 3});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = DodgesProjectiles });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = AttacksPoison | PoisonImmunity });
@@ -52,11 +52,12 @@ public static partial class Slimybois
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Honey, goopColor = Color.yellow, overrideSpeed = _BASE_SPEED * 0.5f, flags = AttacksSlow });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Boom, goopColor = ExtendedColours.vibrantOrange, flags = ExplodesOnDeath | ExplosiveAttacks,
       overrideContactDamage = _BASE_DAMAGE * 4.0f });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Puddle, goopColor = ExtendedColours.skyblue, flags = AbsorbsBullets | PassiveHealthDrain | FireImmunity });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Puddle, goopColor = ExtendedColours.skyblue, flags = AbsorbsBullets | PassiveHealthDrain | FireImmunity | CantReceiveHealing });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Quantum, goopColor = Color.white, flags = QuantumInstability | PassiveHealthDrain | FullStatusImmunity | FireImmunity | PoisonImmunity | CanFly | CantReceiveHealing });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Tabby, goopColor = Color.white, flags = FollowPlayer | CanAlwaysVac | CanFly,
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Tabby, goopColor = Color.white, flags = FollowPlayer | CanAlwaysVac,
       overrideHealth = _BASE_HEALTH * 2, overrideContactDamage = _BASE_DAMAGE * 0.5f, overrideAttackCooldown = _DEFAULT_COOLDOWN * 0.5f });
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Gold, goopColor = ExtendedColours.paleYellow, flags = CanFly | CantReceiveHealing });
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Gold, goopColor = ExtendedColours.paleYellow, flags = CanFly | CantReceiveHealing,
+      overrideHealth = 1 });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Lucky, goopColor = Color.white, overrideHealth = _BASE_HEALTH * 2, flags = ExtraCasingOnKill });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Mosaic, goopColor = ExtendedColours.pink, flags = AttacksHealAllies,
       overrideHealth = _BASE_HEALTH * 3, overrideAttackCooldown = 0.5f * _DEFAULT_COOLDOWN });
@@ -437,7 +438,7 @@ public static partial class Slimybois
       "[g]Heals a Nearby Slime by 1HP Every 0.33 Seconds",
       "[g]Can Fly",
       "[g]Immune to Status Effects",
-      "[g]2x Health",
+      "[g]3x Health",
       "[b]Cannot be Healed",
       "[b]0.33x Damage",
     ],
@@ -452,7 +453,7 @@ public static partial class Slimybois
       "[g]Can Fly",
       "[g]Grants Flight to Nearby Slimes",
       "[g]2x Move Speed",
-      "[g]2x Attack Speed",
+      "[b]0.5x Attack Damage",
     ],
     // Tabby
     [
@@ -473,6 +474,7 @@ public static partial class Slimybois
       "[g]Immune to Fire",
       "[g]2x Health",
       "[b]Passively Loses Health",
+      "[b]Cannot Be Healed",
     ],
     // Quicksilver
     [
@@ -492,6 +494,7 @@ public static partial class Slimybois
       "[g]Grants Invulnerability to Nearby Slimes",
       "[b]Cannot Become Invulnerable",
       "[b]Cannot Be Healed",
+      "[b]1 Health Point",
     ],
     // Crystal
     [

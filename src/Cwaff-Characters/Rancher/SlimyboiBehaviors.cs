@@ -149,7 +149,7 @@ public class SlimyboiController : BraveBehaviour
   private static float GetIframesForFloor()
   {
     float healthMod = AIActor.BaseLevelHealthModifier;
-    return Mathf.Clamp(_BASE_IFRAME_LENGTH / (healthMod * healthMod), 0.2f, 1.0f);
+    return Mathf.Clamp(_BASE_IFRAME_LENGTH / (healthMod * healthMod) - 0.2f, 0.05f, 1.0f);
   }
 
   private void OnDamaged(float resultValue, float maxValue, CoreDamageTypes damageTypes, DamageCategory damageCategory, Vector2 damageDirection)
@@ -1209,6 +1209,8 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
       return true;
     if (target is not AIActor || target.specRigidbody is not SpeculativeRigidbody targetRigidbody)
       return false;
+    if (!targetRigidbody.isActiveAndEnabled)
+      return true;
 
     Vector2 myPos = m_specRigidbody.UnitCenter;
     PixelCollider targetCollider = targetRigidbody.GetPixelCollider(ColliderType.HitBox);
@@ -1271,7 +1273,7 @@ public class SlimyboiTargetingBehavior : TargetBehaviorBase
             // NOTE: allow attacking harmless enemies like key bullet kin and chance kin
             if (!candidate || !candidate.IsNormalEnemy || candidate.gameObject.GetComponent<SlimyboiController>() || candidate.IsGone || candidate == m_aiActor || candidate.healthHaver && candidate.healthHaver.PreventAllDamage)
                 continue;
-            if (candidate.specRigidbody is not SpeculativeRigidbody targetRigidbody)
+            if (candidate.specRigidbody is not SpeculativeRigidbody targetRigidbody || !targetRigidbody.isActiveAndEnabled)
                 continue;
 
             PixelCollider targetCollider = targetRigidbody.GetPixelCollider(ColliderType.HitBox);
