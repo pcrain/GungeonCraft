@@ -56,6 +56,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public  float                             percentSpeedWhileFiring    = 1.0f;   // max relative speed the player can move while firing the gun
   public  float                             percentSpeedWhileCharging  = 1.0f;   // max relative speed the player can move while charging the gun
   public  float                             percentSpeedWhileReloading = 1.0f;   // max relative speed the player can move while reloading the gun
+  public  float                             percentSpeedWhileHolding   = 1.0f;   // max relative speed the player can move while holding the gun normally
   public  bool                              preventRollingWhenCharging = false;  // whether holding the gun prevents the player from dodge rolling
   public  bool                              preventDuctTape            = false;  // whether we should forcibly prevent this gun from being duct taped
   public  float                             spinupTime                 = 0.0f;   // the amount of time it takes an automatic weapon to start firing
@@ -546,6 +547,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
             vec = cg.percentSpeedWhileReloading * vec;
           else if (gun.IsFiring)
             vec = cg.percentSpeedWhileFiring * vec;
+          else
+            vec = cg.percentSpeedWhileHolding * vec;
       }
   }
 

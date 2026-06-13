@@ -397,6 +397,7 @@ public class Vacpack : CwaffGun
       // else
       //   this.PlayerOwner.ClearInputOverride(ItemName);
       BraveTime.SetTimeScaleMultiplier(focus ? 0.1f : 1.0f, base.gameObject); //TODO: use vanilla metalgear time slowdown factor
+      this.percentSpeedWhileHolding = focus ? 0.0f : 1.0f;
     }
 
     private class VacpackAmmoDisplay : CustomAmmoDisplay
