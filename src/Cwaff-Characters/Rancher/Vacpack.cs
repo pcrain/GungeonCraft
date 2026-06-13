@@ -516,6 +516,8 @@ public class VacpackHUD : MonoBehaviour
   private static readonly Color _GeomColor1 = new Color(0.25f, 0.25f, 0.25f);
   private static readonly Color _GeomColor2 = new Color(0.35f, 0.35f, 0.35f);
 
+  private static bool _HideDescriptions = false;
+
   private bool _setup                 = false;   // whether we're set up
   private float _shwoop               = 0.0f;    // whether we're shwooped open
   private bool _active                = false;   // whether we're active
@@ -525,6 +527,12 @@ public class VacpackHUD : MonoBehaviour
   private List<dfLabel> _labels       = new();   // all letter labels rendered by the HUD
   private dfLabel       _nameLabel    = null;    // extra name line for currently selected slime rendered by the HUD
   private dfLabel       _countLabel   = null;    // extra count line for currently selected slime rendered by the HUD
+  private dfLabel       _blurbLabel   = null;    // label for managing slime descriptions
+  private dfLabel       _helpLabel    = null;    // label showing instructions to toggle slime descriptions
+
+  private string        _longHelpText = null;
+  private string        _shortHelpText = null;
+  private bool          _cachedHideHelpText = false;
 
   private CameraController _camera;
   private Vector2 _worldBottomLeft;
@@ -547,6 +555,22 @@ public class VacpackHUD : MonoBehaviour
     }
     this._nameLabel = EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Center);
     this._countLabel = EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Center);
+
+    this._helpLabel = EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Right);
+    this._helpLabel.VerticalAlignment = dfVerticalAlignment.Top;
+    this._helpLabel.Pivot = dfPivotPoint.TopRight;
+    this._longHelpText = "Press [color #dd6666]" + StringTableManager.EvaluateReplacementToken("%CONTROL_INTERACT") + "[/color] to Hide Descriptions";
+    this._shortHelpText = "Press [color #dd6666]" + StringTableManager.EvaluateReplacementToken("%CONTROL_INTERACT") + "[/color]";
+    this._helpLabel.Text = _HideDescriptions ? this._shortHelpText : this._longHelpText;
+    this._cachedHideHelpText = _HideDescriptions;
+    this._helpLabel.IsVisible = false;
+
+    this._blurbLabel = EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Right);
+    this._blurbLabel.AutoHeight = true;
+    this._blurbLabel.WordWrap = true;
+    this._blurbLabel.VerticalAlignment = dfVerticalAlignment.Top;
+    this._blurbLabel.Pivot = dfPivotPoint.TopRight;
+    this._blurbLabel.Size = new Vector2(320f, 48f); // split long names onto multiple lines
 
     Dismiss(force: true);
     this._setup = true;
@@ -576,6 +600,8 @@ public class VacpackHUD : MonoBehaviour
     this._shwoop = 0.0f;
     if (base.gameObject.RequestCameraControl())
       GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
+    if (!_HideDescriptions)
+      Minimap.Instance.TemporarilyPreventMinimap = true;
     base.gameObject.Play("vacpack_menu_sound");
   }
 
@@ -607,10 +633,21 @@ public class VacpackHUD : MonoBehaviour
       this._countLabel.Opacity = 0.0f;
       this._countLabel.IsVisible = false;
     }
+    if (this._blurbLabel)
+    {
+      this._blurbLabel.Opacity = 0.0f;
+      this._blurbLabel.IsVisible = false;
+    }
+    if (this._helpLabel)
+    {
+      this._helpLabel.Opacity = 0.0f;
+      this._helpLabel.IsVisible = false;
+    }
 
     if (deactivate)
     {
       this._active = false;
+      Minimap.Instance.TemporarilyPreventMinimap = false;
       base.gameObject.RelinquishCameraControl();
       if (this._gun)
         this._gun.SetFocus(false);
@@ -632,6 +669,8 @@ public class VacpackHUD : MonoBehaviour
       Dismiss();
     else if (this._active)
     {
+      if (player.m_activeActions.InteractAction.WasPressed)
+        _HideDescriptions = !_HideDescriptions;
       base.gameObject.RequestCameraControl();
       if (base.gameObject.HasControlOverCamera())
         GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
@@ -695,6 +734,30 @@ public class VacpackHUD : MonoBehaviour
         this._countLabel.Text = this._gun.slimeCounts[i].ToString();
         this._countLabel.Opacity = ease;
         this._countLabel.Place(pos: screenCenter + new Vector2(0.0f, -this._countLabel.Height / 32f));
+
+        if (GameManager.Instance.CurrentGameType != GameManager.GameType.COOP_2_PLAYER)
+        {
+          if (this._cachedHideHelpText != _HideDescriptions)
+          {
+            this._helpLabel.Text = _HideDescriptions ? this._shortHelpText : this._longHelpText;
+            Minimap.Instance.TemporarilyPreventMinimap = !_HideDescriptions;
+            this._cachedHideHelpText = _HideDescriptions;
+          }
+          this._helpLabel.Opacity = ease;
+          this._helpLabel.Place(pos: this._worldTopRight + new Vector2(-1.0f, -1.0f));
+          if (!_HideDescriptions)
+          {
+            this._blurbLabel.Text = Slimybois.SlimeBlurbs[i];
+            this._blurbLabel.Opacity = ease;
+            this._blurbLabel.Place(pos: this._worldTopRight + new Vector2(-1.0f, -2.0f));
+          }
+          else
+          {
+            this._blurbLabel.Opacity = 0.0f;
+          }
+        }
+        else
+          this._helpLabel.IsVisible = false;
       }
       this._labels[i].Color = ((this._gun.slimeCounts[i] == 0) ? Color.black : Color.white);
       this._labels[i].OutlineColor = (sel ? Color.white : Color.black).WithAlpha(Mathf.Clamp01(2f * ease - 1f));

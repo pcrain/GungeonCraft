@@ -2,7 +2,7 @@ namespace CwaffingTheGungy;
 
 using static SlimyboiFlags;
 
-public static class Slimybois
+public static partial class Slimybois
 {
   internal const float _DEFAULT_COOLDOWN = 2.0f;
   internal const int _BASE_HEALTH = 10;
@@ -14,6 +14,7 @@ public static class Slimybois
 
   public static readonly int NumSlimes = Enum.GetNames(typeof(SlimyboiType)).Length;
   public static SlimeData[] SlimeData = null;
+  public static string[] SlimeBlurbs = null;
   public static GameObject SlimeParticleSystem = null;
 
   internal static GameObject _SlimeDeathVFX;
@@ -69,6 +70,11 @@ public static class Slimybois
         Lazy.DebugConsoleLog($" default SlimeData for {t}");
         SlimeData.SetupEntry(new SlimeData{ type = t });
       }
+
+    // process slime blurbs
+    SlimeBlurbs = new string[NumSlimes];
+    for (int i = 0; i < NumSlimes; ++i)
+      SlimeBlurbs[i] = ProcessSlimeBlurb(RawSlimeBlurbs[i]);
 
     // shared
     _SlimeImpactVFX = VFX.Create("slime_impact_vfx", fps: 60, loops: false);
@@ -173,6 +179,18 @@ public static class Slimybois
     return (sloim.attributes & flag) == flag;
   }
 
+  public static string ProcessSlimeBlurb(string rawBlurb)
+  {
+    return rawBlurb.Replace("[b]","[color #dd6666]").Replace("[g]","[color #66dd66]")+("[/color]");
+  }
+
+  public static string ProcessSlimeBlurb(List<string> rawBlurb)
+  {
+    for (int i = 0; i < rawBlurb.Count; ++i)
+      rawBlurb[i] = ProcessSlimeBlurb(rawBlurb[i]);
+    return String.Join("\n\n", rawBlurb.ToArray());
+  }
+
   private static GameObject MakeSlimeParticleSystem(Color particleColor)
   {
       GameObject psBasePrefab = Items.CombinedRifle.AsGun().alternateVolley.projectiles[0].projectiles[0].GetComponent<CombineEvaporateEffect>().ParticleSystemToSpawn;
@@ -274,25 +292,25 @@ public static class Slimybois
 // NOTE: these are in the same order they appear in the aseprite file, can only change if we manage that better
 public enum SlimyboiType
 {
-  Glitch,      // unimplemented
-  Saber,       // unimplemented
+  Glitch,
+  Saber,
   Pink,
-  Honey,       // unimplemented
+  Honey,
   Rad,
   Tangle,
-  Hunter,      // unfinished VFX
-  Boom,        // unimplemented
-  Rock,        // unimplemented
-  Quantum,     // unimplemented
+  Hunter,
+  Boom,
+  Rock,
+  Quantum,
   Phosphor,
-  Mosaic,      // unimplemented
-  Dervish,     // unfinished
-  Tabby,       // unimplemented
-  Lucky,       // unimplemented
-  Puddle,      // unimplemented
-  Quicksilver, // unfinished
+  Mosaic,
+  Dervish,
+  Tabby,
+  Lucky,
+  Puddle,
+  Quicksilver,
   Fire,
-  Gold,        // unimplemented
+  Gold,
   Crystal,
 }
 
@@ -347,4 +365,140 @@ public enum SlimyboiFlags // : ulong
   CanAlwaysVac           = 1 << 24, // if set, slime can be vacuumed even while missing health in combat
   CantReceiveHealing     = 1 << 25, // if set, slime can not be healed by, e.g., Phosphor Slimes
   AttacksHealAllies      = 1 << 26, // if set, slime's attacks heal all nearby allies
+}
+
+// partial bit just to hold slime blurbs
+public static partial class Slimybois
+{
+  public static readonly List<string>[] RawSlimeBlurbs = [
+    // Glitch
+    [
+      "[g]Attacks Inflict Ignite, Poison, and Slow",
+      "[g]5x Health",
+      "[g]Immune to Status Effects",
+      "[b]0.5x Move Speed",
+    ],
+    // Saber
+    [
+      "[g]1.5x Attack Speed",
+      "[g]1.5x Attack Damage",
+      "[b]0.75x Move Speed",
+    ],
+    // Pink
+    [
+      "[g]Is Pink :)",
+    ],
+    // Honey
+    [
+      "[g]Attacks Inflict Slow",
+      "[b]0.5x Move Speed",
+    ],
+    // Rad
+    [
+      "[g]Attacks Inflict Poison",
+      "[g]Immune to Poison",
+      "[g]Grants Poison Immunity to Nearby Slimes",
+    ],
+    // Tangle
+    [
+      "[g]Destroys Nearby Projectiles with Vines",
+      "[g]2x Health",
+    ],
+    // Hunter
+    [
+      "[g]Will Attempt to Dodge Projectiles",
+      "[g]2x Move Speed",
+      "[g]1.5x Attack Speed",
+    ],
+    // Boom
+    [
+      "[g]Explodes on Death",
+      "[g]4x Attack Damage",
+      "[b]Explosions Damage Nearby Slimes",
+    ],
+    // Rock
+    [
+      "[g]Immune to Projectiles",
+      "[g]Immune to Fire",
+      "[g]5x Health",
+      "[b]2x Weight",
+      "[b]0.5x Attack Speed",
+      "[b]0.5x Move Speed",
+    ],
+    // Quantum
+    [
+      "[g]Immune to All Damage",
+      "[g]Can Fly",
+      "[b]Perishes In 20 Seconds Unless Vacuumed",
+      "[b]Cannot be Healed",
+    ],
+    // Phosphor
+    [
+      "[g]Heals a Nearby Slime by 1HP Every 0.33 Seconds",
+      "[g]Can Fly",
+      "[g]Immune to Status Effects",
+      "[g]2x Health",
+      "[b]Cannot be Healed",
+      "[b]0.33x Damage",
+    ],
+    // Mosaic
+    [
+      "[g]Attacks Restore 5HP to a Nearby Slime",
+      "[g]3x Health",
+      "[g]2x Attack Speed",
+    ],
+    // Dervish
+    [
+      "[g]Can Fly",
+      "[g]Grants Flight to Nearby Slimes",
+      "[g]2x Move Speed",
+      "[g]2x Attack Speed",
+    ],
+    // Tabby
+    [
+      "[g]Follows the Player When Not in Combat",
+      "[g]Can Always Be Vacuumed",
+      "[g]2x Health",
+      "[g]2x Attack Speed",
+      "[b]0.5x Attack Damage",
+    ],
+    // Lucky
+    [
+      "[g]Attacked Enemies Drop an Extra Casing",
+      "[g]2x Health",
+    ],
+    // Puddle
+    [
+      "[g]Enemy Projectiles Restore Health",
+      "[g]Immune to Fire",
+      "[g]2x Health",
+      "[b]Passively Loses Health",
+    ],
+    // Quicksilver
+    [
+      "[g]Can Fly",
+      "[g]2.5x Move Speed",
+      "[g]4x Attack Speed",
+      "[b]0.5x Health",
+    ],
+    // Fire
+    [
+      "[g]Attacks Inflict Fire",
+      "[g]Immune to Fire",
+      "[g]Grants Fire Immunity to Nearby Slimes",
+    ],
+    // Gold
+    [
+      "[g]Grants Invulnerability to Nearby Slimes",
+      "[b]Cannot Become Invulnerable",
+      "[b]Cannot Be Healed",
+    ],
+    // Crystal
+    [
+      "[g]Reflects Enemy Bullets",
+      "[g]Immune to Spike Rollers",
+      "[b]Cannot Move While in Combat",
+      "[b]4x Weight",
+    ],
+  ];
 }
