@@ -578,3 +578,43 @@ internal static class HandleExplosionPatch
     private static bool Or(bool val1, bool val2) => val1 || val2;
     private static bool AndNot(bool val1, bool val2) => val1 && !val2;
 }
+
+//REFACTOR: move to GGV
+/// <summary>Make GetRandomAvailableCell() reuse a static list to consume less memory.</summary>
+[HarmonyPatch]
+internal static class GetRandomAvailableCellPatch
+{
+  private static List<IntVector2> _StaticIntVectorList = new();
+
+  private static List<IntVector2> GetStaticIntVectorList()
+  {
+    _StaticIntVectorList.Clear();
+    return _StaticIntVectorList;
+  }
+
+  [HarmonyPatch(typeof(RoomHandler), nameof(RoomHandler.GetRandomAvailableCell))]
+  [HarmonyILManipulator]
+  private static void RoomHandlerGetRandomAvailableCellPatchIL(ILContext il)
+  {
+      ILCursor cursor = new ILCursor(il);
+      if (cursor.TryGotoNext(MoveType.Before,instr => instr.MatchNewobj<List<IntVector2>>()))
+      {
+        cursor.Remove();
+        cursor.CallPrivate(typeof(GetRandomAvailableCellPatch), nameof(GetStaticIntVectorList));
+      }
+  }
+}
+
+//REFACTOR: move to GGV
+/// <summary>Make BinaryHeap.Clear() reuse its heap to consume less memory.</summary>
+[HarmonyPatch(typeof(BinaryHeap<Pathfinding.Pathfinder.PathNodeProxy>), "Clear")]
+internal static class BinaryHeapClearPatch
+{
+    [HarmonyPrefix]
+    private static bool Prefix(BinaryHeap<Pathfinding.Pathfinder.PathNodeProxy> __instance)
+    {
+        Array.Clear(__instance.m_data, 0, __instance.m_count);
+        __instance.m_count = 0;
+        return false;
+    }
+}
