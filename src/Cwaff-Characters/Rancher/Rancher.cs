@@ -39,7 +39,7 @@ public class Rancher
       nickname          = InternalName,
       health            = 3,
       armor             = 0,
-      foyerPos          = new Vector3(33.0f, 21.25f),
+      foyerPos          = new Vector3(27.25f, 24.25f),
       loadout           = new(){
         new(Lazy.Pickup<Vacpack>(), false),
         new(Lazy.Pickup<PortableHydroTurret>(), false),

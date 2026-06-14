@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.32.1 (2026-06-14)
+
+- Moved Beatrix's Breach position to avoid overlapping the Cultist (whoops)
+
 ## 1.32.0 (2026-06-14)
 
 - Added new custom character: Beatrix from [Slime Rancher](https://store.steampowered.com/app/433340/Slime_Rancher/)!
