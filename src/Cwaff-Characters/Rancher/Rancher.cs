@@ -38,7 +38,7 @@ public class Rancher
       nickname          = Name,
       health            = 3,
       armor             = 0,
-      foyerPos          = new Vector3(25.25f, 22.25f),
+      foyerPos          = new Vector3(33.0f, 21.25f),
       loadout           = new(){
         new(Lazy.Pickup<Vacpack>(), false),
         new(Lazy.Pickup<PortableHydroTurret>(), false),
@@ -46,6 +46,7 @@ public class Rancher
       idleDoer          = new GameObject().RegisterPrefab().InitComponent<CharacterSelectIdleDoer>(i => {
           i.phases = new CharacterSelectIdlePhase[]{
             new(){ inAnimation = "select_slime",    holdMin = 0, holdMax = 0 },
+            new(){ inAnimation = "select_run",    holdMin = 2, holdMax = 4 },
           };
       }),
       stats = new(){
@@ -63,6 +64,7 @@ public class Rancher
       .AddOrReplaceAnimation("doorway", "rancher_doorway", fps: 10, loopStart: 8)
       .AddOrReplaceAnimation("spinfall", "rancher_spinfall", fps: 16, loopStart: 0)
       .AddOrReplaceAnimation("select_slime", "rancher_select_slime", fps: 11, loopStart: 0)
+      .AddOrReplaceAnimation("select_run", "rancher_select_run", fps: 16, loopStart: 0)
       .SetAudio("dodge",          "Play_Leap", 0)
       .SetAudio("dodge_bw",       "Play_Leap", 0)
       .SetAudio("dodge_left",     "Play_Leap", 0)
