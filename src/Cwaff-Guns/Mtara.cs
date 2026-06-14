@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class Mtara : CwaffGun
 {
     public static string ItemName         = "M'tara";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Maintain Focus";
+    public static string LongDescription  = "Fires a beam that quickly melts targets. Firing too long will overheat the weapon, preventing usage for a few seconds. Substantially slows movement while firing.";
+    public static string Lore             = "A rifle whose effectiveness in melting its targets is matched only by its effectiveness in melting its user's hands. Experienced soldiers quickly learned to get the most use out of the rifle by alternating between firing it for a few seconds and using the excess heat to cook their instant rations.";
 
     private const float _OVERHEAT_TIME = 3.0f;
     private const float _COOLDOWN_RATE_NORMAL = 3.0f;

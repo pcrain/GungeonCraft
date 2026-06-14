@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class Akelus : CwaffGun
 {
     public static string ItemName         = "Akelus";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Brute Force";
+    public static string LongDescription  = "Leaps forward to smash the ground, destroying nearby bullets and sending enemies flying.";
+    public static string Lore             = "A warhammer that should by all appearances be far too heavy to wield for anyone not built like a Greek god. Two gravitic impellers (colloquially known as 'alien magic') are embedded in either side of the hammerhead, allowing the wielder to make the hammer's otherworldly weight someone else's problem.";
 
     internal static GameObject _ShockwaveVFX = null;
 

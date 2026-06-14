@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class Vacpack : CwaffGun
 {
     public static string ItemName         = "Vacpack";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Plortable Storage";
+    public static string LongDescription  = "Shoots and vacuums slimes. Tap reload to toggle between shooting and vacuuming. Hold reload to select a slime to shoot. Each slime type has unique stats and behavior in combat. Slimes cannot be vacuumed in combat.";
+    public static string Lore             = "A multipurpose device catering to all sorts of slime ranching needs. Compared to other models, this Vacpack omits many of the usual upgrades in the interest of carrying as many slimes as possible. Cutting-edge slime compression technology allows the user to collect hundreds -- perhaps thousands -- of slimes in a compact, portable form factor.";
 
     internal static GameObject _VacpackVFX = null;
 
@@ -437,7 +437,7 @@ public class Vacpack : CwaffGun
 
             int index = this._vac._curSlime;
             if (index < 0)
-                uic.GunAmmoCountLabel.Text = "Vac";
+                uic.GunAmmoCountLabel.Text = "Vac Mode";
             else
             {
                 int count = this._vac.slimeCounts[index];

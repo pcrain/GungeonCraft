@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class PortableHydroTurret : CwaffGun
 {
     public static string ItemName         = "Portable Hydro Turret";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Power Rinse";
+    public static string LongDescription  = "Fires short bursts of compressed water. Infinite ammo. Does not reveal secret walls.";
+    public static string Lore             = "A portable variant of the hydro turret, capable of blasting water with 100 times more force than your average water gun. This sounds impressive, until you consider the combat effectiveness of your average water gun. Maybe you can trigger a bit of rust or snuff out a Muzzle Wisp, if you're lucky.";
 
     public static void Init()
     {
