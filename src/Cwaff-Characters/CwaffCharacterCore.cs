@@ -188,6 +188,10 @@ public static class CwaffCharacter
       clips[i] = newClip;
     }
 
+    // NOTE: need to properly set the default sprite or Quick Restart will set it to the base character's initial sprite, potentially causing bad gun carry offsets
+    tk2dSpriteAnimationClip idleClip = pc.spriteAnimator.Library.GetClipByName("idle");
+    pc.sprite.SetSprite(idleClip.frames[0].spriteCollection, idleClip.frames[0].spriteId);
+
     return pc.spriteAnimator;
   }
 

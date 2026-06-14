@@ -17,8 +17,9 @@ namespace CwaffingTheGungy;
 
 public class Rancher
 {
-  public static string Name = "Rancher";
-  public static readonly PlayableCharacters Character = Name.ExtendEnum<PlayableCharacters>();
+  public static string Name = "Beatrix";
+  public static string InternalName = "Rancher";
+  public static readonly PlayableCharacters Character = InternalName.ExtendEnum<PlayableCharacters>();
 
   public static void Init()
   {
@@ -33,9 +34,9 @@ public class Rancher
     CustomCharacterData data = new() {
       baseCharacter     = PlayableCharacters.Robot,
       identity          = Character,
-      name              = "The " + Name,
-      nameShort         = Name,
-      nickname          = Name,
+      name              = Name,
+      nameShort         = InternalName,
+      nickname          = InternalName,
       health            = 3,
       armor             = 0,
       foyerPos          = new Vector3(33.0f, 21.25f),
