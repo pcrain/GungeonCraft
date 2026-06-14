@@ -2,7 +2,8 @@
 
 ## 1.32.0 (TBD)
 
-- Added Akelus and M'tara
+- Added new custom character: Beatrix from [Slime Rancher](https://store.steampowered.com/app/433340/Slime_Rancher/)!
+- Added Akelus, M'tara, Vacpack, and Portable Water Turret
 - Added masteries for Akelus and M'tara
 - Fixed several sprites that were an odd number of pixels wide from rendering with artifacts due to not being aligned to the pixel grid
 - Fixed Chain Driver's chains remaining player-controlled when switching guns while tethered to an enemy
