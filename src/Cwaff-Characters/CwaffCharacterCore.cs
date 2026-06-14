@@ -156,6 +156,9 @@ public static class CwaffCharacter
       foreach (string animToRemove in remove)
         pc.spriteAnimator.RemoveAnimation(animToRemove);
     tk2dSpriteAnimationClip[] clips = pc.spriteAnimator.Library.clips; //NOTE: do this AFTER removing animations so we have an up to date reference
+    List<tk2dSpriteAnimationClip> handClips = new();
+
+    // set up base character animations and keep track of any hand animations they come with
     for (int i = 0; i < clips.Length; ++i)
     {
       tk2dSpriteAnimationClip clip = clips[i];
@@ -184,8 +187,24 @@ public static class CwaffCharacter
         }
       }
 
+      if (col.AddAnimation($"{data.nameInternal}_{baseFrameName}_hand", animName: clip.name+"_hand", fps: newFps, loopStart: loopStart) is tk2dSpriteAnimationClip newClipHand)
+        handClips.Add(newClipHand);
+      if (col.AddAnimation($"{data.nameInternal}_{baseFrameName}_twohands", animName: clip.name+"_twohands", fps: newFps, loopStart: loopStart) is tk2dSpriteAnimationClip newClipHand2)
+        handClips.Add(newClipHand2);
+
       // Lazy.DebugLog($"  updated animations for {clip.name} a.k.a. {frameName} with framerate {newClip.fps}");
       clips[i] = newClip;
+    }
+
+    // auto detect and set up hand animations that base character might be missing
+    int oldClipCount = pc.spriteAnimator.Library.clips.Length;
+    int newClipCount = oldClipCount + handClips.Count;
+    if (newClipCount > oldClipCount)
+    {
+      Array.Resize(ref pc.spriteAnimator.Library.clips, newClipCount);
+      clips = pc.spriteAnimator.Library.clips;
+      for (int i = oldClipCount; i < newClipCount; ++i)
+        clips[i] = handClips[i - oldClipCount];
     }
 
     // NOTE: need to properly set the default sprite or Quick Restart will set it to the base character's initial sprite, potentially causing bad gun carry offsets

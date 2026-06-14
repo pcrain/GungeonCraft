@@ -58,6 +58,7 @@ public class Rancher
       },
     };
     PlayerController pc = data.MakeNewCustomCharacter();
+    pc.ForceHandless = false; // NOTE: integrate directly into MakeNewCustomCharacter
     pc.gunAttachPoint.localPosition = new Vector3(0.5f, 0.5f, 0.0f); // NOTE: fix wonky hand offset, integrate directly into MakeNewCustomCharacter
 
     // Sprite setup
@@ -113,10 +114,15 @@ public class Rancher
     { "idle_select",          9 },
     { "idle_backward",        9 },
     { "idle_backward_hand",   9 },
+    { "idle_backward_twohands", 9 },
     { "idle_bw",              9 },
+    { "idle_bw_hand",              9 },
+    { "idle_bw_twohands",              9 },
     { "idle_forward",         9 },
     { "idle_forward_hand",    9 },
+    { "idle_forward_twohands",    9 },
     { "idle_hand",            9 },
+    { "idle_twohands",            9 },
     { "item_get",             9 },
     { "jetpack_down",         9 },
     { "jetpack_right",        9 },
@@ -126,11 +132,16 @@ public class Rancher
     { "pitfall_return",       9 },
     { "run_down",             11 },
     { "run_down_hand",        11 },
+    { "run_down_twohands",        11 },
     { "run_right",            11 },
     { "run_right_bw",         11 },
+    { "run_right_bw_hand",         11 },
+    { "run_right_bw_twohands",         11 },
     { "run_right_hand",       11 },
+    { "run_right_twohands",       11 },
     { "run_up",               11 },
     { "run_up_hand",          11 },
+    { "run_up_twohands",          11 },
     { "select_choose",        12 },
     { "select_idle",          9 },
     { "slide_down",           8 },
