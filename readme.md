@@ -9,12 +9,12 @@
 
 ### Features
 
-- 172 new items, including
-	+ 95 new guns
+- 174 new items, including
+	+ 97 new guns
 	+ 53 new passive items
 	+ 24 new active items
 - Lore for all new guns and items
-- A new custom character: Rogo from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/)
+- Two new custom characters: Rogo from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/) and Beatrix from [Slime Rancher](https://store.steampowered.com/app/433340/Slime_Rancher/)
 - 90 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
 - Companion Shop: sells 3 random unlocked companions at a 30% discount
 - Barter Shop: trades 3 random D-A tier items for any higher-tiered item
@@ -47,6 +47,8 @@
 	- Check behind the Hero Shrine at the start. I'm sure you can figure out the rest. C:
 * Where do I find the *other* [REDACTED]?
 	- Watch the trailer. C:
+
+![](previews/rancher_slime.gif)
 
 ### Wiki
 

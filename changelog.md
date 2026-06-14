@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.32.0 (TBD)
+## 1.32.0 (2026-06-14)
 
 - Added new custom character: Beatrix from [Slime Rancher](https://store.steampowered.com/app/433340/Slime_Rancher/)!
 - Added Akelus, M'tara, Vacpack, and Portable Water Turret

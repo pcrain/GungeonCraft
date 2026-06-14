@@ -412,6 +412,15 @@ def getCharacters():
       "item2"         : "Pogo Stick",
       "description"   : "Rogo pogos his way into action! Though a little clumsy on his feet, his unrivaled mobility on his trusty pogo stick opens up new possibilites for navigating the dangers of the Gungeon.",
     },
+    "beatrix" : {
+      "filename"      : imageFor("beatrix_happy.png"),
+      "charname"      : "Beatrix<br/>(from [https://store.steampowered.com/app/433340/Slime_Rancher/ Slime Rancher])",
+      "itemfilename1" : imageFor(iconForGun("Vacpack", nameOnly=True)),
+      "item1"         : "Vacpack",
+      "itemfilename2" : imageFor(iconForGun("Portable Hydro Turret", nameOnly=True)),
+      "item2"         : "Portable Hydro Turret",
+      "description"   : "Beatrix ventures into a new realm! Her firearm proficieny is very limited, but her ranching expertise lets her wrangle slimes to keep her safe as she explores the Gungeon's depths.",
+    },
   }
 
 PASSIVE_TEMPLATE='''
@@ -576,7 +585,7 @@ WIKI_TEMPLATE='''
 {enemies}
 |}}
 
-== Custom Character ==
+== Custom Characters ==
 
 {{| {tablestyle}
 !style="font-weight: bold; width: 112px;"|Icon
