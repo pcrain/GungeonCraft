@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.32.3 (2026-06-16)
+
+- Fixed null deref caused by Soul Kaliber's projectiles attempting to link to the Dragun's non-existent actor component
+
 ## 1.32.2 (2026-06-16)
 
 - Fixed slimes spawning when selecting Beatrix in the Breach, then selecting a different character before starting a run

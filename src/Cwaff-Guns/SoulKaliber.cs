@@ -97,7 +97,7 @@ public class SoulLinkProjectile : MonoBehaviour
     private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool _)
     {
         p.gameObject.Play("soul_kaliber_impact");
-        enemy.aiActor.gameObject.GetOrAddComponent<SoulLinkStatus>();
+        enemy.gameObject.GetOrAddComponent<SoulLinkStatus>();
     }
 }
 
