@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.32.2 (TBD)
+## 1.32.2 (2026-06-16)
 
 - Fixed slimes spawning when selecting Beatrix in the Breach, then selecting a different character before starting a run
 - Fixed softlock in Blessed Mode when changing guns in the middle of Akelus' attack

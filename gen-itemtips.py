@@ -47,7 +47,7 @@ def main():
       if root.endswith("/Unfinished"):
         continue # skip unfinished items
       for f in sorted(files):
-        if f.startswith("_"):
+        if f.startswith("_") or ("Exceptional" in f):
           continue # skip reference items
         path = os.path.join(root, f)
         iid = name = desc = None
