@@ -385,6 +385,7 @@ public class Vacpack : CwaffGun
         if (this.PlayerOwner is PlayerController player)
           DeregisterEvents(player);
         DismissHUD();
+        SlimyboiManager.ForceDestroy();
         base.OnDestroy();
     }
 

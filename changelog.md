@@ -2,6 +2,7 @@
 
 ## 1.32.2 (TBD)
 
+- Fixed slimes spawning when selecting Beatrix in the Breach, then selecting a different character before starting a run
 - Fixed softlock in Blessed Mode when changing guns in the middle of Akelus' attack
 - Fixed improper checks for whether the player's current gun can be changed when attempting to start the pizza minigame
 - Added Pogo Stick Gun, Vacpack, and Portable Hydro Turret to itemtips file

@@ -46,11 +46,16 @@ public class SlimyboiManager : MonoBehaviour
     // #endif
   }
 
-  private static void OnCleanStart()
+  internal static void ForceDestroy()
   {
     if (_Instance)
       UnityEngine.Object.Destroy(_Instance);
     _Instance = null;
+  }
+
+  private static void OnCleanStart()
+  {
+    ForceDestroy();
   }
 
   public static void RegisterSlime(SlimyboiController sloim)
