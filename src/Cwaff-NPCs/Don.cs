@@ -182,7 +182,7 @@ public class Don : FancyNPC
         return State.PIZZA_TIME_SUCCESS;
       return State.PIZZA_TIME_PARTIAL;
     }
-    if (interactor.IsGunLocked)
+    if (interactor.IsGunLocked || interactor.inventory.GunLocked.Value)
       return State.INCAPABLE_OF_DELIVERY;
     if (!GameManager.Instance.Dungeon.AllRoomsVisited)
       return State.NEED_FULL_MAP;
@@ -480,7 +480,7 @@ public class Don : FancyNPC
   private IEnumerator PrepareForPizzaTime()
   {
     PlayerController interactor = Interactor();
-    if (interactor.IsGunLocked)
+    if (interactor.IsGunLocked || interactor.inventory.GunLocked.Value)
       yield return ScriptINCAPABLE_OF_DELIVERY();
     else if (!Lazy.AllRoomsVisited())
       yield return ScriptNEED_FULL_MAP();

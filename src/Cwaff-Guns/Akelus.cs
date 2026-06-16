@@ -117,6 +117,7 @@ public class Akelus : CwaffGun
       player.SetInputOverride(Akelus.ItemName);
       this.gun.CanBeDropped = false;
       player.IsGunLocked = true;
+      player.inventory.GunLocked.AddOverride(Akelus.ItemName);
       HealthHaver hh = player.healthHaver;
       if (hh.vulnerable)
           hh.TriggerInvulnerabilityPeriod(BOUNCE_TIME + LANDING_TIME + 0.05f);
@@ -203,6 +204,7 @@ public class Akelus : CwaffGun
       float recoveryTime = RECOVERY_TIME * Mathf.Min(1f / player.FireRateMult(), player.ReloadRateMult());
       yield return new WaitForSeconds(recoveryTime);
 
+      player.inventory.GunLocked.RemoveOverride(Akelus.ItemName);
       player.IsGunLocked = false;
       this.gun.CanBeDropped = true;
       this.gun.DoSwingVFX(reverse: true);

@@ -607,7 +607,7 @@ public class PizzaTimeController : MonoBehaviour
     {
         if (_PizzaTimeHappening)
             return false;
-        if (!deliveryboi || deliveryboi.IsGunLocked)
+        if (!deliveryboi || deliveryboi.IsGunLocked || deliveryboi.inventory.GunLocked.Value)
             return false;
         if (!AllRoomsCleared())
             return false;

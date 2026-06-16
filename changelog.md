@@ -1,20 +1,33 @@
 # Changelog
 
+## 1.32.2 (TBD)
+
+- Fixed softlock in Blessed Mode when changing guns in the middle of Akelus' attack
+- Fixed improper checks for whether the player's current gun can be changed when attempting to start the pizza minigame
+
 ## 1.32.1 (2026-06-14)
 
 - Moved Beatrix's Breach position to avoid overlapping the Cultist (whoops)
 
 ## 1.32.0 (2026-06-14)
 
+#### Features:
+
 - Added new custom character: Beatrix from [Slime Rancher](https://store.steampowered.com/app/433340/Slime_Rancher/)!
 - Added Akelus, M'tara, Vacpack, and Portable Water Turret
 - Added masteries for Akelus and M'tara
+
+#### Balance Changes and Polish:
+
+- Banned Entropynnium from Blessed Runs
+- Cleaned up outline on Chew Toy's sprite
+
+#### Bugfixes and Misc:
+
 - Fixed several sprites that were an odd number of pixels wide from rendering with artifacts due to not being aligned to the pixel grid
 - Fixed Chain Driver's chains remaining player-controlled when switching guns while tethered to an enemy
-- Banned Entropynnium from Blessed Runs
 - Fixed Crapshooter (and probably other items) jittering when appearing from chests due to not being aligned to the pixel grid
 - Fixed getting stuck inside objects when using [REDACTED] while actively taking knockback
-- Cleaned up outline on Chew Toy's sprite
 - Fixed rare null deref when creating synergy notifications when running other mods
 - Fixed camera stuttering when using Death Note
 - Fixed Rat Punchout breaking when using Rogo due to changes to Alexandria's API breaking some local reflection-based setup code
