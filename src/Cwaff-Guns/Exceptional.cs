@@ -3,9 +3,6 @@
 public class Exceptional : CwaffGun
 {
     public static string ItemName         = "Exceptional";
-    public static string ShortDescription = "Exceptional";
-    public static string LongDescription  = "Exceptional";
-    public static string Lore             = "Exceptional";
 
     public static int _PickupId;
     public static int _ExceptionalPower;
@@ -18,7 +15,7 @@ public class Exceptional : CwaffGun
 
     public static void Init()
     {
-        Lazy.SetupGun<Exceptional>(ItemName, ShortDescription, LongDescription, Lore, hideFromAmmonomicon: true)
+        Lazy.SetupGun<Exceptional>(ItemName, "", "", "", hideFromAmmonomicon: true)
           .SetAttributes(quality: ItemQuality.SPECIAL, gunClass: CwaffGunClass.UTILITY, reloadTime: 0f, ammo: 80, shootFps: 30, reloadFps: 40,
             muzzleFrom: Items.Mailbox, fireAudio: "corruption_sound", banFromBlessedRuns: true, infiniteAmmo: true, modulesAreTiers: true)
           .Attach<ExceptionalAmmoDisplay>()

@@ -99,14 +99,11 @@
     <Compile Include="src\Cwaff-Passives\RingOfDefenestration.cs"/>
     <Compile Include="src\Lazy.cs"/>
     <Compile Include="src\Commands.cs"/>
-    <Compile Include="src\Cwaff-Characters\Rogo\PogoGun.cs"/>
     <Compile Include="src\Cwaff-Characters\Rogo\Rogo.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\SlimyboiManager.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\SlimyboiPatches.cs"/>
-    <Compile Include="src\Cwaff-Characters\Rancher\Vacpack.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\Rancher.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\Slimybois.cs"/>
-    <Compile Include="src\Cwaff-Characters\Rancher\PortableHydroTurret.cs"/>
     <Compile Include="src\Cwaff-Characters\Rancher\SlimyboiBehaviors.cs"/>
     <Compile Include="src\Cwaff-Characters\CwaffCharacterCore.cs"/>
     <Compile Include="src\Cwaff-Enemies\Bosses\BuildABoss.cs"/>
@@ -189,6 +186,7 @@
     <Compile Include="src\Cwaff-Guns\BlasTechF4.cs"/>
     <Compile Include="src\Cwaff-Guns\ChekhovsGun.cs"/>
     <Compile Include="src\Cwaff-Guns\AimuHakurei.cs"/>
+    <Compile Include="src\Cwaff-Guns\PogoGun.cs"/>
     <Compile Include="src\Cwaff-Guns\PlatinumStar.cs"/>
     <Compile Include="src\Cwaff-Guns\Crapshooter.cs"/>
     <Compile Include="src\Cwaff-Guns\Plasmarble.cs"/>
@@ -205,6 +203,7 @@
     <Compile Include="src\Cwaff-Guns\Vladimir.cs"/>
     <Compile Include="src\Cwaff-Guns\Exceptional.cs"/>
     <Compile Include="src\Cwaff-Guns\Zag.cs"/>
+    <Compile Include="src\Cwaff-Guns\Vacpack.cs"/>
     <Compile Include="src\Cwaff-Guns\Outbreak.cs"/>
     <Compile Include="src\Cwaff-Guns\Empath.cs"/>
     <Compile Include="src\Cwaff-Guns\SeltzerPelter.cs"/>
@@ -250,6 +249,7 @@
     <Compile Include="src\Cwaff-Guns\Gunbrella.cs"/>
     <Compile Include="src\Cwaff-Guns\Maestro.cs"/>
     <Compile Include="src\Cwaff-Guns\Jugglernaut.cs"/>
+    <Compile Include="src\Cwaff-Guns\PortableHydroTurret.cs"/>
     <Compile Include="src\Cwaff-Guns\KALI.cs"/>
     <Compile Include="src\Cwaff-Guns\AlienNailgun.cs"/>
     <Compile Include="src\Cwaff-Guns\Sunderbuss.cs"/>

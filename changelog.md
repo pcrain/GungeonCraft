@@ -4,6 +4,7 @@
 
 - Fixed softlock in Blessed Mode when changing guns in the middle of Akelus' attack
 - Fixed improper checks for whether the player's current gun can be changed when attempting to start the pizza minigame
+- Added Pogo Stick Gun, Vacpack, and Portable Hydro Turret to itemtips file
 
 ## 1.32.1 (2026-06-14)
 
