@@ -618,3 +618,144 @@ internal static class BinaryHeapClearPatch
         return false;
     }
 }
+
+//REFACTOR: move to GGV
+/// <summary>Optimize walkability checks</summary>
+[HarmonyPatch(typeof(Pathfinding.Pathfinder), nameof(Pathfinding.Pathfinder.Walkable))]
+internal static class PathfinderWalkablePatch
+{
+    private static HashSet<int> _CheckedNodes = new();
+
+    private static bool Prefix(Pathfinding.Pathfinder __instance, Vector2 start, Vector2 end, Vector2 extents, CellTypes passableCellTypes, bool canPassOccupied, IntVector2 clearance, bool ignoreWeightChecks, ref bool __result)
+    {
+      const float STEP_SIZE = 0.2f;
+      const float STEP_SIZE_SQR = STEP_SIZE * STEP_SIZE;
+
+      float pdx = end.x - start.x;
+      float pdy = end.y - start.y;
+      Vector2 pathDelta = new Vector2(pdx, pdy);
+      float sqrDistanceToEnd = pdx * pdx + pdy * pdy;
+      if (sqrDistanceToEnd < STEP_SIZE_SQR)
+      {
+        __result = true;
+        return false;
+      }
+      __result = false; // until proven otherwise
+
+      int pw = __instance.m_width;
+      int ph = __instance.m_height;
+      _CheckedNodes.Clear();
+
+      float distanceToEnd = Mathf.Sqrt(sqrDistanceToEnd);
+      Vector2 stepVector = pathDelta / (distanceToEnd / STEP_SIZE);
+      float minWeightNodeOnPathSoFar = float.MaxValue;
+      float maxWeightNodeOnPath = 0f;
+      bool allPointsOnPathAreOccupied = false;
+      bool allPointsOnPathArePits = false;
+      for (int i = 0; i < 4; i++)
+      {
+        int nodeX;
+        int nodeY;
+        IntVector2 nodeClearance;
+        switch (i)
+        {
+        case 0:
+          nodeX = (int)(start.x + extents.x);
+          nodeY = (int)(start.y + extents.y);
+          nodeClearance = new IntVector2(1, 1);
+          break;
+        case 1:
+          nodeX = (int)(start.x + extents.x);
+          nodeY = (int)(start.y - extents.y);
+          nodeClearance = new IntVector2(1, clearance.y);
+          break;
+        case 2:
+          nodeX = (int)(start.x - extents.x);
+          nodeY = (int)(start.y + extents.y);
+          nodeClearance = new IntVector2(clearance.x, 1);
+          break;
+        default:
+          nodeX = (int)(start.x - extents.x);
+          nodeY = (int)(start.y - extents.y);
+          nodeClearance = clearance;
+          break;
+        }
+        if (nodeX >= 0 && nodeX < pw && nodeY >= 0 && nodeY < ph)
+        {
+          Pathfinding.Pathfinder.PathNode pathNode = __instance.m_nodes[nodeX + nodeY * pw];
+          float nodeWeight = pathNode.GetWeight(nodeClearance, passableCellTypes);
+          if (maxWeightNodeOnPath < nodeWeight)
+            maxWeightNodeOnPath = nodeWeight;
+          if (pathNode.IsOccupied)
+            allPointsOnPathAreOccupied = true;
+          if (pathNode.CellType == CellType.PIT)
+            allPointsOnPathArePits = true;
+        }
+      }
+      if (maxWeightNodeOnPath > 0f)
+        minWeightNodeOnPathSoFar = maxWeightNodeOnPath;
+      Vector2 currentPosition = start;
+      while (distanceToEnd >= 0f)
+      {
+        maxWeightNodeOnPath = 0f;
+        bool currentPointOnPathIsOccupied = false;
+        bool currentPointOnPathIsPit = false;
+        for (int j = 0; j < 4; j++)
+        {
+          int nodeX;
+          int nodeY;
+          IntVector2 nodeClearance;
+          switch (j)
+          {
+          case 0:
+            nodeX = (int)(currentPosition.x + extents.x);
+            nodeY = (int)(currentPosition.y + extents.y);
+            nodeClearance = new IntVector2(1, 1);
+            break;
+          case 1:
+            nodeX = (int)(currentPosition.x + extents.x);
+            nodeY = (int)(currentPosition.y - extents.y);
+            nodeClearance = new IntVector2(1, clearance.y);
+            break;
+          case 2:
+            nodeX = (int)(currentPosition.x - extents.x);
+            nodeY = (int)(currentPosition.y + extents.y);
+            nodeClearance = new IntVector2(clearance.x, 1);
+            break;
+          default:
+            nodeX = (int)(currentPosition.x - extents.x);
+            nodeY = (int)(currentPosition.y - extents.y);
+            nodeClearance = clearance;
+            break;
+          }
+          int nodeId = nodeX + nodeY * pw;
+          if (!_CheckedNodes.Add(nodeId))
+            continue; // NOTE: 75-90% of node checks are duplicates on the average Walkable() invocation, so this makes a big difference
+          if (nodeX < 0 || nodeX >= pw || nodeY < 0 || nodeY >= ph)
+            return false;
+          Pathfinding.Pathfinder.PathNode pathNode = __instance.m_nodes[nodeId];
+          if (!canPassOccupied && !allPointsOnPathAreOccupied && pathNode.IsOccupied)
+            return false;
+          CellType nodeType = pathNode.CellType;
+          CellTypes currentPassableCellTypes = (!allPointsOnPathArePits) ? passableCellTypes : (passableCellTypes | CellTypes.PIT);
+          if (((uint)currentPassableCellTypes & (uint)nodeType) == 0 && (nodeType != CellType.PIT || !pathNode.CellData.fallingPrevented || (passableCellTypes & CellTypes.FLOOR) == 0))
+            return false;
+          if (!ignoreWeightChecks && (float)pathNode.GetWeight(nodeClearance, passableCellTypes) > minWeightNodeOnPathSoFar)
+            return false;
+          currentPointOnPathIsOccupied |= pathNode.IsOccupied;
+          currentPointOnPathIsPit |= nodeType == CellType.PIT;
+          float nodeWeight = pathNode.GetWeight(clearance, passableCellTypes);
+          if (maxWeightNodeOnPath < nodeWeight)
+            maxWeightNodeOnPath = nodeWeight;
+        }
+        currentPosition += stepVector;
+        distanceToEnd -= STEP_SIZE;
+        if (minWeightNodeOnPathSoFar > maxWeightNodeOnPath)
+          minWeightNodeOnPathSoFar = maxWeightNodeOnPath;
+        allPointsOnPathAreOccupied = allPointsOnPathAreOccupied && currentPointOnPathIsOccupied;
+        allPointsOnPathArePits = allPointsOnPathArePits && currentPointOnPathIsPit;
+      }
+      __result = true;
+      return false;
+    }
+}
