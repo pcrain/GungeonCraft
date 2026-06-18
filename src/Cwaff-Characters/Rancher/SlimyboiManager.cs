@@ -138,7 +138,7 @@ public class SlimyboiManager : MonoBehaviour
 
   private static void SpawnSlimes(List<SlimyboiType> slimes, PlayerController player = null, RoomHandler room = null, Vector2? pos = null)
   {
-    if (GameManager.Instance.IsFoyer)
+    if (!_Instance || GameManager.Instance.IsFoyer)
       return;
     _Instance.StartCoroutine(SpawnSlimesEnumerator(slimes, player, room, pos));
   }
