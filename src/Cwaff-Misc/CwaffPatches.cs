@@ -759,3 +759,24 @@ internal static class PathfinderWalkablePatch
       return false;
     }
 }
+
+//REFACTOR: move to GGV
+/// <summary>Fixes a memory leak where whitespace dfMarkupTokens are never released within parseTag()</summary>
+[HarmonyPatch(typeof(dfMarkupTokenizer), nameof(dfMarkupTokenizer.parseTag))]
+internal static class dfMarkupTokenizerparseTagPatch
+{
+  [HarmonyILManipulator]
+  private static void dfMarkupTokenizerparseTagPatchIL(ILContext il)
+  {
+      ILCursor cursor = new ILCursor(il);
+      if (!cursor.TryGotoNext(MoveType.After,
+        instr => instr.MatchCall<dfMarkupTokenizer>(nameof(dfMarkupTokenizer.parseWhitespace)),
+        instr => instr.MatchPop()
+        ))
+          return;
+
+      --cursor.Index;
+      cursor.Remove(); // remove the pop instruction and properly dispose of the markup token
+      cursor.Emit(OpCodes.Call, typeof(dfMarkupToken).GetMethod(nameof(dfMarkupToken.Release), BindingFlags.Instance | BindingFlags.Public));
+  }
+}
