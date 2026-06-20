@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.32.3 (2026-06-16)
+## 1.32.3 (2026-06-19)
 
 - Fixed null deref caused by Soul Kaliber's projectiles attempting to link to the Dragun's non-existent actor component
 - Fixed null deref caused by game attempting to spawn slimes when flipping braziers even when not playing as Beatrix
