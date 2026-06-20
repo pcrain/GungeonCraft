@@ -4,7 +4,8 @@
 
 - Fixed null deref caused by Soul Kaliber's projectiles attempting to link to the Dragun's non-existent actor component
 - Fixed null deref caused by game attempting to spawn slimes when flipping braziers even when not playing as Beatrix
-- Moved Beatrix's Breach position again to avoid overlapping Ralsei when Ralsei custom character is installed (this time for sure)
+- Moved Beatrix's Breach position again to avoid overlapping [Ralsei](https://thunderstore.io/c/enter-the-gungeon/p/CustomCharacters/RalseiCustomCharacter/) (this time for sure)
+- Relocated some optimization patches to Gungeon Go Vroom and updated recommended GGV version to 1.7.0
 
 ## 1.32.2 (2026-06-16)
 
