@@ -44,7 +44,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - [IdioticMuffin](https://www.reddit.com/r/EnterTheGungeon/comments/et316d/yet_even_more_gun_concepts_for_gungeon/): Grandmaster, [Paintball Cannon](https://www.reddit.com/r/EnterTheGungeon/comments/clkr07/splat_the_gungeon_weapon_concepts/)
 
-  - [Hashashaaaa](https://www.reddit.com/r/EnterTheGungeon/comments/b1fnc4/very_big_halo_weapon_set/): Fuel Rod Gun
+  - [Hashashaaaa](https://www.reddit.com/r/EnterTheGungeon/comments/b1fnc4/very_big_halo_weapon_set/): Akelus, Fuel Rod Gun
 
   - [ChaosMiles07](https://www.spriters-resource.com/custom_edited/thelegendofzeldacustoms/sheet/66258/): Glockarina
 
@@ -60,7 +60,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - Misc. edits combined from several sources by me: Breegull, Ki Blast, Racket Launcher, Sub Machine Gun, Ticonderogun
   
-  - Original sprites by me: Akelus, Chain Driver, Chroma, Entropynnium, Flux Fist, Gadulo, Macheening, M'tara, Photon Cannon, Sunderbuss
+  - Original sprites by me: Chain Driver, Chroma, Entropynnium, Flux Fist, Gadulo, Macheening, M'tara, Photon Cannon, Pogo Stick, Portable Hydro Turret, Sunderbuss, Vacpack
 
   - Most gun animations are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
 
@@ -86,6 +86,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 * A few sounds from [OpenGameArt.org](https://opengameart.org), and the rest from various games including Paper Mario 64 / TTYD, Terraria, Super Smash Bros., The Elder Scrolls: Morrowind, Dragonball Z Budokai Tenkaichi 3, Donkey Kong 64, Kirby: Squeak Squad, Minecraft, Undertale, The Legend of Zelda: The Minish Cap, and Team Fortress 2
 	* Digital sounds by [jalastram](https://opengameart.org/content/sound-effects-sfx003)
 * [SPOILERS] boss music [by tomori](https://www.youtube.com/watch?v=pC_7lrh6mGs)
+* [MORE SPOILERS] boss music from [a Hat in Time](https://www.youtube.com/watch?v=fAOn6xZy3FE)
 * Circus music from [Entry of the Gladiators Commodore 64, 6581 Clown Music](https://www.youtube.com/watch?v=ZnHwPX2WxZs)
 * It's Pizza Time! 8-bit cover [by TheFunnyDude](https://www.youtube.com/watch?v=lRFWKvmOGXY)
 * Trailer music [by Mannol](https://www.youtube.com/watch?v=8JUBS7ukJH0)
