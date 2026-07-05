@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.32.4 (2026-07-04)
+## 1.32.4 (2026-07-05)
 
 - Fixed Modular not being able to participate in the pizza minigame
 - Fixed pizza minigame immediately ending due to reading stale room data when encountering Don multiple times in a run
