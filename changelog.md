@@ -5,6 +5,7 @@
 - Fixed Modular not being able to participate in the pizza minigame
 - Fixed pizza minigame immediately ending due to reading stale room data when encountering Don multiple times in a run
 - Fixed Shmuppy being able to activate when in a different room than the player, causing it to get stuck behind doors
+- Fixed null deref caused by checking for nearby slimes that haven't been set up yet
 - Added some missing music credits and fixed some misattributed gun credits
 
 ## 1.32.3 (2026-06-19)

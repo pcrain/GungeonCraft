@@ -657,7 +657,7 @@ public class SlimyboiController : BraveBehaviour
     float y = pos.y;
     foreach (SlimyboiController sloim in SlimyboiManager.ActiveSlimes)
     {
-      if (!sloim)
+      if (!sloim || !sloim.aiActor)
         continue;
       Vector2 opos = sloim.aiActor.CenterPosition;
       float dx = x - opos.x;
