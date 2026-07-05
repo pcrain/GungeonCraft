@@ -71,6 +71,10 @@ public class ChewToy : CwaffCompanion
           if (UnityEngine.Random.value > _SPAWN_CHANCE)
             return;
           // #endif
+          RoomHandler room = __instance.CenterPosition.GetAbsoluteRoom();
+          PlayerController bestPlayer = GameManager.Instance.BestActivePlayer;
+          if (room == null || bestPlayer == null || room != bestPlayer.CurrentRoom)
+            return; // prevent rare bug with Shmuppy spawning in another room and getting stuck behind a door
           __state = true;
       }
 
