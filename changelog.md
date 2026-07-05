@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.32.4 (2026-07-04)
+
+- Fixed Modular not being able to participate in the pizza minigame
+- Fixed pizza minigame immediately ending due to reading stale room data when encountering Don multiple times in a run
+
 ## 1.32.3 (2026-06-19)
 
 - Fixed null deref caused by Soul Kaliber's projectiles attempting to link to the Dragun's non-existent actor component

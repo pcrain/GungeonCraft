@@ -36,7 +36,10 @@ public class Domino : CwaffPassive
         base.Pickup(player);
         CwaffEvents.OnCleanStart -= PizzaTimeController.OnFloorEnded;
         CwaffEvents.OnCleanStart += PizzaTimeController.OnFloorEnded; // no need to remove this when the item is dropped
+        CwaffEvents.OnFloorEnded -= PizzaTimeController.OnFloorEnded;
         CwaffEvents.OnFloorEnded += PizzaTimeController.OnFloorEnded;
+        CwaffEvents.OnNewFloorFullyLoaded -= PizzaTimeController.OnFloorStarted;
+        CwaffEvents.OnNewFloorFullyLoaded += PizzaTimeController.OnFloorStarted;
     }
 
     public override void DisableEffect(PlayerController player)
@@ -72,6 +75,7 @@ public class PizzaPeel : CwaffGun
           .InitProjectile(GunData.New(sprite: "pizza_projectile", clipSize: 4, cooldown: 0.06f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 0.0f, speed: 25f, range: 18f, force: 12f, hitEnemySound: null, hitWallSound: null, pierceBreakables: true))
           .Attach<PizzaPeelProjectile>();
+        AlexandriaTags.SetTag(gun.PickupObjectId, "modular_special_override"); // allow Modular to have fun in the Pizza minigame C:
 
         //REFACTOR: make this part of GunBuilder
         for (int i = 0; i < 5; ++i)
@@ -447,7 +451,7 @@ public class PizzaTimeController : MonoBehaviour
             int numEnemiesInRoom = UnityEngine.Random.Range(1, 5);
             for (int i = 0; i < numEnemiesInRoom; ++i)
             {
-                if (kinPrefab.RandomCellForEnemySpawn(room, overrideClearance: 4) is not IntVector2 clearSpot)
+                if (kinPrefab.RandomCellForEnemySpawn(room, overrideClearance: 2) is not IntVector2 clearSpot)
                 {
                   numEnemiesInRoom = i;
                   break;
@@ -492,7 +496,7 @@ public class PizzaTimeController : MonoBehaviour
         }
         _CurDeliveries = 0;
         _MaxDeliveries = _Hungrybois.Count;
-        // Lazy.DebugLog($"spawned in {_Hungrybois.Count} bullet kin awaiting pizza delivery");
+        // Lazy.DebugLog($"  spawned in {_Hungrybois.Count} bullet kin awaiting pizza delivery");
     }
 
     private static void DespawnHungryBulletKins()
@@ -539,13 +543,17 @@ public class PizzaTimeController : MonoBehaviour
         _CurDeliveries = 0;
         _MaxDeliveries = 0;
         _DonNPC = null;
-        _ScannedRoomsThisFloor = false;
         _PizzaTimeTriedToSpawnThisFloor = false;
         _PizzaTimeAttemptedThisFloor = false;
         _TimerExpired = false;
         _RuinedEquipment = false;
         _ElevatorRoom = null;
         _StartRoom = null;
+    }
+
+    internal static void OnFloorStarted()
+    {
+        _ScannedRoomsThisFloor = false;
     }
 
     private static bool RoomStillHasEnemies(RoomHandler room)
@@ -633,6 +641,8 @@ public class PizzaTimeController : MonoBehaviour
         CwaffEvents.OnFloorEnded += PizzaTimeController.OnFloorEnded;
         CwaffEvents.OnCleanStart -= PizzaTimeController.OnFloorEnded;
         CwaffEvents.OnCleanStart += PizzaTimeController.OnFloorEnded;
+        CwaffEvents.OnNewFloorFullyLoaded -= PizzaTimeController.OnFloorStarted;
+        CwaffEvents.OnNewFloorFullyLoaded += PizzaTimeController.OnFloorStarted;
         deliveryboi.OnReceivedDamage += PizzaTimeController.OnReceivedDamage;
 
         _Instance = new GameObject().AddComponent<PizzaTimeController>();
