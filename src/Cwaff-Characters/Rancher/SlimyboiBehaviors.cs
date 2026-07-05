@@ -908,7 +908,7 @@ public class SlimyboiController : BraveBehaviour
         if (proj.isActiveAndEnabled && proj.Owner is not PlayerController)
         {
           base.gameObject.PlayUnique("slime_reflect_sound");
-          PassiveReflectItem.ReflectBullet(proj, retargetReflectedBullet: false, newOwner: this._owner, minReflectedBulletSpeed: 25.0f);
+          PassiveReflectItem.ReflectBullet(proj, retargetReflectedBullet: false, newOwner: this._owner ? this._owner : base.aiActor, minReflectedBulletSpeed: 25.0f);
           proj.Direction = (proj.SafeCenter - myRigidbody.UnitCenter).normalized;
           this._reflectGlowTimer = _REFLECT_GLOW_TIME;
         }
