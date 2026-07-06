@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.32.5 (TBD)
+
+- Fixed null deref when dropping Stunt Helmet caused by trying to disable explosion immunity for a non-existent player
+
 ## 1.32.4 (2026-07-05)
 
 - Fixed Modular not being able to participate in the pizza minigame

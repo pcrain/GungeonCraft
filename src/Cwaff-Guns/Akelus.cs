@@ -30,40 +30,56 @@ public class Akelus : CwaffGun
     {
       base.OnPlayerPickup(player);
       if (this.Mastered)
-        player.SetImmuneToExplosions(true, ItemName);
+      {
+        player.SetImmuneToExplosionDamage(true, ItemName);
+        player.SetImmuneToExplosionKnockback(true, ItemName);
+      }
     }
 
     public override void OnSwitchedToThisGun()
     {
       base.OnSwitchedToThisGun();
       if (this.Mastered && this.PlayerOwner)
-        this.PlayerOwner.SetImmuneToExplosions(true, ItemName);
+      {
+        this.PlayerOwner.SetImmuneToExplosionDamage(true, ItemName);
+        this.PlayerOwner.SetImmuneToExplosionKnockback(true, ItemName);
+      }
     }
 
     public override void OnMasteryStatusChanged()
     {
       base.OnMasteryStatusChanged();
       if (this.Mastered && this.PlayerOwner)
-        this.PlayerOwner.SetImmuneToExplosions(true, ItemName);
+      {
+        this.PlayerOwner.SetImmuneToExplosionDamage(true, ItemName);
+        this.PlayerOwner.SetImmuneToExplosionKnockback(true, ItemName);
+      }
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
-      player.SetImmuneToExplosions(false, ItemName);
+      player.SetImmuneToExplosionDamage(false, ItemName);
+      player.SetImmuneToExplosionKnockback(false, ItemName);
       base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
       if (this.PlayerOwner)
-        this.PlayerOwner.SetImmuneToExplosions(false, ItemName);
+      {
+        this.PlayerOwner.SetImmuneToExplosionDamage(false, ItemName);
+        this.PlayerOwner.SetImmuneToExplosionKnockback(false, ItemName);
+      }
       base.OnDestroy();
     }
 
     public override void OnSwitchedAwayFromThisGun()
     {
       if (this.PlayerOwner)
-        this.PlayerOwner.SetImmuneToExplosions(false, ItemName);
+      {
+        this.PlayerOwner.SetImmuneToExplosionDamage(false, ItemName);
+        this.PlayerOwner.SetImmuneToExplosionKnockback(false, ItemName);
+      }
       base.OnSwitchedAwayFromThisGun();
     }
 

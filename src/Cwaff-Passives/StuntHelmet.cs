@@ -25,16 +25,16 @@ public class StuntHelmet : CwaffPassive
     public override void Pickup(PlayerController player)
     {
         base.Pickup(player);
-        player.SetImmuneToExplosions(true, ItemName);
+        player.SetImmuneToExplosionDamage(true, ItemName);
     }
 
     public override void DisableEffect(PlayerController player)
     {
         base.DisableEffect(player);
-        player.SetImmuneToExplosions(false, ItemName);
+        if (player)
+          player.SetImmuneToExplosionDamage(false, ItemName);
     }
 
-    //NOTE: used by HandleExplosionPatch in CwaffPatches
     internal static float DoStuntHelmetBoost(float origForce, bool hasStuntHelment, PlayerController player)
     {
         if (!hasStuntHelment)
@@ -74,4 +74,32 @@ public class StuntHelmet : CwaffPassive
         helmet._extantDamageBoostCoroutine = null;
         yield break;
     }
+}
+
+[HarmonyPatch(typeof(Exploder), nameof(Exploder.HandleExplosion), MethodType.Enumerator)]
+internal static class HandleExplosionPatch
+{
+    [HarmonyILManipulator]
+    private static void StuntExplosionIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+
+        VariableDefinition hasStuntHelmet = il.DeclareLocal<bool>(); // false by default
+
+        // Determine if player is wearing stunt helmet
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(13))) // PlayerController
+            return;
+        cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
+        cursor.CallPrivate(typeof(HandleExplosionPatch), nameof(HandleExplosionPatch.PlayerHasStuntHelmet));
+        cursor.Emit(OpCodes.Stloc, hasStuntHelmet);
+
+        // Quadruple all knockback from explosions and provide a damage boost
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdfld<ExplosionData>("force")))
+            return;
+        cursor.Emit(OpCodes.Ldloc, hasStuntHelmet);
+        cursor.Emit(OpCodes.Ldloc_S, (byte)13); // V_13 == the PlayerController
+        cursor.CallPrivate(typeof(StuntHelmet), nameof(StuntHelmet.DoStuntHelmetBoost));
+    }
+
+    private static bool PlayerHasStuntHelmet(PlayerController player) => player && player.HasPassive<StuntHelmet>();
 }
