@@ -104,7 +104,7 @@ public class GameActorHolyGoopEffect : GameActorSpeedEffect
         for (int i = 0; i < array.Length; i++)
             if (array[i] != null)
                 array[i].SetFloat("_AllColorsToggle", 1f);
-        player.healthHaver.IsVulnerable = false;
+        player.SetInvulnerable(true, HolyWaterGun.ItemName);
     }
 
     public override void OnEffectRemoved(GameActor actor, RuntimeGameActorEffectData effectData)
@@ -114,6 +114,6 @@ public class GameActorHolyGoopEffect : GameActorSpeedEffect
             return;
         player.InfiniteAmmo.RemoveOverride("Holy Goop");
         player.ClearOverrideShader();
-        player.healthHaver.IsVulnerable = true;
+        player.SetInvulnerable(false, HolyWaterGun.ItemName);
     }
 }

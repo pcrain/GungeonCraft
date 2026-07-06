@@ -122,8 +122,8 @@ public class Akelus : CwaffGun
       const float LAUNCH_RADIUS_MASTERED = 5f;
       const float LAUNCH_RADIUS_SQR = LAUNCH_RADIUS * LAUNCH_RADIUS;
       const float LAUNCH_RADIUS_MASTERED_SQR = LAUNCH_RADIUS_MASTERED * LAUNCH_RADIUS_MASTERED;
+      const float GRACE_PERIOD = 0.05f; // grace invulnerability after landing
 
-      bool delayInvulnerability = false;
       bool mastered = this.Mastered;
       Vector2 lungeDirection = (player.unadjustedAimPoint.XY() - player.sprite.WorldCenter).normalized;
       player.lockedDodgeRollDirection = lungeDirection; // avoids some animation glitches
@@ -134,11 +134,7 @@ public class Akelus : CwaffGun
       this.gun.CanBeDropped = false;
       player.IsGunLocked = true;
       player.inventory.GunLocked.AddOverride(Akelus.ItemName);
-      HealthHaver hh = player.healthHaver;
-      if (hh.vulnerable)
-          hh.TriggerInvulnerabilityPeriod(BOUNCE_TIME + LANDING_TIME + 0.05f);
-      else //WARN: if we start a bounce during invulnerability, it can wear off during bounce since it's handled by a coroutine
-          delayInvulnerability = true;
+      player.SetInvulnerable(true, Akelus.ItemName); // NOTE: technically we're already invulnerable due to playing dodge roll animation
       player.specRigidbody.AddCollisionLayerIgnoreOverride(_IgnoreCollisions);
       int originalLayer = player.gameObject.layer;
       player.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
@@ -153,11 +149,6 @@ public class Akelus : CwaffGun
       {
           spriteTransform.localPosition = spriteTransform.localPosition.WithY(GetHeight(VELOCITY, GRAVITY, elapsed));
           yield return null;
-          if (delayInvulnerability && hh.vulnerable)
-          {
-              delayInvulnerability = false;
-              hh.TriggerInvulnerabilityPeriod(BOUNCE_TIME + LANDING_TIME + 0.05f - elapsed);
-          }
       }
       player.m_handlingQueuedAnimation = false;
       kb.EndContinuousKnockback(this._leapKnockbackId);
@@ -205,20 +196,16 @@ public class Akelus : CwaffGun
         );
 
       player.ClearTableSlides();
-      for (float elapsed = 0f; elapsed < LANDING_TIME; elapsed += BraveTime.DeltaTime)
-      {
-          yield return null;
-          if (delayInvulnerability && hh.vulnerable)
-          {
-              delayInvulnerability = false;
-              hh.TriggerInvulnerabilityPeriod(LANDING_TIME + 0.05f - elapsed);
-          }
-      }
+      yield return new WaitForSeconds(LANDING_TIME);
 
       player.SetIsFlying(false, Akelus.ItemName, adjustShadow: false);
       player.specRigidbody.RemoveCollisionLayerIgnoreOverride(_IgnoreCollisions);
-      float recoveryTime = RECOVERY_TIME * Mathf.Min(1f / player.FireRateMult(), player.ReloadRateMult());
-      yield return new WaitForSeconds(recoveryTime);
+      float recoveryTime = RECOVERY_TIME * Mathf.Min(1f / player.FireRateMult(), player.ReloadRateMult()) - GRACE_PERIOD;
+      yield return new WaitForSeconds(GRACE_PERIOD);
+
+      player.SetInvulnerable(false, ItemName);
+      if (recoveryTime > 0)
+        yield return new WaitForSeconds(recoveryTime);
 
       player.inventory.GunLocked.RemoveOverride(Akelus.ItemName);
       player.IsGunLocked = false;

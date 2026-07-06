@@ -190,7 +190,7 @@ public class Telefragger : CwaffGun
             if (array[i] != null)
                 array[i].SetFloat("_AllColorsToggle", 1f);
 
-        player.healthHaver.IsVulnerable = false;
+        player.SetInvulnerable(true, ItemName);
         this.gun.CanBeDropped = false;
         this.gun.CanBeSold = false;
         player.inventory.GunLocked.SetOverride(ItemName, true);
@@ -203,7 +203,7 @@ public class Telefragger : CwaffGun
         player.OnAboutToFall -= this.HandleAboutToFall;
         this._invulnTime = 0.0f;
         player.ClearOverrideShader();
-        player.healthHaver.IsVulnerable = true;
+        player.SetInvulnerable(false, ItemName);
         if (m_extantFloor)
         {
             SpawnManager.Despawn(m_extantFloor.gameObject);

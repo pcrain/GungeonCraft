@@ -12,11 +12,16 @@ public static class CwaffOverrides
     => CwaffOverrideCache.Overrides(player).immuneToExplosionKnockback.Value;
   public static void SetImmuneToExplosionKnockback(this PlayerController player, bool value, string reason)
     => CwaffOverrideCache.Overrides(player).immuneToExplosionKnockback.SetOverride(reason, value);
+  public static bool IsInvulnerable(this PlayerController player)
+    => !player.healthHaver.IsVulnerable; // NOTE: handles the override case directly in the HealthHaverIsVulnerableOverridePatch patch
+  public static void SetInvulnerable(this PlayerController player, bool value, string reason)
+    => CwaffOverrideCache.Overrides(player).invulnerable.SetOverride(reason, value);
 
   private class CwaffOverrideCache
   {
     public OverridableBool immuneToExplosionDamage = new(false);
     public OverridableBool immuneToExplosionKnockback = new(false);
+    public OverridableBool invulnerable = new(false);
 
     private static PlayerController _P1 = null;
     private static PlayerController _P2 = null;
@@ -26,6 +31,8 @@ public static class CwaffOverrides
 
     internal static CwaffOverrideCache Overrides(PlayerController player)
     {
+      if (!player)
+        return null;
       if (player.PlayerIDX == 0)
       {
         if (player != _P1)
@@ -68,4 +75,15 @@ public static class CwaffOverrides
 
   private static bool CheckImmuneToExplosionDamage(PlayerController player) => player && player.IsImmuneToExplosionDamage();
   private static bool CheckImmuneToExplosionKnockback(PlayerController player) => player && player.IsImmuneToExplosionKnockback();
+
+  /// <summary>Patch to check if a player's vulnerable state has been overridden.</summary>
+  [HarmonyPatch(typeof(HealthHaver), nameof(HealthHaver.IsVulnerable), MethodType.Getter)]
+  [HarmonyPostfix]
+  private static void HealthHaverIsVulnerableOverridePatch(HealthHaver __instance, ref bool __result)
+  {
+      if (!__instance.isPlayerCharacter || __instance.gameActor is not PlayerController player)
+        return;
+      if (CwaffOverrideCache.Overrides(player).invulnerable.Value)
+        __result = false;  // is we have override invulnerability, IsVulnerable should return false
+  }
 }

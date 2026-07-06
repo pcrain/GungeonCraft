@@ -259,7 +259,7 @@ public class GyroscopeRoll : CustomDodgeRoll
             this.reflectingProjectiles = chargePercent >= DIZZY_THRES;
             this._owner.specRigidbody.OnPreRigidbodyCollision += BounceAwayEnemies;
             this._owner.specRigidbody.OnCollision += BounceOffWalls;
-            this._owner.healthHaver.IsVulnerable = false;
+            this._owner.SetInvulnerable(true, Gyroscope.ItemName);
 
             float dash_speed    = minDashSpeed  + chargePercent * (maxDashSpeed  - minDashSpeed);
             float dash_time     = MIN_DASH_TIME + chargePercent * (MAX_DASH_TIME - MIN_DASH_TIME);
@@ -309,7 +309,7 @@ public class GyroscopeRoll : CustomDodgeRoll
             }
             this._owner.specRigidbody.OnPreRigidbodyCollision -= BounceAwayEnemies;
             this._owner.specRigidbody.OnCollision -= BounceOffWalls;
-            this._owner.healthHaver.IsVulnerable = true;
+            this._owner.SetInvulnerable(false, Gyroscope.ItemName);
             this.reflectingProjectiles = false;
 
             this._owner.ownerlessStatModifiers.Remove(this.rollDamageModifier);
