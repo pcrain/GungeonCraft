@@ -3,6 +3,7 @@
 ## 1.32.5 (TBD)
 
 - Fixed null deref when dropping Stunt Helmet caused by trying to disable explosion immunity for a non-existent player
+- Adding missing sprite credits for Slime Rancher slimes
 
 ## 1.32.4 (2026-07-05)
 

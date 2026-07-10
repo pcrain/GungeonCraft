@@ -78,6 +78,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 * [MORE SPOILERS] boss sprites and boss card art from Metal Slug Attack
 * Rogo character concept, boss card art, and facecard art from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/)
 * Beatrix character concept and boss card art from [Slime Rancher](https://store.steampowered.com/app/433340/Slime_Rancher/)
+* Slime Rancher slime pixel art by [Chompo-Bompo](https://www.reddit.com/r/slimerancher/comments/haklxi/i_made_all_the_slime_in_pixel_art/)
 * Shmuppy sprites and Ammonomicon entry [by TitaniumGrunt7 from DeviantArt](https://www.deviantart.com/titaniumgrunt7/art/Enter-the-Gungeon-Shmuppy-715527348)
 * Other item and effect sprites from various games on [Spriter's Resource](https://www.spriters-resource.com/) and from [OpenGameArt.org](https://opengameart.org)
 	

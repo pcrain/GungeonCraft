@@ -12,6 +12,10 @@ public static class CwaffOverrides
     => CwaffOverrideCache.Overrides(player).immuneToExplosionKnockback.Value;
   public static void SetImmuneToExplosionKnockback(this PlayerController player, bool value, string reason)
     => CwaffOverrideCache.Overrides(player).immuneToExplosionKnockback.SetOverride(reason, value);
+  public static bool IsImmuneToContactDamage(this PlayerController player)
+    => CwaffOverrideCache.Overrides(player).immuneToContactDamage.Value;
+  public static void SetImmuneToContactDamage(this PlayerController player, bool value, string reason)
+    => CwaffOverrideCache.Overrides(player).immuneToContactDamage.SetOverride(reason, value);
   public static bool IsInvulnerable(this PlayerController player)
     => !player.healthHaver.IsVulnerable; // NOTE: handles the override case directly in the HealthHaverIsVulnerableOverridePatch patch
   public static void SetInvulnerable(this PlayerController player, bool value, string reason)
@@ -19,9 +23,10 @@ public static class CwaffOverrides
 
   private class CwaffOverrideCache
   {
-    public OverridableBool immuneToExplosionDamage = new(false);
+    public OverridableBool immuneToExplosionDamage    = new(false);
     public OverridableBool immuneToExplosionKnockback = new(false);
-    public OverridableBool invulnerable = new(false);
+    public OverridableBool immuneToContactDamage      = new(false);
+    public OverridableBool invulnerable               = new(false);
 
     private static PlayerController _P1 = null;
     private static PlayerController _P2 = null;
@@ -85,5 +90,14 @@ public static class CwaffOverrides
         return;
       if (CwaffOverrideCache.Overrides(player).invulnerable.Value)
         __result = false;  // is we have override invulnerability, IsVulnerable should return false
+  }
+
+  /// <summary>Patch to check if a player's contact damage immunity has been overridden.</summary>
+  [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.ReceivesTouchDamage), MethodType.Getter)]
+  [HarmonyPostfix]
+  private static void PlayerControllerReceivesTouchDamagePatch(PlayerController __instance, ref bool __result)
+  {
+      if (CwaffOverrideCache.Overrides(__instance).immuneToContactDamage.Value)
+        __result = false; // change the original result
   }
 }

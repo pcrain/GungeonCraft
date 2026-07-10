@@ -9,6 +9,8 @@ public class DerailGun : CwaffGun
 
     private static DeadlyDeadlyGoopManager _OilGooper = null;
 
+    private bool _cachedContactImmunity = false;
+
     public static void Init()
     {
         Lazy.SetupGun<DerailGun>(ItemName, ShortDescription, LongDescription, Lore)
@@ -32,6 +34,36 @@ public class DerailGun : CwaffGun
             g.InFlightSpawnFrequency = 0.01f;})
           .AttachTrail("derail_gun_beam", fps: 15, cascadeTimer: 2f * C.FRAME, softMaxLength: 1f, destroyOnEmpty: true,
             boneSpawnOffset: new Vector2(0, -0.375f));
+    }
+
+    public override void OwnedUpdate(GameActor owner, GunInventory inventory)
+    {
+        base.OwnedUpdate(owner, inventory);
+        if (this.PlayerOwner is PlayerController player && player.CurrentGun is Gun gun && gun.PickupObjectId == (int)Items.AlienEngine)
+          EnableContactImmunity(player);
+    }
+
+    private void EnableContactImmunity(PlayerController player)
+    {
+        if (this._cachedContactImmunity)
+            return;
+        this._cachedContactImmunity = true;
+        player.SetImmuneToContactDamage(true, Synergy.TANK_ENGINE.SynergyName());
+    }
+
+    private void DisableContactImmunity(PlayerController player)
+    {
+        if (!this._cachedContactImmunity)
+            return;
+        this._cachedContactImmunity = false;
+        player.SetImmuneToContactDamage(false, Synergy.TANK_ENGINE.SynergyName());
+    }
+
+    public override void OnSwitchedToThisGun()
+    {
+        base.OnSwitchedToThisGun();
+        if (this.PlayerOwner is PlayerController player)
+          DisableContactImmunity(player);
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
@@ -64,6 +96,7 @@ public class DerailGun : CwaffGun
     public override void OnDroppedByPlayer(PlayerController player)
     {
         base.OnDroppedByPlayer(player);
+        DisableContactImmunity(player);
         player.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
         player.OnReceivedDamage -= this.OnReceivedDamage;
         gun.SetAnimationFPS(gun.idleAnimation, 0); // don't need to use SetIdleAnimationFPS() outside of Initializer
@@ -74,6 +107,7 @@ public class DerailGun : CwaffGun
     {
         if (this.PlayerOwner)
         {
+            DisableContactImmunity(this.PlayerOwner);
             this.PlayerOwner.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
             this.PlayerOwner.OnReceivedDamage -= this.OnReceivedDamage;
         }
@@ -110,17 +144,5 @@ public class DerailGun : CwaffGun
         base.PostProcessProjectile(projectile);
         if (this.Mastered)
             projectile.GetComponent<GoopModifier>().goopDefinition = EasyGoopDefinitions.GreenOilGoop;
-    }
-
-    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.ReceivesTouchDamage), MethodType.Getter)]
-    private class PlayerControllerReceivesTouchDamagePatch
-    {
-        static bool Prefix(PlayerController __instance, ref bool __result)
-        {
-            if (!__instance.HasSynergy(Synergy.TANK_ENGINE) || __instance.CurrentGun.PickupObjectId != (int)Items.AlienEngine)
-                return true; // call the original method
-            __result = false; // change the original result
-            return false;    // skip the original method
-        }
     }
 }
