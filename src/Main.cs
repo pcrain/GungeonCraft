@@ -13,6 +13,7 @@
     global using System.Threading;
 
     global using BepInEx;
+    global using BepInEx.Bootstrap;
     global using UnityEngine;
     global using UnityEngine.UI;
     global using MonoMod.RuntimeDetour;
@@ -60,6 +61,7 @@ namespace CwaffingTheGungy;
 [BepInDependency(ETGModMainBehaviour.GUID, "1.9.2")]
 [BepInDependency(Alexandria.Alexandria.GUID, "0.4.25")]
 [BepInDependency(Gunfiguration.C.MOD_GUID, "1.1.6")]
+[BepInDependency("glorfindel.etg.itemtips", BepInDependency.DependencyFlags.SoftDependency)]
 public class Initialisation : BaseUnityPlugin
 {
     public static Initialisation Instance;
@@ -516,6 +518,8 @@ public class Initialisation : BaseUnityPlugin
                 ETGModMainBehaviour.Instance.gameObject.Play("vc_kirby_appeal01");
                 // ETGModConsole.Log($"you've played {GameStatsManager.Instance.GetPlayerStatValue(TrackedStats.TIME_PLAYED)} seconds");
             #endif
+
+            SetUpItemTips();
         }
         catch (Exception e)
         {
@@ -532,5 +536,70 @@ public class Initialisation : BaseUnityPlugin
         {
             // ConstructorProfiler.Enable();
         }
+    }
+
+    private static void SetUpItemTips()
+    {
+      Lazy.DebugConsoleLog($"attempting itemtips setup");
+      if (!Chainloader.PluginInfos.TryGetValue("glorfindel.etg.itemtips", out PluginInfo itemTipsPluginInfo))
+      {
+        Lazy.DebugConsoleLog($" itemtips not found, nothing to do");
+        return;
+      }
+
+      // get the tip cache
+      object itemTipsPlugin = itemTipsPluginInfo.Instance;
+      Type itemTipsPluginType = itemTipsPlugin.GetType();
+      FieldInfo tipCachefield = itemTipsPluginType.GetField("_tipCache",
+          BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+      object tipCache = tipCachefield.GetValue(itemTipsPlugin);
+      if (tipCache == null)
+      {
+        Lazy.DebugConsoleLog($" cache missing");
+        return;
+      }
+
+      // get the pickup dictionary
+      Type itemTipsCacheType = tipCache.GetType();
+      FieldInfo itemCachePickupsField = itemTipsCacheType.GetField("Pickups",
+          BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+      object itemCachePickups = itemCachePickupsField.GetValue(tipCache);
+      if (itemCachePickups == null)
+      {
+        Lazy.DebugConsoleLog($" itemCachePickups missing");
+        return;
+      }
+
+      // get the itemdata type
+      Assembly itemTipsAssembly = itemTipsCacheType.Assembly;
+      Type itemDataType = itemTipsAssembly.GetType("ItemTipsMod.ItemData");
+      if (itemDataType == null)
+      {
+        Lazy.DebugConsoleLog($" itemDataType missing");
+        return;
+      }
+
+      // get the Add method for the itemCachePickups dictionary
+      MethodInfo addMethod = itemCachePickups.GetType().GetMethod("Add", new Type[] { typeof(int), itemDataType });
+      if (addMethod == null)
+      {
+        Lazy.DebugConsoleLog($" addMethod missing");
+        return;
+      }
+
+      // add an item as a test
+      int testID = Lazy.PickupId<Chroma>();
+      Type itemMetaDataType = itemDataType.GetField("SourceMetadata").FieldType;
+      object itemMetaData = Activator.CreateInstance(itemMetaDataType);
+      itemMetaDataType.GetField("Name").SetValue(itemMetaData, "Metadata A"); //NOTE: seems unused except for debugging
+      itemMetaDataType.GetField("Url").SetValue(itemMetaData, "Metadata B"); //NOTE: seems unused except for debugging
+      itemMetaDataType.GetField("Version").SetValue(itemMetaData, "Metadata C"); //NOTE: seems unused except for debugging
+      object itemData = Activator.CreateInstance(itemDataType);
+      itemDataType.GetField("Name").SetValue(itemData, "Chroma (but runtime)");
+      itemDataType.GetField("Id").SetValue(itemData, testID);
+      itemDataType.GetField("Notes").SetValue(itemData, "Runtime notes seem to be working!");
+      itemDataType.GetField("SourceMetadata").SetValue(itemData, itemMetaData);
+      addMethod.Invoke(itemCachePickups, new object[] { testID, itemData });
+      Lazy.DebugConsoleLog($" success");
     }
 }
