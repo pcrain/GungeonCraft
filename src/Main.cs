@@ -33,6 +33,7 @@
     global using Alexandria.Misc;
     global using Alexandria.cAPI;
     global using Alexandria.CustomDodgeRollAPI;
+    global using Alexandria.Integrations;
     global using Brave.BulletScript;
     global using Gunfiguration;
 
@@ -61,7 +62,6 @@ namespace CwaffingTheGungy;
 [BepInDependency(ETGModMainBehaviour.GUID, "1.9.2")]
 [BepInDependency(Alexandria.Alexandria.GUID, "0.4.25")]
 [BepInDependency(Gunfiguration.C.MOD_GUID, "1.1.6")]
-[BepInDependency("glorfindel.etg.itemtips", BepInDependency.DependencyFlags.SoftDependency)]
 public class Initialisation : BaseUnityPlugin
 {
     public static Initialisation Instance;
