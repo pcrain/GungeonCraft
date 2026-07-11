@@ -4,6 +4,9 @@
 
 - Fixed null deref when dropping Stunt Helmet caused by trying to disable explosion immunity for a non-existent player
 - Adding missing sprite credits for Slime Rancher slimes
+- Use new Alexandria [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips) integration code to generate item and synergy tips
+- Update required Alexandria version to 0.5.8 for ItemTips integration, cross-mod compatibility feature, and general stability
+- Update required Gunfig version to 1.1.11 for stability and bugfixes
 
 ## 1.32.4 (2026-07-05)
 
