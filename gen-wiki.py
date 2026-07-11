@@ -253,7 +253,7 @@ def scanMasteries():
     if not (r := mrx.match(line)):
       continue
     gun = r.groups()[0]
-    desc = re.sub(r"""^\s*//\s*""","", lines[i-1])
+    desc = re.sub(r"""^\s*tip:\s*\"([^\"]+)\".*""",r"\1", lines[i+1])
     data[gun] = desc
   return data
 
@@ -297,7 +297,7 @@ def scanSynergies(passives, actives, guns):
           itemnames.append(cap_item)
     if len(filenames) < 2:
       continue
-    desc = re.sub(r"""^\s*//\s*""","", lines[i-1])
+    desc = re.sub(r"""^\s*tip:\s*\"([^\"]+)\".*""",r"\1", lines[i+1])
     # data[gun] = desc
     entry = {
       "synergyname" : synergyname,

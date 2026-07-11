@@ -397,9 +397,9 @@
     <Reference Include="MonoMod.RuntimeDetour"/>
     <Reference Include="Assembly-CSharp"/>
     <Reference Include="PlayMaker"/>
-    <Reference Include="Alexandria"/>
     <Reference Include="0Harmony"/>
     <Reference Include="BepInEx"/>
+    <Reference Include="Alexandria"/>
     <Reference Include="Gunfig"/>
     <Reference Include="ModTheGungeonAPI"/>
     <Reference Include="Mono.Cecil.Rocks"/>

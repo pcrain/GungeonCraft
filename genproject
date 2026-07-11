@@ -414,8 +414,8 @@ fi
 
 #Generate new Thunderstore Package
 if [ $thunderstore -eq 1 ]; then
-  echo -e "[${GRN}>${BLN}] Regenerating item tips"
-  ./gen-itemtips.py
+  # echo -e "[${GRN}>${BLN}] Regenerating item tips"
+  # ./gen-itemtips.py
   echo -e "[${GRN}>${BLN}] Assembling Thunderstore package"
   tdir="./_thunderstore_package"
   /bin/mkdir -p "${tdir}"

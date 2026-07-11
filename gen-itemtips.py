@@ -1,5 +1,6 @@
 #!/usr/bin/python
 #Generate item tips from source code
+#DEPRECATED: item tips are now generated via code through Alexandria integration
 
 import os, json
 
