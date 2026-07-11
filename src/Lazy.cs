@@ -114,6 +114,8 @@ public static class Lazy
 
         if (hideFromAmmonomicon)
             item.encounterTrackable.journalData.SuppressInAmmonomicon = true;
+        else
+            item.AddItemTip(longDescription);
 
         if (!isGun)
         {

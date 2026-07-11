@@ -32,364 +32,364 @@ public static class CwaffSynergies
         */
 
       #region Synergies
-        // Gives Drifter's Headgear a 20% longer dash that reflects bullets.
-        NewSynergy(HYPE_YOURSELF_UP, "Hype Yourself Up", new[]{IName(DriftersHeadgear.ItemName), "hyper_light_blaster"});
-        // Alligator's energy output is tripled while standing on carpet.
-        NewSynergy(ELECTRIC_SLIDE, "Electric Slide", new[]{IName(Alligator.ItemName), IName(ComfySlippers.ItemName)});
-        // Chekhov's Gun's ammo is fully restored before each boss fight.
-        NewSynergy(DEUS_EX_MACHINA, "Deus Ex Machina", new[]{IName(ChekhovsGun.ItemName), IName(PlotArmor.ItemName)});
-        // Suncaster replenishes ammo twice as quickly.
-        NewSynergy(SOLAR_FLAIR, "Solar Flair", new[]{IName(Suncaster.ItemName), "sunlight_javelin"});
-        // Bullets no longer have a damage penalty when fired through walls.
-        NewSynergy(PROJECTING_MUCH, "Projecting, Much?", new[]{IName(FourDBullets.ItemName), IName(AstralProjector.ItemName)});
-        // Aimu Hakurei's charge is instantly set to MAX upon getting hit.
-        NewSynergy(LOTUS_LAND_STORY, "Lotus Land Story", new[]{IName(AimuHakurei.ItemName), "laser_lotus"});
-        // Enemies stunned by Gorgun's Eye remain stunned for a second after looking away.
-        NewSynergy(BLANK_STARE, "Blank Stare", new[]{IName(GorgunEye.ItemName), IName(BlankChecks.ItemName)});
-        // Enemies have a 75% chance of having their gun replaced by a Bubble Blaster instead of a 50% chance.
-        NewSynergy(DUBBLE_BUBBLE, "Dubble Bubble", new[]{IName(BubbleWand.ItemName), "bubble_blaster"});
-        // Enemies drop twice as many souls when killed with Uppskeruvel.
-        NewSynergy(SOUL_SEARCHING, "Soul Searching", new[]{IName(Uppskeruvel.ItemName), "gun_soul"});
-        // Vacuuming debris occasionally generates casings (up to 20 per floor).
-        NewSynergy(CLEANUP_CREW, "Cleanup Crew", new[]{IName(VacuumCleaner.ItemName), IName(CustodiansBadge.ItemName)});
-        // Vacuum's chance to restore ammo is increased to 20%.
-        NewSynergy(SCAVENGEST, "Scavengest", new[]{IName(VacuumCleaner.ItemName), IName(ScavengingArms.ItemName)});
-        // When taking an otherwise fatal hit, if the player has at least 100 casings, damage is negated and the player loses 100 casings instead.
-        NewSynergy(DEATH_AND_TAXES, "Death and Taxes", new[]{IName(CreditCard.ItemName), IName(BlankChecks.ItemName)});
-        // Spawns a decoy when feigning death.
-        NewSynergy(DEAD_MAN_STANDING, "Dead Man Standing", new[]{IName(DeadRinger.ItemName), "decoy"});
-        // Spawns an explosive decoy when feigning death.
-        NewSynergy(DEAD_MAN_EXPANDING, "Dead Man Expanding", new[]{IName(DeadRinger.ItemName), "explosive_decoy"});
-        // Semi-automatic weapons have perfect accuracy.
-        NewSynergy(AIM_BOTS, "Aim Bots", new[]{IName(BionicFinger.ItemName), "nanomachines"});
-        // Pistol Whip's melee hit deals double damage to Jammed bosses and minibosses, and instantly smites all other Jammed enemies.
-        NewSynergy(WICKED_CHILD, "Wicked Child", new[]{IName(PistolWhip.ItemName), IName(HolyWaterGun.ItemName)});
-        // Sub Machine Gun replaces any guns held by charmed enemies with Heroine.
-        NewSynergy(I_NEED_A_HERO, "I Need a Hero", new[]{IName(SubMachineGun.ItemName), "heroine"});
-        // Digitized chests are automatically unlocked when re-materialized.
-        NewSynergy(KEYGEN, "Keygen", new[]{IName(Femtobyte.ItemName), "master_of_unlocking"});
-        // Maestro reflects projectiles 50% faster.
-        NewSynergy(COMMON_TIME, "Common Time", new[]{IName(Maestro.ItemName), "metronome"})
+        NewSynergy(HYPE_YOURSELF_UP, "Hype Yourself Up", new[]{IName(DriftersHeadgear.ItemName), "hyper_light_blaster"},
+          tip: "Gives Drifter's Headgear a 20% longer dash that reflects bullets.");
+        NewSynergy(ELECTRIC_SLIDE, "Electric Slide", new[]{IName(Alligator.ItemName), IName(ComfySlippers.ItemName)},
+          tip: "Alligator's energy output is tripled while standing on carpet.");
+        NewSynergy(DEUS_EX_MACHINA, "Deus Ex Machina", new[]{IName(ChekhovsGun.ItemName), IName(PlotArmor.ItemName)},
+          tip: "Chekhov's Gun's ammo is fully restored before each boss fight.");
+        NewSynergy(SOLAR_FLAIR, "Solar Flair", new[]{IName(Suncaster.ItemName), "sunlight_javelin"},
+          tip: "Suncaster replenishes ammo twice as quickly.");
+        NewSynergy(PROJECTING_MUCH, "Projecting, Much?", new[]{IName(FourDBullets.ItemName), IName(AstralProjector.ItemName)},
+          tip: "Bullets no longer have a damage penalty when fired through walls.");
+        NewSynergy(LOTUS_LAND_STORY, "Lotus Land Story", new[]{IName(AimuHakurei.ItemName), "laser_lotus"},
+          tip: "Aimu Hakurei's charge is instantly set to MAX upon getting hit.");
+        NewSynergy(BLANK_STARE, "Blank Stare", new[]{IName(GorgunEye.ItemName), IName(BlankChecks.ItemName)},
+          tip: "Enemies stunned by Gorgun's Eye remain stunned for a second after looking away.");
+        NewSynergy(DUBBLE_BUBBLE, "Dubble Bubble", new[]{IName(BubbleWand.ItemName), "bubble_blaster"},
+          tip: "Enemies have a 75% chance of having their gun replaced by a Bubble Blaster instead of a 50% chance.");
+        NewSynergy(SOUL_SEARCHING, "Soul Searching", new[]{IName(Uppskeruvel.ItemName), "gun_soul"},
+          tip: "Enemies drop twice as many souls when killed with Uppskeruvel.");
+        NewSynergy(CLEANUP_CREW, "Cleanup Crew", new[]{IName(VacuumCleaner.ItemName), IName(CustodiansBadge.ItemName)},
+          tip: "Vacuuming debris occasionally generates casings (up to 20 per floor).");
+        NewSynergy(SCAVENGEST, "Scavengest", new[]{IName(VacuumCleaner.ItemName), IName(ScavengingArms.ItemName)},
+          tip: "Vacuum's chance to restore ammo is increased to 20%.");
+        NewSynergy(DEATH_AND_TAXES, "Death and Taxes", new[]{IName(CreditCard.ItemName), IName(BlankChecks.ItemName)},
+          tip: "When taking an otherwise fatal hit, if the player has at least 100 casings, damage is negated and the player loses 100 casings instead.");
+        NewSynergy(DEAD_MAN_STANDING, "Dead Man Standing", new[]{IName(DeadRinger.ItemName), "decoy"},
+          tip: "Spawns a decoy when feigning death.");
+        NewSynergy(DEAD_MAN_EXPANDING, "Dead Man Expanding", new[]{IName(DeadRinger.ItemName), "explosive_decoy"},
+          tip: "Spawns an explosive decoy when feigning death.");
+        NewSynergy(AIM_BOTS, "Aim Bots", new[]{IName(BionicFinger.ItemName), "nanomachines"},
+          tip: "Semi-automatic weapons have perfect accuracy.");
+        NewSynergy(WICKED_CHILD, "Wicked Child", new[]{IName(PistolWhip.ItemName), IName(HolyWaterGun.ItemName)},
+          tip: "Pistol Whip's melee hit deals double damage to Jammed bosses and minibosses, and instantly smites all other Jammed enemies.");
+        NewSynergy(I_NEED_A_HERO, "I Need a Hero", new[]{IName(SubMachineGun.ItemName), "heroine"},
+          tip: "Sub Machine Gun replaces any guns held by charmed enemies with Heroine.");
+        NewSynergy(KEYGEN, "Keygen", new[]{IName(Femtobyte.ItemName), "master_of_unlocking"},
+          tip: "Digitized chests are automatically unlocked when re-materialized.");
+        NewSynergy(COMMON_TIME, "Common Time", new[]{IName(Maestro.ItemName), "metronome"},
+          tip: "Maestro reflects projectiles 50% faster.")
             .MultFireRate(1.5f);
-        // Movement speed is increased by 25% while Breegull is active.
-        NewSynergy(TALON_TROT, "Talon Trot", new[]{IName(Breegull.ItemName), "backpack"})
+        NewSynergy(TALON_TROT, "Talon Trot", new[]{IName(Breegull.ItemName), "backpack"},
+          tip: "Movement speed is increased by 25% while Breegull is active.")
             .MultMoveSpeed(1.25f);
-        // [REDACTED]
-        NewSynergy(BLASTECH_A1, "BlasTech A-1", new[]{IName(BlasTechF4.ItemName), "laser_sight"});
-        // Blackjack fires poker chips on either side of thrown cards.
-        NewSynergy(PIT_BOSS, "Pit Boss", new[]{IName(Blackjack.ItemName), "amulet_of_the_pit_lord"});
-        // K.A.L.I.'s charge rate is quadrupled.
-        NewSynergy(PARTICLE_ACCELERATOR_ACCELERATOR, "Particle Accelerator Accelerator", new[]{IName(KALI.ItemName), "singularity"})
+        NewSynergy(BLASTECH_A1, "BlasTech A-1", new[]{IName(BlasTechF4.ItemName), "laser_sight"},
+          tip: "[REDACTED]");
+        NewSynergy(PIT_BOSS, "Pit Boss", new[]{IName(Blackjack.ItemName), "amulet_of_the_pit_lord"},
+          tip: "Blackjack fires poker chips on either side of thrown cards.");
+        NewSynergy(PARTICLE_ACCELERATOR_ACCELERATOR, "Particle Accelerator Accelerator", new[]{IName(KALI.ItemName), "singularity"},
+          tip: "K.A.L.I.'s charge rate is quadrupled.")
             .MultChargeRate(4f);
-        // Stuffed Star recharges twice as quickly.
-        NewSynergy(MR_ALLIGATOX, "Mr. Alligatox", new[]{IName(Alligator.ItemName), "stuffed_star"});
-        // Adrenaline Shot's critical state lasts for 90 seconds, and taking damage no longer decreases the countdown timer.
-        NewSynergy(ADRENALINE_RUSH, "Adrenaline Rush", new[]{IName(AdrenalineShot.ItemName), "shotgun_coffee"});
-        // Enemies killed with English's projectiles drop an extra casing.
-        NewSynergy(BANK_SHOTS, "Bank Shots", new[]{IName(English.ItemName), "loot_bag"});
-        // Grappling Hook's cooldown is removed.
-        NewSynergy(BIONIC_COMMANDO, "Bionic Commando", new[]{IName(BionicFinger.ItemName), "grappling_hook"});
-        // Every blank used in a shop gives a 10% discount.
-        NewSynergy(BLANK_EXPRESSION, "Blank Expression", new[]{IName(BlankChecks.ItemName), "disarming_personality"});
-        // Femtobyte instantly kills any enemy that matches the last type of enemy it killed.
-        NewSynergy(LOOKUP_TABLE, "Lookup Table", new[]{IName(Femtobyte.ItemName), "portable_table_device"});
-        // Spawns 5 turtles upon getting hit.
-        NewSynergy(TROLLEY_PROBLEM, "Trolley Problem", new[]{IName(DerailGun.ItemName), "turtle_problem"});
-        // Ticonderogun leaves fire goop along drawn lines.
-        NewSynergy(DRAW_FIRE, "Draw Fire", new[]{IName(Ticonderogun.ItemName), "hot_lead"});
-        // Gorgun Eye's effect pierces walls and enemies, stunning all enemies in the direction the player is facing.
-        NewSynergy(PIERCING_GAZE, "Piercing Gaze", new[]{IName(GorgunEye.ItemName), "ghost_bullets"});
-        // Breegull's normal eggs can be fired for free.
-        NewSynergy(CHEATO_PAGE, "Cheato Page", new[]{IName(Breegull.ItemName), "book_of_chest_anatomy"});
-        // Standing over healthy goops restore Camera's ammo as well as Gunflower's.
-        NewSynergy(PHOTOSYNTHESIS, "Photosynthesis", new[]{IName(Gunflower.ItemName), "camera"});
-        // Grants immunity to contact damage while holding Alien Engine and immunity to most other forms of damage while firing Alien Engine.
-        NewSynergy(TANK_ENGINE, "Tank Engine", new[]{IName(DerailGun.ItemName), "alien_engine"});
-        // Projectiles detonated by blanks create larger explosions.
-        NewSynergy(DEMOLITION_MAN, "Demolition, Man!", new[]{IName(VolcanicAmmolet.ItemName), IName(Scotsman.ItemName)});
-        // Warrior's Gi activates when 2 hits from death as well as 1 hit from death.
-        NewSynergy(SAIYAN_PRIDE, "Saiyan Pride", new[]{IName(WarriorsGi.ItemName), IName(KiBlast.ItemName)});
-        // Flakseed sprouts grow 3x faster while planted in water.
-        NewSynergy(LAWN_CARE, "Lawn Care", new[]{IName(Flakseed.ItemName), "starpew"});
-        // Ring of Defenestration's rewards have a 33% chance of being doubled.
-        NewSynergy(THE_ABYSS_STARES_BACK, "The Abyss Stares Back", new[]{IName(RingOfDefenestration.ItemName), "amulet_of_the_pit_lord"});
-        // Tables reflect projectiles back at enemies.
-        NewSynergy(FURNITURE_POLISH, "Furniture Polish", new[]{IName(BulletproofTablecloth.ItemName), "potion_of_lead_skin"});
-        // Paintball Cannon's projectiles reflect enemy projectiles while Potion of Lead Skin is active.
-        NewSynergy(LEAD_PAINT, "Lead Paint", new[]{IName(PaintballCannon.ItemName), "potion_of_lead_skin"});
-        // Camping Supplies' damage boost builds twice as quickly.
-        NewSynergy(COZY_CAMPER, "Cozy Camper", new[]{IName(CampingSupplies.ItemName), IName(ComfySlippers.ItemName)});
-        // Treasure spots uncovered by Itemfinder also spawn 3-9 casings.
-        NewSynergy(TREASURE_HUNTER, "Treasure Hunter", new[]{IName(Itemfinder.ItemName), "sense_of_direction"});
-        // Taking damage no longer causes juggled guns to be dropped.
-        NewSynergy(SOLID_FOOTING, "Solid Footing", new[]{IName(Jugglernaut.ItemName), "heavy_boots"});
-        // Sextant locks on 30% faster.
-        NewSynergy(YOU_MAY_USE_A_CALCULATOR, "You May Use a Calculator", new[]{IName(Sextant.ItemName), IName(Calculator.ItemName)});
-        // Wayfarer's drones leave a trail of poison
-        NewSynergy(STRAGGLER, "Straggler", new[]{IName(Wayfarer.ItemName), "gas_mask"});
-        // Wayfarer's drones leave a trail of fire
-        NewSynergy(TRAILBLAZER, "Trailblazer", new[]{IName(Wayfarer.ItemName), "ring_of_fire_resistance"});
-        // Hallaeribut always fires 10 piranhas per shot at all hunger levels.
-        NewSynergy(STAY_HUNGRY, "Stay Hungry", new[]{IName(Hallaeribut.ItemName), "hungry_bullets"});
-        // Upon taking damage, time freezes for everything but the player for 5 seconds.
-        NewSynergy(SEGALS_LAW, "Segal's Law", new[]{IName(DeadRinger.ItemName), "super_hot_watch"});
-        // Allays are twice as likely to find items upon clearing a room with at least one torch placed in it.
-        NewSynergy(SPAWNPROOFING, "Spawnproofing", new[]{IName(AmethystShard.ItemName), IName(StackOfTorches.ItemName)});
-        // Cuppajoe's stat boost duration is reduced to 9 seconds, but crash time is reduced to 3 seconds.
-        NewSynergy(CAFFEINE_ADDICTION, "Caffeine Addiction", new[]{IName(MacchiAuto.ItemName), IName(Cuppajoe.ItemName)});
-        // Kaliber's Justice can no longer take items from the player.
-        NewSynergy(KALIBERS_FAVOR, "Kaliber's Favor", new[]{IName(KalibersJustice.ItemName), "seven_leaf_clover"});
-        // Tryhard Snacks stay active for twice as long after an enemy spawns.
-        NewSynergy(GAMER_REFLEXES, "Gamer Reflexes", new[]{IName(TryhardSnacks.ItemName), "3rd_party_controller"});
-        // Derail Gun reloads 35% faster.
-        NewSynergy(AHEAD_OF_SCHEDULE, "Ahead of Schedule", new[]{IName(DerailGun.ItemName), "sense_of_direction"})
+        NewSynergy(MR_ALLIGATOX, "Mr. Alligatox", new[]{IName(Alligator.ItemName), "stuffed_star"},
+          tip: "Stuffed Star recharges twice as quickly.");
+        NewSynergy(ADRENALINE_RUSH, "Adrenaline Rush", new[]{IName(AdrenalineShot.ItemName), "shotgun_coffee"},
+          tip: "Adrenaline Shot's critical state lasts for 90 seconds, and taking damage no longer decreases the countdown timer.");
+        NewSynergy(BANK_SHOTS, "Bank Shots", new[]{IName(English.ItemName), "loot_bag"},
+          tip: "Enemies killed with English's projectiles drop an extra casing.");
+        NewSynergy(BIONIC_COMMANDO, "Bionic Commando", new[]{IName(BionicFinger.ItemName), "grappling_hook"},
+          tip: "Grappling Hook's cooldown is removed.");
+        NewSynergy(BLANK_EXPRESSION, "Blank Expression", new[]{IName(BlankChecks.ItemName), "disarming_personality"},
+          tip: "Every blank used in a shop gives a 10% discount.");
+        NewSynergy(LOOKUP_TABLE, "Lookup Table", new[]{IName(Femtobyte.ItemName), "portable_table_device"},
+          tip: "Femtobyte instantly kills any enemy that matches the last type of enemy it killed.");
+        NewSynergy(TROLLEY_PROBLEM, "Trolley Problem", new[]{IName(DerailGun.ItemName), "turtle_problem"},
+          tip: "Spawns 5 turtles upon getting hit.");
+        NewSynergy(DRAW_FIRE, "Draw Fire", new[]{IName(Ticonderogun.ItemName), "hot_lead"},
+          tip: "Ticonderogun leaves fire goop along drawn lines.");
+        NewSynergy(PIERCING_GAZE, "Piercing Gaze", new[]{IName(GorgunEye.ItemName), "ghost_bullets"},
+          tip: "Gorgun Eye's effect pierces walls and enemies, stunning all enemies in the direction the player is facing.");
+        NewSynergy(CHEATO_PAGE, "Cheato Page", new[]{IName(Breegull.ItemName), "book_of_chest_anatomy"},
+          tip: "Breegull's normal eggs can be fired for free.");
+        NewSynergy(PHOTOSYNTHESIS, "Photosynthesis", new[]{IName(Gunflower.ItemName), "camera"},
+          tip: "Standing over healthy goops restore Camera's ammo as well as Gunflower's.");
+        NewSynergy(TANK_ENGINE, "Tank Engine", new[]{IName(DerailGun.ItemName), "alien_engine"},
+          tip: "Grants immunity to contact damage while holding Alien Engine and immunity to most other forms of damage while firing Alien Engine.");
+        NewSynergy(DEMOLITION_MAN, "Demolition, Man!", new[]{IName(VolcanicAmmolet.ItemName), IName(Scotsman.ItemName)},
+          tip: "Projectiles detonated by blanks create larger explosions.");
+        NewSynergy(SAIYAN_PRIDE, "Saiyan Pride", new[]{IName(WarriorsGi.ItemName), IName(KiBlast.ItemName)},
+          tip: "Warrior's Gi activates when 2 hits from death as well as 1 hit from death.");
+        NewSynergy(LAWN_CARE, "Lawn Care", new[]{IName(Flakseed.ItemName), "starpew"},
+          tip: "Flakseed sprouts grow 3x faster while planted in water.");
+        NewSynergy(THE_ABYSS_STARES_BACK, "The Abyss Stares Back", new[]{IName(RingOfDefenestration.ItemName), "amulet_of_the_pit_lord"},
+          tip: "Ring of Defenestration's rewards have a 33% chance of being doubled.");
+        NewSynergy(FURNITURE_POLISH, "Furniture Polish", new[]{IName(BulletproofTablecloth.ItemName), "potion_of_lead_skin"},
+          tip: "Tables reflect projectiles back at enemies.");
+        NewSynergy(LEAD_PAINT, "Lead Paint", new[]{IName(PaintballCannon.ItemName), "potion_of_lead_skin"},
+          tip: "Paintball Cannon's projectiles reflect enemy projectiles while Potion of Lead Skin is active.");
+        NewSynergy(COZY_CAMPER, "Cozy Camper", new[]{IName(CampingSupplies.ItemName), IName(ComfySlippers.ItemName)},
+          tip: "Camping Supplies' damage boost builds twice as quickly.");
+        NewSynergy(TREASURE_HUNTER, "Treasure Hunter", new[]{IName(Itemfinder.ItemName), "sense_of_direction"},
+          tip: "Treasure spots uncovered by Itemfinder also spawn 3-9 casings.");
+        NewSynergy(SOLID_FOOTING, "Solid Footing", new[]{IName(Jugglernaut.ItemName), "heavy_boots"},
+          tip: "Taking damage no longer causes juggled guns to be dropped.");
+        NewSynergy(YOU_MAY_USE_A_CALCULATOR, "You May Use a Calculator", new[]{IName(Sextant.ItemName), IName(Calculator.ItemName)},
+          tip: "Sextant locks on 30% faster.");
+        NewSynergy(STRAGGLER, "Straggler", new[]{IName(Wayfarer.ItemName), "gas_mask"},
+          tip: "Wayfarer's drones leave a trail of poison");
+        NewSynergy(TRAILBLAZER, "Trailblazer", new[]{IName(Wayfarer.ItemName), "ring_of_fire_resistance"},
+          tip: "Wayfarer's drones leave a trail of fire");
+        NewSynergy(STAY_HUNGRY, "Stay Hungry", new[]{IName(Hallaeribut.ItemName), "hungry_bullets"},
+          tip: "Hallaeribut always fires 10 piranhas per shot at all hunger levels.");
+        NewSynergy(SEGALS_LAW, "Segal's Law", new[]{IName(DeadRinger.ItemName), "super_hot_watch"},
+          tip: "Upon taking damage, time freezes for everything but the player for 5 seconds.");
+        NewSynergy(SPAWNPROOFING, "Spawnproofing", new[]{IName(AmethystShard.ItemName), IName(StackOfTorches.ItemName)},
+          tip: "Allays are twice as likely to find items upon clearing a room with at least one torch placed in it.");
+        NewSynergy(CAFFEINE_ADDICTION, "Caffeine Addiction", new[]{IName(MacchiAuto.ItemName), IName(Cuppajoe.ItemName)},
+          tip: "Cuppajoe's stat boost duration is reduced to 9 seconds, but crash time is reduced to 3 seconds.");
+        NewSynergy(KALIBERS_FAVOR, "Kaliber's Favor", new[]{IName(KalibersJustice.ItemName), "seven_leaf_clover"},
+          tip: "Kaliber's Justice can no longer take items from the player.");
+        NewSynergy(GAMER_REFLEXES, "Gamer Reflexes", new[]{IName(TryhardSnacks.ItemName), "3rd_party_controller"},
+          tip: "Tryhard Snacks stay active for twice as long after an enemy spawns.");
+        NewSynergy(AHEAD_OF_SCHEDULE, "Ahead of Schedule", new[]{IName(DerailGun.ItemName), "sense_of_direction"},
+          tip: "Derail Gun reloads 35% faster.")
             .MultReload(0.65f);
-        // Sextant reloads 70% faster.
-        NewSynergy(WRONG_KIND_OF_COMPASS, "Wrong Kind of Compass", new[]{IName(Sextant.ItemName), "sense_of_direction"})
+        NewSynergy(WRONG_KIND_OF_COMPASS, "Wrong Kind of Compass", new[]{IName(Sextant.ItemName), "sense_of_direction"},
+          tip: "Sextant reloads 70% faster.")
             .MultReload(0.3f);
-        // Custodian's Badge can no longer incur strikes.
-        NewSynergy(JOB_SECURITY, "Job Security", new[]{IName(CustodiansBadge.ItemName), IName(RatPoison.ItemName)});
-        // Vacuum Cleaner and Leafblower are dual wielded.
-        NewSynergy(FULL_CIRCULATION, "Full Circulation", new[]{IName(VacuumCleaner.ItemName), IName(Leafblower.ItemName)});
-        // Enemies killed by explosions drop 2 extra casings instead of 1.
-        NewSynergy(GLUED_BACK_TOGETHER_IN_HELL, "Glued Back Together in Hell", new[]{IName(DemolitionContract.ItemName), IName(Scotsman.ItemName)});
-        // Ignizol's ignition radius is doubled.
-        NewSynergy(COMBUST_LITERALLY_EVERYTHING, "Combust Literally Everything", new[]{IName(ScaldingJelly.ItemName), "molotov_launcher"});
-        // All enemies are stunned while Bottled Abyss is active.
-        NewSynergy(SUNKEN_EYE, "Sunken Eye", new[]{IName(GorgunEye.ItemName), IName(BottledAbyss.ItemName)});
-        // Glass Cannon no longer breaks when taking damage.
-        NewSynergy(BULLETPROOF_GLASS, "Bulletproof Glass", new[]{IName(GlassAmmoBox.ItemName), "glass_cannon"});
-        // Unopened chests drop 10-50 casings when destroyed, depending on their quality
-        NewSynergy(CHEST_BATTLE_ADVANCED, "Chest Battle Advanced", new[]{IName(Grandmaster.ItemName), "book_of_chest_anatomy"});
-        // Ticonderogun leaves poison goop along drawn lines.
-        NewSynergy(TOXIC_LANGUAGE, "Toxic Language", new[]{IName(Ticonderogun.ItemName), "irradiated_lead"});
-        // Enemies killed by Ticonderogun spawn charm goop.
-        NewSynergy(PURPLE_PROSE, "Purple Prose", new[]{IName(Ticonderogun.ItemName), "charming_rounds"});
-        // Gyroscope charges no longer cause dizziness.
-        NewSynergy(PERFECTLY_BALANCED, "Perfectly Balanced", new[]{IName(Gyroscope.ItemName), IName(KalibersJustice.ItemName)});
-        // Chain Driver does 10% more damage for every point of coolness the player has.
-        NewSynergy(CHAIN_SMOKER, "Chain Smoker", new[]{IName(ChainDriver.ItemName), "cigarettes"});
-        // Grenade eggs cost 2 ammo to fire instead of 5.
-        NewSynergy(BAZOOKA_LAYLEE, "Bazooka Laylee", new[]{IName(Breegull.ItemName), "com4nd0"});
-        // Training level is increased by triple the normal amount when Weighted Robes' training is active.
-        NewSynergy(GUN_SOHAN, "Gun Sohan", new[]{IName(WeightedRobes.ItemName), IName(WarriorsGi.ItemName)});
-        // Alligator and Nightlighter are dual wielded.
-        NewSynergy(CABLE_MANAGEMENT, "Cable Management", new[]{IName(Alligator.ItemName), IName(Nightlighter.ItemName)});
-        // Blackjack and Grandmaster are dual wielded.
-        NewSynergy(BOARD_AND_CARD_GAME_NIGHT, "Board and Card Game Night", new[]{IName(Grandmaster.ItemName), IName(Blackjack.ItemName)});
-        // Grants stealth upon entering a room with Death Note equipped.
-        NewSynergy(ILL_TAKE_A_POTATO_CHIP, "I'll Take a Potato Chip", new[]{IName(DeathNote.ItemName), IName(TryhardSnacks.ItemName)});
-        // Toothpaste goop spreads underneath the player's feet while walking around.
-        NewSynergy(BEDTIME_ROUTINE, "Bedtime Routine", new[]{IName(Toothpaste.ItemName), IName(ComfySlippers.ItemName)});
+        NewSynergy(JOB_SECURITY, "Job Security", new[]{IName(CustodiansBadge.ItemName), IName(RatPoison.ItemName)},
+          tip: "Custodian's Badge can no longer incur strikes.");
+        NewSynergy(FULL_CIRCULATION, "Full Circulation", new[]{IName(VacuumCleaner.ItemName), IName(Leafblower.ItemName)},
+          tip: "Vacuum Cleaner and Leafblower are dual wielded.");
+        NewSynergy(GLUED_BACK_TOGETHER_IN_HELL, "Glued Back Together in Hell", new[]{IName(DemolitionContract.ItemName), IName(Scotsman.ItemName)},
+          tip: "Enemies killed by explosions drop 2 extra casings instead of 1.");
+        NewSynergy(COMBUST_LITERALLY_EVERYTHING, "Combust Literally Everything", new[]{IName(ScaldingJelly.ItemName), "molotov_launcher"},
+          tip: "Ignizol's ignition radius is doubled.");
+        NewSynergy(SUNKEN_EYE, "Sunken Eye", new[]{IName(GorgunEye.ItemName), IName(BottledAbyss.ItemName)},
+          tip: "All enemies are stunned while Bottled Abyss is active.");
+        NewSynergy(BULLETPROOF_GLASS, "Bulletproof Glass", new[]{IName(GlassAmmoBox.ItemName), "glass_cannon"},
+          tip: "Glass Cannon no longer breaks when taking damage.");
+        NewSynergy(CHEST_BATTLE_ADVANCED, "Chest Battle Advanced", new[]{IName(Grandmaster.ItemName), "book_of_chest_anatomy"},
+          tip: "Unopened chests drop 10-50 casings when destroyed, depending on their quality");
+        NewSynergy(TOXIC_LANGUAGE, "Toxic Language", new[]{IName(Ticonderogun.ItemName), "irradiated_lead"},
+          tip: "Ticonderogun leaves poison goop along drawn lines.");
+        NewSynergy(PURPLE_PROSE, "Purple Prose", new[]{IName(Ticonderogun.ItemName), "charming_rounds"},
+          tip: "Enemies killed by Ticonderogun spawn charm goop.");
+        NewSynergy(PERFECTLY_BALANCED, "Perfectly Balanced", new[]{IName(Gyroscope.ItemName), IName(KalibersJustice.ItemName)},
+          tip: "Gyroscope charges no longer cause dizziness.");
+        NewSynergy(CHAIN_SMOKER, "Chain Smoker", new[]{IName(ChainDriver.ItemName), "cigarettes"},
+          tip: "Chain Driver does 10% more damage for every point of coolness the player has.");
+        NewSynergy(BAZOOKA_LAYLEE, "Bazooka Laylee", new[]{IName(Breegull.ItemName), "com4nd0"},
+          tip: "Grenade eggs cost 2 ammo to fire instead of 5.");
+        NewSynergy(GUN_SOHAN, "Gun Sohan", new[]{IName(WeightedRobes.ItemName), IName(WarriorsGi.ItemName)},
+          tip: "Training level is increased by triple the normal amount when Weighted Robes' training is active.");
+        NewSynergy(CABLE_MANAGEMENT, "Cable Management", new[]{IName(Alligator.ItemName), IName(Nightlighter.ItemName)},
+          tip: "Alligator and Nightlighter are dual wielded.");
+        NewSynergy(BOARD_AND_CARD_GAME_NIGHT, "Board and Card Game Night", new[]{IName(Grandmaster.ItemName), IName(Blackjack.ItemName)},
+          tip: "Blackjack and Grandmaster are dual wielded.");
+        NewSynergy(ILL_TAKE_A_POTATO_CHIP, "I'll Take a Potato Chip", new[]{IName(DeathNote.ItemName), IName(TryhardSnacks.ItemName)},
+          tip: "Grants stealth upon entering a room with Death Note equipped.");
+        NewSynergy(BEDTIME_ROUTINE, "Bedtime Routine", new[]{IName(Toothpaste.ItemName), IName(ComfySlippers.ItemName)},
+          tip: "Toothpaste goop spreads underneath the player's feet while walking around.");
 
       #endregion
 
       #region Masteries
-        // Grandmaster shoots an additional black piece with every shot, no longer shoots pawns, and moves pieces twice as fast.
-        NewMastery<MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName);
-        // Chekhov's Gun has no minimum fire time and restores all unfired shots at the end of the room.
-        NewMastery<MasteryOfChekhovsGun>(MASTERY_CHEKHOVS_GUN, ChekhovsGun.ItemName);
-        // Pincushion's pins phase through decor, and the gun itself no longer increases in spread.
-        NewMastery<MasteryOfPincushion>(MASTERY_PINCUSHION, Pincushion.ItemName);
-        // Enemies and projectiles are completely halted while souls are active.
-        NewMastery<MasteryOfPlatinumStar>(MASTERY_PLATINUM_STAR, PlatinumStar.ItemName);
-        // Movement penalty is removed.
-        NewMastery<MasteryOfNatascha>(MASTERY_NATASCHA, Natascha.ItemName);
-        // Spawns two hands that clap enemies, dealing double damage and stunning them for 10 seconds.
-        NewMastery<MasteryOfHandCannon>(MASTERY_HAND_CANNON, HandCannon.ItemName);
-        // Projectiles immediately observe enemies, effectively giving a 50% chance to instantly kill any enemy and remove all their projectiles.
-        NewMastery<MasteryOfSchrodingersGat>(MASTERY_SCHRODINGERS_GAT, SchrodingersGat.ItemName);
-        // Chicks spawn jammed and deal contact damage to enemies.
-        NewMastery<MasteryOfHatchlingGun>(MASTERY_HATCHLING_GUN, HatchlingGun.ItemName);
-        // Crapshooter's die face does not reset to 1 upon firing and repeatedly shoots the same-numbered die as long as fire as held.
-        NewMastery<MasteryOfCrapshooter>(MASTERY_CRAPSHOOTER, Crapshooter.ItemName);
-        // Holy Water Gun deals 16x damage to Jammed enemies. Killing Jammed enemies creates pools of holy goop that grant invulnerability and infinite ammo while active.
-        NewMastery<MasteryOfHolyWaterGun>(MASTERY_HOLY_WATER_GUN, HolyWaterGun.ItemName);
-        // Every Junk vacuumed produces a full ammo box, and every 16 corpses vacuumed produces a piece of armor.
-        NewMastery<MasteryOfVacuumCleaner>(MASTERY_VACUUM_CLEANER, VacuumCleaner.ItemName);
-        // Projectiles spawn status effect goops corresponding to their color while in flight and upon impact.
-        NewMastery<MasteryOfPaintballCannon>(MASTERY_PAINTBALL_CANNON, PaintballCannon.ItemName);
-        // Gunbrella fires a constant stream of projectiles at the cursor.
-        NewMastery<MasteryOfGunbrella>(MASTERY_GUNBRELLA, Gunbrella.ItemName);
-        // Alyx decays four times slower and passively grants poison immunity.
-        NewMastery<MasteryOfAlyx>(MASTERY_ALYX, Alyx.ItemName);
-        // Pistol Whip deals double damage to jammed enemies, and after killing any enemy, will trigger a mini blank for the next 3 attacks.
-        NewMastery<MasteryOfPistolWhip>(MASTERY_PISTOL_WHIP, PistolWhip.ItemName);
-        // Femtobyte gains the ability to digitze enemies and respawn them as allies later.
-        NewMastery<MasteryOfFemtobyte>(MASTERY_FEMTOBYTE, Femtobyte.ItemName);
-        // Enemies drop soul fragments and Aimless Souls attack enemies even when Uppskeruvel is not the active gun.
-        NewMastery<MasteryOfUppskeruvel>(MASTERY_UPPSKERUVEL, Uppskeruvel.ItemName);
-        // Card speed is dramatically increased, clip size is doubled, and the last 13 cards in each clip become exploding jokers.
-        NewMastery<MasteryOfBlackjack>(MASTERY_BLACKJACK, Blackjack.ItemName)
+        NewMastery<MasteryOfGrandmaster>(MASTERY_GRANDMASTER, Grandmaster.ItemName,
+          tip: "Grandmaster shoots an additional black piece with every shot, no longer shoots pawns, and moves pieces twice as fast.");
+        NewMastery<MasteryOfChekhovsGun>(MASTERY_CHEKHOVS_GUN, ChekhovsGun.ItemName,
+          tip: "Chekhov's Gun has no minimum fire time and restores all unfired shots at the end of the room.");
+        NewMastery<MasteryOfPincushion>(MASTERY_PINCUSHION, Pincushion.ItemName,
+          tip: "Pincushion's pins phase through decor, and the gun itself no longer increases in spread.");
+        NewMastery<MasteryOfPlatinumStar>(MASTERY_PLATINUM_STAR, PlatinumStar.ItemName,
+          tip: "Enemies and projectiles are completely halted while souls are active.");
+        NewMastery<MasteryOfNatascha>(MASTERY_NATASCHA, Natascha.ItemName,
+          tip: "Movement penalty is removed.");
+        NewMastery<MasteryOfHandCannon>(MASTERY_HAND_CANNON, HandCannon.ItemName,
+          tip: "Spawns two hands that clap enemies, dealing double damage and stunning them for 10 seconds.");
+        NewMastery<MasteryOfSchrodingersGat>(MASTERY_SCHRODINGERS_GAT, SchrodingersGat.ItemName,
+          tip: "Projectiles immediately observe enemies, effectively giving a 50% chance to instantly kill any enemy and remove all their projectiles.");
+        NewMastery<MasteryOfHatchlingGun>(MASTERY_HATCHLING_GUN, HatchlingGun.ItemName,
+          tip: "Chicks spawn jammed and deal contact damage to enemies.");
+        NewMastery<MasteryOfCrapshooter>(MASTERY_CRAPSHOOTER, Crapshooter.ItemName,
+          tip: "Crapshooter's die face does not reset to 1 upon firing and repeatedly shoots the same-numbered die as long as fire as held.");
+        NewMastery<MasteryOfHolyWaterGun>(MASTERY_HOLY_WATER_GUN, HolyWaterGun.ItemName,
+          tip: "Holy Water Gun deals 16x damage to Jammed enemies. Killing Jammed enemies creates pools of holy goop that grant invulnerability and infinite ammo while active.");
+        NewMastery<MasteryOfVacuumCleaner>(MASTERY_VACUUM_CLEANER, VacuumCleaner.ItemName,
+          tip: "Every Junk vacuumed produces a full ammo box, and every 16 corpses vacuumed produces a piece of armor.");
+        NewMastery<MasteryOfPaintballCannon>(MASTERY_PAINTBALL_CANNON, PaintballCannon.ItemName,
+          tip: "Projectiles spawn status effect goops corresponding to their color while in flight and upon impact.");
+        NewMastery<MasteryOfGunbrella>(MASTERY_GUNBRELLA, Gunbrella.ItemName,
+          tip: "Gunbrella fires a constant stream of projectiles at the cursor.");
+        NewMastery<MasteryOfAlyx>(MASTERY_ALYX, Alyx.ItemName,
+          tip: "Alyx decays four times slower and passively grants poison immunity.");
+        NewMastery<MasteryOfPistolWhip>(MASTERY_PISTOL_WHIP, PistolWhip.ItemName,
+          tip: "Pistol Whip deals double damage to jammed enemies, and after killing any enemy, will trigger a mini blank for the next 3 attacks.");
+        NewMastery<MasteryOfFemtobyte>(MASTERY_FEMTOBYTE, Femtobyte.ItemName,
+          tip: "Femtobyte gains the ability to digitze enemies and respawn them as allies later.");
+        NewMastery<MasteryOfUppskeruvel>(MASTERY_UPPSKERUVEL, Uppskeruvel.ItemName,
+          tip: "Enemies drop soul fragments and Aimless Souls attack enemies even when Uppskeruvel is not the active gun.");
+        NewMastery<MasteryOfBlackjack>(MASTERY_BLACKJACK, Blackjack.ItemName,
+          tip: "Card speed is dramatically increased, clip size is doubled, and the last 13 cards in each clip become exploding jokers.")
             .MultSpread(0.5f).MultClipSize(2f).MultFireRate(2f);
-        // English can be charged to launch two additional rows of 6 and 7 balls, respectively.
-        NewMastery<MasteryOfEnglish>(MASTERY_ENGLISH, English.ItemName);
-        // Launches 3 knives at a time for no additional cost.
-        NewMastery<MasteryOfIronMaid>(MASTERY_IRON_MAID, IronMaid.ItemName);
-        // Alligator's energy production rate decays to its base level much more slowly when removed from an energy source, maintaining high damage output for longer.
-        NewMastery<MasteryOfAlligator>(MASTERY_ALLIGATOR, Alligator.ItemName);
-        // Touching enemies that have been transmuted to gold causes them to explode in a burst of high damage gold projectiles that trasmute other enemies to gold on kill.
-        NewMastery<MasteryOfQuarterPounder>(MASTERY_QUARTER_POUNDER, QuarterPounder.ItemName);
-        // Ticonderogun can be reloaded to switch to eraser mode, which reflects encircled enemy bullets.
-        NewMastery<MasteryOfTiconderogun>(MASTERY_TICONDEROGUN, Ticonderogun.ItemName);
-        // King's Law projectiles phase through walls and home in on enemies after launching.
-        NewMastery<MasteryOfKingsLaw>(MASTERY_KINGS_LAW, KingsLaw.ItemName);
-        // Enbubbled projectiles gain the ability to enbubble other projectiles on collision.
-        NewMastery<MasteryOfBubblebeam>(MASTERY_BUBBLEBEAM, Bubblebeam.ItemName);
-        // Deadline lasers act as tripwires and detonate whenever an enemy crosses them.
-        NewMastery<MasteryOfDeadline>(MASTERY_DEADLINE, Deadline.ItemName);
-        // Starmageddon fires meteors that deal splash damage and set the ground ablaze, and passively grants fire immunity.
-        NewMastery<MasteryOfStarmageddon>(MASTERY_STARMAGEDDON, Starmageddon.ItemName);
-        // Subtractor Beam shots that only hit one enemy use that enemy as the damage source for Subtractor Beam's next shot.
-        NewMastery<MasteryOfSubtractorBeam>(MASTERY_SUBTRACTOR_BEAM, SubtractorBeam.ItemName);
-        // Shots ignore the invulnerable phases of most enemies and no longer prevent enemies from dropping casings or other rewards.
-        NewMastery<MasteryOfKALI>(MASTERY_KALI, KALI.ItemName);
-        // Reloading detonates any decor or explosive enemies in a large cone in front of the player. Exploding decor will not damage the player, but explosive enemies will.
-        NewMastery<MasteryOfScotsman>(MASTERY_SCOTSMAN, Scotsman.ItemName);
-        // Carpet Bomber's charge rate is quadrupled and projectiles travel twice as quickly
-        NewMastery<MasteryOfCarpetBomber>(MASTERY_CARPET_BOMBER, CarpetBomber.ItemName)
+        NewMastery<MasteryOfEnglish>(MASTERY_ENGLISH, English.ItemName,
+          tip: "English can be charged to launch two additional rows of 6 and 7 balls, respectively.");
+        NewMastery<MasteryOfIronMaid>(MASTERY_IRON_MAID, IronMaid.ItemName,
+          tip: "Launches 3 knives at a time for no additional cost.");
+        NewMastery<MasteryOfAlligator>(MASTERY_ALLIGATOR, Alligator.ItemName,
+          tip: "Alligator's energy production rate decays to its base level much more slowly when removed from an energy source, maintaining high damage output for longer.");
+        NewMastery<MasteryOfQuarterPounder>(MASTERY_QUARTER_POUNDER, QuarterPounder.ItemName,
+          tip: "Touching enemies that have been transmuted to gold causes them to explode in a burst of high damage gold projectiles that trasmute other enemies to gold on kill.");
+        NewMastery<MasteryOfTiconderogun>(MASTERY_TICONDEROGUN, Ticonderogun.ItemName,
+          tip: "Ticonderogun can be reloaded to switch to eraser mode, which reflects encircled enemy bullets.");
+        NewMastery<MasteryOfKingsLaw>(MASTERY_KINGS_LAW, KingsLaw.ItemName,
+          tip: "King's Law projectiles phase through walls and home in on enemies after launching.");
+        NewMastery<MasteryOfBubblebeam>(MASTERY_BUBBLEBEAM, Bubblebeam.ItemName,
+          tip: "Enbubbled projectiles gain the ability to enbubble other projectiles on collision.");
+        NewMastery<MasteryOfDeadline>(MASTERY_DEADLINE, Deadline.ItemName,
+          tip: "Deadline lasers act as tripwires and detonate whenever an enemy crosses them.");
+        NewMastery<MasteryOfStarmageddon>(MASTERY_STARMAGEDDON, Starmageddon.ItemName,
+          tip: "Starmageddon fires meteors that deal splash damage and set the ground ablaze, and passively grants fire immunity.");
+        NewMastery<MasteryOfSubtractorBeam>(MASTERY_SUBTRACTOR_BEAM, SubtractorBeam.ItemName,
+          tip: "Subtractor Beam shots that only hit one enemy use that enemy as the damage source for Subtractor Beam's next shot.");
+        NewMastery<MasteryOfKALI>(MASTERY_KALI, KALI.ItemName,
+          tip: "Shots ignore the invulnerable phases of most enemies and no longer prevent enemies from dropping casings or other rewards.");
+        NewMastery<MasteryOfScotsman>(MASTERY_SCOTSMAN, Scotsman.ItemName,
+          tip: "Reloading detonates any decor or explosive enemies in a large cone in front of the player. Exploding decor will not damage the player, but explosive enemies will.");
+        NewMastery<MasteryOfCarpetBomber>(MASTERY_CARPET_BOMBER, CarpetBomber.ItemName,
+          tip: "Carpet Bomber's charge rate is quadrupled and projectiles travel twice as quickly")
             .MultChargeRate(4f).MultProjSpeed(2f);
-        // Soul-linked enemies may take damage instead of the player whenever the player gets hit. The chance per enemy is equal to 25% + (5% * Curse), capping at 75% per enemy.
-        NewMastery<MasteryOfSoulKaliber>(MASTERY_SOUL_KALIBER, SoulKaliber.ItemName);
-        // Birds can phase through inner walls and collect up to three projectiles on the way back from an enemy.
-        NewMastery<MasteryOfLightwing>(MASTERY_LIGHTWING, Lightwing.ItemName);
-        // Debris is launched faster and with less spread, and pierces through enemies.
-        NewMastery<MasteryOfMagunet>(MASTERY_MAGUNET, Magunet.ItemName)
+        NewMastery<MasteryOfSoulKaliber>(MASTERY_SOUL_KALIBER, SoulKaliber.ItemName,
+          tip: "Soul-linked enemies may take damage instead of the player whenever the player gets hit. The chance per enemy is equal to 25% + (5% * Curse), capping at 75% per enemy.");
+        NewMastery<MasteryOfLightwing>(MASTERY_LIGHTWING, Lightwing.ItemName,
+          tip: "Birds can phase through inner walls and collect up to three projectiles on the way back from an enemy.");
+        NewMastery<MasteryOfMagunet>(MASTERY_MAGUNET, Magunet.ItemName,
+          tip: "Debris is launched faster and with less spread, and pierces through enemies.")
             .MultSpread(0.5f).MultProjSpeed(2f);
-        // Derail Gun continuously leaks oil onto the ground while held. When ignited, the oil produces green fire that doesn't harm the player.
-        NewMastery<MasteryOfDerailGun>(MASTERY_DERAIL_GUN, DerailGun.ItemName);
-        // Killing any enemy instantly spawns a replicant of that enemy if Alien Nailgun has previously registered its DNA, regardless of active gun.
-        NewMastery<MasteryOfAlienNailgun>(MASTERY_ALIEN_NAILGUN, AlienNailgun.ItemName);
-        // Vladimir increases curse by 1 for every 10 enemies killed, gains power for every point of curse the player has, and passively prevents Lord of the Jammed from spawning.
-        NewMastery<MasteryOfVladimir>(MASTERY_VLADIMIR, Vladimir.ItemName);
-        // Maestro reflects projectiles twice as quickly and does not consume ammo unless a projectile is reflected.
-        NewMastery<MasteryOfMaestro>(MASTERY_MAESTRO, Maestro.ItemName)
+        NewMastery<MasteryOfDerailGun>(MASTERY_DERAIL_GUN, DerailGun.ItemName,
+          tip: "Derail Gun continuously leaks oil onto the ground while held. When ignited, the oil produces green fire that doesn't harm the player.");
+        NewMastery<MasteryOfAlienNailgun>(MASTERY_ALIEN_NAILGUN, AlienNailgun.ItemName,
+          tip: "Killing any enemy instantly spawns a replicant of that enemy if Alien Nailgun has previously registered its DNA, regardless of active gun.");
+        NewMastery<MasteryOfVladimir>(MASTERY_VLADIMIR, Vladimir.ItemName,
+          tip: "Vladimir increases curse by 1 for every 10 enemies killed, gains power for every point of curse the player has, and passively prevents Lord of the Jammed from spawning.");
+        NewMastery<MasteryOfMaestro>(MASTERY_MAESTRO, Maestro.ItemName,
+          tip: "Maestro reflects projectiles twice as quickly and does not consume ammo unless a projectile is reflected.")
             .MultFireRate(2.0f);
-        // Ki Blast can be charged to fire a Kamehameha capable of breaking boss damage caps. Charging a Kamehameha slows the player down, and firing the Kamehameha prevents the player from moving entirely.
-        NewMastery<MasteryOfKiBlast>(MASTERY_KI_BLAST, KiBlast.ItemName);
-        // Hallaeribut becomes permanently Ravenous and can be fed items on the ground by reloading with a full clip. Items grant ammo proportional to their quality. If Hallaeribut runs out of ammo, it will automatically consume the least valuable item in the player's inventory for ammo. Hallaeribut will not feed on the player until no more items are available.
-        NewMastery<MasteryOfHallaeribut>(MASTERY_HALLAERIBUT, Hallaeribut.ItemName);
-        // Gunflower passively regenerates up to 10% of its max ammo while active and can gain ammo from all goops.
-        NewMastery<MasteryOfGunflower>(MASTERY_GUNFLOWER, Gunflower.ItemName);
-        // Omnidirectional Laser fires lasers in 5 directions, with the laser aimed towards the reticle being 50% stronger.
-        NewMastery<MasteryOfOmnidirectionalLaser>(MASTERY_OMNIDIRECTIONAL_LASER, OmnidirectionalLaser.ItemName)
+        NewMastery<MasteryOfKiBlast>(MASTERY_KI_BLAST, KiBlast.ItemName,
+          tip: "Ki Blast can be charged to fire a Kamehameha capable of breaking boss damage caps. Charging a Kamehameha slows the player down, and firing the Kamehameha prevents the player from moving entirely.");
+        NewMastery<MasteryOfHallaeribut>(MASTERY_HALLAERIBUT, Hallaeribut.ItemName,
+          tip: "Hallaeribut becomes permanently Ravenous and can be fed items on the ground by reloading with a full clip. Items grant ammo proportional to their quality. If Hallaeribut runs out of ammo, it will automatically consume the least valuable item in the player's inventory for ammo. Hallaeribut will not feed on the player until no more items are available.");
+        NewMastery<MasteryOfGunflower>(MASTERY_GUNFLOWER, Gunflower.ItemName,
+          tip: "Gunflower passively regenerates up to 10% of its max ammo while active and can gain ammo from all goops.");
+        NewMastery<MasteryOfOmnidirectionalLaser>(MASTERY_OMNIDIRECTIONAL_LASER, OmnidirectionalLaser.ItemName,
+          tip: "Omnidirectional Laser fires lasers in 5 directions, with the laser aimed towards the reticle being 50% stronger.")
             .MultDamage(1.5f);
-        // Blamethrower fires projectiles radially in all directions and permanently stuns scapegoats.
-        NewMastery<MasteryOfBlamethrower>(MASTERY_BLAMETHROWER, Blamethrower.ItemName);
-        // Projectiles that hit walls now split into two projectiles that follow the wall in both directions.
-        NewMastery<MasteryOfZag>(MASTERY_ZAG, Zag.ItemName);
-        // Projectiles move twice as fast and home onto enemies.
-        NewMastery<MasteryOfOutbreak>(MASTERY_OUTBREAK, Outbreak.ItemName)
+        NewMastery<MasteryOfBlamethrower>(MASTERY_BLAMETHROWER, Blamethrower.ItemName,
+          tip: "Blamethrower fires projectiles radially in all directions and permanently stuns scapegoats.");
+        NewMastery<MasteryOfZag>(MASTERY_ZAG, Zag.ItemName,
+          tip: "Projectiles that hit walls now split into two projectiles that follow the wall in both directions.");
+        NewMastery<MasteryOfOutbreak>(MASTERY_OUTBREAK, Outbreak.ItemName,
+          tip: "Projectiles move twice as fast and home onto enemies.")
             .MultProjSpeed(2f);
-        // Telefragger can be reloaded while firing to instantly teleport the player to the end of the beam. This teleport cannot be triggered again until killing another enemy with Telefragger.
-        NewMastery<MasteryOfTelefragger>(MASTERY_TELEFRAGGER, Telefragger.ItemName);
-        // Reload time is halved, and tranquilized enemies with guns are guaranteed to drop their guns and some ammo.
-        NewMastery<MasteryOfTranquilizer>(MASTERY_TRANQUILIZER, Tranquilizer.ItemName)
+        NewMastery<MasteryOfTelefragger>(MASTERY_TELEFRAGGER, Telefragger.ItemName,
+          tip: "Telefragger can be reloaded while firing to instantly teleport the player to the end of the beam. This teleport cannot be triggered again until killing another enemy with Telefragger.");
+        NewMastery<MasteryOfTranquilizer>(MASTERY_TRANQUILIZER, Tranquilizer.ItemName,
+          tip: "Reload time is halved, and tranquilized enemies with guns are guaranteed to drop their guns and some ammo.")
             .MultReload(0.5f);
-        // Graze range is increased, focus mode slows down time even further, and projectiles grazed while not in focus mode are reflected back at enemies.
-        NewMastery<MasteryOfAimuHakurei>(MASTERY_AIMU_HAKUREI, AimuHakurei.ItemName);
-        // Racket Launcher gains increased reflect range, and can serve additional projectiles when fired while no balls are within reflect range.
-        NewMastery<MasteryOfRacketLauncher>(MASTERY_RACKET_LAUNCHER, RacketLauncher.ItemName);
-        // Each juggled gun automatically fires an additional ball projectile when tossed.
-        NewMastery<MasteryOfJugglernaut>(MASTERY_JUGGLERNAUT, Jugglernaut.ItemName);
-        // [REDACTED]
-        NewMastery<MasteryOfBlasTechF4>(MASTERY_BLASTECH_F4, BlasTechF4.ItemName);
-        // Yggdrashell can target up to 3 enemies simultaneously.
-        NewMastery<MasteryOfYggdrashell>(MASTERY_YGGDRASHELL, Yggdrashell.ItemName);
-        // Spider drones fire lasers that pierce small obstacles and have increased speed, damage, and fire rate.
-        NewMastery<MasteryOfWidowmaker>(MASTERY_WIDOWMAKER, Widowmaker.ItemName);
-        // Oddjob fires additional sawblade projectiles outward radially while in flight.
-        NewMastery<MasteryOfOddjob>(MASTERY_ODDJOB, Oddjob.ItemName);
-        // Sunderbuss produces a shockwave that travels along the ground in the direction of aim, heavily damaging all enemies in its path.
-        NewMastery<MasteryOfSunderbuss>(MASTERY_SUNDERBUSS, Sunderbuss.ItemName);
-        // Wavefront's projectiles become ionized, intermittently zapping nearby enemies and each other.
-        NewMastery<MasteryOfWavefront>(MASTERY_WAVEFRONT, Wavefront.ItemName);
-        // Breegull transforms into its dragon form, granting infinite fire eggs that never need reloading.
-        NewMastery<MasteryOfBreegull>(MASTERY_BREEGULL, Breegull.ItemName);
-        // Overflow siphons goop from barrels faster and can be overfilled far past its max ammo, causing it to constantly autofire extra goop until it is no longer overfilled.
-        NewMastery<MasteryOfOverflow>(MASTERY_OVERFLOW, Overflow.ItemName);
-        // Every 5-15 enemies killed with Missiletoe triggers a gift exchange, which randomly replaces a wrapped gift with another item of equal quality.
-        NewMastery<MasteryOfMissiletoe>(MASTERY_MISSILETOE, Missiletoe.ItemName);
-        // Flow of time is further slowed down when standing in coffee goop.
-        NewMastery<MasteryOfMacchiAuto>(MASTERY_MACCHI_AUTO, MacchiAuto.ItemName);
-        // Chroma gains a tribeam mode that uses additional ammo, but deals vastly increased damage. The tribeam's damage scales even further based on the lowest of extracted red, green, and blue pigment levels.
-        NewMastery<MasteryOfChroma>(MASTERY_CHROMA, Chroma.ItemName);
-        // Flakseed's sprouts can grow in hostile terrain and can no longer be trampled. Fully grown sprouts become larger flak flowers that attack and stun nearby enemies with their roots.
-        NewMastery<MasteryOfFlakseed>(MASTERY_FLAKSEED, Flakseed.ItemName);
-        // Cars have much better handling, deal 25% more damage, and can crash into walls up to 3 times before disappearing.
-        NewMastery<MasteryOfRCLauncher>(MASTERY_RC_LAUNCHER, RCLauncher.ItemName)
+        NewMastery<MasteryOfAimuHakurei>(MASTERY_AIMU_HAKUREI, AimuHakurei.ItemName,
+          tip: "Graze range is increased, focus mode slows down time even further, and projectiles grazed while not in focus mode are reflected back at enemies.");
+        NewMastery<MasteryOfRacketLauncher>(MASTERY_RACKET_LAUNCHER, RacketLauncher.ItemName,
+          tip: "Racket Launcher gains increased reflect range, and can serve additional projectiles when fired while no balls are within reflect range.");
+        NewMastery<MasteryOfJugglernaut>(MASTERY_JUGGLERNAUT, Jugglernaut.ItemName,
+          tip: "Each juggled gun automatically fires an additional ball projectile when tossed.");
+        NewMastery<MasteryOfBlasTechF4>(MASTERY_BLASTECH_F4, BlasTechF4.ItemName,
+          tip: "[REDACTED]");
+        NewMastery<MasteryOfYggdrashell>(MASTERY_YGGDRASHELL, Yggdrashell.ItemName,
+          tip: "Yggdrashell can target up to 3 enemies simultaneously.");
+        NewMastery<MasteryOfWidowmaker>(MASTERY_WIDOWMAKER, Widowmaker.ItemName,
+          tip: "Spider drones fire lasers that pierce small obstacles and have increased speed, damage, and fire rate.");
+        NewMastery<MasteryOfOddjob>(MASTERY_ODDJOB, Oddjob.ItemName,
+          tip: "Oddjob fires additional sawblade projectiles outward radially while in flight.");
+        NewMastery<MasteryOfSunderbuss>(MASTERY_SUNDERBUSS, Sunderbuss.ItemName,
+          tip: "Sunderbuss produces a shockwave that travels along the ground in the direction of aim, heavily damaging all enemies in its path.");
+        NewMastery<MasteryOfWavefront>(MASTERY_WAVEFRONT, Wavefront.ItemName,
+          tip: "Wavefront's projectiles become ionized, intermittently zapping nearby enemies and each other.");
+        NewMastery<MasteryOfBreegull>(MASTERY_BREEGULL, Breegull.ItemName,
+          tip: "Breegull transforms into its dragon form, granting infinite fire eggs that never need reloading.");
+        NewMastery<MasteryOfOverflow>(MASTERY_OVERFLOW, Overflow.ItemName,
+          tip: "Overflow siphons goop from barrels faster and can be overfilled far past its max ammo, causing it to constantly autofire extra goop until it is no longer overfilled.");
+        NewMastery<MasteryOfMissiletoe>(MASTERY_MISSILETOE, Missiletoe.ItemName,
+          tip: "Every 5-15 enemies killed with Missiletoe triggers a gift exchange, which randomly replaces a wrapped gift with another item of equal quality.");
+        NewMastery<MasteryOfMacchiAuto>(MASTERY_MACCHI_AUTO, MacchiAuto.ItemName,
+          tip: "Flow of time is further slowed down when standing in coffee goop.");
+        NewMastery<MasteryOfChroma>(MASTERY_CHROMA, Chroma.ItemName,
+          tip: "Chroma gains a tribeam mode that uses additional ammo, but deals vastly increased damage. The tribeam's damage scales even further based on the lowest of extracted red, green, and blue pigment levels.");
+        NewMastery<MasteryOfFlakseed>(MASTERY_FLAKSEED, Flakseed.ItemName,
+          tip: "Flakseed's sprouts can grow in hostile terrain and can no longer be trampled. Fully grown sprouts become larger flak flowers that attack and stun nearby enemies with their roots.");
+        NewMastery<MasteryOfRCLauncher>(MASTERY_RC_LAUNCHER, RCLauncher.ItemName,
+          tip: "Cars have much better handling, deal 25% more damage, and can crash into walls up to 3 times before disappearing.")
             .MultDamage(1.25f);
-        // B. B. Gun projectiles deflect all enemy projectiles in their path, transforming them to pins in the process.
-        NewMastery<MasteryOfBBGun>(MASTERY_B_B_GUN, BBGun.ItemName);
-        // Bat echoes have a 100% chance of distracting enemies at any distance, and gain the ability to distract bosses.
-        NewMastery<MasteryOfNycterian>(MASTERY_NYCTERIAN, Nycterian.ItemName);
-        // Reload time is decreased by 35%, and seltzer water now inflicts hiccups on enemies. Hiccups have a chance to erratically stun enemies for a brief period and causes them to emit a ring of bullets that damage other nearby enemies.
-        NewMastery<MasteryOfSeltzerPelter>(MASTERY_SELTZER_PELTER, SeltzerPelter.ItemName)
+        NewMastery<MasteryOfBBGun>(MASTERY_B_B_GUN, BBGun.ItemName,
+          tip: "B. B. Gun projectiles deflect all enemy projectiles in their path, transforming them to pins in the process.");
+        NewMastery<MasteryOfNycterian>(MASTERY_NYCTERIAN, Nycterian.ItemName,
+          tip: "Bat echoes have a 100% chance of distracting enemies at any distance, and gain the ability to distract bosses.");
+        NewMastery<MasteryOfSeltzerPelter>(MASTERY_SELTZER_PELTER, SeltzerPelter.ItemName,
+          tip: "Reload time is decreased by 35%, and seltzer water now inflicts hiccups on enemies. Hiccups have a chance to erratically stun enemies for a brief period and causes them to emit a ring of bullets that damage other nearby enemies.")
             .MultReload(0.65f);
-        // Firing uncharged shots no longer consumes ammo, and every active prism fires a parallel beam of light in unison with Suncaster.
-        NewMastery<MasteryOfSuncaster>(MASTERY_SUNCASTER, Suncaster.ItemName);
-        // Projectiles home more strongly towards nearby enemies when bouncing, and gain unlimited piercing with no damage loss.
-        NewMastery<MasteryOfBouncer>(MASTERY_BOUNCER, Bouncer.ItemName);
-        // Sub Machine Gun restores all hearts when consumed, and is automatically consumed upon taking otherwise fatal damage.
-        NewMastery<MasteryOfSubMachineGun>(MASTERY_SUB_MACHINE_GUN, SubMachineGun.ItemName);
-        // Reloading now deploys a stereo that continuously emits sound matching Stereoscope's pitch at time of deployment, acting as a secondary source of stun and damage.
-        NewMastery<MasteryOfStereoscope>(MASTERY_STEREOSCOPE, Stereoscope.ItemName);
-        // Groundhog charges twice as quickly and creates a mini-tremor when plunged into the ground, triggering a mini-blank effect.
-        NewMastery<MasteryOfGroundhog>(MASTERY_GROUNDHOG, Groundhog.ItemName)
+        NewMastery<MasteryOfSuncaster>(MASTERY_SUNCASTER, Suncaster.ItemName,
+          tip: "Firing uncharged shots no longer consumes ammo, and every active prism fires a parallel beam of light in unison with Suncaster.");
+        NewMastery<MasteryOfBouncer>(MASTERY_BOUNCER, Bouncer.ItemName,
+          tip: "Projectiles home more strongly towards nearby enemies when bouncing, and gain unlimited piercing with no damage loss.");
+        NewMastery<MasteryOfSubMachineGun>(MASTERY_SUB_MACHINE_GUN, SubMachineGun.ItemName,
+          tip: "Sub Machine Gun restores all hearts when consumed, and is automatically consumed upon taking otherwise fatal damage.");
+        NewMastery<MasteryOfStereoscope>(MASTERY_STEREOSCOPE, Stereoscope.ItemName,
+          tip: "Reloading now deploys a stereo that continuously emits sound matching Stereoscope's pitch at time of deployment, acting as a secondary source of stun and damage.");
+        NewMastery<MasteryOfGroundhog>(MASTERY_GROUNDHOG, Groundhog.ItemName,
+          tip: "Groundhog charges twice as quickly and creates a mini-tremor when plunged into the ground, triggering a mini-blank effect.")
             .MultChargeRate(2f);
-        // Glockarina gains infinite ammo and fires 3 rings of notes when reloading an empty clip.
-        NewMastery<MasteryOfGlockarina>(MASTERY_GLOCKARINA, Glockarina.ItemName);
-        // Macheening's charge-up time is halved, and its projectiles destroy enemy projectiles upon collision.
-        NewMastery<MasteryOfMacheening>(MASTERY_MACHEENING, Macheening.ItemName);
-        // Plasmarble projectiles bounce two additional times before shattering and emit 4 electric bolts per bounce.
-        NewMastery<MasteryOfPlasmarble>(MASTERY_PLASMARBLE, Plasmarble.ItemName);
-        // Reloading toggles autotarget mode, allowing Xelsior's pistols to autotarget enemies at a reduced fire rate.
-        NewMastery<MasteryOfXelsior>(MASTERY_XELSIOR, Xelsior.ItemName);
-        // Projectiles can now hit enemies, and destroy up to 5 of their projectiles on contact.
-        NewMastery<MasteryOfEmpath>(MASTERY_EMPATH, Empath.ItemName);
-        // Sextant automatically fires as soon as it will kill its target or deal a critical hit.
-        NewMastery<MasteryOfSextant>(MASTERY_SEXTANT, Sextant.ItemName);
-        // Leafblower gains increased knockback and the ability to blow around projectiles.
-        NewMastery<MasteryOfLeafblower>(MASTERY_LEAFBLOWER, Leafblower.ItemName);
-        // Reloading while a drone is active disconnects the drone and makes it autonomous, causing it to automatically seek out enemies in its line of sight.
-        NewMastery<MasteryOfWayfarer>(MASTERY_WAYFARER, Wayfarer.ItemName);
-        // Forks explode upon multiplying.
-        NewMastery<MasteryOfForkbomb>(MASTERY_FORKBOMB, Forkbomb.ItemName);
-        // Zealot gains infinite ammo and fires even while dodge rolling.
-        NewMastery<MasteryOfZealot>(MASTERY_ZEALOT, Zealot.ItemName);
-        // Toothpaste projectiles create suds in a much larger radius, and toothbrush can be swung much faster.
-        NewMastery<MasteryOfToothpaste>(MASTERY_TOOTHPASTE, Toothpaste.ItemName);
-        // Gradius deploys 2 extra blue, orange, and pink ships.
-        NewMastery<MasteryOfGradius>(MASTERY_GRADIUS, Gradius.ItemName);
-        // While Heartbreaker is active, each of the player's empty heart containers orbits them to block bullets.
-        NewMastery<MasteryOfHeartbreaker>(MASTERY_HEARTBREAKER, Heartbreaker.ItemName);
-        // Minesweeper grids have smaller cells and contain four times as many mines.
-        NewMastery<MasteryOfCleansweep>(MASTERY_CLEANSWEEP, Cleansweep.ItemName);
-        // Double kills refund ammo, triple kills drop an armor piece, and quad kills completely refill Retina's ammo.
-        NewMastery<MasteryOfRetina>(MASTERY_RETINA, Retina.ItemName);
-        // Mana costs are halved and max power detonations trigger a blank effect.
-        NewMastery<MasteryOfEntropynnium>(MASTERY_ENTROPYNNIUM, Entropynnium.ItemName);
-        // Flux Fist magnetizes enemies 3 times faster and passively grants levitation.
-        NewMastery<MasteryOfFluxFist>(MASTERY_FLUX_FIST, FluxFist.ItemName);
-        // Enemy weight is ignored when determining drag speed, increasing damage potential against heavier enemies.
-        NewMastery<MasteryOfChainDriver>(MASTERY_CHAIN_DRIVER, ChainDriver.ItemName);
-        // Reload time is reduced by 1/3, ammo is tripled, and lasers now create explosions on point of impact.
-        NewMastery<MasteryOfRLTSRTSGTSBTSLB>(MASTERY_RLTSRTSGTSBTSLB, RLTSRTSGTSBTSLB.ItemName)
+        NewMastery<MasteryOfGlockarina>(MASTERY_GLOCKARINA, Glockarina.ItemName,
+          tip: "Glockarina gains infinite ammo and fires 3 rings of notes when reloading an empty clip.");
+        NewMastery<MasteryOfMacheening>(MASTERY_MACHEENING, Macheening.ItemName,
+          tip: "Macheening's charge-up time is halved, and its projectiles destroy enemy projectiles upon collision.");
+        NewMastery<MasteryOfPlasmarble>(MASTERY_PLASMARBLE, Plasmarble.ItemName,
+          tip: "Plasmarble projectiles bounce two additional times before shattering and emit 4 electric bolts per bounce.");
+        NewMastery<MasteryOfXelsior>(MASTERY_XELSIOR, Xelsior.ItemName,
+          tip: "Reloading toggles autotarget mode, allowing Xelsior's pistols to autotarget enemies at a reduced fire rate.");
+        NewMastery<MasteryOfEmpath>(MASTERY_EMPATH, Empath.ItemName,
+          tip: "Projectiles can now hit enemies, and destroy up to 5 of their projectiles on contact.");
+        NewMastery<MasteryOfSextant>(MASTERY_SEXTANT, Sextant.ItemName,
+          tip: "Sextant automatically fires as soon as it will kill its target or deal a critical hit.");
+        NewMastery<MasteryOfLeafblower>(MASTERY_LEAFBLOWER, Leafblower.ItemName,
+          tip: "Leafblower gains increased knockback and the ability to blow around projectiles.");
+        NewMastery<MasteryOfWayfarer>(MASTERY_WAYFARER, Wayfarer.ItemName,
+          tip: "Reloading while a drone is active disconnects the drone and makes it autonomous, causing it to automatically seek out enemies in its line of sight.");
+        NewMastery<MasteryOfForkbomb>(MASTERY_FORKBOMB, Forkbomb.ItemName,
+          tip: "Forks explode upon multiplying.");
+        NewMastery<MasteryOfZealot>(MASTERY_ZEALOT, Zealot.ItemName,
+          tip: "Zealot gains infinite ammo and fires even while dodge rolling.");
+        NewMastery<MasteryOfToothpaste>(MASTERY_TOOTHPASTE, Toothpaste.ItemName,
+          tip: "Toothpaste projectiles create suds in a much larger radius, and toothbrush can be swung much faster.");
+        NewMastery<MasteryOfGradius>(MASTERY_GRADIUS, Gradius.ItemName,
+          tip: "Gradius deploys 2 extra blue, orange, and pink ships.");
+        NewMastery<MasteryOfHeartbreaker>(MASTERY_HEARTBREAKER, Heartbreaker.ItemName,
+          tip: "While Heartbreaker is active, each of the player's empty heart containers orbits them to block bullets.");
+        NewMastery<MasteryOfCleansweep>(MASTERY_CLEANSWEEP, Cleansweep.ItemName,
+          tip: "Minesweeper grids have smaller cells and contain four times as many mines.");
+        NewMastery<MasteryOfRetina>(MASTERY_RETINA, Retina.ItemName,
+          tip: "Double kills refund ammo, triple kills drop an armor piece, and quad kills completely refill Retina's ammo.");
+        NewMastery<MasteryOfEntropynnium>(MASTERY_ENTROPYNNIUM, Entropynnium.ItemName,
+          tip: "Mana costs are halved and max power detonations trigger a blank effect.");
+        NewMastery<MasteryOfFluxFist>(MASTERY_FLUX_FIST, FluxFist.ItemName,
+          tip: "Flux Fist magnetizes enemies 3 times faster and passively grants levitation.");
+        NewMastery<MasteryOfChainDriver>(MASTERY_CHAIN_DRIVER, ChainDriver.ItemName,
+          tip: "Enemy weight is ignored when determining drag speed, increasing damage potential against heavier enemies.");
+        NewMastery<MasteryOfRLTSRTSGTSBTSLB>(MASTERY_RLTSRTSGTSBTSLB, RLTSRTSGTSBTSLB.ItemName,
+          tip: "Reload time is reduced by 1/3, ammo is tripled, and lasers now create explosions on point of impact.")
           .MultReload(0.66f).MultAmmo(3f);
-        // Beams now inflict severe sunburn, which enemies cannot recover from.
-        NewMastery<MasteryOfPhotonCannon>(MASTERY_PHOTON_CANNON, PhotonCannon.ItemName);
-        // Ammo gained from barrels is tripled, and ammo can also be gained from conventional sources.
-        NewMastery<MasteryOfFuelRodGun>(MASTERY_FUEL_ROD_GUN, FuelRodGun.ItemName);
-        // Light strings pierce small obstacles and attempt to extend to other enemies upon impact.
-        NewMastery<MasteryOfNightlighter>(MASTERY_NIGHTLIGHTER, Nightlighter.ItemName);
-        // Needles stick to enemies that aren't instantly killed, and supercombine to kill enemies once their total damage exceeds the enemy's health.
-        NewMastery<MasteryOfGadulo>(MASTERY_GADULO, Gadulo.ItemName);
-        // Time flows at half speed while Death Note is open, except in boss rooms.
-        NewMastery<MasteryOfDeathNote>(MASTERY_DEATH_NOTE, DeathNote.ItemName);
-        // Mtara no longer has a speed penalty and can continue firing after overheating, inflicting green fire on enemies in the process.
-        NewMastery<MasteryOfMtara>(MASTERY_MTARA, Mtara.ItemName);
-        // Akelus has a larger impact radius, reflects bullets in its range, and grants full immunity to explosions while held.
-        NewMastery<MasteryOfAkelus>(MASTERY_AKELUS, Akelus.ItemName);
+        NewMastery<MasteryOfPhotonCannon>(MASTERY_PHOTON_CANNON, PhotonCannon.ItemName,
+          tip: "Beams now inflict severe sunburn, which enemies cannot recover from.");
+        NewMastery<MasteryOfFuelRodGun>(MASTERY_FUEL_ROD_GUN, FuelRodGun.ItemName,
+          tip: "Ammo gained from barrels is tripled, and ammo can also be gained from conventional sources.");
+        NewMastery<MasteryOfNightlighter>(MASTERY_NIGHTLIGHTER, Nightlighter.ItemName,
+          tip: "Light strings pierce small obstacles and attempt to extend to other enemies upon impact.");
+        NewMastery<MasteryOfGadulo>(MASTERY_GADULO, Gadulo.ItemName,
+          tip: "Needles stick to enemies that aren't instantly killed, and supercombine to kill enemies once their total damage exceeds the enemy's health.");
+        NewMastery<MasteryOfDeathNote>(MASTERY_DEATH_NOTE, DeathNote.ItemName,
+          tip: "Time flows at half speed while Death Note is open, except in boss rooms.");
+        NewMastery<MasteryOfMtara>(MASTERY_MTARA, Mtara.ItemName,
+          tip: "Mtara no longer has a speed penalty and can continue firing after overheating, inflicting green fire on enemies in the process.");
+        NewMastery<MasteryOfAkelus>(MASTERY_AKELUS, Akelus.ItemName,
+          tip: "Akelus has a larger impact radius, reflects bullets in its range, and grants full immunity to explosions while held.");
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -404,7 +404,7 @@ public static class CwaffSynergies
                 ETGModConsole.Log($"<color=#ffff88ff>WARNING: haven't initialized custom synergy {_SynergyEnums[i]}</color>");
     }
 
-    private static AdvancedSynergyEntry NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false, int masteryId = -1)
+    private static AdvancedSynergyEntry NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false, int masteryId = -1, string tip = null)
     {
         // Get the enum index of our synergy
         int index = (int)synergy;
@@ -415,6 +415,9 @@ public static class CwaffSynergies
         // Get the actual ID of our synergy entry in the AdvancedSynergyDatabase, which doesn't necessarily match the CustomSynergyType enum
         _SynergyIds[index] = GameManager.Instance.SynergyManager.synergies.Length - 1;
         // Lazy.DebugConsoleLog($" registered synergy {ase.NameKey}");
+        // Add a tip, if applicable
+        if (!string.IsNullOrEmpty(tip))
+          ase.AddItemTip(tip, name);
         // Return the AdvancedSynergyEntry
         return ase;
     }
@@ -470,7 +473,7 @@ public static class CwaffSynergies
         return entry;
     }
 
-    private static AdvancedSynergyEntry NewMastery<T>(Synergy synergy, string gunName) where T : MasteryDummyItem
+    private static AdvancedSynergyEntry NewMastery<T>(Synergy synergy, string gunName, string tip) where T : MasteryDummyItem
     {
         if (Lazy.GetModdedItem(IName(gunName)) is not Gun gun)
             return null;
@@ -483,7 +486,8 @@ public static class CwaffSynergies
             name                 : $"{gun.EncounterNameOrDisplayName} Mastery",
             mandatory            : [IName(gun.gunName)],
             masteryId            : tokenId,
-            ignoreLichEyeBullets : true);
+            ignoreLichEyeBullets : true,
+            tip                  : tip);
         _MasteryIds.Add(tokenId);
         _MasteryGuns[gun.PickupObjectId] = tokenId;
         return ase;
