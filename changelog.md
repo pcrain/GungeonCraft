@@ -8,6 +8,7 @@
 - Update required Alexandria version to 0.5.8 for ItemTips integration, cross-mod compatibility feature, and general stability
 - Update required Gunfig version to 1.1.11 for stability and bugfixes
 - Allowed the pizza minigame to be initiated without having to find or visit any secret rooms
+- Fixed Entropynnium being completely nonfunctional against Lich's 2nd phase
 
 ## 1.32.4 (2026-07-05)
 

@@ -490,6 +490,33 @@ static class BeamApplyArbitraryStatusEffectPatch
     }
 }
 
+// REFACTOR: possibly move to GGV later, but doesn't really affect vanilla explosion conditions so low priority
+/// <summary>Fixes explosion that occur inside the hitboxes of large enemies (e.g., Dragun / Lich Phase 2) not affecting the enemy (used by Entropynnium).</summary>
+[HarmonyPatch]
+internal static class ExploderHandleExplosionPatch
+{
+  [HarmonyPatch(typeof(Exploder), nameof(Exploder.HandleExplosion), MethodType.Enumerator)]
+  [HarmonyILManipulator]
+  private static void ExploderHandleExplosionPatchIL(ILContext il)
+  {
+      ILCursor cursor = new ILCursor(il);
+      if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCall(typeof(BraveMathCollege), nameof(BraveMathCollege.DistToRectangle))))
+          return;
+
+      cursor.Remove();
+      cursor.CallPrivate(typeof(ExploderHandleExplosionPatch), nameof(DistToRectangleOrZeroIfInsideRectangle));
+      return;
+  }
+
+  private static float DistToRectangleOrZeroIfInsideRectangle(Vector2 point, Vector2 origin, Vector2 dimensions)
+  {
+    if (point.x >= origin.x && point.y >= origin.y && point.x <= (origin.x + dimensions.x) && point.y <= (origin.y + dimensions.y))
+      return 0f;
+    return BraveMathCollege.DistToRectangle(point, origin, dimensions);
+  }
+}
+
+
 //NOTE: even with both of these patches enabled, Shmuppy's hitbox collider was still distorted due to the circular collider of
 //      the disabled UltraFortunesFavor component. So, we're just destroying / recreating it as needed, and to heck with these patches
 // /// <summary>Fixes issue with UltraFortunesFavor causing IsGunBlocked() to return true even when disabled</summary>
