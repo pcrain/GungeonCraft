@@ -36,6 +36,8 @@ public static class IncredibleItems
         WWIRations.Init();
         Headstone.Init();
         AssassinBullets.Init();
+        MasterKey.Init();
+        HealthyHeart.Init();
     }
 
     private static T SetupIncredibleItem<T>(this T item) where T : PickupObject
@@ -220,5 +222,75 @@ public class AssassinBullets : CwaffPassive
         return;
       enemy.currentHealth = 0f;
       enemy.currentArmor = 0f;
+    }
+}
+
+public class MasterKey : CwaffActive
+{
+    public static string ItemName         = "Master Key";
+    public static string ShortDescription = "Master of Unlocking?";
+    public static string LongDescription  = "Consumes 1 key to automatically unlock a nearby chest on use. Cannot be used on broken locks.";
+
+    public static void Init()
+    {
+        PlayerItem item  = IncredibleItems.SetupActive<MasterKey>(ItemName, ShortDescription, LongDescription);
+        item.consumable = false;
+        item.SetCooldownType(ItemBuilder.CooldownType.Damage, 100f);
+    }
+
+    private Chest ValidNearbyChest(PlayerController user)
+    {
+      if (user.m_lastInteractionTarget is not IPlayerInteractable ixTarget)
+        return null;
+      if (ixTarget is not Chest chest || !chest)
+        return null;
+      if (chest.IsOpen || chest.IsBroken || !chest.IsLocked || chest.IsLockBroken)
+        return null;
+      return chest;
+    }
+
+    public override bool CanBeUsed(PlayerController user)
+    {
+      return base.CanBeUsed(user) && (user.carriedConsumables.KeyBullets > 0 || user.carriedConsumables.InfiniteKeys) && ValidNearbyChest(user);
+    }
+
+    public override void DoEffect(PlayerController user)
+    {
+        if (ValidNearbyChest(user) is Chest chest)
+          chest.Interact(user);
+    }
+}
+
+public class HealthyHeart : CwaffPassive
+{
+    public static string ItemName         = "Healthy Heart";
+    public static string ShortDescription = "Cholesterol Free";
+    public static string LongDescription  = "Doubles all healing received while at max health.";
+
+    public static void Init()
+    {
+        PassiveItem item  = IncredibleItems.SetupPassive<HealthyHeart>(ItemName, ShortDescription, LongDescription);
+    }
+
+    public override void Pickup(PlayerController player)
+    {
+        base.Pickup(player);
+        if (player.healthHaver is not HealthHaver hh)
+          return;
+        hh.ModifyHealing -= this.ModifyHealing;
+        hh.ModifyHealing += this.ModifyHealing;
+    }
+
+    public override void DisableEffect(PlayerController player)
+    {
+        base.DisableEffect(player);
+        if (player && player.healthHaver is HealthHaver hh)
+          hh.ModifyHealing -= this.ModifyHealing;
+    }
+
+    private void ModifyHealing(HealthHaver hh, HealthHaver.ModifyHealingEventArgs args)
+    {
+      if (hh.currentHealth >= hh.AdjustedMaxHealth)
+        args.ModifiedHealing *= 2;
     }
 }

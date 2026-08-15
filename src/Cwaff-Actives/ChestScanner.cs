@@ -4,7 +4,7 @@ public class ChestScanner : CwaffActive
 {
     public static string ItemName         = "Chest Scanner";
     public static string ShortDescription = "Try Before You Buy";
-    public static string LongDescription  = "Reveals the contents of a single unopened chest in the current room. Subsequently destroying chests nullifies any revealed contents. Reusable.";
+    public static string LongDescription  = "Reveals the contents of the targeted unopened chest. Subsequently destroying chests nullifies any revealed contents. Reusable.";
     public static string Lore             = "The tricky thing about most chests in the Gungeon is that their contents are seemingly not determined until they are opened, making scanning them a largely fruitless endeavor. Similar to an over-eager child on Christmas Eve, this handy little device operates by shaking chests at a sub-atomic level, tricking them into thinking they've been opened before using half-century old x-ray technologies to determine their contents.";
 
     private PlayerController _owner = null;
@@ -36,20 +36,16 @@ public class ChestScanner : CwaffActive
             return false;
 
         this._nearestChest = null;
-        foreach (Chest chest in StaticReferenceManager.AllChests.EmptyIfNull())
-        {
-            if (!chest)
-                continue;
-            if (chest.IsOpen || chest.IsBroken)
-                continue;
-            if (chest.GetAbsoluteParentRoom() != user.CurrentRoom)
-                continue;
-            if (chest.gameObject.GetComponent<ScannedChest>())
-                continue;
-            this._nearestChest = chest;
-            return true;
-        }
-        return false;
+        if (user.m_lastInteractionTarget is not IPlayerInteractable ixTarget)
+          return false;
+        if (ixTarget is not Chest chest || !chest)
+          return false;
+        if (chest.IsOpen || chest.IsBroken)
+          return false;
+        if (chest.gameObject.GetComponent<ScannedChest>())
+          return false;
+        this._nearestChest = chest;
+        return true;
     }
 
     public override void DoEffect(PlayerController user)
