@@ -16,6 +16,15 @@ public class AlienNailgun : CwaffGun
     private const int _FRAGMENTS             = _FRAGMENT_EDGE * _FRAGMENT_EDGE;
     private const float _FRAGMENT_GAP        = _RECONSTRUCT_TIME / (float)_FRAGMENTS;
 
+    // prevent mastered Alien Nailgun from auto-spawning a few enemies that do more harm than good
+    private static readonly List<string> _AutoSpawnBlacklist = [
+      Enemies.Gunsinger,
+      Enemies.AgedGunsinger,
+      Enemies.Ammomancer,
+      Enemies.Jammomancer,
+      Enemies.Jamerlengo,
+    ];
+
     private static HashSet<AIActor> _Replicants   = new();
 
     private Coroutine _dnaReconstruct       = null;
@@ -198,6 +207,8 @@ public class AlienNailgun : CwaffGun
         if (string.IsNullOrEmpty(actor.EnemyGuid))
             return;
         if (!this._registeredEnemies.Contains(actor.EnemyGuid))
+            return;
+        if (_AutoSpawnBlacklist.Contains(actor.EnemyGuid))
             return;
 
         AIActor replicant = Replicant.Create(actor.EnemyGuid, actor.CenterPosition, ApplyReplicantShaders, hasCollision: false);
