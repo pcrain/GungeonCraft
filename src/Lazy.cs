@@ -1596,29 +1596,28 @@ public static class Lazy
 
   /// <summary>Check if all rooms on the current floor have been visited. Code from CheckEntireFloorVisited FsmStateAction</summary>
   public static bool AllRoomsVisited(bool includeSecretRooms = true, bool includeWarpRooms = true, bool onlyIncludeStandardRooms = false)
-  {
-    if (!includeSecretRooms || !includeWarpRooms || onlyIncludeStandardRooms)
     {
-      int nrooms = GameManager.Instance.Dungeon.data.rooms.Count;
-      for (int i = 0; i < nrooms; i++)
-      {
-        RoomHandler room = GameManager.Instance.Dungeon.data.rooms[i];
-        if (room.RevealedOnMap || room.visibility != RoomHandler.VisibilityStatus.OBSCURED || room.OverrideTilemap)
-          continue;
-        if (!includeSecretRooms && room.IsSecretRoom)
-          continue;
-        if (!includeWarpRooms && room.IsStartOfWarpWing)
-          continue;
-        if (onlyIncludeStandardRooms && !room.IsStandardRoom && room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.SPECIAL && room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.REWARD)
-          continue;
-        return false;
-      }
+        if (includeSecretRooms && includeWarpRooms && !onlyIncludeStandardRooms)
+            return GameManager.Instance.Dungeon.AllRoomsVisited;
+        int nrooms = GameManager.Instance.Dungeon.data.rooms.Count;
+        for (int i = 0; i < nrooms; i++)
+        {
+            RoomHandler room = GameManager.Instance.Dungeon.data.rooms[i];
+            if (room.RevealedOnMap || room.visibility != RoomHandler.VisibilityStatus.OBSCURED || room.OverrideTilemap)
+                continue;
+            if (!includeSecretRooms && room.IsSecretRoom)
+                continue;
+            if (!includeWarpRooms && room.IsStartOfWarpWing)
+                continue;
+            if (onlyIncludeStandardRooms && !room.IsStandardRoom && room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.SPECIAL && room.area.PrototypeRoomCategory != PrototypeDungeonRoom.RoomCategory.REWARD)
+                continue;
+            return false;
+        }
+        return true;
     }
-    return true;
-  }
 
-  /// <summary>Static version of AmmonomiconDeathPageController function that takes a PlayerController so we can work with custom characters.</summary>
-  public static string GetPlayerCharacterName(PlayerController player)
+    /// <summary>Static version of AmmonomiconDeathPageController function that takes a PlayerController so we can work with custom characters.</summary>
+    public static string GetPlayerCharacterName(PlayerController player)
   {
     switch (player.characterIdentity)
     {

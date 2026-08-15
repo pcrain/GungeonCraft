@@ -3,6 +3,7 @@ namespace CwaffingTheGungy;
 public class Don : FancyNPC
 {
   private const float _DON_CHANCE_PER_RUN = 0.06f;
+  // private const float _DON_CHANCE_PER_RUN = 1.0f;
 
   private static int _EncountersThisRun = 0;
 
@@ -184,7 +185,7 @@ public class Don : FancyNPC
     }
     if (interactor.IsGunLocked || interactor.inventory.GunLocked.Value)
       return State.INCAPABLE_OF_DELIVERY;
-    if (!GameManager.Instance.Dungeon.AllRoomsVisited)
+    if (!Lazy.AllRoomsVisited(includeSecretRooms: false))
       return State.NEED_FULL_MAP;
     if (PizzaTimeController.CheckAnyRoomsStillOccupied()/* && !C.DEBUG_BUILD*/)
       return State.ENEMIES_ON_FLOOR;
@@ -482,7 +483,7 @@ public class Don : FancyNPC
     PlayerController interactor = Interactor();
     if (interactor.IsGunLocked || interactor.inventory.GunLocked.Value)
       yield return ScriptINCAPABLE_OF_DELIVERY();
-    else if (!Lazy.AllRoomsVisited())
+    else if (!Lazy.AllRoomsVisited(includeSecretRooms: false))
       yield return ScriptNEED_FULL_MAP();
     else if (PizzaTimeController.CheckAnyRoomsStillOccupied()/* && !C.DEBUG_BUILD*/)
       yield return ScriptENEMIES_ON_FLOOR();

@@ -7,6 +7,7 @@
 - Use new Alexandria [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips) integration code to generate item and synergy tips
 - Update required Alexandria version to 0.5.8 for ItemTips integration, cross-mod compatibility feature, and general stability
 - Update required Gunfig version to 1.1.11 for stability and bugfixes
+- Allowed the pizza minigame to be initiated without having to find or visit any secret rooms
 
 ## 1.32.4 (2026-07-05)
 
