@@ -1,16 +1,21 @@
 # Changelog
 
-## 1.32.5 (TBD)
+## 1.32.5 (2026-08-15)
 
-- Fixed null deref when dropping Stunt Helmet caused by trying to disable explosion immunity for a non-existent player
-- Adding missing sprite credits for Slime Rancher slimes
-- Use new Alexandria [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips) integration code to generate item and synergy tips
-- Update required Alexandria version to 0.5.8 for ItemTips integration, cross-mod compatibility feature, and general stability
-- Update required Gunfig version to 1.1.11 for stability and bugfixes
+#### Balance Changes and Polish:
+
 - Allowed the pizza minigame to be initiated without having to find or visit any secret rooms
-- Fixed Entropynnium being completely nonfunctional against Lich's 2nd phase
 - Prevented mastered Alien Nailgun from auto-spawning a few enemies that do more harm than good (e.g., enemies that summon other enemies)
 - Changed Chest Scanner to work on the player's currently targeted chest, rather than a random chest in the player's current room
+
+#### Bugfixes and Misc:
+
+- Fixed null deref when dropping Stunt Helmet caused by trying to disable explosion immunity for a non-existent player
+- Fixed Entropynnium being completely nonfunctional against Lich's 2nd phase
+- Switched to new Alexandria [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips) integration code to generate item and synergy tips
+- Updated required Alexandria version to 0.5.8 for ItemTips integration, cross-mod compatibility feature, and general stability
+- Updated required Gunfig version to 1.1.11 for stability and bugfixes
+- Adding missing sprite credits for Slime Rancher slimes
 
 ## 1.32.4 (2026-07-05)
 
