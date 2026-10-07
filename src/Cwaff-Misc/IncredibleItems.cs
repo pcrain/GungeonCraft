@@ -88,7 +88,7 @@ public static class IncredibleItems
       #if DEBUG
       private const float _INCREDIBLE_CHEST_CHANCE = 1.00f;
       #else
-      private const float _INCREDIBLE_CHEST_CHANCE = 0.01f;
+      private const float _INCREDIBLE_CHEST_CHANCE = Mathf.PI / 200f;
       #endif
 
       [HarmonyPatch(typeof(FloorChestPlacer), nameof(FloorChestPlacer.ConfigureOnPlacement))]

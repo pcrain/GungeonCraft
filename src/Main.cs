@@ -60,7 +60,7 @@ namespace CwaffingTheGungy;
 
 [BepInPlugin(C.MOD_GUID, C.MOD_NAME, C.MOD_VERSION)]
 [BepInDependency(ETGModMainBehaviour.GUID, "1.9.2")]
-[BepInDependency(Alexandria.Alexandria.GUID, "0.5.8")]
+[BepInDependency(Alexandria.Alexandria.GUID, "0.5.10")]
 [BepInDependency(Gunfiguration.C.MOD_GUID, "1.1.11")]
 public class Initialisation : BaseUnityPlugin
 {

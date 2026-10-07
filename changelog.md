@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.32.6 (TBD)
+
+- Bundled external ItemTips file again to facilitate translations
+- Updated required Alexandria version to 0.5.10 for enabling translated ItemTips to load correctly again 
+
 ## 1.32.5 (2026-08-15)
 
 #### Balance Changes and Polish:
