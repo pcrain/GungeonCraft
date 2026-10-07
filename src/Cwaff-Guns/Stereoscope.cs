@@ -177,7 +177,15 @@ public class Stereoscope : CwaffGun
         _ActiveIcons[i].AddLast(current);
         if (current.Value is not Geometry icon)
             icon = current.Value = Geometry.Create(shape);
-        return icon;
+        if (icon)
+          return icon;
+
+        // if icon is invalid, we probably changed floors. clear our pools and try again
+        _ActiveIcons[0].Clear();
+        _ActiveIcons[1].Clear();
+        _PooledIcons[0].Clear();
+        _PooledIcons[1].Clear();
+        return RentIcon(shape);
     }
 
     public void HandleAudioChecks()

@@ -244,7 +244,7 @@ public class MasterKey : CwaffActive
         return null;
       if (ixTarget is not Chest chest || !chest)
         return null;
-      if (chest.IsOpen || chest.IsBroken || !chest.IsLocked || chest.IsLockBroken)
+      if (chest.IsOpen || chest.IsBroken || !chest.IsLocked || chest.IsLockBroken || chest.ChestIdentifier == Chest.SpecialChestIdentifier.RAT)
         return null;
       return chest;
     }

@@ -3,7 +3,8 @@
 ## 1.32.6 (TBD)
 
 - Bundled external ItemTips file again to facilitate translations
-- Updated required Alexandria version to 0.5.10 for enabling translated ItemTips to load correctly again 
+- Updated required Alexandria version to 0.5.10 for enabling translated ItemTips to load correctly again
+- Fix null deref caused by Stereoscope attempting to reuse destroyed renderers for Stereoscope's indicators after changing floors
 
 ## 1.32.5 (2026-08-15)
 
@@ -20,7 +21,7 @@
 - Switched to new Alexandria [ItemTips](https://enter-the-gungeon.thunderstore.io/package/Glorfindel/ItemTips) integration code to generate item and synergy tips
 - Updated required Alexandria version to 0.5.8 for ItemTips integration, cross-mod compatibility feature, and general stability
 - Updated required Gunfig version to 1.1.11 for stability and bugfixes
-- Adding missing sprite credits for Slime Rancher slimes
+- Added missing sprite credits for Slime Rancher slimes
 
 ## 1.32.4 (2026-07-05)
 
