@@ -308,8 +308,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
       return;
     if (animator.currentClip is not tk2dSpriteAnimationClip clip)
       return;
-    if (this._barrelOffsets.TryGetValue(clip.name, out List<Vector3> offsets))
-      this.gun.barrelOffset.localPosition = offsets[animator.CurrentFrame];
+    if (this._barrelOffsets.TryGetValue(clip.name, out List<Vector3> offsets) && clip.frames.Length > 0)
+      this.gun.barrelOffset.localPosition = offsets[Mathf.Clamp(animator.CurrentFrame, 0, clip.frames.Length - 1)];
     else
       this.gun.barrelOffset.localPosition = this._defaultBarrelOffset;
     if (this.gun.sprite.FlipY)

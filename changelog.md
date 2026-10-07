@@ -4,7 +4,8 @@
 
 - Bundled external ItemTips file again to facilitate translations
 - Updated required Alexandria version to 0.5.10 for enabling translated ItemTips to load correctly again
-- Fix null deref caused by Stereoscope attempting to reuse destroyed renderers for Stereoscope's indicators after changing floors
+- Fixed null deref caused by Stereoscope attempting to reuse destroyed renderers for Stereoscope's indicators after changing floors
+- Fixed rare null deref caused by trying to set dynamic barrel offsets for weapons playing unrecognized animations
 
 ## 1.32.5 (2026-08-15)
 
