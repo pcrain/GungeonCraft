@@ -12,6 +12,7 @@
 - Fixed Pizza Time event data not properly resetting when restarting a run, causing Don to incorrectly tell the player they haven't explored the map
 - Fixed Pizza Time event requiring the player to visit the elevator shaft to start the event
 - Fixed Pizza Time event not being triggerable on the first floor due to requiring the player to visit a non-existent room
+- Fixed custom HUDs for Vacpack, Death Note, and Retina being completely illegible when the game language is set to a language that uses a non-default font atlas
 
 ## 1.32.5 (2026-08-15)
 

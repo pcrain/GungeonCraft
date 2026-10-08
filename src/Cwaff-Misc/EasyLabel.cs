@@ -12,6 +12,12 @@ public static class EasyLabel
   /// <param name="align">How the text should be aligned relative to its placed position.</param>
   public static dfLabel Create(bool unicode = true, bool outline = false, TextAlignment align = TextAlignment.Center)
   {
+      StringTableManager.GungeonSupportedLanguages language = GameManager.Options.CurrentLanguage;
+      bool languageUsesNonDefaultAtlas =
+        language == StringTableManager.GungeonSupportedLanguages.CHINESE ||
+        language == StringTableManager.GungeonSupportedLanguages.JAPANESE ||
+        language == StringTableManager.GungeonSupportedLanguages.KOREAN ||
+        language == StringTableManager.GungeonSupportedLanguages.RUSSIAN;
       dfLabel label = UnityEngine.Object.Instantiate(GameUIRoot.Instance.p_needsReloadLabel.gameObject, GameUIRoot.Instance.transform).GetComponent<dfLabel>();
       if (unicode)
       {
@@ -19,6 +25,13 @@ public static class EasyLabel
           label.Atlas = (label.Font as dfFont).Atlas;
           label.TextScale = 2.0f;
       }
+      else
+      {
+          label.Font = label.GUIManager.DefaultFont; // force English font atlas since other font atlases are immutable
+          label.Atlas = (label.Font as dfFont).Atlas;
+          label.m_defaultAssignedFont = label.Font;
+      }
+      label.m_cachedLanguage = StringTableManager.GungeonSupportedLanguages.ENGLISH;
       label.transform.localScale = Vector3.one / GameUIRoot.GameUIScalar;
       label.TextAlignment = align;
       if (align == TextAlignment.Left)
@@ -35,7 +48,8 @@ public static class EasyLabel
       label.ProcessMarkup = true;
       label.Color = Color.white;
       label.WordWrap = true;
-      if (outline)
+      label.PreventFontChanges = true;
+      if (outline && !languageUsesNonDefaultAtlas)  // HACK: for some reason, outlines draw VERY weirdly with non default fonts...I can't figure out why, so just disable them
       {
         label.Outline = true;
         label.OutlineSize = 4;
