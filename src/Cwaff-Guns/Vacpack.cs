@@ -573,9 +573,7 @@ public class VacpackHUD : MonoBehaviour
     this._helpLabel = EasyLabel.Create(unicode: false, outline: true, align: TextAlignment.Right);
     this._helpLabel.VerticalAlignment = dfVerticalAlignment.Top;
     this._helpLabel.Pivot = dfPivotPoint.TopRight;
-    this._longHelpText = "Press [color #dd6666]" + StringTableManager.EvaluateReplacementToken("%CONTROL_INTERACT") + "[/color] to Hide Descriptions";
-    this._shortHelpText = "Press [color #dd6666]" + StringTableManager.EvaluateReplacementToken("%CONTROL_INTERACT") + "[/color]";
-    this._helpLabel.Text = _HideDescriptions ? this._shortHelpText : this._longHelpText;
+    UpdateHelpText();
     this._cachedHideHelpText = _HideDescriptions;
     this._helpLabel.IsVisible = false;
 
@@ -605,6 +603,13 @@ public class VacpackHUD : MonoBehaviour
       Engage();
   }
 
+  private void UpdateHelpText()
+  {
+    this._longHelpText = "Press [color #dd6666]" + StringTableManager.EvaluateReplacementToken("%CONTROL_INTERACT") + "[/color] to Hide Descriptions";
+    this._shortHelpText = "Press [color #dd6666]" + StringTableManager.EvaluateReplacementToken("%CONTROL_INTERACT") + "[/color]";
+    this._helpLabel.Text = _HideDescriptions ? this._shortHelpText : this._longHelpText;
+  }
+
   public void Engage()
   {
     if (this._active)
@@ -616,6 +621,7 @@ public class VacpackHUD : MonoBehaviour
       GameManager.Instance.MainCameraController.OverridePosition = this._gun.PlayerOwner.CenterPosition;
     if (!_HideDescriptions)
       Minimap.Instance.TemporarilyPreventMinimap = true;
+    UpdateHelpText();
     base.gameObject.Play("vacpack_menu_sound");
   }
 
