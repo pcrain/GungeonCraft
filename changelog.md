@@ -7,6 +7,7 @@
 - Fixed null deref caused by Stereoscope attempting to reuse destroyed renderers for Stereoscope's indicators after changing floors
 - Fixed rare null deref caused by trying to set dynamic barrel offsets for weapons playing unrecognized animations
 - Fixed help text in Vacpack's radial menu displaying controller buttons when on mouse and keyboard
+- Prevented Ignizol from being thrown while the map screen is open
 
 ## 1.32.5 (2026-08-15)
 

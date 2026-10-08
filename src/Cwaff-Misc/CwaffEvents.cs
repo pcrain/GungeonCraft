@@ -251,6 +251,8 @@ public static class CwaffEvents // global custom events we can listen for
                 return;
             if (__instance.m_lastInteractionTarget != null || __instance.m_activeActions == null || !__instance.m_activeActions.InteractAction.WasPressed || __instance.IsPetting || __instance.IsDodgeRolling || __instance.m_handlingQueuedAnimation)
                 return;
+            if (Minimap.Instance && Minimap.Instance.IsFullscreen)
+                return;
             OnEmptyInteract(__instance);
         }
     }
