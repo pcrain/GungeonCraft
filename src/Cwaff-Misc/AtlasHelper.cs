@@ -9,11 +9,23 @@ internal static class AtlasHelper
 
   internal static Dictionary<string, tk2dSpriteDefinition> _PackedTextures = new();
 
+  // private static dfAtlas ForeignLanguageAtlas = null;
+
   /// <summary>Batches UI sprite additions from a list of sprite definitions</summary>
   public static void AddUISpriteBatch(List<tk2dSpriteDefinition> defs)
   {
+    // NOTE: this takes like 20 seconds and even if we auto-detect language...this extra startup time just isn't worth it
+    // if (ForeignLanguageAtlas == null)
+    // {
+    //   ForeignLanguageAtlas = (ResourceCache.Acquire("Alternate Fonts/NanumGothic16_DF") as GameObject).GetComponent<dfFont>().atlas;
+    //   if (ForeignLanguageAtlas.material.mainTexture is Texture2D tex2d && !tex2d.IsReadable())
+    //     ForeignLanguageAtlas.material.mainTexture = ForeignLanguageAtlas.material.mainTexture.GetReadable();
+    // }
     foreach (tk2dSpriteDefinition def in defs)
+    {
       ToolsCharApi.AddUISprite(def);
+      // ForeignLanguageAtlas.AddNewItemToAtlas(def);
+    }
   }
 
   /// <summary>
