@@ -25,11 +25,10 @@ public class Vladimir : CwaffGun
             infiniteAmmo: true, canReloadNoMatterAmmo: true, fireAudio: "vladimir_fire_sound", muzzleVFX: "muzzle_vladimir",
             muzzleFps: 30, muzzleAnchor: Anchor.MiddleCenter, curse: 1f, dynamicBarrelOffsets: true)
           .AddToShop(ItemBuilder.ShopType.Cursula)
-          .InitProjectile(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
+          .InitSpecialProjectile<VladimirProjectile>(GunData.New(ammoCost: 0, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 7.0f, speed: 1f, range: 0.01f, sprite: "vladimir_hitbox", hideAmmo: true))  // low range ensures the projectile dissipates swiftly
           .SetAllImpactVFX(VFX.CreatePool("vladimir_particles", fps: 20, loops: false, anchor: Anchor.MiddleCenter, scale: 0.5f))
-          .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; })
-          .Attach<VladimirProjectile>();
+          .Attach<PierceProjModifier>(pierce => { pierce.penetration = 100; pierce.penetratesBreakables = true; });
 
         _AbsorbVFX = VFX.Create("vladimir_impale_projectile_vfx", emissivePower: 1f);
     }
@@ -171,40 +170,17 @@ public class Vladimir : CwaffGun
     }
 }
 
-public class VladimirProjectile : MonoBehaviour
+public class VladimirProjectile : WeirdProjectile
 {
     private const float _PROJ_GRAB_RANGE_SQR = 9f;
 
-    private Projectile _projectile;
-    private PlayerController _owner;
-    private Vladimir _gun = null;
-    private bool _absorbedProjectile = false;
-
-    private void Start()
+    protected override void OnFiredByAnything()
     {
-        this._projectile = base.GetComponent<Projectile>();
-        this._projectile.sprite.renderer.enabled = false; // projectile shouldn't be visible since it's just a hitbox
-        this._owner = this._projectile.Owner as PlayerController;
-        if (!this._owner || !this._owner.CurrentGun || this._owner.CurrentGun.GetComponent<Vladimir>() is not Vladimir v)
+        base.sprite.renderer.enabled = false; // projectile shouldn't be visible since it's just a hitbox
+        if (base.Owner is not PlayerController player || player.CurrentGun is not Gun gun || gun.GetComponent<Vladimir>() is not Vladimir v)
             return;
 
-        this._gun = v;
-        this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreRigidbodyCollision;
-        this._projectile.OnHitEnemy += this.OnHitEnemy;
-    }
-
-    private void OnPreRigidbodyCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
-    {
-        if (otherRigidbody.gameObject.GetComponent<Vladimir.ImpaledOnGunBehaviour>())
-            PhysicsEngine.SkipCollision = true;
-    }
-
-    private void Update()
-    {
-        if (!this._gun || this._absorbedProjectile)
-            return;
-
-        Vector2 myPos = this._projectile.SafeCenter;
+        Vector2 myPos = base.SafeCenter;
         for (int i = StaticReferenceManager.AllProjectiles.Count - 1; i >= 0; --i)
         {
             Projectile p = StaticReferenceManager.AllProjectiles[i];
@@ -214,29 +190,37 @@ public class VladimirProjectile : MonoBehaviour
                 continue;
             if ((myPos - p.SafeCenter).sqrMagnitude > _PROJ_GRAB_RANGE_SQR)
                 continue;
-            this._gun.AbsorbProjectile(p);
-            this._absorbedProjectile = true;
+            v.AbsorbProjectile(p);
             break;
         }
-    }
 
-    private void OnHitEnemy(Projectile p, SpeculativeRigidbody enemy, bool killed)
-    {
-        if (!enemy)
-            return;
-        if (!killed)
+        AIActor nearestLivingEnemy = null;
+        float nearestSqrDist = 999f;
+        foreach (AIActor enemy in myPos.GetAllNearbyEnemies(radius: 1.75f))
         {
-            this._gun.Impale(enemy.aiActor);
-            return;
+          if (enemy.healthHaver is not HealthHaver)
+            continue;
+          if (enemy.gameObject.GetComponent<Vladimir.ImpaledOnGunBehaviour>())
+            continue;
+          float sqrDist = (enemy.CenterPosition - myPos).sqrMagnitude;
+          if (sqrDist > nearestSqrDist)
+            continue;
+          nearestSqrDist = sqrDist;
+          nearestLivingEnemy = enemy;
+        }
+        if (nearestLivingEnemy && nearestLivingEnemy.healthHaver is HealthHaver hh)
+        {
+          hh.ApplyDamage(baseData.damage, base.m_currentDirection, OwnerName);
+          if (hh.IsAlive)
+            v.Impale(nearestLivingEnemy);
+          else if (v.Mastered && (++v._enemiesKilled >= Vladimir._ENEMIES_PER_CURSE))
+          {
+            v._enemiesKilled -= Vladimir._ENEMIES_PER_CURSE;
+            player.IncreaseCurse();
+          }
         }
 
-        if (!this._gun || this._gun.PlayerOwner is not PlayerController player)
-            return;
-        if (!this._gun.Mastered)
-            return;
-        if (++this._gun._enemiesKilled < Vladimir._ENEMIES_PER_CURSE)
-            return;
-        this._gun._enemiesKilled -= Vladimir._ENEMIES_PER_CURSE;
-        player.IncreaseCurse();
+        // normal WeirdProjectile deaths suppress air effects, so call DieInAir() ourself to play them in full
+        DieInAir(suppressInAirEffects: false, allowActorSpawns: false, allowProjectileSpawns: false, killedEarly: false);
     }
 }
