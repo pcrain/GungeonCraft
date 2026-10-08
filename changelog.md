@@ -1,25 +1,30 @@
 # Changelog
 
-## 1.32.6 (TBD)
+## 1.32.6 (2026-10-08)
 
-- Bundled external ItemTips file again to facilitate translations
-- Updated required Alexandria version to 0.5.10 for enabling translated ItemTips to load correctly again
-- Fixed null deref caused by Stereoscope attempting to reuse destroyed renderers for Stereoscope's indicators after changing floors
-- Fixed rare null deref caused by trying to set dynamic barrel offsets for weapons playing unrecognized animations
-- Fixed help text in Vacpack's radial menu displaying controller buttons when on mouse and keyboard
-- Prevented Ignizol from being thrown while the map screen is open
-- Fixed rendering issue where Ignizol's shadow would remain permanently over a player's head if they die in co-op mode
-- Fixed Pizza Time event data not properly resetting when restarting a run, causing Don to incorrectly tell the player they haven't explored the map
-- Fixed Pizza Time event requiring the player to visit the elevator shaft to start the event
-- Fixed Pizza Time event not being triggerable on the first floor due to requiring the player to visit a non-existent room
-- Fixed custom HUDs for Vacpack, Death Note, and Retina being completely illegible when the game language is set to a language that uses a non-default font atlas
-- Tweaked Vladimir's projectile mechanics so that higher projectile speeds don't extend the range of melee stabs
-- Added a short grace period to Super Cold Watch in which the player can stop moving without time returning to normal speed
+#### Balance Changes and Polish:
+
 - Lowered the quality of several situational or otherwise difficult-to-use guns
 	- A -> B quality: Gunbrella, Stereoscope, Wayfarer
 	- B -> C quality: B. B. Gun, Chroma, Jugglernaut, Racket Launcher, Soul Kaliber
 	- C -> D quality: Blackjack, Flakseed, Omnidirectional Laser, Sub Machine Gun
-- Improve stability and layout of custom HUDs for Vacpack, Death Note, and Retina when toggling Tiny UI on or off
+- Added a short grace period to Super Cold Watch in which the player can stop moving without time returning to normal speed
+- Tweaked Vladimir's projectile mechanics so that higher projectile speeds don't extend the range of melee stabs
+- Improved stability and layout of custom HUDs for Vacpack, Death Note, and Retina when toggling Tiny UI on or off
+- Bundled external ItemTips file again to facilitate translations
+- Prevented Ignizol from being thrown while the map screen is open
+
+#### Bugfixes and Misc:
+
+- Fixed custom HUDs for Vacpack, Death Note, and Retina being illegible when the game is set to a language that uses a non-default font atlas (Chinese, Japanese, Korean, Russian)
+- Fixed help text in Vacpack's radial menu displaying controller buttons when on mouse and keyboard
+- Fixed Pizza Time event data not properly resetting when restarting a run, causing Don to incorrectly tell the player they haven't explored the map
+- Fixed Pizza Time event requiring the player to visit the elevator shaft to start the event
+- Fixed Pizza Time event not being triggerable on the first floor due to requiring the player to visit a non-existent room
+- Fixed rendering issue where Ignizol's shadow would remain permanently over a player's head if they die in co-op mode
+- Fixed null deref caused by Stereoscope attempting to reuse destroyed renderers for Stereoscope's indicators after changing floors
+- Fixed rare null deref caused by trying to set dynamic barrel offsets for weapons playing unrecognized animations
+- Updated required Alexandria version to 0.5.10 for enabling translated ItemTips to load correctly again
 
 ## 1.32.5 (2026-08-15)
 
