@@ -28,7 +28,7 @@ public class Gunbrella : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Gunbrella>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60 * _BARRAGE_SIZE, shootFps: 60, chargeFps: 16,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.0f, ammo: 60 * _BARRAGE_SIZE, shootFps: 60, chargeFps: 16,
             loopChargeAt: 17, muzzleVFX: "muzzle_gunbrella", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter, attacksThroughWalls: true)
           .AddReticle<CwaffReticle>(
             reticleVFX : VFX.Create("gunbrella_target_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter, emissivePower: 10, emissiveColour: Color.cyan, scale: 0.75f),

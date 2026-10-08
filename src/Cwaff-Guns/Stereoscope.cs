@@ -31,7 +31,7 @@ public class Stereoscope : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Stereoscope>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 261, idleFps: _IDLE_FPS, shootFps: _IDLE_FPS,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.0f, ammo: 261, idleFps: _IDLE_FPS, shootFps: _IDLE_FPS,
             fireAudio: "stereoscope_fire_sound", attacksThroughWalls: true, suppressReloadAnim: true, autoPlay: false)
           .InitSpecialProjectile<ResonantProjectile>(GunData.New(sprite: null, clipSize: -1, cooldown: 0.3f, shootStyle: ShootStyle.SemiAutomatic,
             damage: 17.0f, speed: 25f, range: 18f, force: 12f, invisibleProjectile: true, customClip: true))

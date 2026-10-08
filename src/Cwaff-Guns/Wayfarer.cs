@@ -16,7 +16,7 @@ public class Wayfarer : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Wayfarer>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.PISTOL, reloadTime: 0.0f, ammo: 50, shootFps: 14, reloadFps: 4,
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.PISTOL, reloadTime: 0.0f, ammo: 50, shootFps: 14, reloadFps: 4,
             muzzleFrom: Items.Mailbox, fireAudio: "wayfarer_launch_sound")
           .AddToShop(ItemBuilder.ShopType.Goopton)
           .InitProjectile(GunData.New(sprite: "wayfarer_projectile", scale: 0.9f, clipSize: 1, cooldown: 1.0f, shootStyle: ShootStyle.SemiAutomatic,

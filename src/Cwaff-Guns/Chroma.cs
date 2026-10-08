@@ -28,7 +28,7 @@ public class Chroma : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Chroma>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, idleFps: 20, shootFps: 60,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.BEAM, reloadTime: 0.0f, ammo: 600, idleFps: 20, shootFps: 60,
             modulesAreTiers: true)
           .Attach<ChromaAmmoDisplay>()
           .AssignGun(out Gun gun)

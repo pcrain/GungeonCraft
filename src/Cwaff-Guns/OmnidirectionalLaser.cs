@@ -32,7 +32,7 @@ public class OmnidirectionalLaser : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<OmnidirectionalLaser>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250, handedness: GunHandedness.NoHanded,
+          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 250, handedness: GunHandedness.NoHanded,
             idleFps: _BASE_FPS, shootFps: _BASE_FPS, loopFireAt: 0, preventRotation: true, suppressReloadAnim: true,
             onlyUsesIdleInWeaponBox: true) // fixes half-sprite from appearing in weapon box
           .SetFireAudio("omni_spin_sound", 0, 1, 2, 3, 4, 5, 6, 7)

@@ -17,7 +17,7 @@ public class RacketLauncher : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<RacketLauncher>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: _AMMO, canReloadNoMatterAmmo: true,
             idleFps: _IDLE_FPS, shootFps: 60, autoPlay: false)
           .InitProjectile(GunData.New(ammoCost: 1, clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventOrbiting: true,
             damage: 10.0f, speed: 20.0f, range: 300.0f, force: 12f, sprite: "tennis_ball", fps: 12, scale: 0.6f, anchor: Anchor.MiddleCenter,

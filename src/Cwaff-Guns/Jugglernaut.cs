@@ -55,7 +55,7 @@ public class Jugglernaut : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Jugglernaut>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 240, shootFps: 30, reloadFps: 40, preventRotation: true)
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 240, shootFps: 30, reloadFps: 40, preventRotation: true)
           .AddFlippedCarryPixelOffsets(offset: _CarryOffset, flippedOffset: _FlippedCarryOffset)
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: -1, cooldown: 0.4f, shootStyle: ShootStyle.SemiAutomatic, damage: 10.0f, speed: 70.0f,

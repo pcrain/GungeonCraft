@@ -20,7 +20,7 @@ public class Blackjack : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Blackjack>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _AMMO, canGainAmmo: false,
+          .SetAttributes(quality: ItemQuality.D, gunClass: GunClass.SILLY, reloadTime: 0.8f, ammo: _AMMO, canGainAmmo: false,
             shootFps: 30, reloadFps: 30, muzzleFrom: Items.Mailbox, reloadAudio: "card_shuffle_sound", fireAudio: "card_throw_sound")
           .AddDualWieldSynergy(Synergy.BOARD_AND_CARD_GAME_NIGHT)
           .AssignGun(out Gun gun)

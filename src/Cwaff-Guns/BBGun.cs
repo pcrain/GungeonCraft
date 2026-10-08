@@ -17,7 +17,7 @@ public class BBGun : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<BBGun>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 1, canGainAmmo: false,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.CHARGE, reloadTime: 0.5f, ammo: 1, canGainAmmo: false,
             shootFps: 10, chargeFps: 16, loopChargeAt: 32, muzzleVFX: "muzzle_b_b_gun", muzzleFps: 30, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleCenter,
             fireAudio: "Play_WPN_seriouscannon_shot_01", reloadAudio: "Play_ENM_flame_veil_01")
           .AssignGun(out Gun gun)
