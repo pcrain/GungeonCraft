@@ -8,9 +8,11 @@ public class SuperColdWatch : CwaffPassive
     public static string Lore             = "A Super Hot Watch that was left to cool off in the Hollow for far too long. You feel an otherworldly coldness and stillness in the air around you as you hold it, comparable to being permanently stuck in the moment of complete silence after telling a poorly received joke at a funeral.";
 
     private const float _BUILDUP_TIME = 5.0f;
+    private const float _GRACE_TIME = 0.2f;
     private const float _MAX_TIMESCALE_REDUCTION = 0.875f;
 
     private bool _active = false;
+    private float _graceTime = 0.0f;
     private float _activeTime = 0.0f;
     private float _effectStrength = 0.0f;
 
@@ -51,7 +53,15 @@ public class SuperColdWatch : CwaffPassive
       bool shouldBeActive = m_pickedUp && !GameManager.Instance.IsLoadingLevel && m_owner
         && (m_owner.CurrentInputState == PlayerInputState.AllInput || m_owner.CurrentInputState == PlayerInputState.OnlyMovement)
         && !m_owner.IsFalling && !m_owner.IsDodgeRolling && m_owner.healthHaver && !m_owner.healthHaver.IsDead
-        && m_owner.specRigidbody && m_owner.specRigidbody.Velocity.sqrMagnitude > 0.01f;
+        && m_owner.specRigidbody;
+      bool playerIsMoving = m_owner.specRigidbody.Velocity.sqrMagnitude > 0.01f;
+      if (shouldBeActive && !playerIsMoving)
+      {
+        this._graceTime += Time.unscaledDeltaTime;
+        if (this._graceTime < _GRACE_TIME)
+          return;
+        shouldBeActive = false;
+      }
       if (!shouldBeActive)
       {
         if (!this._active)
@@ -64,8 +74,8 @@ public class SuperColdWatch : CwaffPassive
         this._active = false;
         return;
       }
-
-      this._activeTime += Time.deltaTime; // NOTE: don't use BraveTime here, we want the actual delta time
+      this._graceTime = 0.0f;
+      this._activeTime += Time.unscaledDeltaTime; // NOTE: don't use BraveTime here, we want the actual delta time
       UpdateStats();
       BraveTime.SetTimeScaleMultiplier(1f - this._effectStrength, base.gameObject);
       this._active = true;

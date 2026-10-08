@@ -14,6 +14,7 @@
 - Fixed Pizza Time event not being triggerable on the first floor due to requiring the player to visit a non-existent room
 - Fixed custom HUDs for Vacpack, Death Note, and Retina being completely illegible when the game language is set to a language that uses a non-default font atlas
 - Tweaked Vladimir's projectile mechanics so that higher projectile speeds don't extend the range of melee stabs
+- Added a short grace period to Super Cold Watch in which the player can stop moving without time returning to normal speed
 
 ## 1.32.5 (2026-08-15)
 
