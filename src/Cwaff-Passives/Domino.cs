@@ -553,6 +553,8 @@ public class PizzaTimeController : MonoBehaviour
 
     internal static void OnFloorStarted()
     {
+        _DeliveryRooms.Clear();
+        _OccupiedRooms.Clear();
         _ScannedRoomsThisFloor = false;
     }
 
@@ -601,6 +603,22 @@ public class PizzaTimeController : MonoBehaviour
                 _OccupiedRooms.AddLast(room);
         }
         // Lazy.DebugConsoleLog($"still {_OccupiedRooms.Count} occupied rooms");
+        // foreach (RoomHandler room in _OccupiedRooms)
+        // {
+        //   Lazy.DebugConsoleLog($"  {room.GetRoomName()}");
+        //   if (room.activeEnemies != null)
+        //   {
+        //     foreach (var enemy in room.activeEnemies)
+        //       Lazy.DebugConsoleLog($"    active {enemy.AmmonomiconName()}");
+        //     if (room.remainingReinforcementLayers != null)
+        //       foreach (var layer in room.remainingReinforcementLayers)
+        //         foreach (var obj in layer.placedObjects)
+        //         {
+        //           if (!obj.enemyBehaviourGuid.IsNullOrWhiteSpace())
+        //             Lazy.DebugConsoleLog($"    reinforcement {obj.enemyBehaviourGuid.AmmonomiconName()}");
+        //         }
+        //   }
+        // }
         return _OccupiedRooms.Count > 0;
     }
 

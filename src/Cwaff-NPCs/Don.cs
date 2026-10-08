@@ -107,6 +107,8 @@ public class Don : FancyNPC
     PizzaTimeController._DonNPC = this;
 
     CwaffEvents.OnChangedRooms += this.OnChangedRooms;
+    CwaffEvents.OnNewFloorFullyLoaded -= PizzaTimeController.OnFloorStarted;
+    CwaffEvents.OnNewFloorFullyLoaded += PizzaTimeController.OnFloorStarted;
   }
 
   private static readonly List<Tuple<string, string>> _EntryStrings = [
@@ -185,7 +187,7 @@ public class Don : FancyNPC
     }
     if (interactor.IsGunLocked || interactor.inventory.GunLocked.Value)
       return State.INCAPABLE_OF_DELIVERY;
-    if (!Lazy.AllRoomsVisited(includeSecretRooms: false))
+    if (!Lazy.AllRoomsVisited(includeSecretRooms: false, includeWarpRooms: false))
       return State.NEED_FULL_MAP;
     if (PizzaTimeController.CheckAnyRoomsStillOccupied()/* && !C.DEBUG_BUILD*/)
       return State.ENEMIES_ON_FLOOR;
@@ -483,7 +485,7 @@ public class Don : FancyNPC
     PlayerController interactor = Interactor();
     if (interactor.IsGunLocked || interactor.inventory.GunLocked.Value)
       yield return ScriptINCAPABLE_OF_DELIVERY();
-    else if (!Lazy.AllRoomsVisited(includeSecretRooms: false))
+    else if (!Lazy.AllRoomsVisited(includeSecretRooms: false, includeWarpRooms: false))
       yield return ScriptNEED_FULL_MAP();
     else if (PizzaTimeController.CheckAnyRoomsStillOccupied()/* && !C.DEBUG_BUILD*/)
       yield return ScriptENEMIES_ON_FLOOR();
