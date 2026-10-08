@@ -204,6 +204,7 @@ public class IgnizolCompanion : CwaffCompanionController
 
         public override void Destroy()
         {
+            DisableSecondaryRenderer();
             if (this._jumpSprite)
                 UnityEngine.Object.Destroy(this._jumpSprite);
             CwaffEvents.OnEmptyInteract -= this.AttemptToPickUpOrThrow;
@@ -502,8 +503,10 @@ public class IgnizolCompanion : CwaffCompanionController
 
         private void DisableSecondaryRenderer()
         {
-            ToggleRendererAndOutlines(this._jumpSprite, false);
-            ToggleRendererAndOutlines(this.m_aiActor.sprite, true);
+            if (this._jumpSprite)
+              ToggleRendererAndOutlines(this._jumpSprite, false);
+            if (this.m_aiActor && this.m_aiActor.sprite)
+              ToggleRendererAndOutlines(this.m_aiActor.sprite, true);
         }
     }
 }

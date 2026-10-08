@@ -8,6 +8,7 @@
 - Fixed rare null deref caused by trying to set dynamic barrel offsets for weapons playing unrecognized animations
 - Fixed help text in Vacpack's radial menu displaying controller buttons when on mouse and keyboard
 - Prevented Ignizol from being thrown while the map screen is open
+- Fixed rendering issue where Ignizol's shadow would remain permanently over a player's head if they die in co-op mode
 
 ## 1.32.5 (2026-08-15)
 
