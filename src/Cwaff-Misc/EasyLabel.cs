@@ -25,11 +25,12 @@ public static class EasyLabel
           label.Atlas = (label.Font as dfFont).Atlas;
           label.TextScale = 2.0f;
       }
-      else
+      else if (languageUsesNonDefaultAtlas)
       {
           label.Font = label.GUIManager.DefaultFont; // force English font atlas since other font atlases are immutable
           label.Atlas = (label.Font as dfFont).Atlas;
           label.m_defaultAssignedFont = label.Font;
+          label.TextScale = 1.0f;
       }
       label.m_cachedLanguage = StringTableManager.GungeonSupportedLanguages.ENGLISH;
       label.transform.localScale = Vector3.one / GameUIRoot.GameUIScalar;
@@ -120,4 +121,24 @@ public class LabelExt : MonoBehaviour
 {
     public Vector2 lastPos;
     public float lastRot;
+
+    private void Start()
+    {
+      if (GameUIRoot.Instance is GameUIRoot root)
+      {
+        root.OnScaleUpdate -= this.OnScaleUpdate;
+        root.OnScaleUpdate += this.OnScaleUpdate;
+      }
+    }
+
+    private void OnDestroy()
+    {
+      if (GameUIRoot.Instance is GameUIRoot root)
+        root.OnScaleUpdate -= this.OnScaleUpdate;
+    }
+
+    private void OnScaleUpdate()
+    {
+      base.transform.localScale = Vector3.one / GameUIRoot.GameUIScalar;
+    }
 }

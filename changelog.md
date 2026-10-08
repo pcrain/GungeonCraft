@@ -19,6 +19,7 @@
 	- A -> B quality: Gunbrella, Stereoscope, Wayfarer
 	- B -> C quality: B. B. Gun, Chroma, Jugglernaut, Racket Launcher, Soul Kaliber
 	- C -> D quality: Blackjack, Flakseed, Omnidirectional Laser, Sub Machine Gun
+- Improve stability and layout of custom HUDs for Vacpack, Death Note, and Retina when toggling Tiny UI on or off
 
 ## 1.32.5 (2026-08-15)
 
