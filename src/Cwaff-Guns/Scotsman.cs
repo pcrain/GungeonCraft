@@ -120,7 +120,10 @@ public class Scotsman : CwaffGun
             player.forceAimPoint = this._aimPoint;
         }
         else
+        {
             this._aimPoint = player.CenterPosition + player.m_currentGunAngle.ToVector(_MAX_RETICLE_RANGE);
+            player.forceAimPoint = null;
+        }
     }
 
     private void LateUpdate()

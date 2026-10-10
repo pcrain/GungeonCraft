@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.32.7 (TBD)
+
+- Fixed mastered Scotsman's detonation cone not working properly on controller when aim direction is neutral
+
 ## 1.32.6 (2026-10-08)
 
 #### Balance Changes and Polish:

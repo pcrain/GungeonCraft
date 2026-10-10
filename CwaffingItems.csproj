@@ -38,7 +38,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <FrameworkPathOverride>/home/pretzel/workspace/gungeon-projects/gungy-cwaffing/_dotNETFramework/v3.5</FrameworkPathOverride>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <ItemGroup>

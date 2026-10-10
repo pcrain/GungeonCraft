@@ -303,7 +303,6 @@ template=`cat <<'HERE'
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <FrameworkPathOverride>%s</FrameworkPathOverride>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <ItemGroup>
@@ -329,7 +328,7 @@ echo -e "[${GRN}>${BLN}] Substituting .csproj template"
 #Get old checksum of generated csproj file
 oldchecksum="$(md5sum "$projfile" | cut -f 1 -d ' ')"
 #Invoke the substitution and create our projects file
-printf "$template" "$namespace" "$projectname" "$dotnet35path" "$dotnet35path" "$replace" | xmllint --format - > "${projfile}.new"
+printf "$template" "$namespace" "$projectname" "$dotnet35path" "$replace" | xmllint --format - > "${projfile}.new"
 #Get new checksum of generated csproj file
 newchecksum="$(md5sum "${projfile}.new" | cut -f 1 -d ' ')"
 
