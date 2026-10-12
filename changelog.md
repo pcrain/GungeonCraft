@@ -5,6 +5,7 @@
 - Fixed mastered Scotsman's detonation cone not working properly on controller when aim direction is neutral
 - Added Hightide
 - Added mastery for Hightide
+- Fixed Armor Piercing Rounds breaking boss DPS caps even though they were specifically meant not to do that
 
 ## 1.32.6 (2026-10-08)
 

@@ -62,6 +62,8 @@ static class MinorBreakablePrecollisionPatches
 [HarmonyPatch(typeof(Projectile), nameof(Projectile.HandleDamage))]
 static class ProjectileHandleDamagePatches
 {
+    private static List<HealthHaver> _ForcedVulnerable = new();
+
     //NOTE: used by DamageAdjuster for adjusting damage based on the enemy a projectile is colliding with
     [HarmonyILManipulator]
     private static void HandleDamageIL(ILContext il)
@@ -104,15 +106,31 @@ static class ProjectileHandleDamagePatches
         if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchStloc(9))) // hitPixelCollider (local)
             return;
 
-        // we're right before ApplyDamage(), HealthHaver obj is already on the stack
-        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchLdcI4(0)))
-            return; // match the load for the hardcoded "false" for ignoreInvulnerabilityFrames
+        // move right before ApplyDamage()
+        if (!cursor.TryGotoNext(MoveType.Before, instr => instr.MatchCallvirt<HealthHaver>(nameof(HealthHaver.ApplyDamage))))
+          return;
+        // disable iframes check for IsVulnerable property
         cursor.Emit(OpCodes.Ldloc, shouldPierce);
-        cursor.CallPrivate(typeof(ProjectileHandleDamagePatches), nameof(ShouldIgnoreInvulnerabilityFrames));
+        cursor.Emit(OpCodes.Ldarg_1); // rigidbody
+        cursor.CallPrivate(typeof(ProjectileHandleDamagePatches), nameof(MaybeForceVulnerable));
+        // move right after ApplyDamage()
+        if (!cursor.TryGotoNext(MoveType.After, instr => instr.MatchCallvirt<HealthHaver>(nameof(HealthHaver.ApplyDamage))))
+          return;
+        cursor.Emit(OpCodes.Ldarg_1); // rigidbody
+        cursor.CallPrivate(typeof(ProjectileHandleDamagePatches), nameof(ClearForceVulnerable));
+    }
+
+    [HarmonyPatch(typeof(HealthHaver), nameof(HealthHaver.IsVulnerable), MethodType.Getter)]
+    [HarmonyPostfix]
+    private static void IsVulnerablePatch(HealthHaver __instance, ref bool __result)
+    {
+      if (_ForcedVulnerable.Contains(__instance))
+        __result = true;
     }
 
     private static bool AndNot(bool trueVal, bool falseVal) => trueVal && !falseVal;
-    private static bool ShouldIgnoreInvulnerabilityFrames(bool _, bool ignore) => ignore;
+    private static void ClearForceVulnerable(SpeculativeRigidbody body) { if (body.healthHaver is HealthHaver hh) _ForcedVulnerable.Remove(hh); }
+    private static void MaybeForceVulnerable(bool disable, SpeculativeRigidbody body) { if (disable && body.healthHaver is HealthHaver hh) _ForcedVulnerable.Add(hh); }
 }
 
 [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnRigidbodyCollision))]
