@@ -18,7 +18,7 @@ public class Hightide : CwaffGun
           .InitProjectile(GunData.New(
             clipSize: 1, cooldown: 0.15f, angleVariance: 10.0f, shootStyle: ShootStyle.Charged, range: 9999f, speed: 7f, force: 30f, damage: 2f, sequenceStyle: ProjectileSequenceStyle.Ordered,
             barrageSize: _MAX_PROJECTILES * 2 + 1, surviveRigidbodyCollisions: true, multihitDelay: 0.05f, sprite: "tidal_projectile", fps: 30, pierceInternalWalls: true, pierceBreakables: true,
-            customClip: true))
+            customClip: true, water: true))
           .SetAllImpactVFX(VFX.CreatePool("tidal_splash_vfx", fps: 20, loops: false, anchor: Anchor.MiddleLeft, scale: 0.5f,
             emissivePower: 37.0f, emissiveColour: new Color(0.0f, 0.0f, 1.0f), emissiveColorPower: 7.0f, emissiveSensitivity: 0.8f))
           .Attach<GoopModifier>(g => {

@@ -71,6 +71,7 @@ public sealed class GunData
   public string hitWallSound;
   public bool? becomeDebris;
   public bool? electric;
+  public bool? water;
   public float? burstCooldown;
   public bool? preventSparks;
   public bool? pierceBreakables;
@@ -183,6 +184,7 @@ public sealed class GunData
   /// <param name="ignoredForReloadPurposes">If true, prevents reload notifications when this projectile is created (useful for synergy bonus projectiles).</param>
   /// <param name="mirror">If true, the current projectile module will spawn another identical projectile with an opposite angleFromAim.</param>
   /// <param name="electric">If true, adds the Electric damage type to the projectile.</param>
+  /// <param name="water">If true, adds the Water damage type to the projectile.</param>
   /// <param name="burstCooldown">The minimum number of seconds between shots in a burst.</param>
   /// <param name="preventSparks">If true, prevents sparks from being created for electric / cursed projectiles.</param>
   /// <param name="pierceBreakables">If true, the projectile will pierce minor breakables such as crates, barrels, etc.</param>
@@ -245,7 +247,7 @@ public sealed class GunData
     bool? shouldFlipHorizontally = null, bool? shouldFlipVertically = null, bool useDummyChargeModule = false, bool invisibleProjectile = false, string spawnSound = null,
     bool? stopSoundOnDeath = null, bool? uniqueSounds = null, GameObject shrapnelVFX = null, int? shrapnelCount = null, float? shrapnelMinVelocity = null,
     float? shrapnelMaxVelocity = null, float? shrapnelLifetime = null, bool? preventOrbiting = null, string hitSound = null, string hitEnemySound = null, string hitWallSound = null,
-    bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false, bool? electric = null, float? burstCooldown = null,
+    bool? becomeDebris = null, float angleFromAim = 0.0f, bool ignoredForReloadPurposes = false, bool mirror = false, bool? electric = null, bool? water = null, float? burstCooldown = null,
     bool? preventSparks = null, bool? pierceBreakables = null, bool? collidesOnlyWithPlayerProjectiles = null, bool? pierceInternalWalls = null, bool? doBeamSetup = null,
     string beamSprite = null, int beamFps = -1, int beamStartFps = -1, int beamEndFps = -1, int beamChargeFps = -1, int beamMuzzleFps = -1, int beamImpactFps = -1, bool beamLoopCharge = true,
     float beamEmission = -1f, int beamReflections = -1, float beamChargeDelay = -1f, float beamStatusDelay = -1f, GoopDefinition beamGoop = null, bool? beamInterpolate = null,
@@ -313,6 +315,7 @@ public sealed class GunData
       _Instance.angleFromAim                      = angleFromAim;
       _Instance.mirror                            = mirror;
       _Instance.electric                          = electric;
+      _Instance.water                             = water;
       _Instance.burstCooldown                     = burstCooldown;
       _Instance.preventSparks                     = preventSparks;
       _Instance.pierceBreakables                  = pierceBreakables;
@@ -496,6 +499,13 @@ public static class GunBuilder
         p.damageTypes |= CoreDamageTypes.Electric;
       else
         p.damageTypes &= (~CoreDamageTypes.Electric);
+    }
+    if (b.water.HasValue)
+    {
+      if (b.water.Value)
+        p.damageTypes |= CoreDamageTypes.Water;
+      else
+        p.damageTypes &= (~CoreDamageTypes.Water);
     }
 
     CwaffProjectile c = p.GetOrAddComponent<CwaffProjectile>();
