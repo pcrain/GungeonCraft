@@ -1512,6 +1512,9 @@ public class OrbitalEffect : MonoBehaviour
 
     private void UpdateOrbitals()
     {
+        if (this._orbitals == null)
+          return;
+
         int i = 0;
         float orbitOffset = this._orbitTimer / this._spr;
         float z = C.PIXELS_PER_TILE * this._enemyGirth;
@@ -1520,7 +1523,8 @@ public class OrbitalEffect : MonoBehaviour
 
         foreach (GameObject g in this._orbitals)
         {
-            tk2dSprite sprite = g.GetComponent<tk2dSprite>();
+            if (g.GetComponent<tk2dSprite>() is not tk2dSprite sprite)
+              continue;
             sprite.renderer.enabled = this._enemy.renderer.enabled;
             float angle = (this._orbitalGap * i + 360.0f * orbitOffset).Clamp360();
             float radAngle = angle / 57.29578f;

@@ -6,6 +6,7 @@
 - Added Hightide
 - Added mastery for Hightide
 - Fixed Armor Piercing Rounds breaking boss DPS caps even though they were specifically meant not to do that
+- Fixed null deref trying to update non-existent orbital VFX for Soul Kaliber's soul link effect
 
 ## 1.32.6 (2026-10-08)
 
