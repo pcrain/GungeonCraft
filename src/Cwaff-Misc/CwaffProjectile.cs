@@ -22,6 +22,7 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
     public float lightStrength       = 0f;
     public float lightRange          = 0f;
     public Color lightColor          = Color.white;
+    public float multihitDelay      = -1f;
 
     private Projectile _projectile;
     private PlayerController _owner;
@@ -103,6 +104,7 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
       this.lightStrength = baseCp.lightStrength;
       this.lightRange = baseCp.lightRange;
       this.lightColor = baseCp.lightColor;
+      this.multihitDelay = baseCp.multihitDelay;
 
       this._projectile = null;
       this._owner = null;
@@ -239,6 +241,27 @@ public class CwaffProjectile : MonoBehaviour, IPPPComponent
           break;
         }
       cp.LoopSoundIf(hitAnEnemy, __instance.projectile.enemyImpactEventName);
+    }
+
+    /// <summary>Clear the default 0.5 second collision exception timer for multihit projectiles, if necessary</summary>
+    [HarmonyPatch(typeof(Projectile), nameof(Projectile.OnRigidbodyCollision))]
+    internal static class ProjectileOnRigidbodyCollisionPatch
+    {
+        private static void Postfix(Projectile __instance, CollisionData rigidbodyCollision)
+        {
+          if (rigidbodyCollision.OtherRigidbody is not SpeculativeRigidbody otherBody)
+            return;
+          if (rigidbodyCollision.MyRigidbody is not SpeculativeRigidbody myBody)
+            return;
+          if (__instance.gameObject.GetComponent<CwaffProjectile>() is not CwaffProjectile cp)
+            return;
+          if (cp.multihitDelay < 0)
+            return;
+          myBody.DeregisterTemporaryCollisionException(otherBody);
+          otherBody.DeregisterTemporaryCollisionException(myBody);
+          myBody.RegisterTemporaryCollisionException(otherBody, maxTime: cp.multihitDelay);
+          otherBody.RegisterTemporaryCollisionException(myBody, maxTime: cp.multihitDelay);
+        }
     }
 }
 

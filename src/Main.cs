@@ -298,6 +298,7 @@ public class Initialisation : BaseUnityPlugin
                 DeathNote.Init();
                 Akelus.Init();
                 Mtara.Init();
+                Hightide.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

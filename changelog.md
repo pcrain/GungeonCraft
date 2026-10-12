@@ -1,8 +1,10 @@
 # Changelog
 
-## 1.32.7 (TBD)
+## 1.33.0 (TBD)
 
 - Fixed mastered Scotsman's detonation cone not working properly on controller when aim direction is neutral
+- Added Hightide
+- Added mastery for Hightide
 
 ## 1.32.6 (2026-10-08)
 

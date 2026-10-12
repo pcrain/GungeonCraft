@@ -446,3 +446,5 @@ slime_mosaic_heal_sound,2.0,1,sound,1
 portable_hydro_turret_fire_sound,5.0,1,sound,0
 portable_hydro_turret_reload_sound,5.0,1,sound,0
 portable_hydro_turret_impact_sound,5.0,1,sound,0
+hightide_impact_wall_sound,-3.0,1,sound,2
+hightide_shoot_sound,-3.0,1,sound,1
