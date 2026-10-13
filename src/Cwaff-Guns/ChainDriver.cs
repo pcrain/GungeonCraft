@@ -26,6 +26,7 @@ public class ChainDriver : CwaffGun
         _ChainImpact = VFX.Create("chain_impact_vfx", fps: 20, loops: false, anchor: Anchor.MiddleLeft);
 
         for (int i = 0; i < 2; ++i)
+        {
             _ChainDebris[i] = BreakableAPIToolbox.GenerateDebrisObject(
                 shardSpritePath         : $"chain_debris_{i+1}",
                 debrisObjectsCanRotate  : true,
@@ -34,6 +35,8 @@ public class ChainDriver : CwaffGun
                 AngularVelocity         : 0,
                 AngularVelocityVariance : 180,
                 DebrisBounceCount       : 1).gameObject;
+            _ChainDebris[i].gameObject.SetActive(false); // HACK: should be fixed in Alexandria, not here
+        }
     }
 
     public override void PostProcessProjectile(Projectile projectile)

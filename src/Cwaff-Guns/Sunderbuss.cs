@@ -34,6 +34,7 @@ public class Sunderbuss : CwaffGun
             anchor: Anchor.MiddleCenter, chargeTime: _CHARGE_TIME, hideAmmo: true));
 
         for (int i = 0; i < 7; ++i)
+        {
             _ShatterDebris[i] = BreakableAPIToolbox.GenerateDebrisObject(
                 shardSpritePath         : $"sunderbuss_debris_{_ColorNames[i]}",
                 debrisObjectsCanRotate  : true,
@@ -42,6 +43,8 @@ public class Sunderbuss : CwaffGun
                 AngularVelocity         : 0,
                 AngularVelocityVariance : 1080,
                 DebrisBounceCount       : 2).gameObject;
+            _ShatterDebris[i].gameObject.SetActive(false); // HACK: should be fixed in Alexandria, not here
+        }
 
         _BlunderbussProjectile = Items.Blunderbuss.AsGun().rawVolley.projectiles[0].chargeProjectiles[0].Projectile.gameObject.ClonePrefab();
         UnityEngine.Object.Destroy(_BlunderbussProjectile.GetComponent<BounceProjModifier>());

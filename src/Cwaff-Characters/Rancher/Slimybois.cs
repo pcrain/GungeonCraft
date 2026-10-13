@@ -150,6 +150,7 @@ public static partial class Slimybois
     goopDebris.decayOnBounce = 0.8f;
     goopDebris.usesLifespan = true;
     goopDebris.sprite.MakeGlowyBetter(glowAmount: 50.0f, glowColor: Color.white, glowColorPower: 100.0f, sensitivity: 0.5f, overrideColor: sd.goopColor);
+    goopDebris.gameObject.SetActive(false); // HACK: should be fixed in Alexandria, not here
 
     SlimyboiController controller = actor.gameObject.AddComponent<SlimyboiController>();
     controller.slimeType = sd.type;

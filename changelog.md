@@ -7,6 +7,9 @@
 - Added mastery for Hightide
 - Fixed Armor Piercing Rounds breaking boss DPS caps even though they were specifically meant not to do that
 - Fixed null deref trying to update non-existent orbital VFX for Soul Kaliber's soul link effect
+- Fixed null deref caused by Vacpack trying to play despawned particle debris effects when firing Vacpack, particularly on low shader settings
+- Fixed potential null deref caused by Chain Driver trying to spawn despawned links as debris 
+- Fixed potential null deref caused by Sunderbuss trying to spawn despawned shrapnel as debris 
 
 ## 1.32.6 (2026-10-08)
 
