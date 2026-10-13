@@ -460,3 +460,5 @@ voidcaller_shoot_proj_9,-11.0,1,sound,1
 voidcaller_shoot_sound,2.0,1,sound,1
 voidcaller_impact_sound,-5.0,1,sound,1
 voidcaller_reload_sound,0.0,1,sound,1
+pegasus_boots_collide_sound,5.0,1,sound,1
+pegasus_boots_dash_sound,10.0,1,sound,1

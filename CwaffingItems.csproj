@@ -49,6 +49,7 @@
     <Compile Include="src\Cwaff-Passives\ScaldingJelly.cs"/>
     <Compile Include="src\Cwaff-Passives\StuntHelmet.cs"/>
     <Compile Include="src\Cwaff-Passives\CustodiansBadge.cs"/>
+    <Compile Include="src\Cwaff-Passives\PegasusBoots.cs"/>
     <Compile Include="src\Cwaff-Passives\AmethystShard.cs"/>
     <Compile Include="src\Cwaff-Passives\PrismaticScope.cs"/>
     <Compile Include="src\Cwaff-Passives\DriftersHeadgear.cs"/>

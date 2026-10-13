@@ -4109,6 +4109,44 @@ public static class Extensions
     return ((!(Mathf.Abs(direction.x) < 0.1f)) ? player.spriteAnimator.GetClipByName(((!(direction.y > 0.1f)) ? "dodge_left" : "dodge_left_bw") + ((!player.UseArmorlessAnim) ? string.Empty : "_armorless")) : player.spriteAnimator.GetClipByName(((!(direction.y > 0.1f)) ? "dodge" : "dodge_bw") + ((!player.UseArmorlessAnim) ? string.Empty : "_armorless")));
   }
 
+  /// <summary>Returns the sprite animation clip for a player's run given a direction</summary>
+  public static tk2dSpriteAnimationClip RunningClipForDirection(this PlayerController pc, Vector2 direction)
+  {
+      float gunAngle = direction.ToAngle();
+      string aname = string.Empty;
+      bool hasGun = pc.CurrentGun != null;
+      bool forceTwoHands = true;
+      float num = 155f;
+      float num2 = 25f;
+      float num3 = 120f;
+      float num4 = 60f;
+      float num5 = -60f;
+      float num6 = -120f;
+      bool facingUp = gunAngle <= num && gunAngle >= num2;
+
+      if (facingUp)
+      {
+        string text5 = (((!forceTwoHands && hasGun) || pc.ForceHandless) ? "run_right_bw" : "run_right_bw_twohands");
+        if (gunAngle < num3 && gunAngle >= num4)
+          text5 = (((forceTwoHands || !hasGun) && !pc.ForceHandless) ? "run_up_twohands" : ((!pc.RenderBodyHand) ? "run_up" : "run_up_hand"));
+        aname = text5;
+      }
+      else
+      {
+        string text6 = "run_right";
+        if (gunAngle <= num5 && gunAngle >= num6)
+          text6 = "run_down";
+        if ((forceTwoHands || !hasGun) && !pc.ForceHandless)
+          text6 += "_twohands";
+        else if (pc.RenderBodyHand)
+          text6 += "_hand";
+        aname = text6;
+      }
+      if (pc.UseArmorlessAnim && !pc.IsGhost)
+        aname += "_armorless";
+      return pc.spriteAnimator.GetClipByName(aname);
+  }
+
   /// <summary>Given a Vector pos, returns the closest point on collider to pos.</summary>
   public static Vector2 ClosestPointOnCollider(this Vector2 pos, PixelCollider collider)
   {

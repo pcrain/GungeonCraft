@@ -393,6 +393,7 @@ public class Initialisation : BaseUnityPlugin
                 ChewToy.Init();
                 SuperColdWatch.Init();
                 VengefulSpirit.Init();
+                PegasusBoots.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

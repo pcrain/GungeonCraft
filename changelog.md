@@ -2,12 +2,12 @@
 
 ## 1.33.0 (TBD)
 
-- Fixed mastered Scotsman's detonation cone not working properly on controller when aim direction is neutral
-- Added Hightide and Voidcaller
+- Added Hightide, Voidcaller, and Pegasus Boots
 - Added mastery for Hightide
+- Fixed mastered Scotsman's detonation cone not working properly on controller when aim direction is neutral
 - Fixed Armor Piercing Rounds breaking boss DPS caps even though they were specifically meant not to do that
 - Fixed null deref trying to update non-existent orbital VFX for Soul Kaliber's soul link effect
-- Fixed null deref caused by Vacpack trying to play despawned particle debris effects when firing Vacpack, particularly on low shader settings
+- Fixed null deref caused by Vacpack trying to play despawned particle debris effects when firing slimes
 - Fixed potential null deref caused by Chain Driver trying to spawn despawned links as debris 
 - Fixed potential null deref caused by Sunderbuss trying to spawn despawned shrapnel as debris 
 
@@ -181,7 +181,7 @@
 #### Features:
 
 - Added Nightlighter, Gadulo, Vengeful Spirit, and Death Note
-	- Nightlighter sprite thanks to [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)!
+	- Nightlighter sprites thanks to [Nevernamed](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/)!
 	- Vengeful Spirit and Death Note sprites thanks to [Dallan](https://thunderstore.io/c/enter-the-gungeon/p/Dallan/)!
 - Added new NPC: Don
 	- Don has a 6% chance of spawning in his pizza kitchen at some point during any run
