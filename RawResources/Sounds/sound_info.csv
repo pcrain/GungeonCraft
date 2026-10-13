@@ -448,3 +448,15 @@ portable_hydro_turret_reload_sound,5.0,1,sound,0
 portable_hydro_turret_impact_sound,5.0,1,sound,0
 hightide_impact_wall_sound,-3.0,1,sound,2
 hightide_shoot_sound,-3.0,1,sound,1
+voidcaller_shoot_proj_1,-7.0,1,sound,1
+voidcaller_shoot_proj_2,-7.5,1,sound,1
+voidcaller_shoot_proj_3,-8.0,1,sound,1
+voidcaller_shoot_proj_4,-8.5,1,sound,1
+voidcaller_shoot_proj_5,-9.0,1,sound,1
+voidcaller_shoot_proj_6,-9.5,1,sound,1
+voidcaller_shoot_proj_7,-10.0,1,sound,1
+voidcaller_shoot_proj_8,-10.5,1,sound,1
+voidcaller_shoot_proj_9,-11.0,1,sound,1
+voidcaller_shoot_sound,2.0,1,sound,1
+voidcaller_impact_sound,-5.0,1,sound,1
+voidcaller_reload_sound,0.0,1,sound,1

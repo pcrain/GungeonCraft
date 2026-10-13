@@ -299,6 +299,7 @@ public class Initialisation : BaseUnityPlugin
                 Akelus.Init();
                 Mtara.Init();
                 Hightide.Init();
+                Voidcaller.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

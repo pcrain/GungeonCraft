@@ -3,7 +3,7 @@
 ## 1.33.0 (TBD)
 
 - Fixed mastered Scotsman's detonation cone not working properly on controller when aim direction is neutral
-- Added Hightide
+- Added Hightide and Voidcaller
 - Added mastery for Hightide
 - Fixed Armor Piercing Rounds breaking boss DPS caps even though they were specifically meant not to do that
 - Fixed null deref trying to update non-existent orbital VFX for Soul Kaliber's soul link effect

@@ -212,6 +212,12 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   {
   }
 
+  /// <summary>Called in HandleSpecificInitialGunShoot() when determining if a module should be allowed to fire</summary>
+  public virtual bool IsModuleActive(ProjectileModule module)
+  {
+    return true;
+  }
+
   /// <summary>Called any time a gun is picked up by a player during a run</summary>
   public override void OnPlayerPickup(PlayerController player)
   {
@@ -895,6 +901,19 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
     {
       return gun && gun.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.preventVolleyModifications;
     }
+  }
+
+  /// <summary>Selectively disable a gun's ProjectileModule from shooting</summary>
+  [HarmonyPatch(typeof(Gun), nameof(Gun.HandleSpecificInitialGunShoot))]
+  internal static class GunHandleSpecificInitialGunShootPatch
+  {
+      private static bool Prefix(Gun __instance, ProjectileModule module, ProjectileData overrideProjectileData, GameObject overrideBulletObject, bool playEffects, ref bool __result)
+      {
+          if (__instance.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg || cg.IsModuleActive(module))
+            return true; // call the original method
+          __result = false;
+          return false;
+      }
   }
 }
 

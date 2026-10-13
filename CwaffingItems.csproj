@@ -264,6 +264,7 @@
     <Compile Include="src\Cwaff-Guns\PaintballCannon.cs"/>
     <Compile Include="src\Cwaff-Guns\Widowmaker.cs"/>
     <Compile Include="src\Cwaff-Guns\HatchlingGun.cs"/>
+    <Compile Include="src\Cwaff-Guns\Voidcaller.cs"/>
     <Compile Include="src\Cwaff-Guns\Bouncer.cs"/>
     <Compile Include="src\Cwaff-Guns\Alligator.cs"/>
     <Compile Include="src\Cwaff-Guns\HolyWaterGun.cs"/>

@@ -2,6 +2,9 @@ namespace CwaffingTheGungy;
 
 public static class CwaffShaders
 {
+    public static Shader PlayerShader = null;
+    public static Shader UberEmissiveShader = null;
+
     public static Shader DigitizeShader = null;
     public static Shader UnlitDigitizeShader = null;
     public static Shader GoldShader = null;
@@ -44,6 +47,9 @@ public static class CwaffShaders
 
     public static void Init()
     {
+        PlayerShader = ShaderCache.Acquire("Brave/PlayerShader");
+        UberEmissiveShader = ShaderCache.Acquire("Brave/LitCutoutUber_ColorEmissive");
+
         string shaderBundleName = GetShaderBundleNameForPlatform();
         using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(shaderBundleName))
         {
