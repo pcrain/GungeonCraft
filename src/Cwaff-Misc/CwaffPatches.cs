@@ -534,6 +534,21 @@ internal static class ExploderHandleExplosionPatch
   }
 }
 
+//NOTE: the game really does not like custom goop shaders ):
+// [HarmonyPatch(typeof(DeadlyDeadlyGoopManager), nameof(DeadlyDeadlyGoopManager.GetChunkMesh))]
+// internal static class DeadlyDeadlyGoopManagerGetChunkMeshPatch
+// {
+//     private static void Postfix(DeadlyDeadlyGoopManager __instance, int chunkX, int chunkY, ref Mesh __result)
+//     {
+//       if (__instance.goopDefinition != EasyGoopDefinitions.SeltzerGoop)
+//         return;
+//       Lazy.DebugConsoleLog($"setting up seltzer shaders");
+//       Material mat = __instance.m_mrs[chunkX, chunkY].material;
+//       mat.shader = CwaffShaders.SandstormShader;
+//       mat.SetTexture("_MainTex", __instance.m_worldTexture);
+//       mat.SetTexture("_WorldTex", __instance.m_worldTexture);
+//     }
+// }
 
 //NOTE: even with both of these patches enabled, Shmuppy's hitbox collider was still distorted due to the circular collider of
 //      the disabled UltraFortunesFavor component. So, we're just destroying / recreating it as needed, and to heck with these patches

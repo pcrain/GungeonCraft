@@ -21,12 +21,14 @@ public static class CwaffShaders
     public static Shader GlassShader = null;
     public static Shader BirthShader = null;
     public static Shader HellShader = null;
+    public static Shader SandstormShader = null;
     public static Texture2D DigitizeTexture = null;
     public static Texture2D StarsTexture = null;
     public static Texture2D NoiseTexture = null;
     public static Texture2D StarNoiseTexture = null;
     public static Texture2D PowerdownTexture = null;
     public static Texture2D PowerupTexture = null;
+    public static Texture2D GrayNoiseTexture = null;
 
     private static string GetShaderBundleNameForPlatform()
     {
@@ -72,6 +74,7 @@ public static class CwaffShaders
             GoldShader = shaderBundle.LoadAsset<Shader>("assets/goldshader.shader");
             CosmicShader = shaderBundle.LoadAsset<Shader>("assets/cosmicshader.shader");
             StarsTexture = shaderBundle.LoadAsset<Texture2D>("assets/startexture_cropped.png");
+            GrayNoiseTexture = shaderBundle.LoadAsset<Texture2D>("assets/graynoise.png");
             EmissiveAlphaShader = shaderBundle.LoadAsset<Shader>("assets/emissivealphashader.shader");
             CorruptShader = shaderBundle.LoadAsset<Shader>("assets/corruptshader.shader");
             ChromaShader = shaderBundle.LoadAsset<Shader>("assets/chromashiftshader.shader");
@@ -87,6 +90,7 @@ public static class CwaffShaders
             StarNoiseTexture = shaderBundle.LoadAsset<Texture2D>("assets/starnoise.png");
             BirthShader = shaderBundle.LoadAsset<Shader>("assets/screenbirthshader.shader");
             HellShader = shaderBundle.LoadAsset<Shader>("assets/screenhellshader.shader");
+            SandstormShader = shaderBundle.LoadAsset<Shader>("assets/sandstormshader.shader");
         }
 
         CwaffEvents.OnCleanStart += ResetShaders;
