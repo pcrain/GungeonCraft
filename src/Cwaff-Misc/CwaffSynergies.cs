@@ -392,6 +392,8 @@ public static class CwaffSynergies
           tip: "Akelus has a larger impact radius, reflects bullets in its range, and grants full immunity to explosions while held.");
         NewMastery<MasteryOfHightide>(MASTERY_HIGHTIDE, Hightide.ItemName,
           tip: "Hightide's waves destroy enemy bullets in their path.");
+        NewMastery<MasteryOfVoidcaller>(MASTERY_VOIDCALLER, Voidcaller.ItemName,
+          tip: "Voidcaller passively grants a 10% chance to nullify enemy projectiles for each projectile in its current volley.");
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -709,6 +711,7 @@ internal class MasteryOfDeathNote            : MasteryDummyItem {}
 internal class MasteryOfMtara                : MasteryDummyItem {}
 internal class MasteryOfAkelus               : MasteryDummyItem {}
 internal class MasteryOfHightide             : MasteryDummyItem {}
+internal class MasteryOfVoidcaller           : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -884,4 +887,5 @@ public enum Synergy {
     MASTERY_MTARA,
     MASTERY_AKELUS,
     MASTERY_HIGHTIDE,
+    MASTERY_VOIDCALLER,
 };

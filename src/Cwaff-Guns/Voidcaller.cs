@@ -9,6 +9,15 @@ public class Voidcaller : CwaffGun
 
     private enum VoidType { Default, Key, Blank, Casing, Heart, Armor, Passive, Active, Gun }
 
+    private const float NULL_CHANCE_PER_BULLET = 0.1f;
+    private const float NULLIFICATION_DELAY_MIN = 0.25f;
+    private const float NULLIFICATION_DELAY_MAX = 0.75f;
+
+    private int _lastKnownVolleySize = 0;
+    private bool[] _moduleEnabled = new bool[(int)VoidType.Gun + 1];
+
+    private static VFXPool _ImpactPool = null;
+
     public static void Init()
     {
         Lazy.SetupGun<Voidcaller>(ItemName, ShortDescription, LongDescription, Lore)
@@ -17,7 +26,7 @@ public class Voidcaller : CwaffGun
           .SetReloadAudio("voidcaller_reload_sound", 0, 2, 4, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25)
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: 6, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f))
-          .SetAllImpactVFX(VFX.CreatePool("voidcaller_impact", fps: 30, loops: false, emissivePower: 2f,
+          .SetAllImpactVFX(_ImpactPool = VFX.CreatePool("voidcaller_impact", fps: 30, loops: false, emissivePower: 2f,
             emissiveColorPower: 10.0f, emissiveColour: new Color(0.7f, 0.4f, 0.7f), emissiveSensitivity: 0.6f))
           .Assign(out Projectile p);
 
@@ -55,6 +64,66 @@ public class Voidcaller : CwaffGun
         }
         else
           mat.shader = CwaffShaders.PlayerShader;
+    }
+
+    private void CheckVoidcallerNullification(Projectile projectile)
+    {
+        if (!this || !this.Mastered)
+          return;
+        if (UnityEngine.Random.value > (NULL_CHANCE_PER_BULLET * this._lastKnownVolleySize))
+          return;
+        if (projectile.Owner is PlayerController)
+          return;
+        projectile.AddComponent<ProjectileNullifier>().Setup(UnityEngine.Random.Range(NULLIFICATION_DELAY_MIN, NULLIFICATION_DELAY_MAX));
+    }
+
+    private class ProjectileNullifier : MonoBehaviour
+    {
+      private float _timeout = 0.0f;
+      private Projectile _proj = null;
+
+      public void Setup(float timeout)
+      {
+        this._timeout = timeout;
+        this._proj = base.gameObject.GetComponent<Projectile>();
+      }
+
+      private void Update()
+      {
+        if (this._timeout <= 0.0f)
+          return;
+        if (!this._proj)
+        {
+          UnityEngine.Object.Destroy(this);
+          return;
+        }
+        this._timeout -= BraveTime.DeltaTime;
+        if (this._timeout > 0)
+          return;
+        base.gameObject.Play("voidcaller_impact");
+        Vector2 pos = this._proj.SafeCenter;
+        _ImpactPool.SpawnAtPosition(pos.x, pos.y, 1.0f, 0.0f);
+        this._proj.DieInAir(true, false, false, true);
+      }
+    }
+
+    public override void OnPlayerPickup(PlayerController player)
+    {
+      base.OnPlayerPickup(player);
+      StaticReferenceManager.ProjectileAdded -= CheckVoidcallerNullification;
+      StaticReferenceManager.ProjectileAdded += CheckVoidcallerNullification;
+    }
+
+    public override void OnDroppedByPlayer(PlayerController player)
+    {
+      StaticReferenceManager.ProjectileAdded -= CheckVoidcallerNullification;
+      base.OnDroppedByPlayer(player);
+    }
+
+    public override void OnDestroy()
+    {
+      StaticReferenceManager.ProjectileAdded -= CheckVoidcallerNullification;
+      base.OnDestroy();
     }
 
     private static ProjectileModule VoidcallerModule(Gun gun, Projectile proj, string sprite, string sound, int ammoCost = 0)
@@ -113,6 +182,15 @@ public class Voidcaller : CwaffGun
         VoidType.Gun       => OwnerOnlyHasThisGunAndUndroppableGuns(player),
         _                  => true,
       };
+      if (this._moduleEnabled[index] != canFire)
+      {
+        this._moduleEnabled[index] = canFire;
+        // recompute last known volley size
+        this._lastKnownVolleySize = 0;
+        for (int i = 0; i <= (int)VoidType.Gun; ++i)
+          if (this._moduleEnabled[i])
+            ++this._lastKnownVolleySize;
+      }
       return canFire;
     }
 }

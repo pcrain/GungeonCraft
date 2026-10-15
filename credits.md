@@ -60,7 +60,7 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
 
   - Misc. edits combined from several sources by me: Breegull, Ki Blast, Racket Launcher, Sub Machine Gun, Ticonderogun
   
-  - Original sprites by me: Chain Driver, Chroma, Entropynnium, Flux Fist, Gadulo, Macheening, M'tara, Photon Cannon, Pogo Stick, Portable Hydro Turret, Sunderbuss, Vacpack
+  - Original sprites by me: Chain Driver, Chroma, Entropynnium, Flux Fist, Gadulo, Hightide, Macheening, M'tara, Photon Cannon, Pogo Stick, Portable Hydro Turret, Sunderbuss, Vacpack, Voidcaller
 
   - Most gun animations are my own, but probably aren't as good as the animations of the guns in their respective games / mods, so please check the original sources out!
 
