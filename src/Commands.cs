@@ -20,7 +20,7 @@ public class Commands
         ETGModConsole.Commands.AddGroup("gg", delegate (string[] args)
         {
             DebrisObject debris = LootEngine.SpawnItem(
-                PickupObjectDatabase.GetById(Lazy.PickupId<PegasusBoots>()).gameObject,
+                PickupObjectDatabase.GetById(Lazy.PickupId<ChronosTrigger>()).gameObject,
                 // PickupObjectDatabase.GetById(IDs.Pickups["bubblebeam"]).gameObject,
                 GameManager.Instance.PrimaryPlayer.CenterPosition,
                 Vector2.zero,
@@ -110,6 +110,10 @@ public class Commands
             ms.renderer.material.SetFloat("_Progressive", 1f);
             ms.renderer.material.SetFloat("_Amplitude", 10f);
             ms.gameObject.AddComponent<Distortyboi>().Setup(ms.renderer.material);
+        });
+        ETGModConsole.Commands.AddGroup("tt", delegate (string[] args)
+        {
+            PlayerController pc = GameManager.Instance.PrimaryPlayer;
         });
         ETGModConsole.Commands.AddGroup("ww", delegate (string[] args)
         {//

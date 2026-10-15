@@ -1,6 +1,5 @@
 namespace CwaffingTheGungy;
 
-using System;
 using static ShmuppyCompanion.ShmuppyMovementBehavior.State;
 
 public class ChewToy : CwaffCompanion

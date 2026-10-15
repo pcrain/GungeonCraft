@@ -13,7 +13,6 @@
     global using System.Threading;
 
     global using BepInEx;
-    global using BepInEx.Bootstrap;
     global using UnityEngine;
     global using UnityEngine.UI;
     global using MonoMod.RuntimeDetour;
@@ -333,6 +332,7 @@ public class Initialisation : BaseUnityPlugin
                 PogoStick.Init();
                 GlassAmmoBox.Init();
                 TradingGuide.Init();
+                ChronosTrigger.Init();
 
                 setupActivesWatch.Stop();
             #endregion

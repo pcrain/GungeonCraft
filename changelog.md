@@ -2,7 +2,7 @@
 
 ## 1.33.0 (TBD)
 
-- Added Hightide, Voidcaller, and Pegasus Boots
+- Added Hightide, Voidcaller, Pegasus Boots, and Chronos' Trigger
 - Added mastery for Hightide
 - Fixed mastered Scotsman's detonation cone not working properly on controller when aim direction is neutral
 - Fixed Armor Piercing Rounds breaking boss DPS caps even though they were specifically meant not to do that

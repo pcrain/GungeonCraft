@@ -22,6 +22,7 @@ public static class CwaffShaders
     public static Shader BirthShader = null;
     public static Shader HellShader = null;
     public static Shader SandstormShader = null;
+    public static Shader RadialTimestopShader = null;
     public static Texture2D DigitizeTexture = null;
     public static Texture2D StarsTexture = null;
     public static Texture2D NoiseTexture = null;
@@ -91,6 +92,7 @@ public static class CwaffShaders
             BirthShader = shaderBundle.LoadAsset<Shader>("assets/screenbirthshader.shader");
             HellShader = shaderBundle.LoadAsset<Shader>("assets/screenhellshader.shader");
             SandstormShader = shaderBundle.LoadAsset<Shader>("assets/sandstormshader.shader");
+            RadialTimestopShader = shaderBundle.LoadAsset<Shader>("assets/radialtimestopshader.shader");
         }
 
         CwaffEvents.OnCleanStart += ResetShaders;

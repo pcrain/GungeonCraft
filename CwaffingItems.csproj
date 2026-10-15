@@ -168,6 +168,7 @@
     <Compile Include="src\Cwaff-Actives\StopSign.cs"/>
     <Compile Include="src\Cwaff-Actives\GunSynthesizer.cs"/>
     <Compile Include="src\Cwaff-Actives\GasterBlaster.cs"/>
+    <Compile Include="src\Cwaff-Actives\ChronosTrigger.cs"/>
     <Compile Include="src\Cwaff-Actives\InsurancePolicy.cs"/>
     <Compile Include="src\Cwaff-Actives\Itemfinder.cs"/>
     <Compile Include="src\PlayerProjectilePooler.cs"/>
