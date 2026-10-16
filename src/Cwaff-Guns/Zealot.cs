@@ -12,7 +12,7 @@ public class Zealot : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Zealot>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SHITTY, reloadTime: 0.75f, ammo: 1200, shootFps: 60, reloadFps: 12,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SHITTY, reloadTime: 0.00f, ammo: 1200, shootFps: 60, reloadFps: 12,
             muzzleFps: 60, muzzleScale: 0.5f, muzzleAnchor: Anchor.MiddleLeft, attacksThroughWalls: true, fireAudio: "zealot_shoot_sound",
             canAttackWhileRolling: false)
           .InitProjectile(GunData.New(sprite: "zealot_projectile", clipSize: -1, cooldown: 0.1f, shootStyle: ShootStyle.Automatic, customClip: true,
