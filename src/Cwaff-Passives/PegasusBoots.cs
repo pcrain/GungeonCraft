@@ -4,8 +4,8 @@ public class PegasusBoots : CwaffDodgeRollItem
 {
     public static string ItemName         = "Pegasus Boots";
     public static string ShortDescription = "Dashingly Stylish";
-    public static string LongDescription  = "Hold dodge while standing still to charge up a dash. Dashing destroys bullets, deals high damage to enemies, and grants immunity to most forms of contact damage. Dashing cannot cross pits or be interrupted until rebounding off a solid object.";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Hold dodge while standing still to charge up a dash. Dashing destroys bullets, deals high damage to enemies, and grants immunity to most forms of contact damage. Dashes cannot cross pits or be interrupted until rebounding off a solid object.";
+    public static string Lore             = "These boots were once owned by a green-clad lad whose ears were bigger than his feet. They served him well for many adventures, but repeatedly crashing into walls caused enough head trauma that his short term memory was permanently affected. He forgot about these boots mere seconds after taking them off to take a quick swim.";
 
     private PegasusBootsRoll _dodgeRoller = null;
 

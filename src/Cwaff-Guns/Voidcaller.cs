@@ -4,8 +4,8 @@ public class Voidcaller : CwaffGun
 {
     public static string ItemName         = "Voidcaller";
     public static string ShortDescription = "Ascetic Aesthetic";
-    public static string LongDescription  = "Fires an extra projectile for each of the following the player has none of: keys, blanks, casings, hearts, armor, passives, actives, and (other) guns.";
-    public static string Lore             = "TBD";
+    public static string LongDescription  = "Fires an extra projectile for each of the following the player possesses none of: keys, blanks, casings, hearts, armor, passives, actives, and additional guns. Undroppable guns and items do not count towards possessions.";
+    public static string Lore             = "For the Gungeoneer who has everything, this gun offers nothing. For the Gungeoneer who has nothing, this gun...still doesn't offer very much, but at least it's signficantly more than nothing!";
 
     private enum VoidType { Default, Key, Blank, Casing, Heart, Armor, Passive, Active, Gun }
 

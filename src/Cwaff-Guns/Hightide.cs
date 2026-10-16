@@ -5,7 +5,7 @@ public class Hightide : CwaffGun
     public static string ItemName         = "Hightide";
     public static string ShortDescription = "Washed Up";
     public static string LongDescription  = "Fires a slow-moving tidal wave that pushes enemies backwards and can hit them multiple times. Longer charge times result in larger waves.";
-    public static string Lore             = "";
+    public static string Lore             = "Lost for centuries at the bottom of Davy Jones' Locker, this cannon has assimilated the very essence of the ocean. As it happens, the overwhelming majority of that essence is water. The sand comprising the gun's barrel has also absorbed an incredible amount of water. Furthermore, the gun's barrel is absolutely overflowing with water. It cannot be overstated how much water has been imbued, absorbed, and contained within this gun.";
 
     private const int   _MAX_PROJECTILES       = 6;
     private const float _CHARGE_PER_PROJECTILE = 0.55f;

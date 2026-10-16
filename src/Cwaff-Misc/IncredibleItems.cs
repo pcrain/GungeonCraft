@@ -103,6 +103,7 @@ public static class IncredibleItems
     }
 }
 
+[Cerealized]
 public class GunCarryingCase : CwaffPassive
 {
     public static string ItemName         = "Gun Carrying Case";
@@ -116,6 +117,7 @@ public class GunCarryingCase : CwaffPassive
     }
 }
 
+[Cerealized]
 public class WWIRations : CwaffActive
 {
     public static string ItemName         = "WWI Rations";
@@ -135,6 +137,7 @@ public class WWIRations : CwaffActive
     }
 }
 
+[Cerealized]
 public class Headstone : CwaffPassive
 {
     public static string ItemName         = "Headstone";
@@ -187,6 +190,7 @@ public class Headstone : CwaffPassive
     }
 }
 
+[Cerealized]
 public class AssassinBullets : CwaffPassive
 {
     public static string ItemName         = "Assassin Bullets";
@@ -221,6 +225,7 @@ public class AssassinBullets : CwaffPassive
     }
 }
 
+[Cerealized]
 public class MasterKey : CwaffActive
 {
     public static string ItemName         = "Master Key";
@@ -257,6 +262,7 @@ public class MasterKey : CwaffActive
     }
 }
 
+[Cerealized]
 public class HealthyHeart : CwaffPassive
 {
     public static string ItemName         = "Healthy Heart";

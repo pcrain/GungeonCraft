@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class ChronosTrigger : CwaffActive
 {
     public static string ItemName         = "Chronos' Trigger";
-    public static string ShortDescription = "TBD";
+    public static string ShortDescription = "A Timeless Classic";
     public static string LongDescription  = "Halts the flow of time for all enemy projectiles around the player for a short duration. Bullets cannot collide with the player while halted.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A large, egg-shaped device with a revolver's trigger inexplicably formed into its core. Pulling the trigger doesn't fire any bullets, but does have a noticeable effect on bullets fired at you. Observing this effect leads you to the revolutionary conclusion that bullets are rather useless without the flow of time on their side.";
 
     private Material _renderPass = null;
     private Coroutine _activeTimestop = null;

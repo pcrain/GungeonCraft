@@ -47,6 +47,7 @@ global using ExoticObjects            = Alexandria.DungeonAPI.SetupExoticObjects
 global using StaticReferences         = Alexandria.DungeonAPI.StaticReferences;
 global using CustomShopController     = Alexandria.NPCAPI.CustomShopController;
 global using CustomShopItemController = Alexandria.NPCAPI.CustomShopItemController;
+global using Cerealized               = UnityEngine.SerializeField;
 
 global using static ProjectileModule;        //ShootStyle, ProjectileSequenceStyle
 global using static tk2dBaseSprite;          //Anchor
