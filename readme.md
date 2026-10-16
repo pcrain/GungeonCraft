@@ -9,10 +9,10 @@
 
 ### Features
 
-- 174 new items, including
-	+ 97 new guns
-	+ 53 new passive items
-	+ 24 new active items
+- 178 new items, including
+	+ 99 new guns
+	+ 54 new passive items
+	+ 25 new active items
 - Lore for all new guns and items
 - Two new custom characters: Rogo from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/) and Beatrix from [Slime Rancher](https://store.steampowered.com/app/433340/Slime_Rancher/)
 - 90 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach

@@ -1,9 +1,14 @@
 # Changelog
 
-## 1.33.0 (TBD)
+## 1.33.0 (2026-10-15)
+
+#### Features:
 
 - Added Hightide, Voidcaller, Pegasus Boots, and Chronos' Trigger
 - Added masteries for Hightide and Voidcaller
+
+#### Bugfixes and Misc:
+
 - Fixed mastered Scotsman's detonation cone not working properly on controller when aim direction is neutral
 - Fixed Armor Piercing Rounds breaking boss DPS caps even though they were specifically meant not to do that
 - Fixed null deref trying to update non-existent orbital VFX for Soul Kaliber's soul link effect
