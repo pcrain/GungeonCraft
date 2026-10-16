@@ -73,18 +73,19 @@ def main():
 
   # Process synergies
   synergies = {}
+  lastline = ""
   with open(MODSYNERGYFILE, 'r') as fin:
     try:
       while line := next(fin):
         sline = line.strip()
-        if sline.startswith("NewSynergy"):
-          comment = lastline.replace("// ","").replace("//","")
-          name = sline.split('"')[1]
+        if lastline.startswith("NewSynergy"):
+          comment = sline.split('"')[1]
+          name = lastline.split('"')[1]
           sid = "#"+name.upper().replace("\n", "").replace("\\", "").replace("\"", "").replace(" ", "_").replace(".", "").replace("-", "")
           synergies[sid] = {"name": name, "notes" : comment }
-        elif sline.startswith("NewMastery"):
-          comment = lastline.replace("// ","").replace("//","")
-          sname = sline.split('(')[1].split(',')[0]
+        elif lastline.startswith("NewMastery"):
+          comment = sline.split('"')[1]
+          sname = lastline.split('(')[1].split(',')[0]
           gunname = items[getId(modprefix, sname.replace("MASTERY_",""))]["name"]
           name = "Mastery of " + gunname
           sid = "#"+getId(None, gunname+" Mastery").upper()

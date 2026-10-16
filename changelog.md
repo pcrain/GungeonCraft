@@ -16,6 +16,7 @@
 - Fixed potential null deref caused by Chain Driver trying to spawn despawned links as debris
 - Fixed potential null deref caused by Sunderbuss trying to spawn despawned shrapnel as debris
 - Fixed lighting issues and rendering artifacts caused by screen shaders attempting to use alpha blending instead of opaque rendering
+- Fixed issue with synergies in external ItemTips file having messed up formatting and mixed up entries
 
 ## 1.32.6 (2026-10-08)
 
