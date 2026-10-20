@@ -181,6 +181,8 @@ public static class CwaffSynergies
           tip: "Grants stealth upon entering a room with Death Note equipped.");
         NewSynergy(BEDTIME_ROUTINE, "Bedtime Routine", new[]{IName(Toothpaste.ItemName), IName(ComfySlippers.ItemName)},
           tip: "Toothpaste goop spreads underneath the player's feet while walking around.");
+        NewSynergy(METAL_DETECTOR, "Metal Detector", new[]{IName(Cleansweep.ItemName), IName(Itemfinder.ItemName)},
+          tip: "Minesweeper grids are fully revealed to the player.");
 
       #endregion
 
@@ -787,6 +789,7 @@ public enum Synergy {
     BOARD_AND_CARD_GAME_NIGHT,
     ILL_TAKE_A_POTATO_CHIP,
     BEDTIME_ROUTINE,
+    METAL_DETECTOR,
 
     // Masteries
     MASTERY_GRANDMASTER,

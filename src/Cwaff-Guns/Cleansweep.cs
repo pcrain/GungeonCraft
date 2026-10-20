@@ -173,6 +173,7 @@ public class MinesweeperTile : MonoBehaviour
     internal bool _revealed          = false;
     internal bool _flagged           = false;
     internal float _lastAlpha        = 0.0f;
+    internal bool _detonated         = false;
 
     public bool IsRevealed => this._revealed;
     public bool IsFlagged => this._flagged;
@@ -241,6 +242,7 @@ public class MinesweeperTile : MonoBehaviour
         tile._br                            = tile._tl + new Vector2(tileSize, tileSize);
         tile._labelPos                      = tile._tl + new Vector2(tileSize * 0.6f, tileSize * 0.3f);
         tile._color                         = (number < 0) ? Color.red : _NumberColors[0];
+        tile._detonated                     = number >= 0;
         tile._number                        = number;
         tile._numberLabel.Text              = (number <= 0) ? string.Empty : $"{number}";
         tile._numberLabel.TextScale         = 0.5f * tileSize;
@@ -261,12 +263,17 @@ public class MinesweeperTile : MonoBehaviour
 
     public void Reveal(bool detonateMines = true, bool playSounds = true)
     {
-        if (this._revealed || this._flagged)
+        if (this._flagged)
+            return;
+        if (this._revealed && (this._detonated || !detonateMines))
             return;
         this._revealed = true;
         this._lifetime = 0f;
-        if (this.IsMine && detonateMines)
+        if (!this._detonated && detonateMines)
+        {
+            this._detonated = true;
             Exploder.Explode(this._center, Cleansweep._MineExplosion, Vector2.zero, ignoreQueues: true, ignoreDamageCaps: true);
+        }
         else if (playSounds)
             base.gameObject.PlayOnce("minesweeper_place_sound");
     }
@@ -320,6 +327,7 @@ public class MinesweeperGame : MonoBehaviour
     private Queue<MinesweeperTile> _revealQueue              = new();
     private float _nextRevealTime                            = 0f;
     private int _tileSize                                    = 2;
+    private bool _revealTiles                                = false;
 
     public static void StartGame(PlayerController player, bool mastered)
     {
@@ -345,6 +353,7 @@ public class MinesweeperGame : MonoBehaviour
         this._tiles      = new List<MinesweeperTile>();
         this._tileMap    = new Dictionary<IntVector2, MinesweeperTile>();
         this._gameRoom   = this._player.CurrentRoom;
+        this._revealTiles = this._player.HasSynergy(Synergy.METAL_DETECTOR);
         this._gameRoom.OnEnemiesCleared += this.OnRoomCleared;
         this._spawner    = StartCoroutine(PopulateGrid());
         RegisterEvents();
@@ -519,6 +528,8 @@ public class MinesweeperGame : MonoBehaviour
                 MinesweeperTile newTile = MinesweeperTile.Setup(tilePos, _Mines.Contains(tilePos) ? -1 : neighborMines, this._tileSize);
                 if (this._tiles.Count == 0)
                     this._revealQueue.Enqueue(newTile); // first tile automatically gets added to reveal queue
+                else if (this._revealTiles)
+                    this.RevealTile(newTile, detonateMines: false);
                 this._tiles.Add(newTile);
                 this._tileMap[tilePos] = newTile;
             }
@@ -532,11 +543,9 @@ public class MinesweeperGame : MonoBehaviour
         yield break;
     }
 
-    private void RevealTile(MinesweeperTile tile)
+    private void RevealTile(MinesweeperTile tile, bool detonateMines)
     {
-        if (tile.IsRevealed)
-            return;
-        tile.Reveal(detonateMines: true, playSounds: true);
+        tile.Reveal(detonateMines: detonateMines, playSounds: true);
         if (!tile.IsSafe)
             return;
         // if the tile has 0 mines next to it, reveal adjacent tiles
@@ -571,6 +580,9 @@ public class MinesweeperGame : MonoBehaviour
     }
 
     private const float _PROFILE_RATE = 0.5f;
+    private const float _MAX_TILE_ALPHA = 0.75f;
+    private const float _MIN_TILE_ALPHA = 0.25f;
+    private const float _DLT_TILE_ALPHA = _MAX_TILE_ALPHA - _MIN_TILE_ALPHA;
     // private static float _NextProfile = 0.0f;
     private void OnFinishedFrame()
     {
@@ -604,6 +616,7 @@ public class MinesweeperGame : MonoBehaviour
         float alpha                = this._dismissing ? this._dismissTime : 1.0f;
         float adj                  = ((this._tiles.Count > 0) && this._tiles[0]) ? (this._tiles[0]._numberLabel.PixelsToUnits() / uiScale) : 0.0f;
         float offscreenPercent     = 0.10f / this._tileSize;
+        Color dangerColor          = Color.Lerp(Color.red, Color.white, Ease.InOutQuad(Mathf.Abs(Mathf.Sin(3f * now))));
         // precompute camera transform conversion matrix for more quickly computing label positions, thanks AI O:
         CameraController mcc       = GameManager.Instance.MainCameraController;
         Camera mainCam             = mcc.Camera;
@@ -629,10 +642,12 @@ public class MinesweeperGame : MonoBehaviour
                   ease = 0f;
               Color renderColor = tile._revealed ? tile._color : tile._flagged ? _FlaggedColor : _UnknownColor;
               tile._square.Place(
-                color : renderColor.WithAlpha(alpha * (0.75f - 0.5f * percentDone)),
+                color : renderColor.WithAlpha(alpha * (_MAX_TILE_ALPHA - _DLT_TILE_ALPHA * percentDone)),
                 pos   : tile._tl - ease * Vector2.one,
                 pos2  : tile._br + ease * Vector2.one);
             }
+            else if (tile._revealed && !tile._detonated)
+              tile._square.Place(color : dangerColor.WithAlpha(_MIN_TILE_ALPHA), pos : tile._tl, pos2 : tile._br);
 
             // update tile label
             if (tile._number > 0) // optimization: don't draw the label if it's empty
@@ -664,11 +679,11 @@ public class MinesweeperGame : MonoBehaviour
                 continue;
             MinesweeperTile enemyTile = null;
             if (this._tileMap.TryGetValue(body.UnitBottomCenter.QuantizeTileRound(this._tileSize), out enemyTile))
-                RevealTile(enemyTile);
+                RevealTile(enemyTile, detonateMines: true);
             if (this._tileMap.TryGetValue(body.UnitBottomLeft.QuantizeTileRound(this._tileSize), out enemyTile))
-                RevealTile(enemyTile);
+                RevealTile(enemyTile, detonateMines: true);
             if (this._tileMap.TryGetValue(body.UnitBottomRight.QuantizeTileRound(this._tileSize), out enemyTile))
-                RevealTile(enemyTile);
+                RevealTile(enemyTile, detonateMines: true);
         }
 
         // update targeted tile
@@ -680,7 +695,7 @@ public class MinesweeperGame : MonoBehaviour
         if (numToReveal > 0 && this._nextRevealTime <= now)
         {
             for (int n = 0; n < numToReveal; ++n)
-                RevealTile(this._revealQueue.Dequeue());
+                RevealTile(this._revealQueue.Dequeue(), detonateMines: false);
             this._nextRevealTime = now + SPAWN_DELAY;
         }
     }
@@ -690,7 +705,7 @@ public class MinesweeperGame : MonoBehaviour
         IntVector2 curTile = player.SpriteBottomCenter.XY().FloorToInt().ToIntVector2().QuantizeRound(this._tileSize);
         bool validTile = this._tileMap.TryGetValue(curTile, out MinesweeperTile standingTile);
         if (validTile && !standingTile.IsFlagged) // don't reveal flagged tiles so we can safely walk over them
-            this._revealQueue.Enqueue(standingTile);
+            RevealTile(standingTile, detonateMines: true);
     }
 
     private void RegisterEvents()
