@@ -7,6 +7,7 @@
 - Resprited Rat Poison
 - Rebalanced Plot Armor to always spawn 2 armor pickups (or 3, for zero-health characters)
 - Scotsman's mastery now passively grants explosion damage immunity
+- Fixed null deref caused by Scotsman targeting it's own non-existent HealthHaver when trying to detonate explosive enemies
 
 ## 1.33.0 (2026-10-15)
 

@@ -202,7 +202,7 @@ public class Scotsman : CwaffGun
             if (!b.explodesOnBreak || b.explosionData == null)
             {
                 ExplosionData ed = GameManager.Instance.Dungeon.sharedSettingsPrefab.DefaultSmallExplosionData.Clone();
-                ed.damageToPlayer = 0f;
+                ed.damageToPlayer = 0f; // REFACTOR: just create this once statically
                 Exploder.Explode(position: bpos, data: ed, sourceNormal: Vector2.zero, ignoreQueues: true);
             }
             else
@@ -232,11 +232,11 @@ public class Scotsman : CwaffGun
         foreach (AIActor enemy in barrelPos.XY().AllEnemiesWithinConeOfVision(
           coneAngle: gunAngle, maxDeviation: 0.5f * _CONE_SPREAD, maxDistance: _CONE_MAG, ignoreWalls: true, includeInvulnerable: false))
         {
-            if (enemy.IsSignatureEnemy || enemy.healthHaver.IsBoss)
+            if (enemy.IsSignatureEnemy || enemy.healthHaver is not HealthHaver hh || hh.IsBoss)
                 continue;
             if (enemy.GetComponent<ExplodeOnDeath>() is not ExplodeOnDeath sploder || sploder.immuneToIBombApp)
                 continue;
-            healthHaver.ApplyDamage(2.1474836E+09f, Vector2.zero, "DetonateTheWorld", CoreDamageTypes.None, DamageCategory.Normal, true);
+            hh.ApplyDamage(2.1474836E+09f, Vector2.zero, "DetonateTheWorld", CoreDamageTypes.None, DamageCategory.Normal, true);
             anythingDetonated = true;
         }
         return anythingDetonated;
