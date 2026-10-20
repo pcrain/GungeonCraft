@@ -6,6 +6,7 @@
 - Tweaked inner outline colors in sprites for Chronos' Trigger and Pegasus Boots
 - Resprited Rat Poison
 - Rebalanced Plot Armor to always spawn 2 armor pickups (or 3, for zero-health characters)
+- Scotsman's mastery now passively grants explosion damage immunity
 
 ## 1.33.0 (2026-10-15)
 

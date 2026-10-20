@@ -245,7 +245,7 @@ public static class CwaffSynergies
         NewMastery<MasteryOfKALI>(MASTERY_KALI, KALI.ItemName,
           tip: "Shots ignore the invulnerable phases of most enemies and no longer prevent enemies from dropping casings or other rewards.");
         NewMastery<MasteryOfScotsman>(MASTERY_SCOTSMAN, Scotsman.ItemName,
-          tip: "Reloading detonates any decor or explosive enemies in a large cone in front of the player. Exploding decor will not damage the player, but explosive enemies will.");
+          tip: "Reloading detonates any decor or explosive enemies in a large cone in front of the player, and Scotsman passively grants explosion damage immunity.");
         NewMastery<MasteryOfCarpetBomber>(MASTERY_CARPET_BOMBER, CarpetBomber.ItemName,
           tip: "Carpet Bomber's charge rate is quadrupled and projectiles travel twice as quickly")
             .MultChargeRate(4f).MultProjSpeed(2f);

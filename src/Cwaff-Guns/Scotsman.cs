@@ -40,6 +40,13 @@ public class Scotsman : CwaffGun
         DetonateStickies(player);
     }
 
+    public override void OnMasteryStatusChanged()
+    {
+      base.OnMasteryStatusChanged();
+      if (this.Mastered && this.PlayerOwner)
+        this.PlayerOwner.SetImmuneToExplosionDamage(true, ItemName);
+    }
+
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
@@ -59,11 +66,14 @@ public class Scotsman : CwaffGun
     public override void OnPlayerPickup(PlayerController player)
     {
         player.OnEnteredCombat += this.OnEnteredCombat;
+        if (this.Mastered)
+          player.SetImmuneToExplosionDamage(true, ItemName);
         base.OnPlayerPickup(player);
     }
     public override void OnDroppedByPlayer(PlayerController player)
     {
         player.OnEnteredCombat -= this.OnEnteredCombat;
+        player.SetImmuneToExplosionDamage(false, ItemName);
         if (this._meshRenderer)
             this._meshRenderer.enabled = false;
         base.OnDroppedByPlayer(player);
@@ -75,6 +85,7 @@ public class Scotsman : CwaffGun
         {
             this.PlayerOwner.forceAimPoint = null;
             this.PlayerOwner.OnEnteredCombat -= this.OnEnteredCombat;
+            this.PlayerOwner.SetImmuneToExplosionDamage(false, ItemName);
         }
         if (this._coneMeshObject)
             UnityEngine.Object.Destroy(this._coneMeshObject);
