@@ -3,6 +3,7 @@
 ## 1.33.1 (TBD)
 
 - Changed Zealot's reload time to 0 seconds to remove unintended way of temporarily ceasing fire
+- Tweaked inner outline colors in sprites for Chronos' Trigger and Pegasus Boots
 
 ## 1.33.0 (2026-10-15)
 
