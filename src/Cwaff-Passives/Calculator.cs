@@ -30,3 +30,34 @@ public class Calculator : CwaffPassive
     }
 }
 
+[HarmonyPatch]
+internal static class CalculatorPatches
+{
+    private const float _CHARGEBACK_CHANCE = 0.25f;
+
+    [HarmonyPatch(typeof(ShopItemController), nameof(ShopItemController.Interact))]
+    [HarmonyPatch(typeof(CustomShopItemController), nameof(CustomShopItemController.Interact))]
+    [HarmonyILManipulator]
+    private static void ShopItemControllerInteractPatchIL(ILContext il)
+    {
+        ILCursor cursor = new ILCursor(il);
+        while (cursor.TryGotoNext(MoveType.Before,
+          instr => instr.MatchCall<ShopItemController>("get_ModifiedPrice"),
+          instr => instr.MatchSub()
+          ))
+        {
+          cursor.Index++;
+          cursor.Emit(OpCodes.Ldarg_1); // PlayerController
+          cursor.CallPrivate(typeof(CalculatorPatches), nameof(CheckChargebacks));
+        }
+    }
+
+    private static int CheckChargebacks(int oldPrice, PlayerController player)
+    {
+      if (UnityEngine.Random.value > _CHARGEBACK_CHANCE)
+        return oldPrice;
+      if (!player.HasSynergy(Synergy.CHARGEBACK))
+        return oldPrice;
+      return 0; // TODO: might be worth adding a sound / VFX thingy here
+    }
+}

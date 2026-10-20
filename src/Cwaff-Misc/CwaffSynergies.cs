@@ -187,6 +187,8 @@ public static class CwaffSynergies
           tip: "Automatically fires 3 Knight, Bishop, Rook, and Queen pieces upon entering combat.");
         NewSynergy(HELL_OR_HIGH_WATER, "Hell or High Water", new[]{IName(Hightide.ItemName), "cursed_bullets"},
           tip: "Hightide's projectiles deal an extra 30% damage to Jammed enemies per point of curse.");
+        NewSynergy(CHARGEBACK, "Chargeback", new[]{IName(CreditCard.ItemName), IName(Calculator.ItemName)},
+          tip: "Shop purchases have a 25% chance to consume zero casings.");
 
       #endregion
 
@@ -796,6 +798,7 @@ public enum Synergy {
     METAL_DETECTOR,
     PREMOVE,
     HELL_OR_HIGH_WATER,
+    CHARGEBACK,
 
     // Masteries
     MASTERY_GRANDMASTER,
