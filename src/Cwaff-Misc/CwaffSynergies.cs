@@ -183,6 +183,8 @@ public static class CwaffSynergies
           tip: "Toothpaste goop spreads underneath the player's feet while walking around.");
         NewSynergy(METAL_DETECTOR, "Metal Detector", new[]{IName(Cleansweep.ItemName), IName(Itemfinder.ItemName)},
           tip: "Minesweeper grids are fully revealed to the player.");
+        NewSynergy(PREMOVE, "Premove", new[]{IName(Grandmaster.ItemName), IName(Calculator.ItemName)},
+          tip: "Automatically fires 3 Knight, Bishop, Rook, and Queen pieces upon entering combat.");
 
       #endregion
 
@@ -790,6 +792,7 @@ public enum Synergy {
     ILL_TAKE_A_POTATO_CHIP,
     BEDTIME_ROUTINE,
     METAL_DETECTOR,
+    PREMOVE,
 
     // Masteries
     MASTERY_GRANDMASTER,

@@ -51,18 +51,62 @@ public class Grandmaster : CwaffGun
     {
         base.OnPlayerPickup(player);
         player.OnChestBroken += this.OnChestBroken;
+        player.OnEnteredCombat += this.OnEnteredCombat;
+    }
+
+    private static readonly List<ChessPieces> _PremovePieces = [
+        ChessPieces.Rook,
+        ChessPieces.Bishop,
+        ChessPieces.Knight,
+        ChessPieces.Queen,
+    ];
+
+    private void OnEnteredCombat()
+    {
+        if (this.PlayerOwner is not PlayerController player)
+          return;
+        if (!player.HasSynergy(Synergy.PREMOVE))
+          return;
+        player.StartCoroutine(DoPremoves(player));
+    }
+
+    private IEnumerator DoPremoves(PlayerController player)
+    {
+        const int PREMOVE_COUNT = 3;
+        const float GAP = 0.1f;
+
+        SpeculativeRigidbody shooter = player.specRigidbody;
+        for (int j = 0; j < PREMOVE_COUNT; ++j)
+        {
+          for (int i = 0; i < _PremovePieces.Count; ++i)
+          {
+            Vector2 spawnPos = player.CenterPosition;
+            float angle = player.m_currentGunAngle;
+            Projectile p = VolleyUtility.ShootSingleProjectile(
+              Grandmaster._Projectile, spawnPos + Lazy.RandomVector(0.5f * UnityEngine.Random.value), angle, false, player);
+            p.gameObject.GetComponent<PlayChessBehavior>().Setup(_PremovePieces[i]);
+            p.Owner = player;
+            p.Shooter = shooter;
+            player.DoPostProcessProjectile(p);
+            yield return new WaitForSeconds(GAP);
+          }
+        }
     }
 
     public override void OnDroppedByPlayer(PlayerController player)
     {
         player.OnChestBroken -= this.OnChestBroken;
+        player.OnEnteredCombat -= this.OnEnteredCombat;
         base.OnDroppedByPlayer(player);
     }
 
     public override void OnDestroy()
     {
         if (this.PlayerOwner)
+        {
             this.PlayerOwner.OnChestBroken -= this.OnChestBroken;
+            this.PlayerOwner.OnEnteredCombat -= this.OnEnteredCombat;
+        }
         base.OnDestroy();
     }
 
@@ -397,6 +441,7 @@ public class PlayChessBehavior : MonoBehaviour
     private Projectile _projectile  = null;
     private PlayerController _owner = null;
     private ChessPiece _piece       = null;
+    private bool _setup             = false;
 
     private static readonly List<ChessPieces> _PiecePool = new() {
         ChessPieces.Pawn,
@@ -426,24 +471,36 @@ public class PlayChessBehavior : MonoBehaviour
         ChessPieces.Queen, // 1 queen (and 0 kings for now)
     };
 
+    public void Setup(ChessPieces chessPiece)
+    {
+      this._projectile = base.GetComponent<Projectile>();
+      this._owner      = this._projectile.Owner as PlayerController;
+      if (!this._owner)
+          return;
+
+      if (this._projectile.gameObject.AddComponent<ChessPiece>() is ChessPiece oldChessPiece)
+        UnityEngine.Object.Destroy(oldChessPiece);
+      switch(chessPiece)
+      {
+          case ChessPieces.Pawn:   this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();   break;
+          case ChessPieces.Rook:   this._piece = this._projectile.gameObject.AddComponent<RookPiece>();   break;
+          case ChessPieces.Bishop: this._piece = this._projectile.gameObject.AddComponent<BishopPiece>(); break;
+          case ChessPieces.Knight: this._piece = this._projectile.gameObject.AddComponent<KnightPiece>(); break;
+          case ChessPieces.Queen:  this._piece = this._projectile.gameObject.AddComponent<QueenPiece>();  break;
+          // case ChessPieces.King:   this._piece = this._projectile.gameObject.AddComponent<KingPiece>();   break;
+          default:                 this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();   break;
+      }
+
+      this._piece.Setup(this._projectile, this._owner, isBlackPiece);
+      this._setup = true;
+    }
+
     private void Start()
     {
+        if (this._setup)
+          return;
         this._projectile = base.GetComponent<Projectile>();
-        this._owner      = this._projectile.Owner as PlayerController;
-        if (!this._owner)
-            return;
-
-        switch((this._owner.HasSynergy(Synergy.MASTERY_GRANDMASTER) ? _MasteredPiecePool : _PiecePool).ChooseRandom())
-        {
-            case ChessPieces.Pawn:   this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();   break;
-            case ChessPieces.Rook:   this._piece = this._projectile.gameObject.AddComponent<RookPiece>();   break;
-            case ChessPieces.Bishop: this._piece = this._projectile.gameObject.AddComponent<BishopPiece>(); break;
-            case ChessPieces.Knight: this._piece = this._projectile.gameObject.AddComponent<KnightPiece>(); break;
-            case ChessPieces.Queen:  this._piece = this._projectile.gameObject.AddComponent<QueenPiece>();  break;
-            // case ChessPieces.King:   this._piece = this._projectile.gameObject.AddComponent<KingPiece>();   break;
-            default:                 this._piece = this._projectile.gameObject.AddComponent<PawnPiece>();   break;
-        }
-
-        this._piece.Setup(this._projectile, this._owner, isBlackPiece);
+        this._owner = this._projectile.Owner as PlayerController;
+        Setup(((this._owner && this._owner.HasSynergy(Synergy.MASTERY_GRANDMASTER)) ? _MasteredPiecePool : _PiecePool).ChooseRandom());
     }
 }
