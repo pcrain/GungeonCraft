@@ -4,11 +4,10 @@ public class PlotArmor : CwaffPassive
 {
     public static string ItemName         = "Plot Armor";
     public static string ShortDescription = "Can't Die Yet";
-    public static string LongDescription  = "Upon first entering a boss room foyer, spawns enough armor pickups to bring the player to 3 total armor (4 for zero-health characters). Always grants at least 1 armor.";
+    public static string LongDescription  = "Upon first entering a boss room foyer, spawns 2 armor pickups (or 3, for zero-health characters).";
     public static string Lore             = "The single most effective piece of armor ever created, under the right circumstances. The amount of protection it actually offers seems to vary from person to person over time, and the Gungeon's best blacksmiths are still trying to figure out how to fully harness the properties of \"plot\" to their advantage.";
 
-    internal const int _MIN_PLAYER_ARMOR  = 3;
-    internal const int _MIN_ARMOR_TO_GIVE = 1;
+    internal const int _ARMOR_TO_GIVE = 2;
 
     private RoomHandler _lastVisitedRoom  = null;
 
@@ -34,9 +33,7 @@ public class PlotArmor : CwaffPassive
         if (room == null || room.hasEverBeenVisited || room != ChestTeleporterItem.FindBossFoyer())
             return;
 
-        int minArmor = _MIN_PLAYER_ARMOR + (this.Owner.ForceZeroHealthState ? 1 : 0);
-        int currentArmor = (int)this.Owner.healthHaver.Armor;
-        int armorToGain = Mathf.Max(_MIN_ARMOR_TO_GIVE, minArmor - currentArmor);
+        int armorToGain = _ARMOR_TO_GIVE + (this.Owner.ForceZeroHealthState ? 1 : 0);
         this.Owner.StartCoroutine(SpawnSomeArmor(room, armorToGain));
 
         if (!this.Owner.HasSynergy(Synergy.DEUS_EX_MACHINA))
