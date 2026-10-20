@@ -189,6 +189,8 @@ public static class CwaffSynergies
           tip: "Hightide's projectiles deal an extra 30% damage to Jammed enemies per point of curse.");
         NewSynergy(CHARGEBACK, "Chargeback", new[]{IName(CreditCard.ItemName), IName(Calculator.ItemName)},
           tip: "Shop purchases have a 25% chance to consume zero casings.");
+        NewSynergy(RUGGED_TERRAIN, "Rugged Terrain", new[]{IName(CarpetBomber.ItemName), IName(ComfySlippers.ItemName)},
+          tip: "Carpet Bomber has infinite ammo while standing on carpets.");
 
       #endregion
 
@@ -799,6 +801,7 @@ public enum Synergy {
     PREMOVE,
     HELL_OR_HIGH_WATER,
     CHARGEBACK,
+    RUGGED_TERRAIN,
 
     // Masteries
     MASTERY_GRANDMASTER,

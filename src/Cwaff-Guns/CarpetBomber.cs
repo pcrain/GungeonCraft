@@ -68,8 +68,29 @@ public class CarpetBomber : CwaffGun
     public override void Update()
     {
         base.Update();
-        if (this.PlayerOwner)
-            this.gun.SynchronizeReloadAcrossAllModules(); // Synchronize ammo clips between projectile modules as necessary
+        if (this.PlayerOwner is not PlayerController player)
+          return;
+
+        this.gun.SynchronizeReloadAcrossAllModules(); // Synchronize ammo clips between projectile modules as necessary
+        if (!player.HasSynergy(Synergy.RUGGED_TERRAIN))
+          return;
+
+        CellVisualData.CellFloorType cellFloorType =
+          GameManager.Instance.Dungeon.GetFloorTypeFromPosition(player.specRigidbody.UnitBottomCenter);
+        bool onCarpet = cellFloorType == CellVisualData.CellFloorType.Carpet;
+        if (onCarpet == this.gun.LocalInfiniteAmmo)
+          return;
+
+        if (onCarpet)
+        {
+          this.gun.LocalInfiniteAmmo = true;
+          this.gun.DefaultModule.ammoCost = 0;
+        }
+        else
+        {
+          this.gun.LocalInfiniteAmmo = false;
+          this.gun.DefaultModule.ammoCost = 1;
+        }
     }
 
     public override void OnMasteryStatusChanged()
