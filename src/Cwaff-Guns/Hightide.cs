@@ -72,6 +72,8 @@ public class TidalSpreader : MonoBehaviour
         this._spawnPerp = (this._projectile.OriginalDirection() + 90f).ToVector();
         this._curSpread = 0.0f;
         this._mastered = this._projectile.Mastered<Hightide>();
+        if (this._owner && this._owner.HasSynergy(Synergy.HELL_OR_HIGH_WATER))
+          this._projectile.BlackPhantomDamageMultiplier += 0.3f * Mathf.Max(0f, this._owner.Curse());
         if (!this._mastered)
           return;
 

@@ -185,6 +185,8 @@ public static class CwaffSynergies
           tip: "Minesweeper grids are fully revealed to the player.");
         NewSynergy(PREMOVE, "Premove", new[]{IName(Grandmaster.ItemName), IName(Calculator.ItemName)},
           tip: "Automatically fires 3 Knight, Bishop, Rook, and Queen pieces upon entering combat.");
+        NewSynergy(HELL_OR_HIGH_WATER, "Hell or High Water", new[]{IName(Hightide.ItemName), "cursed_bullets"},
+          tip: "Hightide's projectiles deal an extra 30% damage to Jammed enemies per point of curse.");
 
       #endregion
 
@@ -793,6 +795,7 @@ public enum Synergy {
     BEDTIME_ROUTINE,
     METAL_DETECTOR,
     PREMOVE,
+    HELL_OR_HIGH_WATER,
 
     // Masteries
     MASTERY_GRANDMASTER,
