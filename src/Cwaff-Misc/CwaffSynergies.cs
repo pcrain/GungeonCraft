@@ -193,6 +193,8 @@ public static class CwaffSynergies
           tip: "Carpet Bomber has infinite ammo while standing on carpets.");
         NewSynergy(NIGHT_OF_NIGHTS, "Night of Nights", new[]{IName(AimuHakurei.ItemName), IName(IronMaid.ItemName)},
           tip: "Aimu Hakurei's projectiles are replaced with knives.");
+        NewSynergy(DOUBLE_DEALING_CHARACTER, "Double Dealing Character", new[]{IName(AimuHakurei.ItemName), IName(Blackjack.ItemName)},
+          tip: "Aimu Hakurei's projectiles are replaced with cards.");
 
       #endregion
 
@@ -805,6 +807,7 @@ public enum Synergy {
     CHARGEBACK,
     RUGGED_TERRAIN,
     NIGHT_OF_NIGHTS,
+    DOUBLE_DEALING_CHARACTER,
 
     // Masteries
     MASTERY_GRANDMASTER,

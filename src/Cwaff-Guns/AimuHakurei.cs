@@ -19,12 +19,15 @@ public class AimuHakurei : CwaffGun
     {
       NORMAL,
       KNIFE,
+      CARD,
     }
 
     internal static readonly int[] _GRAZE_TIER_THRESHOLDS  = {10, 30, 60, 100};
 
     internal static Projectile _ProjBase;
     internal static Projectile _ProjKunai;
+    internal static Projectile _ProjCard;
+    internal static Projectile _ProjCardWithSound;
     internal static GameObject _GrazeVFX;
 
     public int graze = 0;
@@ -47,6 +50,8 @@ public class AimuHakurei : CwaffGun
         _ProjBase = gun.InitFirstProjectile(GunData.New(damage: 8f, speed: 44f, range: 100f, force: 3f, sprite: "aimu_projectile", scale: 0.625f));
         _ProjKunai = _ProjBase.Clone(GunData.New(sprite: "aimu_kunai", damage: 3.5f, speed: 60f,
           hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound")).CopyAllImpactVFX(Items.Thunderclap);
+        _ProjCard = Blackjack._BlackjackProjectile;
+        _ProjCardWithSound = _ProjCard.Clone(GunData.New(spawnSound: "card_throw_sound"));
 
         Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f, spawnSound: "aimu_beam_sound_2"))
           .SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false,
@@ -98,6 +103,17 @@ public class AimuHakurei : CwaffGun
             KnifeMod(level: 4, fireRate: 4, gun: gun),
             // Tier 4 / Level 5
             KnifeMod(level: 5, fireRate: 2, gun: gun),
+          // Card Projectiles
+            // Tier 0 / Level 1
+            CardMod(level: 1, fireRate: 16, gun: gun),
+            // Tier 1 / Level 2
+            CardMod(level: 2, fireRate: 12, gun: gun),
+            // Tier 2 / Level 3
+            CardMod(level: 3, fireRate: 8, gun: gun),
+            // Tier 3 / Level 4
+            CardMod(level: 4, fireRate: 4, gun: gun),
+            // Tier 4 / Level 5
+            CardMod(level: 5, fireRate: 2, gun: gun),
         };
 
         _GrazeVFX = VFX.Create("graze_vfx", fps: 5, emissivePower: 5f);
@@ -233,6 +249,20 @@ public class AimuHakurei : CwaffGun
             shootStyle: ShootStyle.Burst, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
     }
 
+    private static ProjectileModule CardMod(float fireRate, int level, Gun gun)
+    {
+        List<Projectile> projectiles = new();
+        for (int i = 0; i < level; ++i)
+          projectiles.Add((i == 0) ? _ProjCardWithSound : _ProjCard);
+        return
+          new ProjectileModule() {
+            projectiles       = projectiles,
+            burstShotCount    = projectiles.Count,
+            burstCooldownTime = 0.0f }
+          .SetAttributes(GunData.New(gun: gun, ammoCost: 0, clipSize: -1, cooldown: C.FRAME * fireRate, angleVariance: 10f,
+            shootStyle: ShootStyle.Burst, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
+    }
+
     private static void AddTrail(Projectile p, float trailWidth, Color? trailColor = null)
     {
         EasyTrailBullet trail = p.gameObject.AddComponent<EasyTrailBullet>();
@@ -261,8 +291,11 @@ public class AimuHakurei : CwaffGun
 
     private void UpdateStrengthTier()
     {
-        if (this.PlayerOwner is PlayerController pc && pc.HasSynergy(Synergy.NIGHT_OF_NIGHTS))
+        PlayerController pc = this.PlayerOwner;
+        if (pc && pc.HasSynergy(Synergy.NIGHT_OF_NIGHTS))
           this.projType = ProjType.KNIFE;
+        else if (pc && pc.HasSynergy(Synergy.DOUBLE_DEALING_CHARACTER))
+          this.projType = ProjType.CARD;
         else
           this.projType = ProjType.NORMAL;
         int newStrengthTier = this.level + _GRAZE_LEVEL_MAX * (int)projType;

@@ -16,6 +16,7 @@ public class Blackjack : CwaffGun
     internal static tk2dSpriteAnimationClip _BackSprite;
     internal static tk2dSpriteAnimationClip _RedSprite;
     internal static tk2dSpriteAnimationClip _RedBackSprite;
+    internal static Projectile _BlackjackProjectile;
 
     public static void Init()
     {
@@ -33,13 +34,13 @@ public class Blackjack : CwaffGun
             AnimatedBullet.Create(refClip: ref _RedBackSprite, name: "playing_card_back_red", fps: 0, scale: 0.25f, anchor: Anchor.MiddleLeft))
           .SetAllImpactVFX(VFX.CreatePool("blackjack_card_impact_vfx", fps: 16, loops: false, scale: 0.75f, anchor: Anchor.MiddleCenter))
           .Attach<ThrownCard>()
-          .Assign(out Projectile p);
+          .Assign(out _BlackjackProjectile);
 
         gun.AddSynergyModules(Synergy.PIT_BOSS, new ProjectileModule().InitSingleProjectileModule(GunData.New(gun: gun, ammoCost: 0, clipSize: _CLIP_SIZE,
           cooldown: 0.16f, shootStyle: ShootStyle.Automatic, customClip: true, angleFromAim: 20f, angleVariance: 5f, ignoredForReloadPurposes: true,
           mirror: true, baseProjectile: Items._38Special.Projectile(), sprite: "chip_projectile", hitSound: "chess_move", becomeDebris: true)));
 
-        gun.AddSynergyFinalProjectile(Synergy.MASTERY_BLACKJACK, p.Clone().Attach<ThrownCard>(t => t.explosive = true), "blackjack_red", _CLIP_SIZE);
+        gun.AddSynergyFinalProjectile(Synergy.MASTERY_BLACKJACK, _BlackjackProjectile.Clone().Attach<ThrownCard>(t => t.explosive = true), "blackjack_red", _CLIP_SIZE);
     }
 }
 
