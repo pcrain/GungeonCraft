@@ -13,13 +13,23 @@ public class AimuHakurei : CwaffGun
     internal const float _GRAZE_COOLDOWN           = 1.0f;  // cooldown to prevent projectiles from being infinitely grazed
     internal const int   _GRAZE_PER_PROJECTILE     = 5;     // max amount of graze we can accumulate per projectile
     internal const int   _GRAZE_MAX                = 120;   // max amount of graze we can accumulate overall
+    internal const int   _GRAZE_LEVEL_MAX          = 5;     // max level for graze
+
+    public enum ProjType
+    {
+      NORMAL,
+      KNIFE,
+    }
 
     internal static readonly int[] _GRAZE_TIER_THRESHOLDS  = {10, 30, 60, 100};
 
     internal static Projectile _ProjBase;
+    internal static Projectile _ProjKunai;
     internal static GameObject _GrazeVFX;
 
     public int graze = 0;
+    public int level = 0;
+    public ProjType projType = ProjType.NORMAL;
 
     private float _lastDecayTime = 0f;
     private bool _focused = false;
@@ -35,6 +45,9 @@ public class AimuHakurei : CwaffGun
           .AssignGun(out Gun gun);
 
         _ProjBase = gun.InitFirstProjectile(GunData.New(damage: 8f, speed: 44f, range: 100f, force: 3f, sprite: "aimu_projectile", scale: 0.625f));
+        _ProjKunai = _ProjBase.Clone(GunData.New(sprite: "aimu_kunai", damage: 3.5f, speed: 60f,
+          hitEnemySound: "knife_hit_enemy_sound", hitWallSound: "knife_hit_wall_sound")).CopyAllImpactVFX(Items.Thunderclap);
+
         Projectile beamProj = Items._38Special.CloneProjectile(GunData.New(damage: 16.0f, speed: 300.0f, spawnSound: "aimu_beam_sound_2"))
           .SetAllImpactVFX(VFX.CreatePool("aimu_beam_impact", fps: 20, loops: false,
             emissivePower: 2.0f, emissiveColorPower: 8.0f, emissiveColour: new Color(1.0f, 0.5f, 0.75f)))
@@ -44,6 +57,7 @@ public class AimuHakurei : CwaffGun
 
         // set up tiered projectiles
         gun.Volley.projectiles = new(){
+          // Normal Projectiles
             // Tier 0 / Level 1
             AimuMod(level: 1, fireRate: 16, gun: gun, projectiles: new(){
                 AimuProj(invert: false, amplitude: 0.0f, sound: "aimu_shoot_sound",      trailWidth: 0.2f),
@@ -73,6 +87,17 @@ public class AimuHakurei : CwaffGun
                 AimuProj(invert: true,  amplitude: 2.25f, sound: "aimu_shoot_sound_alt", trailWidth: 0.5f, trailColor: Color.white),
                 beamProj,
                 }),
+          // Knife Projectiles
+            // Tier 0 / Level 1
+            KnifeMod(level: 1, fireRate: 16, gun: gun),
+            // Tier 1 / Level 2
+            KnifeMod(level: 2, fireRate: 12, gun: gun),
+            // Tier 2 / Level 3
+            KnifeMod(level: 3, fireRate: 8, gun: gun),
+            // Tier 3 / Level 4
+            KnifeMod(level: 4, fireRate: 4, gun: gun),
+            // Tier 4 / Level 5
+            KnifeMod(level: 5, fireRate: 2, gun: gun),
         };
 
         _GrazeVFX = VFX.Create("graze_vfx", fps: 5, emissivePower: 5f);
@@ -89,9 +114,11 @@ public class AimuHakurei : CwaffGun
         base.OnPlayerPickup(player);
         this.graze                   = 0; // reset graze when dropped
         this.gun.CurrentStrengthTier = 0;
+        this.level                   = 0;
         SetFocus(false);
         player.OnRollStarted += this.OnDodgeRoll;
         player.OnReceivedDamage += this.OnReceivedDamage;
+        UpdateStrengthTier();
     }
 
     private void OnReceivedDamage(PlayerController player)
@@ -128,6 +155,7 @@ public class AimuHakurei : CwaffGun
     {
         base.OnSwitchedToThisGun();
         SetFocus(false);
+        UpdateStrengthTier();
     }
 
     public override void OnSwitchedAwayFromThisGun()
@@ -179,6 +207,32 @@ public class AimuHakurei : CwaffGun
         return proj;
     }
 
+    private static ProjectileModule KnifeMod(float fireRate, int level, Gun gun)
+    {
+        const float _FOCUS_DIST = 8f;
+        const float _GAP = 0.75f;
+
+        float minOffset = (level - 1) * (-0.5f * _GAP);
+        List<Projectile> projectiles = new();
+        Vector2 target = new Vector2(_FOCUS_DIST, 0f);
+        for (int i = 0; i < level; ++i)
+        {
+          float offset = minOffset + _GAP * i;
+          Vector2 origin = new Vector2(0f, offset);
+          float relAngle = (target - origin).ToAngle();
+          Projectile p = _ProjKunai.ClonePrefab<Projectile>();
+          p.gameObject.AddComponent<AimuKnifeProjectileBehavior>().Setup(offset: offset, angle: relAngle, sound: i == 0 ? "knife_gun_fire" : null);
+          projectiles.Add(p);
+        }
+        return
+          new ProjectileModule() {
+            projectiles       = projectiles,
+            burstShotCount    = projectiles.Count,
+            burstCooldownTime = 0.0f }
+          .SetAttributes(GunData.New(gun: gun, ammoCost: 0, clipSize: -1, cooldown: C.FRAME * fireRate, angleVariance: 0f,
+            shootStyle: ShootStyle.Burst, sequenceStyle: ProjectileSequenceStyle.Ordered, customClip: true));
+    }
+
     private static void AddTrail(Projectile p, float trailWidth, Color? trailColor = null)
     {
         EasyTrailBullet trail = p.gameObject.AddComponent<EasyTrailBullet>();
@@ -205,23 +259,38 @@ public class AimuHakurei : CwaffGun
         UpdateGraze();
     }
 
+    private void UpdateStrengthTier()
+    {
+        if (this.PlayerOwner is PlayerController pc && pc.HasSynergy(Synergy.NIGHT_OF_NIGHTS))
+          this.projType = ProjType.KNIFE;
+        else
+          this.projType = ProjType.NORMAL;
+        int newStrengthTier = this.level + _GRAZE_LEVEL_MAX * (int)projType;
+        if (this.gun.CurrentStrengthTier != newStrengthTier)
+          this.gun.CurrentStrengthTier = newStrengthTier;
+    }
+
     private void PowerUp()
     {
-        while (this.gun.CurrentStrengthTier < _GRAZE_TIER_THRESHOLDS.Length && this.graze >= _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier])
-        {
-            ++this.gun.CurrentStrengthTier;
-            this.PlayerOwner.gameObject.PlayOnce("aimu_power_up_sound");
-            this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
-        }
+        int oldLevel = this.level;
+        while (this.level < _GRAZE_TIER_THRESHOLDS.Length && this.graze >= _GRAZE_TIER_THRESHOLDS[this.level])
+            ++this.level;
+        if (oldLevel == this.level)
+          return;
+        this.PlayerOwner.gameObject.PlayOnce("aimu_power_up_sound");
+        this.gun.gameObject.SetGlowiness(this.level * this.level);
+        UpdateStrengthTier();
     }
 
     private void PowerDown()
     {
-        while (this.gun.CurrentStrengthTier > 0 && this.graze < _GRAZE_TIER_THRESHOLDS[this.gun.CurrentStrengthTier - 1])
-        {
-            --this.gun.CurrentStrengthTier;
-            this.gun.gameObject.SetGlowiness(this.gun.CurrentStrengthTier * this.gun.CurrentStrengthTier);
-        }
+        int oldLevel = this.level;
+        while (this.level > 0 && this.graze < _GRAZE_TIER_THRESHOLDS[this.level - 1])
+            --this.level;
+        if (oldLevel == this.level)
+          return;
+        this.gun.gameObject.SetGlowiness(this.level * this.level);
+        UpdateStrengthTier();
     }
 
     private static LinkedList<Projectile> _GrazeCandidates = new();
@@ -304,10 +373,10 @@ public class AimuHakureiAmmoDisplay : CustomAmmoDisplay
         if (!this._owner)
             return false;
 
-        if (this._gun.CurrentStrengthTier < 4)
+        if (this._aimu.level < 4)
         {
             uic.SetAmmoCountLabelColor(Color.magenta);
-            uic.GunAmmoCountLabel.Text = $"{this._aimu.graze} - L{1 + this._gun.CurrentStrengthTier}";
+            uic.GunAmmoCountLabel.Text = $"{this._aimu.graze} - L{1 + this._aimu.level}";
         }
         else
         {
@@ -410,4 +479,29 @@ public class AimuHakureiProjectileMotionModule : ProjectileMotionModule
     {
         Initialize(((!projectileSprite) ? projectileTransform.position.XY() : projectileSprite.WorldCenter), projectileTransform, m_timeElapsed, m_currentDirection, shouldRotate);
     }
+}
+
+public class AimuKnifeProjectileBehavior : MonoBehaviour
+{
+  public float offset;
+  public float angle;
+  public string sound;
+
+  public void Setup(float offset, float angle, string sound)
+  {
+    this.offset = offset;
+    this.angle = angle;
+    this.sound = sound;
+  }
+
+  private void Start()
+  {
+    Projectile proj = base.gameObject.GetComponent<Projectile>();
+    float oldAngle = proj.transform.rotation.eulerAngles.z;
+    SpeculativeRigidbody body = proj.specRigidbody;
+    body.Position = new Position(body.Position.UnitPosition + (oldAngle + 90f).ToVector(offset));
+    proj.SendInDirection((oldAngle + this.angle).ToVector(), true, true);
+    if (!sound.IsNullOrWhiteSpace())
+      base.gameObject.Play(sound);
+  }
 }

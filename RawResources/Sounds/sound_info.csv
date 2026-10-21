@@ -209,7 +209,7 @@ femtobyte_shoot_sound,-3.0,1,sound,0
 kazooie_walk_a,-5.5,1,sound,0
 kazooie_walk_b,-5.5,1,sound,0
 knife_hit_wall_sound,-4.5,1,sound,0
-knife_hit_enemy_sound,-5.0,1,sound,0
+knife_hit_enemy_sound,-7.5,1,sound,1
 paintball_impact_enemy_sound,-5.5,1,sound,0
 bb_impact_sound,2.5,1,sound,0
 generic_bullet_impact,-2.0,1,sound,0

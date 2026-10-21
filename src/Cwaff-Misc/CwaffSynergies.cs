@@ -191,6 +191,8 @@ public static class CwaffSynergies
           tip: "Shop purchases have a 25% chance to consume zero casings.");
         NewSynergy(RUGGED_TERRAIN, "Rugged Terrain", new[]{IName(CarpetBomber.ItemName), IName(ComfySlippers.ItemName)},
           tip: "Carpet Bomber has infinite ammo while standing on carpets.");
+        NewSynergy(NIGHT_OF_NIGHTS, "Night of Nights", new[]{IName(AimuHakurei.ItemName), IName(IronMaid.ItemName)},
+          tip: "Aimu Hakurei's projectiles are replaced with knives.");
 
       #endregion
 
@@ -802,6 +804,7 @@ public enum Synergy {
     HELL_OR_HIGH_WATER,
     CHARGEBACK,
     RUGGED_TERRAIN,
+    NIGHT_OF_NIGHTS,
 
     // Masteries
     MASTERY_GRANDMASTER,
