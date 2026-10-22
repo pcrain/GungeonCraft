@@ -9,7 +9,7 @@
 - Scotsman's mastery now passively grants explosion damage immunity
 - Fixed null deref caused by Scotsman targeting it's own non-existent HealthHaver when trying to detonate explosive enemies
 - Added 7 new synergies
-- Shortened and cleaned up several weapon descriptions
+- Shortened and cleaned up several weapon and item descriptions
 
 ## 1.33.0 (2026-10-15)
 

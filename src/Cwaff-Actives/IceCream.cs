@@ -4,7 +4,7 @@ public class IceCream : CwaffActive
 {
     public static string ItemName         = "Ice Cream";
     public static string ShortDescription = "Frozen Treat to Warm the Heart";
-    public static string LongDescription  = "When used near an enemy with a gun, replaces their gun with ice cream. Enemies with ice cream are non-hostile, and will seek out other enemies with guns and try to share their ice cream.";
+    public static string LongDescription  = "When used near an enemy with a gun, replaces their gun with ice cream. Enemies with ice cream are non-hostile, and will try to share their ice cream with other gun-wielding enemies.";
     public static string Lore             = "The ice cream sundae is happiness in dairy format -- an irresistible, timeless classic that needs no introduction or explanation. Getting it into the hands of a frenzied Gundead may prove difficult, but that difficulty is more than made up for by the friendships you'll make by going through the effort of doing it anyway. :>";
 
     internal static GameObject _HeartVFX;

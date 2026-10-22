@@ -4,7 +4,7 @@ public class SuperColdWatch : CwaffPassive
 {
     public static string ItemName         = "Super Cold Watch";
     public static string ShortDescription = "Time Moves As You...Don't?";
-    public static string LongDescription  = "All other objects gradually slow down as the player moves, down to a minimum of 1/8 their normal speed. Standing still or dodge rolling will reset time to its normal speed.";
+    public static string LongDescription  = "All other objects gradually slow down as the player moves, down to a minimum of 1/8 of their normal speed. Standing still or dodge rolling will reset time to its normal speed.";
     public static string Lore             = "A Super Hot Watch that was left to cool off in the Hollow for far too long. You feel an otherworldly coldness and stillness in the air around you as you hold it, comparable to being permanently stuck in the moment of complete silence after telling a poorly received joke at a funeral.";
 
     private const float _BUILDUP_TIME = 5.0f;

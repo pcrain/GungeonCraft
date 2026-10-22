@@ -4,7 +4,7 @@ public class InsurancePolicy : CwaffActive
 {
     public static string ItemName         = "Insurance Policy";
     public static string ShortDescription = "Kill Your Past, not Your Future";
-    public static string LongDescription  = "Can be used when near a dropped item to insure it. Insured items will spawn in a special chest at the start of the next new run. Pseudo-restarts (such as those triggered by Clone) do not count as a new run for insurance purposes.";
+    public static string LongDescription  = "Use near a dropped item to insure it. Insured items will spawn in a special chest at the start of the next new run. Pseudo-restarts (such as those triggered by Clone) do not count as a new run for insurance purposes.";
     public static string Lore             = "You can never quite know what the Gungeon has in store for you. One moment you might be minding your own business fighting off a wave of Blobulons, the next moment you might find a bottomless pit has formed underneath your feet to consume you and all of your hard-earned loot. Regardless of the outcome of your journey into the Gungeon, a personalized insurance policy offers the peace of mind that you'll get a second chance to put your favorite item to poor use.";
 
     private const float _MAX_DIST = 5f;
