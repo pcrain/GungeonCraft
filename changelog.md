@@ -10,6 +10,8 @@
 - Fixed null deref caused by Scotsman targeting it's own non-existent HealthHaver when trying to detonate explosive enemies
 - Added 7 new synergies
 - Shortened and cleaned up several weapon and item descriptions
+- Removed mechanic from K.A.L.I. where ammo would be constantly drained while charging (the no casings downside is already enough)
+- Reduced K.A.L.I.'s ammo from 200 to 80 to compensate for lower overall ammo usage
 
 ## 1.33.0 (2026-10-15)
 

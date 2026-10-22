@@ -4,10 +4,8 @@ public class KALI : CwaffGun
 {
     public static string ItemName         = "K.A.L.I.";
     public static string ShortDescription = "Fission";
-    public static string LongDescription  = "Fires high-velocity piercing particles with high recoil. Projectile damage, velocity, and recoil are doubled at level 2 charge and again at level 3 charge. Destroys enemy projectiles at level 3 charge. Continuously drains ammo while charging. Killed enemies are obliterated and do not drop casings or pickups. ";
+    public static string LongDescription  = "Fires high-velocity piercing particles with high recoil. Projectile damage, velocity, and recoil are doubled at level 2 charge and again at level 3 charge. Destroys enemy projectiles at level 3 charge. Killed enemies are obliterated and do not drop casings or pickups.";
     public static string Lore             = "Developed by the nation of Gundia's Department of the Best Defense is a Good Offense, this high-powered handheld electron accelerator can instantaneously ionize most targets and anything in direct contact with them. Various ongoing attempts by the government to market the device to the nation's citizens as a children's toy, a water purifier, and a flashlight have all been criticized by major media outlets as 'irresponsible and asinine', although surveys suggest high market interest from the age 12-17 demographic.";
-
-    private const float _AMMO_DRAIN_RATE = 1.0f;
 
     internal static GameObject _IonizeVFX = null;
     internal static Projectile _KaliProjectile = null;
@@ -16,12 +14,11 @@ public class KALI : CwaffGun
     internal GameObject _timeShifter = null;
 
     private int _chargeLevel = -1;
-    private float _timeCharging = 0f;
 
     public static void Init()
     {
         Lazy.SetupGun<KALI>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 200, fireAudio: "kali_shoot_sound")
+          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 0.1f, ammo: 80, fireAudio: "kali_shoot_sound")
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(range: 9999f, force: 3f, cooldown: 0.1f, collidesWithProjectiles: true,
             clipSize: 1, sprite: "kali_projectile", shootStyle: ShootStyle.Charged, customClip: true))
@@ -71,18 +68,11 @@ public class KALI : CwaffGun
         if (!this.gun.IsCharging)
         {
             this._chargeLevel = -1;
-            this._timeCharging = 0f;
             this.gun.chargeAnimation = _ChargeAnimations[0];
             this.gun.sprite.usesOverrideMaterial = false;
             this.gun.sprite.renderer.material.SetFloat(CwaffVFX._EmissivePowerId, 0f);
             this.gun.sprite.UpdateMaterial();
             return;
-        }
-
-        if ((this._timeCharging += BraveTime.DeltaTime) > _AMMO_DRAIN_RATE)
-        {
-            this._timeCharging -= _AMMO_DRAIN_RATE;
-            this.gun.LoseAmmo(1);
         }
 
         int newChargeLevel = 1 + this.gun.GetChargeLevel();
