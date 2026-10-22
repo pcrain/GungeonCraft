@@ -106,7 +106,7 @@ public class FlakseedProjectile : MonoBehaviour
 
 public class FlakseedFlower : MonoBehaviour
 {
-    const float _GROWTH_TIME = 3f;
+    const float _GROWTH_TIME = 5f;
     const float _MIN_FIRE_RATE = 0.5f;
     const float _FIRE_RATE_VARIANCE = 0.25f;
     const float _WILT_TIME = 15.0f;
