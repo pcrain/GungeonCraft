@@ -13,6 +13,7 @@
 - Removed mechanic from K.A.L.I. where ammo would be constantly drained while charging (the no casings downside is already enough)
 - Reduced K.A.L.I.'s ammo from 200 to 80 to compensate for lower overall ammo usage
 - Increased growth time of Flakseed's flowers from 3 to 5 seconds (spamming projectiles made it way too strong and convenient for a D tier)
+- Improved impact sounds for Iron Maid's projectiles
 
 ## 1.33.0 (2026-10-15)
 
