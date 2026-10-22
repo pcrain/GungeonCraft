@@ -4,7 +4,7 @@ public class Sextant : CwaffGun
 {
     public static string ItemName         = "Sextant";
     public static string ShortDescription = "Deadly Precision";
-    public static string LongDescription  = "Fires a calculated, single-target shot that deals more damage the longer Sextant is trained on its target before firing. When completely locked on, fires a critical shot that heavily damages bosses and instantly kills non-boss enemies. Reloading toggles focus mode, which slows down movement speed to assist with aiming.";
+    public static string LongDescription  = "Fires a calculated, single-target shot that deals more damage the longer Sextant is trained on its target before firing. When completely locked on, fires a critical shot that heavily damages bosses and instantly kills non-bosses. Reloading toggles focus mode, which slows down movement speed to assist with aiming.";
     public static string Lore             = "An essential instrument among mariners for centuries, repurposed against all odds as a deadly weapon. Holding it in your hands evokes painful memories of 10th grade trigonometry lessons. Should you ever be allowed a few seconds of respite in combat, you're certain this device will let you hit your enemies physically and psychologically *exactly* where it hurts most.";
 
     private const float _PHASE_TIME = 0.35f;

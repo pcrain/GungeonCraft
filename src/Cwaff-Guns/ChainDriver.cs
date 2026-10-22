@@ -4,7 +4,7 @@ public class ChainDriver : CwaffGun
 {
     public static string ItemName         = "Chain Driver";
     public static string ShortDescription = "The Strongest Links";
-    public static string LongDescription  = "Fires chains that shackle enemies. Shackled enemies are dragged towards the current aim point, and can be slammed into solid objects. Enemy weight and damage stat influence drag speed. Reloading releases shackled enemies. Increases curse by 1 while in inventory.";
+    public static string LongDescription  = "Fires chains that shackle enemies. Shackled enemies are dragged towards the current aim point, and can be slammed into solid objects. The player's damage stat and the enemy's weight influence drag speed. Reloading releases shackled enemies. Increases curse by 1 while in inventory.";
     public static string Lore             = "They say a chain is only as strong as its weakest link. By breaking and reassembling chains millions of times until only the strongest links survived, gunsmiths were able to produce a chain so powerful it developed arcane self-regenerating properties. In typical fashion, they ignored all the potential good an infinite supply of iron could offer, and instead chose to stuff it inside a firearm.";
 
     internal static GameObject[] _ChainDebris          = new GameObject[2];

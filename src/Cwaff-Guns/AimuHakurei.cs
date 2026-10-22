@@ -4,7 +4,7 @@ public class AimuHakurei : CwaffGun
 {
     public static string ItemName         = "Aimu Hakurei";
     public static string ShortDescription = "Highly Responsive";
-    public static string LongDescription  = "Passively grants the ability to graze enemy projectiles. Fires additional projectiles based on graze level, which increases at 10, 30, 60, and 100 graze. Reloading toggles focus mode, which slows time to enable precision grazing. Reloading, firing, dodge rolling, or switching guns cancels focus mode. Graze naturally decays over time and cannot be gained while invulnerable.";
+    public static string LongDescription  = "Passively grants the ability to graze projectiles. Fires additional projectiles at 10, 30, 60, and 100 graze. Graze naturally decays over time and can't be gained while invulnerable. Reloading toggles focus mode for precision grazing.";
     public static string Lore             = "One of the finest weapons ever crafted in Gunsokyo, a land whose denizens are renowned for their otherworldly bullet-dodging abilities that would put most Gungeoneers to shame. The potential dakka output of this gun is enough to keep up even with these impressive abilities. However, the Gunsokyo warriors being the showboats that they are, reaching this gun's full potential requires placing oneself in some rather precarious situations, making it a weapon of truly ludicrous risk and reward.";
 
     internal const float _GRAZE_THRES              = 1.5f;  // max distance from player a projectile can be to count as grazed
