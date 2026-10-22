@@ -25,14 +25,11 @@ public class Voidcaller : CwaffGun
             muzzleFrom: Items.Mailbox, fireAudio: "voidcaller_shoot_sound", smoothReload: 0.1f)
           .SetReloadAudio("voidcaller_reload_sound", 0, 2, 4, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25)
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(clipSize: 6, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f))
+          .InitProjectile(GunData.New(clipSize: 6, cooldown: 0.5f, shootStyle: ShootStyle.SemiAutomatic, damage: 7.5f, percentSpeedVariance: new(-25f, 25f)))
           .SetAllImpactVFX(_ImpactPool = VFX.CreatePool("voidcaller_impact", fps: 30, loops: false, emissivePower: 2f,
             emissiveColorPower: 10.0f, emissiveColour: new Color(0.7f, 0.4f, 0.7f), emissiveSensitivity: 0.6f))
           .Assign(out Projectile p);
 
-        gun.Volley.UsesShotgunStyleVelocityRandomizer = true;
-        gun.Volley.DecreaseFinalSpeedPercentMin = -25.0f;
-        gun.Volley.IncreaseFinalSpeedPercentMax = 25.0f;
         gun.Volley.projectiles = Enumerable.Repeat<ProjectileModule>(null, Enum.GetValues(typeof(VoidType)).Length).ToList();
           gun.Volley.projectiles[(int)VoidType.Default]   = VoidcallerModule(gun, p, sprite: "voidcaller_projectile_default", sound: "voidcaller_shoot_proj_1", ammoCost: 1);
           gun.Volley.projectiles[(int)VoidType.Key]       = VoidcallerModule(gun, p, sprite: "voidcaller_projectile_key",     sound: "voidcaller_shoot_proj_2");

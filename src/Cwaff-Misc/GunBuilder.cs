@@ -124,6 +124,7 @@ public sealed class GunData
   public float glowSensitivity;
   public bool greenFire;
   public float? multihitDelay;
+  public Vector2? percentSpeedVariance;
 
   /// <summary>Pseudo-constructor holding most setup information required for a single projectile gun.</summary>
   /// <param name="gun">The gun we're attaching to (can be null, only used for custom clip sprite name resolution for now).</param>
@@ -237,6 +238,7 @@ public sealed class GunData
   /// <param name="glowSensitivity">The color sensitivity of the emissive shader to use on the projectile.</param>
   /// <param name="greenFire">If true, fire status inflicts green fire instead.</param>
   /// <param name="multihitDelay">If set, overrides the default 0.5 second collision exception timer for a projectile after hitting an enemy.</param>
+  /// <param name="percentSpeedVariance">Sets the minimum / maximum percent speed variance for a projectile.</param>
   public static GunData New(Gun gun = null, Projectile baseProjectile = null, int? clipSize = null, float? cooldown = null, float? angleVariance = null,
     ShootStyle shootStyle = ShootStyle.Automatic, ProjectileSequenceStyle sequenceStyle = ProjectileSequenceStyle.Random, float chargeTime = 0.0f, int ammoCost = 1,
     GameUIAmmoType.AmmoType? ammoType = null, bool customClip = false, float? damage = null, float? speed = null, float? force = null, float? range = null, float? recoil = null,
@@ -256,7 +258,7 @@ public sealed class GunData
     bool hideAmmo = false, float spinupTime = 0.0f, string spinupSound = null, float glowAmount = 0f, Color? glowColor = null, float? glowColorPower = null,
     int beamDissipateFps = -1, float? spinRate = null, float? lightStrength = null, float? lightRange = null, Color? lightColor = null, string chargeSound = null, bool? damagesWalls = null,
     Color? beamEmissionColor = null, float beamEmissionColorPower = 1.55f, float beamImpactEmission = -1f, float stunChance = 0f, float stunDuration = -1f, float beamEmissionSensitivity = -1f,
-    bool useBetterEmissiveShader = false, float glowSensitivity = 0.5f, bool greenFire = false, float? multihitDelay = null)
+    bool useBetterEmissiveShader = false, float glowSensitivity = 0.5f, bool greenFire = false, float? multihitDelay = null, Vector2? percentSpeedVariance = null)
   {
       _Instance.gun                               = gun; // set by InitSpecialProjectile()
       _Instance.baseProjectile                    = baseProjectile;
@@ -369,6 +371,7 @@ public sealed class GunData
       _Instance.glowSensitivity                   = glowSensitivity;
       _Instance.greenFire                         = greenFire;
       _Instance.multihitDelay                     = multihitDelay;
+      _Instance.percentSpeedVariance              = percentSpeedVariance;
       return _Instance;
   }
 }
@@ -845,7 +848,8 @@ public static class GunBuilder
   public static ProjectileModule SetAttributes(this ProjectileModule mod, GunData b = null)
   {
     b ??= GunData.Default;
-    CwaffGun cg = b.gun.gameObject.GetComponent<CwaffGun>();
+    Gun gun = b.gun;
+    CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
     if (b.clipSize.HasValue)
       mod.numberOfShotsInClip = b.clipSize.Value;
@@ -867,6 +871,12 @@ public static class GunBuilder
       mod.SetupCustomAmmoClip(b);
     else if (b.ammoType.HasValue)
       mod.ammoType = b.ammoType.Value;
+    if (b.percentSpeedVariance is Vector2 speedVariance)
+    {
+      gun.Volley.DecreaseFinalSpeedPercentMin = speedVariance.x;
+      gun.Volley.IncreaseFinalSpeedPercentMax = speedVariance.y;
+      gun.Volley.UsesShotgunStyleVelocityRandomizer = (speedVariance.x != 0 && speedVariance.y != 0);
+    }
 
     cg.spinupTime  = b.spinupTime;
     cg.spinupSound = b.spinupSound;
