@@ -1,19 +1,27 @@
 # Changelog
 
-## 1.33.1 (TBD)
+## 1.33.1 (2026-10-21)
 
-- Changed Zealot's reload time to 0 seconds to remove unintended way of temporarily ceasing fire
-- Tweaked inner outline colors in sprites for Chronos' Trigger and Pegasus Boots
-- Resprited Rat Poison
-- Rebalanced Plot Armor to always spawn 2 armor pickups (or 3, for zero-health characters)
-- Scotsman's mastery now passively grants explosion damage immunity
-- Fixed null deref caused by Scotsman targeting it's own non-existent HealthHaver when trying to detonate explosive enemies
+#### Features:
+
 - Added 7 new synergies
-- Shortened and cleaned up several weapon and item descriptions
+
+#### Balance Changes and Polish:
+
+- Made Scotsman's mastery passively grant explosion damage immunity
 - Removed mechanic from K.A.L.I. where ammo would be constantly drained while charging (the no casings downside is already enough)
 - Reduced K.A.L.I.'s ammo from 200 to 80 to compensate for lower overall ammo usage
+- Rebalanced Plot Armor to always spawn 2 armor pickups (or 3, for zero-health characters)
 - Increased growth time of Flakseed's flowers from 3 to 5 seconds (spamming projectiles made it way too strong and convenient for a D tier)
+- Resprited Rat Poison
+- Tweaked inner outline colors in sprites for Chronos' Trigger and Pegasus Boots
 - Improved impact sounds for Iron Maid's projectiles
+- Shortened and cleaned up several weapon and item descriptions
+
+#### Bugfixes and Misc:
+
+- Changed Zealot's reload time to 0 seconds to remove unintended way of temporarily ceasing fire
+- Fixed null deref caused by Scotsman targeting its own non-existent HealthHaver when trying to detonate explosive enemies
 
 ## 1.33.0 (2026-10-15)
 
