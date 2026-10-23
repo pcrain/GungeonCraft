@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.33.2 (TBD)
+
+- Fixed null deref caused by Super Cold Watch checking the velocity of its non-existent owner
+
 ## 1.33.1 (2026-10-21)
 
 #### Features:

@@ -54,8 +54,7 @@ public class SuperColdWatch : CwaffPassive
         && (m_owner.CurrentInputState == PlayerInputState.AllInput || m_owner.CurrentInputState == PlayerInputState.OnlyMovement)
         && !m_owner.IsFalling && !m_owner.IsDodgeRolling && m_owner.healthHaver && !m_owner.healthHaver.IsDead
         && m_owner.specRigidbody;
-      bool playerIsMoving = m_owner.specRigidbody.Velocity.sqrMagnitude > 0.01f;
-      if (shouldBeActive && !playerIsMoving)
+      if (shouldBeActive && (m_owner.specRigidbody.Velocity.sqrMagnitude <= 0.01f))
       {
         this._graceTime += Time.unscaledDeltaTime;
         if (this._graceTime < _GRACE_TIME)
