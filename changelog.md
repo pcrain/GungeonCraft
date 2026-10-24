@@ -6,6 +6,7 @@
 - Fixed softlock caused by opening a chest while dodge rolling an in possession of Pegasus Boots
 - Fixed Jugglernaut's circus music not playing after changing floors
 - Added config toggle for Jugglernaut's circus music
+- Fixed bug where dying to [REDACTED] and quick restarting could take you back to floors other than the starting floor
 
 ## 1.33.1 (2026-10-21)
 

@@ -20,12 +20,18 @@ public class BulletThatCanKillTheFuture : CwaffActive
         item.quality      = ItemQuality.SPECIAL;
 
         _Sprite = item.sprite;
+        CwaffEvents.OnCleanStart += ResetLevelOverrides;
         CwaffEvents.OnRunStartFromAnyFloor += ResetBTCKTF;
         CwaffEvents.OnNewFloorFullyLoaded += SpawnFutureBullet;
 
         ETGMod.Databases.Strings.Core.AddComplex("#SHOP_RUNBASEDMULTILINE_STOPPER", _BelloItemHint);
 
         _EeveeTexture = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise");
+    }
+
+    private static void ResetLevelOverrides()
+    {
+        GameManager.Instance.InjectedLevelName = null;
     }
 
     private static void ResetBTCKTF(PlayerController arg1, PlayerController arg2, GameManager.GameMode arg3)
