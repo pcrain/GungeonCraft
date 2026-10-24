@@ -4,6 +4,8 @@
 
 - Fixed null deref caused by Super Cold Watch checking the velocity of its non-existent owner
 - Fixed softlock caused by opening a chest while dodge rolling an in possession of Pegasus Boots
+- Fixed Jugglernaut's circus music not playing after changing floors
+- Added config toggle for Jugglernaut's circus music
 
 ## 1.33.1 (2026-10-21)
 

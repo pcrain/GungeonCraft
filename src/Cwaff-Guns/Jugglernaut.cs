@@ -326,7 +326,10 @@ public class Jugglernaut : CwaffGun
         base.Update();
         if (this.PlayerOwner is not PlayerController pc)
             return;
-        Lazy.PlaySoundUntilDeathOrTimeout("circus_music", pc.gameObject, 0.1f);
+        if (GameManager.Instance.IsLoadingLevel)
+            return;
+        if (CwaffConfig._PlayJugglernautMusic)
+            Lazy.PlaySoundUntilDeathOrTimeout("circus_music", pc.gameObject, 0.1f);
         UpdateIdleAnimation(); // fixes idle animation not playing when picked up, not sure why this is necessary
     }
 
