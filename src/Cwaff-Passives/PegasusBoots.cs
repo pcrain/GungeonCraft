@@ -58,6 +58,8 @@ public class PegasusBoots : CwaffDodgeRollItem
       CustomDodgeRoll roll = CustomDodgeRoll();
       if (!this.m_owner || this.m_owner.IsDodgeRolling || roll._isDodging)
         return;  // don't toggle enabled status while we're actively dodge rolling
+      if (this.m_owner.CurrentInputState != PlayerInputState.AllInput)
+        return;  // don't toggle enabled status while not in control of our character (fixes softlock when opening a chest during dodge roll)
       if (!roll.IsEnabled && roll._dodgeButtonPressed)
         return; // fixes a quirk where if you're coming out of a normal dodge roll and stop moving while the dodge button is held, the Pegasus dodge roll immediately starts charging
       roll.IsEnabled = this.m_owner.m_activeActions.Move.Vector == Vector2.zero;

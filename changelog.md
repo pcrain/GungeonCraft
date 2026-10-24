@@ -3,6 +3,7 @@
 ## 1.33.2 (TBD)
 
 - Fixed null deref caused by Super Cold Watch checking the velocity of its non-existent owner
+- Fixed softlock caused by opening a chest while dodge rolling an in possession of Pegasus Boots
 
 ## 1.33.1 (2026-10-21)
 
