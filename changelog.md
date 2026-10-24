@@ -3,10 +3,13 @@
 ## 1.33.2 (TBD)
 
 - Fixed null deref caused by Super Cold Watch checking the velocity of its non-existent owner
-- Fixed softlock caused by opening a chest while dodge rolling an in possession of Pegasus Boots
+- Fixed softlock caused by opening a chest while dodge rolling and in possession of Pegasus Boots
 - Fixed Jugglernaut's circus music not playing after changing floors
 - Added config toggle for Jugglernaut's circus music
 - Fixed bug where dying to [REDACTED] and quick restarting could take you back to floors other than the starting floor
+- Added custom clip sprite for Portable Hydro Turret
+- Added missing gun sprite credits for Gradius
+- Updated Flakseed's description to proper 5 second growth time added last update
 
 ## 1.33.1 (2026-10-21)
 

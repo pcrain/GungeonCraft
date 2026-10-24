@@ -14,9 +14,9 @@ public class PortableHydroTurret : CwaffGun
             infiniteAmmo: true, fireAudio: "portable_hydro_turret_fire_sound", isStarterGun: true, undroppableStarter: true)
           .SetReloadAudio("portable_hydro_turret_reload_sound", 0, 2, 4, 6)
           .SetMuzzleVFX((ItemHelper.Get(Items.EyeOfTheBeholster) as Gun).DefaultModule.finalProjectile.hitEffects.enemy)
-          .InitProjectile(GunData.New(sprite: "portable_hydro_turret_projectile", clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: false,
+          .InitProjectile(GunData.New(sprite: "portable_hydro_turret_projectile", clipSize: 10, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
             damage: 3.0f, speed: 60f, range: 10.0f, force: 1.0f, hitSound: "portable_hydro_turret_impact_sound", useBetterEmissiveShader: true,
-            glowAmount: 7.0f, glowColorPower: 7.0f, glowSensitivity: 2.0f, glowColor: new Color(0.5f, 0.5f, 1.0f))) // TODO: custom clip
+            glowAmount: 7.0f, glowColorPower: 7.0f, glowSensitivity: 2.0f, glowColor: new Color(0.5f, 0.5f, 1.0f)))
           .SetAllImpactVFX((ItemHelper.Get(Items.EyeOfTheBeholster) as Gun).DefaultModule.finalProjectile.hitEffects.enemy);
     }
 }

@@ -35,6 +35,8 @@ I have little artistic ability beyond making minor sprite and sound edits, so mo
   - [Duck Game](https://store.steampowered.com/app/312530/Duck_Game/): Magunet
 
   - [Knights in the Nightmare](https://www.spriters-resource.com/psp/knightsinthenightmare/sheet/172920/): Pistol Whip
+  
+  - [Gradius](https://www.spriters-resource.com/nes/gradius/asset/5114/): Gradius
 
 #### Original Sprites (please check out the authors' work! <3)
 
