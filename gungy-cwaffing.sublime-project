@@ -69,6 +69,10 @@
       {
 				"enabled": false,
 			},
+      "LSP-OmniSharp":
+      {
+				"enabled": true
+			},
     },
   },
 }

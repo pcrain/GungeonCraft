@@ -1041,6 +1041,7 @@ public static class Extensions
   /// <param name="banFromBlessedRuns">Whether the gun should be blanned from Blessed Mode's random gun selection.</param>
   /// <param name="rampUpFireRate">Whether the gun's rate of fire changes as it's continuously fired.</param>
   /// <param name="rampUpFactor">How quickly the gun's rate of fire changes as it's continuously fired.</param>
+  /// <param name="suppressFireAnim">Whether the fire animation for the gun should be completely disabled.</param>
   /// <param name="suppressReloadAnim">Whether the reload animation for the gun should be completely disabled.</param>
   /// <param name="handedness">Overrides the handedness of the gun.</param>
   /// <param name="autoPlay">Whether the gun's animations should automatically play by default.</param>
@@ -1065,7 +1066,7 @@ public static class Extensions
     int loopChargeAt = -1, int loopReloadAt = -1, int loopFireAt = -1, Items? muzzleFrom = null, bool modulesAreTiers = false, string muzzleVFX = null, int muzzleFps = 60,
     float muzzleScale = 1.0f, Anchor muzzleAnchor = Anchor.MiddleLeft, float muzzleEmission = -1f, Color? muzzleEmissionColor = null, float muzzleEmissionColorPower = -1f, bool muzzleLit = false, float muzzleLightStrength = 0f,
     float muzzleLightRange = 0f, Color? muzzleLightColor = null, IntVector2? carryOffset = null, bool preventRotation = false, float curse = 0f, bool continuousFire = false,
-    bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressReloadAnim = false,
+    bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressFireAnim = false, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
     bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f, bool canAttackWhileRolling = false,
     bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f, bool preventDuctTape = false, float muzzleEmissionSensitivity = 0.5f, bool preventVolleyModifications = false, bool undroppableStarter = false)
@@ -1177,6 +1178,8 @@ public static class Extensions
         );
     }
 
+    if (suppressFireAnim)
+        gun.SuppressFireAnimations();
     if (suppressReloadAnim)
         gun.SuppressReloadAnimations();
 

@@ -981,16 +981,35 @@ public static class GunBuilder
   public static void SuppressReloadAnimations(this Gun gun)
   {
     gun.reloadAnimation = gun.idleAnimation; // animation shouldn't automatically change when reloading
-    gun.gameObject.AddComponent<ReloadAnimationSuppressor>();
+    gun.gameObject.GetComponent<CwaffGun>().suppressReloadAnimations = true;
   }
 
-  /// <summary>Helper patch for enabling ReloadAnimationSuppressor's functionality</summary>
+  /// <summary>Prevent a gun from ever playing fire animations automatically</summary>
+  public static void SuppressFireAnimations(this Gun gun)
+  {
+    gun.usesContinuousFireAnimation = true; // implied, suppresses most other fire animation checks
+    gun.gameObject.GetComponent<CwaffGun>().suppressFireAnimations = true;
+  }
+
+  /// <summary>Helper patch for suppressing fire animations</summary>
+  [HarmonyPatch(typeof(Gun), nameof(Gun.HandleShootAnimation))]
+  private class FireAnimationSuppressorPatch
+  {
+      static bool Prefix(Gun __instance)
+      {
+          if (__instance.GetComponent<CwaffGun>() is CwaffGun cg && cg.suppressFireAnimations)
+              return false;
+          return true;
+      }
+  }
+
+  /// <summary>Helper patch for suppressing reload animations</summary>
   [HarmonyPatch(typeof(Gun), nameof(Gun.FinishReload))]
   private class ReloadAnimationSuppressorPatch
   {
       static void Prefix(Gun __instance, bool activeReload, ref bool silent, bool isImmediate)
       {
-          if (__instance.GetComponent<ReloadAnimationSuppressor>())
+          if (__instance.GetComponent<CwaffGun>() is CwaffGun cg && cg.suppressReloadAnimations)
               silent = true;
       }
   }

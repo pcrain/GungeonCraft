@@ -66,6 +66,8 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public  float                             smoothReloadOffset         = 0f;     // time between reloading finishing visually and functionally
   public  bool                              canAttackWhileRolling      = false;  // if true, allows the player to fire the gun while dodge rolling
   public  bool                              preventVolleyModifications = false;  // if true, prevents gun from applying volley modifications (e.g. Scattershot)
+  public  bool                              suppressReloadAnimations   = false;  // if true, suppresses all reload animations for the gun from auto-playing
+  public  bool                              suppressFireAnimations     = false;  // if true, suppresses all fire animations for the gun from auto-playing
 
   public  bool                              Mastered {get; private set;}         // whether the gun has been mastered
 

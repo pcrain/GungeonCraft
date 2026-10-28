@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.33.0 (TBD)
+
+- Added Autumn's Fury
+
 ## 1.33.2 (2026-10-23)
 
 #### Balance Changes and Polish:
