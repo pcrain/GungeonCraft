@@ -158,6 +158,7 @@ public class AutumnsFuryProjectile : MonoBehaviour
     private float            _accelTime             = 0.0f;
     private bool             _addedTrail            = false;
     private bool             _atFinalSpeed          = false;
+    private Vector2          _velocity              = default;
 
     private enum State {
         NEUTRAL,
@@ -207,6 +208,7 @@ public class AutumnsFuryProjectile : MonoBehaviour
           return;
         }
 
+        PhysicsEngine.Instance.Deregister(this._body);
         this._state = State.ORBITING;
         this._projectile.ManualControl = true;
         this._projectile.SetSpeed(0.01f);
@@ -249,13 +251,14 @@ public class AutumnsFuryProjectile : MonoBehaviour
             this._body.OnPreTileCollision += this._projectile.OnPreTileCollision;
             this._body.CollideWithOthers = true;
             this._body.CollideWithTileMap = true;
+            this._body.m_initialized = false;
             this._body.Reinitialize();
-            AIActor closestEnemy = Lazy.NearestEnemyWithinConeOfVision(start: this._projectile.SafeCenter, coneAngle: this._body.Velocity.ToAngle(),
+            AIActor closestEnemy = Lazy.NearestEnemyWithinConeOfVision(start: this._projectile.SafeCenter, coneAngle: this._velocity.ToAngle(),
               maxDeviation: 360f, maxDistance: 100f, ignoreWalls: true, useNearestAngleInsteadOfDistance: true);
             if (closestEnemy)
               this._projectile.SendInDirection(closestEnemy.CenterPosition - this._projectile.SafeCenter, resetDistance: true);
-            else if (this._body.Velocity.sqrMagnitude > 0.1f)
-              this._projectile.SendInDirection(this._body.Velocity, resetDistance: true);
+            else if (this._velocity.sqrMagnitude > 0.1f)
+              this._projectile.SendInDirection(this._velocity, resetDistance: true);
             else
               this._projectile.SendInDirection(this._projectile.OriginalDirection().ToVector(), resetDistance: true);
             this._body.Reinitialize();
@@ -306,16 +309,14 @@ public class AutumnsFuryProjectile : MonoBehaviour
         this._tilOrbitTimer -= dtime;
         this._angle = (this._angle + 360f * this._rotSpeed * (0.5f * Mathf.Abs(Mathf.Sin(2f * this._orbitTime))) * dtime).Clamp360();
         Vector2 ownerPos = this._owner.CenterPosition;
-        Vector2 oldPos = this._body.Position.GetPixelVector2();
         float orbitOffset = 3f * this._orbitTime;
         if (this._sprite)
           this._sprite.scale = this._sprite.scale.WithY(Mathf.Sin(orbitOffset));
         Vector2 newPos = ownerPos + this._angle.ToVector((this._radius * this._radiusScale) + Mathf.Cos(orbitOffset));
         if (this._tilOrbitTimer > 0)
           newPos = Vector2.Lerp(ownerPos, newPos, Ease.OutQuad(1f - this._tilOrbitTimer / TIME_TIL_ORBIT));
-        this._body.m_position = new Position(newPos); // NOTE: use m_position to avoid expensive physics updates
-        Vector2 vel = (newPos - oldPos);
-        this._body.Velocity = vel;
+        this._velocity = (newPos - base.transform.position.XY());
+        base.transform.position = newPos;
       }
 
     private void OnBecameDebris(DebrisObject debris)
