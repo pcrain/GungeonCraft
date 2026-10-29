@@ -26,7 +26,8 @@ public class AutumnsFury : CwaffGun
     {
         Lazy.SetupGun<AutumnsFury>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.S, gunClass: GunClass.FULLAUTO, reloadTime: 0.0f, ammo: 2000, shootFps: 24, chargeFps: 12,
-            reloadFps: 30, attacksThroughWalls: true, doesScreenShake: false, suppressFireAnim: true, suppressReloadAnim: true)
+            reloadFps: 30, attacksThroughWalls: true, doesScreenShake: false, suppressFireAnim: true, suppressReloadAnim: true,
+            continuousFire: true) // NOTE: continuousFire needed to suppress additional instances that suppressFireAnim doesn't handle
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: 100, cooldown: 0.05f, angleVariance: 5.0f, customClip: true,
             shootStyle: ShootStyle.Automatic, damage: 7.0f, speed: 50.0f, range: 999999f, hitSound: "autumn_impact_sound",

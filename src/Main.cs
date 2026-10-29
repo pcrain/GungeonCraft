@@ -301,6 +301,7 @@ public class Initialisation : BaseUnityPlugin
                 Hightide.Init();
                 Voidcaller.Init();
                 AutumnsFury.Init();
+                Daoitzer.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 

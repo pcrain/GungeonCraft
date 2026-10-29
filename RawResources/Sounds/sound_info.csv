@@ -466,3 +466,9 @@ chronos_trigger_activate_sound,5.0,1,sound,1
 autumn_impact_sound,2.0,1,sound,1
 autumn_shoot_sound,5.0,1,sound,1
 autumn_wind_sound,1.0,1,sound,3
+daoitzer_impact_sound,5.0,1,sound,0
+daoitzer_balance_yang,-2.0,1,sound,0
+daoitzer_imbalance_yang,0.0,1,sound,0
+daoitzer_imbalance_yin,-5.5,1,sound,0
+daoitzer_balance_yinyang,-2.0,1,sound,0
+daoitzer_balance_perfect,-1.0,1,sound,0

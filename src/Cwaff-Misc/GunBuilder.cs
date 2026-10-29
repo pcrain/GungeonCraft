@@ -987,7 +987,6 @@ public static class GunBuilder
   /// <summary>Prevent a gun from ever playing fire animations automatically</summary>
   public static void SuppressFireAnimations(this Gun gun)
   {
-    gun.usesContinuousFireAnimation = true; // implied, suppresses most other fire animation checks
     gun.gameObject.GetComponent<CwaffGun>().suppressFireAnimations = true;
   }
 

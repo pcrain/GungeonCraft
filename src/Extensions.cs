@@ -1189,7 +1189,7 @@ public static class Extensions
   /// <summary>Create a prefab trail, add it to a prefab projectile, and return the projectile.</summary>
   public static Projectile AttachTrail(this Projectile target, string spriteName, int fps = -1, string startAnim = null,
     float timeTillAnimStart = -1, float cascadeTimer = -1, float softMaxLength = -1, bool destroyOnEmpty = false, GameObject dispersalPrefab = null,
-    Vector2? boneSpawnOffset = null, float? emissivePower = null, float? emissiveColorPower = null, Color? emissiveColor = null)
+    Vector2? boneSpawnOffset = null, float? emissivePower = null, float? emissiveColorPower = null, Color? emissiveColor = null, float? emissiveSensitivity = null)
   {
       CwaffTrailController trail = VFX.CreateSpriteTrailObject(
           spriteName         : spriteName,
@@ -1204,7 +1204,8 @@ public static class Extensions
       trail.gameObject.SetActive(true); // parent projectile is deactivated, so we want to re-activate ourselves so we display correctly when the projectile becomes active
       trail.gameObject.transform.parent = target.transform;
       if (emissivePower.HasValue || emissiveColorPower.HasValue || emissiveColor.HasValue)
-        trail.gameObject.GetComponent<tk2dBaseSprite>().MakeGlowyBetter(glowAmount: emissivePower, glowColorPower: emissiveColorPower, glowColor: emissiveColor);
+        trail.gameObject.GetComponent<tk2dBaseSprite>().MakeGlowyBetter(glowAmount: emissivePower, glowColorPower: emissiveColorPower, glowColor: emissiveColor,
+          sensitivity: emissiveSensitivity ?? 0.5f);
       trail.boneSpawnOffset = boneSpawnOffset ?? Vector2.zero;
       return target;
   }

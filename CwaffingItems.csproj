@@ -187,6 +187,7 @@
     <Compile Include="src\Cwaff-Guns\BlasTechF4.cs"/>
     <Compile Include="src\Cwaff-Guns\ChekhovsGun.cs"/>
     <Compile Include="src\Cwaff-Guns\AimuHakurei.cs"/>
+    <Compile Include="src\Cwaff-Guns\Daoitzer.cs"/>
     <Compile Include="src\Cwaff-Guns\PogoGun.cs"/>
     <Compile Include="src\Cwaff-Guns\PlatinumStar.cs"/>
     <Compile Include="src\Cwaff-Guns\Crapshooter.cs"/>
