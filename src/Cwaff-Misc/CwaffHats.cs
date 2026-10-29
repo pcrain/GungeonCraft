@@ -108,6 +108,8 @@ public static class CwaffHats
       EasyHat(name: "comedy_bowtie",         offset: new IntVector2( 0, -9), onEyes: true);
       EasyHat(name: "dress_bowtie",          offset: new IntVector2( 0, -9), onEyes: true);
 
+      EasyHat(name: "leaf_tiara",            offset: new IntVector2( 0, -4), autoFlip: true);
+
       Lazy.DebugLog($"Successfully initialized {_NumHats} hats! C:");
     }
 

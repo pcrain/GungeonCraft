@@ -3,6 +3,7 @@
 ## 1.33.0 (TBD)
 
 - Added Autumn's Fury
+- Added Leaf Tiara hat
 
 ## 1.33.2 (2026-10-23)
 
