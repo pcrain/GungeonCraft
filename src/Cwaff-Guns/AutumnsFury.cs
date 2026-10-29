@@ -29,7 +29,7 @@ public class AutumnsFury : CwaffGun
             reloadFps: 30, attacksThroughWalls: true, doesScreenShake: false, suppressFireAnim: true, suppressReloadAnim: true)
           .AssignGun(out Gun gun)
           .InitProjectile(GunData.New(clipSize: 100, cooldown: 0.05f, angleVariance: 5.0f, customClip: true,
-            shootStyle: ShootStyle.Automatic, damage: 6.0f, speed: 50.0f, range: 999999f, hitSound: "autumn_impact_sound",
+            shootStyle: ShootStyle.Automatic, damage: 7.0f, speed: 50.0f, range: 999999f, hitSound: "autumn_impact_sound",
             sprite: "autumns_fury_bullet", fps: 12, anchor: Anchor.MiddleCenter, useDummyChargeModule: true, pierceBreakables: true))
           .SetAllImpactVFX(VFX.CreatePool("leaf_impact", fps: 30, loops: false, emissivePower: 1.0f,
             emissiveColorPower: 10.0f, emissiveColour: ExtendedColours.vibrantOrange, emissiveSensitivity: 0.5f))
@@ -131,6 +131,8 @@ public class AutumnsFuryProjectile : MonoBehaviour
     private const float ROT_PER_SEC = 2f;    // rotation speed of leaf sprites
     private const float REV_PER_SEC = 2.5f; // revolution speed of leaves around player
     private const float TIME_TIL_ORBIT = 0.125f;
+    private const float SLOW_TIME = 0.5f;
+    private const float ACCEL_TIME = 0.35f;
 
     private PlayerController _owner                 = null;
     private Projectile       _projectile            = null;
@@ -150,10 +152,17 @@ public class AutumnsFuryProjectile : MonoBehaviour
     private float            _tilOrbitTimer         = 0.0f;
     private tk2dBaseSprite   _sprite                = null;
     private State            _state                 = State.NEUTRAL;
+    private SpeculativeRigidbody _body              = null;
+    private float            _slowTime              = 0.0f;
+    private float            _originalRotSpeed      = 0.0f;
+    private float            _accelTime             = 0.0f;
+    private bool             _addedTrail            = false;
+    private bool             _atFinalSpeed          = false;
 
     private enum State {
         NEUTRAL,
         ORBITING,
+        SLOWING,
         SCATTERING,
     }
 
@@ -165,6 +174,7 @@ public class AutumnsFuryProjectile : MonoBehaviour
         this._room        = base.transform.position.GetAbsoluteRoom();
         this._targetSpeed = this._projectile.baseData.speed;
         this._sprite      = this._projectile.sprite;
+        this._body        = this._projectile.specRigidbody;
 
         this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
         this._projectile.OnBecameDebris += OnBecameDebris;
@@ -184,9 +194,9 @@ public class AutumnsFuryProjectile : MonoBehaviour
             af.AddProjectile(this);
         }
         this._projectile.sprite.MakeGlowyBetter(glowAmount: 1f, glowColor: ExtendedColours.vibrantOrange, glowColorPower: 10f, sensitivity: 0.5f);
-        this._projectile.specRigidbody.CollideWithTileMap = false;
-        this._projectile.specRigidbody.CollideWithOthers = false;
-        this._projectile.specRigidbody.Reinitialize();
+        this._body.CollideWithTileMap = false;
+        this._body.CollideWithOthers = false;
+        this._body.Reinitialize();
 
         this._state = State.NEUTRAL;
         this._tilOrbitTimer = TIME_TIL_ORBIT;
@@ -198,6 +208,7 @@ public class AutumnsFuryProjectile : MonoBehaviour
         }
 
         this._state = State.ORBITING;
+        this._projectile.ManualControl = true;
         this._projectile.SetSpeed(0.01f);
         this._radiusScale = UnityEngine.Random.Range(0.92f, 1.08f);
         this._angle = this._projectile.AngleFromOwner();
@@ -224,7 +235,50 @@ public class AutumnsFuryProjectile : MonoBehaviour
             }
             Swirl(dtime);
             break;
+          case State.SLOWING:
+            if (this._stateTimer > 0)
+            {
+              this._rotSpeed = this._originalRotSpeed * (1f - Ease.InCubic(1f - this._stateTimer / this._slowTime));
+              Swirl(dtime);
+              break;
+            }
+            // transition to scattering state
+            this._state = State.SCATTERING;
+            base.gameObject.Play("autumn_shoot_sound");
+            this._projectile.PenetratesInternalWalls = true;
+            this._body.OnPreTileCollision += this._projectile.OnPreTileCollision;
+            this._body.CollideWithOthers = true;
+            this._body.CollideWithTileMap = true;
+            this._body.Reinitialize();
+            AIActor closestEnemy = Lazy.NearestEnemyWithinConeOfVision(start: this._projectile.SafeCenter, coneAngle: this._body.Velocity.ToAngle(),
+              maxDeviation: 360f, maxDistance: 100f, ignoreWalls: true, useNearestAngleInsteadOfDistance: true);
+            if (closestEnemy)
+              this._projectile.SendInDirection(closestEnemy.CenterPosition - this._projectile.SafeCenter, resetDistance: true);
+            else if (this._body.Velocity.sqrMagnitude > 0.1f)
+              this._projectile.SendInDirection(this._body.Velocity, resetDistance: true);
+            else
+              this._projectile.SendInDirection(this._projectile.OriginalDirection().ToVector(), resetDistance: true);
+            this._body.Reinitialize();
+            this._projectile.SetSpeed(0.01f);
+            this._accelTime = ACCEL_TIME * UnityEngine.Random.value;
+            this._stateTimer = this._accelTime;
+            break;
           case State.SCATTERING:
+            if (this._stateTimer > 0)
+            {
+              float newSpeed = this._targetSpeed * Ease.InCubic(1f - this._stateTimer / this._accelTime);
+              this._projectile.SetSpeed(newSpeed);
+              if (!this._addedTrail && newSpeed > 20f)
+              {
+                this._addedTrail = true;
+                this._projectile.AddTrail(AutumnsFury._AutumnTrailPrefab);
+              }
+            }
+            else if (!this._atFinalSpeed)
+            {
+              this._atFinalSpeed = true;
+              this._projectile.SetSpeed(this._targetSpeed);
+            }
             Vector2 pos = this._projectile.SafeCenter;
             if (GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.4f))
               break;
@@ -237,63 +291,14 @@ public class AutumnsFuryProjectile : MonoBehaviour
 
     public void ScatterLikeTheWind()
     {
-      if (this._projectile)
-        this.StartCoroutine(Scatter());
-    }
+      if (!this._projectile || !this._body || this._state == State.SCATTERING || this._state == State.SLOWING)
+        return;
 
-    private IEnumerator Scatter()
-    {
-      const float SLOW_TIME = 0.5f;
-      const float ACCEL_TIME = 0.35f;
-
-      if (!this._projectile || this._projectile.specRigidbody is not SpeculativeRigidbody body)
-        yield break;
-
-      this._state = State.SCATTERING;
-      float slowTime = SLOW_TIME * UnityEngine.Random.value;
-      float originalRotSpeed = this._rotSpeed;
-      float dtime = 0.0f;
-      for (float elapsed = 0f; elapsed < slowTime; dtime = BraveTime.DeltaTime)
-      {
-          elapsed += dtime;
-          this._rotSpeed = originalRotSpeed * (1f - Ease.InCubic(elapsed / slowTime));
-          Swirl(dtime);
-          yield return null;
-      }
-
-      base.gameObject.Play("autumn_shoot_sound");
-      this._projectile.PenetratesInternalWalls = true;
-      body.OnPreTileCollision += this._projectile.OnPreTileCollision;
-      body.CollideWithOthers = true;
-      body.CollideWithTileMap = true;
-      body.Reinitialize();
-      AIActor closestEnemy = Lazy.NearestEnemyWithinConeOfVision(start: this._projectile.SafeCenter, coneAngle: body.Velocity.ToAngle(),
-        maxDeviation: 360f, maxDistance: 100f, ignoreWalls: true, useNearestAngleInsteadOfDistance: true);
-      if (closestEnemy)
-        this._projectile.SendInDirection(closestEnemy.CenterPosition - this._projectile.SafeCenter, resetDistance: true);
-      else if (body.Velocity.sqrMagnitude > 0.1f)
-        this._projectile.SendInDirection(body.Velocity, resetDistance: true);
-      else
-        this._projectile.SendInDirection(this._projectile.OriginalDirection().ToVector(), resetDistance: true);
-      body.Reinitialize();
-      this._projectile.SetSpeed(0.01f);
-
-      float accelTime = ACCEL_TIME * UnityEngine.Random.value;
-      bool addedTrail = false;
-      for (float elapsed = 0f; elapsed < accelTime; dtime = BraveTime.DeltaTime)
-      {
-          elapsed += dtime;
-          float newSpeed = this._targetSpeed * Ease.InCubic(elapsed / accelTime);
-          this._projectile.SetSpeed(newSpeed);
-          if (!addedTrail && newSpeed > 20f)
-          {
-            addedTrail = true;
-            this._projectile.AddTrail(AutumnsFury._AutumnTrailPrefab);
-          }
-          yield return null;
-      }
-        this._projectile.SetSpeed(this._targetSpeed);
-      yield break;
+      this._projectile.ManualControl = false;
+      this._state = State.SLOWING;
+      this._slowTime = SLOW_TIME * UnityEngine.Random.value;
+      this._originalRotSpeed = this._rotSpeed;
+      this._stateTimer = this._slowTime;
     }
 
     private void Swirl(float dtime)
@@ -301,18 +306,17 @@ public class AutumnsFuryProjectile : MonoBehaviour
         this._tilOrbitTimer -= dtime;
         this._angle = (this._angle + 360f * this._rotSpeed * (0.5f * Mathf.Abs(Mathf.Sin(2f * this._orbitTime))) * dtime).Clamp360();
         Vector2 ownerPos = this._owner.CenterPosition;
-        Vector2 oldPos = this._projectile.specRigidbody.Position.GetPixelVector2();
+        Vector2 oldPos = this._body.Position.GetPixelVector2();
         float orbitOffset = 3f * this._orbitTime;
         if (this._sprite)
           this._sprite.scale = this._sprite.scale.WithY(Mathf.Sin(orbitOffset));
         Vector2 newPos = ownerPos + this._angle.ToVector((this._radius * this._radiusScale) + Mathf.Cos(orbitOffset));
         if (this._tilOrbitTimer > 0)
           newPos = Vector2.Lerp(ownerPos, newPos, Ease.OutQuad(1f - this._tilOrbitTimer / TIME_TIL_ORBIT));
-        this._projectile.specRigidbody.Position = new Position(newPos);
+        this._body.m_position = new Position(newPos); // NOTE: use m_position to avoid expensive physics updates
         Vector2 vel = (newPos - oldPos);
-        this._projectile.specRigidbody.Velocity = vel;
-        this._projectile.specRigidbody.UpdateColliderPositions();
-    }
+        this._body.Velocity = vel;
+      }
 
     private void OnBecameDebris(DebrisObject debris)
     {
