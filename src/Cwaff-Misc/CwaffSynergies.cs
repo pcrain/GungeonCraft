@@ -408,6 +408,8 @@ public static class CwaffSynergies
           tip: "Hightide's waves destroy enemy bullets in their path.");
         NewMastery<MasteryOfVoidcaller>(MASTERY_VOIDCALLER, Voidcaller.ItemName,
           tip: "Voidcaller passively grants a 10% chance to nullify enemy projectiles for each projectile in its current volley.");
+        NewMastery<MasteryOfAutumnsFury>(MASTERY_AUTUMNS_FURY, AutumnsFury.ItemName,
+          tip: "Autumn's Fury's vortex collects grounded debris instead of pushing it away, creating additional projectiles.");
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -726,6 +728,7 @@ internal class MasteryOfMtara                : MasteryDummyItem {}
 internal class MasteryOfAkelus               : MasteryDummyItem {}
 internal class MasteryOfHightide             : MasteryDummyItem {}
 internal class MasteryOfVoidcaller           : MasteryDummyItem {}
+internal class MasteryOfAutumnsFury          : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -909,4 +912,5 @@ public enum Synergy {
     MASTERY_AKELUS,
     MASTERY_HIGHTIDE,
     MASTERY_VOIDCALLER,
+    MASTERY_AUTUMNS_FURY,
 };

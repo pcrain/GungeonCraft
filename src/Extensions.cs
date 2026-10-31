@@ -4293,4 +4293,26 @@ public static class Extensions
         proj.ForceCollision(enemyBody, lcr);
     LinearCastResult.Pool.Free(ref lcr);
   }
+
+  /// <summary>Disable debris for manual movement control in guns such as Magunet, Autumn's Fury, etc., returning true if successful</summary>
+  public static bool DeactivateDebris(this DebrisObject debris, bool disable = true)
+  {
+    if (debris.gameObject.GetComponent<MagnetParticle>())
+        return false; // already added a magnet particle component
+    if (debris.gameObject.GetComponent<AutumnsFuryProjectile>())
+        return false; // already added a magnet particle component
+    if (debris.gameObject.GetComponent<Projectile>())
+        return false; // can't vacuum active projectiles
+    debris.ClearVelocity();
+    debris.PreventFallingInPits = true;
+    debris.IsAccurateDebris = false;
+    debris.isStatic = true;
+    if (disable)
+    {
+      if (debris.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
+        body.enabled = false;
+      debris.enabled = false;
+    }
+    return true;
+  }
 }

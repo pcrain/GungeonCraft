@@ -59,7 +59,10 @@ public class AutumnsFury : CwaffGun
           this.radius = MIN_RADIUS + DLT_RADIUS * Mathf.Clamp01(this._chargeTime / CHARGE_TIME);
           float phase = 1f + Mathf.Sin(10f * now);
           float curRadius = this.radius + phase;
-          Exploder.DoRadialPush(player.CenterPosition, 0.35f * curRadius, curRadius);
+          if (this.Mastered)
+            AssimilateNearbyDebris(player, curRadius);
+          else
+            Exploder.DoRadialPush(player.CenterPosition, 0.35f * curRadius, curRadius);
           Exploder.DoRadialKnockback(player.CenterPosition, 0.35f * curRadius, curRadius);
           return;
         }
@@ -71,6 +74,27 @@ public class AutumnsFury : CwaffGun
         // Synchronize ammo clips between projectile modules as necessary
         // (don't do while charging or bullets will all be forcibly released)
         this.gun.SynchronizeReloadAcrossAllModules();
+    }
+
+    private void AssimilateNearbyDebris(PlayerController player, float radius)
+    {
+        foreach(DebrisObject debris in player.CenterPosition.DebrisWithinCone(this.radius * this.radius, 0, 360f, limit: 100, allowJunk: false))
+        {
+            GameObject debrisObject = debris.gameObject;
+            // Make sure our debris doesn't glitch out with existing additional movement modifiers
+            if (!debris.DeactivateDebris(disable: false))
+              continue;
+            tk2dBaseSprite sprite = debris.sprite;
+            if (!sprite)
+              sprite = debris.gameObject.GetComponent<tk2dSprite>();
+            if (!sprite)
+              continue;
+            Material mat = sprite.renderer.material;
+            Texture2D palette = mat.HasProperty("_PaletteTex") ? (mat.GetTexture("_PaletteTex") as Texture2D) : null;
+            GameObject newDebrisObject = sprite.DuplicateInWorld(optionalPalette: palette, copyShader: true).gameObject;
+            UnityEngine.Object.Destroy(debris.gameObject);
+            newDebrisObject.AddComponent<AutumnsFuryProjectile>().Setup(true, player);
+        }
     }
 
     public void AddProjectile(AutumnsFuryProjectile proj)
@@ -159,6 +183,7 @@ public class AutumnsFuryProjectile : MonoBehaviour
     private bool             _addedTrail            = false;
     private bool             _atFinalSpeed          = false;
     private Vector2          _velocity              = default;
+    private bool             _didSetup              = false;
 
     private enum State {
         NEUTRAL,
@@ -169,16 +194,50 @@ public class AutumnsFuryProjectile : MonoBehaviour
 
     private void Start()
     {
-        this._projectile  = base.GetComponent<Projectile>();
-        this._owner       = this._projectile.Owner as PlayerController;
+        Setup(false, null);
+    }
+
+    public void Setup(bool fromGroundedDebris, PlayerController player)
+    {
+        if (this._didSetup)
+          return;
+
+        this._didSetup    = true;
+        if (fromGroundedDebris)
+        {
+          this._projectile = base.gameObject.AddComponent<Projectile>();
+          this._projectile.specRigidbody = base.gameObject.GetComponent<SpeculativeRigidbody>();
+          if (!this._projectile.specRigidbody)
+            this._projectile.specRigidbody = base.gameObject.AutoRigidBody(CollisionLayer.Projectile);
+          this._projectile.baseData = new ProjectileData() {
+            damage = 7.0f,
+            speed  = 50.0f,
+            range  = 999999f,
+            force  = 5.0f,
+          };
+          this._projectile.Awake(); // HACK: force tile collision logic to be set up
+          this._owner = player;
+          this._projectile.SetOwnerAndStats(this._owner);
+          // this._owner.DoPostProcessProjectile(this._projectile); // NOTE: intentionally not doing this due to lag + sparks + generally not useful
+        }
+        else
+        {
+          this._projectile  = base.GetComponent<Projectile>();
+          this._owner       = this._projectile.Owner as PlayerController;
+        }
         this._spawnTime   = BraveTime.ScaledTimeSinceStartup;
         this._room        = base.transform.position.GetAbsoluteRoom();
         this._targetSpeed = this._projectile.baseData.speed;
         this._sprite      = this._projectile.sprite;
         this._body        = this._projectile.specRigidbody;
 
-        this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
-        this._projectile.OnBecameDebris += OnBecameDebris;
+        // grounded debris gets destroyed once flung
+        // (NOTE: mostly because shotgun kin palettes get weird and i can't be bothered to find out why)
+        if (!fromGroundedDebris)
+        {
+          this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.BecomeDebris;
+          this._projectile.OnBecameDebris += OnBecameDebris;
+        }
 
         if (!this._owner)
             return; // shouldn't happen, but just be safe
@@ -194,13 +253,14 @@ public class AutumnsFuryProjectile : MonoBehaviour
             this._projectile.SetSpeed(this._radius / TIME_TIL_ORBIT);
             af.AddProjectile(this);
         }
-        this._projectile.sprite.MakeGlowyBetter(glowAmount: 1f, glowColor: ExtendedColours.vibrantOrange, glowColorPower: 10f, sensitivity: 0.5f);
+        if (!fromGroundedDebris)
+          this._projectile.sprite.MakeGlowyBetter(glowAmount: 1f, glowColor: ExtendedColours.vibrantOrange, glowColorPower: 10f, sensitivity: 0.5f);
         this._body.CollideWithTileMap = false;
         this._body.CollideWithOthers = false;
         this._body.Reinitialize();
 
         this._state = State.NEUTRAL;
-        this._tilOrbitTimer = TIME_TIL_ORBIT;
+        this._tilOrbitTimer = fromGroundedDebris ? 0.0f : TIME_TIL_ORBIT;
 
         if (!this._naturalSpawn)
         {
@@ -287,6 +347,8 @@ public class AutumnsFuryProjectile : MonoBehaviour
               break;
             if (this._room != null && this._room == pos.GetAbsoluteRoom())
               break;
+            this._projectile.OnBecameDebris -= OnBecameDebris;
+            this._projectile.DestroyMode = Projectile.ProjectileDestroyMode.Destroy;
             this._projectile.DieInAir();
             break;
         }
@@ -297,6 +359,7 @@ public class AutumnsFuryProjectile : MonoBehaviour
       if (!this._projectile || !this._body || this._state == State.SCATTERING || this._state == State.SLOWING)
         return;
 
+      this._body.Reinitialize();
       this._projectile.ManualControl = false;
       this._state = State.SLOWING;
       this._slowTime = SLOW_TIME * UnityEngine.Random.value;

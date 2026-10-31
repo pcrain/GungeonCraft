@@ -111,19 +111,9 @@ public class Magunet : CwaffGun
 
         foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100, allowJunk: false))
         {
-            if (debris.gameObject.GetComponent<MagnetParticle>())
-                continue; // already added a magnet particle component
-            if (debris.gameObject.GetComponent<Projectile>())
-                continue; // can't vacuum active projectiles
-
             // Make sure our debris doesn't glitch out with existing additional movement modifiers
-            debris.ClearVelocity();
-            debris.PreventFallingInPits = true;
-            debris.IsAccurateDebris = false;
-            if (debris.GetComponent<SpeculativeRigidbody>() is SpeculativeRigidbody body)
-                body.enabled = false;
-            debris.isStatic = true;
-            debris.enabled = false;
+            if (!debris.DeactivateDebris())
+              continue;
 
             // Actually add the MagnetParticle component to it
             Vector2 debrisCenter = debris.sprite ? debris.sprite.WorldCenter : debris.gameObject.transform.position.XY();
