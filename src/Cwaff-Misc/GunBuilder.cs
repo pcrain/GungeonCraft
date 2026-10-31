@@ -990,13 +990,24 @@ public static class GunBuilder
     gun.gameObject.GetComponent<CwaffGun>().suppressFireAnimations = true;
   }
 
-  /// <summary>Helper patch for suppressing fire animations</summary>
-  [HarmonyPatch(typeof(Gun), nameof(Gun.HandleShootAnimation))]
-  private class FireAnimationSuppressorPatch
+  /// <summary>Helper patches for suppressing fire animations</summary>
+  [HarmonyPatch]
+  private class FireAnimationSuppressorPatches
   {
-      static bool Prefix(Gun __instance)
+      [HarmonyPatch(typeof(Gun), nameof(Gun.HandleShootAnimation))]
+      [HarmonyPrefix]
+      static bool GunHandleShootAnimationPrefix(Gun __instance)
       {
           if (__instance.GetComponent<CwaffGun>() is CwaffGun cg && cg.suppressFireAnimations)
+              return false;
+          return true;
+      }
+
+      [HarmonyPatch(typeof(Gun), nameof(Gun.Play))]
+      [HarmonyPrefix]
+      static bool GunPlayPrefix(Gun __instance, string animName)
+      {
+          if (animName == __instance.shootAnimation && __instance.GetComponent<CwaffGun>() is CwaffGun cg && cg.suppressFireAnimations)
               return false;
           return true;
       }
