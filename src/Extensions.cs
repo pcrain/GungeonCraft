@@ -873,7 +873,7 @@ public static class Extensions
   }
   public static Gun SetMuzzleVFX(this Gun gun, string resPath = null, float fps = 60, bool loops = false, float scale = 1.0f, Anchor anchor = Anchor.MiddleLeft,
     bool orphaned = false, float emissivePower = -1, float emissiveColorPower = -1f, Color? emissiveColor = null, bool continuous = false, bool unlit = true,
-    float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveSensitivity = 0.5f)
+    float lightStrength = 0f, float lightRange = 0f, Color? lightColor = null, float emissiveSensitivity = 0.5f, bool attached = true)
   {
     if (string.IsNullOrEmpty(resPath))
     {
@@ -882,7 +882,7 @@ public static class Extensions
     }
 
     gun.muzzleFlashEffects = VFX.CreatePool(resPath, fps: fps,
-      loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: true, emissivePower: emissivePower, emissiveColour: emissiveColor,
+      loops: loops, scale: scale, anchor: anchor, alignment: VFXAlignment.Fixed, orphaned: orphaned, attached: attached, emissivePower: emissivePower, emissiveColour: emissiveColor,
       emissiveColorPower: emissiveColorPower, unlit: unlit, lightStrength: lightStrength, lightRange: lightRange, lightColor: lightColor, emissiveSensitivity: emissiveSensitivity);
     gun.usesContinuousMuzzleFlash = continuous;
     return gun;
@@ -1060,6 +1060,7 @@ public static class Extensions
   /// <param name="muzzleEmissionSensitivity">The emissive sensitivity of the lighting produced by the muzzle.</param>
   /// <param name="preventVolleyModifications">If true, prevents volley modification items such as Scattershot from being applied to the gun.</param>
   /// <param name="undroppableStarter">If true, gun is undroppable as a starter item.</param>
+  /// <param name="muzzleOrphaned">If true, muzzles effects remain attached to the gun; if false, muzzle effects stay where they are spawned.</param>
   public static Gun SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
@@ -1069,7 +1070,8 @@ public static class Extensions
     bool dynamicBarrelOffsets = false, bool banFromBlessedRuns = false, bool rampUpFireRate = false, float rampUpFactor = 0f, bool suppressFireAnim = false, bool suppressReloadAnim = false,
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
     bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f, bool canAttackWhileRolling = false,
-    bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f, bool preventDuctTape = false, float muzzleEmissionSensitivity = 0.5f, bool preventVolleyModifications = false, bool undroppableStarter = false)
+    bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f, bool preventDuctTape = false, float muzzleEmissionSensitivity = 0.5f, bool preventVolleyModifications = false, bool undroppableStarter = false,
+    bool muzzleOrphaned = false)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -1169,7 +1171,7 @@ public static class Extensions
         emissiveColorPower : muzzleEmissionColorPower,
         emissiveSensitivity: muzzleEmissionSensitivity,
         loops              : false,
-        orphaned           : false,
+        orphaned           : muzzleOrphaned,
         continuous         : false,
         unlit              : !muzzleLit,
         lightStrength      : muzzleLightStrength,
@@ -2438,7 +2440,7 @@ public static class Extensions
     return $"{gun.InternalSpriteName()}_idle";
   }
 
-  /// <summary>Get a Projectile's original direction for PostProcessProjectile purposes</summary>
+  /// <summary>Get a Projectile's original direction for PostProcessProjectile purposes (NOTE: i think this ONLY works for rotating projectiles)</summary>
   public static float OriginalDirection(this Projectile p)
   {
     return p.transform.right.XY().ToAngle();
@@ -2643,7 +2645,7 @@ public static class Extensions
 
   /// <summary>Adds a targeting reticle to the gun</summary>
   public static Gun AddReticle<T>(this Gun gun, GameObject reticleVFX, float reticleAlpha = 1f, float fadeInTime = 0f, float fadeOutTime = 0f, bool smoothLerp = false,
-    float maxDistance = -1f, float controllerScale = 1f, float rotateSpeed = 0f, CwaffReticle.Visibility visibility = CwaffReticle.Visibility.DEFAULT,
+    float minDistance = -1f, float maxDistance = -1f, float controllerScale = 1f, float rotateSpeed = 0f, CwaffReticle.Visibility visibility = CwaffReticle.Visibility.DEFAULT,
     bool aimFromPlayerCenter = false, bool background = false) where T : CwaffReticle
   {
     T reticle                   = gun.gameObject.AddComponent<T>();
@@ -2653,6 +2655,7 @@ public static class Extensions
     reticle.fadeOutTime         = fadeOutTime;
     reticle.smoothLerp          = smoothLerp;
     reticle.aimFromPlayerCenter = aimFromPlayerCenter;
+    reticle.minDistance         = minDistance;
     reticle.maxDistance         = maxDistance;
     reticle.controllerScale     = controllerScale;
     reticle.rotateSpeed         = rotateSpeed;
@@ -4277,5 +4280,17 @@ public static class Extensions
       if (actor.m_activeEffects[i].resistanceType == resistanceType || actor.m_activeEffects[i].effectIdentifier == resistanceString)
         return actor.m_activeEffects[i];
     return null;
+  }
+
+  /// <summary>Force a projectile to collide with all enemies within a certain radius of itself.</summary>
+  public static void CollideWithAllEnemiesInRadius(this Projectile proj, float radius)
+  {
+    LinearCastResult lcr = LinearCastResult.Pool.Allocate();
+    Vector2 ppos = proj.SafeCenter;
+    SpeculativeRigidbody pbody = proj.specRigidbody;
+    foreach (AIActor enemy in ppos.GetAllNearbyEnemies(radius: radius, includeHarmless: true))
+      if (enemy.specRigidbody is SpeculativeRigidbody enemyBody)
+        proj.ForceCollision(enemyBody, lcr);
+    LinearCastResult.Pool.Free(ref lcr);
   }
 }

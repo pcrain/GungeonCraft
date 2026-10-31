@@ -2,7 +2,7 @@
 
 ## 1.33.0 (TBD)
 
-- Added Autumn's Fury and Daoitzer
+- Added Autumn's Fury, Daoitzer, and Rubble Rouser
 - Added Leaf Tiara hat
 
 ## 1.33.2 (2026-10-23)

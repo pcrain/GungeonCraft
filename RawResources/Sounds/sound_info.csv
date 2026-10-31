@@ -472,3 +472,8 @@ daoitzer_imbalance_yang,0.0,1,sound,0
 daoitzer_imbalance_yin,-5.5,1,sound,0
 daoitzer_balance_yinyang,-2.0,1,sound,0
 daoitzer_balance_perfect,-1.0,1,sound,0
+rubble_crash_sound,3.0,1,sound,1
+rubble_break_sound,4.0,1,sound,1
+rubble_damage_sound,4.0,1,sound,1
+rubble_rouser_charge_sound,-4.5,1,sound,1
+rubble_rouser_fire_sound,3.0,1,sound,1

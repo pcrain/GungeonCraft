@@ -24,6 +24,7 @@ public class CwaffReticle : MonoBehaviour
   public bool       smoothLerp          = false; // whether the reticle smoothly lerps to its target
   public bool       aimFromPlayerCenter = false; // if true, aim is relative to player center; if false, aim is relative to barrel offset
   public bool       background          = false; // whether the reticle draws in the background
+  public float      minDistance         = -1f;   // minimum distance the reticle can be from the player (-1 == no min)
   public float      maxDistance         = -1f;   // maximum distance the reticle can be from the player (-1 == no max)
   public float      controllerScale     = 1f;    // on controller, determines how the reticle scales with aim distance
   public float      rotateSpeed         = 0f;    // how quickly the reticle rotates
@@ -145,12 +146,15 @@ public class CwaffReticle : MonoBehaviour
     else
       this._targetPos = this._player.unadjustedAimPoint.XY();
 
-    if (this.maxDistance > 0)
+    if (this.minDistance > 0 || this.maxDistance > 0)
     {
       Vector2 centerPos = this.aimFromPlayerCenter ? this._player.CenterPosition : this._gun.gun.barrelOffset.transform.position;
       Vector2 delta = (this._targetPos - centerPos);
-      if (delta.sqrMagnitude > (this.maxDistance * this.maxDistance))
+      float sqrMag = delta.sqrMagnitude;
+      if (this.maxDistance > 0 && sqrMag > (this.maxDistance * this.maxDistance))
         this._targetPos = centerPos + this.maxDistance * delta.normalized;
+      else if (this.minDistance > 0 && sqrMag < (this.minDistance * this.minDistance))
+        this._targetPos = centerPos + this.minDistance * delta.normalized;
     }
   }
 
