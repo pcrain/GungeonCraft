@@ -3,7 +3,7 @@
 ## 1.33.0 (TBD)
 
 - Added Autumn's Fury, Daoitzer, and Rubble Rouser
-- Added Mastery for Autumn's Fury
+- Added masteries for Autumn's Fury and Daoitzer
 - Added Leaf Tiara hat
 
 ## 1.33.2 (2026-10-23)

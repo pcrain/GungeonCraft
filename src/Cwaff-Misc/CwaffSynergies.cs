@@ -410,6 +410,8 @@ public static class CwaffSynergies
           tip: "Voidcaller passively grants a 10% chance to nullify enemy projectiles for each projectile in its current volley.");
         NewMastery<MasteryOfAutumnsFury>(MASTERY_AUTUMNS_FURY, AutumnsFury.ItemName,
           tip: "Autumn's Fury's vortex collects grounded debris instead of pushing it away, creating additional projectiles.");
+        NewMastery<MasteryOfDaoitzer>(MASTERY_DAOITZER, Daoitzer.ItemName,
+          tip: "While Yin and Yang are perfectly balanced, any damage the player takes is negated and increases Yang by 1 instead.");
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -729,6 +731,7 @@ internal class MasteryOfAkelus               : MasteryDummyItem {}
 internal class MasteryOfHightide             : MasteryDummyItem {}
 internal class MasteryOfVoidcaller           : MasteryDummyItem {}
 internal class MasteryOfAutumnsFury          : MasteryDummyItem {}
+internal class MasteryOfDaoitzer             : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -913,4 +916,5 @@ public enum Synergy {
     MASTERY_HIGHTIDE,
     MASTERY_VOIDCALLER,
     MASTERY_AUTUMNS_FURY,
+    MASTERY_DAOITZER,
 };

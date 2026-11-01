@@ -22,20 +22,25 @@ public class Daoitzer : CwaffGun
     internal static Projectile _PerfectYinYangProj = null;
     internal static Projectile _WeakYinProj = null;
     internal static Projectile _WeakYangProj = null;
+    internal static GameObject _YinVFX;
+    internal static GameObject _YangVFX;
 
     public int balance = 0;
 
     private int _lastBalance = -9999;
+    private GameObject _extantYinOribtal = null;
+    private GameObject _extantYangOribtal = null;
+    private float _vfxAngle = 0.0f;
 
     public static void Init()
     {
         Lazy.SetupGun<Daoitzer>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.9f, ammo: 333, shootFps: 30, reloadFps: 12,
+          .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.9f, ammo: 777, shootFps: 30, reloadFps: 12,
             dynamicBarrelOffsets: true, suppressFireAnim: true, suppressReloadAnim: true, autoPlay: false)
           .Attach<DaoitzerAmmoDisplay>()
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(sprite: "daoitzer_yin_taijitu", fps: 30, clipSize: 3, cooldown: 0.333f, shootStyle: ShootStyle.Automatic,
-            damage: 9.0f, speed: 40f, range: 9999f, force: 12f, hitSound: "daoitzer_impact_sound"))
+          .InitProjectile(GunData.New(sprite: "daoitzer_yin_taijitu", fps: 30, clipSize: 9, cooldown: 0.333f, shootStyle: ShootStyle.Automatic,
+            damage: 9.0f, speed: 40f, range: 9999f, force: 12f, hitSound: "daoitzer_impact_sound", customClip: true))
           .SetAllImpactVFX(VFX.CreatePool("daoitzer_impact_vfx", fps: 30, loops: false, emissiveColour: _YinColor, emissivePower: 30.0f, emissiveColorPower: 10.0f))
           .AttachTrail("daoitzer_trail", fps: 60, cascadeTimer: C.FRAME, softMaxLength: 1f, destroyOnEmpty: false, emissivePower: 30.0f, emissiveColorPower: 10.0f,
             emissiveColor: _YinTrailColor, emissiveSensitivity: 0.1f)
@@ -63,6 +68,9 @@ public class Daoitzer : CwaffGun
 
         _WeakYangProj = MakeProjectile(baseProj: _YangProj, damageMult: 0.67f);
         UnityEngine.Object.Destroy(_WeakYangProj.GetComponentInChildren<CwaffTrailController>().gameObject);
+
+        _YinVFX = VFX.Create("yin_vfx");
+        _YangVFX = VFX.Create("yang_vfx");
     }
 
     private static Projectile MakeProjectile(Projectile baseProj, string newSprite = null, float damageMult = 1.0f)
@@ -75,6 +83,8 @@ public class Daoitzer : CwaffGun
         base.OnPlayerPickup(player);
         player.OnDealtDamageContext -= this.OnDealtDamageContext;
         player.OnDealtDamageContext += this.OnDealtDamageContext;
+        player.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
+        player.healthHaver.ModifyDamage += this.OnMightTakeDamage;
         gun.spriteAnimator.Play();
     }
 
@@ -82,14 +92,113 @@ public class Daoitzer : CwaffGun
     {
         base.OnDroppedByPlayer(player);
         player.OnDealtDamageContext -= this.OnDealtDamageContext;
+        player.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
         gun.spriteAnimator.StopAndResetFrameToDefault();
         StopGlowing();
+        DismissVFX();
+    }
+
+    public override void OnDestroy()
+    {
+        DismissVFX();
+        if (this.PlayerOwner)
+        {
+            this.PlayerOwner.OnDealtDamageContext -= this.OnDealtDamageContext;
+            this.PlayerOwner.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
+        }
+        base.OnDestroy();
+    }
+
+    private void OnMightTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
+    {
+        if (this.balance != 0 || !this.Mastered || this.PlayerOwner is not PlayerController player || player.healthHaver != hh)
+          return;
+        data.ModifiedDamage = 0f;
+        hh.TriggerInvulnerabilityPeriod();
+        Lazy.DoDamagedFlash(hh);
+        this.balance--;
+        player.gameObject.Play("balance_block_sound");
     }
 
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
         UpdateAnimations(force: true);
+    }
+
+    public override void OwnedUpdate(GameActor owner, GunInventory inventory)
+    {
+        base.OwnedUpdate(owner, inventory);
+        UpdateVFX();
+    }
+
+    // public override void Update()
+    // {
+    //   base.Update();
+    //   UpdateVFX();
+    // }
+
+    private void UpdateVFX()
+    {
+      const float RPS = 0.5f;
+
+      if (this.balance != 0 || !this.Mastered || this.PlayerOwner is not PlayerController player)
+      {
+        DismissVFX();
+        return;
+      }
+      Vector2 ppos = player.sprite.WorldCenter;
+
+      if (!this._extantYinOribtal)
+      {
+        player.gameObject.Play("the_sound_of_achieving_balance");
+        this._extantYinOribtal = SpawnManager.SpawnVFX(_YinVFX, ppos, Quaternion.identity);
+        this._extantYinOribtal.transform.position = ppos;
+        this._extantYinOribtal.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 30.0f, glowColorPower: 10.0f,
+          glowColor: Color.Lerp(_YinTrailColor, _YangTrailColor, 0.5f), sensitivity: 1.2f);
+      }
+      if (!this._extantYangOribtal)
+      {
+        this._extantYangOribtal = SpawnManager.SpawnVFX(_YangVFX, ppos, Quaternion.identity);
+        this._extantYangOribtal.transform.position = ppos;
+        this._extantYangOribtal.GetComponent<tk2dSprite>().MakeGlowyBetter(glowAmount: 30.0f, glowColorPower: 10.0f,
+          glowColor: Color.Lerp(_YinTrailColor, _YangTrailColor, 0.5f), sensitivity: 1.2f);
+      }
+
+      float rot = (RPS * BraveTime.ScaledTimeSinceStartup);
+      rot -= (int)rot; // get fractional portion
+      if (rot > 0.5f)
+        rot = 1f - rot;
+      rot *= 2.0f;
+      this._vfxAngle += (0.5f + 0.5f * rot) * BraveTime.DeltaTime;
+      float angle = (-360f * this._vfxAngle).Clamp360();
+      this._extantYinOribtal.transform.position = ppos + angle.ToVector(1.75f);
+      this._extantYangOribtal.transform.position = ppos + angle.ToVector(-1.75f);
+      this._extantYinOribtal.transform.localRotation = (angle + 90f).EulerZ();
+      this._extantYangOribtal.transform.localRotation = (angle + 90f).EulerZ();
+    }
+
+    private static void Dissipate(tk2dSprite sprite)
+    {
+      tk2dMeshSprite ms = Lazy.CreateMeshSpriteObject(sprite, sprite.WorldCenter, pointMesh: true);
+      ms.gameObject.transform.rotation = sprite.transform.rotation;
+      ms.Dissipate(time: 1.0f, amplitudeEnd: 2f, progressive: true);
+    }
+
+    private void DismissVFX()
+    {
+        if (this._extantYinOribtal)
+        {
+          Dissipate(this._extantYinOribtal.GetComponent<tk2dSprite>());
+          UnityEngine.Object.Destroy(this._extantYinOribtal);
+          this._extantYinOribtal = null;
+        }
+        if (this._extantYangOribtal)
+        {
+          Dissipate(this._extantYangOribtal.GetComponent<tk2dSprite>());
+          UnityEngine.Object.Destroy(this._extantYangOribtal);
+          this._extantYangOribtal = null;
+        }
     }
 
     private void StopGlowing()
@@ -215,6 +324,24 @@ public class Daoitzer : CwaffGun
             }
             uic.GunAmmoCountLabel.Text = this._cachedBalanceString + this._owner.VanillaAmmoDisplay();
             return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.ProcessHeartSpriteModifications))]
+    private class DaoitzerShieldPatch
+    {
+        static void Postfix(GameUIHeartController __instance, PlayerController associatedPlayer)
+        {
+            if (!associatedPlayer || associatedPlayer.inventory == null || associatedPlayer.inventory.AllGuns == null)
+                return;
+            if (associatedPlayer.GetGun<Daoitzer>() is not Daoitzer d)
+                return;
+            if (!d.Mastered || d.balance != 0)
+                return;
+
+            __instance.m_currentFullHeartName  = "balance_heart_full_ui";
+            __instance.m_currentHalfHeartName  = "balance_heart_half_ui";
+            __instance.m_currentArmorName      = "balance_armor_ui";
         }
     }
 }
