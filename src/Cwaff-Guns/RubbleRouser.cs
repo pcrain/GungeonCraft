@@ -13,6 +13,7 @@ public class RubbleRouser : CwaffGun
     private const float _SOUND_TIMER_CHARGED = 0.07f;
 
     internal static GameObject _RockDebris = null;
+    internal static Projectile _RubbleProj = null;
 
     private float _nextSoundTime = 0.0f;
 
@@ -31,7 +32,7 @@ public class RubbleRouser : CwaffGun
           .InitProjectile(GunData.New(sprite: "rubble_rouser_projectile", clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true,
             damage: 200f, chargeTime: _MIN_CHARGE_TIME, force: 200f, speed: 45.0f, angleVariance: 3f, shouldRotate: false, preventOrbiting: true))
           .Attach<RubbleRouserProjectile>()
-          .Assign(out Projectile proj);
+          .Assign(out _RubbleProj);
 
         _RockDebris = BreakableAPIToolbox.GenerateDebrisObject(
             shardSpritePath         : $"groundhog_rock_vfx1",
@@ -87,6 +88,9 @@ public class RubbleRouserProjectile : MonoBehaviour
     private float _travelTime          = 0.0f;
     private float _lifetime            = 0.0f;
     private SpeculativeRigidbody _body = null;
+    private bool _mastered             = false;
+    private PlayerController _owner    = null;
+    private GameObject _shadow         = null;
 
     public void Setup(RubbleRouser rr)
     {
@@ -98,6 +102,7 @@ public class RubbleRouserProjectile : MonoBehaviour
     {
         // set up sprites
         this._projectile = base.GetComponent<Projectile>();
+        this._owner      = this._projectile.Owner as PlayerController;
         if (UnityEngine.Random.value < _SPECIAL_ROCK_CHANCE)
           this._projectile.spriteAnimator.PickFrame();
         else
@@ -111,7 +116,7 @@ public class RubbleRouserProjectile : MonoBehaviour
         PerformBoundsChecks(launchAngle);
         // determine our overall travel time
         this._halfwayPos = 0.5f * (this._startPos + this._landingPos);
-        this._travelTime = Mathf.Clamp(30.0f / Mathf.Max(1f, this._projectile.baseData.speed), 0.2f, 0.8f);
+        this._travelTime = Mathf.Clamp(30.0f / Mathf.Max(1f, this._projectile.baseData.speed), 0.2f, 0.8f).AddRandomSpread(0.1f);
 
         this._projectile.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
         this._projectile.damageTypes &= (~CoreDamageTypes.Electric); // remove robot's electric damage type from the projectile
@@ -120,18 +125,33 @@ public class RubbleRouserProjectile : MonoBehaviour
         this._body.CollideWithOthers = false;
         this._body.CollideWithTileMap = false;
         this._projectile.OnDestruction += OnProjectileDestruction;
+        this._shadow = this._projectile.sprite.AddShadow(parentToSprite: false);
+
+        if (this._owner && this._owner.GetGun<RubbleRouser>() is RubbleRouser rr && rr.Mastered)
+          this._mastered = true;
     }
 
     private void PerformBoundsChecks(float launchAngle)
     {
       RoomHandler startRoom = this._startPos.GetAbsoluteRoom();
       // if our target is in bounds, we're good
-      if (this._landingPos.InBounds() && startRoom == this._landingPos.GetAbsoluteRoom())
+      RoomHandler targetRoom = this._landingPos.GetAbsoluteRoom();
+      if (this._landingPos.InBounds() && (targetRoom == null || targetRoom.IsVisible || startRoom == targetRoom))
+      {
+        // verify we're at least one unit away from the nearest wall
+        Vector2 wallInFront = this._landingPos.ToNearestWall(out Vector2 wallInFrontNormal, launchAngle, minDistance: 0.1f);
+        if ((wallInFront - this._landingPos).sqrMagnitude < 1f)
+          this._landingPos = wallInFront + wallInFrontNormal;
+        Vector2 wallBehind = this._landingPos.ToNearestWall(out Vector2 wallBehindNormal, launchAngle + 180f, minDistance: 0.1f);
+        if ((wallBehind - this._landingPos).sqrMagnitude < 1f)
+          this._landingPos = wallBehind + wallBehindNormal;
         return;
+      }
       // if our midpoint is in bounds, raycast from there to our landing pos until we hit a wall; otherwise, start from the starting point
       Vector2 midpoint = 0.5f * (this._startPos + this._landingPos);
       Vector2 castpoint = (midpoint.InBounds() && startRoom == midpoint.GetAbsoluteRoom()) ? midpoint : this._startPos;
-      this._landingPos = castpoint.ToNearestWall(out Vector2 _, launchAngle, minDistance: 0.1f);
+      this._landingPos = castpoint.ToNearestWall(out Vector2 normal, launchAngle, minDistance: 0.1f);
+      this._landingPos += normal;
     }
 
     private void Update()
@@ -139,10 +159,13 @@ public class RubbleRouserProjectile : MonoBehaviour
       float dtime = BraveTime.DeltaTime;
       this._lifetime += dtime;
       float travelPercent = Mathf.Min(this._lifetime / this._travelTime, 1.0f);
-      float height = _ARC_HEIGHT * Mathf.Sin(Mathf.PI * travelPercent); // TODO: use an actual parabola here
-      Vector2 curPos = Vector2.Lerp(this._startPos, this._landingPos, travelPercent) + new Vector2(0.0f, height);
+      float height = _ARC_HEIGHT * Mathf.Sin(Mathf.PI * travelPercent);
+      Vector2 shadowPos = Vector2.Lerp(this._startPos, this._landingPos, travelPercent);
+      this._shadow.transform.position = shadowPos;
+      Vector2 curPos = shadowPos + new Vector2(0.0f, height);
       this._projectile.m_transform.rotation = (_NUM_FLIPS * 360f * travelPercent).EulerZ();
       float scale = 1f - Mathf.Min(travelPercent, 1f - travelPercent);
+      this._shadow.transform.localScale = new Vector3(2f * scale, 2f * scale, 1.0f);
       this._projectile.m_transform.localScale = new(scale, scale, 1.0f);
       this._body.Position = new Position(curPos);
       this._body.UpdateColliderPositions();
@@ -153,17 +176,23 @@ public class RubbleRouserProjectile : MonoBehaviour
     private void OnProjectileDestruction(Projectile projectile)
     {
         projectile.OnDestruction -= OnProjectileDestruction;
-        CrashLanding();
+        CrashLanding(projectile, createRubble: true, makeSentient: this._mastered);
     }
 
-    private void CrashLanding()
+    private void OnDestroy()
+    {
+      if (this._shadow)
+        UnityEngine.Object.Destroy(this._shadow);
+    }
+
+    internal static void CrashLanding(Projectile projectile, bool createRubble, bool makeSentient)
     {
         // collide with nearby enemies
-        this._projectile.CollideWithAllEnemiesInRadius(_CRASH_RADIUS + 0.5f);
+        projectile.CollideWithAllEnemiesInRadius(_CRASH_RADIUS + 0.5f);
         // land and scorch
-        Vector2 landingPos = this._projectile.SafeCenter;
+        Vector2 landingPos = projectile.SafeCenter;
         Exploder.DoRadialMinorBreakableBreak(landingPos, _CRASH_RADIUS);
-        Exploder.DoRadialMajorBreakableDamage(this._projectile.baseData.damage, landingPos, _CRASH_RADIUS);
+        Exploder.DoRadialMajorBreakableDamage(projectile.baseData.damage, landingPos, _CRASH_RADIUS);
         Exploder.DoRadialPush(landingPos, 100f, _CRASH_RADIUS);
         Lazy.ScorchGroundAt(landingPos);
         GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(0.5f, 6f, 0.5f, 0f), landingPos);
@@ -182,18 +211,26 @@ public class RubbleRouserProjectile : MonoBehaviour
           uniform          : true,
           randomFrame      : true
           );
-        // persist on ground
-        Rubble rubble = Rubble.Create(this._projectile.sprite);
         // play a sound
-        rubble.gameObject.Play("rubble_crash_sound");
+        projectile.gameObject.PlayUnique("rubble_crash_sound");
+        // persist on ground
+        if (createRubble)
+          Rubble.Create(projectile.sprite, sentient: makeSentient, owner: projectile.Owner as PlayerController);
     }
 }
 
 public class Rubble : MonoBehaviour
 {
     private const float _DAMAGE_SHAKE_TIME = 0.25f;
-    private const int _NUM_DEBRIS = 20;
-    private const int _RUBBLE_HP = 30;
+    private const int _NUM_DEBRIS          = 20;
+    private const int _RUBBLE_HP           = 30;
+    private const float _Z_OFFSET          = 0.25f;
+    private const float _RISE_TIME         = 0.5f;
+    private const float _MOVE_TIME         = 0.4f;
+    private const float _FALL_TIME         = 0.2f;
+    private const float _RISE_HEIGHT       = 5f;
+    private const float _SCAN_RADIUS       = 6.0f;
+    private const float _SCAN_DELAY        = 0.5f;
 
     private OccupiedCells _occupiedCells = null;
     private RoomHandler _room            = null;
@@ -203,8 +240,13 @@ public class Rubble : MonoBehaviour
     private tk2dSprite _sprite           = null;
     private float _shakeTimer            = 0.0f;
     private SpeculativeRigidbody _body   = null;
+    private bool _sentient               = false;
+    private bool _stomping               = false;
+    private PlayerController _owner      = null;
+    private GameObject _shadow           = null;
+    private float _scanTime              = 0.0f;
 
-    public static Rubble Create(tk2dBaseSprite sprite)
+    public static Rubble Create(tk2dBaseSprite sprite, bool sentient, PlayerController owner)
     {
       // persist on ground
       GameObject rubbleObject = sprite.DuplicateInWorld(copyShader: true).gameObject;
@@ -216,7 +258,7 @@ public class Rubble : MonoBehaviour
       if (sprite.WorldCenter.GetAbsoluteRoom() is RoomHandler room)
       {
         rubble._room = room;
-        rubble._occupiedCells = new OccupiedCells(rubble._body, room); // NOTE: constructor automatically updates Pathfinder
+        rubble._occupiedCells = new OccupiedCells(rubble._body, rubble._room); // NOTE: constructor automatically updates Pathfinder
       }
       PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(rubble._body);
       // make breakable
@@ -228,36 +270,156 @@ public class Rubble : MonoBehaviour
       rubble._breakable.OnDamaged += rubble.OnDamaged;
       // decouple sprite and body
       rubble._sprite = rubble._body.DecoupleSpriteFromCollider();
-      rubble._sprite.HeightOffGround = -3f;
-      rubble._pos = rubble._sprite.WorldCenter.ToVector3ZUp(rubble.transform.position.z);
+      rubble._sprite.HeightOffGround = _Z_OFFSET;
+      rubble._sprite.UpdateZDepth();
+      rubble._pos = rubble._sprite.WorldCenter.ToVector3ZisY(_Z_OFFSET);
+      rubble._owner = owner;
+      // set up timers for sentient ruble
+      rubble._sentient = sentient;
+      if (rubble._sentient)
+      {
+        rubble.UpdateSpriteOutline();
+        rubble._scanTime = BraveTime.ScaledTimeSinceStartup + _SCAN_DELAY;
+      }
       return rubble;
+    }
+
+    private void WatchForNearbyEnemies()
+    {
+      if (this._scanTime > BraveTime.ScaledTimeSinceStartup)
+        return;
+      if (Lazy.NearestEnemy(this._pos, ignoreWalls: true) is not AIActor actor)
+        return;
+      if ((actor.CenterPosition - this._pos).sqrMagnitude > (_SCAN_RADIUS * _SCAN_RADIUS))
+        return;
+
+      this._sentient = false;
+      this._stomping = true;
+      StartCoroutine(StompEnemy(actor));
+    }
+
+    private void UpdateSpriteOutline()
+    {
+      SpriteOutlineManager.AddOutlineToSprite(this._sprite, ExtendedColours.vibrantOrange, zOffset: _Z_OFFSET + 0.75f);
+    }
+
+    private void MoveSprite(Vector2 newPos, float height)
+    {
+      this._sprite.PlaceAtPositionByAnchor(new Vector2(newPos.x, newPos.y + height).Quantize(0.0625f).ToVector3ZisY(_Z_OFFSET), Anchor.MiddleCenter);
+      if (this._shadow)
+      {
+        this._shadow.transform.position = newPos;
+        float scale = 2f - (height / _RISE_HEIGHT);
+        this._shadow.transform.localScale = new Vector3(scale, scale, 1.0f);
+      }
+      this._sprite.HeightOffGround = _Z_OFFSET;
+      this._sprite.UpdateZDepth();
+    }
+
+    private IEnumerator StompEnemy(AIActor actor)
+    {
+      if (!actor || actor.specRigidbody is not SpeculativeRigidbody targetBody || actor.healthHaver is not HealthHaver targetHH || targetHH.IsDead)
+        yield break;
+
+      this._shadow = this._sprite.AddShadow(parentToSprite: false);
+      this._occupiedCells.Clear();
+      this._occupiedCells = null;
+      this._breakable.enabled = false; // NOTE: prevent self damage and weird shenanigans with collisions when multiple rocks are on screen
+      PhysicsEngine.Instance.Deregister(this._body);
+      int oldLayer = base.gameObject.layer;
+      base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
+
+      Vector2 startPos = this._pos;
+
+      for (float elapsed = 0f; elapsed < _RISE_TIME; elapsed += BraveTime.DeltaTime)
+      {
+          float percentDone = elapsed / _RISE_TIME;
+          MoveSprite(startPos, _RISE_HEIGHT * percentDone);
+          yield return null;
+      }
+
+      Vector2 curPos = startPos;
+      Vector2 targetPos = targetBody ? targetBody.UnitBottomCenter : startPos;
+
+      for (float elapsed = 0f; elapsed < _MOVE_TIME; elapsed += BraveTime.DeltaTime)
+      {
+          float percentDone = elapsed / _MOVE_TIME;
+          if (targetBody && targetHH && targetHH.IsAlive)
+            targetPos = targetBody.UnitBottomCenter;
+          curPos = Vector2.Lerp(startPos, targetPos, Ease.OutQuad(percentDone));
+          MoveSprite(curPos, _RISE_HEIGHT);
+          yield return null;
+      }
+
+      for (float elapsed = 0f; elapsed < _FALL_TIME; elapsed += BraveTime.DeltaTime)
+      {
+          float percentDone = elapsed / _FALL_TIME;
+          if (targetBody && targetHH && targetHH.IsAlive)
+            targetPos = targetBody.UnitBottomCenter;
+          MoveSprite(targetPos, _RISE_HEIGHT * (1f - percentDone));
+          yield return null;
+      }
+
+      base.gameObject.SetLayerRecursively(oldLayer);
+      if (targetBody && targetHH && targetHH.IsAlive)
+        targetPos = targetBody.UnitBottomCenter;
+      this._pos = targetPos;
+      MoveSprite(this._pos, 0.0f);
+      this._stomping = false;
+      base.transform.position = this._sprite.WorldCenter.ToVector3ZisY();
+      SpriteOutlineManager.RemoveOutlineFromSprite(this._sprite);
+      this._sprite.transform.position = base.transform.position;
+      this._body.Reinitialize();
+      this._body.UpdateColliderPositions();
+      this._occupiedCells = new OccupiedCells(this._body, this._room);
+      this._sprite.UpdateZDepth();
+      if (this._shadow)
+        UnityEngine.Object.Destroy(this._shadow);
+      this._shadow = null;
+
+      Projectile proj = base.gameObject.AddComponent<Projectile>();
+      proj.specRigidbody = this._body;
+      proj.baseData = new ProjectileData(RubbleRouser._RubbleProj.baseData); // NOTE: clone so this doesn't get overwritten
+      if (this._owner)
+        proj.SetOwnerAndStats(this._owner, updateCollisions: true);
+      RubbleRouserProjectile.CrashLanding(proj, createRubble: false, makeSentient: false);
+      proj.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;
+      proj.DieInAir(true, false, false, true);
+      this._body.PrimaryPixelCollider.IsTrigger = false; // NOTE: Projectile component sets the collider to a trigger, so we need to undo that
+      PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(this._body);
+      this._breakable.enabled = true;
+
+      yield break;
     }
 
     private void Update()
     {
-      if (this._shakeTimer <= 0.0f)
+      if (this._sentient)
+        WatchForNearbyEnemies();
+      if (this._stomping || this._shakeTimer <= 0.0f)
         return;
 
       this._shakeTimer -= BraveTime.DeltaTime;
-      Vector3 newPos = (this._shakeTimer <= 0.0f) ? this._pos : this._pos + new Vector2(0.125f * Mathf.Sin(100f * this._shakeTimer), 0.0f);
-      this._sprite.PlaceAtPositionByAnchor(newPos, Anchor.MiddleCenter);
-      this._sprite.UpdateZDepth();
+      Vector2 newPos = (this._shakeTimer <= 0.0f) ? this._pos : this._pos + new Vector2(0.125f * Mathf.Sin(100f * this._shakeTimer), 0.0f);
+      MoveSprite(newPos, 0.0f);
     }
 
     private void OnDamaged(float damage)
     {
       base.gameObject.Play("rubble_damage_sound");
       this._shakeTimer = _DAMAGE_SHAKE_TIME;
+      if (this._room != null && !this._room.IsSealed && this._breakable && this._breakable.enabled && !this._breakable.IsDestroyed)
+        this._breakable.Break(Vector2.zero);
     }
 
     private void OnBreak()
     {
-      if (this._destroyed)
+      if (!this || this._destroyed)
         return;
       this._destroyed = true;
 
-      // PhysicsEngine.Instance.Deregister(this._body);
-      this._occupiedCells.Clear();
+      if (this._occupiedCells != null)
+        this._occupiedCells.Clear();
       for (int i = 0; i < _NUM_DEBRIS; ++i)
         UnityEngine.Object.Instantiate(RubbleRouser._RockDebris, this._pos, Lazy.RandomEulerZ())
           .GetComponent<DebrisObject>().Trigger(Lazy.RandomVector(3f + 2f * UnityEngine.Random.value).ToVector3ZUp(2f), 0.25f);
@@ -267,7 +429,8 @@ public class Rubble : MonoBehaviour
 
     private void OnDestroy()
     {
+      if (this._shadow)
+        UnityEngine.Object.Destroy(this._shadow);
       OnBreak();
     }
 }
-

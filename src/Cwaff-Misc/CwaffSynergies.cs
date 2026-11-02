@@ -412,6 +412,8 @@ public static class CwaffSynergies
           tip: "Autumn's Fury's vortex collects grounded debris instead of pushing it away, creating additional projectiles.");
         NewMastery<MasteryOfDaoitzer>(MASTERY_DAOITZER, Daoitzer.ItemName,
           tip: "While Yin and Yang are perfectly balanced, any damage the player takes is negated and increases Yang by 1 instead.");
+        NewMastery<MasteryOfRubbleRouser>(MASTERY_RUBBLE_ROUSER, RubbleRouser.ItemName,
+          tip: "Rubble on the ground will reanimate when an enemy is nearby and attempt to crush them.");
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -732,6 +734,7 @@ internal class MasteryOfHightide             : MasteryDummyItem {}
 internal class MasteryOfVoidcaller           : MasteryDummyItem {}
 internal class MasteryOfAutumnsFury          : MasteryDummyItem {}
 internal class MasteryOfDaoitzer             : MasteryDummyItem {}
+internal class MasteryOfRubbleRouser         : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -917,4 +920,5 @@ public enum Synergy {
     MASTERY_VOIDCALLER,
     MASTERY_AUTUMNS_FURY,
     MASTERY_DAOITZER,
+    MASTERY_RUBBLE_ROUSER,
 };

@@ -4315,4 +4315,15 @@ public static class Extensions
     }
     return true;
   }
+
+  /// <summary>Creates and returns a shadow object parented to a specific sprite's transform</summary>
+  public static GameObject AddShadow(this tk2dBaseSprite sprite, bool parentToSprite = true)
+  {
+      GameObject shadowObject = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("DefaultShadowSprite"));
+      shadowObject.transform.position = sprite.WorldBottomCenter.Quantize(0.0625f);
+      if (parentToSprite)
+        shadowObject.transform.parent = sprite.transform;
+      DepthLookupManager.ProcessRenderer(shadowObject.GetComponent<Renderer>(), DepthLookupManager.GungeonSortingLayer.PLAYFIELD);
+      return shadowObject;
+  }
 }
