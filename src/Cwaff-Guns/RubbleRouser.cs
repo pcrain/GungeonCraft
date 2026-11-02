@@ -3,9 +3,9 @@ namespace CwaffingTheGungy;
 public class RubbleRouser : CwaffGun
 {
     public static string ItemName         = "Rubble Rouser";
-    public static string ShortDescription = "TBD";
-    public static string LongDescription  = "TBD";
-    public static string Lore             = "TBD";
+    public static string ShortDescription = "Rock It, Launcher";
+    public static string LongDescription  = "Launches large boulders a fixed distance away from the player. Boulders can be lobbed over walls, can block paths when grounded, and can be destroyed by projectiles or explosions.";
+    public static string Lore             = "Seasoned explorers of the Gungeon's mines will often employ tactical blast mining to combat the Gundead. The Rubble Rouser captures all of the fun of dropping unholy amounts of rocks on unsuspecting Gundead and puts it in a convenient, portable form factor.";
 
     private const float _MIN_CHARGE_TIME     = 0.8f;
     private const float _FIXED_RANGE         = 10f;
