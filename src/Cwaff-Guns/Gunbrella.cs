@@ -35,7 +35,7 @@ public class Gunbrella : CwaffGun
             reticleAlpha: 0.25f, fadeInTime : _MIN_CHARGE_TIME, fadeOutTime : 0.25f, maxDistance : _MAX_RETICLE_RANGE, controllerScale : 1f + _MAX_RETICLE_RANGE,
             visibility : CwaffReticle.Visibility.CHARGING, background: true)
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true, ammoCost: 1,
+          .InitProjectile(GunData.New(clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true, ammoCost: 1, preventSparks: true,
             damage: _PROJ_DAMAGE, sprite: "gunbrella_projectile", fps: 16, anchor: Anchor.MiddleLeft, freeze: 0.33f, chargeTime: _MIN_CHARGE_TIME,
             destroySound: "icicle_crash", barrageSize: _BARRAGE_SIZE, bossDamageMult: 0.6f)) // bosses are big and this does a lot of damage, so tone it down
           .SetAllImpactVFX(VFX.CreatePool("icicle_crash_particles", fps: 30, loops: false, anchor: Anchor.MiddleCenter, scale: 0.35f))
@@ -153,7 +153,6 @@ public class GunbrellaProjectile : MonoBehaviour
             this._exactTarget = target ? target.CenterPosition : this._owner.CenterPosition;
         }
 
-        this._projectile.damageTypes &= (~CoreDamageTypes.Electric); // remove robot's electric damage type from the projectile
         this._projectile.specRigidbody.OnPreRigidbodyCollision += this.OnPreCollision;
         this._projectile.specRigidbody.OnPreTileCollision += this.OnPreTileCollision;
 

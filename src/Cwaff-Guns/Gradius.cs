@@ -50,7 +50,7 @@ public class Gradius : CwaffGun
         _JadeRingImpactVFX = VFX.Create("jade_projectile_impact_vfx", fps: 60, loops: false, anchor: Anchor.MiddleCenter,
             emissivePower: 0.5f, emissiveColorPower: 1.5f, emissiveColour: ExtendedColours.vibrantOrange,
             lightColor: ExtendedColours.lime, lightRange: 1.5f, lightStrength: 7.0f);
-        _RoundLaserProjectile = Items._38Special.DefaultProjectile().Clone(GunData.New(damage: 25f)).ConvertToSpecialtyType<RoundLaser>();
+        _RoundLaserProjectile = Items._38Special.DefaultProjectile().Clone(GunData.New(damage: 25f, preventSparks: true)).ConvertToSpecialtyType<RoundLaser>();
         _WeakseekerProjectile = Items._38Special.CloneProjectile(GunData.New(speed: 300f))
           .SetAllImpactVFX(VFX.CreatePool("lord_projectile_impact_vfx", fps: 60, loops: false, anchor: Anchor.MiddleCenter,
             emissivePower: 2f, emissiveColorPower: 10.0f, emissiveColour: new Color(1.0f, 0.85f, 0.5f), emissiveSensitivity: 0.6f,
@@ -388,8 +388,6 @@ public class RoundLaser : Projectile
         if (this.sprite is tk2dBaseSprite sprite)
             sprite.renderer.enabled = false;
         this.UpdateCollisionMask();
-
-        base.damageTypes &= (~CoreDamageTypes.Electric); // remove robot's electric damage type from the projectile
 
         this._laserRing = Geometry.Create(Geometry.Shape.RING);
     }

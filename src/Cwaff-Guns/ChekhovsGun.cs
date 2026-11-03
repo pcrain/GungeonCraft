@@ -18,7 +18,7 @@ public class ChekhovsGun : CwaffGun
         Lazy.SetupGun<ChekhovsGun>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.RIFLE, reloadTime: 0.75f, ammo: 200, shootFps: 16, reloadFps: 16,
             muzzleVFX: "muzzle_chekhovs_gun", fireAudio: "chekhovs_gun_place_sound", reloadAudio: "chekhovs_gun_reload_sound")
-          .InitProjectile(GunData.New(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
+          .InitProjectile(GunData.New(clipSize: 8, cooldown: 0.1f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventSparks: true,
             damage: 15f, range: 1000f, speed: 200f, sprite: "chekhov_projectile", fps: 12, scale: 0.5f, anchor: Anchor.MiddleCenter))
           .Attach<ChekhovBullet>();
 
@@ -107,8 +107,6 @@ public class ChekhovBullet : MonoBehaviour
         Vector2 start = this._projectile.transform.position.XY();
         RoomHandler room = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(start.ToIntVector2());
         float oldSpeed = this._projectile.baseData.speed;
-        bool wasElectric = (this._projectile.damageTypes & CoreDamageTypes.Electric) > 0;
-        this._projectile.damageTypes &= (~CoreDamageTypes.Electric);
         this._projectile.SetSpeed(0.0001f);
         this._projectile.specRigidbody.CollideWithOthers  = false;
         this._projectile.specRigidbody.CollideWithTileMap = false;
@@ -161,8 +159,6 @@ public class ChekhovBullet : MonoBehaviour
         this._projectile.specRigidbody.CollideWithOthers  = true;
         this._projectile.specRigidbody.CollideWithTileMap = true;
         this._projectile.SetSpeed(oldSpeed);
-        if (wasElectric)
-            this._projectile.damageTypes |= CoreDamageTypes.Electric;
         EasyTrailBullet trail = this._projectile.gameObject.AddComponent<EasyTrailBullet>();
             trail.StartWidth = 0.1f;
             trail.EndWidth   = 0f;

@@ -26,7 +26,7 @@ public class Scotsman : CwaffGun
           .AddReticle<CwaffReticle>(reticleVFX : VFX.Create("scotsman_reticle", fps: 12, loops: true, anchor: Anchor.MiddleCenter),
             controllerScale : _MAX_RETICLE_RANGE, visibility : CwaffReticle.Visibility.CONTROLLER)
           .AddToShop(ItemBuilder.ShopType.Trorc)
-          .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic, customClip: true,
+          .InitProjectile(GunData.New(clipSize: 20, cooldown: 0.22f, shootStyle: ShootStyle.SemiAutomatic, customClip: true, preventSparks: true,
             damage: _BASE_EXPLOSION_DAMAGE, speed: 40.0f, sprite: "stickybomb_projectile", fps: 12, anchor: Anchor.MiddleCenter))
           .Attach<Stickybomb>();
 
@@ -408,7 +408,6 @@ public class Stickybomb : MonoBehaviour
 
         // Phase 2, lie in wait
         this._projectile.m_usesNormalMoveRegardless = true; // disable movement modifiers such as Helix Bullets
-        this._projectile.damageTypes &= (~CoreDamageTypes.Electric);  // remove electric effect after stopping
         while (!this._detonateSequenceStarted && this._scotsman)  // skip this sequence if not fired from Scotsman
             yield return null;
 

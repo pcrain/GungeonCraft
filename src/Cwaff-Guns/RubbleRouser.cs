@@ -29,7 +29,7 @@ public class RubbleRouser : CwaffGun
             reticleAlpha: 0.25f, fadeInTime : _MIN_CHARGE_TIME, fadeOutTime : 0.25f, minDistance : _FIXED_RANGE, maxDistance : _FIXED_RANGE,
             controllerScale : 1f + _FIXED_RANGE, visibility : CwaffReticle.Visibility.CHARGING, background: true, rotateSpeed: 90f)
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(sprite: "rubble_rouser_projectile", clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true,
+          .InitProjectile(GunData.New(sprite: "rubble_rouser_projectile", clipSize: 1, shootStyle: ShootStyle.Charged, customClip: true, preventSparks: true,
             damage: 200f, chargeTime: _MIN_CHARGE_TIME, force: 200f, speed: 45.0f, angleVariance: 3f, shouldRotate: false, preventOrbiting: true))
           .Attach<RubbleRouserProjectile>()
           .Assign(out _RubbleProj);
@@ -119,7 +119,6 @@ public class RubbleRouserProjectile : MonoBehaviour
         this._travelTime = Mathf.Clamp(30.0f / Mathf.Max(1f, this._projectile.baseData.speed), 0.2f, 0.8f).AddRandomSpread(0.1f);
 
         this._projectile.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
-        this._projectile.damageTypes &= (~CoreDamageTypes.Electric); // remove robot's electric damage type from the projectile
         this._body = this._projectile.specRigidbody;
         this._projectile.collidesWithEnemies = false;
         this._body.CollideWithOthers = false;
