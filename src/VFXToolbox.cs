@@ -1319,7 +1319,13 @@ public partial class CwaffVFX // private
         if (copyShaders)
         {
           this._material = this._sprite.renderer.material = prefab.gameObject.GetComponent<tk2dSprite>().renderer.material;
-          // this._sprite.MakeGlowyBetter(100.0f, Color.white, 100.0f, sensitivity: 2.0f);
+          this._sprite.usesOverrideMaterial = true;
+          this._material.DisableKeyword("BRIGHTNESS_CLAMP_OFF");
+          this._material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+          this._material.DisableKeyword("EMISSIVE_OFF");
+          this._material.EnableKeyword("EMISSIVE_ON");
+          this._material.DisableKeyword("TINTING_OFF");
+          this._material.EnableKeyword("TINTING_ON");
         }
         else if (emissivePower > 0)
         {

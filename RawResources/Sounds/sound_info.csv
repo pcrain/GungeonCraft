@@ -477,3 +477,6 @@ rubble_break_sound,2.0,1,sound,1
 rubble_damage_sound,4.0,1,sound,1
 rubble_rouser_charge_sound,-6.0,1,sound,1
 rubble_rouser_fire_sound,3.0,1,sound,1
+frost_effigy_block_sound,5.0,1,sound,0
+frost_effigy_break_sound,5.0,1,sound,0
+frost_effigy_deploy_sound,5.0,1,sound,0

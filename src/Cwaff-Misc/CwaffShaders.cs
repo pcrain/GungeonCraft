@@ -72,7 +72,7 @@ public static class CwaffShaders
             DigitizeShader = shaderBundle.LoadAsset<Shader>("assets/digitizeshader.shader");
             DigitizeTexture = shaderBundle.LoadAsset<Texture2D>("assets/bits.png");
             UnlitDigitizeShader = shaderBundle.LoadAsset<Shader>("assets/digitizeshaderunlit.shader");
-            GoldShader = shaderBundle.LoadAsset<Shader>("assets/goldshader.shader");
+            GoldShader = shaderBundle.LoadAsset<Shader>("assets/goldshader.shader");  // SheenColor, SheenWidth, SheenSpeed, SheenSpacing, SheenStrength, SheenAngle, GoldColor, SheenEmission, Goldness, EmissivePower, GoldNorm, PaletteTex, UsePaeltte, Cutoff
             CosmicShader = shaderBundle.LoadAsset<Shader>("assets/cosmicshader.shader");
             StarsTexture = shaderBundle.LoadAsset<Texture2D>("assets/startexture_cropped.png");
             GrayNoiseTexture = shaderBundle.LoadAsset<Texture2D>("assets/graynoise.png");

@@ -1,8 +1,8 @@
 # Changelog
 
-## 1.33.0 (TBD)
+## 1.34.0 (TBD)
 
-- Added Autumn's Fury, Daoitzer, and Rubble Rouser
+- Added Autumn's Fury, Daoitzer, Rubble Rouser, and Frost Effigy
 - Added masteries for Autumn's Fury, Daoitzer, and Rubble Rouser
 - Added Leaf Tiara hat
 

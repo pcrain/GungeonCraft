@@ -337,6 +337,7 @@ public class Initialisation : BaseUnityPlugin
                 GlassAmmoBox.Init();
                 TradingGuide.Init();
                 ChronosTrigger.Init();
+                FrostEffigy.Init();
 
                 setupActivesWatch.Stop();
             #endregion
