@@ -63,6 +63,13 @@ public class Sunderbuss : CwaffGun
       guic.m_currentHalfHeartName  = "lichguard_heart_half_ui";
     }
 
+    public override void OnFinishAttack(PlayerController player, Gun gun)
+    {
+        base.OnFinishAttack(player, gun);
+        if (this.gun.m_anim.IsPlaying(this.gun.shootAnimation))
+          this.gun.DoSwingVFX();
+    }
+
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);

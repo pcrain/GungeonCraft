@@ -10,6 +10,7 @@
 - Reworked how Battery Bullet's particle effects are suppressed on Chekhov's Gun, Forkbomb, Gradius, Gunbrella, and Scotsman projectiles
 	- (the old method outright removed the electric damage type from the projectiles; the new code keeps the electric damage and just removes the particles)
 - Fixed Death Note's opening sound effect not playing under some circumstances
+- Improved swinging animation for Sunderbuss
 
 ## 1.33.2 (2026-10-23)
 
