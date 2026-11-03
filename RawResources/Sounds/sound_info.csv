@@ -119,7 +119,7 @@ coffee_drink_sound,12.0,1,sound,0
 tesla_projectile_impact_sound,-3.0,1,sound,0
 minigun_wind_up_stop,-10.0,1,sound,0
 minigun_wind_down_stop,-10.0,1,sound,0
-minigun_spin,-3.5,0,sound,0
+minigun_spin,-6.5,0,sound,0
 bouncer_reload_short,-5.0,1,sound,0
 bouncer_reload,-5.0,1,sound,0
 fall_asleep_sound,-6.5,1,sound,0

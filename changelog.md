@@ -6,6 +6,7 @@
 - Added masteries for Autumn's Fury, Daoitzer, and Rubble Rouser
 - Added Leaf Tiara hat
 - Changed Adrenaline Shot's heart UI sprites to the vanilla empty heart sprites
+- Significantly lowered the volume of Natascha's revving sound
 
 ## 1.33.2 (2026-10-23)
 
