@@ -320,8 +320,6 @@ public class FrisbeeBehaviour : MonoBehaviour
             return;
         if (activeActions.Move.Vector.magnitude <= 0.1f)
             return;
-        if (this._rider.IsEffectivelyOutOfBounds()) //TODO: this is not implemented, but should be...just not sure how yet
-            return;
         Catch();
     }
 

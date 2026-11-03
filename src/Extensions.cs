@@ -1444,14 +1444,6 @@ public static class Extensions
     return offsets;
   }
 
-  /// <summary>Returns true if a projectile was fired from a gun without depleting ammo</summary>
-  public static bool FiredForFreeOld(this Projectile proj, Gun gun, ProjectileModule mod)
-  {
-    if (proj.Owner is PlayerController pc && pc.InfiniteAmmo.Value)
-      return true;
-    return (mod.ammoCost == 0 || gun.InfiniteAmmo || gun.LocalInfiniteAmmo);
-  }
-
   /// <summary>Add a component to an existing component's GameObject and return the component</summary>
   public static T AddComponent<T>(this Component component) where T : MonoBehaviour
   {
@@ -2516,21 +2508,6 @@ public static class Extensions
     mat.SetTexture("_PaletteTex", optionalPalette);
   }
 
-  /// <summary>Freezes a projectile and launches it with a short delay</summary>
-  public static void FreezeAndLaunchWithDelay(this Projectile p, float delay, float speed, string sound = null)
-  {
-    p.StartCoroutine(FreezeAndLaunchWithDelay_CR(p, delay, speed, sound));
-
-    static IEnumerator FreezeAndLaunchWithDelay_CR(Projectile p, float delay, float speed, string sound = null)
-    {
-      p.Speed = 0.001f;
-      yield return new WaitForSeconds(delay);
-      p.Speed = speed;
-      if (sound != null)
-        p.gameObject.Play(sound);
-    }
-  }
-
   /// <summary>Returns the distance from a projectile to its owner. Returns -1f if the projectile has no owner.</summary>
   public static float DistanceToOwner(this Projectile p)
   {
@@ -2671,13 +2648,6 @@ public static class Extensions
   {
     //NOTE: checking the name against "secret exit collider" is how vanilla gungeon blocks projectiles from the Oubilette entrance...rip
     return body.name.StartsWith("secret exit collider");
-  }
-
-  /// <summary>Returns true if the Player is at a location where they would effectively be stuck under normal circumstances</summary>
-  /// <remarks>NOT IMPLEMENTED</remarks>
-  public static bool IsEffectivelyOutOfBounds(this PlayerController player)
-  {
-    return false; //TODO: originally needed so Frisbee couldn't clip behind Bello's shop, but that was fixed...should still be implemented at some point
   }
 
   private static List<AIActor> _RefEnemies = new();
@@ -2951,24 +2921,6 @@ public static class Extensions
     return je.GetPrimaryDisplayName();
   }
 
-  /// <summary>Jumps to the next instruction a specific number of times, and moves after the final instance</summary>
-  public static bool JumpToNext(this ILCursor cursor, Func<Instruction, bool> match, int times = 1)
-  {
-    for(int i = 0; i < times; i++)
-      if (!cursor.TryGotoNext(MoveType.After, match))
-        return false;
-    return true;
-  }
-
-  /// <summary>Jumps to the next instruction a specific number of times, and moves before the final instance</summary>
-  public static bool JumpBeforeNext(this ILCursor cursor, Func<Instruction, bool> match, int times = 1)
-  {
-    for(int i = 0; i < times; i++)
-      if (!cursor.TryGotoNext(MoveType.Before, match))
-        return false;
-    return true;
-  }
-
   private static Dictionary<string, string> _EnemyNames = new();
   /// <summary>Get an enemy's Ammonomicon display name from their guid</summary>
   public static string AmmonomiconName(this string guid)
@@ -3183,27 +3135,10 @@ public static class Extensions
     return false;
   }
 
-  /// <summary>Get the name of the default clip for a sprite animator</summary>
-  public static string DefaultClipName(this tk2dSpriteAnimator animator)
-  {
-      if (!animator)
-          return "no animator";
-      if (animator.DefaultClip == null)
-          return "no default clip";
-      if (animator.DefaultClip.frames == null || animator.DefaultClip.frames.Length == 0)
-          return "no default clip frames";
-      tk2dSpriteAnimationFrame frame = animator.DefaultClip.frames[0];
-      if (!frame.spriteCollection)
-          return "no sprite collection";
-      return frame.spriteCollection.spriteDefinitions[frame.spriteId].name;
-  }
-
   //NOTE: this skews towards the bottom of the room for some reason
   /// <summary>Returns a random position in the GameActor's current room</summary>
   public static Vector2 RandomPosInCurrentRoom(this PlayerController player)
   {
-    if (!player)
-      player = GameManager.Instance.BestActivePlayer;
     RoomHandler room = player.CurrentRoom;
     if (room == null)
       return player.CenterPosition;
@@ -3504,12 +3439,6 @@ public static class Extensions
     return proj.Direction == Vector2.zero || proj.Direction.ToAngle().IsNearAngle((player.CenterPosition - proj.SafeCenter).ToAngle(), 90f);
   }
 
-  /// <summary>Get the percent of the way a given vector c is between two endpoints a and b (assumes all 3 points are roughly colinear)</summary>
-  public static float LazyInverseLerp(this Vector2 c, Vector2 a, Vector2 b)
-  {
-    return Mathf.Sqrt((c-a).sqrMagnitude / (b-a).sqrMagnitude);
-  }
-
   /// <summary>Creates chain lighting VFX from a normal VFX object</summary>
   public static GameObject MakeChainLightingVFX(this GameObject vfx)
   {
@@ -3688,14 +3617,6 @@ public static class Extensions
     }
     if (input.GetButton(GungeonActions.GungeonActionType.Shoot))
       input.ConsumeAll(GungeonActions.GungeonActionType.Shoot);
-  }
-
-  /// <summary>Get the current value for a PassiveItem flag for a player</summary>
-  public static int GetFlagCount(this PlayerController pc, Type flag)
-  {
-    if (PassiveItem.ActiveFlagItems.TryGetValue(pc, out var d))
-      return d.TryGetValue(flag, out int count) ? count : 0;
-    return 0;
   }
 
   /// <summary>Get all children of a transform</summary>
@@ -4017,16 +3938,6 @@ public static class Extensions
     return !GameManager.Instance.MainCameraController.PointIsVisible(pos, 0.4f);
   }
 
-  /// <summary>Get a random point on an enemy suitable for VFX or projectile attachments</summary>
-  public static Vector2 GetRandomPointOnBody(this AIActor enemy)
-  {
-    if (!enemy || !enemy.sprite)
-      return Vector2.zero;
-    if (enemy.specRigidbody is not SpeculativeRigidbody body || body.HitboxPixelCollider == null)
-      return enemy.CenterPosition;
-    return body.HitboxPixelCollider.UnitCenter + Lazy.RandomVector(enemy.sprite.GetBounds().extents.x * UnityEngine.Random.Range(0.15f, 0.5f));
-  }
-
   /// <summary>Get the player's aim direction relative to the center of the screen (mostly meaningful for keyboard and mouse).</summary>
   public static float AimAngleFromCenterOfScreen(this PlayerController player)
   {
@@ -4161,7 +4072,6 @@ public static class Extensions
     Vector2 max = collider.UnitTopRight;
     return new Vector2(Mathf.Clamp(pos.x, min.x, max.x), Mathf.Clamp(pos.y, min.y, max.y));
   }
-
 
   private static LinkedList<IntVector2> _FrontierCells = new();
   private static Dictionary<RoomHandler, Dictionary<IntVector2, int>> _PitMaps = new();

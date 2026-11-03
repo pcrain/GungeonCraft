@@ -317,7 +317,6 @@
     <Compile Include="src\Cwaff-Misc\CwaffEnums.cs"/>
     <Compile Include="src\Cwaff-Misc\GunBuilder.cs"/>
     <Compile Include="src\Cwaff-Misc\tk2dMeshSprite.cs"/>
-    <Compile Include="src\Cwaff-Misc\MiniInteractable.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffProjectile.cs"/>
     <Compile Include="src\Cwaff-Misc\CwaffBone.cs"/>
     <Compile Include="src\Cwaff-Misc\DamageAdjuster.cs"/>

@@ -382,7 +382,7 @@ public static class Lazy
       return UnityEngine.Random.value < 0.5f;
     }
 
-    /// <summary>Get the defautl projectile for a gun by id</summary>
+    /// <summary>Get the default projectile for a gun by id</summary>
     public static Projectile GunDefaultProjectile(int gunid)
     {
         return (PickupObjectDatabase.GetById(gunid) as Gun).DefaultModule.projectiles[0];

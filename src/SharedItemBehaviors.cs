@@ -16,6 +16,7 @@ public class FakeProjectileComponent : MonoBehaviour
         if (p.sprite)
             p.sprite.renderer.enabled = false;
         p.damageTypes &= (~CoreDamageTypes.Electric);
+        p.CurseSparks = false;
         p.collidesWithEnemies = false;
         p.collidesWithProjectiles = false;
     }
@@ -42,13 +43,8 @@ public class ProjectileExpiration : MonoBehaviour
 
     private void Die()
     {
-        if (base.gameObject.GetComponent<Projectile>() is not Projectile p)
-            return;
-
-        // disable some sparks to avoid visual weirdness with robot / cursed items
-        p.damageTypes &= (~CoreDamageTypes.Electric);
-        p.CurseSparks = false;
-        p.DieInAir(true,false,false,true);
+        if (base.gameObject.GetComponent<Projectile>() is Projectile p)
+          p.DieInAir(true,false,false,true);
     }
 }
 
@@ -104,40 +100,6 @@ public class FakeItem : CwaffPassive
     public static FakeItem Get(int id) => _PrefabsById[id];
     private static Dictionary<Type, FakeItem> _Prefabs     = new();
     private static Dictionary<int, FakeItem>  _PrefabsById = new();
-}
-
-public class BulletLifeTimer : MonoBehaviour
-{
-    public BulletLifeTimer()
-    {
-        this.secondsTillDeath = 1;
-        this.eraseInsteadOfDie = false;
-    }
-    private void Start()
-    {
-        timer = secondsTillDeath;
-        this.m_projectile = base.GetComponent<Projectile>();
-
-    }
-    private void FixedUpdate()
-    {
-        if (this.m_projectile != null)
-        {
-            if (timer > 0)
-            {
-                timer -= BraveTime.DeltaTime;
-            }
-            if (timer <= 0)
-            {
-                if (eraseInsteadOfDie) UnityEngine.Object.Destroy(this.m_projectile.gameObject);
-                else this.m_projectile.DieInAir();
-            }
-        }
-    }
-    public float secondsTillDeath;
-    public bool eraseInsteadOfDie;
-    private float timer;
-    private Projectile m_projectile;
 }
 
 public class ArcTowardsTargetBehavior : MonoBehaviour
@@ -207,88 +169,6 @@ public class ArcTowardsTargetBehavior : MonoBehaviour
         else
             this._projectile.SendInDirection(BraveMathCollege.DegreesToVector(newAngle), true);
     }
-}
-
-public class ProjectileSlashingBehaviour : MonoBehaviour  // stolen from NN
-{
-    public ProjectileSlashingBehaviour()
-    {
-        DestroyBaseAfterFirstSlash = false;
-        timeBetweenSlashes = 1;
-        SlashDamageUsesBaseProjectileDamage = true;
-    }
-    private void Start()
-    {
-        this.m_projectile = base.GetComponent<Projectile>();
-        if (this.m_projectile.Owner && this.m_projectile.Owner is PlayerController) this.owner = this.m_projectile.Owner as PlayerController;
-    }
-    private void Update()
-    {
-        if (this.m_projectile)
-        {
-            if (timer > 0)
-            {
-                timer -= BraveTime.DeltaTime;
-            }
-            if (timer <= 0)
-            {
-                this.m_projectile.StartCoroutine(DoSlash(0, 0));
-                if (doSpinAttack)
-                {
-                    this.m_projectile.StartCoroutine(DoSlash(90, 0.15f));
-                    this.m_projectile.StartCoroutine(DoSlash(180, 0.30f));
-                    this.m_projectile.StartCoroutine(DoSlash(-90, 0.45f));
-                }
-                timer = timeBetweenSlashes;
-            }
-        }
-    }
-    private IEnumerator DoSlash(float angle, float delay)
-    {
-        yield return new WaitForSeconds(delay);
-
-        if (slashParameters == null) { slashParameters = new SlashData(); ETGModConsole.Log("Made a new slashparam"); }
-
-
-        Projectile proj = this.m_projectile;
-        List<GameActorEffect> effects = new List<GameActorEffect>();
-        effects.AddRange(proj.GetFullListOfStatusEffects(true));
-
-        SlashData instSlash = SlashData.CloneSlashData(slashParameters);
-
-        if (SlashDamageUsesBaseProjectileDamage)
-        {
-            instSlash.damage = this.m_projectile.baseData.damage;
-            instSlash.bossDamageMult = this.m_projectile.BossDamageMultiplier;
-            instSlash.jammedDamageMult = this.m_projectile.BlackPhantomDamageMultiplier;
-            instSlash.enemyKnockbackForce = this.m_projectile.baseData.force;
-        }
-        instSlash.OnHitTarget += SlashHitTarget;
-
-        SlashDoer.DoSwordSlash(this.m_projectile.specRigidbody.UnitCenter, (this.m_projectile.Direction.ToAngle() + angle), owner, instSlash);
-
-        if (DestroyBaseAfterFirstSlash) StartCoroutine(Suicide());
-        yield break;
-    }
-    private IEnumerator Suicide()
-    {
-        yield return null;
-        UnityEngine.Object.Destroy(this.m_projectile.gameObject);
-        yield break;
-    }
-    public virtual void SlashHitTarget(GameActor target, bool fatal)
-    {
-
-    }
-
-    private float timer;
-    public float timeBetweenSlashes;
-    public bool doSpinAttack;
-    public bool SlashDamageUsesBaseProjectileDamage;
-    public bool DestroyBaseAfterFirstSlash;
-    public SlashData slashParameters;
-    private Projectile m_projectile;
-    private PlayerController owner;
 }
 
 public static class AnimatedBullet // stolen and modified from NN
@@ -1767,52 +1647,6 @@ public class FlippedCarryPixelOffset : MonoBehaviour
             fixer._cachedFlipped        = wasFlipped;
             fixer._firstSpriteCheck     = false;
         }
-    }
-}
-
-/// <summary>Class to allow for easy manual movement and manipulation of projectiles</summary>
-public class ManualMotionModule : ProjectileAndBeamMotionModule
-{
-    public override void Move(Projectile source, Transform projectileTransform, tk2dBaseSprite projectileSprite, SpeculativeRigidbody specRigidbody, ref float m_timeElapsed, ref Vector2 m_currentDirection, bool Inverted, bool shouldRotate)
-    {
-        // Vector2 vector = ((!projectileSprite) ? projectileTransform.position.XY() : projectileSprite.WorldCenter);
-        // if (!m_initialized)
-        // {
-        //     m_initialized        = true;
-        //     m_initialRightVector = ((!shouldRotate) ? m_currentDirection : projectileTransform.right.XY());
-        //     m_initialUpVector    = ((!shouldRotate) ? (Quaternion.Euler(0f, 0f, 90f) * m_currentDirection) : projectileTransform.up);
-        //     m_radius             = UnityEngine.Random.Range(MinRadius, MaxRadius);
-        //     m_currentAngle       = m_initialRightVector.ToAngle();
-        // }
-
-        // m_timeElapsed        += BraveTime.DeltaTime;
-        // float radius         = m_radius;
-        // float num            = source.Speed * BraveTime.DeltaTime;
-        // float num2           = num / ((float)Math.PI * 2f * radius) * 360f;
-        // m_currentAngle       += num2;
-        // Vector2 targetCenter = ((!usesAlternateOrbitTarget) ? source.Owner.CenterPosition : alternateOrbitTarget.UnitCenter);
-        // Vector2 vector2      = targetCenter + (Quaternion.Euler(0f, 0f, m_currentAngle) * Vector2.right * radius).XY();
-        // Vector2 velocity     = (vector2 - vector) / BraveTime.DeltaTime;
-        // m_currentDirection   = velocity.normalized;
-        // if (shouldRotate)
-        // {
-        //     float num7 = m_currentDirection.ToAngle();
-        //     if (float.IsNaN(num7) || float.IsInfinity(num7))
-        //         num7 = 0f;
-        //     projectileTransform.localRotation = Quaternion.Euler(0f, 0f, num7);
-        // }
-        // specRigidbody.Velocity = velocity;
-        // if (float.IsNaN(specRigidbody.Velocity.magnitude) || Mathf.Approximately(specRigidbody.Velocity.magnitude, 0f))
-        //     source.DieInAir();
-    }
-
-    public override void UpdateDataOnBounce(float angleDiff)
-    {
-    }
-
-    public override Vector2 GetBoneOffset(BasicBeamController.BeamBone bone, BeamController sourceBeam, bool inverted)
-    {
-        return Vector2.zero;
     }
 }
 
