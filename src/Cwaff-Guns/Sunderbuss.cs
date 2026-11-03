@@ -54,6 +54,15 @@ public class Sunderbuss : CwaffGun
         _ShockwavePrefab = new GameObject().RegisterPrefab().AddComponent<SunderbussShockwave>();
     }
 
+    private void OnHealthUIUpdated(PlayerController associatedPlayer, GameUIHeartController guic)
+    {
+      if (associatedPlayer.CurrentGun != this.gun || associatedPlayer.HasPassive<Lichguard>())
+        return;
+
+      guic.m_currentFullHeartName  = "lichguard_heart_full_ui";
+      guic.m_currentHalfHeartName  = "lichguard_heart_half_ui";
+    }
+
     public override void OnPlayerPickup(PlayerController player)
     {
         base.OnPlayerPickup(player);
@@ -62,6 +71,8 @@ public class Sunderbuss : CwaffGun
         player.healthHaver.ModifyDamage += this.ModifyDamage;
         player.healthHaver.OnDamaged += this.OnDamaged;
         CwaffEvents.OnStatsRecalculated += this.CheckForLichguard;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
+        CwaffEvents.OnHealthUIUpdated += this.OnHealthUIUpdated;
         CheckForLichguard(player);
     }
 
@@ -73,6 +84,7 @@ public class Sunderbuss : CwaffGun
         player.healthHaver.ModifyDamage -= this.ModifyDamage;
         player.healthHaver.OnDamaged -= this.OnDamaged;
         CwaffEvents.OnStatsRecalculated -= this.CheckForLichguard;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
         CheckForLichguard(player);
     }
 
@@ -94,8 +106,9 @@ public class Sunderbuss : CwaffGun
         {
             this.PlayerOwner.healthHaver.ModifyDamage -= this.ModifyDamage;
             this.PlayerOwner.healthHaver.OnDamaged -= this.OnDamaged;
-            CwaffEvents.OnStatsRecalculated -= this.CheckForLichguard;
         }
+        CwaffEvents.OnStatsRecalculated -= this.CheckForLichguard;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
         base.OnDestroy();
     }
 

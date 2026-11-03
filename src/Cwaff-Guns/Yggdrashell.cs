@@ -43,23 +43,14 @@ public class Yggdrashell : CwaffGun
         _LeafVFX = VFX.Create("leaf_vfx", emissivePower: 100f, emissiveColour: Color.green);
     }
 
-    [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.ProcessHeartSpriteModifications))]
-    private class YggdrashellShieldPatch
+    private void OnHealthUIUpdated(PlayerController associatedPlayer, GameUIHeartController guic)
     {
-        static void Postfix(GameUIHeartController __instance, PlayerController associatedPlayer)
-        {
-            if (!associatedPlayer || associatedPlayer.inventory == null || associatedPlayer.inventory.AllGuns == null)
-                return;
-            if (associatedPlayer.GetGun<Yggdrashell>() is not Yggdrashell y)
-                return;
-            if (!y._protectionActive)
-                return;
+      if (!this._protectionActive || this.PlayerOwner != associatedPlayer)
+          return;
 
-            __instance.m_currentFullHeartName  = "yggdrashell_heart_full_ui";
-            __instance.m_currentHalfHeartName  = "yggdrashell_heart_half_ui";
-            // __instance.m_currentEmptyHeartName = "yggdrashell_heart_empty_ui";
-            __instance.m_currentArmorName      = "yggdrashell_armor_ui";
-        }
+      guic.m_currentFullHeartName  = "yggdrashell_heart_full_ui";
+      guic.m_currentHalfHeartName  = "yggdrashell_heart_half_ui";
+      guic.m_currentArmorName      = "yggdrashell_armor_ui";
     }
 
     private static ProjectileModule SetupMod(int level, Gun gun)
@@ -149,6 +140,8 @@ public class Yggdrashell : CwaffGun
         this.gun.CurrentStrengthTier = 0;
         player.OnReceivedDamage += this.OnReceivedDamage;
         player.healthHaver.ModifyDamage += this.OnMightTakeDamage;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
+        CwaffEvents.OnHealthUIUpdated += this.OnHealthUIUpdated;
     }
 
     private void OnReceivedDamage(PlayerController player)
@@ -172,6 +165,7 @@ public class Yggdrashell : CwaffGun
         base.OnDroppedByPlayer(player);
         player.OnReceivedDamage -= this.OnReceivedDamage;
         player.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
     }
 
     public override void OnDestroy()
@@ -181,6 +175,7 @@ public class Yggdrashell : CwaffGun
             this.PlayerOwner.OnReceivedDamage -= this.OnReceivedDamage;
             this.PlayerOwner.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
         }
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
         base.OnDestroy();
     }
 

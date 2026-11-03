@@ -73,6 +73,16 @@ public class Daoitzer : CwaffGun
         _YangVFX = VFX.Create("yang_vfx");
     }
 
+    private void OnHealthUIUpdated(PlayerController associatedPlayer, GameUIHeartController guic)
+    {
+      if (this.balance != 0 || !this.Mastered || this.PlayerOwner != associatedPlayer)
+          return;
+
+      guic.m_currentFullHeartName  = "balance_heart_full_ui";
+      guic.m_currentHalfHeartName  = "balance_heart_half_ui";
+      guic.m_currentArmorName      = "balance_armor_ui";
+    }
+
     private static Projectile MakeProjectile(Projectile baseProj, string newSprite = null, float damageMult = 1.0f)
     {
       return baseProj.Clone(GunData.New(sprite: newSprite, hitSound: "daoitzer_impact_sound", damage: baseProj.baseData.damage * damageMult));
@@ -85,6 +95,8 @@ public class Daoitzer : CwaffGun
         player.OnDealtDamageContext += this.OnDealtDamageContext;
         player.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
         player.healthHaver.ModifyDamage += this.OnMightTakeDamage;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
+        CwaffEvents.OnHealthUIUpdated += this.OnHealthUIUpdated;
         gun.spriteAnimator.Play();
     }
 
@@ -93,6 +105,7 @@ public class Daoitzer : CwaffGun
         base.OnDroppedByPlayer(player);
         player.OnDealtDamageContext -= this.OnDealtDamageContext;
         player.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
         gun.spriteAnimator.StopAndResetFrameToDefault();
         StopGlowing();
         DismissVFX();
@@ -106,6 +119,7 @@ public class Daoitzer : CwaffGun
             this.PlayerOwner.OnDealtDamageContext -= this.OnDealtDamageContext;
             this.PlayerOwner.healthHaver.ModifyDamage -= this.OnMightTakeDamage;
         }
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
         base.OnDestroy();
     }
 
@@ -324,24 +338,6 @@ public class Daoitzer : CwaffGun
             }
             uic.GunAmmoCountLabel.Text = this._cachedBalanceString + this._owner.VanillaAmmoDisplay();
             return true;
-        }
-    }
-
-    [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.ProcessHeartSpriteModifications))]
-    private class DaoitzerShieldPatch
-    {
-        static void Postfix(GameUIHeartController __instance, PlayerController associatedPlayer)
-        {
-            if (!associatedPlayer || associatedPlayer.inventory == null || associatedPlayer.inventory.AllGuns == null)
-                return;
-            if (associatedPlayer.GetGun<Daoitzer>() is not Daoitzer d)
-                return;
-            if (!d.Mastered || d.balance != 0)
-                return;
-
-            __instance.m_currentFullHeartName  = "balance_heart_full_ui";
-            __instance.m_currentHalfHeartName  = "balance_heart_half_ui";
-            __instance.m_currentArmorName      = "balance_armor_ui";
         }
     }
 }

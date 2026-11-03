@@ -40,6 +40,8 @@ public static class CwaffEvents // global custom events we can listen for
     public static Action<PlayerController, PickupObject> OnWillPickUpAnyPassive;
     // Run right before a player will pick up currency
     public static Action<PlayerController, CurrencyPickup> OnWillPickUpCurrency;
+    // Run right before the player's health and armor UI finalize their sprite
+    public static Action<PlayerController, GameUIHeartController> OnHealthUIUpdated;
 
     internal static bool _OnFirstFloor = false;
     internal static bool _RunJustStarted = false;
@@ -313,6 +315,17 @@ public static class CwaffEvents // global custom events we can listen for
         {
             if (CwaffEvents.OnWillPickUpCurrency != null)
                 CwaffEvents.OnWillPickUpCurrency(player, __instance);
+        }
+    }
+
+    [HarmonyPatch]
+    private static class GameUIHeartControllerProcessHeartSpriteModificationsPatch
+    {
+        [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.ProcessHeartSpriteModifications))]
+        static void Postfix(GameUIHeartController __instance, PlayerController associatedPlayer)
+        {
+            if (CwaffEvents.OnHealthUIUpdated != null)
+              CwaffEvents.OnHealthUIUpdated(associatedPlayer, __instance);
         }
     }
 }

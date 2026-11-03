@@ -23,6 +23,16 @@ public class AdrenalineShot : CwaffPassive
         item.AddToSubShop(ItemBuilder.ShopType.Trorc);
     }
 
+    private void OnHealthUIUpdated(PlayerController associatedPlayer, GameUIHeartController guic)
+    {
+      if (!this._adrenalineActive || this.Owner != associatedPlayer)
+        return;
+
+      guic.m_currentFullHeartName  = "adrenaline_heart_full_ui";
+      guic.m_currentHalfHeartName  = "adrenaline_heart_half_ui";
+      guic.m_currentEmptyHeartName = "adrenaline_heart_empty_ui";
+    }
+
     public override void OnFirstPickup(PlayerController player)
     {
         if (player.ForceZeroHealthState) // Robot + 0-health characters can't use this item, so just give them some money
@@ -34,6 +44,8 @@ public class AdrenalineShot : CwaffPassive
         base.Pickup(player);
         if (!player.ForceZeroHealthState)
             player.healthHaver.ModifyDamage += this.OnTakeDamage;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
+        CwaffEvents.OnHealthUIUpdated += this.OnHealthUIUpdated;
     }
 
     public override void DisableEffect(PlayerController player)
@@ -45,6 +57,7 @@ public class AdrenalineShot : CwaffPassive
             DeactivateAdrenaline(); // shouldn't ever be able to happen, but just in case
         if (!player.ForceZeroHealthState)
             player.healthHaver.ModifyDamage -= this.OnTakeDamage;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
     }
 
     public override void Update()

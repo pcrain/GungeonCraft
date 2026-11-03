@@ -26,22 +26,13 @@ public class FrostEffigy : CwaffActive
           emissivePower: 10.0f, emissiveColorPower: 10.0f, emissiveSensitivity: 1.0f);
     }
 
-    [HarmonyPatch(typeof(GameUIHeartController), nameof(GameUIHeartController.ProcessHeartSpriteModifications))]
-    private class FrostEffigyShieldPatch
+    private void OnHealthUIUpdated(PlayerController associatedPlayer, GameUIHeartController guic)
     {
-        static void Postfix(GameUIHeartController __instance, PlayerController associatedPlayer)
-        {
-            if (!associatedPlayer || associatedPlayer.activeItems == null)
-                return;
-            if (associatedPlayer.GetActive<FrostEffigy>() is not FrostEffigy f)
-                return;
-            if (!f._extantEffigy)
-                return;
-
-            __instance.m_currentFullHeartName  = "frost_effigy_heart_full_ui";
-            __instance.m_currentHalfHeartName  = "frost_effigy_heart_half_ui";
-            __instance.m_currentArmorName      = "frost_effigy_armor_ui";
-        }
+      if (!this._extantEffigy || this._owner != associatedPlayer)
+          return;
+      guic.m_currentFullHeartName  = "frost_effigy_heart_full_ui";
+      guic.m_currentHalfHeartName  = "frost_effigy_heart_half_ui";
+      guic.m_currentArmorName      = "frost_effigy_armor_ui";
     }
 
     public override void Update()
@@ -73,10 +64,12 @@ public class FrostEffigy : CwaffActive
 
     public override void Pickup(PlayerController player)
     {
-        base.Pickup(player);
-        CwaffEvents.OnChangedRooms -= this.OnChangedRooms;
-        CwaffEvents.OnChangedRooms += this.OnChangedRooms;
-        this._owner = player;
+      base.Pickup(player);
+      CwaffEvents.OnChangedRooms -= this.OnChangedRooms;
+      CwaffEvents.OnChangedRooms += this.OnChangedRooms;
+      CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
+      CwaffEvents.OnHealthUIUpdated += this.OnHealthUIUpdated;
+      this._owner = player;
     }
 
     public override void OnPreDrop(PlayerController player)
@@ -84,8 +77,18 @@ public class FrostEffigy : CwaffActive
       if (this._extantEffigy)
         this._extantEffigy.Break(wasGentle: !player.IsInCombat);
       CwaffEvents.OnChangedRooms -= this.OnChangedRooms;
+      CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
       this._owner = null;
       base.OnPreDrop(player);
+    }
+
+    public override void OnDestroy()
+    {
+      if (this._extantEffigy)
+        this._extantEffigy.Break(wasGentle: !this._owner || !this._owner.IsInCombat);
+      CwaffEvents.OnChangedRooms -= this.OnChangedRooms;
+      CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
+      base.OnDestroy();
     }
 
     private void OnChangedRooms(PlayerController controller, RoomHandler handler1, RoomHandler handler2)

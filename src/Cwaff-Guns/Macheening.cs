@@ -41,6 +41,15 @@ public class Macheening : CwaffGun
         CwaffGun.SetUpDynamicBarrelOffsetsForExtraAnimation(gun, _PrefireAnim);
     }
 
+    private void OnHealthUIUpdated(PlayerController associatedPlayer, GameUIHeartController guic)
+    {
+      if (associatedPlayer.CurrentGun != this.gun || associatedPlayer.HasPassive<Lichguard>())
+        return;
+
+      guic.m_currentFullHeartName  = "lichguard_heart_full_ui";
+      guic.m_currentHalfHeartName  = "lichguard_heart_half_ui";
+    }
+
     public override void Update()
     {
         base.Update();
@@ -63,6 +72,8 @@ public class Macheening : CwaffGun
         player.healthHaver.ModifyDamage += this.ModifyDamage;
         player.healthHaver.OnDamaged += this.OnDamaged;
         CwaffEvents.OnStatsRecalculated += this.CheckForLichguard;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
+        CwaffEvents.OnHealthUIUpdated += this.OnHealthUIUpdated;
         CheckForLichguard(player);
     }
 
@@ -106,6 +117,7 @@ public class Macheening : CwaffGun
         player.healthHaver.ModifyDamage -= this.ModifyDamage;
         player.healthHaver.OnDamaged -= this.OnDamaged;
         CwaffEvents.OnStatsRecalculated -= this.CheckForLichguard;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
         CheckForLichguard(player);
     }
 
@@ -115,8 +127,9 @@ public class Macheening : CwaffGun
         {
             this.PlayerOwner.healthHaver.ModifyDamage -= this.ModifyDamage;
             this.PlayerOwner.healthHaver.OnDamaged -= this.OnDamaged;
-            CwaffEvents.OnStatsRecalculated -= this.CheckForLichguard;
         }
+        CwaffEvents.OnStatsRecalculated -= this.CheckForLichguard;
+        CwaffEvents.OnHealthUIUpdated -= this.OnHealthUIUpdated;
         base.OnDestroy();
     }
 
