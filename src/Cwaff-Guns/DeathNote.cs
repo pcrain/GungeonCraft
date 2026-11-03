@@ -78,7 +78,7 @@ public class DeathNote : CwaffGun
         CreateHUDIfNecessary();
         if (this._hud && !this.gun.m_moduleData[this.gun.DefaultModule].onCooldown) // don't toggle HUD while the weapon is on cooldown
         {
-          gun.PlayIfExists("death_note_open", restartIfPlaying: true);
+          gun.PlayIfExists("death_note_open_sound", restartIfPlaying: true);
           this._hud.Toggle();
           if (this.Mastered)
             SetFocus(true);

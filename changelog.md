@@ -9,6 +9,7 @@
 - Significantly lowered the volume of Natascha's revving sound
 - Reworked how Battery Bullet's particle effects are suppressed on Chekhov's Gun, Forkbomb, Gradius, Gunbrella, and Scotsman projectiles
 	- (the old method outright removed the electric damage type from the projectiles; the new code keeps the electric damage and just removes the particles)
+- Fixed Death Note's opening sound effect not playing under some circumstances
 
 ## 1.33.2 (2026-10-23)
 

@@ -326,7 +326,6 @@
     <Compile Include="src\Main.cs"/>
     <Compile Include="src\CwaffConfig.cs"/>
     <EmbeddedResource Include="Resources\cwaffshaders-macos"/>
-    <EmbeddedResource Include="Resources\armistice_bosscard.png"/>
     <EmbeddedResource Include="Resources\CwaffingTheGungy.bnk"/>
     <EmbeddedResource Include="Resources\cwaffshaders-linux"/>
     <EmbeddedResource Include="Resources\sans_bosscard.png"/>
