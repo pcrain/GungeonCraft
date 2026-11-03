@@ -201,19 +201,38 @@ public static class CwaffTweaks
 
         private static void ReplaceLoadingScreenAnimation(FoyerPreloader loader, string anim, Vector2 size)
         {
-            dfSprite oldThrobber = loader.Throbber;
-            loader.Throbber = UnityEngine.Object.Instantiate(loader.Throbber.gameObject).GetComponent<dfSprite>();
-            loader.Throbber.gameObject.transform.parent = oldThrobber.gameObject.transform.parent;
-            loader.Throbber.Position = oldThrobber.Position;
-            oldThrobber.IsVisible = false;
+          loader.gameObject.AddComponent<FoyerPreloaderModifier>().Setup(loader, anim, size);
+        }
+
+        private class FoyerPreloaderModifier : MonoBehaviour
+        {
+          private FoyerPreloader _loader;
+          private dfSprite _oldThrobber;
+
+          public void Setup(FoyerPreloader loader, string anim, Vector2 size)
+          {
+            this._loader = loader;
+            this._oldThrobber = this._loader.Throbber;
+            this._loader.Throbber = UnityEngine.Object.Instantiate(this._loader.Throbber.gameObject).GetComponent<dfSprite>();
+            this._loader.Throbber.gameObject.transform.parent = this._oldThrobber.gameObject.transform.parent;
+            this._loader.Throbber.Position = this._oldThrobber.Position;
+            this._oldThrobber.IsVisible = false;
             List<string> frames = ResMap.Get(anim).Base();
-            loader.Throbber.SpriteName = frames[0];
-            loader.Throbber.Size = size;
-            loader.Throbber.Atlas = CwaffCharacter.UIAtlas;
-            dfAnimationClip clip = loader.Throbber.gameObject.GetComponent<dfSpriteAnimation>().clip
-                = new GameObject("temp_loading_anim_clip", typeof(dfAnimationClip)).GetComponent<dfAnimationClip>();
-            clip.atlas = CwaffCharacter.UIAtlas;
-            clip.sprites = frames;
+            this._loader.Throbber.SpriteName = frames[0];
+            this._loader.Throbber.Size = size;
+            this._loader.Throbber.Atlas = CwaffCharacter.UIAtlas;
+            dfSpriteAnimation animation = this._loader.Throbber.gameObject.GetComponent<dfSpriteAnimation>();
+            animation.clip = new GameObject("temp_loading_anim_clip", typeof(dfAnimationClip)).GetComponent<dfAnimationClip>();
+            animation.clip.atlas = CwaffCharacter.UIAtlas;
+            animation.clip.sprites = frames;
+          }
+
+          private void OnDestroy()
+          {
+            UnityEngine.Object.Destroy(this._loader.Throbber.gameObject);
+            this._loader.Throbber = this._oldThrobber;
+            this._oldThrobber.IsVisible = true;
+          }
         }
     }
 
