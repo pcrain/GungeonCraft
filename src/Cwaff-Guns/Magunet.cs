@@ -100,12 +100,12 @@ public class Magunet : CwaffGun
                 float spread = _SPREAD * (i / _NUM_PARTICLES);
                 float angleRight = this.gun.CurrentAngle + spread;
                 GameObject or = SpawnManager.SpawnVFX(_MagunetBeamVFX, (gunpos + angleRight.ToVector(_REACH)).ToVector3ZUp(), angleRight.EulerZ());
-                    or.AddComponent<MagnetParticle>().Setup(this.gun, _REACH, spread);
+                    or.AddComponent<MagnetParticle>().Setup(this.gun, _REACH, spread, false, null);
                 if (i == 0)
                     continue;
                 float angleLeft = this.gun.CurrentAngle - spread;
                 GameObject ol = SpawnManager.SpawnVFX(_MagunetBeamVFX, (gunpos + angleLeft.ToVector(_REACH)).ToVector3ZUp(), angleLeft.EulerZ());
-                    ol.AddComponent<MagnetParticle>().Setup(this.gun, _REACH, -spread);
+                    ol.AddComponent<MagnetParticle>().Setup(this.gun, _REACH, -spread, false, null);
             }
         }
 
@@ -114,10 +114,17 @@ public class Magunet : CwaffGun
             // Make sure our debris doesn't glitch out with existing additional movement modifiers
             if (!debris.DeactivateDebris())
               continue;
-
-            // Actually add the MagnetParticle component to it
-            Vector2 debrisCenter = debris.sprite ? debris.sprite.WorldCenter : debris.gameObject.transform.position.XY();
-            debris.gameObject.AddComponent<MagnetParticle>().Setup(this.gun, (debrisCenter - gunpos).magnitude);
+            tk2dBaseSprite sprite = debris.sprite;
+            if (!sprite)
+              sprite = debris.gameObject.GetComponent<tk2dSprite>();
+            if (sprite)
+            {
+              Material mat = sprite.renderer.material;
+              Texture2D palette = mat.HasProperty("_PaletteTex") ? (mat.GetTexture("_PaletteTex") as Texture2D) : null;
+              GameObject newDebrisObject = sprite.DuplicateInWorld(optionalPalette: palette, copyShader: true).gameObject;
+              newDebrisObject.AddComponent<MagnetParticle>().Setup(this.gun, (sprite.WorldCenter - gunpos).magnitude, 0.0f, true, debris);
+            }
+            UnityEngine.Object.Destroy(debris.gameObject);
         }
     }
 }
@@ -158,6 +165,7 @@ public class MagnetParticle : MonoBehaviour
     private Vector2 _velocity      = Vector2.zero;
     private float _lifetime        = 0.0f;
     private bool _isDebris         = true; // false for the VFX particles created by the vacuum animation itself, true for actual debris
+    private bool _isCorpse         = false; // false for the VFX particles created by the vacuum animation itself, true for actual debris
     private DebrisObject _debris   = null;
     private float _startDistance   = 0.0f;
     private float _startScaleX     = 1.0f;
@@ -170,42 +178,47 @@ public class MagnetParticle : MonoBehaviour
     private float _timeInStasis    = 0.0f;
     private Vector2 _spriteCenter  = Vector2.zero;
 
-    public void Setup(Gun g, float startDistance = 0.0f, float offsetAngle = 0f)
+    private float _debrisInertialMass    = 0.0f;
+    private bool _debrisCanRotate        = false;
+    private float _debrisAngularVelocity = 0.0f;
+    private int _debrisBounceCount       = 0;
+    private float _debrisDecayOnBounce   = 0.0f;
+
+    public void Setup(Gun g, float startDistance, float offsetAngle, bool isDebris, DebrisObject debris)
     {
         this._gun           = g;
         this._startDistance = startDistance;
-        this._debris        = base.gameObject.GetComponent<DebrisObject>();
-        this._isDebris      = this._debris != null;
-        this._sprite        = this._isDebris ? this._debris.sprite : base.gameObject.GetComponent<tk2dSprite>();
+        this._isDebris      = isDebris;
+        this._sprite        = base.gameObject.GetComponent<tk2dSprite>();
         this._startScaleX   = this._sprite.scale.x;
         this._startScaleY   = this._sprite.scale.y;
         this._startAngle    = offsetAngle;
         this._spriteCenter  = this._sprite.WorldCenter;
-
-        // get rid of any previously-cached speculativerigidbody information so that enemies we've previously
-        //   collided with don't detect us as the same projectile and ignore us
-        if (this._debris && this._debris.specRigidbody)
+        if (debris)
         {
-            UnityEngine.Object.Destroy(this._debris.specRigidbody);
-            this._debris.specRigidbody = null;
-            this._debris.RegenerateCache();
+          this._isCorpse              = debris.IsCorpse;
+          this._debrisInertialMass    = debris.inertialMass;
+          this._debrisCanRotate       = debris.canRotate;
+          this._debrisAngularVelocity = debris.angularVelocity;
+          this._debrisBounceCount     = debris.bounceCount;
+          this._debrisDecayOnBounce   = debris.decayOnBounce;
         }
-
-        #if DEBUG
-        if (this._debris)
-        {
-            // this._debris.m_transform;
-            // Lazy.DebugLog($"sprite transform same as object transform? {this._sprite.transform == base.gameObject.transform}");
-            // Lazy.DebugLog($"sprite transform's parent is object transform? {this._sprite.transform.parent == base.gameObject.transform}");
-            // Lazy.DebugLog($"got debris with sprite {this._debris.sprite.CurrentSprite.name} at base pos {base.transform.position.XY()} with sprite center at {this._debris.sprite.WorldCenter} (offset = {this._debris.sprite.WorldCenter - base.transform.position.XY()}) and body at {this._debris.specRigidbody.UnitCenter}  (offset = {this._debris.specRigidbody.UnitCenter - base.transform.position.XY()})");
-        }
-        #endif
     }
 
     private void LaunchDebrisInStasis(Vector2 velocity)
     {
         const int COLLISION_WIDTH = 8;
-        SpeculativeRigidbody body = this._debris.specRigidbody = base.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
+
+        this._debris                 = base.gameObject.AddComponent<DebrisObject>();
+        this._debris.IsCorpse        = this._isCorpse;
+        this._debris.inertialMass    = this._debrisInertialMass;
+        this._debris.canRotate       = this._debrisCanRotate;
+        this._debris.angularVelocity = this._debrisAngularVelocity;
+        this._debris.bounceCount     = this._debrisBounceCount;
+        this._debris.decayOnBounce   = this._debrisDecayOnBounce;
+        this._debris.sprite          = this._sprite;
+        SpeculativeRigidbody body    = this._debris.specRigidbody = base.gameObject.AddComponent<SpeculativeRigidbody>();
+
         body.ClearSpecificCollisionExceptions();
         body.CollideWithTileMap = true;
         body.CollideWithOthers  = true;
@@ -220,12 +233,12 @@ public class MagnetParticle : MonoBehaviour
 
         DebrisProjectile p    = base.gameObject.AddComponent<DebrisProjectile>();
         p.specRigidbody       = body;
-        p.baseData.damage     = this._debris.IsCorpse ? 30f : 2f;
+        p.baseData.damage     = this._isCorpse ? 30f : 2f;
         p.baseData.range      = 1000000f;
         p.baseData.speed      = velocity.magnitude;
         p.baseData.force      = 50f;
         p.SetOwnerAndStats(this._gun.CurrentOwner);
-        p.DestroyMode         = Projectile.ProjectileDestroyMode.BecomeDebris;
+        p.DestroyMode         = Projectile.ProjectileDestroyMode.DestroyComponent;
         p.ManualControl       = true; // let debris velocity take care of movement
         p.OnHitEnemy         += this.OnHitEnemy;
         p.shouldRotate        = true;
@@ -236,13 +249,9 @@ public class MagnetParticle : MonoBehaviour
 
         if (p.Owner is PlayerController player)
             velocity *= player.ProjSpeedMult();
-        this._debris.m_currentPosition    = this.gameObject.transform.position.WithZ(0f);
-        this._debris.m_transform.rotation = this.gameObject.transform.rotation;
-        this._debris.enabled              = true;
-        if (!this._debris.sprite)
-            this._debris.sprite = this._sprite;  // debris sometimes forgets its cached sprite because of course it does D:
+        this._debris.m_currentPosition = this.gameObject.transform.position.WithZ(0f);
+        this._debris.Trigger(velocity, 0.0f);
         this._debris.ApplyVelocity(velocity);
-
         UnityEngine.Object.Destroy(this);
     }
 

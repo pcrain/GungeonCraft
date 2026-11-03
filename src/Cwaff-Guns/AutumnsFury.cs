@@ -80,20 +80,20 @@ public class AutumnsFury : CwaffGun
     {
         foreach(DebrisObject debris in player.CenterPosition.DebrisWithinCone(this.radius * this.radius, 0, 360f, limit: 100, allowJunk: false))
         {
-            GameObject debrisObject = debris.gameObject;
             // Make sure our debris doesn't glitch out with existing additional movement modifiers
             if (!debris.DeactivateDebris(disable: false))
               continue;
             tk2dBaseSprite sprite = debris.sprite;
             if (!sprite)
               sprite = debris.gameObject.GetComponent<tk2dSprite>();
-            if (!sprite)
-              continue;
-            Material mat = sprite.renderer.material;
-            Texture2D palette = mat.HasProperty("_PaletteTex") ? (mat.GetTexture("_PaletteTex") as Texture2D) : null;
-            GameObject newDebrisObject = sprite.DuplicateInWorld(optionalPalette: palette, copyShader: true).gameObject;
+            if (sprite)
+            {
+              Material mat = sprite.renderer.material;
+              Texture2D palette = mat.HasProperty("_PaletteTex") ? (mat.GetTexture("_PaletteTex") as Texture2D) : null;
+              GameObject newDebrisObject = sprite.DuplicateInWorld(optionalPalette: palette, copyShader: true).gameObject;
+              newDebrisObject.AddComponent<AutumnsFuryProjectile>().Setup(true, player);
+            }
             UnityEngine.Object.Destroy(debris.gameObject);
-            newDebrisObject.AddComponent<AutumnsFuryProjectile>().Setup(true, player);
         }
     }
 

@@ -12,6 +12,7 @@
 	- (the old method outright removed the electric damage type from the projectiles; the new code keeps the electric damage and just removes the particles)
 - Fixed Death Note's opening sound effect not playing under some circumstances
 - Improved swinging animation for Sunderbuss
+- Reduced lag and general jankiness surrouding Magunet's debris manipulation mechanics
 
 ## 1.33.2 (2026-10-23)
 
