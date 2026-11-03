@@ -4,7 +4,8 @@
 
 - Added Autumn's Fury, Daoitzer, Rubble Rouser, and Frost Effigy
 - Added masteries for Autumn's Fury, Daoitzer, and Rubble Rouser
-- Added Leaf Tiara hat
+- Added Leaf Tiara and Cubulon hats
+	- Cubulon hat sprites thanks to Dallan!
 - Changed Adrenaline Shot's heart UI sprites to the vanilla empty heart sprites
 - Significantly lowered the volume of Natascha's revving sound
 - Reworked how Battery Bullet's particle effects are suppressed on Chekhov's Gun, Forkbomb, Gradius, Gunbrella, and Scotsman projectiles
