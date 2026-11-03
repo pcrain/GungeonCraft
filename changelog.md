@@ -5,6 +5,7 @@
 - Added Autumn's Fury, Daoitzer, Rubble Rouser, and Frost Effigy
 - Added masteries for Autumn's Fury, Daoitzer, and Rubble Rouser
 - Added Leaf Tiara hat
+- Changed Adrenaline Shot's heart UI sprites to the vanilla empty heart sprites
 
 ## 1.33.2 (2026-10-23)
 
