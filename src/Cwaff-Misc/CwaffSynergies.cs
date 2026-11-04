@@ -201,6 +201,8 @@ public static class CwaffSynergies
           tip: "If the first two enemies Subtractor Beam's projectile passes through have the same HP, both are killed.");
         NewSynergy(HYPERLINKS, "Hyperlinks", new[]{IName(ChainDriver.ItemName), IName(Femtobyte.ItemName)},
           tip: "Chain Driver's projectiles phase through inner walls.");
+        NewSynergy(FRIGHT_TRAIN, "Fright Train", new[]{IName(DerailGun.ItemName), "jk47"},
+          tip: "Derail Gun inflicts fear on enemies when reloading.");
 
       #endregion
 
@@ -826,6 +828,7 @@ public enum Synergy {
     MONEY_MAKES_THE_WORLD_GO_ROUND,
     ZEROED_OUT,
     HYPERLINKS,
+    FRIGHT_TRAIN,
 
     // Masteries
     MASTERY_GRANDMASTER,

@@ -62,8 +62,26 @@ public class DerailGun : CwaffGun
     public override void OnSwitchedToThisGun()
     {
         base.OnSwitchedToThisGun();
-        if (this.PlayerOwner is PlayerController player)
+        PlayerController player = this.PlayerOwner;
+        if (player)
           DisableContactImmunity(player);
+        if (player && player.HasSynergy(Synergy.FRIGHT_TRAIN))
+        {
+          if (!base.gameObject.GetComponent<ScareEnemiesModifier>())
+          {
+            ScareEnemiesModifier scareMod = base.gameObject.AddComponent<ScareEnemiesModifier>();
+            scareMod.FleeData = new(){
+              StartDistance = 9f,
+              DeathDistance = 12f,
+              StopDistance = 15f,
+              Player = player,
+            };
+            scareMod.ConeAngle = 180f;
+            scareMod.OnlyFearDuringReload = true;
+          }
+        }
+        else if (base.gameObject.GetComponent<ScareEnemiesModifier>() is ScareEnemiesModifier scareMod)
+          UnityEngine.Object.Destroy(scareMod);
     }
 
     public override void OnReloadPressed(PlayerController player, Gun gun, bool manualReload)
