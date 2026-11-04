@@ -19,6 +19,7 @@
 - Fixed UI Atlas corruption caused by failure to clean up loading screen modifications once the loading screen has been destroyed
 - Fixed Magunet rendering pieces of debris uncollectable if it was repeatedly toggled on and off too quickly
 - Increased Magunet's quality from B to A since it's a lot stronger now that it's not so buggy
+- Rebalanced Phosphor Slimes: they now attempt to stay farther away from enemies, have slightly more health, and can no longer attack
 
 ## 1.33.2 (2026-10-23)
 

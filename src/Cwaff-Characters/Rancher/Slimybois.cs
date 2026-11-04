@@ -8,6 +8,7 @@ public static partial class Slimybois
   internal const int _BASE_HEALTH = 6;
   internal const float _BASE_DAMAGE = 0.6f; //NOTE: chargeDamage multiplied by 5 on enemies for some reason
   internal const float _BASE_ATTACK_RANGE = 3.0f;
+  internal const float _BASE_TARGET_RANGE = 1.75f;
   internal const float _BASE_ATTACK_KB = 5.0f;
   internal const float _BASE_WEIGHT = 40.0f;
   internal const float _BASE_SPEED = 4.5f;
@@ -36,8 +37,8 @@ public static partial class Slimybois
       overrideSpeed = _BASE_SPEED * 2.5f, goopColor = Color.white });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Dervish, flags = CanFly, goopColor = Color.gray,
       overrideSpeed = _BASE_SPEED * 2.0f, overrideContactDamage = _BASE_DAMAGE * 0.5f});
-    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity | FireImmunity | PoisonImmunity | CantReceiveHealing,
-      goopColor = Color.cyan, overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH * 3});
+    SlimeData.SetupEntry(new(){ type = SlimyboiType.Phosphor, flags = CanFly | FullStatusImmunity | FireImmunity | PoisonImmunity | CantReceiveHealing | CantAttack,
+      goopColor = Color.cyan, overrideContactDamage = 0.2f, overrideHealth = _BASE_HEALTH * 4, overrideMinRange = 5.0f});
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Pink, goopColor = Color.magenta });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Hunter, flags = DodgesProjectiles });
     SlimeData.SetupEntry(new(){ type = SlimyboiType.Rad, goopColor = ExtendedColours.lime, flags = AttacksPoison | PoisonImmunity });
@@ -108,17 +109,19 @@ public static partial class Slimybois
       actor.ImmuneToAllEffects = true;
 
     float attackRange = sd.overrideAttackRange ?? _BASE_ATTACK_RANGE;
+    float minRange = sd.overrideMinRange ?? _BASE_TARGET_RANGE;
     BehaviorSpeculator bs = actor.gameObject.GetComponent<BehaviorSpeculator>();
     bs.InstantFirstTick = true; // NOTE: fixes delays between being able to attack after spawning in
     bs.OverrideBehaviors.Add(new SlimyboiImmobileInCombatBehavior(){ });
     bs.OverrideBehaviors.Add(new SlimyboiDodgeBehavior(){ });
     bs.TargetBehaviors.Add(new SlimyboiTargetingBehavior(){ Radius = 35.0f, LineOfSight = false, ObjectPermanence = false });
-    bs.MovementBehaviors.Add(new SlimyboiSeekBehavior(){ StopWhenInRange = true, CustomMinRange = 1.75f, CustomRange = 2.75f, PathInterval = 0.5f });
+    bs.MovementBehaviors.Add(new SlimyboiSeekBehavior(){ StopWhenInRange = true, CustomMinRange = minRange, CustomRange = minRange + 1.0f, PathInterval = 0.5f });
     if (sd.flags.IsSet(FollowPlayer))
       bs.MovementBehaviors.Add(new SlimyboiFollowPlayerBehavior { PathInterval = 0.5f });
     bs.MovementBehaviors.Add(new MoveErraticallyBehavior { PathInterval = 0.5f, StayOnScreen = false, UseTargetsRoom = false, AvoidTarget = false });
-    bs.AttackBehaviors.Add(new SlimyboiChargeBehavior(){ chargeDamage = sd.overrideContactDamage ?? _BASE_DAMAGE, chargeKnockback = _BASE_ATTACK_KB, chargeSpeed = 30.0f,
-      minRange = 0.0f, maxRange = attackRange, Cooldown = sd.overrideAttackCooldown ?? _DEFAULT_COOLDOWN, maxChargeDistance = attackRange + 0.5f });
+    if (!sd.flags.IsSet(CantAttack))
+      bs.AttackBehaviors.Add(new SlimyboiChargeBehavior(){ chargeDamage = sd.overrideContactDamage ?? _BASE_DAMAGE, chargeKnockback = _BASE_ATTACK_KB, chargeSpeed = 30.0f,
+        minRange = 0.0f, maxRange = attackRange, Cooldown = sd.overrideAttackCooldown ?? _DEFAULT_COOLDOWN, maxChargeDistance = attackRange + 0.5f });
 
     KnockbackDoer kbd = actor.gameObject.GetComponent<KnockbackDoer>();
     kbd.weight = sd.overrideWeight ?? _BASE_WEIGHT;
@@ -333,6 +336,7 @@ public class SlimeData
   public float? overrideContactDamage;
   public float? overrideAttackCooldown;
   public float? overrideAttackRange;
+  public float? overrideMinRange;
   public GoopDefinition goopDefinition;
   public GameObject attackVFX;
 }
@@ -368,6 +372,7 @@ public enum SlimyboiFlags // : ulong
   CanAlwaysVac           = 1 << 24, // if set, slime can be vacuumed even while missing health in combat
   CantReceiveHealing     = 1 << 25, // if set, slime can not be healed by, e.g., Phosphor Slimes
   AttacksHealAllies      = 1 << 26, // if set, slime's attacks heal all nearby allies
+  CantAttack             = 1 << 27, // if set, slime cannot attack
 }
 
 // partial bit just to hold slime blurbs
@@ -451,9 +456,9 @@ public static partial class Slimybois
       "[g]Heals a Nearby Slime by 1HP Every 0.33 Seconds",
       "[g]Can Fly",
       "[g]Immune to Status Effects",
-      "[g]3x Health",
+      "[g]4x Health",
       "[b]Cannot be Healed",
-      "[b]0.33x Damage",
+      "[b]Cannot Attack",
     ],
     // Mosaic
     [
