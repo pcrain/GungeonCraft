@@ -53,8 +53,10 @@ public class Leafblower : CwaffGun
         }
 
         // blow around debris
-        float debrisForce = _DEBRIS_FORCE * (this.Mastered ? 2f : 1f);
-        foreach (DebrisObject debris in gunpos.DebrisWithinCone(_SQR_MAX_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100))
+        bool fallDamage = player.HasSynergy(Synergy.FALL_DAMAGE);
+        float forceMult = (this.Mastered ? 2f : 1f) * (fallDamage ? 2f : 1f);
+        float debrisForce = _DEBRIS_FORCE * forceMult;
+        foreach (DebrisObject debris in gunpos.DebrisWithinCone(_SQR_MAX_REACH * (fallDamage ? 4f : 1f), this.gun.CurrentAngle, _SPREAD, limit: 100))
         {
             Vector2 debrisCenter = debris.sprite ? debris.sprite.WorldCenter : debris.gameObject.transform.position.XY();
             Vector2 angleFromPlayer = debrisCenter - gunpos;
@@ -67,7 +69,7 @@ public class Leafblower : CwaffGun
         }
 
         // blow around enemies
-        float actorForce = _ACTOR_FORCE * (this.Mastered ? 2f : 1f);
+        float actorForce = _ACTOR_FORCE * forceMult;
         foreach (AIActor enemy in Lazy.AllEnemiesWithinConeOfVision(gunpos, this.gun.CurrentAngle, _SPREAD, _MAX_REACH))
         {
             if (enemy.knockbackDoer is not KnockbackDoer kb || kb.m_isImmobile.Value)
@@ -88,6 +90,7 @@ public class Leafblower : CwaffGun
         }
 
         // blow around projectiles if mastered
+        float projForce = _PROJ_FORCE * forceMult;
         if (this.Mastered)
         {
             ReadOnlyCollection<Projectile> allProj = StaticReferenceManager.AllProjectiles;
@@ -108,7 +111,7 @@ public class Leafblower : CwaffGun
                     continue;
 
                 p.RemoveBulletScriptControl();
-                Vector2 applyVelocity = (_PROJ_FORCE * (1f - Mathf.Clamp01((sqrMag - _SQR_MIN_REACH) / (_SQR_MAX_REACH - _SQR_MIN_REACH)))) * delta.normalized;
+                Vector2 applyVelocity = (projForce * (1f - Mathf.Clamp01((sqrMag - _SQR_MIN_REACH) / (_SQR_MAX_REACH - _SQR_MIN_REACH)))) * delta.normalized;
                 p.gameObject.GetOrAddComponent<BlownByLeafblowerBehavior>().Blow(applyVelocity);
             }
         }

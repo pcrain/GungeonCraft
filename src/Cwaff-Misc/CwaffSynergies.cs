@@ -208,6 +208,8 @@ public static class CwaffSynergies
             .MultFireRate(1.5f);
         NewSynergy(IN_CONCERT, "In Concert", new[]{IName(Maestro.ItemName), "face_melter"},
           tip: "Maesto and Face Melter are dual wielded.");
+        NewSynergy(FALL_DAMAGE, "Fall Damage", new[]{IName(Leafblower.ItemName), IName(AutumnsFury.ItemName)},
+          tip: "Leafblower's range and knockback are doubled.");
 
       #endregion
 
@@ -836,6 +838,7 @@ public enum Synergy {
     FRIGHT_TRAIN,
     CATEGORY_FIVE,
     IN_CONCERT,
+    FALL_DAMAGE,
 
     // Masteries
     MASTERY_GRANDMASTER,
