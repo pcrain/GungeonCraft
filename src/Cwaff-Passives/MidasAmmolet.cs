@@ -12,14 +12,14 @@ public class MidasAmmolet : CwaffBlankModificationItem, ICustomBlankDoer
     public static void Init()
     {
         PassiveItem item  = Lazy.SetupPassive<MidasAmmolet>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.S;
+        item.quality      = ItemQuality.A;
         item.AddPassiveStatModifier(StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
     }
 
     public void OnCustomBlankedProjectile(Projectile p)
     {
-        if (UnityEngine.Random.value < _CASING_CHANCE)
+        if (UnityEngine.Random.value < _CASING_CHANCE || (this.m_owner && this.m_owner.HasSynergy(Synergy.MONEY_MAKES_THE_WORLD_GO_ROUND)))
           LootEngine.SpawnCurrency(p.SafeCenter, 1, false, Lazy.RandomVector(), null);
     }
 }

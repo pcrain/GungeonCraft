@@ -5,6 +5,7 @@
 - Added Autumn's Fury, Daoitzer, Rubble Rouser, Frost Effigy, and Midas' Ammolet
 	- Frost Effigy and Midas' Ammolet sprites thanks to Dallan!
 - Added masteries for Autumn's Fury, Daoitzer, and Rubble Rouser
+- Added 1 new synergy
 - Added Leaf Tiara and Cubulon hats
 	- Cubulon hat sprites thanks to Dallan!
 - Changed Adrenaline Shot's heart UI sprites to the vanilla empty heart sprites

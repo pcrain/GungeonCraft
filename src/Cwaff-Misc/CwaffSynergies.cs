@@ -195,6 +195,8 @@ public static class CwaffSynergies
           tip: "Aimu Hakurei's projectiles are replaced with knives.");
         NewSynergy(DOUBLE_DEALING_CHARACTER, "Double Dealing Character", new[]{IName(AimuHakurei.ItemName), IName(Blackjack.ItemName)},
           tip: "Aimu Hakurei's projectiles are replaced with cards.");
+        NewSynergy(MONEY_MAKES_THE_WORLD_GO_ROUND, "Money Makes the World Go Round", new[]{IName(QuarterPounder.ItemName), IName(MidasAmmolet.ItemName)},
+          tip: "Blanks have a 100% chance to transform projectiles into casings.");
 
       #endregion
 
@@ -817,6 +819,7 @@ public enum Synergy {
     RUGGED_TERRAIN,
     NIGHT_OF_NIGHTS,
     DOUBLE_DEALING_CHARACTER,
+    MONEY_MAKES_THE_WORLD_GO_ROUND,
 
     // Masteries
     MASTERY_GRANDMASTER,
