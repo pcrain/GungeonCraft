@@ -28,7 +28,7 @@ public class Magunet : CwaffGun
     public static void Init()
     {
         Lazy.SetupGun<Magunet>(ItemName, ShortDescription, LongDescription, Lore)
-          .SetAttributes(quality: ItemQuality.B, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
+          .SetAttributes(quality: ItemQuality.A, gunClass: GunClass.CHARGE, reloadTime: 1.2f, ammo: 999, infiniteAmmo: true,
             chargeFps: 16, curse: 1f, banFromBlessedRuns: true)
           .AddToShop(ItemBuilder.ShopType.Cursula)
           .InitProjectile(GunData.New(clipSize: -1, shootStyle: ShootStyle.Charged, //TODO: can possibly use dummy charge module here
@@ -112,7 +112,7 @@ public class Magunet : CwaffGun
         foreach(DebrisObject debris in gunpos.DebrisWithinCone(_SQR_REACH, this.gun.CurrentAngle, _SPREAD, limit: 100, allowJunk: false))
         {
             // Make sure our debris doesn't glitch out with existing additional movement modifiers
-            if (!debris.DeactivateDebris())
+            if (!debris.DeactivateDebris(disable: false))
               continue;
             tk2dBaseSprite sprite = debris.sprite;
             if (!sprite)
@@ -140,6 +140,7 @@ public class DebrisProjectile : Projectile
     {
         base.Start();
         this._debris = base.GetComponent<DebrisObject>();
+        this.ManualControl = true;  // let debris velocity take care of movement
     }
 
     public override void Update()
@@ -219,7 +220,7 @@ public class MagnetParticle : MonoBehaviour
         this._debris.sprite          = this._sprite;
         SpeculativeRigidbody body    = this._debris.specRigidbody = base.gameObject.AddComponent<SpeculativeRigidbody>();
 
-        body.ClearSpecificCollisionExceptions();
+        // body.ClearSpecificCollisionExceptions();
         body.CollideWithTileMap = true;
         body.CollideWithOthers  = true;
         body.PixelColliders     = new List<PixelCollider>{new(){
@@ -231,27 +232,35 @@ public class MagnetParticle : MonoBehaviour
             ManualHeight           = COLLISION_WIDTH,
         }};
 
-        DebrisProjectile p    = base.gameObject.AddComponent<DebrisProjectile>();
-        p.specRigidbody       = body;
-        p.baseData.damage     = this._isCorpse ? 30f : 2f;
-        p.baseData.range      = 1000000f;
-        p.baseData.speed      = velocity.magnitude;
-        p.baseData.force      = 50f;
-        p.SetOwnerAndStats(this._gun.CurrentOwner);
-        p.DestroyMode         = Projectile.ProjectileDestroyMode.DestroyComponent;
-        p.ManualControl       = true; // let debris velocity take care of movement
-        p.OnHitEnemy         += this.OnHitEnemy;
-        p.shouldRotate        = true;
+        bool hasVelocity = velocity != Vector2.zero;
+        if (hasVelocity)
+        {
+          DebrisProjectile p    = base.gameObject.AddComponent<DebrisProjectile>();
+          p.specRigidbody       = body;
+          p.baseData.damage     = this._isCorpse ? 30f : 2f;
+          p.baseData.range      = 1000000f;
+          p.baseData.speed      = velocity.magnitude;
+          p.baseData.force      = 50f;
+          p.SetOwnerAndStats(this._gun.CurrentOwner);
+          p.DestroyMode         = Projectile.ProjectileDestroyMode.DestroyComponent;
+          p.OnHitEnemy         += this.OnHitEnemy;
+          p.shouldRotate        = true;
+          body.RegenerateCache();
+          body.Reinitialize();
+          p.Start();
+          if (p.Owner is PlayerController player)
+              velocity *= player.ProjSpeedMult();
+        }
+        else
+        {
+          body.RegenerateCache();
+          body.Reinitialize();
+        }
 
-        body.RegenerateCache();
-        body.Reinitialize();
-        p.Start();
-
-        if (p.Owner is PlayerController player)
-            velocity *= player.ProjSpeedMult();
         this._debris.m_currentPosition = this.gameObject.transform.position.WithZ(0f);
         this._debris.Trigger(velocity, 0.0f);
-        this._debris.ApplyVelocity(velocity);
+        if (hasVelocity)
+          this._debris.ApplyVelocity(velocity);
         UnityEngine.Object.Destroy(this);
     }
 
@@ -303,9 +312,9 @@ public class MagnetParticle : MonoBehaviour
                 float launchAngle = this._statisAngle * (Magunet._SPREAD / 180f) * (owner ? owner.AccuracyMult() : 1f);
                 float gunAngle = this._gun ? this._gun.CurrentAngle : Lazy.RandomAngle();
                 LaunchDebrisInStasis((gunAngle + launchAngle).ToVector((owner ? owner.ProjSpeedMult() : 1f) * UnityEngine.Random.Range(_MIN_LAUNCH_SPEED, _MAX_LAUNCH_SPEED)));
-                return;
             }
-            UnityEngine.Object.Destroy(this);
+            else
+              LaunchDebrisInStasis(Vector2.zero);
             return;
         }
 

@@ -17,6 +17,8 @@
 - Improved swinging animation for Sunderbuss
 - Reduced lag and general jankiness surrouding Magunet's debris manipulation mechanics
 - Fixed UI Atlas corruption caused by failure to clean up loading screen modifications once the loading screen has been destroyed
+- Fixed Magunet rendering pieces of debris uncollectable if it was repeatedly toggled on and off too quickly
+- Increased Magunet's quality from B to A since it's a lot stronger now that it's not so buggy
 
 ## 1.33.2 (2026-10-23)
 
