@@ -344,7 +344,7 @@ public class Stereoscope : CwaffGun
 
         private void ProcessEnemy(AIActor enemy, float b)
         {
-            if (!enemy || !enemy.IsNormalEnemy || !enemy.healthHaver || enemy.IsGone)
+            if (!enemy || !enemy.IsNormalEnemy || enemy.IsGone || enemy.healthHaver is not HealthHaver hh)
                 return;
 
             string guid = enemy.EnemyGuid;
@@ -355,9 +355,12 @@ public class Stereoscope : CwaffGun
             if (resonantFrequency != this.frequency)
                 return;
             Reverberate(enemy.CenterPosition);
-            enemy.healthHaver.ApplyDamage((0.125f * this.power) * base.ModifiedDamage, Vector2.zero, base.Owner ? base.OwnerName : "projectile", damageTypes);
-            if (enemy.healthHaver.IsDead && !enemy.healthHaver.IsBoss && !enemy.healthHaver.IsSubboss)
+            hh.ApplyDamage((0.125f * this.power) * base.ModifiedDamage, Vector2.zero, base.Owner ? base.OwnerName : "projectile", damageTypes);
+            if (hh.IsDead && !hh.IsBoss && !hh.IsSubboss)
             {
+                // NOTE: intentionally does not count as an explosion kill for Demolition Contract
+                if (base.Owner is PlayerController player && player.HasSynergy(Synergy.KABOOM_BOX))
+                  Exploder.Explode(enemy.CenterPosition, Explosions.DefaultLarge, Lazy.RandomVector(), ignoreQueues: true);
                 SunderbussProjectile.ShatterViolentlyIntoAMillionPieces(enemy);
                 enemy.EraseFromExistenceWithRewards(suppressDeathSounds: true);
             }

@@ -212,6 +212,8 @@ public static class CwaffSynergies
           tip: "Leafblower's range and knockback are doubled.");
         NewSynergy(PREAPPROVED, "Preapproved", new[]{IName(QuarterPounder.ItemName), IName(CreditCard.ItemName)},
           tip: "If the player is in debt at the start of a new floor, casings are set to 0.");
+        NewSynergy(KABOOM_BOX, "Kaboom Box", new[]{IName(Stereoscope.ItemName), IName(DemolitionContract.ItemName)},
+          tip: "Enemies killed by Stereoscope explode on death.");
 
       #endregion
 
@@ -842,6 +844,7 @@ public enum Synergy {
     IN_CONCERT,
     FALL_DAMAGE,
     PREAPPROVED,
+    KABOOM_BOX,
 
     // Masteries
     MASTERY_GRANDMASTER,
