@@ -210,6 +210,8 @@ public static class CwaffSynergies
           tip: "Maesto and Face Melter are dual wielded.");
         NewSynergy(FALL_DAMAGE, "Fall Damage", new[]{IName(Leafblower.ItemName), IName(AutumnsFury.ItemName)},
           tip: "Leafblower's range and knockback are doubled.");
+        NewSynergy(PREAPPROVED, "Preapproved", new[]{IName(QuarterPounder.ItemName), IName(CreditCard.ItemName)},
+          tip: "If the player is in debt at the start of a new floor, casings are set to 0.");
 
       #endregion
 
@@ -839,6 +841,7 @@ public enum Synergy {
     CATEGORY_FIVE,
     IN_CONCERT,
     FALL_DAMAGE,
+    PREAPPROVED,
 
     // Masteries
     MASTERY_GRANDMASTER,

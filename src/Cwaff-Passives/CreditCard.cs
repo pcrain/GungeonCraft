@@ -33,6 +33,7 @@ public class CreditCard : CwaffPassive
     public override void Pickup(PlayerController player)
     {
         base.Pickup(player);
+        CwaffEvents.OnNewFloorFullyLoaded += this.OnNewFloorFullyLoaded;
         player.healthHaver.ModifyDamage += this.OnTakeDamage;
         oldCurrency = _BASE_CREDIT;
         player.carriedConsumables.Currency += _BASE_CREDIT;
@@ -42,10 +43,22 @@ public class CreditCard : CwaffPassive
     public override void DisableEffect(PlayerController player)
     {
         base.DisableEffect(player);
+        CwaffEvents.OnNewFloorFullyLoaded -= this.OnNewFloorFullyLoaded;
         if (!player)
             return;
         player.carriedConsumables.Currency -= _BASE_CREDIT;
         player.healthHaver.ModifyDamage -= this.OnTakeDamage;
+    }
+
+    private void OnNewFloorFullyLoaded()
+    {
+        if (this.Owner is not PlayerController player)
+          return;
+        if (player.carriedConsumables.Currency >= _BASE_CREDIT)
+          return;
+        if (!player.HasSynergy(Synergy.PREAPPROVED))
+          return;
+        player.carriedConsumables.Currency = _BASE_CREDIT;
     }
 
     private void OnTakeDamage(HealthHaver hh, HealthHaver.ModifyDamageEventArgs data)
