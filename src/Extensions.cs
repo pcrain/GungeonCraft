@@ -3178,12 +3178,15 @@ public static class Extensions
 
   private static GameObject _BlankVFX = null;
   /// <summary>Do a blank effect with a custom color</summary>
-  public static void DoColorfulBlank(this PlayerController user, Color color, Vector2? position = null)
+  public static void DoColorfulBlank(this PlayerController user, Color color, Vector2? position = null, bool vfxOnly = false)
   // public void DoColorfulBlank(float overrideRadius = 25f, float overrideTimeAtMaxRadius = 0.5f, bool silent = false, bool breaksWalls = true, Vector2? overrideCenter = null, bool breaksObjects = true, float overrideForce = -1f)
   {
       Vector2 pos = position ?? user.CenterPosition;
-      SilencerInstance silencerInstance = new GameObject("silencer").AddComponent<SilencerInstance>();
-      silencerInstance.TriggerSilencer(pos, 50f, 25f, null, 0.15f, 0.2f, 50, 10, 140f, 15, 0.5f, user, true);
+      if (!vfxOnly)
+      {
+        SilencerInstance silencerInstance = new GameObject("silencer").AddComponent<SilencerInstance>();
+        silencerInstance.TriggerSilencer(pos, 50f, 25f, null, 0.15f, 0.2f, 50, 10, 140f, 15, 0.5f, user, true);
+      }
 
       _BlankVFX ??= (GameObject)BraveResources.Load("Global VFX/BlankVFX");
       GameObject blankVfx = UnityEngine.Object.Instantiate(_BlankVFX, pos.ToVector3ZUp(pos.y), Quaternion.identity);

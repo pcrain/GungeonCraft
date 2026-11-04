@@ -123,6 +123,7 @@ public class FrostEffigy : CwaffActive
         mat.SetColor("_GoldColor", ExtendedColours.skyblue);
         mat.SetFloat("_SheenSpeed", 10.0f);
       }
+      user.DoColorfulBlank(ExtendedColours.skyblue, vfxOnly: true);
     }
 
     internal void DeregisterEffigy()
