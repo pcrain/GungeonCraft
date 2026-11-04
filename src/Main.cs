@@ -399,6 +399,7 @@ public class Initialisation : BaseUnityPlugin
                 SuperColdWatch.Init();
                 VengefulSpirit.Init();
                 PegasusBoots.Init();
+                MidasAmmolet.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

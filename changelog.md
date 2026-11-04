@@ -2,8 +2,8 @@
 
 ## 1.34.0 (TBD)
 
-- Added Autumn's Fury, Daoitzer, Rubble Rouser, and Frost Effigy
-	- Frost Effigy sprite thanks to Dallan!
+- Added Autumn's Fury, Daoitzer, Rubble Rouser, Frost Effigy, and Midas' Ammolet
+	- Frost Effigy and Midas' Ammolet sprites thanks to Dallan!
 - Added masteries for Autumn's Fury, Daoitzer, and Rubble Rouser
 - Added Leaf Tiara and Cubulon hats
 	- Cubulon hat sprites thanks to Dallan!
