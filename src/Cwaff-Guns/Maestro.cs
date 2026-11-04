@@ -25,6 +25,7 @@ public class Maestro : CwaffGun
             muzzleFrom: Items.FaceMelter, doesScreenShake: false, continuousFire: true, curse: 1f, dynamicBarrelOffsets: true,
             banFromBlessedRuns: true, attacksThroughWalls: true)
           .AddToShop(ItemBuilder.ShopType.Cursula)
+          .AddDualWieldSynergy(Synergy.IN_CONCERT, otherVanillaGun: Items.FaceMelter.AsGun())
           .AddReticle<CwaffEnemyReticle>(reticleVFX : VFX.Create("maestro_target_enemy_vfx", fps: 2), aimFromPlayerCenter: true,
             reticleAlpha  : 0.5f, smoothLerp : true, rotateSpeed : 270f, visibility : CwaffReticle.Visibility.WITHTARGET)
           .AddReticle<CwaffProjectileReticle>(reticleVFX : VFX.Create("maestro_target_projectile_vfx", fps: 2), aimFromPlayerCenter: true,

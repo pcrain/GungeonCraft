@@ -3584,9 +3584,10 @@ public static class Extensions
 
   private static Dictionary<Synergy, Gun> _UnresolvedDualWields = new();
   /// <summary>Add a dual-wield synergy with another gun.</summary>
-  public static Gun AddDualWieldSynergy(this Gun gun, Synergy dualWieldSynergy)
+  public static Gun AddDualWieldSynergy(this Gun gun, Synergy dualWieldSynergy, Gun otherVanillaGun = null)
   {
-    if (!_UnresolvedDualWields.TryGetValue(dualWieldSynergy, out Gun otherGun))
+    Gun otherGun = otherVanillaGun;
+    if (!otherGun && !_UnresolvedDualWields.TryGetValue(dualWieldSynergy, out otherGun))
     {
       _UnresolvedDualWields[dualWieldSynergy] = gun;
       return gun;

@@ -206,6 +206,8 @@ public static class CwaffSynergies
         NewSynergy(CATEGORY_FIVE, "Category Five", new[]{IName(AutumnsFury.ItemName), IName(Sextant.ItemName)},
           tip: "Autumn's Fury fires 60% faster and has a larger vortex radius.")
             .MultFireRate(1.5f);
+        NewSynergy(IN_CONCERT, "In Concert", new[]{IName(Maestro.ItemName), "face_melter"},
+          tip: "Maesto and Face Melter are dual wielded.");
 
       #endregion
 
@@ -833,6 +835,7 @@ public enum Synergy {
     HYPERLINKS,
     FRIGHT_TRAIN,
     CATEGORY_FIVE,
+    IN_CONCERT,
 
     // Masteries
     MASTERY_GRANDMASTER,
