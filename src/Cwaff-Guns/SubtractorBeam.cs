@@ -161,7 +161,7 @@ public class SubtractorProjectile : MonoBehaviour
         this._projectile = base.GetComponent<Projectile>();
         this._owner = this._projectile.Owner as PlayerController;
 
-        if (this._owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<SubtractorBeam>() is SubtractorBeam sub)
+        if (this._owner && this._owner.CurrentGun is Gun gun && gun.gameObject.GetComponent<SubtractorBeam>() is SubtractorBeam sub)
         {
             this._gun = sub;
             this._hitFirstEnemy = sub.GetLastEnemy();
@@ -225,6 +225,8 @@ public class SubtractorProjectile : MonoBehaviour
         this._hitTwoEnemies              = true;
         this._damage                     = this._postHitDamage;
         this._projectile.baseData.damage = this._damage;
+        if (Mathf.Abs(this._damage) < 1.0f && this._owner && this._owner.HasSynergy(Synergy.ZEROED_OUT) && this._hitFirstEnemy && !this._hitFirstEnemy.IsDead)
+            this._hitFirstEnemy.ApplyDamage(999f, this._projectile.Direction, this._projectile.OwnerName);
         if (this._damage <= 0)
             this._projectile.DieInAir();
     }

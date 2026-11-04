@@ -197,6 +197,8 @@ public static class CwaffSynergies
           tip: "Aimu Hakurei's projectiles are replaced with cards.");
         NewSynergy(MONEY_MAKES_THE_WORLD_GO_ROUND, "Money Makes the World Go Round", new[]{IName(QuarterPounder.ItemName), IName(MidasAmmolet.ItemName)},
           tip: "Blanks have a 100% chance to transform projectiles into casings.");
+        NewSynergy(ZEROED_OUT, "Zeroed Out", new[]{IName(SubtractorBeam.ItemName), IName(Calculator.ItemName)},
+          tip: "If the first two enemies Subtractor Beam's projectile passes through have the same HP, both are killed.");
 
       #endregion
 
@@ -820,6 +822,7 @@ public enum Synergy {
     NIGHT_OF_NIGHTS,
     DOUBLE_DEALING_CHARACTER,
     MONEY_MAKES_THE_WORLD_GO_ROUND,
+    ZEROED_OUT,
 
     // Masteries
     MASTERY_GRANDMASTER,
