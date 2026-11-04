@@ -8,6 +8,7 @@
 - Added 1 new synergy
 - Added Leaf Tiara and Cubulon hats
 	- Cubulon hat sprites thanks to Dallan!
+- Added several new companions from [Once More Into the Breach](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/Once_More_Into_The_Breach/) to the companion shop
 - Changed Adrenaline Shot's heart UI sprites to the vanilla empty heart sprites
 - Significantly lowered the volume of Natascha's revving sound
 - Reworked how Battery Bullet's particle effects are suppressed on Chekhov's Gun, Forkbomb, Gradius, Gunbrella, and Scotsman projectiles

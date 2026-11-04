@@ -46,6 +46,11 @@ public class Cammy
             "nn:lil_munchy",
             "nn:hapulon",
             "nn:cubud",
+            "nn:organ_donor_card",
+            "nn:gungineer",
+            "nn:prismatic_snail",
+            "nn:man_of_mystery",
+            "nn:goobleck",
             // Frost and Gunfire
             "kp:penguin",
             "kp:blue_balloon",
