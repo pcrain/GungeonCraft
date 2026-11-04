@@ -307,8 +307,7 @@ public class AutumnsFuryProjectile : MonoBehaviour
             // transition to scattering state
             this._state = State.SCATTERING;
             base.gameObject.Play("autumn_shoot_sound");
-            this._projectile.PenetratesInternalWalls = true;
-            this._body.OnPreTileCollision += this._projectile.OnPreTileCollision;
+            this._projectile.MakePierceInternalWalls();
             this._body.CollideWithOthers = true;
             this._body.CollideWithTileMap = true;
             this._body.m_initialized = false;

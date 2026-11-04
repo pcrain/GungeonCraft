@@ -199,6 +199,8 @@ public static class CwaffSynergies
           tip: "Blanks have a 100% chance to transform projectiles into casings.");
         NewSynergy(ZEROED_OUT, "Zeroed Out", new[]{IName(SubtractorBeam.ItemName), IName(Calculator.ItemName)},
           tip: "If the first two enemies Subtractor Beam's projectile passes through have the same HP, both are killed.");
+        NewSynergy(HYPERLINKS, "Hyperlinks", new[]{IName(ChainDriver.ItemName), IName(Femtobyte.ItemName)},
+          tip: "Chain Driver's projectiles phase through inner walls.");
 
       #endregion
 
@@ -823,6 +825,7 @@ public enum Synergy {
     DOUBLE_DEALING_CHARACTER,
     MONEY_MAKES_THE_WORLD_GO_ROUND,
     ZEROED_OUT,
+    HYPERLINKS,
 
     // Masteries
     MASTERY_GRANDMASTER,

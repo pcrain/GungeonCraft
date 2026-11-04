@@ -64,13 +64,15 @@ public class ChainDriver : CwaffGun
           player.SuppressThisClick = true; // can't fire more than one chain at once
     }
 
-    public static void DoChainDebrisAt(Vector2 pos, int num)
+    public static void DoChainDebrisAt(Vector2 pos, int num, bool hyperlinks)
     {
       for (int i = 0; i < num; ++i)
       {
           DebrisObject debris = UnityEngine.Object.Instantiate(ChainDriver._ChainDebris[UnityEngine.Random.Range(0, 2)], pos, Lazy.RandomEulerZ())
             .GetComponent<DebrisObject>();
           debris.Trigger(Lazy.RandomVector(2f * UnityEngine.Random.value).ToVector3ZUp(2f), 0.25f);
+          if (hyperlinks && debris.sprite)
+            debris.sprite.MakeHolographic(green: true);
       }
     }
 
@@ -100,6 +102,7 @@ public class ChainLinkDoer : MonoBehaviour
 {
   private Projectile _proj = null;
   private bool _setup = false;
+  private bool _hyperlinked = false;
 
   public void Setup(ChainDriver gun)
   {
@@ -107,7 +110,14 @@ public class ChainLinkDoer : MonoBehaviour
     if (this._proj)
     {
       this._proj.OnDestruction += this.OnProjectileDestruction;
-      new GameObject("chainlink").AddComponent<ChainkLink>().Setup(gun ? gun.PlayerOwner : null, this._proj, gun);
+      PlayerController player = gun ? gun.PlayerOwner : (this._proj.Owner as PlayerController);
+      this._hyperlinked = player && player.HasSynergy(Synergy.HYPERLINKS);
+      if (this._hyperlinked)
+      {
+        this._proj.MakePierceInternalWalls();
+        this._proj.sprite.MakeHolographic(green: true);
+      }
+      new GameObject("chainlink").AddComponent<ChainkLink>().Setup(player, this._proj, gun);
     }
     this._setup = true;
   }
@@ -123,7 +133,7 @@ public class ChainLinkDoer : MonoBehaviour
       if (!projectile || projectile != this._proj)
         return;
       this._proj.OnDestruction -= this.OnProjectileDestruction;
-      ChainDriver.DoChainDebrisAt(this._proj.SafeCenter, 3);
+      ChainDriver.DoChainDebrisAt(this._proj.SafeCenter, 3, this._hyperlinked);
   }
 }
 
@@ -185,6 +195,8 @@ public class ChainkLink : MonoBehaviour
         animation: ChainDriver._ChainLink, startPos: endPos, endPos: endPos, numSegments: SEGMENTS,
         stretchPolicy: CwaffingTheGungy.RopeSim.StretchPolicy.GROWTEMPORARY);
       this._mesh.sprite.HeightOffGround = -10f; // draw behind most things
+      if (this._owner && this._owner.HasSynergy(Synergy.HYPERLINKS))
+        this._mesh.sprite.MakeHolographic(green: true);
       this._active                = true;
       this._setup                 = true;
     }
@@ -309,7 +321,6 @@ public class ChainkLink : MonoBehaviour
         startScale    : Mathf.Clamp01(slamForce),
         endScale      : Mathf.Clamp01(slamForce)
         );
-      // ChainDriver.DoChainDebrisAt(tileCollision.Contact, Mathf.Clamp(Mathf.CeilToInt(10f * slamForce), 4, 20));
       GameManager.Instance.MainCameraController.DoScreenShake(new ScreenShakeSettings(
         mag: slamForce, spd: slamForce, tim: 0.3f * Mathf.Min(slamForce, 1f), foff: 0f), contact);
     }

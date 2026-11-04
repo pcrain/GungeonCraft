@@ -230,10 +230,7 @@ public class KingsLawBullets : MonoBehaviour
 
         this._projectile.specRigidbody.OnPreRigidbodyCollision += SkipCorpseAndDoorCollisions;
         if (this._mastered)
-        {
-            this._projectile.PenetratesInternalWalls = true;
-            this._projectile.specRigidbody.OnPreTileCollision += this._projectile.OnPreTileCollision;
-        }
+            this._projectile.MakePierceInternalWalls();
 
         StartCoroutine(TheLaw());
     }

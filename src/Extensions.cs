@@ -4236,4 +4236,15 @@ public static class Extensions
       DepthLookupManager.ProcessRenderer(shadowObject.GetComponent<Renderer>(), DepthLookupManager.GungeonSortingLayer.PLAYFIELD);
       return shadowObject;
   }
+
+  /// <summary>Allows a projectile to pierce internal walls after being set up.</summary>
+  public static void MakePierceInternalWalls(this Projectile proj, bool pierce = true)
+  {
+    if (!proj || proj.specRigidbody is not SpeculativeRigidbody body)
+      return;
+    body.OnPreTileCollision -= proj.OnPreTileCollision;
+    proj.PenetratesInternalWalls = pierce;
+    if (pierce)
+      body.OnPreTileCollision += proj.OnPreTileCollision;
+  }
 }
