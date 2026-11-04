@@ -203,6 +203,9 @@ public static class CwaffSynergies
           tip: "Chain Driver's projectiles phase through inner walls.");
         NewSynergy(FRIGHT_TRAIN, "Fright Train", new[]{IName(DerailGun.ItemName), "jk47"},
           tip: "Derail Gun inflicts fear on enemies when reloading.");
+        NewSynergy(CATEGORY_FIVE, "Category Five", new[]{IName(AutumnsFury.ItemName), IName(Sextant.ItemName)},
+          tip: "Autumn's Fury fires 60% faster and has a larger vortex radius.")
+            .MultFireRate(1.5f);
 
       #endregion
 
@@ -829,6 +832,7 @@ public enum Synergy {
     ZEROED_OUT,
     HYPERLINKS,
     FRIGHT_TRAIN,
+    CATEGORY_FIVE,
 
     // Masteries
     MASTERY_GRANDMASTER,

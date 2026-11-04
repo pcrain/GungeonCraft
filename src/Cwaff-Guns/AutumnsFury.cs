@@ -9,7 +9,9 @@ public class AutumnsFury : CwaffGun
 
     internal const float MIN_RADIUS = 2f;
     internal const float MAX_RADIUS = 7f;
+    internal const float CAT_5_RADIUS = 10f;
     internal const float DLT_RADIUS = MAX_RADIUS - MIN_RADIUS;
+    internal const float CAT_5_DLT_RADIUS = CAT_5_RADIUS - MIN_RADIUS;
     internal const float CHARGE_TIME = 5f;
 
     internal static CwaffTrailController _AutumnTrailPrefab = null;
@@ -55,8 +57,9 @@ public class AutumnsFury : CwaffGun
             this._nextSoundTime = now + 0.2f;
             base.gameObject.Play("autumn_wind_sound");
           }
-          this._chargeTime += dtime * player.ChargeMult();
-          this.radius = MIN_RADIUS + DLT_RADIUS * Mathf.Clamp01(this._chargeTime / CHARGE_TIME);
+          float chargePercent = 1f - Mathf.Clamp01((float)this.gun.ClipShotsRemaining / Mathf.Max(1, this.gun.ClipCapacity));
+          this._chargeTime += dtime;
+          this.radius = MIN_RADIUS + (player.HasSynergy(Synergy.CATEGORY_FIVE) ? CAT_5_DLT_RADIUS : DLT_RADIUS) * chargePercent;
           float phase = 1f + Mathf.Sin(10f * now);
           float curRadius = this.radius + phase;
           if (this.Mastered)
