@@ -1167,7 +1167,9 @@ public static class Lazy
                     break;
                 hh.outlineMaterialsToFlash[l].SetColor(CwaffVFX._OverrideColorId, hh.sourceColors[l]);
             }
-        hh.m_flashOnHitCoroutine = hh.StartCoroutine(hh.FlashOnHit(DamageCategory.Normal, null));
+        hh.m_flashOnHitCoroutine = hh.StartCoroutine(hh.FlashOnHit(DamageCategory.Normal, (hh.specRigidbody is SpeculativeRigidbody body ? body.PrimaryPixelCollider : null)));
+        if (hh.incorporealityOnDamage && !hh.m_isIncorporeal)
+          hh.StartCoroutine(hh.IncorporealityOnHit());
     }
 
     /// <summary>Make a list of size n filled with default values for a type</summary>
