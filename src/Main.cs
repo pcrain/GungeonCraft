@@ -400,6 +400,7 @@ public class Initialisation : BaseUnityPlugin
                 VengefulSpirit.Init();
                 PegasusBoots.Init();
                 MidasAmmolet.Init();
+                OrnateShield.Init();
 
                 GameManager.Instance.ResolveModdedLootChances(); // make sure loot chances between items are resolved
 

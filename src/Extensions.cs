@@ -3159,11 +3159,14 @@ public static class Extensions
 
   private static GameObject _MiniBlankVFX = null;
   /// <summary>Do a mini-blank effect with a custom color</summary>
-  public static void DoColorfulMiniBlank(this PlayerController user, Color color, Vector2? position = null)
+  public static void DoColorfulMiniBlank(this PlayerController user, Color color, Vector2? position = null, bool vfxOnly = false)
   {
       Vector2 pos = position ?? user.CenterPosition;
-      SilencerInstance silencerInstance = new GameObject("silencer").AddComponent<SilencerInstance>();
-      silencerInstance.TriggerSilencer(pos, 20f, 5f, null, 0f, 3f, 3f, 3f, 30f, 3f, 0.25f, user);
+      if (!vfxOnly)
+      {
+        SilencerInstance silencerInstance = new GameObject("silencer").AddComponent<SilencerInstance>();
+        silencerInstance.TriggerSilencer(pos, 20f, 5f, null, 0f, 3f, 3f, 3f, 30f, 3f, 0.25f, user);
+      }
 
       _MiniBlankVFX ??= (GameObject)BraveResources.Load("Global VFX/BlankVFX_Ghost");
       GameObject blankVfx = UnityEngine.Object.Instantiate(_MiniBlankVFX, pos.ToVector3ZUp(pos.y), Quaternion.identity);

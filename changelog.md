@@ -2,7 +2,7 @@
 
 ## 1.34.0 (TBD)
 
-- Added Autumn's Fury, Daoitzer, Rubble Rouser, Frost Effigy, and Midas' Ammolet
+- Added Autumn's Fury, Daoitzer, Rubble Rouser, Frost Effigy, Midas' Ammolet, and Ornate Shield
 	- Frost Effigy and Midas' Ammolet sprites thanks to Dallan!
 - Added masteries for Autumn's Fury, Daoitzer, and Rubble Rouser
 - Added 9 new synergies
