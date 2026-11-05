@@ -26,9 +26,8 @@ public static class CwaffSynergies
 
     public static void Init()
     {
-        /* NOTE:
-            - Each synergy entry below must have a comment before the line and the name of the synergy as the first quoted string in the following line
-              This is to ensure that our automatic item tips generation script parses it correctly.
+        /* NOTE: Each synergy entry below must have a `tip: "..."` line after the `NewSynergy` line and the synergy name as the first
+                 quoted string in the `NewSynergy` line. This is to ensure the automatic item tips generation script parses it correctly.
         */
 
       #region Synergies
@@ -214,8 +213,9 @@ public static class CwaffSynergies
           tip: "If the player is in debt at the start of a new floor, casings are set to 0.");
         NewSynergy(KABOOM_BOX, "Kaboom Box", new[]{IName(Stereoscope.ItemName), IName(DemolitionContract.ItemName)},
           tip: "Enemies killed by Stereoscope explode on death.");
-        NewSynergy(TOMB_RAIDER, "Tomb Raider", new[]{IName(RubbleRouser.ItemName), "holey_grail"},
-          tip: "Boulders roll forward after landing until crashing into walls.");
+        NewSynergy(TOMB_RAIDER, "Tomb Raider", new[]{IName(RubbleRouser.ItemName)}, optional: new[]{"holey_grail", "bullet_idol"},
+          tip: "Boulders roll forward after landing until crashing into walls.")
+            .RequiresAtLeastOneGunAndOneItem();
         NewSynergy(SISYPHEAN, "Sisyphean", new[]{IName(RubbleRouser.ItemName), "decoy"},
           tip: "Boulders act as decoys and draw fire from enemies.");
 
@@ -449,6 +449,12 @@ public static class CwaffSynergies
         for (int i = 0; i < _SynergyNames.Count; ++i)
             if (_SynergyNames[i] == null)
                 ETGModConsole.Log($"<color=#ffff88ff>WARNING: haven't initialized custom synergy {_SynergyEnums[i]}</color>");
+    }
+
+    private static AdvancedSynergyEntry RequiresAtLeastOneGunAndOneItem(this AdvancedSynergyEntry synergy)
+    {
+      synergy.RequiresAtLeastOneGunAndOneItem = true;
+      return synergy;
     }
 
     private static AdvancedSynergyEntry NewSynergy(Synergy synergy, string name, string[] mandatory, string[] optional = null, bool ignoreLichEyeBullets = false, int masteryId = -1, string tip = null)

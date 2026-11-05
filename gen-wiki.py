@@ -76,7 +76,7 @@ def main():
   WIKI_PARAMS["guns"] = "".join([GUN_TEMPLATE.format(**v) for k,v in gunData.items()])
 
   synergyData = scanSynergies(passiveDataByClass, activeDataByClass, gunDataByClass)
-  WIKI_PARAMS["synergies"] = "".join([SYNERGY_TEMPLATE.format(**v) for k,v in synergyData.items()])
+  WIKI_PARAMS["synergies"] = processSynergies(synergyData)
 
   npcData = getNPCs()
   WIKI_PARAMS["npcs"] = "".join([NPC_TEMPLATE.format(**v) for k,v in npcData.items()])
@@ -89,6 +89,17 @@ def main():
 
   wikitext = WIKI_TEMPLATE.format(**WIKI_PARAMS)
   print(wikitext)
+
+def processSynergies(synergyData):
+  entries = []
+  for k, v in synergyData.items():
+    if len(v["itemX"]) == 0:
+      entries.append(SYNERGY_TEMPLATE.format(**v))
+    elif len(v["itemX"]) == 1:
+      v["item3"] = v["itemX"][0]
+      v["filename3"] = v["filenameX"][0]
+      entries.append(SYNERGY_OPT_TEMPLATE.format(**v))
+  return "".join(entries)
 
 def getSourceFiles(sourcedir):
   for f in sorted(os.listdir(sourcedir)):
@@ -261,15 +272,18 @@ def scanSynergies(passives, actives, guns):
   data = {}
   synergyFile = os.path.join(SOURCE_DIR, "Cwaff-Misc", "CwaffSynergies.cs")
   lines = readAllLines(synergyFile).split("\n")
-  srx = re.compile(r"""^\s*NewSynergy.*?,\s*\"([^\"]+)\",\s*new\[\]\{(.*)\}""")
+  srx = re.compile(r"""^\s*NewSynergy.*?,\s*\"([^\"]+)\",\s*new\[\]\{([^\}]+)\}(, optional: new\[\]\{([^\}]+)\})?""")
   for i, line in enumerate(lines):
     if not (r := srx.match(line)):
       continue
     synergyname = r.groups()[0]
     mandatories = [s.strip() for s in r.groups()[1].split(",")]
+    optionals   = []
+    if (optString := r.groups()[3]) is not None:
+      optionals   = [s.strip() for s in optString.split(",")]
     filenames = []
     itemnames = []
-    for m in mandatories:
+    for m in mandatories + optionals:
       if m.startswith("IName"): # one of our items
         itemname = m.split("(")[1].split(".")[0]
         if (e := passives.get(itemname, None)) is not None:
@@ -305,6 +319,8 @@ def scanSynergies(passives, actives, guns):
       "item1"       : itemnames[0],
       "filename2"   : filenames[1],
       "item2"       : itemnames[1],
+      "filenameX"   : filenames[2:],
+      "itemX"       : itemnames[2:],
       "description" : desc,
       }
     data[synergyname] = entry
@@ -462,6 +478,14 @@ SYNERGY_TEMPLATE='''
 |{synergyname}
 |<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename1}</div>{item1}
 |<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename2}</div>{item2}
+|{description}
+'''
+
+SYNERGY_OPT_TEMPLATE='''
+|-
+|{synergyname}
+|<div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename1}</div>{item1}
+|<div>One of the following:</div><span style="display: flex;"><span style="margin: auto;"><div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename2}</div>{item2}</span><span style="margin: auto;"><div style="min-height: 56px; transform-origin: top; transform: scale(2);">{filename3}</div>{item3}</span></span>
 |{description}
 '''
 
