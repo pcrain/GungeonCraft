@@ -102,6 +102,7 @@ public class RubbleRouserProjectile : MonoBehaviour
     {
         // set up sprites
         this._projectile = base.GetComponent<Projectile>();
+        this._projectile.m_usesNormalMoveRegardless = true; // ignore helix bullets and whatnot
         this._owner      = this._projectile.Owner as PlayerController;
         if (UnityEngine.Random.value < _SPECIAL_ROCK_CHANCE)
           this._projectile.spriteAnimator.PickFrame();
@@ -245,14 +246,15 @@ public class Rubble : MonoBehaviour
     private GameObject _shadow           = null;
     private float _scanTime              = 0.0f;
 
-    public static Rubble Create(tk2dBaseSprite sprite, bool sentient, PlayerController owner)
+    public static void Create(tk2dBaseSprite sprite, bool sentient, PlayerController owner)
     {
       // persist on ground
       GameObject rubbleObject = sprite.DuplicateInWorld(copyShader: true).gameObject;
       Rubble rubble = rubbleObject.AddComponent<Rubble>();
       rubble._body = rubbleObject.AutoRigidBody(height: 0.5f, useUntrimmedBounds: true);
       rubble._body.Reinitialize();
-      rubble._body.UpdateColliderPositions();
+      if (rubble.CheckForPits())
+        return;
       // prevent pathing over the space
       if (sprite.WorldCenter.GetAbsoluteRoom() is RoomHandler room)
       {
@@ -280,7 +282,25 @@ public class Rubble : MonoBehaviour
         rubble.UpdateSpriteOutline();
         rubble._scanTime = BraveTime.ScaledTimeSinceStartup + _SCAN_DELAY;
       }
-      return rubble;
+    }
+
+    private bool CheckForPits()
+    {
+      DebrisObject debris = base.gameObject.AddComponent<DebrisObject>();
+      debris.Priority = EphemeralObject.EphemeralPriority.Important;
+      debris.canRotate = false;
+      debris.angularVelocity = 0.0f;
+      debris.onGround = true;
+      debris.Trigger(Vector2.zero, 0.0f);
+      debris.isStatic = true;
+      debris.animatePitFall = true;
+      debris.ForceCheckForPitfall();
+      if (!debris.isFalling)
+      {
+        UnityEngine.Object.Destroy(debris);
+        return false;
+      }
+      return true;
     }
 
     private void WatchForNearbyEnemies()
@@ -387,6 +407,7 @@ public class Rubble : MonoBehaviour
       this._body.PrimaryPixelCollider.IsTrigger = false; // NOTE: Projectile component sets the collider to a trigger, so we need to undo that
       PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(this._body);
       this._breakable.enabled = true;
+      this.CheckForPits();
 
       yield break;
     }
@@ -413,7 +434,7 @@ public class Rubble : MonoBehaviour
 
     private void OnBreak()
     {
-      if (!this || this._destroyed)
+      if (!this || this._destroyed || GameManager.Instance.IsLoadingLevel)
         return;
       this._destroyed = true;
 
