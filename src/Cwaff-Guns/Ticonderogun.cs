@@ -199,9 +199,14 @@ public class Ticonderogun : CwaffGun
         if (enemy.healthHaver.IsVulnerable)
         {
             enemy.healthHaver.ApplyDamage(damage, Vector2.zero, ItemName, CoreDamageTypes.Magic, DamageCategory.Normal);
-            if (enemy.healthHaver.IsDead && this.PlayerOwner.HasSynergy(Synergy.PURPLE_PROSE))
+            if (enemy.healthHaver.IsDead)
+            {
+              if (this.PlayerOwner.HasSynergy(Synergy.PURPLE_PROSE))
                 if (DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(EasyGoopDefinitions.CharmGoopDef) is DeadlyDeadlyGoopManager gooper)
                     gooper.TimedAddGoopCircle(enemy.CenterPosition, 3.0f);
+              if (this.PlayerOwner.HasSynergy(Synergy.DRAWING_A_BLANK))
+                this.PlayerOwner.DoColorfulMiniBlank(color: Color.white, position: enemy.CenterPosition, playSound: true);
+            }
         }
         CwaffVFX.SpawnBurst(
             prefab           : _RunePrefab,

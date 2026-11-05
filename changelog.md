@@ -5,7 +5,7 @@
 - Added Autumn's Fury, Daoitzer, Rubble Rouser, Frost Effigy, Midas' Ammolet, and Ornate Shield
 	- Frost Effigy and Midas' Ammolet sprites thanks to Dallan!
 - Added masteries for Autumn's Fury, Daoitzer, and Rubble Rouser
-- Added 11 new synergies
+- Added 12 new synergies
 - Added Leaf Tiara and Cubulon hats
 	- Cubulon hat sprites thanks to Dallan!
 - Added several new companions from [Once More Into the Breach](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/Once_More_Into_The_Breach/) to the companion shop

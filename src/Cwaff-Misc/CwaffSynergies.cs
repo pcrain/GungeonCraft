@@ -218,6 +218,8 @@ public static class CwaffSynergies
             .RequiresAtLeastOneGunAndOneItem();
         NewSynergy(SISYPHEAN, "Sisyphean", new[]{IName(RubbleRouser.ItemName), "decoy"},
           tip: "Boulders act as decoys and draw fire from enemies.");
+        NewSynergy(DRAWING_A_BLANK, "Drawing a Blank", new[]{IName(Ticonderogun.ItemName), "elder_blank"},
+          tip: "Enemies trigger a mini blank effect at their position when killed by Ticonderogun.");
 
       #endregion
 
@@ -857,6 +859,7 @@ public enum Synergy {
     KABOOM_BOX,
     TOMB_RAIDER,
     SISYPHEAN,
+    DRAWING_A_BLANK,
 
     // Masteries
     MASTERY_GRANDMASTER,

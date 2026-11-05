@@ -3159,7 +3159,7 @@ public static class Extensions
 
   private static GameObject _MiniBlankVFX = null;
   /// <summary>Do a mini-blank effect with a custom color</summary>
-  public static void DoColorfulMiniBlank(this PlayerController user, Color color, Vector2? position = null, bool vfxOnly = false)
+  public static void DoColorfulMiniBlank(this PlayerController user, Color color, Vector2? position = null, bool vfxOnly = false, bool playSound = false)
   {
       Vector2 pos = position ?? user.CenterPosition;
       if (!vfxOnly)
@@ -3174,6 +3174,8 @@ public static class Extensions
           blankVfxSprite.usesOverrideMaterial = true;
           blankVfxSprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
           blankVfxSprite.renderer.material.SetColor(CwaffVFX._OverrideColorId, color.WithAlpha(0.25f));
+      if (playSound)
+        AkSoundEngine.PostEvent("Play_OBJ_silenceblank_small_01", blankVfx);
       UnityEngine.Object.Destroy(blankVfx, 1f);
 
       user.DoVibration(Vibration.Time.Quick, Vibration.Strength.Medium);
