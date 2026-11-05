@@ -12,7 +12,7 @@ public class MidasAmmolet : CwaffBlankModificationItem, ICustomBlankDoer
     public static void Init()
     {
         PassiveItem item  = Lazy.SetupPassive<MidasAmmolet>(ItemName, ShortDescription, LongDescription, Lore);
-        item.quality      = ItemQuality.A;
+        item.quality      = ItemQuality.B;
         item.AddPassiveStatModifier(StatType.AdditionalBlanksPerFloor, 1f, StatModifier.ModifyMethod.ADDITIVE);
         item.AddToSubShop(ItemBuilder.ShopType.OldRed);
     }

@@ -91,6 +91,7 @@ public class RubbleRouserProjectile : MonoBehaviour
     private bool _mastered             = false;
     private PlayerController _owner    = null;
     private GameObject _shadow         = null;
+    private bool _goingRight           = false;
 
     public void Setup(RubbleRouser rr)
     {
@@ -116,6 +117,7 @@ public class RubbleRouserProjectile : MonoBehaviour
         // bounds-check our trajectory so we aren't going out of bounds
         PerformBoundsChecks(launchAngle);
         // determine our overall travel time
+        this._goingRight = this._landingPos.x > this._startPos.x;
         this._halfwayPos = 0.5f * (this._startPos + this._landingPos);
         this._travelTime = Mathf.Clamp(30.0f / Mathf.Max(1f, this._projectile.baseData.speed), 0.2f, 0.8f).AddRandomSpread(0.1f);
 
@@ -163,7 +165,7 @@ public class RubbleRouserProjectile : MonoBehaviour
       Vector2 shadowPos = Vector2.Lerp(this._startPos, this._landingPos, travelPercent);
       this._shadow.transform.position = shadowPos;
       Vector2 curPos = shadowPos + new Vector2(0.0f, height);
-      this._projectile.m_transform.rotation = (_NUM_FLIPS * 360f * travelPercent).EulerZ();
+      this._projectile.m_transform.rotation = (_NUM_FLIPS * 360f * travelPercent * (this._goingRight ? -1f : 1f)).EulerZ();
       float scale = 1f - Mathf.Min(travelPercent, 1f - travelPercent);
       this._shadow.transform.localScale = new Vector3(2f * scale, 2f * scale, 1.0f);
       this._projectile.m_transform.localScale = new(scale, scale, 1.0f);
@@ -176,7 +178,7 @@ public class RubbleRouserProjectile : MonoBehaviour
     private void OnProjectileDestruction(Projectile projectile)
     {
         projectile.OnDestruction -= OnProjectileDestruction;
-        CrashLanding(projectile, createRubble: true, makeSentient: this._mastered);
+        CrashLanding(projectile, createRubble: true, makeSentient: this._mastered, direction: (this._landingPos - this._startPos));
     }
 
     private void OnDestroy()
@@ -185,7 +187,7 @@ public class RubbleRouserProjectile : MonoBehaviour
         UnityEngine.Object.Destroy(this._shadow);
     }
 
-    internal static void CrashLanding(Projectile projectile, bool createRubble, bool makeSentient)
+    internal static void CrashLanding(Projectile projectile, bool createRubble, bool makeSentient, Vector2 direction = default)
     {
         // collide with nearby enemies
         projectile.CollideWithAllEnemiesInRadius(_CRASH_RADIUS + 0.5f);
@@ -215,7 +217,7 @@ public class RubbleRouserProjectile : MonoBehaviour
         projectile.gameObject.PlayUnique("rubble_crash_sound");
         // persist on ground
         if (createRubble)
-          Rubble.Create(projectile.sprite, sentient: makeSentient, owner: projectile.Owner as PlayerController);
+          Rubble.Create(projectile.sprite, sentient: makeSentient, owner: projectile.Owner as PlayerController, direction: direction);
     }
 }
 
@@ -245,8 +247,12 @@ public class Rubble : MonoBehaviour
     private PlayerController _owner      = null;
     private GameObject _shadow           = null;
     private float _scanTime              = 0.0f;
+    private bool _isDecoy                = false;
+    private List<AIActor> _shmucks       = null;
+    private bool _isRolling              = false;
+    private Projectile _projectile       = null;
 
-    public static void Create(tk2dBaseSprite sprite, bool sentient, PlayerController owner)
+    public static void Create(tk2dBaseSprite sprite, bool sentient, PlayerController owner, Vector2 direction)
     {
       // persist on ground
       GameObject rubbleObject = sprite.DuplicateInWorld(copyShader: true).gameObject;
@@ -262,6 +268,33 @@ public class Rubble : MonoBehaviour
         rubble._occupiedCells = new OccupiedCells(rubble._body, rubble._room); // NOTE: constructor automatically updates Pathfinder
       }
       PhysicsEngine.Instance.RegisterOverlappingGhostCollisionExceptions(rubble._body);
+
+      if (owner && owner.HasSynergy(Synergy.SISYPHEAN))
+      {
+        rubble._shmucks = new();
+        rubble._isDecoy = true;
+      }
+
+      if (owner && owner.HasSynergy(Synergy.TOMB_RAIDER))
+      {
+        Projectile projectile = rubble.BecomeProjectile();
+        projectile.pierceMinorBreakables = true;
+        PierceProjModifier ppm = projectile.GetOrAddComponent<PierceProjModifier>();
+        ppm.BeastModeLevel = PierceProjModifier.BeastModeStatus.BEAST_MODE_LEVEL_ONE;
+        ppm.penetration = 999;
+        projectile.transform.right = direction.normalized;
+        projectile.baseData.range = 9999f;
+        projectile.baseData.speed = 5.0f;
+        projectile.OnDestruction += rubble.OnRollingProjectileDestruction;
+        projectile.shouldRotate = false;
+        projectile.shouldFlipHorizontally = false;
+        projectile.shouldFlipVertically = false;
+        projectile.angularVelocity = 360.0f;
+        rubble._isRolling = true;
+        rubble._projectile = projectile;
+        return;
+      }
+
       // make breakable
       rubble._breakable = rubbleObject.AddComponent<MajorBreakable>();
       rubble._breakable.spawnShards = false;
@@ -284,6 +317,13 @@ public class Rubble : MonoBehaviour
       }
     }
 
+    private void OnRollingProjectileDestruction(Projectile projectile)
+    {
+      projectile.OnDestruction -= OnRollingProjectileDestruction;
+      RubbleRouserProjectile.CrashLanding(projectile, createRubble: false, makeSentient: false);
+      OnBreak();
+    }
+
     private bool CheckForPits()
     {
       DebrisObject debris = base.gameObject.AddComponent<DebrisObject>();
@@ -303,6 +343,17 @@ public class Rubble : MonoBehaviour
       return true;
     }
 
+    private void MakeNonDecoy()
+    {
+      if (!this._isDecoy)
+        return;
+
+      foreach (AIActor shmuck in this._shmucks)
+        if (shmuck.OverrideTarget == this._body)
+          shmuck.OverrideTarget = null;
+      this._isDecoy = true;
+    }
+
     private void WatchForNearbyEnemies()
     {
       if (this._scanTime > BraveTime.ScaledTimeSinceStartup)
@@ -312,6 +363,7 @@ public class Rubble : MonoBehaviour
       if ((actor.CenterPosition - this._pos).sqrMagnitude > (_SCAN_RADIUS * _SCAN_RADIUS))
         return;
 
+      MakeNonDecoy();
       this._sentient = false;
       this._stomping = true;
       StartCoroutine(StompEnemy(actor));
@@ -333,6 +385,16 @@ public class Rubble : MonoBehaviour
       }
       this._sprite.HeightOffGround = _Z_OFFSET;
       this._sprite.UpdateZDepth();
+    }
+
+    private Projectile BecomeProjectile()
+    {
+      Projectile proj = base.gameObject.AddComponent<Projectile>();
+      proj.specRigidbody = this._body;
+      proj.baseData = new ProjectileData(RubbleRouser._RubbleProj.baseData); // NOTE: clone so this doesn't get overwritten
+      if (this._owner)
+        proj.SetOwnerAndStats(this._owner, updateCollisions: true);
+      return proj;
     }
 
     private IEnumerator StompEnemy(AIActor actor)
@@ -396,11 +458,7 @@ public class Rubble : MonoBehaviour
         UnityEngine.Object.Destroy(this._shadow);
       this._shadow = null;
 
-      Projectile proj = base.gameObject.AddComponent<Projectile>();
-      proj.specRigidbody = this._body;
-      proj.baseData = new ProjectileData(RubbleRouser._RubbleProj.baseData); // NOTE: clone so this doesn't get overwritten
-      if (this._owner)
-        proj.SetOwnerAndStats(this._owner, updateCollisions: true);
+      Projectile proj = BecomeProjectile();
       RubbleRouserProjectile.CrashLanding(proj, createRubble: false, makeSentient: false);
       proj.DestroyMode = Projectile.ProjectileDestroyMode.DestroyComponent;
       proj.DieInAir(true, false, false, true);
@@ -412,10 +470,32 @@ public class Rubble : MonoBehaviour
       yield break;
     }
 
+    private void DoDecoyChecks()
+    {
+      const float DECOY_RANGE = 6.0f;
+      foreach (AIActor enemy in this._body.UnitCenter.GetAllNearbyEnemies(DECOY_RANGE, includeInvulnerable: true))
+      {
+        if (enemy && enemy.OverrideTarget == null)
+        {
+          enemy.OverrideTarget = this._body;
+          this._shmucks.Add(enemy);
+        }
+      }
+    }
+
+    private void OrientRollingProjectile()
+    {
+      this._projectile.angularVelocity = this._body.Velocity.x < 0 ? 360.0f : -360.0f;
+    }
+
     private void Update()
     {
+      if (this._isRolling && this._projectile)
+        OrientRollingProjectile();
       if (this._sentient)
         WatchForNearbyEnemies();
+      if (this._isDecoy)
+        DoDecoyChecks();
       if (this._stomping || this._shakeTimer <= 0.0f)
         return;
 
@@ -449,6 +529,7 @@ public class Rubble : MonoBehaviour
 
     private void OnDestroy()
     {
+      MakeNonDecoy();
       if (this._shadow)
         UnityEngine.Object.Destroy(this._shadow);
       OnBreak();

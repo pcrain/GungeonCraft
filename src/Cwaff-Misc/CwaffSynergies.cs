@@ -214,6 +214,10 @@ public static class CwaffSynergies
           tip: "If the player is in debt at the start of a new floor, casings are set to 0.");
         NewSynergy(KABOOM_BOX, "Kaboom Box", new[]{IName(Stereoscope.ItemName), IName(DemolitionContract.ItemName)},
           tip: "Enemies killed by Stereoscope explode on death.");
+        NewSynergy(TOMB_RAIDER, "Tomb Raider", new[]{IName(RubbleRouser.ItemName), "holey_grail"},
+          tip: "Boulders roll forward after landing until crashing into walls.");
+        NewSynergy(SISYPHEAN, "Sisyphean", new[]{IName(RubbleRouser.ItemName), "decoy"},
+          tip: "Boulders act as decoys and draw fire from enemies.");
 
       #endregion
 
@@ -845,6 +849,8 @@ public enum Synergy {
     FALL_DAMAGE,
     PREAPPROVED,
     KABOOM_BOX,
+    TOMB_RAIDER,
+    SISYPHEAN,
 
     // Masteries
     MASTERY_GRANDMASTER,
