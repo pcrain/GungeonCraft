@@ -21,6 +21,7 @@
 - Increased Magunet's quality from B to A since it's a lot stronger now that it's not so buggy
 - Rebalanced Phosphor Slimes: they now attempt to stay farther away from enemies, have slightly more health, and can no longer attack
 - Added intangibility frames to several damage negation effects from various guns, items, and synergies
+- Fixed null deref caused by custom reticles attempt to check non-existent input devices during level loading
 
 ## 1.33.2 (2026-10-23)
 

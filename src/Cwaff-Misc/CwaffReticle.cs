@@ -50,7 +50,7 @@ public class CwaffReticle : MonoBehaviour
 
   private void LateUpdate()
   {
-    if (!this._gun || !this._gun.PlayerOwner)
+    if (!this._gun || !this._gun.PlayerOwner || GameManager.Instance.IsLoadingLevel)
       return;
 
     this._player = this._gun.PlayerOwner;
@@ -141,7 +141,7 @@ public class CwaffReticle : MonoBehaviour
     }
     else if (this.targetPosFunc != null)
       this._targetPos = this.targetPosFunc(this);
-    else if (!this._player.IsKeyboardAndMouse())  //WARNING: this has caused a null dereference, but not sure how
+    else if (!this._player.IsKeyboardAndMouse())
       this._targetPos = this._player.CenterPosition + this.controllerScale * this._player.m_activeActions.Aim.Vector;
     else
       this._targetPos = this._player.unadjustedAimPoint.XY();
