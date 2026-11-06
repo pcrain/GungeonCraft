@@ -321,8 +321,10 @@ public class AutumnsFuryProjectile : MonoBehaviour
               this._projectile.SendInDirection(closestEnemy.CenterPosition - this._projectile.SafeCenter, resetDistance: true);
             else if (this._velocity.sqrMagnitude > 0.1f)
               this._projectile.SendInDirection(this._velocity, resetDistance: true);
-            else
+            else if (this._naturalSpawn)
               this._projectile.SendInDirection(this._projectile.OriginalDirection().ToVector(), resetDistance: true);
+            else
+              { } // do nothing if not a natural spawn
             this._body.Reinitialize();
             this._projectile.SetSpeed(0.01f);
             this._accelTime = ACCEL_TIME * UnityEngine.Random.value;
@@ -366,7 +368,7 @@ public class AutumnsFuryProjectile : MonoBehaviour
       this._state = State.SLOWING;
       this._slowTime = SLOW_TIME * UnityEngine.Random.value;
       this._originalRotSpeed = this._rotSpeed;
-      this._stateTimer = this._slowTime;
+      this._stateTimer = this._naturalSpawn ? this._slowTime : 0.0f;
     }
 
     private void Swirl(float dtime)
