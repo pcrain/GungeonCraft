@@ -22,6 +22,7 @@
 - Rebalanced Phosphor Slimes: they now attempt to stay farther away from enemies, have slightly more health, and can no longer attack
 - Added intangibility frames to several damage negation effects from various guns, items, and synergies
 - Fixed null deref caused by custom reticles attempt to check non-existent input devices during level loading
+- Blacklisted Hightide projectiles from being affected by Orbital Bullets (waves should always break on collision)
 
 ## 1.33.2 (2026-10-23)
 
