@@ -13,8 +13,10 @@ public class Voidcaller : CwaffGun
     private const float NULLIFICATION_DELAY_MIN = 0.25f;
     private const float NULLIFICATION_DELAY_MAX = 0.75f;
 
+    private static readonly int _NumModules = Enum.GetValues(typeof(VoidType)).Length;
+
     private int _lastKnownVolleySize = 0;
-    private bool[] _moduleEnabled = new bool[(int)VoidType.Gun + 1];
+    private bool[] _moduleEnabled = new bool[_NumModules + 1];
 
     private static VFXPool _ImpactPool = null;
 
@@ -30,7 +32,7 @@ public class Voidcaller : CwaffGun
             emissiveColorPower: 10.0f, emissiveColour: new Color(0.7f, 0.4f, 0.7f), emissiveSensitivity: 0.6f))
           .Assign(out Projectile p);
 
-        gun.Volley.projectiles = Enumerable.Repeat<ProjectileModule>(null, Enum.GetValues(typeof(VoidType)).Length).ToList();
+        gun.Volley.projectiles = Enumerable.Repeat<ProjectileModule>(null, _NumModules).ToList();
           gun.Volley.projectiles[(int)VoidType.Default]   = VoidcallerModule(gun, p, sprite: "voidcaller_projectile_default", sound: "voidcaller_shoot_proj_1", ammoCost: 1);
           gun.Volley.projectiles[(int)VoidType.Key]       = VoidcallerModule(gun, p, sprite: "voidcaller_projectile_key",     sound: "voidcaller_shoot_proj_2");
           gun.Volley.projectiles[(int)VoidType.Blank]     = VoidcallerModule(gun, p, sprite: "voidcaller_projectile_blank",   sound: "voidcaller_shoot_proj_3");
@@ -166,7 +168,9 @@ public class Voidcaller : CwaffGun
       if (this.gun.GunPlayerOwner() is not PlayerController player)
         return true;
 
-      int index = this.gun.Volley.projectiles.IndexOf(module);
+      int index = module.CloneSourceIndex;
+      if (index < 0)
+        index = this.gun.Volley.projectiles.IndexOf(module);
       bool canFire = ((VoidType)index) switch {
         VoidType.Default   => true,
         VoidType.Key       => player.carriedConsumables.KeyBullets == 0,

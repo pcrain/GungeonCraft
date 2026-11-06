@@ -23,6 +23,7 @@
 - Added intangibility frames to several damage negation effects from various guns, items, and synergies
 - Fixed null deref caused by custom reticles attempt to check non-existent input devices during level loading
 - Blacklisted Hightide projectiles from being affected by Orbital Bullets (waves should always break on collision)
+- Fixed index out of range exception caused by Voidcaller attempting to incorrectly access cloned projectile modules (e.g., by Scattershot or Backup Gun)
 
 ## 1.33.2 (2026-10-23)
 
