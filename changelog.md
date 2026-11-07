@@ -2,11 +2,11 @@
 
 ## 1.34.0 (TBD)
 
-- Added Autumn's Fury, Daoitzer, Rubble Rouser, Frost Effigy, Midas' Ammolet, and Ornate Shield
+- Added Autumn's Fury, Daoitzer, Rubble Rouser, Frost Effigy, Midas' Ammolet, Ornate Shield, and Steel Drum
 	- Frost Effigy and Midas' Ammolet sprites thanks to Dallan!
 - Added masteries for Autumn's Fury, Daoitzer, and Rubble Rouser
 - Added 12 new synergies
-- Added Leaf Tiara and Cubulon hats
+- Added Leaf Tiara, Cubulon Hat, and Marching Band Conductor's Hat
 	- Cubulon hat sprites thanks to Dallan!
 - Added several new companions from [Once More Into the Breach](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/Once_More_Into_The_Breach/) to the companion shop
 - Changed Adrenaline Shot's heart UI sprites to the vanilla empty heart sprites

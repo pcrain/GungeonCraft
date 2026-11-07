@@ -110,6 +110,7 @@ public static class CwaffHats
 
       EasyHat(name: "leaf_tiara",            offset: new IntVector2( 0, -4), autoFlip: true);
       EasyHat(name: "cubulon",               offset: new IntVector2( 0, -1), autoFlip: true, depth: Hat.HatDepthType.IN_FRONT_WHEN_FACING_BACK);
+      EasyHat(name: "marching_band_conductors_hat", offset: new IntVector2( 0, -2), autoFlip: true);
 
       Lazy.DebugLog($"Successfully initialized {_NumHats} hats! C:");
     }

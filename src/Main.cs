@@ -303,6 +303,7 @@ public class Initialisation : BaseUnityPlugin
                 AutumnsFury.Init();
                 Daoitzer.Init();
                 RubbleRouser.Init();
+                SteelDrum.Init();
 
                 Lazy.FinalizeGuns(); // Make sure encounter trackables are finalized so shoot styles properly display in the Ammonomicon
 
