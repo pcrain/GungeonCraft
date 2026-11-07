@@ -4256,4 +4256,28 @@ public static class Extensions
     if (pierce)
       body.OnPreTileCollision += proj.OnPreTileCollision;
   }
+
+  /// <summary>Relocate an enemy to a new room, making sure a bunch of weird shenanigans don't cause problems</summary>
+  public static void RelocateToNewRoom(this AIActor actor, RoomHandler newRoom, bool forceReparent = true)
+  {
+    if (newRoom == null)
+      return;
+
+    RoomHandler oldRoom = actor.ParentRoom;
+    if (oldRoom == newRoom)
+      return;
+
+    bool resetParent = forceReparent;
+    if (oldRoom != null)
+    {
+      if (newRoom.hierarchyParent != null && actor.transform.parent == newRoom.hierarchyParent)
+        resetParent = true;
+      oldRoom.DeregisterEnemy(actor, true);
+    }
+    newRoom.RegisterEnemy(actor);
+    if (resetParent)
+      actor.transform.parent = newRoom.hierarchyParent; // a lot of enemies are parented to their rooms, so when the rooms are deactivated, so are they
+    actor.ParentRoom = newRoom;
+    actor.TeleportSomewhere(keepClose: true);
+  }
 }
