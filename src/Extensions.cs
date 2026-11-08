@@ -1062,6 +1062,7 @@ public static class Extensions
   /// <param name="undroppableStarter">If true, gun is undroppable as a starter item.</param>
   /// <param name="muzzleOrphaned">If true, muzzles effects remain attached to the gun; if false, muzzle effects stay where they are spawned.</param>
   /// <param name="lowersAudioWhileFiring">If true, other audio is lowered while the gun is firing.</param>
+  /// <param name="manuallyHandleCooldown">If true, prevents TriggerModuleCooldown() from being called so cooldown can be manually managed.</param>
   public static Gun SetAttributes(this Gun gun, ItemQuality quality, GunClass gunClass, float reloadTime, int ammo,
     Items audioFrom = Items.Banana, bool defaultAudio = false, bool infiniteAmmo = false, bool canGainAmmo = true, bool canReloadNoMatterAmmo = false, bool? doesScreenShake = null,
     int? idleFps = null, int? shootFps = null, int? reloadFps = null, int? chargeFps = null, int? introFps = null, string fireAudio = null, string reloadAudio = null, string introAudio = null,
@@ -1072,7 +1073,7 @@ public static class Extensions
     GunHandedness handedness = GunHandedness.AutoDetect, bool autoPlay = true, bool attacksThroughWalls = false, bool suppressReloadLabel = false, float percentSpeedWhileCharging = 1.0f,
     bool onlyUsesIdleInWeaponBox = false, bool continuousFireAnimation = false, bool preventRollingWhenCharging = false, float percentSpeedWhileFiring = 1.0f, float smoothReload = -1f, bool canAttackWhileRolling = false,
     bool isStarterGun = false, float percentSpeedWhileReloading = 1.0f, bool preventDuctTape = false, float muzzleEmissionSensitivity = 0.5f, bool preventVolleyModifications = false, bool undroppableStarter = false,
-    bool muzzleOrphaned = false, bool lowersAudioWhileFiring = false)
+    bool muzzleOrphaned = false, bool lowersAudioWhileFiring = false, bool manuallyHandleCooldown = false)
   {
     CwaffGun cg = gun.gameObject.GetComponent<CwaffGun>();
 
@@ -1126,6 +1127,7 @@ public static class Extensions
     cg.percentSpeedWhileCharging = percentSpeedWhileCharging;
     cg.percentSpeedWhileReloading = percentSpeedWhileReloading;
     cg.percentSpeedWhileFiring = percentSpeedWhileFiring;
+    cg.manuallyHandleCooldown = manuallyHandleCooldown;
     if (dynamicBarrelOffsets)
       CwaffGun.SetUpDynamicBarrelOffsets(gun);
     if (suppressReloadLabel)

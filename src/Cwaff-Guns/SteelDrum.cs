@@ -26,9 +26,9 @@ public class SteelDrum : CwaffGun
         Lazy.SetupGun<SteelDrum>(ItemName, ShortDescription, LongDescription, Lore)
           .SetAttributes(quality: ItemQuality.C, gunClass: GunClass.SILLY, reloadTime: 0.0f, ammo: 2018, shootFps: 30, reloadFps: 12,/* preventRotation: true,*/
             dynamicBarrelOffsets: true, suppressFireAnim: true, suppressReloadAnim: true, doesScreenShake: false, lowersAudioWhileFiring: true,
-            carryOffset: new IntVector2(4, -2), attacksThroughWalls: true)
+            carryOffset: new IntVector2(4, -2), attacksThroughWalls: true, manuallyHandleCooldown: true)
           .AssignGun(out Gun gun)
-          .InitProjectile(GunData.New(baseProjectile: Items.FaceMelter.Projectile(), clipSize: -1, cooldown: 1000.0f, shootStyle: ShootStyle.Automatic,
+          .InitProjectile(GunData.New(baseProjectile: Items.FaceMelter.Projectile(), clipSize: -1, cooldown: 0.0f, shootStyle: ShootStyle.Automatic,
             damage: 6.0f, speed: 30f, range: 9999f, force: 12f, angleVariance: 16.0f, barrageSize: _TheSong.Count))
           .Assign(out Projectile proj);
         for (int i = 1; i <= 5; ++i)
@@ -46,8 +46,8 @@ public class SteelDrum : CwaffGun
               speed: (i < 3) ? 30.0f : 16.0f));
             if (i == 3)
             {
+              mod.projectiles[0] = mod.projectiles[0].ConvertToSpecialtyType<DrumProjectile>();
               mod.projectiles[0].collidesWithProjectiles = true;
-              mod.projectiles[0].gameObject.AddComponent<DrumProjectile>();
             }
           }
           else // everything after 3 uses drum projectiles
@@ -72,42 +72,20 @@ public class SteelDrum : CwaffGun
       this.canAttackWhileRolling = this.Mastered;
     }
 
-    public class DrumProjectile : MonoBehaviour
+    public class DrumProjectile : Projectile
     {
-      private Projectile _projectile     = null;
-      private SpeculativeRigidbody _body = null;
-      private bool _setup                = false;
-      private bool _mastered             = false;
+      private bool _mastered = false;
 
-      private void Start()
+      public void SetMastered()
       {
-        Setup(mastered: false);
+        this._mastered = true;
       }
 
-      public void Setup(bool mastered = true)
+      public override void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherCollider)
       {
-        if (mastered)
-          this._mastered = mastered;
-        if (this._setup)
-          return;
-        this._projectile = base.GetComponent<Projectile>();
-        this._body = base.gameObject.GetComponent<SpeculativeRigidbody>();
-        this._body.OnPreRigidbodyCollision += this.OnPreCollision;
-        this._setup = true;
-      }
-
-      private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
-      {
-        if (!otherRigidbody)
+        base.OnPreCollision(myRigidbody, myCollider, otherRigidbody, otherCollider);
+        if (otherRigidbody.projectile is Projectile p && p.isActiveAndEnabled && (!this._mastered || p.m_owner is PlayerController))
           PhysicsEngine.SkipCollision = true;
-        else if (otherRigidbody.gameObject.GetComponent<Projectile>() is Projectile p && p.isActiveAndEnabled && (!this._mastered || p.m_owner is PlayerController))
-          PhysicsEngine.SkipCollision = true;
-      }
-
-      private void OnDestroy()
-      {
-        if (this._body)
-          this._body.OnPreRigidbodyCollision -= this.OnPreCollision;
       }
     }
 
@@ -219,7 +197,7 @@ public class SteelDrum : CwaffGun
     {
       base.PostProcessProjectile(projectile);
       if (this.Mastered && projectile.gameObject.GetComponent<DrumProjectile>() is DrumProjectile dp)
-        dp.Setup(mastered: true);
+        dp.SetMastered();
     }
 
     private struct DrumNote

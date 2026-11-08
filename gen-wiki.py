@@ -62,6 +62,9 @@ def applyGunDataOverrides(gunData):
   gunData["Pincushion"]["firerate"]      = "0.02" # 1/60, rounded
   gunData["Pincushion"]["damage"]        = "0.35" # as set by _NEEDLE_DAMAGE
 
+def applySynergyDataOverrides(synergyData):
+  synergyData["Fright Train"]["filename2"] = "[[File:JK-47.png]]"
+
 def main():
   passiveData, passiveDataByClass = scanPassives()
   WIKI_PARAMS["passives"] = "".join([PASSIVE_TEMPLATE.format(**v) for k,v in passiveData.items()])
@@ -76,6 +79,7 @@ def main():
   WIKI_PARAMS["guns"] = "".join([GUN_TEMPLATE.format(**v) for k,v in gunData.items()])
 
   synergyData = scanSynergies(passiveDataByClass, activeDataByClass, gunDataByClass)
+  applySynergyDataOverrides(synergyData)
   WIKI_PARAMS["synergies"] = processSynergies(synergyData)
 
   npcData = getNPCs()

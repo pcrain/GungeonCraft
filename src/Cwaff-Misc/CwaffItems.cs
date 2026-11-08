@@ -68,6 +68,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   public  bool                              preventVolleyModifications = false;  // if true, prevents gun from applying volley modifications (e.g. Scattershot)
   public  bool                              suppressReloadAnimations   = false;  // if true, suppresses all reload animations for the gun from auto-playing
   public  bool                              suppressFireAnimations     = false;  // if true, suppresses all fire animations for the gun from auto-playing
+  public  bool                              manuallyHandleCooldown     = false;  // if true, we manually handle cooldown and prohibit calling TriggerModuleCooldown()
 
   public  bool                              Mastered {get; private set;}         // whether the gun has been mastered
 
@@ -915,6 +916,18 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
             return true; // call the original method
           __result = false;
           return false;
+      }
+  }
+
+  /// <summary>Suppress calls to TriggerModuleCooldown() if we're handling them manually</summary>
+  [HarmonyPatch(typeof(Gun), nameof(Gun.TriggerModuleCooldown))]
+  internal static class GunTriggerModuleCooldownPatch
+  {
+      private static bool Prefix(Gun __instance, ProjectileModule mod)
+      {
+          if (__instance.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg || cg.manuallyHandleCooldown)
+            return false; // skip original method
+          return true; // call the original method
       }
   }
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.34.1 (TBD)
+
+- Fixed major memory leak caused by spawning excessive cooldown timer routines when firing Steel Drum
+
 ## 1.34.0 (2026-11-07)
 
 #### Features:
