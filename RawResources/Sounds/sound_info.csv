@@ -481,11 +481,11 @@ frost_effigy_block_sound,5.0,1,sound,0
 frost_effigy_break_sound,5.0,1,sound,0
 frost_effigy_deploy_sound,5.0,1,sound,0
 the_sound_of_financial_security,1.0,1,sound,1
-sd_maracas,3.0,1,sound,0
-sd_castanets,3.0,1,sound,0
-sd_claves,3.0,1,sound,0
-sd_bongo_hi,3.0,1,sound,0
-sd_conga_hi,3.0,1,sound,0
+sd_maracas,5.0,1,sound,0
+sd_castanets,5.0,1,sound,0
+sd_claves,5.0,1,sound,0
+sd_bongo_hi,5.0,1,sound,0
+sd_conga_hi,8.0,1,sound,0
 steel_drum_note_0_c4,-3.0,1,sound,0
 steel_drum_note_1_c4s,-3.0,1,sound,0
 steel_drum_note_2_d4,-3.0,1,sound,0
