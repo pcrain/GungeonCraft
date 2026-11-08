@@ -1,6 +1,8 @@
 # Changelog
 
-## 1.34.0 (TBD)
+## 1.34.0 (2026-11-07)
+
+#### Features:
 
 - Added Autumn's Fury, Daoitzer, Rubble Rouser, Frost Effigy, Midas' Ammolet, Ornate Shield, and Steel Drum
 	- Frost Effigy and Midas' Ammolet sprites thanks to Dallan!
@@ -8,24 +10,30 @@
 - Added 13 new synergies
 - Added Leaf Tiara, Cubulon Hat, and Marching Band Conductor's Hat
 	- Cubulon hat sprites thanks to Dallan!
+
+#### Balance Changes and Polish:
+
 - Added several new companions from [Once More Into the Breach](https://thunderstore.io/c/enter-the-gungeon/p/Nevernamed/Once_More_Into_The_Breach/) to the companion shop
+- Rebalanced Phosphor Slimes: they now attempt to stay farther away from enemies, have slightly more health, and can no longer attack
+- Increased Magunet's quality from B to A since it's a lot stronger now that it's not so buggy
+- Tweaked Sub Machine Gun's charm effect: charmed enemies can be fed to restore health, and will teleport to the player's room upon entering combat
 - Changed Adrenaline Shot's heart UI sprites to the vanilla empty heart sprites
-- Significantly lowered the volume of Natascha's revving sound
+- Added intangibility frames to several damage negation effects from various guns, items, and synergies
 - Reworked how Battery Bullet's particle effects are suppressed on Chekhov's Gun, Forkbomb, Gradius, Gunbrella, and Scotsman projectiles
 	- (the old method outright removed the electric damage type from the projectiles; the new code keeps the electric damage and just removes the particles)
-- Fixed Death Note's opening sound effect not playing under some circumstances
 - Improved swinging animation for Sunderbuss
-- Reduced lag and general jankiness surrouding Magunet's debris manipulation mechanics
+- Significantly lowered the volume of Natascha's revving sound
+
+#### Bugfixes and Misc:
+
 - Fixed UI Atlas corruption caused by failure to clean up loading screen modifications once the loading screen has been destroyed
-- Fixed Magunet rendering pieces of debris uncollectable if it was repeatedly toggled on and off too quickly
-- Increased Magunet's quality from B to A since it's a lot stronger now that it's not so buggy
-- Rebalanced Phosphor Slimes: they now attempt to stay farther away from enemies, have slightly more health, and can no longer attack
-- Added intangibility frames to several damage negation effects from various guns, items, and synergies
-- Fixed null deref caused by custom reticles attempt to check non-existent input devices during level loading
-- Blacklisted Hightide projectiles from being affected by Orbital Bullets (waves should always break on collision)
 - Fixed index out of range exception caused by Voidcaller attempting to incorrectly access cloned projectile modules (e.g., by Scattershot or Backup Gun)
-- Tweaked Sub Machine Gun's charm effect so that enemies teleport to the player's room upon entering combat
+- Fixed Magunet rendering pieces of debris uncollectable if it was repeatedly toggled on and off too quickly
+- Fixed null deref caused by custom reticles attempt to check non-existent input devices during level loading
 - Fixed guns disappearing for a fraction of a second after dodge rolling when in possession of Combat Leotard
+- Fixed Death Note's opening sound effect not playing under some circumstances
+- Blacklisted Hightide projectiles from being affected by Orbital Bullets (waves should always break on collision)
+- Reduced lag and general jankiness surrouding Magunet's debris manipulation mechanics
 
 ## 1.33.2 (2026-10-23)
 

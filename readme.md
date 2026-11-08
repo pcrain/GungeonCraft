@@ -9,13 +9,13 @@
 
 ### Features
 
-- 178 new items, including
-	+ 99 new guns
-	+ 54 new passive items
-	+ 25 new active items
+- 185 new items, including
+	+ 103 new guns
+	+ 56 new passive items
+	+ 26 new active items
 - Lore for all new guns and items
 - Two new custom characters: Rogo from [Pogo Rogue](https://store.steampowered.com/app/2870280/Pogo_Rogue/) and Beatrix from [Slime Rancher](https://store.steampowered.com/app/433340/Slime_Rancher/)
-- 90 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
+- 93 stylish cosmetic hats, accessible via a new hat room near Winchester in the Breach
 - Companion Shop: sells 3 random unlocked companions at a 30% discount
 - Barter Shop: trades 3 random D-A tier items for any higher-tiered item
 - Insurance Shop: sells insurance policies that let you carry items over to the next run
