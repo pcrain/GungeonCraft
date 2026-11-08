@@ -15,10 +15,11 @@ public class SteelDrum : CwaffGun
       1 + 2 + 4 + 8 + 16 + 32,
       ];
 
-    private float _songTime    = 0.0f;
-    private List<int> _songPos = [0, 0, 0, 0, 0, 0];
-    private int _loop          = 0;
-    private bool _left         = false;
+    private float _songTime          = 0.0f;
+    private List<int> _songPos       = [0, 0, 0, 0, 0, 0];
+    private int _loop                = 0;
+    private bool _left               = false;
+    private bool _cachedInfiniteAmmo = false;
 
     public static void Init()
     {
@@ -73,23 +74,33 @@ public class SteelDrum : CwaffGun
 
     public class DrumProjectile : MonoBehaviour
     {
-      internal bool _mastered = false;
+      private Projectile _projectile     = null;
+      private SpeculativeRigidbody _body = null;
+      private bool _setup                = false;
+      private bool _mastered             = false;
 
-      private Projectile _projectile;
-      private SpeculativeRigidbody _body;
-
-      public void Master()
+      private void Start()
       {
+        Setup(mastered: false);
+      }
+
+      public void Setup(bool mastered = true)
+      {
+        if (mastered)
+          this._mastered = mastered;
+        if (this._setup)
+          return;
         this._projectile = base.GetComponent<Projectile>();
         this._body = base.gameObject.GetComponent<SpeculativeRigidbody>();
         this._body.OnPreRigidbodyCollision += this.OnPreCollision;
+        this._setup = true;
       }
 
       private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
       {
         if (!otherRigidbody)
           PhysicsEngine.SkipCollision = true;
-        else if (otherRigidbody.gameObject.GetComponent<Projectile>() is Projectile p && p.isActiveAndEnabled && p.m_owner is PlayerController)
+        else if (otherRigidbody.gameObject.GetComponent<Projectile>() is Projectile p && p.isActiveAndEnabled && (!this._mastered || p.m_owner is PlayerController))
           PhysicsEngine.SkipCollision = true;
       }
 
@@ -150,9 +161,7 @@ public class SteelDrum : CwaffGun
       {
         foreach (ProjectileModule mod in this.gun.Volley.projectiles)
         {
-          int index = mod.CloneSourceIndex;
-          if (index < 0)
-            index = this.gun.Volley.projectiles.IndexOf(mod);
+          int index = mod.TrueSourceIndex(this.gun);
           this.gun.m_moduleData[mod].onCooldown = (index > 0); // TODO: figure out how to disable infinite spam clicking
         }
       }
@@ -167,13 +176,23 @@ public class SteelDrum : CwaffGun
       this._songTime += Time.unscaledDeltaTime * this.PlayerOwner.FireRateMult();
       foreach (ProjectileModule mod in this.gun.Volley.projectiles)
       {
-        int index = mod.CloneSourceIndex;
-        if (index < 0)
-          index = this.gun.Volley.projectiles.IndexOf(mod);
+        int index = mod.TrueSourceIndex(this.gun);
         if (index < 0 || index >= _TheSong.Count)
           continue;
         this.gun.m_moduleData[mod].onCooldown = !CanPlayNextNote(part: index);
       }
+    }
+
+    private void UpdateAmmo(PlayerController pc)
+    {
+      bool infiniteAmmo = pc && pc.HasSynergy(Synergy.BEAT_OF_YOUR_OWN_DRUMS);
+      if (infiniteAmmo == this._cachedInfiniteAmmo)
+        return;
+      this._cachedInfiniteAmmo = infiniteAmmo;
+      this.gun.LocalInfiniteAmmo = infiniteAmmo;
+      foreach (ProjectileModule mod in this.gun.Volley.projectiles)
+        if (mod.TrueSourceIndex(this.gun) < 3)
+          mod.ammoCost = infiniteAmmo ? 0 : 1;
     }
 
     public override void Update()
@@ -183,6 +202,7 @@ public class SteelDrum : CwaffGun
         return;
       if (this.PlayerOwner is not PlayerController pc)
         return;
+      UpdateAmmo(pc);
       if (this.gun.IsFiring && pc.m_CanAttack)
         UpdateSong();
       else
@@ -199,7 +219,7 @@ public class SteelDrum : CwaffGun
     {
       base.PostProcessProjectile(projectile);
       if (this.Mastered && projectile.gameObject.GetComponent<DrumProjectile>() is DrumProjectile dp)
-        dp.Master();
+        dp.Setup(mastered: true);
     }
 
     private struct DrumNote

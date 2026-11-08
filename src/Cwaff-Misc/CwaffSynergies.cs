@@ -220,6 +220,8 @@ public static class CwaffSynergies
           tip: "Boulders act as decoys and draw fire from enemies.");
         NewSynergy(DRAWING_A_BLANK, "Drawing a Blank", new[]{IName(Ticonderogun.ItemName), "elder_blank"},
           tip: "Enemies trigger a mini blank effect at their position when killed by Ticonderogun.");
+        NewSynergy(BEAT_OF_YOUR_OWN_DRUMS, "Beat of Your Own Drums", new[]{IName(SteelDrum.ItemName), "drum_clip"},
+          tip: "Steel Drum gains infinite ammo.");
 
       #endregion
 
@@ -863,6 +865,7 @@ public enum Synergy {
     TOMB_RAIDER,
     SISYPHEAN,
     DRAWING_A_BLANK,
+    BEAT_OF_YOUR_OWN_DRUMS,
 
     // Masteries
     MASTERY_GRANDMASTER,

@@ -4282,4 +4282,13 @@ public static class Extensions
     actor.ParentRoom = newRoom;
     actor.TeleportSomewhere(keepClose: true);
   }
+
+  /// <summary>Get the true clone source index for a module, or its own source index if it's not a clone</summary>
+  public static int TrueSourceIndex(this ProjectileModule mod, Gun gun)
+  {
+    int index = mod.CloneSourceIndex;
+    if (index >= 0)
+      return index;
+    return gun.Volley.projectiles.IndexOf(mod);
+  }
 }

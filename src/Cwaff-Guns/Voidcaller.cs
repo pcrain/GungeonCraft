@@ -168,9 +168,7 @@ public class Voidcaller : CwaffGun
       if (this.gun.GunPlayerOwner() is not PlayerController player)
         return true;
 
-      int index = module.CloneSourceIndex;
-      if (index < 0)
-        index = this.gun.Volley.projectiles.IndexOf(module);
+      int index = module.TrueSourceIndex(this.gun);
       bool canFire = ((VoidType)index) switch {
         VoidType.Default   => true,
         VoidType.Key       => player.carriedConsumables.KeyBullets == 0,
