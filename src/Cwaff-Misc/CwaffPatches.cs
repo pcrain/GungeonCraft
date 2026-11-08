@@ -374,7 +374,7 @@ static class DisplayMasteryInGunNamePatch
     }
 }
 
-//NOTE: used by Zealot and Combat Leotard
+//NOTE: used by Zealot, Combat Leotard, and Steel Drum
 /// <summary>Patches to allow the player to attack while dodge rolling.</summary>
 [HarmonyPatch]
 static class AttackWhileRollingPatch
@@ -410,7 +410,7 @@ static class AttackWhileRollingPatch
     [HarmonyPrefix]
     private static bool KeepRenderersOnWhileDodgeRollingPatch(PlayerController __instance, bool value, string reason)
     {
-      if (value || reason != "dodgeroll")
+      if (reason != "dodgeroll" && reason != "postdodgeroll")
         return true; // call original method
       if (PassiveItem.IsFlagSetForCharacter(__instance, typeof(CombatLeotard)))
         return false; // skip original method

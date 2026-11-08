@@ -25,6 +25,7 @@
 - Blacklisted Hightide projectiles from being affected by Orbital Bullets (waves should always break on collision)
 - Fixed index out of range exception caused by Voidcaller attempting to incorrectly access cloned projectile modules (e.g., by Scattershot or Backup Gun)
 - Tweaked Sub Machine Gun's charm effect so that enemies teleport to the player's room upon entering combat
+- Fixed guns disappearing for a fraction of a second after dodge rolling when in possession of Combat Leotard
 
 ## 1.33.2 (2026-10-23)
 
