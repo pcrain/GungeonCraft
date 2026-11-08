@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.34.1 (TBD)
+## 1.34.1 (2026-11-08)
 
 - Fixed major memory leak caused by spawning excessive cooldown timer routines when firing Steel Drum
 - Made some of Steel Drum's nearly-inaudible percussion sounds a little louder
