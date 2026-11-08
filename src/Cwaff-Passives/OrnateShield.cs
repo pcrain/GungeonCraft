@@ -5,7 +5,7 @@ public class OrnateShield : CwaffPassive
     public static string ItemName         = "Ornate Shield";
     public static string ShortDescription = "Financial Security";
     public static string LongDescription  = "Adds a 0.1% chance to negate damage and trigger a mini blank for every casing the player possesses, up to a maximum of 50%.";
-    public static string Lore             = "TBD";
+    public static string Lore             = "A presumably once-functional shield that has been gilded, embossed, emblazoned, embellished, and bedazzled to the point of absurdity. The haphazardly placed ornaments render the shield very heavy and imbalanced, substantially decreasing its utility. Nobody in their right mind would fear someone who wields this shield, but if you're lucky, your enemies just might be really, really impressed by it.";
 
     public static void Init()
     {

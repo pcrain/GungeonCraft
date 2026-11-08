@@ -4,8 +4,8 @@ public class SteelDrum : CwaffGun
 {
     public static string ItemName         = "Steel Drum";
     public static string ShortDescription = "The Beatdown Goes On";
-    public static string LongDescription  = "Fires melodic notes forward and drum notes in random directions. More notes are fired the longer the drum plays uninterrupted.";
-    public static string Lore             = "";
+    public static string LongDescription  = "Fires melodic notes forward and percussive notes in random directions. More notes are fired the longer the drum plays uninterrupted.";
+    public static string Lore             = "When morale is low on the battlefield, good music is a surefire way to lift everyone's spirits. Unfortunately, instruments are scarce in combat, and the average solider doesn't exactly have the voice of an angel. Gungeoneers thus typically resort to drum magazines for their musical needs, which works out pretty well for everyone...except the shmuck who ends up getting stranded without a drum clip in the heat of battle.";
 
     private static readonly List<int> _ActiveParts = [
       1         + 8,
@@ -39,9 +39,16 @@ public class SteelDrum : CwaffGun
         {
           ProjectileModule mod = gun.Volley.projectiles[i];
           if (i <= 3)
+          {
             mod.projectiles[0] = proj.Clone(GunData.New(
               sprite: $"steel_drum_{(i+1)}_proj", glowSensitivity: 2.0f, glowColor: Color.white, glowAmount: 10.0f, glowColorPower: 5.0f, useBetterEmissiveShader: true,
               speed: (i < 3) ? 30.0f : 16.0f));
+            if (i == 3)
+            {
+              mod.projectiles[0].collidesWithProjectiles = true;
+              mod.projectiles[0].gameObject.AddComponent<DrumProjectile>();
+            }
+          }
           else // everything after 3 uses drum projectiles
             mod.projectiles[0] = gun.Volley.projectiles[3].projectiles[0];
           if (i >= 3)
@@ -50,6 +57,47 @@ public class SteelDrum : CwaffGun
             mod.ammoCost = 0; // drum projectiles don't cost ammo
           }
         }
+    }
+
+    public override void OnMasteryStatusChanged()
+    {
+      base.OnMasteryStatusChanged();
+      this.canAttackWhileRolling = this.Mastered;
+    }
+
+    public override void OnSwitchedToThisGun()
+    {
+      base.OnSwitchedToThisGun();
+      this.canAttackWhileRolling = this.Mastered;
+    }
+
+    public class DrumProjectile : MonoBehaviour
+    {
+      internal bool _mastered = false;
+
+      private Projectile _projectile;
+      private SpeculativeRigidbody _body;
+
+      public void Master()
+      {
+        this._projectile = base.GetComponent<Projectile>();
+        this._body = base.gameObject.GetComponent<SpeculativeRigidbody>();
+        this._body.OnPreRigidbodyCollision += this.OnPreCollision;
+      }
+
+      private void OnPreCollision(SpeculativeRigidbody myRigidbody, PixelCollider myPixelCollider, SpeculativeRigidbody otherRigidbody, PixelCollider otherPixelCollider)
+      {
+        if (!otherRigidbody)
+          PhysicsEngine.SkipCollision = true;
+        else if (otherRigidbody.gameObject.GetComponent<Projectile>() is Projectile p && p.isActiveAndEnabled && p.m_owner is PlayerController)
+          PhysicsEngine.SkipCollision = true;
+      }
+
+      private void OnDestroy()
+      {
+        if (this._body)
+          this._body.OnPreRigidbodyCollision -= this.OnPreCollision;
+      }
     }
 
     private bool CanPlayNextNote(int part)
@@ -72,8 +120,6 @@ public class SteelDrum : CwaffGun
           if (!CanPlayNextNote(i))
             continue;
         }
-        // if (i == 2)
-        //   base.gameObject.Play(_TheOtherNotes[_TheSong[i][this._songPos[i]].note]);
         if (i >= 3)
           base.gameObject.Play(_DrumNotes[_TheSong[i][this._songPos[i]].note]);
         else
@@ -149,17 +195,22 @@ public class SteelDrum : CwaffGun
       PlayNextNote();
     }
 
+    public override void PostProcessProjectile(Projectile projectile)
+    {
+      base.PostProcessProjectile(projectile);
+      if (this.Mastered && projectile.gameObject.GetComponent<DrumProjectile>() is DrumProjectile dp)
+        dp.Master();
+    }
+
     private struct DrumNote
     {
       public float time;
       public int note;
-      public int layer;
 
-      public DrumNote(float time, int note, int layer = 0)
+      public DrumNote(float time, int note)
       {
         this.time = time;
         this.note = note;
-        this.layer = layer;
       }
     }
 
@@ -193,36 +244,6 @@ public class SteelDrum : CwaffGun
       "steel_drum_note_26_d6",
     ];
 
-    private static readonly List<string> _TheOtherNotes = [
-      "electric_guitar_0",
-      "electric_guitar_1",
-      "electric_guitar_2",
-      "electric_guitar_3",
-      "electric_guitar_4",
-      "electric_guitar_5",
-      "electric_guitar_6",
-      "electric_guitar_7",
-      "electric_guitar_8",
-      "electric_guitar_9",
-      "electric_guitar_10",
-      "electric_guitar_11",
-      "electric_guitar_12",
-      "electric_guitar_13",
-      "electric_guitar_14",
-      "electric_guitar_15",
-      "electric_guitar_16",
-      "electric_guitar_17",
-      "electric_guitar_18",
-      "electric_guitar_19",
-      "electric_guitar_20",
-      "electric_guitar_21",
-      "electric_guitar_22",
-      "electric_guitar_23",
-      "electric_guitar_24",
-      "electric_guitar_25",
-      "electric_guitar_26",
-    ];
-
     private static readonly List<string> _DrumNotes = [
       "sd_maracas",
       "sd_castanets",
@@ -230,36 +251,6 @@ public class SteelDrum : CwaffGun
       "sd_bongo_hi",
       "sd_conga_hi",
     ];
-
-    // private static readonly List<string> _TheOtherNotes = [
-    //   "electric_guitar_note_0_c3",
-    //   "electric_guitar_note_1_c3s",
-    //   "electric_guitar_note_2_d3",
-    //   "electric_guitar_note_3_d3s",
-    //   "electric_guitar_note_4_e3",
-    //   "electric_guitar_note_5_f3",
-    //   "electric_guitar_note_6_f3s",
-    //   "electric_guitar_note_7_g3",
-    //   "electric_guitar_note_8_g3s",
-    //   "electric_guitar_note_9_a3",
-    //   "electric_guitar_note_10_a3s",
-    //   "electric_guitar_note_11_b3",
-    //   "electric_guitar_note_12_c4",
-    //   "electric_guitar_note_13_c4s",
-    //   "electric_guitar_note_14_d4",
-    //   "electric_guitar_note_15_d4s",
-    //   "electric_guitar_note_16_e4",
-    //   "electric_guitar_note_17_f4",
-    //   "electric_guitar_note_18_f4s",
-    //   "electric_guitar_note_19_g4",
-    //   "electric_guitar_note_20_g4s",
-    //   "electric_guitar_note_21_a4",
-    //   "electric_guitar_note_22_a4s",
-    //   "electric_guitar_note_23_b4",
-    //   "electric_guitar_note_24_c5",
-    //   "electric_guitar_note_25_c5s",
-    //   "electric_guitar_note_26_d5",
-    // ];
 
     private static readonly List<DrumNote> _TheSongPart1 = [
       new(0.0f, 22 - 12),

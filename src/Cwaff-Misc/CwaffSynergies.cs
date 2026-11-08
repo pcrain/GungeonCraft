@@ -439,6 +439,8 @@ public static class CwaffSynergies
           tip: "While Yin and Yang are perfectly balanced, any damage the player takes is negated and increases Yang by 1 instead.");
         NewMastery<MasteryOfRubbleRouser>(MASTERY_RUBBLE_ROUSER, RubbleRouser.ItemName,
           tip: "Rubble on the ground will reanimate when an enemy is nearby and attempt to crush them.");
+        NewMastery<MasteryOfSteelDrum>(MASTERY_STEEL_DRUM, SteelDrum.ItemName,
+          tip: "Steel Drum can continue firing while dodge rolling, and percussive notes destroy enemy bullets.");
       #endregion
 
         SanityCheckAllSynergiesHaveBeenInitialized();
@@ -766,6 +768,7 @@ internal class MasteryOfVoidcaller           : MasteryDummyItem {}
 internal class MasteryOfAutumnsFury          : MasteryDummyItem {}
 internal class MasteryOfDaoitzer             : MasteryDummyItem {}
 internal class MasteryOfRubbleRouser         : MasteryDummyItem {}
+internal class MasteryOfSteelDrum            : MasteryDummyItem {}
 
 public enum Synergy {
     // Synergies
@@ -964,4 +967,5 @@ public enum Synergy {
     MASTERY_AUTUMNS_FURY,
     MASTERY_DAOITZER,
     MASTERY_RUBBLE_ROUSER,
+    MASTERY_STEEL_DRUM,
 };
