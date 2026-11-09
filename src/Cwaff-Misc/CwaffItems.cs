@@ -925,7 +925,7 @@ public abstract class CwaffGun: GunBehaviour, ICwaffItem, IGunInheritable/*, ILe
   {
       private static bool Prefix(Gun __instance, ProjectileModule mod)
       {
-          if (__instance.gameObject.GetComponent<CwaffGun>() is not CwaffGun cg || cg.manuallyHandleCooldown)
+          if (__instance.gameObject.GetComponent<CwaffGun>() is CwaffGun cg && cg.manuallyHandleCooldown)
             return false; // skip original method
           return true; // call the original method
       }

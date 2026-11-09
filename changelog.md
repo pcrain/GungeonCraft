@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.34.2 (2026-11-08)
+
+- Fixed accidentally giving every gun in the game infinite fire rate D:
+
 ## 1.34.1 (2026-11-08)
 
 - Fixed major memory leak caused by spawning excessive cooldown timer routines when firing Steel Drum
